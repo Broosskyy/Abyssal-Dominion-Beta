@@ -60,7 +60,15 @@ static func pack_config() -> Dictionary:
 
 static func actor_config(actor_name: String) -> Dictionary:
 	var actors: Dictionary = pack_config().get("actors", {})
-	var entry: Variant = actors.get(actor_name, {})
+	var slot := actor_name
+	# Extra patrols keep their gameplay identity, but reuse an audited source
+	# hull when the SeaBattles pack has no dedicated binding for their ID.
+	# Explicit pack overrides always win; other packs retain their own mapping.
+	if not actors.has(slot) and active_pack == "seabattles" and actor_name.begins_with("NPC_"):
+		var suffix := actor_name.trim_prefix("NPC_")
+		if suffix.is_valid_int() and suffix.to_int() >= 0:
+			slot = "NPC_%d" % posmod(suffix.to_int(), 5)
+	var entry: Variant = actors.get(slot, {})
 	return entry if entry is Dictionary else {}
 
 static func has_local_actor(actor_name: String) -> bool:

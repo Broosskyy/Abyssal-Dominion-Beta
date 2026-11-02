@@ -56,6 +56,7 @@ def main():
     output = args.output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     run_logged([args.godot, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.import.log'), env)
+    run_logged([args.godot, '--headless', '--path', str(ROOT), '--script', 'res://tests/m3051_complete_reference_fleet_smoke.gd'], output.with_suffix('.fleet-test.log'), env)
     run_logged([args.godot, '--headless', '--path', str(ROOT), '--export-debug', 'Android', str(output)], output.with_suffix('.export.log'), env)
     with zipfile.ZipFile(output) as z:
         if z.testzip():
