@@ -1,0 +1,50 @@
+[
+  {
+    "script": "tests/network/zone_simulation_test.gd",
+    "exit": 0,
+    "errors": [],
+    "summary": [
+      "{\"failed\":[],\"status\":\"PASS\",\"test\":\"zone_simulation\"}"
+    ]
+  },
+  {
+    "script": "tests/network/crossplay_e2e_test.gd",
+    "exit": 0,
+    "errors": [],
+    "summary": [
+      "{\"engine\":\"4.7.2-stable (official)\",\"failed\":[],\"scope\":\"Godot chart plus second real WebSocket client; local transport, not physical devices/browser exports\",\"status\":\"PASS\",\"test\":\"crossplay_e2e\"}"
+    ]
+  },
+  {
+    "script": "tests/m3042_live_hud_helm_smoke.gd",
+    "exit": 0,
+    "errors": [],
+    "summary": [
+      "{\"failed\":[],\"scope\":\"scene, chain ammo, atlas-frame stability, non-overlapping buttons, shipyard, helm\",\"status\":\"PASS\",\"version\":\"M304.2\"}"
+    ]
+  },
+  {
+    "script": "tests/m3044_ammo_shipyard_hud_smoke.gd",
+    "exit": 0,
+    "errors": [],
+    "summary": [
+      "{\"failed\":[],\"scope\":\"genuine illustrated shipyard, three ammo selectors, spendable gold restock, exclusive modal, responsive 690/844/1280 controls\",\"status\":\"PASS\",\"version\":\"M304.4\"}"
+    ]
+  },
+  {
+    "script": "tests/m3046_immediate_course_smoke.gd",
+    "exit": 0,
+    "errors": [],
+    "summary": [
+      "{\"failed\":[],\"scope\":\"reference sprites default, direct tap full-speed movement, immediate reverse, retained route planner, ship identity, UI\",\"status\":\"PASS\",\"version\":\"M304.6\"}"
+    ]
+  },
+  {
+    "script": "tests/m3049_user_art_zip_import_smoke.gd",
+    "exit": 0,
+    "errors": [],
+    "summary": [
+      "{\"failed\":[],\"scope\":\"Android ZIP picker, validated curatorial PNG imports, anti-traversal, no reset, HUD usability\",\"status\":\"PASS\",\"version\":\"M304.9\"}"
+    ]
+  }
+]

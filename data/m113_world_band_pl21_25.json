@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "milestone": "M113",
+  "region": "abyssal_frontier",
+  "grid": [
+    6,
+    6
+  ],
+  "maps": [
+    {
+      "level": 21,
+      "coordinate": [
+        1,
+        5
+      ],
+      "name": "Riftwater"
+    },
+    {
+      "level": 22,
+      "coordinate": [
+        2,
+        5
+      ],
+      "name": "Hexed Convoy Sea",
+      "port": "Riftwatch"
+    },
+    {
+      "level": 23,
+      "coordinate": [
+        3,
+        5
+      ],
+      "name": "Broken Sigil"
+    },
+    {
+      "level": 24,
+      "coordinate": [
+        4,
+        5
+      ],
+      "name": "Frontier Maw",
+      "port": "Frontier Refuge"
+    },
+    {
+      "level": 25,
+      "coordinate": [
+        5,
+        5
+      ],
+      "name": "Specialist's Trial",
+      "port": "Specialist Anchorage"
+    }
+  ],
+  "native_runtime_qa": false
+}

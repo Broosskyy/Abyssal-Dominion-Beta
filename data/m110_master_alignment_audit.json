@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "milestone": "M110",
+  "v3_7_found": false,
+  "grounded_sources": {
+    "pl11_15_identity": "Build/Admiral/Monster identity",
+    "pl15_trial": "Shield/Deck/Module/Support foundations",
+    "pl14_15_example": "regional quests + NPC/monster + Ship Mastery + elite/admiral + Hunter + regional chain -> PL15 trial",
+    "main_design_assets": "Main Progression Designs 04/05 have separate GLB production slots"
+  },
+  "implemented": [
+    "continuous map levels 11-15",
+    "Veil fleet slots",
+    "PL11-15 mastery XP",
+    "regional objective counters",
+    "Hunter counters",
+    "Admiral gates",
+    "PL15 Pirate Trial readiness/claim",
+    "PL11-15 HUD"
+  ],
+  "not_claimed": [
+    "final balance",
+    "real backend authority",
+    "final GLBs",
+    "native Godot runtime QA"
+  ],
+  "authority": {
+    "local_prototype": true,
+    "server_authoritative": false
+  }
+}

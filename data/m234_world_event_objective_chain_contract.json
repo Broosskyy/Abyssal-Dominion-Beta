@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "milestone": "M234",
+  "master_concept": "V3.8",
+  "feature": "multi_stage_world_event_objective_chain_and_completion_continuity",
+  "authority": {
+    "event_phase": "existing EventRuntime/local prototype or future server authority",
+    "objective_publication": "server/admin authoritative snapshot when connected",
+    "reward_publication": "server/admin authoritative; client presentation only",
+    "hud": "read_only presentation",
+    "client_reward_grants": false,
+    "client_phase_advancement": false
+  },
+  "objective_chain": {
+    "states": ["complete", "current", "locked"],
+    "flow": ["normal_phase", "admiral_escalation", "boss_finale", "event_complete", "normal_world_return"],
+    "uses_existing_phase_rows": true,
+    "uses_existing_world_nodes_only": true,
+    "creates_parallel_pathfinder": false
+  },
+  "online_ready": {
+    "snapshot_fields": ["event_id", "state", "phase", "objective_id", "objective_label", "progress", "target", "finale_ready", "event_complete", "reward_publication_state", "reward_summary"],
+    "server_time_and_publication_authority_required_for_liveops": true,
+    "client_may_publish_rewards": false
+  },
+  "completion": {
+    "event_complete_is_replicated_or_runtime_read_only": true,
+    "return_to_normal_world_removes_event_presentation_only": true,
+    "normal_world_navigation_persists": true
+  },
+  "unchanged": ["damage", "range", "reload", "collision", "navigation", "spawn authority", "reward values", "loot values", "M213/M214 camera", "round gameplay minimap", "rectangular full sea chart"]
+}

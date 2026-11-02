@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "milestone": "M48",
+  "pattern": "ad_<family>_<stable_id>_v###",
+  "examples": [
+    "ad_ship_ship_main_01_v001",
+    "ad_island_island_base_01_v001",
+    "ad_npc_npc_support_escort_v001"
+  ],
+  "rules": [
+    "stable_id must match production slot",
+    "no gameplay code final filenames",
+    "lowercase snake_case",
+    "version suffix belongs to file not stable id"
+  ]
+}

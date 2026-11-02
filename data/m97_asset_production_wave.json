@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "milestone": "M97",
+  "priority": "P0",
+  "master_first_13": [
+    "ship_small",
+    "ship_medium",
+    "ship_large",
+    "npc_friendly_coastal_sloop",
+    "npc_scout_01",
+    "npc_raider_01",
+    "npc_gunship_01",
+    "npc_heavy_01",
+    "harbor_havens_reach",
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "monster_early_01"
+  ],
+  "wired_this_milestone": [
+    "nature_island_cliff_bridge_01",
+    "nature_island_sharp_reef_01",
+    "prop_harbor_pirate_sign_01",
+    "prop_harbor_rope_gantry_01",
+    "prop_wreck_half_mast_01",
+    "npc_pirate_sail_patch_01",
+    "Halloween compact quest HUD",
+    "event marker labels",
+    "Admin category filter/clear previews",
+    "MobileLodController bootstrap/event integration"
+  ],
+  "prepared_next": [
+    "event_design_drowned_corsair_01",
+    "guild island tower damage-state visual set",
+    "PL2 guild island interaction icon family",
+    "additional long/thin/split island silhouettes",
+    "harbor pirate lantern/sign variants"
+  ],
+  "rule": "Do not increase world dressing counts merely because slots exist; replace within budgets. Master P0 first-13 remains final-art priority.",
+  "guild_island_early_wave": [
+    "guild_island_base_01",
+    "guild_harbor_dock_01",
+    "guild_hall_01",
+    "guild_warehouse_01",
+    "guild_repair_station_01",
+    "guild_tower_cannon_01",
+    "guild_tower_chain_01",
+    "guild_tower_mortar_01",
+    "guild_tower_guardian_01",
+    "guild_wall_straight_01",
+    "guild_wall_corner_01",
+    "guild_shield_node_01"
+  ],
+  "next_locked": "M94 Admin Mode + Halloween Event foundation/vertical slice"
+}

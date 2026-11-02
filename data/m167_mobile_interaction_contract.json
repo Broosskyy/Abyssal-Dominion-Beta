@@ -1,0 +1,220 @@
+{
+  "schema": 1,
+  "milestone": "M167",
+  "master_concept": "V3.8",
+  "profiles": {
+    "compact_phone": {
+      "edge_margin": 8,
+      "panel_margin": 8,
+      "touch_target": 52,
+      "tab_touch_target": 48,
+      "content_gap": 8,
+      "max_columns": 1,
+      "header_compact": true,
+      "persistent_close": true,
+      "prefer_short_labels": true,
+      "tooltip_mode": "tap",
+      "safe_area_required": true
+    },
+    "phone": {
+      "edge_margin": 12,
+      "panel_margin": 12,
+      "touch_target": 52,
+      "tab_touch_target": 48,
+      "content_gap": 10,
+      "max_columns": 1,
+      "header_compact": false,
+      "persistent_close": true,
+      "prefer_short_labels": false,
+      "tooltip_mode": "tap",
+      "safe_area_required": true
+    },
+    "tablet_desktop": {
+      "edge_margin": 18,
+      "panel_margin": 18,
+      "touch_target": 44,
+      "tab_touch_target": 42,
+      "content_gap": 12,
+      "max_columns": 2,
+      "header_compact": false,
+      "persistent_close": true,
+      "prefer_short_labels": false,
+      "tooltip_mode": "hover_tap",
+      "safe_area_required": false
+    }
+  },
+  "navigation": {
+    "tabs": [
+      "decks",
+      "special",
+      "cannons",
+      "ammo",
+      "crafting",
+      "talents",
+      "citadel",
+      "guild",
+      "buffs"
+    ],
+    "short_labels": {
+      "decks": "DECKS",
+      "special": "SPEZIAL",
+      "cannons": "KANONEN",
+      "ammo": "MUNITION",
+      "crafting": "WERKSTATT",
+      "talents": "TALENTE",
+      "citadel": "KASTELL",
+      "guild": "GILDE",
+      "buffs": "SEGEN"
+    },
+    "rules": [
+      "no horizontal page scrolling",
+      "selected tab remains visible",
+      "back/close always reachable",
+      "one primary action per row on compact phone",
+      "destructive or paid actions require explicit confirmation"
+    ]
+  },
+  "interaction_contracts": [
+    {
+      "id": "menu.open_close",
+      "scope": "all_modal_panels",
+      "must": [
+        "open",
+        "close",
+        "back",
+        "outside_block"
+      ],
+      "mobile": [
+        "safe_area",
+        "reachable_close",
+        "no dead overlay"
+      ]
+    },
+    {
+      "id": "progression.purchase",
+      "scope": "deck_special_cannon_talent_citadel",
+      "must": [
+        "show_cost",
+        "show_requirement",
+        "success_feedback",
+        "failure_feedback",
+        "save_after_authoritative_success"
+      ]
+    },
+    {
+      "id": "selection.equipment",
+      "scope": "ammo_harpoon_special_deck",
+      "must": [
+        "show_current",
+        "select",
+        "persist",
+        "restore",
+        "invalid_fallback"
+      ]
+    },
+    {
+      "id": "crafting.recipe",
+      "scope": "crafting",
+      "must": [
+        "inputs",
+        "station",
+        "cost",
+        "output",
+        "availability",
+        "result_feedback"
+      ],
+      "authority": "economy_mutation_server_ready"
+    },
+    {
+      "id": "guild.mutation",
+      "scope": "guild",
+      "must": [
+        "permission",
+        "authority",
+        "audit",
+        "confirmation"
+      ],
+      "authority": "server_only"
+    },
+    {
+      "id": "commerce.purchase",
+      "scope": "itemshop_payment",
+      "must": [
+        "price_source",
+        "offer_state",
+        "entitlement_authority",
+        "receipt_state"
+      ],
+      "authority": "server_payment_only"
+    },
+    {
+      "id": "staff.command",
+      "scope": "chat_admin",
+      "must": [
+        "rbac",
+        "server_authority",
+        "audit",
+        "risk_level",
+        "confirmation_for_critical"
+      ],
+      "authority": "server_only"
+    }
+  ],
+  "qa_matrix": [
+    {
+      "surface": "game_hud",
+      "sizes": [
+        "360x800",
+        "393x873",
+        "412x915",
+        "800x1280"
+      ],
+      "checks": [
+        "touch targets",
+        "safe area",
+        "combat readability",
+        "no overlap"
+      ]
+    },
+    {
+      "surface": "command_deck",
+      "sizes": [
+        "360x800",
+        "393x873",
+        "800x1280"
+      ],
+      "checks": [
+        "all tabs reachable",
+        "scroll works",
+        "close works",
+        "buttons not clipped"
+      ]
+    },
+    {
+      "surface": "progression_hub",
+      "sizes": [
+        "360x800",
+        "393x873",
+        "800x1280"
+      ],
+      "checks": [
+        "tab wrap",
+        "actions reachable",
+        "state refresh",
+        "no horizontal scroll"
+      ]
+    },
+    {
+      "surface": "shop",
+      "sizes": [
+        "360x800",
+        "393x873"
+      ],
+      "checks": [
+        "offer cards readable",
+        "currency visible",
+        "paid preview cannot grant locally"
+      ]
+    }
+  ]
+}

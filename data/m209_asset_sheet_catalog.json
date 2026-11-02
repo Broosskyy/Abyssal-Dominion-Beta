@@ -1,0 +1,322 @@
+{
+  "schema": 1,
+  "milestone": "M209",
+  "master_concept": "V3.8",
+  "purpose": "Authored 2D production catalog for batch generation and later atlas/slot import.",
+  "production_rule": {
+    "assets_per_generation_min": 5,
+    "assets_per_generation_max": 8,
+    "transparent_background": true,
+    "generous_spacing": true,
+    "no_overlap": true,
+    "same_camera_material_language_within_family": true,
+    "distinct_silhouette_before_recolor": true,
+    "source_px": "1024-1536 sheet or 512-1024 isolated master",
+    "small_size_checks_px": [
+      96,
+      64,
+      48
+    ]
+  },
+  "sheets": [
+    {
+      "sheet_id": "UI01",
+      "name": "Cannon Ammo I",
+      "count": 8,
+      "assets": [
+        "iron_shell",
+        "explosive_shell",
+        "chain_shot",
+        "piercing_shell",
+        "ember_shell",
+        "venom_shell",
+        "shatter_shell",
+        "spectral_shell"
+      ]
+    },
+    {
+      "sheet_id": "UI02",
+      "name": "Harpoons & Payloads",
+      "count": 6,
+      "assets": [
+        "hunter_standard",
+        "barbed_chain",
+        "abyss_piercer",
+        "tempered_harpoon",
+        "stormhook_harpoon",
+        "relic_harpoon"
+      ]
+    },
+    {
+      "sheet_id": "UI03",
+      "name": "Combat Items I",
+      "count": 8,
+      "assets": [
+        "emergency_planks",
+        "storm_sail",
+        "abyssal_veil",
+        "storm_bolt",
+        "infernal_barrel",
+        "crystal_barrier",
+        "armor_corrosive",
+        "repair_blocker"
+      ]
+    },
+    {
+      "sheet_id": "UI04",
+      "name": "Combat Items II",
+      "count": 8,
+      "assets": [
+        "leviathan_hook",
+        "recall_compass",
+        "gravewake_lantern",
+        "repair_crew",
+        "smoke_screen",
+        "war_banner",
+        "monster_bait",
+        "admiral_seal"
+      ]
+    },
+    {
+      "sheet_id": "UI05",
+      "name": "Cannons I",
+      "count": 7,
+      "assets": [
+        "light_culverin",
+        "naval_cannon",
+        "long_nine",
+        "storm_carronade",
+        "heavy_bombard",
+        "abyssal_repeater",
+        "sovereign_mortar"
+      ]
+    },
+    {
+      "sheet_id": "UI06",
+      "name": "Cannon Quality",
+      "count": 8,
+      "assets": [
+        "common_cannon_badge",
+        "uncommon_cannon_badge",
+        "rare_cannon_badge",
+        "epic_cannon_badge",
+        "legendary_cannon_badge",
+        "mastery_barrel",
+        "mastery_carriage",
+        "mastery_chamber"
+      ]
+    },
+    {
+      "sheet_id": "UI07",
+      "name": "Normal Decks I",
+      "count": 5,
+      "assets": [
+        "deck_level_1",
+        "deck_level_2",
+        "deck_level_3",
+        "deck_level_4",
+        "deck_level_5"
+      ]
+    },
+    {
+      "sheet_id": "UI08",
+      "name": "Normal Decks II",
+      "count": 5,
+      "assets": [
+        "deck_level_6",
+        "deck_level_7",
+        "deck_level_8",
+        "deck_level_9",
+        "deck_level_10"
+      ]
+    },
+    {
+      "sheet_id": "UI09",
+      "name": "Special Decks",
+      "count": 6,
+      "assets": [
+        "arcane_tide_deck",
+        "stormwake_deck",
+        "leviathan_deck",
+        "iron_bastion_deck",
+        "corsair_oath_deck",
+        "gravewake_deck"
+      ]
+    },
+    {
+      "sheet_id": "UI10",
+      "name": "Ship Equipment",
+      "count": 7,
+      "assets": [
+        "hull_armor",
+        "sails",
+        "crew",
+        "ram",
+        "ward",
+        "harpoon_mount",
+        "cannon_battery"
+      ]
+    },
+    {
+      "sheet_id": "UI11",
+      "name": "Core Materials",
+      "count": 8,
+      "assets": [
+        "wood",
+        "metal",
+        "components",
+        "stormglass",
+        "ember_ore",
+        "veil_silk",
+        "reinforced_timber",
+        "precision_gears"
+      ]
+    },
+    {
+      "sheet_id": "UI12",
+      "name": "Rare Materials",
+      "count": 8,
+      "assets": [
+        "admiral_component",
+        "abyss_scale",
+        "corrupted_pearl",
+        "ancient_guardian_fragment",
+        "legendary_fragment",
+        "ancient_relic_core",
+        "dominion_shard",
+        "sun_core_fragment"
+      ]
+    },
+    {
+      "sheet_id": "UI13",
+      "name": "Siege & Guild Materials",
+      "count": 8,
+      "assets": [
+        "guild_timber",
+        "guild_steel",
+        "guild_masonry",
+        "ward_resin",
+        "arcane_shard",
+        "siege_core",
+        "tower_parts",
+        "enchanted_rope"
+      ]
+    },
+    {
+      "sheet_id": "UI14",
+      "name": "Maps & Progression",
+      "count": 8,
+      "assets": [
+        "silver_chart_fragment",
+        "gold_chart_fragment",
+        "abyss_chart_fragment",
+        "gold_map_token",
+        "legendary_command_seal",
+        "dominion_crest",
+        "talent_compass",
+        "talent_chart"
+      ]
+    },
+    {
+      "sheet_id": "UI15",
+      "name": "HUD Combat",
+      "count": 8,
+      "assets": [
+        "attack",
+        "target_cycle",
+        "ammo_select",
+        "harpoon_attack",
+        "action_item",
+        "repair",
+        "recenter",
+        "combat_lock"
+      ]
+    },
+    {
+      "sheet_id": "UI16",
+      "name": "HUD Navigation",
+      "count": 8,
+      "assets": [
+        "map",
+        "inventory",
+        "shipyard",
+        "market",
+        "crafting",
+        "quests",
+        "settings",
+        "menu"
+      ]
+    },
+    {
+      "sheet_id": "UI17",
+      "name": "Menu System",
+      "count": 8,
+      "assets": [
+        "back",
+        "close",
+        "home",
+        "progress",
+        "harbor",
+        "fleet",
+        "rankings",
+        "help"
+      ]
+    },
+    {
+      "sheet_id": "UI18",
+      "name": "Status & Feedback",
+      "count": 8,
+      "assets": [
+        "health",
+        "armor",
+        "speed",
+        "range",
+        "reload",
+        "cooldown",
+        "selected_target",
+        "out_of_range"
+      ]
+    },
+    {
+      "sheet_id": "UI19",
+      "name": "Loot",
+      "count": 6,
+      "assets": [
+        "common_salvage",
+        "rare_chest",
+        "epic_relic",
+        "admiral_loot",
+        "repair_supply",
+        "currency_pickup"
+      ]
+    },
+    {
+      "sheet_id": "UI20",
+      "name": "Economy & Shop",
+      "count": 8,
+      "assets": [
+        "silver",
+        "pearls",
+        "premium_currency",
+        "buy",
+        "sell",
+        "upgrade",
+        "craft",
+        "locked"
+      ]
+    }
+  ],
+  "atlas_policy": {
+    "generation_sheet_is_not_runtime_atlas": true,
+    "cut_assets_individually_first": true,
+    "runtime_atlas_optional_after_qa": true,
+    "keep_individual_source_masters": true,
+    "padding_px_at_runtime_atlas": "8-16 depending on export scale",
+    "avoid_mip_bleed": true
+  },
+  "world_asset_policy": {
+    "ships_islands_monsters_not_packed_into_ui_atlas": true,
+    "concept_sheets_allowed": true,
+    "final_world_assets_individual": true
+  }
+}

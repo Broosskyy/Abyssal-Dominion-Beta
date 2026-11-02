@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "milestone": "M49",
+  "rules": {
+    "damage_orientation_independent": true,
+    "same_ship_controls": true,
+    "no_auto_chase_for_player": true
+  },
+  "regions": {
+    "stormreach": {
+      "roles": [
+        "storm_skirmisher",
+        "storm_guard",
+        "storm_hunter"
+      ],
+      "identity": "mobility, chain control, orbit pressure"
+    },
+    "ember_shoals": {
+      "roles": [
+        "ember_brawler",
+        "ember_bulwark",
+        "ember_artillery"
+      ],
+      "identity": "close pressure, explosive damage, armor"
+    },
+    "veil_sea": {
+      "roles": [
+        "veil_stalker",
+        "veil_marksman",
+        "veil_warden"
+      ],
+      "identity": "range, spectral/shatter pressure, evasive spacing"
+    }
+  }
+}

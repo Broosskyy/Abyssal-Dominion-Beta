@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "milestone": "M158",
+  "status": "OLDER_CONTENT_REPAIR_PLUS_NEW_DEPTH",
+  "repairs": [
+    {
+      "area": "PL6-50 encounters",
+      "problem": "generic fixed three-phase boss escalation",
+      "resolution": "band-specific phase profiles and identity catalog added"
+    },
+    {
+      "area": "cannon upgrades",
+      "problem": "M155 tiers were presentation/data only",
+      "resolution": "M158 runtime modifiers affect player cannon damage, reload and range"
+    },
+    {
+      "area": "bonus maps",
+      "problem": "expanded waves lacked explicit boss mechanic contracts",
+      "resolution": "four map-specific final-boss mechanic profiles added"
+    },
+    {
+      "area": "Halloween",
+      "problem": "shallow late event runway",
+      "resolution": "phase 4 plus additional quests/shop preview contracts added"
+    }
+  ],
+  "not_changed": [
+    "PL1-5 passive-until-attacked beginner behavior",
+    "server/economy authority boundaries",
+    "stable production slot ids"
+  ]
+}

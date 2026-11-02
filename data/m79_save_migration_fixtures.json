@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "milestone": "M79",
+  "status": "STATIC_FIXTURE_READY",
+  "cases": [
+    {
+      "id": "fresh_v2",
+      "beginner_version": 2,
+      "expect": "canonical PL2/PL3 rewards"
+    },
+    {
+      "id": "v1_stage1",
+      "beginner_version": 1,
+      "completed_trials": 1,
+      "expect": "legacy Clipper grandfathered"
+    },
+    {
+      "id": "v1_stage5",
+      "beginner_version": 1,
+      "completed_trials": 5,
+      "expect": "legacy Clipper+Chalupa retained"
+    },
+    {
+      "id": "pre_version_passed",
+      "trial_passed": true,
+      "expect": "one completion only; no fabricated canonical PL2 reward"
+    },
+    {
+      "id": "owned_ship_preservation",
+      "expect": "already-owned valid ships never removed"
+    }
+  ],
+  "game_state_order": [
+    "ship_roster",
+    "voyage"
+  ],
+  "server_audit_claimed": false
+}

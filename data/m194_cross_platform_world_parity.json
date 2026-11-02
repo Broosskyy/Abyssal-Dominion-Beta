@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "milestone": "M194",
+  "master_concept": "V3.8",
+  "status": "CROSS_PLATFORM_WORLD_PARITY_LOCKED",
+  "world_parity": {
+    "same_chart_dimensions": true,
+    "same_named_region_and_chart": true,
+    "same_islands_and_positions": true,
+    "same_collision_and_navigation": true,
+    "same_npc_monster_boss_spawns": true,
+    "same_poi_and_loot": true,
+    "same_events_and_quests": true,
+    "same_simulation_distance": true,
+    "same_gameplay_object_budgets": true,
+    "same_world_visual_content_budget": true
+  },
+  "platform_difference_allowed_only_for_ui": [
+    "responsive HUD scale",
+    "touch target size",
+    "safe-area padding",
+    "menu width and arrangement",
+    "font scaling",
+    "input affordance presentation"
+  ],
+  "forbidden_platform_differences": [
+    "island count",
+    "spawn count",
+    "monster count",
+    "world POIs",
+    "loot availability",
+    "routes",
+    "collision",
+    "combat rules",
+    "progression",
+    "map size"
+  ],
+  "canonical_world": {
+    "world_units": 360,
+    "islands_per_chart": 8,
+    "decorators_per_island": 8,
+    "simulation_distance": 110,
+    "max_npcs": 22,
+    "max_monsters": 4
+  },
+  "note": "Device class must never select gameplay/world content. UI may respond to viewport and input method."
+}

@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cmkq18ripraik"
+path="res://.godot/imported/desert_island_06_main.obj-70707d7d84491c67dca9b6f2294c2eed.mesh"
+
+[deps]
+
+files=["res://.godot/imported/desert_island_06_main.obj-70707d7d84491c67dca9b6f2294c2eed.mesh"]
+
+source_file="res://assets/recovered_test/m8/islands/desert_island_06_main.obj"
+dest_files=["res://.godot/imported/desert_island_06_main.obj-70707d7d84491c67dca9b6f2294c2eed.mesh", "res://.godot/imported/desert_island_06_main.obj-70707d7d84491c67dca9b6f2294c2eed.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

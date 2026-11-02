@@ -1,0 +1,10 @@
+{
+  "milestone":"M154",
+  "status":"GAMEPLAY_CONTENT_POLISH",
+  "progression":{"existing_map_levels":"1-50 retained","extension_policy":"future 51+ bands remain data-driven; do not fabricate final balance before content/world bands exist","bonusmaps":["silver","gold","abyss","legendary"]},
+  "combat":{"cannon_roles":["rapid","balanced","marksman","brawler","siege","sustained","endgame_siege"],"ammo_count":9,"principle":"cannons differ by tactical role, not recolor-only stats"},
+  "loot":{"native_placeholder_archetypes":["coin_cache","salvage_bundle","tier_chest","admiral_vault","repair_crate"],"replacement_ready":true},
+  "halloween":{"retain_existing_runtime":true,"polish_targets":["portal","wreck","fleet","boss","guild_deco","reward visuals"],"authority":"event runtime/data; no hard-coded live schedule"},
+  "admin":{"retain_unified_admin":true,"content_types":"data-driven","publish":"RBAC + validation + transport authority"},
+  "mobile":{"touch_targets":">=52 logical px for primary panel actions","scrollable_panels":true,"no desktop-only progression path":true}
+}

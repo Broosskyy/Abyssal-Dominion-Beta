@@ -1,0 +1,16 @@
+{
+  "milestone": "M299",
+  "master_concept": "V3.8",
+  "scene": "res://scenes/qa/m299_ship_animation_visual_qa.tscn",
+  "scope": "LOCAL_DEVELOPMENT_3D_VISUAL_LAB_ONLY",
+  "slots": ["ship_small", "ship_medium", "ship_large", "npc_friendly_coastal_sloop", "npc_scout_01", "npc_raider_01", "npc_gunship_01", "npc_heavy_01"],
+  "scenarios": ["IDLE", "CRUISE", "TURN PORT", "TURN STARBOARD", "SHIELD HIT", "HULL HIT", "STAGGER", "FLOODING", "BREAKUP", "SUBMERGED", "CLEANUP PENDING", "RESET"],
+  "qa_only_input": "Local explicit scene-tagged presentation preview; never a SERVER-sourced event or a combat receipt.",
+  "gates": ["LOCAL_DEVELOPMENT only", "server_authority_verified must be false", "m299_animation_qa scene tag", "no active server presentation mode"],
+  "ship_rule": "one complete individual GLB per starter and early NPC ship; visual overlays external",
+  "master_hud": "gameplay HUD unchanged; scene UI exists only in isolated QA lab",
+  "controls": "Tap-to-Sail unchanged; lower-left joystick remains camera-only in actual gameplay",
+  "authority": "NONE",
+  "release_approved": false,
+  "native_qa": "NOT_EVALUATED"
+}

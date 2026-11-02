@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "milestone": "M266",
+  "master_concept": "V3.8",
+  "system": "ECONOMY_INVENTORY_TRANSACTION_LAYER",
+  "status": "ATOMIC_IDEMPOTENT_SERVER_TRANSACTION_BOUNDARY",
+  "principles": {
+    "wallet_and_inventory_truth_server_authoritative": true,
+    "all_value_movement_atomic": true,
+    "idempotency_required": true,
+    "expected_revision_required": true,
+    "transaction_locks_server_owned": true,
+    "server_receipt_is_commit_evidence": true,
+    "client_success_is_not_commit_evidence": true,
+    "test_global_isolated": true,
+    "missing_backend_fails_closed": true
+  },
+  "transaction_domains": [
+    "wallet",
+    "inventory",
+    "loot_rewards",
+    "shop_purchase",
+    "shop_sale",
+    "crafting",
+    "salvage",
+    "bazaar",
+    "equipment_mutation",
+    "mail_claim",
+    "event_reward",
+    "compensation"
+  ],
+  "transaction_envelope": {
+    "required_fields": [
+      "request_id",
+      "transaction_id",
+      "idempotency_key",
+      "environment",
+      "account_id",
+      "captain_id",
+      "expected_revision",
+      "domain",
+      "operation"
+    ],
+    "states": [
+      "REQUESTED",
+      "VALIDATING",
+      "LOCKED",
+      "COMMITTED",
+      "ABORTED",
+      "CONFLICT",
+      "REJECTED"
+    ],
+    "commit_requires_server_receipt": true,
+    "duplicate_idempotency_key_replays_same_result": true,
+    "partial_value_movement_allowed": false
+  },
+  "integrity": {
+    "wallet_debit_credit_same_transaction": true,
+    "inventory_input_output_same_transaction": true,
+    "ownership_lock_before_transfer": true,
+    "capacity_preflight_before_commit": true,
+    "equipped_or_bound_constraints_checked_server_side": true,
+    "reward_claim_idempotent": true,
+    "bazaar_escrow_server_owned": true,
+    "rollback_on_failed_commit": true
+  },
+  "safety": {
+    "client_can_commit_transaction": false,
+    "client_can_set_wallet_balance": false,
+    "client_can_create_inventory_instance": false,
+    "client_can_destroy_inventory_instance": false,
+    "client_can_settle_loot_reward": false,
+    "client_can_settle_shop_trade": false,
+    "client_can_settle_crafting_salvage": false,
+    "client_can_settle_bazaar_transfer": false,
+    "client_can_unlock_transaction_lock": false,
+    "client_can_generate_server_receipt": false,
+    "client_can_override_revision_conflict": false,
+    "client_can_transfer_test_value_to_global": false
+  },
+  "configuration": {
+    "transaction_timeout_ms": null,
+    "lock_ttl_seconds": null,
+    "retry_count": null,
+    "wallet_limits": null,
+    "inventory_capacity": null,
+    "max_batch_operations": null
+  },
+  "ui": {
+    "existing_system_page_only": true,
+    "no_new_main_page": true,
+    "no_permanent_gameplay_transaction_hud": true,
+    "responsive_compact_cards": true
+  },
+  "production_gap": [
+    "production atomic transaction service",
+    "durable wallet/economy ledger",
+    "durable inventory/ownership mutation repository",
+    "server-side loot/shop/crafting/salvage settlement",
+    "bazaar escrow and transfer backend",
+    "distributed transaction/lock conflict handling",
+    "native concurrency/double-spend/dupe QA"
+  ]
+}

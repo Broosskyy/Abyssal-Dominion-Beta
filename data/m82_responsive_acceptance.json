@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "milestone": "M82",
+  "title": "Cross-platform Responsive Acceptance",
+  "targets": [
+    {
+      "id": "android_compact",
+      "viewport": [
+        960,
+        540
+      ],
+      "input": "touch",
+      "required": "56+ touch targets, no HUD overlap, tap/drag sail"
+    },
+    {
+      "id": "android_wide",
+      "viewport": [
+        1560,
+        720
+      ],
+      "input": "touch",
+      "required": "large combat controls, readable target/objective"
+    },
+    {
+      "id": "ios_landscape",
+      "viewport": [
+        2556,
+        1179
+      ],
+      "input": "touch",
+      "required": "safe-area aware, density-scaled HUD"
+    },
+    {
+      "id": "desktop_1080p",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "input": "mouse_keyboard",
+      "required": "denser nav, quick ammo visible, readable 1080p baseline"
+    },
+    {
+      "id": "desktop_1440p",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "input": "mouse_keyboard",
+      "required": "modest UI scale-up, no tiny HUD"
+    },
+    {
+      "id": "desktop_4k",
+      "viewport": [
+        3840,
+        2160
+      ],
+      "input": "mouse_keyboard",
+      "required": "bounded scale, world view preserved"
+    },
+    {
+      "id": "desktop_gamepad",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "input": "gamepad",
+      "required": "same gameplay intent vocabulary; presentation profile may differ later"
+    }
+  ],
+  "crossplay_rules": [
+    "gameplay values identical across device classes",
+    "only presentation/input translation changes by platform",
+    "future online authority remains server-side"
+  ],
+  "native_required": true
+}

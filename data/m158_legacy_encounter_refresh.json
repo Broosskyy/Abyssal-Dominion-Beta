@@ -1,0 +1,276 @@
+{
+  "schema": 1,
+  "milestone": "M158",
+  "authority": "LOCAL_PROTOTYPE_DATA",
+  "purpose": "Refresh older PL6-50 combat identity without replacing stable production slots or progression authority.",
+  "bands": [
+    {
+      "min_level": 6,
+      "max_level": 10,
+      "id": "shoal_raiders",
+      "identity": "fast coastal skirmish",
+      "roles": [
+        "skirmisher",
+        "guard",
+        "hunter"
+      ],
+      "boss_titles": [
+        "Reef Captain",
+        "Shoal Reaver"
+      ],
+      "phase_profile": "mobile_pressure",
+      "loot_profile": "coastal_salvage"
+    },
+    {
+      "min_level": 11,
+      "max_level": 15,
+      "id": "crimson_privateers",
+      "identity": "burst and pursuit",
+      "roles": [
+        "crimson_skirmisher",
+        "crimson_guard",
+        "crimson_hunter"
+      ],
+      "boss_titles": [
+        "Crimson Commodore",
+        "Redwake Admiral"
+      ],
+      "phase_profile": "burst_command",
+      "loot_profile": "privateer_cache"
+    },
+    {
+      "min_level": 16,
+      "max_level": 20,
+      "id": "drowned_hunters",
+      "identity": "control, curses and monster pressure",
+      "roles": [
+        "drowned_raider",
+        "drowned_bulwark",
+        "wraith_scout"
+      ],
+      "boss_titles": [
+        "Drowned Warden",
+        "Lantern Admiral"
+      ],
+      "phase_profile": "curse_pressure",
+      "loot_profile": "drowned_relics"
+    },
+    {
+      "min_level": 21,
+      "max_level": 25,
+      "id": "stormreach_fleet",
+      "identity": "range control and chain pressure",
+      "roles": [
+        "storm_skirmisher",
+        "storm_guard",
+        "storm_hunter"
+      ],
+      "boss_titles": [
+        "Storm Marshal",
+        "Thunder Admiral"
+      ],
+      "phase_profile": "range_control",
+      "loot_profile": "storm_salvage"
+    },
+    {
+      "min_level": 26,
+      "max_level": 30,
+      "id": "ember_shoals",
+      "identity": "fire damage and close siege",
+      "roles": [
+        "ember_brawler",
+        "ember_bulwark",
+        "ember_artillery"
+      ],
+      "boss_titles": [
+        "Ember Commodore",
+        "Cinder Admiral"
+      ],
+      "phase_profile": "burn_siege",
+      "loot_profile": "ember_forge"
+    },
+    {
+      "min_level": 31,
+      "max_level": 35,
+      "id": "cursed_dominion",
+      "identity": "status pressure and monster hunts",
+      "roles": [
+        "cursed_raider",
+        "cursed_marksman",
+        "cursed_hunter"
+      ],
+      "boss_titles": [
+        "Cursed High Captain",
+        "Relic Tyrant"
+      ],
+      "phase_profile": "status_rotation",
+      "loot_profile": "cursed_relics"
+    },
+    {
+      "min_level": 36,
+      "max_level": 40,
+      "id": "void_sea",
+      "identity": "armor break and long-range pressure",
+      "roles": [
+        "void_raider",
+        "void_guard",
+        "void_hunter"
+      ],
+      "boss_titles": [
+        "Void Admiral",
+        "Blackglass Sovereign"
+      ],
+      "phase_profile": "void_escalation",
+      "loot_profile": "void_relics"
+    },
+    {
+      "min_level": 41,
+      "max_level": 45,
+      "id": "sovereign_waters",
+      "identity": "formation combat and escorts",
+      "roles": [
+        "sovereign_raider",
+        "sovereign_guard",
+        "banner_hunter"
+      ],
+      "boss_titles": [
+        "Sovereign High Admiral",
+        "Banner Sovereign"
+      ],
+      "phase_profile": "formation_command",
+      "loot_profile": "sovereign_vault"
+    },
+    {
+      "min_level": 46,
+      "max_level": 50,
+      "id": "abyssal_dominion",
+      "identity": "endgame mix of siege, hunters and guardians",
+      "roles": [
+        "dominion_raider",
+        "legendary_guard",
+        "rift_hunter"
+      ],
+      "boss_titles": [
+        "Abyssal High Admiral",
+        "Dominion Crown Admiral"
+      ],
+      "phase_profile": "dominion_command",
+      "loot_profile": "dominion_vault"
+    }
+  ],
+  "phase_profiles": {
+    "mobile_pressure": {
+      "2": {
+        "reload_mult": 0.9,
+        "speed_mult": 1.08,
+        "damage_mult": 1.0
+      },
+      "3": {
+        "reload_mult": 0.8,
+        "speed_mult": 1.16,
+        "damage_mult": 1.08
+      }
+    },
+    "burst_command": {
+      "2": {
+        "reload_mult": 0.88,
+        "speed_mult": 1.06,
+        "damage_mult": 1.05
+      },
+      "3": {
+        "reload_mult": 0.76,
+        "speed_mult": 1.12,
+        "damage_mult": 1.12
+      }
+    },
+    "curse_pressure": {
+      "2": {
+        "reload_mult": 0.9,
+        "speed_mult": 1.04,
+        "damage_mult": 1.06
+      },
+      "3": {
+        "reload_mult": 0.8,
+        "speed_mult": 1.1,
+        "damage_mult": 1.14
+      }
+    },
+    "range_control": {
+      "2": {
+        "reload_mult": 0.92,
+        "speed_mult": 1.02,
+        "damage_mult": 1.05
+      },
+      "3": {
+        "reload_mult": 0.82,
+        "speed_mult": 1.06,
+        "damage_mult": 1.13
+      }
+    },
+    "burn_siege": {
+      "2": {
+        "reload_mult": 0.94,
+        "speed_mult": 1.0,
+        "damage_mult": 1.08
+      },
+      "3": {
+        "reload_mult": 0.84,
+        "speed_mult": 1.04,
+        "damage_mult": 1.18
+      }
+    },
+    "status_rotation": {
+      "2": {
+        "reload_mult": 0.89,
+        "speed_mult": 1.05,
+        "damage_mult": 1.06
+      },
+      "3": {
+        "reload_mult": 0.79,
+        "speed_mult": 1.1,
+        "damage_mult": 1.15
+      }
+    },
+    "void_escalation": {
+      "2": {
+        "reload_mult": 0.9,
+        "speed_mult": 1.03,
+        "damage_mult": 1.08
+      },
+      "3": {
+        "reload_mult": 0.78,
+        "speed_mult": 1.08,
+        "damage_mult": 1.17
+      }
+    },
+    "formation_command": {
+      "2": {
+        "reload_mult": 0.91,
+        "speed_mult": 1.02,
+        "damage_mult": 1.07
+      },
+      "3": {
+        "reload_mult": 0.8,
+        "speed_mult": 1.06,
+        "damage_mult": 1.16
+      }
+    },
+    "dominion_command": {
+      "2": {
+        "reload_mult": 0.88,
+        "speed_mult": 1.04,
+        "damage_mult": 1.09
+      },
+      "3": {
+        "reload_mult": 0.74,
+        "speed_mult": 1.1,
+        "damage_mult": 1.2
+      }
+    }
+  },
+  "rules": [
+    "PL1-5 beginner neutrality remains unchanged",
+    "stable slot ids remain authoritative",
+    "phase profiles tune existing boss runtime rather than adding a parallel combat loop"
+  ]
+}

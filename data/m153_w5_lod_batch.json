@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "milestone": "M153",
+  "wave": "W5",
+  "range": [51, 60],
+  "state": "CLEAN_ROOM_GLB_PLACEHOLDER_BATCH_READY_NOT_FINAL_ART",
+  "purpose": "Ten distinct, replaceable late-fleet models with explicit LOD and socket contracts.",
+  "lod_contract": {
+    "LOD0": "desktop hero / shipyard inspection",
+    "LOD1": "desktop sea map / mobile hero",
+    "LOD2": "mobile and Web preview sea map"
+  },
+  "socket_contract": [
+    "WeaponPort_P0", "WeaponPort_P1", "WeaponPort_S0", "WeaponPort_S1",
+    "BowWeaponSocket", "MastSocket_0", "MastSocket_1", "SailSocket_0",
+    "WakeAnchor", "NameplateAnchor"
+  ],
+  "ships": [
+    {"id":"ship_main_51","class_number":51,"name":"Needle Runner","family":"dread_cutter","identity":"extreme long spear prow and low racing stern"},
+    {"id":"ship_main_52","class_number":52,"name":"Hook Cutter","family":"dread_cutter","identity":"forked hook bow and offset rear sail"},
+    {"id":"ship_main_53","class_number":53,"name":"Blade Sloop","family":"dread_cutter","identity":"asymmetric port blade and tall foremast"},
+    {"id":"ship_main_54","class_number":54,"name":"Outrider Cutter","family":"dread_cutter","identity":"wide stabilizer outriggers and central chase deck"},
+    {"id":"ship_main_55","class_number":55,"name":"Phantom Crescent","family":"dread_cutter","identity":"open crescent prow and split mast crown"},
+    {"id":"ship_main_56","class_number":56,"name":"Iron Galleass","family":"iron_galleass","identity":"wide oared hull and armored side ribs"},
+    {"id":"ship_main_57","class_number":57,"name":"Tower Galleass","family":"iron_galleass","identity":"high stern tower and compact bow battery"},
+    {"id":"ship_main_58","class_number":58,"name":"Ram Galleass","family":"iron_galleass","identity":"massive wedge ram and low dense broadside"},
+    {"id":"ship_main_59","class_number":59,"name":"Siege Barge","family":"iron_galleass","identity":"broad mortar terrace and shortened mast line"},
+    {"id":"ship_main_60","class_number":60,"name":"Royal Galleass","family":"iron_galleass","identity":"double gallery, crown spine and four-point sail rhythm"}
+  ],
+  "path_pattern": "res://assets/production_placeholders/late_fleet/w5/{id}.glb",
+  "lod1_pattern": "res://assets/production_placeholders/late_fleet/w5/{id}_lod1.glb",
+  "lod2_pattern": "res://assets/production_placeholders/late_fleet/w5/{id}_lod2.glb",
+  "rules": [
+    "Every class uses distinct geometry and is not a recolor-only duplicate.",
+    "All generated GLBs are clean-room visual placeholders and never final art.",
+    "Collision, stats, movement, unlocks and damage remain outside the GLB.",
+    "Wake, foam, smoke, trails, impacts, light and magic remain Godot runtime effects.",
+    "Replacement keeps stable file paths and socket names."
+  ]
+}

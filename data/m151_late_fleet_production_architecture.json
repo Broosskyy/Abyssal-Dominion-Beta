@@ -1,0 +1,37 @@
+{
+  "schema_version":1,
+  "milestone":"M151",
+  "master":"V3.7_CURRENT_BINDING_SHIP_DIRECTION",
+  "purpose":"Addressable replacement architecture and honest runtime silhouettes for regular classes 51-100 and Prestige P1-P5.",
+  "regular":{"range":[51,100],"count":50,"mastery_levels_per_design":10,"id_pattern":"ship_main_%02d","slot_pattern":"SHIP-PROG-%03d"},
+  "waves":[
+    {"id":"W5","range":[51,60],"root":"res://assets/production_placeholders/late_fleet/w5/","state":"DISTINCT_GLB_SLOTS_RESERVED"},
+    {"id":"W6","range":[61,70],"root":"res://assets/production_placeholders/late_fleet/w6/","state":"DISTINCT_GLB_SLOTS_RESERVED"},
+    {"id":"W7","range":[71,80],"root":"res://assets/production_placeholders/late_fleet/w7/","state":"DISTINCT_GLB_SLOTS_RESERVED"},
+    {"id":"W8","range":[81,90],"root":"res://assets/production_placeholders/late_fleet/w8/","state":"DISTINCT_GLB_SLOTS_RESERVED"},
+    {"id":"W9","range":[91,100],"root":"res://assets/production_placeholders/late_fleet/w9/","state":"DISTINCT_GLB_SLOTS_RESERVED"}
+  ],
+  "families":[
+    {"id":"dread_cutter","range":[51,55],"role":"speed_hunter","hull":"needle cutter","bow":"long knife","stern":"low counter","masts":2,"sail_layout":"split lateen","weapon_layout":"forward chase + light broadside","special":"asymmetric prow blade","recipe":{"length":5.8,"width":1.55,"height":0.72,"deck_count":1,"bow_taper":0.78,"mast_spacing":1.9}},
+    {"id":"iron_galleass","range":[56,60],"role":"armored_broadside","hull":"wide oared galleass","bow":"ram beak","stern":"raised square gallery","masts":3,"sail_layout":"square-lateen hybrid","weapon_layout":"dense low broadside","special":"visible armored ribs","recipe":{"length":6.4,"width":2.35,"height":1.05,"deck_count":2,"bow_taper":0.46,"mast_spacing":1.7}},
+    {"id":"bone_brigantine","range":[61,65],"role":"raider_control","hull":"lean brigantine","bow":"forked bone prow","stern":"open raider deck","masts":2,"sail_layout":"torn square stacks","weapon_layout":"swivel clusters + broadside","special":"rib-cage outriggers","recipe":{"length":6.1,"width":1.78,"height":0.88,"deck_count":1,"bow_taper":0.68,"mast_spacing":2.15}},
+    {"id":"coral_rammer","range":[66,70],"role":"close_siege","hull":"short heavy rammer","bow":"massive coral wedge","stern":"rounded armored stern","masts":1,"sail_layout":"single oversized fan sail","weapon_layout":"bow battery + mortar","special":"coral shoulder masses","recipe":{"length":5.5,"width":2.55,"height":1.15,"deck_count":2,"bow_taper":0.30,"mast_spacing":1.0}},
+    {"id":"chain_frigate","range":[71,75],"role":"tactical_support","hull":"long modular frigate","bow":"hooked clipper","stern":"split gallery","masts":3,"sail_layout":"narrow high squares","weapon_layout":"spaced heavy broadside","special":"chain bridges and side cranes","recipe":{"length":7.0,"width":1.92,"height":1.02,"deck_count":2,"bow_taper":0.72,"mast_spacing":2.0}},
+    {"id":"abyss_catamaran","range":[76,80],"role":"fast_artillery","hull":"twin hull catamaran","bow":"paired spear bows","stern":"open twin tails","masts":2,"sail_layout":"offset crescent sails","weapon_layout":"central spinal cannon","special":"void gap between hulls","recipe":{"length":6.8,"width":3.05,"height":0.76,"deck_count":1,"bow_taper":0.82,"mast_spacing":2.35}},
+    {"id":"cathedral_battleship","range":[81,85],"role":"fortress","hull":"towering multi-deck battleship","bow":"chapel prow","stern":"vertical cathedral gallery","masts":4,"sail_layout":"tiered square walls","weapon_layout":"three-deck broadside","special":"central spire silhouette","recipe":{"length":7.4,"width":2.62,"height":1.62,"deck_count":3,"bow_taper":0.42,"mast_spacing":1.55}},
+    {"id":"leviathan_hybrid","range":[86,90],"role":"monster_hunter","hull":"organic armored cruiser","bow":"jaw prow","stern":"fin tail","masts":2,"sail_layout":"membrane fins","weapon_layout":"harpoon wings + dorsal guns","special":"non-symmetrical living plates","recipe":{"length":7.2,"width":2.48,"height":1.24,"deck_count":2,"bow_taper":0.55,"mast_spacing":2.45}},
+    {"id":"void_ark","range":[91,95],"role":"abyss_control","hull":"deep crescent ark","bow":"hollow crescent","stern":"floating ring gallery","masts":3,"sail_layout":"detached shard sails","weapon_layout":"void emitters + sparse cannons","special":"negative-space central aperture","recipe":{"length":7.8,"width":2.85,"height":1.38,"deck_count":2,"bow_taper":0.38,"mast_spacing":2.1}},
+    {"id":"dominion_sovereign","range":[96,100],"role":"endgame_command","hull":"royal asymmetric dreadnought","bow":"crowned spear","stern":"wide throne gallery","masts":5,"sail_layout":"layered crown sails","weapon_layout":"mixed heavy batteries + command core","special":"dominant crown spine","recipe":{"length":8.4,"width":2.75,"height":1.72,"deck_count":3,"bow_taper":0.62,"mast_spacing":1.45}}
+  ],
+  "prestige":{"count":5,"root":"res://assets/production_placeholders/late_fleet/prestige/","classes":[
+    {"id":"prestige_p1","rank":"P1","name":"Abyss Vanguard","family":"prestige_spear","role":"precision_command","recipe":{"length":8.6,"width":2.45,"height":1.45,"deck_count":2,"masts":3,"twin_hull":false,"special":"floating spear halo"}},
+    {"id":"prestige_p2","rank":"P2","name":"Tidebreaker Crown","family":"prestige_crown","role":"siege_command","recipe":{"length":8.1,"width":3.25,"height":1.85,"deck_count":3,"masts":4,"twin_hull":false,"special":"crown-shaped artillery terraces"}},
+    {"id":"prestige_p3","rank":"P3","name":"Leviathan Throne","family":"prestige_leviathan","role":"hunter_command","recipe":{"length":9.0,"width":3.05,"height":1.70,"deck_count":2,"masts":2,"twin_hull":false,"special":"living jaw and dorsal citadel"}},
+    {"id":"prestige_p4","rank":"P4","name":"Void Imperator","family":"prestige_void","role":"control_command","recipe":{"length":9.3,"width":3.35,"height":1.95,"deck_count":3,"masts":3,"twin_hull":true,"special":"large central void aperture"}},
+    {"id":"prestige_p5","rank":"P5","name":"Dominion Ascendant","family":"prestige_ascendant","role":"ultimate_command","recipe":{"length":10.0,"width":3.6,"height":2.2,"deck_count":4,"masts":5,"twin_hull":false,"special":"asymmetric throne-spire silhouette"}}
+  ]},
+  "runtime_fallback":{"type":"GODOT_NATIVE_VISUAL_ONLY","classification":"M151_PROCEDURAL_SILHOUETTE_FALLBACK","counts_as_final_glb":false,"collision_authority":false,"gameplay_authority":false},
+  "qa_scene":"res://scenes/qa/m151_late_fleet_silhouette_qa.tscn",
+  "admin":{"content_type":"ship","editable_fields":["name","role","mastery_levels","asset_slot","lod0_path","lod1_path","lod2_path","silhouette_profile","production_priority","reference_status","import_status","enabled"],"publish_requires":["RBAC","MFA","validation","review","approval","audit","server_authority"],"global_locked":true},
+  "rules":["Prestige P1-P5 is separate from regular classes 1-100.","Every final GLB must be a genuinely distinct authored silhouette; recolor-only replacements fail acceptance.","Runtime fallback never claims final asset completion.","Hull, weapon sockets, sail/mast animation and runtime VFX are separate layers.","Wake, foam, smoke, trails, impacts, light and magic are never baked into ship GLBs.","Visuals never own collision, damage, movement, unlock, reward or server authority.","Acceptance uses the oblique mobile sea-map camera and desktop hero inspection."]
+}

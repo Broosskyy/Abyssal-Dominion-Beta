@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "milestone": "M87",
+  "title": "Shattered Shores P0 Island Composition Profiles",
+  "rules": {
+    "gameplay_collision_independent": true,
+    "water_not_in_glb": true,
+    "mobile_oblique_silhouette_primary": true,
+    "missing_final_asset_uses_procedural_fallback": true,
+    "m87_silhouette_metadata_visual_only": true
+  },
+  "profiles": {
+    "tropical_small": {
+      "slot": "island_tropical_small",
+      "aspect": [
+        1.15,
+        0.78
+      ],
+      "lobes": [
+        [
+          -0.22,
+          0.1,
+          0.58
+        ],
+        [
+          0.28,
+          -0.12,
+          0.42
+        ]
+      ],
+      "height": 0.72,
+      "prop_density": 0.62,
+      "yaw": -12,
+      "silhouette": "asymmetric_low",
+      "coast_feature": "small_beach_notch"
+    },
+    "tropical_medium": {
+      "slot": "island_tropical_medium",
+      "aspect": [
+        1.42,
+        0.92
+      ],
+      "lobes": [
+        [
+          -0.32,
+          0.02,
+          0.68
+        ],
+        [
+          0.18,
+          0.16,
+          0.62
+        ],
+        [
+          0.42,
+          -0.22,
+          0.38
+        ]
+      ],
+      "height": 0.88,
+      "prop_density": 0.86,
+      "yaw": 18,
+      "silhouette": "broken_oval",
+      "coast_feature": "double_headland"
+    },
+    "long_shoal": {
+      "slot": "island_tropical_medium",
+      "aspect": [
+        2.15,
+        0.62
+      ],
+      "lobes": [
+        [
+          -0.42,
+          0.03,
+          0.58
+        ],
+        [
+          0.02,
+          -0.08,
+          0.52
+        ],
+        [
+          0.43,
+          0.08,
+          0.48
+        ]
+      ],
+      "height": 0.62,
+      "prop_density": 0.58,
+      "yaw": 31,
+      "silhouette": "long_irregular",
+      "coast_feature": "shoal_tail"
+    },
+    "thin_spit": {
+      "slot": "island_tropical_small",
+      "aspect": [
+        2.55,
+        0.46
+      ],
+      "lobes": [
+        [
+          -0.38,
+          0.04,
+          0.52
+        ],
+        [
+          0.12,
+          -0.05,
+          0.44
+        ],
+        [
+          0.46,
+          0.03,
+          0.32
+        ]
+      ],
+      "height": 0.48,
+      "prop_density": 0.38,
+      "yaw": -27,
+      "silhouette": "thin_hook",
+      "coast_feature": "sand_spit"
+    },
+    "cliff_cove": {
+      "slot": "island_cliff_cove",
+      "aspect": [
+        1.72,
+        0.88
+      ],
+      "lobes": [
+        [
+          -0.32,
+          -0.08,
+          0.72
+        ],
+        [
+          0.3,
+          -0.16,
+          0.66
+        ],
+        [
+          -0.04,
+          0.3,
+          0.44
+        ]
+      ],
+      "height": 1.35,
+      "prop_density": 0.52,
+      "yaw": 12,
+      "silhouette": "cliff_crescent",
+      "coast_feature": "deep_cove_visual"
+    },
+    "rocky_islet": {
+      "slot": "island_cliff_cove",
+      "aspect": [
+        0.82,
+        1.12
+      ],
+      "lobes": [
+        [
+          0,
+          0,
+          0.72
+        ],
+        [
+          0.18,
+          0.22,
+          0.34
+        ]
+      ],
+      "height": 1.18,
+      "prop_density": 0.2,
+      "yaw": -8,
+      "silhouette": "offset_rock",
+      "coast_feature": "steep_ledge"
+    }
+  }
+}

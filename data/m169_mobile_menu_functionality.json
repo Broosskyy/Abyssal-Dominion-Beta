@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "milestone": "M169",
+  "master_concept": "V3.8",
+  "goal": "MOBILE_MENU_FUNCTIONALITY_AND_PROGRESSION_CONNECTION_PASS",
+  "principles": [
+    "seekarte remains primary gameplay surface",
+    "polish existing UI instead of replacing it",
+    "one dominant modal at a time",
+    "mobile first touch targets and safe-area aware layouts",
+    "server authority unchanged for sensitive mutations"
+  ],
+  "mobile_profiles": [
+    {
+      "id": "compact_phone",
+      "max_width": 390,
+      "touch_target": 54,
+      "edge_margin": 8,
+      "tab_mode": "short_labels"
+    },
+    {
+      "id": "phone",
+      "max_width": 700,
+      "touch_target": 54,
+      "edge_margin": 10,
+      "tab_mode": "wrapped"
+    },
+    {
+      "id": "tablet",
+      "max_width": 1200,
+      "touch_target": 52,
+      "edge_margin": 14,
+      "tab_mode": "full"
+    }
+  ],
+  "harbor_tabs": [
+    {
+      "id": "modules",
+      "short": "MODULE"
+    },
+    {
+      "id": "services",
+      "short": "MARKT"
+    },
+    {
+      "id": "specialization",
+      "short": "BUILD"
+    },
+    {
+      "id": "abyss",
+      "short": "ABYSS"
+    },
+    {
+      "id": "ancient",
+      "short": "ANCIENT"
+    },
+    {
+      "id": "trials",
+      "short": "PRÜFUNG"
+    },
+    {
+      "id": "bonusmaps",
+      "short": "BONUS"
+    },
+    {
+      "id": "production",
+      "short": "ASSETS"
+    }
+  ],
+  "interaction_audit": [
+    {
+      "screen": "shipyard",
+      "requirements": [
+        "responsive preview",
+        "vertical details scroll",
+        "close/back always reachable",
+        "asset status visible",
+        "no gameplay mutation from preview"
+      ]
+    },
+    {
+      "screen": "harbor_workshop",
+      "requirements": [
+        "tabs wrap on phone",
+        "no horizontal page overflow",
+        "bonusmap start transactional",
+        "requirements visible"
+      ]
+    },
+    {
+      "screen": "arsenal",
+      "requirements": [
+        "touch targets >=48",
+        "vertical scroll",
+        "runtime ammo catalog",
+        "data-driven caps/prices",
+        "immediate refresh"
+      ]
+    },
+    {
+      "screen": "progression_hub",
+      "requirements": [
+        "compact tabs",
+        "crafting station level visible",
+        "recipe lock reason visible",
+        "state persisted"
+      ]
+    }
+  ],
+  "progression_connections": [
+    {
+      "system": "crafting",
+      "from": "station_level",
+      "to": "recipe_unlock",
+      "authority": "local_prototype_data_driven"
+    },
+    {
+      "system": "bonusmaps",
+      "from": "fragments+map_level",
+      "to": "instance_entry",
+      "authority": "transactional_runtime"
+    },
+    {
+      "system": "shipyard",
+      "from": "map_level+ownership",
+      "to": "ship_selection",
+      "authority": "roster_runtime"
+    },
+    {
+      "system": "guild",
+      "from": "rank+treasury+server_state",
+      "to": "island_upgrade",
+      "authority": "server_required"
+    }
+  ],
+  "qa_devices": [
+    {
+      "w": 360,
+      "h": 800
+    },
+    {
+      "w": 393,
+      "h": 873
+    },
+    {
+      "w": 412,
+      "h": 915
+    },
+    {
+      "w": 800,
+      "h": 1280
+    },
+    {
+      "w": 1920,
+      "h": 1080
+    }
+  ],
+  "no_code_types": [
+    "mobile_menu_profile",
+    "harbor_tab_profile",
+    "interaction_audit_profile",
+    "progression_connection"
+  ]
+}

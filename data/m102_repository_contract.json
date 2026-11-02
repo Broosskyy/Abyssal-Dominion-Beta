@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "milestone": "M102",
+  "repositories": {
+    "profile": [
+      "load_snapshot",
+      "save_snapshot"
+    ],
+    "inventory": [
+      "load_inventory",
+      "commit_inventory_transaction"
+    ],
+    "wallet": [
+      "load_wallet",
+      "commit_wallet_transaction"
+    ],
+    "entitlement": [
+      "load_entitlements",
+      "verify_entitlement"
+    ],
+    "progression": [
+      "load_progression",
+      "commit_progression_reward"
+    ]
+  },
+  "current_adapter": "local_game_state_legacy",
+  "future_adapter": "server_api",
+  "transaction_fields": [
+    "transaction_id",
+    "account_id",
+    "environment",
+    "operation",
+    "definition_id",
+    "quantity",
+    "expected_revision"
+  ],
+  "rules": [
+    "Local GameState remains functional while repository boundaries are introduced.",
+    "Future server writes require immutable account IDs and idempotent transaction IDs.",
+    "Client success cannot mint wallet currency, premium entitlements or persistent ownership on GLOBAL.",
+    "No direct support/admin database edits."
+  ]
+}

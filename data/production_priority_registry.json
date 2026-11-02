@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "milestone": "M49",
+  "rules": {
+    "P0": "vertical-slice/runtime blocking",
+    "P1": "PL6-15 production depth",
+    "P2": "later content",
+    "PREPARED": "slot reserved only"
+  },
+  "families": {
+    "starter_ships": "P0",
+    "npc_fleets": "P0",
+    "islands": "P0",
+    "harbors": "P0",
+    "projectiles": "P0",
+    "combat_vfx": "P0",
+    "ui_hud_icons": "P0",
+    "main_progression_ships": "P1",
+    "regional_npcs": "P1",
+    "harbor_modules": "P1",
+    "regional_equipment": "P1",
+    "audio": "P1",
+    "monsters_bosses": "P1"
+  }
+}

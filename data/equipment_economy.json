@@ -1,0 +1,199 @@
+{
+  "schema": 1,
+  "milestone": "M48",
+  "authority": "local_prototype_balance_not_final",
+  "live_item_authority": false,
+  "crafting_families": {
+    "cannon": {
+      "inputs": [
+        "blueprint",
+        "metals",
+        "components",
+        "gold"
+      ],
+      "output": "cannon_family_or_tier"
+    },
+    "harpoon": {
+      "inputs": [
+        "hunter_materials",
+        "components",
+        "gold"
+      ],
+      "output": "harpoon_family_or_tier"
+    },
+    "deck": {
+      "inputs": [
+        "wood",
+        "metal",
+        "regional_components"
+      ],
+      "output": "deck"
+    },
+    "module": {
+      "inputs": [
+        "special_components",
+        "recipe"
+      ],
+      "output": "module"
+    },
+    "consumables": {
+      "inputs": [
+        "common_materials",
+        "gold"
+      ],
+      "output": "supplies"
+    },
+    "event": {
+      "inputs": [
+        "event_materials",
+        "normal_materials"
+      ],
+      "output": "seasonal_gear_or_cosmetics"
+    },
+    "legendary": {
+      "inputs": [
+        "fragments_or_cores",
+        "boss_components"
+      ],
+      "output": "planned_high_end_item"
+    }
+  },
+  "upgrade_rules": {
+    "uses_gold_and_material_components": true,
+    "normal_failure_destroys_valuable_equipment": false,
+    "early_phase": "cheap_learning",
+    "infinite_raw_stat_ladder": false
+  },
+  "prototype_materials": [
+    "wood",
+    "metal",
+    "components",
+    "stormglass",
+    "ember_ore",
+    "veil_silk",
+    "reinforced_timber",
+    "precision_gears"
+  ],
+  "prototype_recipes": {
+    "repair_supply": {
+      "gold": 15,
+      "materials": {
+        "wood": 1,
+        "metal": 1
+      },
+      "output": {
+        "repair": 1
+      }
+    },
+    "powder_supply": {
+      "gold": 18,
+      "materials": {
+        "components": 1
+      },
+      "output": {
+        "powder": 3
+      }
+    },
+    "plate_supply": {
+      "gold": 20,
+      "materials": {
+        "metal": 2
+      },
+      "output": {
+        "plates": 2
+      }
+    },
+    "storm_deck_kit": {
+      "gold": 70,
+      "materials": {
+        "stormglass": 2,
+        "reinforced_timber": 2,
+        "metal": 1
+      },
+      "output": {
+        "components": 2
+      }
+    },
+    "barbed_payload_batch": {
+      "gold": 45,
+      "materials": {
+        "stormglass": 1,
+        "metal": 1
+      },
+      "output": {
+        "barbed_chain": 6
+      }
+    },
+    "ward_shell_batch": {
+      "gold": 55,
+      "materials": {
+        "stormglass": 1,
+        "components": 1
+      },
+      "output": {
+        "ward_shell": 5
+      }
+    },
+    "ember_powder_batch": {
+      "gold": 50,
+      "materials": {
+        "ember_ore": 2,
+        "components": 1
+      },
+      "output": {
+        "powder": 8
+      }
+    },
+    "abyss_piercer_batch": {
+      "gold": 75,
+      "materials": {
+        "ember_ore": 2,
+        "precision_gears": 1
+      },
+      "output": {
+        "abyss_piercer": 4
+      }
+    },
+    "reinforced_plate_batch": {
+      "gold": 60,
+      "materials": {
+        "ember_ore": 1,
+        "metal": 2
+      },
+      "output": {
+        "plates": 6
+      }
+    },
+    "restoration_shell_batch": {
+      "gold": 55,
+      "materials": {
+        "veil_silk": 2,
+        "wood": 1
+      },
+      "output": {
+        "restoration_shell": 6
+      }
+    },
+    "veil_supply_batch": {
+      "gold": 85,
+      "materials": {
+        "veil_silk": 3,
+        "components": 1
+      },
+      "output": {
+        "veil": 1
+      }
+    },
+    "support_core_kit": {
+      "gold": 80,
+      "materials": {
+        "veil_silk": 1,
+        "precision_gears": 2
+      },
+      "output": {
+        "ward_shell": 4,
+        "restoration_shell": 4
+      }
+    }
+  }
+}

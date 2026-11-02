@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "milestone": "M148",
+  "master": "V3.7",
+  "production_wave": "W2_P1_REGIONAL",
+  "state": "DEDICATED_SWAP_PLACEHOLDERS_NOT_LIVE",
+  "acceptance_basis": "Mobile oblique top-down gameplay zoom",
+  "regions": {
+    "crimson_sea": {"levels":[6,10],"harbor":"Redhaven","families":["Crimson Corsairs","Hunters","War Raiders"],"elite_admiral":"Bloodsail / Executioner"},
+    "drowned_reach": {"levels":[11,15],"harbor":"Mourning Port","families":["Drowned Fleet","Wraith Scouts"],"elite_admiral":"Drowned Admiral / Sovereign"}
+  },
+  "assets": [
+    {"id":"npc_storm_raider","master_slot":"NPC-SHIP-CRIMSON-001","region":"crimson_sea","family":"ship","role":"raider","file":"ships/npc_crimson_raider.glb"},
+    {"id":"npc_storm_scout","master_slot":"NPC-SHIP-CRIMSON-SCOUT-001","region":"crimson_sea","family":"ship","role":"scout","file":"ships/npc_crimson_scout.glb"},
+    {"id":"npc_storm_guard","master_slot":"NPC-SHIP-CRIMSON-GUARD-001","region":"crimson_sea","family":"ship","role":"guard","file":"ships/npc_crimson_guard.glb"},
+    {"id":"npc_storm_hunter","master_slot":"NPC-SHIP-CRIMSON-HUNTER-001","region":"crimson_sea","family":"ship","role":"hunter","file":"ships/npc_crimson_hunter.glb"},
+    {"id":"npc_storm_admiral","master_slot":"NPC-ADMIRAL-CRIMSON-001","region":"crimson_sea","family":"ship","role":"admiral","file":"ships/npc_crimson_admiral.glb"},
+    {"id":"npc_ember_raider","master_slot":"NPC-SHIP-DROWNED-001","region":"drowned_reach","family":"ship","role":"raider","file":"ships/npc_drowned_raider.glb"},
+    {"id":"npc_ember_tank","master_slot":"NPC-SHIP-DROWNED-GUARD-001","region":"drowned_reach","family":"ship","role":"guard","file":"ships/npc_drowned_guard.glb"},
+    {"id":"npc_ember_hunter","master_slot":"NPC-SHIP-DROWNED-HUNTER-001","region":"drowned_reach","family":"ship","role":"hunter","file":"ships/npc_drowned_hunter.glb"},
+    {"id":"npc_ember_admiral","master_slot":"NPC-ADMIRAL-DROWNED-001","region":"drowned_reach","family":"ship","role":"admiral","file":"ships/npc_drowned_admiral.glb"},
+    {"id":"monster_krakenling_01","master_slot":"MON-KRAKENLING-001","region":"crimson_sea","family":"monster","role":"early_hunter","file":"monsters/monster_krakenling.glb"},
+    {"id":"monster_redfin_01","master_slot":"MON-REDFIN-001","region":"crimson_sea","family":"monster","role":"regional","file":"monsters/monster_redfin.glb"},
+    {"id":"monster_ember_ray_01","master_slot":"MON-EMBER-RAY-001","region":"crimson_sea","family":"monster","role":"regional","file":"monsters/monster_ember_ray.glb"},
+    {"id":"monster_drowned_beast_01","master_slot":"MON-DROWNED-BEAST-001","region":"drowned_reach","family":"monster","role":"regional","file":"monsters/monster_drowned_beast.glb"},
+    {"id":"monster_ghost_whale_01","master_slot":"MON-GHOST-WHALE-001","region":"drowned_reach","family":"monster","role":"regional","file":"monsters/monster_ghost_whale.glb"},
+    {"id":"monster_wraith_serpent_01","master_slot":"MON-WRAITH-SERPENT-001","region":"drowned_reach","family":"monster","role":"regional","file":"monsters/monster_wraith_serpent.glb"},
+    {"id":"monster_young_leviathan_01","master_slot":"MON-YOUNG-LEVIATHAN-001","region":"drowned_reach","family":"monster","role":"hunter_boss","file":"monsters/monster_young_leviathan.glb"},
+    {"id":"flora_coral_cluster_01","master_slot":"FLORA-CORAL-CLUSTER-001","region":"shared_p1","family":"flora","role":"instanced_dressing","file":"nature/flora_coral_cluster.glb"},
+    {"id":"flora_coastal_flowers_01","master_slot":"FLORA-COASTAL-FLOWERS-001","region":"crimson_sea","family":"flora","role":"instanced_dressing","file":"nature/flora_coastal_flowers.glb"},
+    {"id":"flora_mangrove_01","master_slot":"FLORA-MANGROVE-001","region":"drowned_reach","family":"flora","role":"instanced_dressing","file":"nature/flora_mangrove.glb"},
+    {"id":"flora_reeds_01","master_slot":"FLORA-REEDS-001","region":"drowned_reach","family":"flora","role":"instanced_dressing","file":"nature/flora_reeds.glb"},
+    {"id":"island_module_crimson_coast_01","master_slot":"ISLAND-MODULE-CRIMSON-COAST-001","region":"crimson_sea","family":"island_module","role":"coast_layer","file":"islands/island_module_crimson_coast.glb"},
+    {"id":"island_module_drowned_coast_01","master_slot":"ISLAND-MODULE-DROWNED-COAST-001","region":"drowned_reach","family":"island_module","role":"coast_layer","file":"islands/island_module_drowned_coast.glb"},
+    {"id":"harbor_stormreach","master_slot":"HARBOR-REDHAVEN","region":"crimson_sea","family":"harbor","role":"regional_harbor","file":"harbors/harbor_redhaven.glb"},
+    {"id":"harbor_ember","master_slot":"HARBOR-MOURNING-PORT","region":"drowned_reach","family":"harbor","role":"regional_harbor","file":"harbors/harbor_mourning_port.glb"}
+  ],
+  "replacement_contract": {
+    "classification": "M148_DEDICATED_PRODUCTION_PLACEHOLDER",
+    "required_ship_anchors": ["harpoon_socket","impact_socket","muzzle_socket","wake_socket","nameplate_anchor"],
+    "required_monster_anchors": ["harpoon_socket","impact_socket","phase_anchor","submerge_anchor","nameplate_anchor"],
+    "rules": [
+      "Geometry is replaceable GLB content; collision, damage, AI and progression remain authoritative gameplay wrappers.",
+      "Island modules contain no baked water, reef or foam.",
+      "Motion, light, smoke, wakes, foam, trails, impacts and magic remain Godot effects.",
+      "Flora is authored for instancing and LOD; mobile may reduce dressing before hero silhouettes.",
+      "Dedicated placeholder does not mean final art or live activation."
+    ]
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "milestone": "M68",
+  "asset_id": "monster_early_01",
+  "priority": "P0",
+  "class": "Hero GLB + Rig",
+  "coordinate_contract": {
+    "up_axis": "+Y",
+    "forward": "+Z",
+    "units": "meters",
+    "waterline_y": 0.0,
+    "pivot": "waterline / gameplay center",
+    "no_embedded_water": true
+  },
+  "rig_contract": {
+    "required_bone_groups": [
+      "body_root",
+      "head_or_jaw",
+      "locomotion_appendages"
+    ],
+    "optional_bone_groups": [
+      "tentacles",
+      "fins",
+      "tail",
+      "crest"
+    ],
+    "rule": "Rig/animations are visual. Gameplay hit areas, damage and targeting stay in Godot wrappers."
+  },
+  "animation_states": {
+    "required": [
+      "idle",
+      "move",
+      "attack",
+      "hit",
+      "death_or_submerge"
+    ],
+    "prepared": [
+      "phase",
+      "special"
+    ],
+    "aliases": {
+      "idle": [
+        "Idle",
+        "idle"
+      ],
+      "move": [
+        "Move",
+        "Swim",
+        "move",
+        "swim"
+      ],
+      "attack": [
+        "Attack",
+        "Bite",
+        "attack"
+      ],
+      "hit": [
+        "Hit",
+        "Damage",
+        "hit"
+      ],
+      "death_or_submerge": [
+        "Death",
+        "Submerge",
+        "death",
+        "submerge"
+      ]
+    }
+  },
+  "visual_anchors": [
+    {
+      "id": "head",
+      "suggested_node": "Anchors/Head",
+      "purpose": "camera/nameplate/VFX reference"
+    },
+    {
+      "id": "harpoon_center",
+      "suggested_node": "Anchors/HarpoonCenter",
+      "purpose": "visual harpoon impact reference"
+    },
+    {
+      "id": "vfx_mouth",
+      "suggested_node": "Anchors/VfxMouth",
+      "purpose": "attack VFX"
+    },
+    {
+      "id": "vfx_body",
+      "suggested_node": "Anchors/VfxBody",
+      "purpose": "hit/phase VFX"
+    }
+  ],
+  "gameplay_boundary": "Weak points/hitboxes are optional wrapper nodes and MUST NOT be inferred from mesh/bones.",
+  "lod": {
+    "hero": [
+      "LOD0",
+      "LOD1",
+      "LOD2"
+    ],
+    "mobile_rule": "preserve head/body/appendage silhouette; remove micro detail first"
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "milestone": "M103",
+  "generated_from": "m101_p0_replacement_matrix.json",
+  "summary": {
+    "total": 13,
+    "source_resources_present": 13,
+    "final_overrides": 0
+  },
+  "assets": [
+    {
+      "order": 1,
+      "id": "ship_small",
+      "effective_path": "res://assets/placeholder_pack/models/ship_small.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 2,
+      "id": "ship_medium",
+      "effective_path": "res://assets/placeholder_pack/models/ship_medium.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 3,
+      "id": "ship_large",
+      "effective_path": "res://assets/placeholder_pack/models/ship_large.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 4,
+      "id": "npc_friendly_coastal_sloop",
+      "effective_path": "res://assets/placeholder_pack/models/npc_corsair.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 5,
+      "id": "npc_scout_01",
+      "effective_path": "res://assets/placeholder_pack/models/npc_corsair.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 6,
+      "id": "npc_raider_01",
+      "effective_path": "res://assets/placeholder_pack/models/npc_corsair.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 7,
+      "id": "npc_gunship_01",
+      "effective_path": "res://assets/placeholder_pack/models/npc_corsair.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 8,
+      "id": "npc_heavy_01",
+      "effective_path": "res://assets/placeholder_pack/models/npc_admiral.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 9,
+      "id": "harbor_havens_reach",
+      "effective_path": "res://assets/placeholder_pack/models/harbor.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 10,
+      "id": "island_tropical_small",
+      "effective_path": "res://assets/placeholder_pack/models/island_tropical.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 11,
+      "id": "island_tropical_medium",
+      "effective_path": "res://assets/placeholder_pack/models/island_tropical.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 12,
+      "id": "island_cliff_cove",
+      "effective_path": "res://assets/placeholder_pack/models/island_rock.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": false
+    },
+    {
+      "order": 13,
+      "id": "monster_early_01",
+      "effective_path": "res://assets/placeholder_pack/models/monster_kraken.glb",
+      "file_present_in_source": true,
+      "status": "SOURCE_FALLBACK_PRESENT",
+      "final_override": false,
+      "mobile_acceptance_required": true,
+      "rig_animation_required": true
+    }
+  ],
+  "note": "Source-file presence is static readiness only; Godot import/parser/render/mobile acceptance still requires native QA."
+}

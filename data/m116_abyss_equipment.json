@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "milestone": "M116",
+  "unlock_level": 26,
+  "harpoons": [
+    {
+      "id": "abyssal_spike",
+      "unlock": 26,
+      "role": "monster_damage"
+    },
+    {
+      "id": "rift_piercer",
+      "unlock": 27,
+      "role": "monster_armor_pierce"
+    },
+    {
+      "id": "leviathan_chain",
+      "unlock": 29,
+      "role": "monster_slow"
+    }
+  ],
+  "corruption_gear_slots": [
+    "gear_corruption_hull_01",
+    "gear_corruption_sails_01",
+    "gear_corruption_cannon_01"
+  ],
+  "advanced_castle_hooks": [
+    "castle_abyss_harpoon_01",
+    "castle_corruption_control_01",
+    "castle_guardian_hunter_01"
+  ],
+  "rule": "stable data-driven hooks; no cash-exclusive power; final tuning pending"
+}

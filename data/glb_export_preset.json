@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "milestone": "M48",
+  "unit": "meter",
+  "up_axis": "+Y",
+  "forward_axis": "+Z",
+  "pivot": "waterline/semantic origin",
+  "apply_transforms": true,
+  "textures": "external or embedded project-approved",
+  "lod": "optional per asset budget",
+  "collision": "gameplay wrapper owns collision unless explicitly approved"
+}

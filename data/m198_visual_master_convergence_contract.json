@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "milestone": "M198",
+  "status": "VISUAL_MASTER_CONVERGENCE_STATIC_VERIFIED",
+  "master_basis": "V3.8 + user visual-master correction lock",
+  "visual_master": {
+    "world_first": true,
+    "sea_is_primary_play_surface": true,
+    "camera": "controlled angled top-down/isometric",
+    "water": {
+      "gameplay_chart_units": 360,
+      "render_surface_units": 390,
+      "strong_readable_water": true
+    },
+    "hud": {
+      "edge_anchored": true,
+      "primary_attack": "lower_right",
+      "persistent_bottom_command_bar": false,
+      "centered_primary_attack": false,
+      "same_hierarchy_mobile_desktop": true,
+      "platform_difference": "size_spacing_safe_areas_only"
+    },
+    "combat_readability": [
+      "target_ring",
+      "healthbar",
+      "projectile",
+      "hit_vfx",
+      "loot_feedback"
+    ]
+  },
+  "preserved_locks": {
+    "tap_to_sail": true,
+    "land_blocks_navigation": true,
+    "dynamic_actors_do_not_block": true,
+    "named_charts_not_technical_numbering": true,
+    "cross_platform_world_parity": true
+  },
+  "native_runtime_visual_qa_pending": true
+}

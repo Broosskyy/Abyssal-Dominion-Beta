@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "milestone": "M211",
+  "master_concept": "V3.8",
+  "purpose": "Bridge authored 2D production masters into stable runtime slots without changing gameplay.",
+  "priority": ["authored_runtime_single", "approved_runtime_atlas", "production_placeholder"],
+  "small_size_review_px": [96, 64, 48],
+  "families": {
+    "ammo": {"first_sheet": "UI01", "runtime_prefix": "ui_ammo_"},
+    "harpoon": {"first_sheet": "UI02", "runtime_resolution": "item_catalog"},
+    "combat_item": {"first_sheets": ["UI03", "UI04"], "runtime_resolution": "item_catalog"},
+    "cannon": {"first_sheet": "UI05", "runtime_prefix": "ui_cannon_"},
+    "deck": {"first_sheets": ["UI07", "UI08"], "runtime_prefix": "ui_deck_level_"},
+    "special_deck": {"first_sheet": "UI09", "runtime_resolution": "special_deck_catalog"},
+    "ship_equipment": {"first_sheet": "UI10", "runtime_prefix": "ui_ship_equipment_"},
+    "hud": {"first_sheets": ["UI15", "UI16"], "runtime_resolution": "stable_hud_slots"}
+  },
+  "locks": {
+    "generation_sheet_is_runtime_atlas": false,
+    "art_can_change_stats": false,
+    "art_can_change_collision": false,
+    "art_can_change_unlocks": false,
+    "mobile_desktop_gameplay_art_divergence": false
+  }
+}

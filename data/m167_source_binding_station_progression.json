@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "milestone": "M167",
+  "item_families": [
+    {
+      "id": "ammunition",
+      "sources": [
+        "loot",
+        "crafting",
+        "quest",
+        "event",
+        "shop"
+      ],
+      "admin_editable": true
+    },
+    {
+      "id": "harpoon",
+      "sources": [
+        "loot",
+        "crafting",
+        "hunter",
+        "admiral",
+        "event",
+        "shop"
+      ],
+      "admin_editable": true
+    },
+    {
+      "id": "consumable",
+      "sources": [
+        "loot",
+        "crafting",
+        "quest",
+        "guild",
+        "event",
+        "shop"
+      ],
+      "admin_editable": true
+    },
+    {
+      "id": "cannon_material",
+      "sources": [
+        "loot",
+        "admiral",
+        "bonusmap",
+        "guild",
+        "event"
+      ],
+      "admin_editable": true
+    },
+    {
+      "id": "special_deck_material",
+      "sources": [
+        "bonusmap",
+        "event",
+        "guild",
+        "quest",
+        "shop"
+      ],
+      "admin_editable": true
+    },
+    {
+      "id": "citadel_material",
+      "sources": [
+        "loot",
+        "quest",
+        "guild",
+        "admiral"
+      ],
+      "admin_editable": true
+    },
+    {
+      "id": "guild_construction",
+      "sources": [
+        "guild",
+        "siege",
+        "loot",
+        "shop"
+      ],
+      "admin_editable": true
+    }
+  ],
+  "binding_rules": [
+    {
+      "type": "loot_source_binding",
+      "fields": [
+        "content_id",
+        "source_id",
+        "weight",
+        "min_amount",
+        "max_amount",
+        "conditions",
+        "active"
+      ]
+    },
+    {
+      "type": "shop_source_binding",
+      "fields": [
+        "content_id",
+        "offer_id",
+        "price_rule",
+        "availability",
+        "limits",
+        "active"
+      ]
+    },
+    {
+      "type": "quest_source_binding",
+      "fields": [
+        "content_id",
+        "quest_id",
+        "amount",
+        "conditions",
+        "active"
+      ]
+    },
+    {
+      "type": "event_source_binding",
+      "fields": [
+        "content_id",
+        "event_id",
+        "phase",
+        "amount",
+        "conditions",
+        "active"
+      ]
+    },
+    {
+      "type": "admiral_source_binding",
+      "fields": [
+        "content_id",
+        "admiral_id",
+        "weight",
+        "conditions",
+        "active"
+      ]
+    },
+    {
+      "type": "bonusmap_source_binding",
+      "fields": [
+        "content_id",
+        "map_id",
+        "wave_or_boss",
+        "weight",
+        "conditions",
+        "active"
+      ]
+    }
+  ],
+  "station_progression": [
+    {
+      "id": "powder_magazine",
+      "max_level": 10,
+      "unlocks": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10
+      ]
+    },
+    {
+      "id": "rune_foundry",
+      "max_level": 10,
+      "unlocks": [
+        1,
+        3,
+        5,
+        7,
+        9,
+        10
+      ]
+    },
+    {
+      "id": "hunter_lodge",
+      "max_level": 10,
+      "unlocks": [
+        1,
+        2,
+        5,
+        7,
+        9,
+        10
+      ]
+    },
+    {
+      "id": "siege_workshop",
+      "max_level": 10,
+      "unlocks": [
+        1,
+        3,
+        5,
+        6,
+        8,
+        10
+      ]
+    }
+  ],
+  "no_code_rule": "Bindings, weights, quantities, conditions, station levels, icons, text and availability are content data. New behavior primitives still require reviewed code."
+}

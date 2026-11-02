@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "milestone": "M137",
+  "rules": {
+    "gameplay_never_blocks_on_final_asset": true,
+    "visual_only_replacement": true,
+    "hero_lods": [
+      "LOD0",
+      "LOD1",
+      "LOD2"
+    ],
+    "standard_fleet_aggressive_lod": true,
+    "mobile_topdown_readability_is_acceptance_basis": true,
+    "effect_variants_reuse_mesh": true
+  },
+  "families": [
+    {
+      "id": "starter_fleet",
+      "priority": "P0",
+      "slots": [
+        "SHIP-STARTER-001",
+        "SHIP-STARTER-002",
+        "SHIP-STARTER-003"
+      ],
+      "placeholder": "procedural_pirate_ship",
+      "required_anchors": [
+        "muzzle_left",
+        "muzzle_right",
+        "wake",
+        "nameplate",
+        "selection",
+        "damage_vfx"
+      ]
+    },
+    {
+      "id": "early_npc_fleet",
+      "priority": "P0",
+      "slots": [
+        "NPC-SHIP-EARLY-001",
+        "NPC-SHIP-EARLY-002",
+        "NPC-SHIP-EARLY-003",
+        "NPC-SHIP-EARLY-004",
+        "NPC-SHIP-EARLY-005"
+      ],
+      "placeholder": "procedural_pirate_npc",
+      "required_anchors": [
+        "muzzle_left",
+        "muzzle_right",
+        "wake",
+        "nameplate",
+        "selection"
+      ]
+    },
+    {
+      "id": "first_monster",
+      "priority": "P0",
+      "slots": [
+        "MON-KRAKEN-001"
+      ],
+      "placeholder": "procedural_monster",
+      "required_anchors": [
+        "hit_area",
+        "harpoon_impact",
+        "vfx_origin"
+      ]
+    },
+    {
+      "id": "haven_reach",
+      "priority": "P0",
+      "slots": [
+        "HARBOR-HAVENS-REACH",
+        "ISLAND-P0-001",
+        "ISLAND-P0-002",
+        "ISLAND-P0-003",
+        "ISLAND-P0-004"
+      ],
+      "placeholder": "procedural_world",
+      "required_anchors": [
+        "coast",
+        "poi",
+        "harbor"
+      ]
+    },
+    {
+      "id": "hud_icons",
+      "priority": "P0",
+      "slots": [
+        "ICON-COMBAT",
+        "ICON-AMMO",
+        "ICON-HARPOON",
+        "ICON-REPAIR",
+        "ICON-SHIELD",
+        "ICON-SUPPORT",
+        "ICON-QUEST",
+        "ICON-MAP"
+      ],
+      "placeholder": "vector_fallback",
+      "required_anchors": []
+    },
+    {
+      "id": "pl6_15_world",
+      "priority": "P1",
+      "slots": [
+        "SHIP-PROG-001",
+        "SHIP-PROG-002",
+        "SHIP-PROG-003",
+        "NPC-SHIP-CRIMSON-001",
+        "NPC-SHIP-DROWNED-001",
+        "HARBOR-REDHAVEN",
+        "HARBOR-MOURNING-PORT"
+      ],
+      "placeholder": "family_fallback",
+      "required_anchors": []
+    },
+    {
+      "id": "special_pve",
+      "priority": "P2",
+      "slots": [
+        "NPC-ADMIRAL-001",
+        "MON-LEVIATHAN-001",
+        "MON-SERPENT-001",
+        "MON-CRAB-001",
+        "MON-GHOST-WHALE-001",
+        "MON-ABYSS-GUARDIAN-001"
+      ],
+      "placeholder": "hero_fallback",
+      "required_anchors": [
+        "hit_area",
+        "vfx_origin"
+      ]
+    },
+    {
+      "id": "full_progression_fleet",
+      "priority": "P1-P4",
+      "slots": [
+        "SHIP-PROG-004",
+        "SHIP-PROG-005",
+        "SHIP-PROG-006",
+        "SHIP-PROG-007",
+        "SHIP-PROG-008",
+        "SHIP-PROG-009",
+        "SHIP-PROG-010",
+        "SHIP-PROG-011",
+        "SHIP-PROG-012",
+        "SHIP-PROG-013",
+        "SHIP-PROG-014",
+        "SHIP-PROG-015",
+        "SHIP-PROG-016",
+        "SHIP-PROG-017",
+        "SHIP-PROG-018",
+        "SHIP-PROG-019",
+        "SHIP-PROG-020",
+        "SHIP-PROG-021",
+        "SHIP-PROG-022",
+        "SHIP-PROG-023",
+        "SHIP-PROG-024",
+        "SHIP-PROG-025",
+        "SHIP-PROG-026",
+        "SHIP-PROG-027",
+        "SHIP-PROG-028",
+        "SHIP-PROG-029",
+        "SHIP-PROG-030",
+        "SHIP-PROG-031",
+        "SHIP-PROG-032",
+        "SHIP-PROG-033",
+        "SHIP-PROG-034",
+        "SHIP-PROG-035",
+        "SHIP-PROG-036",
+        "SHIP-PROG-037",
+        "SHIP-PROG-038",
+        "SHIP-PROG-039",
+        "SHIP-PROG-040",
+        "SHIP-PROG-041",
+        "SHIP-PROG-042",
+        "SHIP-PROG-043",
+        "SHIP-PROG-044",
+        "SHIP-PROG-045",
+        "SHIP-PROG-046",
+        "SHIP-PROG-047",
+        "SHIP-PROG-048",
+        "SHIP-PROG-049",
+        "SHIP-PROG-050"
+      ],
+      "placeholder": "family_fallback",
+      "required_anchors": [
+        "muzzle_left",
+        "muzzle_right",
+        "wake",
+        "nameplate",
+        "selection",
+        "damage_vfx"
+      ]
+    },
+    {
+      "id": "world_island_bases",
+      "priority": "P0-P4",
+      "slots": [
+        "ISLAND-BASE-001",
+        "ISLAND-BASE-002",
+        "ISLAND-BASE-003",
+        "ISLAND-BASE-004",
+        "ISLAND-BASE-005",
+        "ISLAND-BASE-006",
+        "ISLAND-BASE-007",
+        "ISLAND-BASE-008",
+        "ISLAND-BASE-009",
+        "ISLAND-BASE-010",
+        "ISLAND-BASE-011",
+        "ISLAND-BASE-012",
+        "ISLAND-BASE-013",
+        "ISLAND-BASE-014",
+        "ISLAND-BASE-015",
+        "ISLAND-BASE-016",
+        "ISLAND-BASE-017",
+        "ISLAND-BASE-018",
+        "ISLAND-BASE-019",
+        "ISLAND-BASE-020"
+      ],
+      "placeholder": "procedural_world",
+      "required_anchors": [
+        "coast",
+        "poi",
+        "architecture",
+        "nature"
+      ]
+    },
+    {
+      "id": "canonical_harbors",
+      "priority": "P0-P4",
+      "slots": [
+        "HARBOR-TEMPEST-ANCHORAGE",
+        "HARBOR-BLACK-LANTERN-HAVEN",
+        "HARBOR-RIFTWATCH",
+        "HARBOR-CROWNFALL",
+        "HARBOR-LAST-LIGHT",
+        "HARBOR-SOVEREIGNS-REST",
+        "HARBOR-DOMINION-GATE"
+      ],
+      "placeholder": "procedural_harbor",
+      "required_anchors": [
+        "dock",
+        "safe_zone",
+        "shop",
+        "quest",
+        "nameplate"
+      ]
+    }
+  ],
+  "runtime_composition": [
+    "materials",
+    "shaders",
+    "particles",
+    "trails",
+    "lights",
+    "animations",
+    "decals",
+    "audio"
+  ]
+}

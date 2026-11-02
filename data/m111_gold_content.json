@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "milestone": "M111",
+  "unlock_band": "PL16-20",
+  "trial_focus_level": 20,
+  "content": [
+    {
+      "id": "cursed_admiral_chest",
+      "source": "qualified cursed admiral",
+      "rewards": [
+        "gold",
+        "regional_salvage",
+        "design_fragments"
+      ]
+    },
+    {
+      "id": "gilded_wreck_route",
+      "source": "exploration/interact",
+      "rewards": [
+        "gold",
+        "world_progress"
+      ]
+    },
+    {
+      "id": "hunter_bounty_cursed",
+      "source": "hunter monster objective",
+      "rewards": [
+        "hunter_materials",
+        "ship_mastery",
+        "gold"
+      ]
+    },
+    {
+      "id": "regional_contract_cursed",
+      "source": "qualified regional objectives",
+      "rewards": [
+        "gold",
+        "supplies",
+        "progress"
+      ]
+    }
+  ],
+  "rule": "Gold content is an activity/reward layer, not a real-money entitlement.",
+  "balance": "prototype values remain data-driven"
+}

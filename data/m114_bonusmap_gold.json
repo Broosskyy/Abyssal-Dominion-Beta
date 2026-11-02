@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "milestone": "M114",
+  "id": "bonusmap_gold",
+  "eligibility_level": 18,
+  "entry": {
+    "gold_chart_fragments": 12,
+    "must_be_at_port": true
+  },
+  "structure": {
+    "waves": 5,
+    "kills_per_wave": [
+      3,
+      4,
+      4,
+      5,
+      1
+    ],
+    "final_wave": "admiral"
+  },
+  "enemies": [
+    "npc",
+    "elite",
+    "admiral"
+  ],
+  "difficulty": "midgame",
+  "wave_rewards": {
+    "coins": [
+      120,
+      150,
+      180,
+      220,
+      0
+    ],
+    "ship_mastery_xp": [
+      80,
+      100,
+      120,
+      150,
+      0
+    ]
+  },
+  "completion": {
+    "coins": 700,
+    "gold_map_token": 1,
+    "admiral_component": 2,
+    "pity_token": 1
+  },
+  "rules": [
+    "optional accelerator",
+    "does not bypass Pirate Trials",
+    "death does not delete normal inventory",
+    "replay requires new fragments"
+  ],
+  "authority": "local prototype; server persistence/claims not implemented",
+  "tuning": "prototype values, playtest pending"
+}

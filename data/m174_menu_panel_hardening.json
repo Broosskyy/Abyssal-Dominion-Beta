@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "milestone": "M174",
+  "master_concept": "V3.8",
+  "goal": "MENU_PANEL_SELECTION_AND_TRANSACTION_FEEDBACK_HARDENING",
+  "menu_panel_contracts": [
+    {
+      "id": "shop_transaction_feedback",
+      "rules": [
+        "show_requirement_before_purchase",
+        "disable_impossible_soft_currency_actions",
+        "refresh_after_transaction"
+      ]
+    },
+    {
+      "id": "shipyard_selection",
+      "rules": [
+        "selected_ship_is_explicit",
+        "ownership_state_visible",
+        "comparison_preview_preserved"
+      ]
+    },
+    {
+      "id": "overlay_back",
+      "rules": [
+        "ui_cancel_closes_topmost_panel",
+        "no_gameplay_camera_mutation"
+      ]
+    }
+  ],
+  "mobile_panel_rules": {
+    "touch_target": 50,
+    "horizontal_scroll": false,
+    "safe_area": true,
+    "selection_state": "explicit"
+  },
+  "authoring": {
+    "content_types": [
+      "transaction_feedback_profile",
+      "shipyard_selection_profile",
+      "panel_state_profile",
+      "mobile_action_profile"
+    ]
+  },
+  "security": {
+    "soft_currency": "runtime_validated",
+    "payment": "server_receipt_only",
+    "guild_critical": "server_authoritative"
+  }
+}

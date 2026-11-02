@@ -1,0 +1,22 @@
+{
+	"metrics": {
+		"clipper_fleet": {
+			"mesh_instances": 120,
+			"ships": 20,
+			"unique_materials": 4
+		},
+		"full": {
+			"ammo": 3,
+			"damage": 194.399999999998,
+			"logical_balls": 3,
+			"visible_balls": 3
+		},
+		"reduced": {
+			"ammo": 3,
+			"damage": 194.399999999998,
+			"logical_balls": 3,
+			"visible_balls": 1
+		}
+	},
+	"mode": "headless; counts and behavior, not FPS or visual QA"
+}

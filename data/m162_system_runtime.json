@@ -1,0 +1,1367 @@
+{
+  "schema": 1,
+  "milestone": "M162",
+  "master_concept": "V3.8",
+  "normal_decks": {
+    "max_level": 10,
+    "visible_under_ship": true
+  },
+  "special_decks": [
+    {
+      "id": "arcane_tide_deck",
+      "label": "Arkanes Gezeitendeck",
+      "role": "mystic",
+      "max_level": 5,
+      "unlock_rule": "content_source",
+      "vfx_profile": "azure_runes",
+      "upgrade_costs": [
+        250,
+        450,
+        750,
+        1150,
+        1700
+      ],
+      "bonus_curve_pct": [
+        2,
+        4,
+        7,
+        10,
+        14
+      ],
+      "effects_per_level_pct": {
+        "cannon_damage_pct": 0.7,
+        "elite_damage_pct": 0.8
+      },
+      "vfx_color": "4ac7ff"
+    },
+    {
+      "id": "stormwake_deck",
+      "label": "Sturmwachtdeck",
+      "role": "mobility_control",
+      "max_level": 5,
+      "unlock_rule": "content_source",
+      "vfx_profile": "storm_sparks",
+      "upgrade_costs": [
+        350,
+        575,
+        900,
+        1325,
+        1900
+      ],
+      "bonus_curve_pct": [
+        2,
+        4,
+        7,
+        10,
+        14
+      ],
+      "effects_per_level_pct": {
+        "reload_pct": 0.7,
+        "movement_pct": 0.5
+      },
+      "vfx_color": "8fdcff"
+    },
+    {
+      "id": "leviathan_deck",
+      "label": "Leviathandeck",
+      "role": "hunter",
+      "max_level": 5,
+      "unlock_rule": "content_source",
+      "vfx_profile": "deep_teal_marks",
+      "upgrade_costs": [
+        450,
+        700,
+        1050,
+        1500,
+        2100
+      ],
+      "bonus_curve_pct": [
+        2,
+        4,
+        7,
+        10,
+        14
+      ],
+      "effects_per_level_pct": {
+        "harpoon_damage_pct": 1.6,
+        "monster_damage_pct": 0.9
+      },
+      "vfx_color": "35d4b4"
+    },
+    {
+      "id": "iron_bastion_deck",
+      "label": "Bollwerkdeck",
+      "role": "defense",
+      "max_level": 5,
+      "unlock_rule": "content_source",
+      "vfx_profile": "iron_ward",
+      "upgrade_costs": [
+        550,
+        825,
+        1200,
+        1675,
+        2300
+      ],
+      "bonus_curve_pct": [
+        2,
+        4,
+        7,
+        10,
+        14
+      ],
+      "effects_per_level_pct": {
+        "hull_pct": 1.2,
+        "resistance_pct": 0.7
+      },
+      "vfx_color": "b8c0c8"
+    },
+    {
+      "id": "corsair_oath_deck",
+      "label": "Korsareneid-Deck",
+      "role": "pvp",
+      "max_level": 5,
+      "unlock_rule": "content_source",
+      "vfx_profile": "red_banner_marks",
+      "upgrade_costs": [
+        650,
+        950,
+        1350,
+        1850,
+        2500
+      ],
+      "bonus_curve_pct": [
+        2,
+        4,
+        7,
+        10,
+        14
+      ],
+      "effects_per_level_pct": {
+        "pvp_damage_pct": 0.8,
+        "pvp_resistance_pct": 0.6
+      },
+      "vfx_color": "e14f54"
+    },
+    {
+      "id": "gravewake_deck",
+      "label": "Grabflutdeck",
+      "role": "event",
+      "max_level": 5,
+      "unlock_rule": "content_source",
+      "vfx_profile": "gravefire_runes",
+      "upgrade_costs": [
+        750,
+        1075,
+        1500,
+        2025,
+        2700
+      ],
+      "bonus_curve_pct": [
+        2,
+        4,
+        7,
+        10,
+        14
+      ],
+      "effects_per_level_pct": {
+        "event_damage_pct": 1.6,
+        "event_loot_pct": 0.9
+      },
+      "vfx_color": "9e5cff"
+    }
+  ],
+  "talent_nodes": [
+    {
+      "id": "navigator_01",
+      "tree": "navigator",
+      "label": "Navigator 01",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "movement_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "navigator_02",
+      "tree": "navigator",
+      "label": "Navigator 02",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "turning_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "navigator_03",
+      "tree": "navigator",
+      "label": "Navigator 03",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "map_efficiency_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "navigator_04",
+      "tree": "navigator",
+      "label": "Navigator 04",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "navigator_01"
+      ],
+      "effect_key": "movement_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "navigator_05",
+      "tree": "navigator",
+      "label": "Navigator 05",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "navigator_02"
+      ],
+      "effect_key": "turning_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "navigator_06",
+      "tree": "navigator",
+      "label": "Navigator 06",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "navigator_03"
+      ],
+      "effect_key": "map_efficiency_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "navigator_07",
+      "tree": "navigator",
+      "label": "Navigator 07",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "navigator_04"
+      ],
+      "effect_key": "movement_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "navigator_08",
+      "tree": "navigator",
+      "label": "Navigator 08",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "navigator_05"
+      ],
+      "effect_key": "turning_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "navigator_09",
+      "tree": "navigator",
+      "label": "Navigator 09",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "navigator_06"
+      ],
+      "effect_key": "map_efficiency_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "navigator_10",
+      "tree": "navigator",
+      "label": "Navigator 10",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "navigator_07"
+      ],
+      "effect_key": "movement_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "navigator_11",
+      "tree": "navigator",
+      "label": "Navigator 11",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "navigator_08"
+      ],
+      "effect_key": "turning_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "navigator_12",
+      "tree": "navigator",
+      "label": "Navigator 12",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "navigator_09"
+      ],
+      "effect_key": "map_efficiency_pct",
+      "effect_per_rank_pct": 4,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_01",
+      "tree": "artillery",
+      "label": "Artillery 01",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "cannon_damage_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_02",
+      "tree": "artillery",
+      "label": "Artillery 02",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "reload_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_03",
+      "tree": "artillery",
+      "label": "Artillery 03",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "ammo_efficiency_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_04",
+      "tree": "artillery",
+      "label": "Artillery 04",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "artillery_01"
+      ],
+      "effect_key": "cannon_damage_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_05",
+      "tree": "artillery",
+      "label": "Artillery 05",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "artillery_02"
+      ],
+      "effect_key": "reload_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_06",
+      "tree": "artillery",
+      "label": "Artillery 06",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "artillery_03"
+      ],
+      "effect_key": "ammo_efficiency_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_07",
+      "tree": "artillery",
+      "label": "Artillery 07",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "artillery_04"
+      ],
+      "effect_key": "cannon_damage_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_08",
+      "tree": "artillery",
+      "label": "Artillery 08",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "artillery_05"
+      ],
+      "effect_key": "reload_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_09",
+      "tree": "artillery",
+      "label": "Artillery 09",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "artillery_06"
+      ],
+      "effect_key": "ammo_efficiency_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_10",
+      "tree": "artillery",
+      "label": "Artillery 10",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "artillery_07"
+      ],
+      "effect_key": "cannon_damage_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_11",
+      "tree": "artillery",
+      "label": "Artillery 11",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "artillery_08"
+      ],
+      "effect_key": "reload_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "artillery_12",
+      "tree": "artillery",
+      "label": "Artillery 12",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "artillery_09"
+      ],
+      "effect_key": "ammo_efficiency_pct",
+      "effect_per_rank_pct": 4,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_01",
+      "tree": "bulwark",
+      "label": "Bulwark 01",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "hull_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_02",
+      "tree": "bulwark",
+      "label": "Bulwark 02",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "repair_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_03",
+      "tree": "bulwark",
+      "label": "Bulwark 03",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "resistance_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_04",
+      "tree": "bulwark",
+      "label": "Bulwark 04",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "bulwark_01"
+      ],
+      "effect_key": "hull_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_05",
+      "tree": "bulwark",
+      "label": "Bulwark 05",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "bulwark_02"
+      ],
+      "effect_key": "repair_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_06",
+      "tree": "bulwark",
+      "label": "Bulwark 06",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "bulwark_03"
+      ],
+      "effect_key": "resistance_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_07",
+      "tree": "bulwark",
+      "label": "Bulwark 07",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "bulwark_04"
+      ],
+      "effect_key": "hull_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_08",
+      "tree": "bulwark",
+      "label": "Bulwark 08",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "bulwark_05"
+      ],
+      "effect_key": "repair_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_09",
+      "tree": "bulwark",
+      "label": "Bulwark 09",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "bulwark_06"
+      ],
+      "effect_key": "resistance_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_10",
+      "tree": "bulwark",
+      "label": "Bulwark 10",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "bulwark_07"
+      ],
+      "effect_key": "hull_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_11",
+      "tree": "bulwark",
+      "label": "Bulwark 11",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "bulwark_08"
+      ],
+      "effect_key": "repair_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "bulwark_12",
+      "tree": "bulwark",
+      "label": "Bulwark 12",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "bulwark_09"
+      ],
+      "effect_key": "resistance_pct",
+      "effect_per_rank_pct": 4,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_01",
+      "tree": "hunter",
+      "label": "Hunter 01",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "harpoon_damage_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_02",
+      "tree": "hunter",
+      "label": "Hunter 02",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "monster_damage_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_03",
+      "tree": "hunter",
+      "label": "Hunter 03",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "loot_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_04",
+      "tree": "hunter",
+      "label": "Hunter 04",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "hunter_01"
+      ],
+      "effect_key": "harpoon_damage_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_05",
+      "tree": "hunter",
+      "label": "Hunter 05",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "hunter_02"
+      ],
+      "effect_key": "monster_damage_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_06",
+      "tree": "hunter",
+      "label": "Hunter 06",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "hunter_03"
+      ],
+      "effect_key": "loot_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_07",
+      "tree": "hunter",
+      "label": "Hunter 07",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "hunter_04"
+      ],
+      "effect_key": "harpoon_damage_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_08",
+      "tree": "hunter",
+      "label": "Hunter 08",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "hunter_05"
+      ],
+      "effect_key": "monster_damage_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_09",
+      "tree": "hunter",
+      "label": "Hunter 09",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "hunter_06"
+      ],
+      "effect_key": "loot_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_10",
+      "tree": "hunter",
+      "label": "Hunter 10",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "hunter_07"
+      ],
+      "effect_key": "harpoon_damage_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_11",
+      "tree": "hunter",
+      "label": "Hunter 11",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "hunter_08"
+      ],
+      "effect_key": "monster_damage_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "hunter_12",
+      "tree": "hunter",
+      "label": "Hunter 12",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "hunter_09"
+      ],
+      "effect_key": "loot_pct",
+      "effect_per_rank_pct": 4,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_01",
+      "tree": "corsair",
+      "label": "Corsair 01",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "pvp_damage_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_02",
+      "tree": "corsair",
+      "label": "Corsair 02",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "boarding_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_03",
+      "tree": "corsair",
+      "label": "Corsair 03",
+      "tier": 1,
+      "max_rank": 3,
+      "requires": [],
+      "effect_key": "honor_pct",
+      "effect_per_rank_pct": 1,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_04",
+      "tree": "corsair",
+      "label": "Corsair 04",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "corsair_01"
+      ],
+      "effect_key": "pvp_damage_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_05",
+      "tree": "corsair",
+      "label": "Corsair 05",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "corsair_02"
+      ],
+      "effect_key": "boarding_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_06",
+      "tree": "corsair",
+      "label": "Corsair 06",
+      "tier": 2,
+      "max_rank": 3,
+      "requires": [
+        "corsair_03"
+      ],
+      "effect_key": "honor_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_07",
+      "tree": "corsair",
+      "label": "Corsair 07",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "corsair_04"
+      ],
+      "effect_key": "pvp_damage_pct",
+      "effect_per_rank_pct": 2,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_08",
+      "tree": "corsair",
+      "label": "Corsair 08",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "corsair_05"
+      ],
+      "effect_key": "boarding_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_09",
+      "tree": "corsair",
+      "label": "Corsair 09",
+      "tier": 3,
+      "max_rank": 3,
+      "requires": [
+        "corsair_06"
+      ],
+      "effect_key": "honor_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_10",
+      "tree": "corsair",
+      "label": "Corsair 10",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "corsair_07"
+      ],
+      "effect_key": "pvp_damage_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_11",
+      "tree": "corsair",
+      "label": "Corsair 11",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "corsair_08"
+      ],
+      "effect_key": "boarding_pct",
+      "effect_per_rank_pct": 3,
+      "point_cost": 1
+    },
+    {
+      "id": "corsair_12",
+      "tree": "corsair",
+      "label": "Corsair 12",
+      "tier": 4,
+      "max_rank": 1,
+      "requires": [
+        "corsair_09"
+      ],
+      "effect_key": "honor_pct",
+      "effect_per_rank_pct": 4,
+      "point_cost": 1
+    }
+  ],
+  "talent_points": {
+    "source": "progression_rewards",
+    "respec_supported": true,
+    "respec_authority": "server_rule"
+  },
+  "citadel_branches": [
+    {
+      "id": "powder_vault",
+      "label": "Pulvermagazin",
+      "focus": "ammo_capacity_reload",
+      "max_level": 10,
+      "gold_curve": [
+        300,
+        480,
+        660,
+        840,
+        1020,
+        1200,
+        1380,
+        1560,
+        1740,
+        1920
+      ],
+      "material_curve": [
+        0,
+        0,
+        2,
+        3,
+        4,
+        5,
+        7,
+        9,
+        12,
+        16
+      ],
+      "effects_per_level_pct": {
+        "reload_pct": 0.4
+      }
+    },
+    {
+      "id": "master_gunner",
+      "label": "Meisterschütze",
+      "focus": "cannon_mastery",
+      "max_level": 10,
+      "gold_curve": [
+        300,
+        480,
+        660,
+        840,
+        1020,
+        1200,
+        1380,
+        1560,
+        1740,
+        1920
+      ],
+      "material_curve": [
+        0,
+        0,
+        2,
+        3,
+        4,
+        5,
+        7,
+        9,
+        12,
+        16
+      ],
+      "effects_per_level_pct": {
+        "cannon_damage_pct": 0.6
+      }
+    },
+    {
+      "id": "reinforced_hull",
+      "label": "Verstärkter Rumpf",
+      "focus": "hull_resistance",
+      "max_level": 10,
+      "gold_curve": [
+        300,
+        480,
+        660,
+        840,
+        1020,
+        1200,
+        1380,
+        1560,
+        1740,
+        1920
+      ],
+      "material_curve": [
+        0,
+        0,
+        2,
+        3,
+        4,
+        5,
+        7,
+        9,
+        12,
+        16
+      ],
+      "effects_per_level_pct": {
+        "hull_pct": 1.0,
+        "resistance_pct": 0.3
+      }
+    },
+    {
+      "id": "chart_room",
+      "label": "Kartensaal",
+      "focus": "navigation_bonusmaps",
+      "max_level": 10,
+      "gold_curve": [
+        300,
+        480,
+        660,
+        840,
+        1020,
+        1200,
+        1380,
+        1560,
+        1740,
+        1920
+      ],
+      "material_curve": [
+        0,
+        0,
+        2,
+        3,
+        4,
+        5,
+        7,
+        9,
+        12,
+        16
+      ],
+      "effects_per_level_pct": {
+        "bonusmap_reward_pct": 0.6
+      }
+    },
+    {
+      "id": "hunter_lodge",
+      "label": "Jägerloge",
+      "focus": "harpoon_monsters",
+      "max_level": 10,
+      "gold_curve": [
+        300,
+        480,
+        660,
+        840,
+        1020,
+        1200,
+        1380,
+        1560,
+        1740,
+        1920
+      ],
+      "material_curve": [
+        0,
+        0,
+        2,
+        3,
+        4,
+        5,
+        7,
+        9,
+        12,
+        16
+      ],
+      "effects_per_level_pct": {
+        "harpoon_damage_pct": 0.8,
+        "monster_damage_pct": 0.4
+      }
+    },
+    {
+      "id": "guild_quarter",
+      "label": "Gildenquartier",
+      "focus": "guild_siege",
+      "max_level": 10,
+      "gold_curve": [
+        300,
+        480,
+        660,
+        840,
+        1020,
+        1200,
+        1380,
+        1560,
+        1740,
+        1920
+      ],
+      "material_curve": [
+        0,
+        0,
+        2,
+        3,
+        4,
+        5,
+        7,
+        9,
+        12,
+        16
+      ],
+      "effects_per_level_pct": {
+        "guild_structure_pct": 0.8
+      }
+    }
+  ],
+  "cannon_upgrade_tracks": [
+    {
+      "id": "barrel",
+      "label": "Rohr",
+      "effect": "damage_precision",
+      "max_level": 10,
+      "gold_curve": [
+        150,
+        250,
+        350,
+        450,
+        550,
+        650,
+        750,
+        850,
+        950,
+        1050
+      ],
+      "oil_curve": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "effects_per_level_pct": {
+        "cannon_damage_pct": 1.0
+      }
+    },
+    {
+      "id": "carriage",
+      "label": "Lafette",
+      "effect": "reload_stability",
+      "max_level": 10,
+      "gold_curve": [
+        150,
+        250,
+        350,
+        450,
+        550,
+        650,
+        750,
+        850,
+        950,
+        1050
+      ],
+      "oil_curve": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "effects_per_level_pct": {
+        "reload_pct": 0.8
+      }
+    },
+    {
+      "id": "chamber",
+      "label": "Kammer",
+      "effect": "ammo_efficiency",
+      "max_level": 10,
+      "gold_curve": [
+        150,
+        250,
+        350,
+        450,
+        550,
+        650,
+        750,
+        850,
+        950,
+        1050
+      ],
+      "oil_curve": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "effects_per_level_pct": {
+        "ammo_efficiency_pct": 0.8
+      }
+    },
+    {
+      "id": "runes",
+      "label": "Runenfassung",
+      "effect": "role_mastery",
+      "max_level": 10,
+      "gold_curve": [
+        150,
+        250,
+        350,
+        450,
+        550,
+        650,
+        750,
+        850,
+        950,
+        1050
+      ],
+      "oil_curve": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "effects_per_level_pct": {
+        "cannon_damage_pct": 0.5,
+        "role_mastery_pct": 1.0
+      }
+    }
+  ],
+  "new_items": [
+    {
+      "id": "harpoon_tempered",
+      "label": "Gehärtete Harpune",
+      "kind": "harpoon",
+      "role": "standard_hunter",
+      "stack": 9999
+    },
+    {
+      "id": "harpoon_stormhook",
+      "label": "Sturmhaken",
+      "kind": "harpoon",
+      "role": "control",
+      "stack": 9999
+    },
+    {
+      "id": "harpoon_relic",
+      "label": "Reliktharpune",
+      "kind": "harpoon",
+      "role": "guardian",
+      "stack": 9999
+    },
+    {
+      "id": "ward_tonic",
+      "label": "Wardsud",
+      "kind": "consumable",
+      "role": "temporary_resistance",
+      "stack": 50
+    },
+    {
+      "id": "powder_charge",
+      "label": "Pulverladung",
+      "kind": "consumable",
+      "role": "temporary_reload",
+      "stack": 50
+    },
+    {
+      "id": "hunter_flare",
+      "label": "Jägerleuchtfeuer",
+      "kind": "consumable",
+      "role": "monster_tracking",
+      "stack": 50
+    },
+    {
+      "id": "siege_repair_kit",
+      "label": "Belagerungs-Reparaturkit",
+      "kind": "guild_supply",
+      "role": "guild_structure_repair",
+      "stack": 100
+    },
+    {
+      "id": "arcane_shard",
+      "label": "Arkaner Splitter",
+      "kind": "material",
+      "role": "special_deck_upgrade",
+      "stack": 9999
+    }
+  ],
+  "guild": {
+    "island_upgrade_levels": 10,
+    "tower_upgrade_levels": 10,
+    "rank_permission_driven": true,
+    "treasury_server_authoritative": true,
+    "buildings": [
+      "guild_hall",
+      "warehouse",
+      "shipyard",
+      "treasury",
+      "siege_workshop"
+    ],
+    "tower_roles": [
+      "cannon",
+      "chain",
+      "mortar",
+      "ward"
+    ],
+    "siege_contracts": [
+      "attack_window",
+      "repair_window",
+      "ownership_transfer",
+      "combat_log",
+      "cooldown"
+    ]
+  },
+  "presentation": {
+    "panels": [
+      "decks",
+      "special_decks",
+      "cannons",
+      "ammo_harpoons",
+      "talents",
+      "citadel",
+      "guild",
+      "buffs"
+    ],
+    "tooltips_data_driven": true,
+    "icons_data_driven": true,
+    "vfx_data_driven": true
+  },
+  "authority": "LOCAL_GAMEPLAY_PREVIEW_SERVER_MUTATIONS_GATED"
+}

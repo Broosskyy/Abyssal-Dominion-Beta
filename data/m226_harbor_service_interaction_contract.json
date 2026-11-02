@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "milestone": "M226",
+  "master_concept": "V3.8",
+  "scope": "harbor world readability and docked-service interaction",
+  "world_readability": {
+    "dock_anchor": "pier approach is visually readable from the master-reference camera",
+    "approach_lane": "visual-only twin approach beacons; no collision/navigation authority",
+    "mooring_read": "visual-only dock-edge/mooring cue",
+    "world_center_rule": "no automatic full-screen harbor takeover while docked"
+  },
+  "services": {
+    "shipyard": "opens existing shipyard authority",
+    "repair": "uses PlayerInventory.purchase_harbor_repair and existing economy quote",
+    "market": "opens existing shop route",
+    "arsenal": "opens existing arsenal authority",
+    "undock": "uses existing PortInteraction.activate toggle"
+  },
+  "repair_feedback": {
+    "success": "visible repaired state + quote refresh",
+    "no_damage": "clear no-repair-needed feedback",
+    "insufficient_funds": "clear gold requirement feedback",
+    "values_changed": false
+  },
+  "boundaries": {
+    "navigation_changed": false,
+    "collision_changed": false,
+    "damage_changed": false,
+    "range_changed": false,
+    "economy_values_changed": false,
+    "world_parity": "same on mobile/web/desktop; responsive UI only"
+  }
+}

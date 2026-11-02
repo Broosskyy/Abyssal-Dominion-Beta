@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "milestone": "M249",
+  "master_concept": "V3.8",
+  "source_sections": [
+    "V1.5 §§313-354",
+    "V2.5 §§529-537"
+  ],
+  "status": "CLIENT_SERVER_REPLICA_FOUNDATION",
+  "master_contract": {
+    "pvp_modes": [
+      "open_sea",
+      "ranked",
+      "guild_war",
+      "event_pvp",
+      "bounty_hunt",
+      "duel"
+    ],
+    "zone_types": [
+      "safe_harbor",
+      "protected_sea",
+      "standard_sea",
+      "risk_sea",
+      "guild_war_sea",
+      "ranked_instance",
+      "world_boss_zone"
+    ],
+    "zone_visibility_rule": "pvp_state_must_be_clear_before_vulnerability",
+    "starter_protection": true,
+    "respawn_protection": true,
+    "combat_timer_server_time": true,
+    "honor_distinct_from_fame": true,
+    "honor_distinct_from_battle_rank": true,
+    "ranked_hidden_mmr": true,
+    "ranked_visible_rank_points": true,
+    "ranked_divisions": true,
+    "ranked_soft_season_reset": true,
+    "ranked_decay_high_ranks_only_if_needed": true,
+    "no_broadside_angle_damage": true,
+    "pvp_uses_core_combat_contract": true,
+    "harpoon_vs_player_default": "disabled_or_special_rule_only",
+    "pvp_sinking_no_full_loot": true,
+    "ship_loss_on_pvp_sink": false,
+    "equipment_full_loot": false,
+    "ship_mastery_loss": false,
+    "pirate_level_loss": false,
+    "gold_total_loss": false
+  },
+  "honor_sources": {
+    "qualified_open_sea": "normal",
+    "higher_value_wanted": "increased",
+    "bounty_completion": "increased",
+    "guild_war_objective": "increased_plus_guild_progression",
+    "ranked": "small_or_separate_honor_component",
+    "extreme_power_gap": "strongly_reduced_or_zero",
+    "repeat_same_victim": "strongly_reduced_or_zero",
+    "arranged_exploit": "zero_plus_telemetry_enforcement"
+  },
+  "ranked_matchmaking_priority": [
+    "mmr",
+    "region_ping",
+    "party_size",
+    "ship_build_power_protection_only",
+    "pirate_level_eligibility",
+    "controlled_queue_expansion",
+    "rematch_abuse_limit"
+  ],
+  "pvp_modifier_layer": [
+    "cannon_damage",
+    "healing_received",
+    "self_repair",
+    "shield_recovery",
+    "armor_plate_effect",
+    "crit_damage",
+    "chain_slow_cc",
+    "dot",
+    "event_modifiers"
+  ],
+  "anti_gank_and_abuse": [
+    "starter_protection",
+    "respawn_protection",
+    "extreme_power_gap_reward_reduction",
+    "repeat_victim_reduction",
+    "respawn_camping_no_normal_rewards",
+    "group_dogpile_context",
+    "logout_combat_timer",
+    "trade_kill_detection",
+    "afk_target_reduced_competitive_contribution"
+  ],
+  "authority": {
+    "live_zone_and_flag_state": "server",
+    "honor_mutation": "server",
+    "mmr_and_rank_points": "server",
+    "matchmaking_and_match_result": "server",
+    "combat_timer": "server_time",
+    "pvp_modifiers": "server_live_config",
+    "reward_qualification_and_settlement": "server_idempotent",
+    "anti_farm_verdict": "server",
+    "client_role": "presentation_prediction_and_intent_only"
+  },
+  "balance_boundary": {
+    "final_honor_values": null,
+    "final_mmr_formula": null,
+    "final_rank_point_values": null,
+    "final_combat_timer_seconds": null,
+    "final_pvp_modifiers": null,
+    "final_ranked_rewards": null,
+    "reason": "V3.8 leaves final competitive values to telemetry/playtests/server configuration."
+  },
+  "hud_rules": {
+    "show_zone_or_flag_state_when_relevant": true,
+    "show_spawn_or_respawn_protection_when_relevant": true,
+    "show_combat_timer_when_server_published": true,
+    "no_fake_local_honor_rank_or_queue": true,
+    "no_permanent_pvp_panel_over_world": true,
+    "round_minimap_preserved": true,
+    "rectangular_full_chart_preserved": true,
+    "mobile_desktop_same_information_architecture": true
+  }
+}

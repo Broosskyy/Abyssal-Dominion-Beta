@@ -1,0 +1,2 @@
+# M121 — PL36–40 Void Sea Foundation
+Physical contiguous PL36–40 sectors now follow PL35. V3.7 contracts: Void Fleets, elite-chain objectives, Void Admiral slots, multi-phase Void monster placeholders, Last Light, Legendary Bonusmap PL36+ contract, PL40 Void-Sea High Risk trial. Placeholder-first and mobile-budgeted. No real backend/server authority is claimed. Legendary map balance remains prototype/data-driven.

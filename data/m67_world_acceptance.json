@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "milestone": "M67",
+  "title": "P0 Island / Harbor Acceptance",
+  "assets": [
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "harbor_havens_reach"
+  ],
+  "checks": [
+    "distinct top-down silhouette",
+    "no water embedded in final island GLB",
+    "modular vegetation/POI compatible",
+    "coastline readable at phone landscape",
+    "base silhouette survives low quality",
+    "small nature/props cull before island base",
+    "materials use reusable families where sensible",
+    "final GLB replacement does not change collision/gameplay"
+  ],
+  "source_alignment": "Master: base islands + biome/POI modules; nature instanced/LOD; VFX in Godot; stable fallback slots."
+}

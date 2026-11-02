@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "milestone": "M204",
+  "status": "INVENTORY_ICON_AND_ARSENAL_READABILITY_STATIC_VERIFIED",
+  "master_concept": "V3.8",
+  "platform_parity": true,
+  "world_gameplay_identical": true,
+  "responsive_only": [
+    "hud_size",
+    "font_size",
+    "touch_targets",
+    "spacing",
+    "safe_areas"
+  ],
+  "icon_families": {
+    "materials": [
+      "wood",
+      "metal",
+      "components",
+      "stormglass",
+      "ember_ore",
+      "veil_silk",
+      "reinforced_timber",
+      "precision_gears",
+      "admiral_component",
+      "abyss_scale",
+      "corrupted_pearl",
+      "ancient_guardian_fragment",
+      "legendary_fragment",
+      "ancient_relic_core",
+      "dominion_shard",
+      "sun_core_fragment",
+      "guild_masonry",
+      "ward_resin",
+      "arcane_shard",
+      "siege_core"
+    ],
+    "equipment": [
+      "harpoon_tempered",
+      "harpoon_stormhook",
+      "harpoon_relic",
+      "ward_tonic",
+      "powder_charge",
+      "hunter_flare",
+      "siege_repair_kit",
+      "master_gunlock",
+      "citadel_blueprint",
+      "siege_beacon",
+      "ward_crystal",
+      "siege_powder"
+    ],
+    "currencies": [
+      "silver_chart_fragment",
+      "gold_chart_fragment",
+      "abyss_chart_fragment",
+      "gold_map_token",
+      "legendary_command_seal",
+      "dominion_crest"
+    ],
+    "navigation": [
+      "talent_compass",
+      "talent_chart"
+    ]
+  },
+  "arsenal": {
+    "uses_item_ui_icon_catalog": true,
+    "category_badges": true,
+    "touch_target_minimum_preserved": true,
+    "ammo_action_runtime_values_unchanged": true
+  },
+  "visual_rules": [
+    "navy_gold_base",
+    "distinct silhouettes",
+    "text_free_art",
+    "replacement_ready",
+    "no gameplay values in artwork"
+  ]
+}

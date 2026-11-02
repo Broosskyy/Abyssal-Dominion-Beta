@@ -1,0 +1,15 @@
+extends Node
+func _ready()->void:
+	var dto:=AccountProfileDto.local_preview({"id":"0123456789abcdef0123456789abcdef","name":"Captain Test"},false)
+	assert(not bool(dto.server_verified))
+	var tx:=TransactionEnvelope.local("wallet","grant_preview","gold",100,3)
+	assert(TransactionEnvelope.valid_shape(tx))
+	var ledger:=IdempotencyLedger.new()
+	assert(ledger.accept(tx).status=="accepted")
+	assert(ledger.accept(tx).status=="duplicate")
+	var conflicts:=AccountLinkingPolicy.preview_conflicts({"owned_ship_ids":["ship_small"],"captain_name":"A"},{"owned_ship_ids":["ship_small"],"captain_name":"A"})
+	assert("ownership_overlap" in conflicts)
+	assert(not AccountLinkingPolicy.can_commit_live())
+	var report:=P0ImportReadiness.summary()
+	assert(int(report.total)==13)
+	print("M103_TRANSACTION_LINKING_P0_PASS")

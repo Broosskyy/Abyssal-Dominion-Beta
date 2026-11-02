@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "milestone": "M172",
+  "master_concept": "V3.8",
+  "focus": [
+    "bonusmap_runtime_presentation",
+    "crafting_requirement_feedback",
+    "shipyard_catalog_hardening",
+    "mobile_interaction_feedback",
+    "no_code_authoring"
+  ],
+  "bonusmap_runtime_presentation": {
+    "rule": "UI reads eligibility, entry item and entry cost from the owning progress/config runtime instead of duplicating values.",
+    "kinds": [
+      "silver",
+      "gold",
+      "abyss",
+      "legendary"
+    ],
+    "states": [
+      "locked",
+      "ready",
+      "missing_fragments",
+      "active"
+    ],
+    "mobile": [
+      "one primary start action per map",
+      "requirements visible before action",
+      "active wave state replaces start action"
+    ]
+  },
+  "crafting_feedback": {
+    "states": [
+      "ready",
+      "not_in_port",
+      "station_locked",
+      "insufficient_gold",
+      "missing_materials",
+      "output_full",
+      "unknown_recipe"
+    ],
+    "rule": "crafting button/result may remain generic, but requirement text must come from runtime state rather than hidden failure."
+  },
+  "shipyard_hardening": {
+    "deduplicate_catalog_ids": true,
+    "preserve_existing_camera": true,
+    "preserve_actual_asset_pipeline": true,
+    "mobile": [
+      "single scrollable details column on compact phone",
+      "52px scaled actions",
+      "back closes panel"
+    ]
+  },
+  "authoring_guards": [
+    {
+      "type": "bonusmap_entry_profile",
+      "server_sensitive": false,
+      "fields": [
+        "kind",
+        "eligibility_level",
+        "entry_item",
+        "entry_cost",
+        "label",
+        "enabled"
+      ]
+    },
+    {
+      "type": "crafting_requirement_profile",
+      "server_sensitive": false,
+      "fields": [
+        "recipe_id",
+        "station",
+        "station_level",
+        "inputs",
+        "gold",
+        "output"
+      ]
+    },
+    {
+      "type": "shipyard_catalog_profile",
+      "server_sensitive": false,
+      "fields": [
+        "ship_id",
+        "display_order",
+        "unlock_summary",
+        "asset_slots"
+      ]
+    },
+    {
+      "type": "interaction_feedback_profile",
+      "server_sensitive": false,
+      "fields": [
+        "state",
+        "label",
+        "severity",
+        "mobile_label"
+      ]
+    }
+  ]
+}

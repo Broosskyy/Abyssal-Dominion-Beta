@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://c0rkyamgx3twn"
+
+[deps]
+
+files=["res://docs/unity_pc_inventory.type.translation", "res://docs/unity_pc_inventory.path.translation", "res://docs/unity_pc_inventory.name.translation", "res://docs/unity_pc_inventory.serialized.translation", "res://docs/unity_pc_inventory.width.translation", "res://docs/unity_pc_inventory.height.translation", "res://docs/unity_pc_inventory.format.translation"]
+
+source_file="res://docs/unity_pc_inventory.csv"
+dest_files=["res://docs/unity_pc_inventory.type.translation", "res://docs/unity_pc_inventory.path.translation", "res://docs/unity_pc_inventory.name.translation", "res://docs/unity_pc_inventory.serialized.translation", "res://docs/unity_pc_inventory.width.translation", "res://docs/unity_pc_inventory.height.translation", "res://docs/unity_pc_inventory.format.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

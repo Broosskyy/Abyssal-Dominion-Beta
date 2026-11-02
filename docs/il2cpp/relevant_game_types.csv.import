@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cmxb4sg8gn4ly"
+
+[deps]
+
+files=["res://docs/il2cpp/relevant_game_types.type.translation", "res://docs/il2cpp/relevant_game_types.namespace.translation", "res://docs/il2cpp/relevant_game_types.type.translation", "res://docs/il2cpp/relevant_game_types.methods.translation", "res://docs/il2cpp/relevant_game_types.fields.translation"]
+
+source_file="res://docs/il2cpp/relevant_game_types.csv"
+dest_files=["res://docs/il2cpp/relevant_game_types.type.translation", "res://docs/il2cpp/relevant_game_types.namespace.translation", "res://docs/il2cpp/relevant_game_types.type.translation", "res://docs/il2cpp/relevant_game_types.methods.translation", "res://docs/il2cpp/relevant_game_types.fields.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

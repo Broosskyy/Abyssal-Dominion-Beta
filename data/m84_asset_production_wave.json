@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "milestone": "M84",
+  "priority": "P0",
+  "master_first_13": [
+    "ship_small",
+    "ship_medium",
+    "ship_large",
+    "npc_friendly_coastal_sloop",
+    "npc_scout_01",
+    "npc_raider_01",
+    "npc_gunship_01",
+    "npc_heavy_01",
+    "harbor_havens_reach",
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "monster_early_01"
+  ],
+  "wired_this_milestone": [
+    "prop_harbor_barrel_rack_01",
+    "prop_harbor_small_boat_01",
+    "prop_wreck_mast_broken_02",
+    "prop_wreck_rope_tangle_01",
+    "nature_shallow_rock_line_01",
+    "nature_foam_reef_line_01"
+  ],
+  "prepared_next": [
+    "prop_harbor_fishing_net_02",
+    "prop_harbor_rope_coil_02",
+    "prop_wreck_side_planking_01",
+    "prop_wreck_crows_nest_01",
+    "nature_shallow_coral_cluster_01",
+    "nature_shallow_seagrass_01",
+    "prop_monster_harpoon_marker_01",
+    "prop_monster_scrape_buoy_01"
+  ],
+  "rule": "Master P0 first-13 final assets remain highest priority; M84 UI/world placeholders only extend swap-ready coverage."
+}

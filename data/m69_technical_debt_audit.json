@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "milestone": "M69",
+  "fixed": [
+    "P0 NPC resolver no longer leaks generic PL1-5 archetype slots into higher-level NPCs without explicit production slot",
+    "target frame relation now uses EncounterRelation.status like world nameplates",
+    "boss progression reward no longer depends on stale last_progression_ship_reward metadata",
+    "boss progression award emits roster_changed once instead of twice",
+    "explicit progression_ship_awarded signal added",
+    "legacy owned progression designs gain clearly-marked local migration history rows",
+    "shared P0 NPC fallback geometry now receives role-specific visual silhouette decoration"
+  ],
+  "remaining": [
+    "native Godot parser/runtime/device QA",
+    "full PL1-5 playthrough including Pirate Trial PL5",
+    "dedicated final GLBs for all five P0 NPC roles",
+    "mobile performance profiler pass",
+    "real backend/multiplayer/account persistence remains later phase"
+  ]
+}

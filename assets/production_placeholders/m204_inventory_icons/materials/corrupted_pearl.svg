@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><!-- M204 corrupted_pearl: visual-only replacement-ready placeholder -->
+<rect x="5" y="5" width="86" height="86" rx="18" fill="#081827" stroke="#d6a84f" stroke-width="4"/>
+<circle cx="48" cy="48" r="34" fill="#10293b" stroke="#31536a" stroke-width="2"/>
+<polygon points="48.0,31.0 51.9,39.9 61.3,37.4 56.8,46.0 64.6,51.8 55.0,53.6 55.4,63.3 48.0,57.0 40.6,63.3 41.0,53.6 31.4,51.8 39.2,46.0 34.7,37.4 44.1,39.9" fill="#64cfe8" fill-opacity=".20" stroke="#d6a84f" stroke-width="3" stroke-linejoin="round"/>
+<g fill="none" stroke="#64cfe8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M30 57 Q48 35 66 57 M33 63 H63"/></g>
+<circle cx="73" cy="23" r="5" fill="#64cfe8" stroke="#f4df9a" stroke-width="2"/></svg>

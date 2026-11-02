@@ -1,0 +1,10 @@
+{
+  "milestone": "M64",
+  "requested_artifact": "AbyssalDominion_M64_Test.apk",
+  "godot_required": "4.7.2.stable",
+  "godot_binary_found": false,
+  "matching_export_templates_found": false,
+  "apk_built": false,
+  "reason": "Current execution environment contains no Godot 4.7.2 executable/export templates, so a genuine installable APK cannot be exported here.",
+  "do_not_fake": true
+}

@@ -1,0 +1,11 @@
+Godot Engine v4.5.1.stable.official.f62fdbde1 - https://godotengine.org
+
+ERROR: The object does not have any 'meta' values with the key 'nearby_port'.
+   at: get_meta (core/object/object.cpp:1091)
+   GDScript backtrace (most recent call first):
+       [0] at_port (res://scripts/progression/player_inventory.gd:59)
+       [1] _refresh (res://scripts/ui/arsenal_panel.gd:161)
+       [2] _ready (res://scripts/ui/arsenal_panel.gd:72)
+       [3] _ready (res://scripts/core/game_bootstrap.gd:44)
+       [4] _run (res://tests/m10_encounters_test.gd:14)
+M10_ENGINE_TESTS: 86/86 passed

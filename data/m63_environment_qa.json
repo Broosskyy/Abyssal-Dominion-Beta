@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "milestone": "M63",
+  "title": "Environment QA Presets",
+  "checks": [
+    "player ship silhouette remains readable against water",
+    "neutral and hostile nameplates remain legible over water highlights",
+    "shoreline foam does not obscure island collision edge",
+    "wake and bow foam remain visible without becoming opaque white ribbons",
+    "safe-zone ring is recognizable but does not dominate harbor art",
+    "impact VFX remain distinguishable on phone landscape",
+    "reduced-motion setting lowers animated water motion without disabling readability",
+    "low quality tier preserves gameplay information"
+  ],
+  "camera_basis": "oblique sea-map / top-down mobile acceptance camera"
+}

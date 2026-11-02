@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "milestone": "M190",
+  "title": "Sea-map composition, water restraint and gameplay framing",
+  "master_reference": "Masterkonzept V3.8 gameplay/world references",
+  "locks": {
+    "tap_to_sail_preserved": true,
+    "camera_wheel_camera_only": true,
+    "primary_attack_bottom_right": true,
+    "world_center_gameplay_first": true,
+    "global_meta_access_preserved": true,
+    "harbor_is_local_world_poi": true,
+    "collision_and_combat_scale_unchanged": true
+  },
+  "camera": {
+    "default_zoom_factor": 1.0,
+    "fov_degrees": 38.0,
+    "base_offset": [
+      11.2,
+      19.5,
+      -16.8
+    ],
+    "pinch_zoom_preserved": true,
+    "recenter_preserved": true,
+    "goal": "make ship, encounters and islands read larger without changing gameplay collision or movement authority"
+  },
+  "water": {
+    "goal": "dark restrained maritime surface with readable ships and islands; no bright plastic glare",
+    "micro_normal_scale_a": 8.2,
+    "micro_normal_scale_b": 13.5,
+    "crest_mix_max": 0.032,
+    "default_surface_roughness": 0.64,
+    "default_specular_strength": 0.17,
+    "gameplay_water_plane_unchanged": true,
+    "reduced_motion_preserved": true
+  },
+  "hud": {
+    "harbor_proximity_message_moves_out_of_world_center": true,
+    "generic_poi_labels_require_close_range": true,
+    "tracked_objective_remains_highest_priority_world_cue": true,
+    "combat_nameplates_preserved": true,
+    "generic_poi_label_range_preserved_meters": 34.0
+  },
+  "authority": "presentation_only"
+}

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "milestone": "M88",
+  "harbor_id": "havens_reach",
+  "mobile": {
+    "landmark_max": 3,
+    "secondary_max": 7,
+    "dressing_visible_target": 12,
+    "dressing_hard_max": 18
+  },
+  "desktop": {
+    "landmark_max": 3,
+    "secondary_max": 7,
+    "dressing_visible_target": 18,
+    "dressing_hard_max": 24
+  },
+  "policy": "Preserve landmark/secondary hierarchy; suppress dressing first.",
+  "authority": "visual only"
+}

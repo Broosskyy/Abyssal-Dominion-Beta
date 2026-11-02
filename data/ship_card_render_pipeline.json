@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "milestone": "M52",
+  "purpose": "Final ship GLB and ship-card visuals remain independently replaceable while sharing stable design IDs.",
+  "workflow": [
+    "Map final GLB to model slot ship_main_XX (or starter model slot).",
+    "Validate scale/pivot/material in QA scenes.",
+    "Open ShipyardPanel/Asset Preview and render approved oblique preview externally or through future capture tool.",
+    "Map approved thumbnail to ship_card_main_XX / starter card slot.",
+    "Removing either override must safely fall back without affecting gameplay."
+  ],
+  "card_contract": {
+    "recommended_resolution": [
+      512,
+      384
+    ],
+    "formats": [
+      "png",
+      "webp",
+      "svg"
+    ],
+    "camera": "oblique sea-map readable",
+    "background": "transparent or approved shipyard background",
+    "no_stats_baked_into_art": true
+  },
+  "model_contract": {
+    "unit": "meter",
+    "up": "+Y",
+    "forward": "+Z",
+    "waterline_pivot": true,
+    "visual_only": true
+  },
+  "runtime_capture": "not claimed in M52; contract/preparation only"
+}

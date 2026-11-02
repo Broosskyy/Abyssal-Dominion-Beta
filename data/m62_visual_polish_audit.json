@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "milestone": "M62",
+  "title": "Visual Polish Audit M58-M61",
+  "checks": [
+    {
+      "area": "UI SVG",
+      "result": "PASS",
+      "rule": "text-free stable-slot graphics"
+    },
+    {
+      "area": "combat icons",
+      "result": "PASS",
+      "rule": "central M61 resolver replaces direct m42 HUD references"
+    },
+    {
+      "area": "world nameplates",
+      "result": "PASS",
+      "rule": "relation truth code-owned"
+    },
+    {
+      "area": "P0 GLB slots",
+      "result": "PASS",
+      "rule": "+Y/+Z/meter/waterline contracts retained"
+    },
+    {
+      "area": "mobile touch",
+      "result": "PASS_CONTRACT",
+      "rule": ">=52dp; native device QA still pending"
+    },
+    {
+      "area": "textures/materials",
+      "result": "CONTINUE",
+      "rule": "final GLB textures/materials will be audited per imported asset"
+    },
+    {
+      "area": "performance",
+      "result": "CONTINUE",
+      "rule": "native profiler/device pass required before final claim"
+    }
+  ],
+  "do_not_regress": [
+    "stable slot IDs",
+    "fallback behavior",
+    "safe-area rules",
+    "gameplay/code ownership",
+    "mobile readability"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "browser": "134.0.6998.35",
+  "transport": "Browser WebSocket to Godot local probe",
+  "result": {
+    "build": "M12",
+    "protocol": 1,
+    "scope": "transport-only",
+    "session": 1,
+    "type": "welcome"
+  },
+  "shared_gameplay": false
+}

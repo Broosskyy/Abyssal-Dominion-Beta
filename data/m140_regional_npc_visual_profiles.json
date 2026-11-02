@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "profiles": {
+    "shattered_shores": {
+      "hull": "7b5130",
+      "sail": "d8c7a2",
+      "trim": "a77b45",
+      "family": "weathered_coastal"
+    },
+    "crimson_sea": {
+      "hull": "713a2d",
+      "sail": "d5b69a",
+      "trim": "b58a4a",
+      "family": "red_corsair"
+    },
+    "drowned_reach": {
+      "hull": "4e5b57",
+      "sail": "b8b6a5",
+      "trim": "7e927c",
+      "family": "drowned_weathered"
+    },
+    "stormbound_expanse": {
+      "hull": "4f4b58",
+      "sail": "c4c0b5",
+      "trim": "8b7b66",
+      "family": "storm_raider"
+    },
+    "cursed_dominion": {
+      "hull": "473b35",
+      "sail": "a99b80",
+      "trim": "7d6950",
+      "family": "cursed_black_lantern"
+    },
+    "abyssal_frontier": {
+      "hull": "314c53",
+      "sail": "9ca8a1",
+      "trim": "5c8781",
+      "family": "abyss_hunter"
+    },
+    "sunken_empire": {
+      "hull": "514a3a",
+      "sail": "b3a98a",
+      "trim": "a08858",
+      "family": "relic_empire"
+    },
+    "void_sea": {
+      "hull": "343341",
+      "sail": "868593",
+      "trim": "665f7a",
+      "family": "void_fleet"
+    },
+    "sovereign_waters": {
+      "hull": "59462d",
+      "sail": "d0c09a",
+      "trim": "b79855",
+      "family": "sovereign_ornate"
+    },
+    "abyssal_dominion": {
+      "hull": "352d34",
+      "sail": "9f9398",
+      "trim": "7e6656",
+      "family": "dominion_legendary"
+    }
+  }
+}

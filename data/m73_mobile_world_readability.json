@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "milestone": "M73",
+  "poi_world_max": 8,
+  "poi_minimap_max": 6,
+  "objective_strip_max_lines": 3,
+  "touch_minimum_px": 56,
+  "minor_dressing_distance": {
+    "low": 26,
+    "balanced": 38,
+    "high": 52
+  },
+  "rules": [
+    "primary objective must remain readable without opening a menu",
+    "POI markers never cover reserved HUD regions",
+    "decorative density may fall on low quality",
+    "navigation/combat/quest truth never depends on decorative visibility"
+  ]
+}

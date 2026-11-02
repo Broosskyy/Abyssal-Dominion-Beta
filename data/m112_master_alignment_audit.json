@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "milestone": "M112",
+  "v3_7_found": false,
+  "implemented": [
+    "physical PL16-20 sector registration",
+    "5x5 world grid",
+    "Cursed biome encounter fallback",
+    "Cursed regional NPC/harbor/island slots",
+    "irregular cursed island composition",
+    "PL12+ Silver chart fragment hook",
+    "guild islands continue from level 2"
+  ],
+  "preserved": [
+    "all legacy sector coordinates",
+    "Tap-to-Sail",
+    "one active sector content root",
+    "Ship Mastery 1-10",
+    "PL20 trial gate",
+    "no fake server authority"
+  ],
+  "pending": [
+    "native Godot 4.7.2 parser/runtime",
+    "mobile minimap screenshot QA",
+    "final Cursed GLBs",
+    "true monster creature runtime for Cursed Serpent/Ghost Whale",
+    "full Silver Bonusmap scene"
+  ]
+}

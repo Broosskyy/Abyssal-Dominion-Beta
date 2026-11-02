@@ -1,0 +1,9 @@
+{
+  "schema_version":1,"milestone":"M150","master":"CURRENT_BINDING_SHIP_DIRECTION","supersedes_total_ship_count_claims_before_m150":true,
+  "starter_ships":{"count":3,"unlock_levels":{"small":1,"medium":2,"large":3},"style":"classical NPC-near ships; bright natural materials; mobile-readable"},
+  "regular_ship_classes":{"count":100,"range":[1,100],"ship_mastery_levels_per_playable_design":10},
+  "prestige_ship_classes":{"count":5,"ids":["P1","P2","P3","P4","P5"],"starts_after_regular_class":100},
+  "current_asset_state":{"dedicated_regular_glb_ready":[1,10],"legacy_reserved_range":[11,50],"new_reserved_range":[51,100],"prestige_reserved":["P1","P2","P3","P4","P5"]},
+  "design_rules":["Classes use multiple ship generations and hull families, not one recolor chain.","Silhouette variety requires different hulls, proportions, bow/stern forms, deck structures, mast/sail layouts, weapon arrangements, materials, ornaments and special features.","Color and theme support identity but never replace form variation.","Early classes remain grounded; extreme Abyss, monster and mystical forms escalate mainly toward later classes.","Size, sail count and strength are not automatically coupled.","Class and design are separate; Event, PvP, Admiral, Boss, Season, Payment, Guild and Achievement designs remain independent pools.","Every silhouette must remain readable from the oblique top-down mobile sea-map camera."],
+  "production_rule":"Reserved class does not require a placeholder GLB until its scheduled production wave; mass duplication is not silhouette coverage."
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "milestone": "M203",
+  "status": "OPTIMIZED_COMBAT_ITEM_ICON_FAMILY_STATIC_VERIFIED",
+  "visual_master": "V3.8 + approved visual master references",
+  "platform_parity": true,
+  "format": {
+    "source": "SVG",
+    "viewbox": "96x96",
+    "raster_embedded": false,
+    "scalable": true,
+    "touch_readable": true,
+    "stable_silhouette": true
+  },
+  "families": {
+    "ammo": [
+      "iron",
+      "explosive",
+      "chain",
+      "piercing",
+      "ember",
+      "venom",
+      "shatter",
+      "spectral"
+    ],
+    "action_items": [
+      "repair",
+      "boost",
+      "veil",
+      "storm_bolt",
+      "infernal_barrel",
+      "crystal_barrier",
+      "armor_corrosive",
+      "repair_blocker",
+      "leviathan_hook",
+      "recall_compass",
+      "gravewake_lantern"
+    ],
+    "inventory_items": [
+      "crystal_blessing",
+      "sea_chart",
+      "repair_crew",
+      "smoke_screen",
+      "war_banner",
+      "tower_parts",
+      "guild_timber",
+      "guild_steel",
+      "enchanted_rope",
+      "cannon_oil",
+      "monster_bait",
+      "admiral_seal"
+    ],
+    "harpoon_payloads": [
+      "hunter_standard",
+      "barbed_chain",
+      "abyss_piercer"
+    ],
+    "support_ammo": [
+      "restoration_shell",
+      "ward_shell",
+      "event_restoration_shell"
+    ]
+  },
+  "rules": [
+    "same icon on mobile/web/desktop",
+    "responsive display size only",
+    "no gameplay stats in visual assets",
+    "stable slot IDs keep final-art replacement safe",
+    "distinct silhouette before decorative detail"
+  ]
+}

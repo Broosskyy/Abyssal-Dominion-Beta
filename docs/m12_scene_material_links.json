@@ -1,0 +1,3743 @@
+[
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_01_coast",
+    "mesh_path_id": 1031,
+    "mesh": "island_01_coast5",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_01_coast",
+    "mesh_path_id": 1031,
+    "mesh": "island_01_coast5",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_01_coast",
+    "mesh_path_id": 1031,
+    "mesh": "island_01_coast5",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_01_coast",
+    "mesh_path_id": 1031,
+    "mesh": "island_01_coast5",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_01_coast",
+    "mesh_path_id": 1031,
+    "mesh": "island_01_coast5",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_01_coast",
+    "mesh_path_id": 1031,
+    "mesh": "island_01_coast5",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "snow_island_02_coast",
+    "mesh_path_id": 966,
+    "mesh": "snow_island_02_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_01_coast",
+    "mesh_path_id": 1031,
+    "mesh": "island_01_coast5",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_01_coast",
+    "mesh_path_id": 1031,
+    "mesh": "island_01_coast5",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_01_coast",
+    "mesh_path_id": 1031,
+    "mesh": "island_01_coast5",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "island_04_coast",
+    "mesh_path_id": 1044,
+    "mesh": "island_04_coast",
+    "materials": [
+      {
+        "source": "sharedassets2.assets",
+        "path_id": 53,
+        "name": "coast_new01",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 270
+            },
+            "scale": {
+              "x": 0.10000000149011612,
+              "y": 0.08299999684095383
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

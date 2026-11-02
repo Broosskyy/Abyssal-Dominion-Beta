@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "milestone": "M67",
+  "title": "Haven's Reach Modular Composition",
+  "harbor_id": "havens_reach",
+  "layers": [
+    {
+      "id": "base",
+      "slot": "harbor_havens_reach",
+      "required": true
+    },
+    {
+      "id": "pier",
+      "slot": "harbor_module_pier",
+      "required": false
+    },
+    {
+      "id": "lighthouse",
+      "slot": "harbor_module_lighthouse",
+      "required": false
+    },
+    {
+      "id": "shipyard",
+      "slot": "harbor_module_shipyard",
+      "required": false
+    },
+    {
+      "id": "market",
+      "slot": "harbor_module_market",
+      "required": false
+    },
+    {
+      "id": "arsenal",
+      "slot": "harbor_module_arsenal",
+      "required": false
+    },
+    {
+      "id": "quest_hub",
+      "slot": "harbor_module_quest_hub",
+      "required": false
+    },
+    {
+      "id": "decoration",
+      "slot": "harbor_module_decoration",
+      "required": false
+    }
+  ],
+  "rule": "Architecture is modular/separate from island/water gameplay; missing modules fall back or remain absent without breaking port services."
+}

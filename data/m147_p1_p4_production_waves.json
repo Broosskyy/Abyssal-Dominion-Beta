@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "milestone": "M147",
+  "master": "V3.7",
+  "purpose": "Prepare P1-P4 gradually without skipping P0 acceptance or claiming reserved art is complete.",
+  "waves": {
+    "P1": {
+      "master_priority": "P1",
+      "scope": "Early Game and first regions",
+      "main_ship_range": [1, 10],
+      "state": "FIRST_GLB_BATCH_READY_NOT_LIVE",
+      "root": "res://assets/production_placeholders/p1/",
+      "regions": ["Crimson Sea", "Drowned Reach"],
+      "focus": ["main progression ships", "regional admirals", "frigate/heavy-frigate/sniper NPCs", "Krakenling", "coral/coastal flowers/mangrove/reed kits"]
+    },
+    "P2": {
+      "master_priority": "P2",
+      "scope": "Midgame, core systems, Guild, PvP and special PvE",
+      "main_ship_range": [11, 30],
+      "state": "SLOTS_RESERVED",
+      "root": "res://assets/production_placeholders/p2/",
+      "regions": ["Stormbound Expanse", "Cursed Dominion", "Abyssal Frontier"],
+      "focus": ["regional admirals", "destroyer/juggernaut/siege/support/elite/bounty/corrupted ships", "cursed tree/abyss crystal/corrupted coral kits", "piercing/hybrid harpoons", "guild island and siege"]
+    },
+    "P3": {
+      "master_priority": "P3",
+      "scope": "Late Game and Legendary content",
+      "main_ship_range": [31, 40],
+      "state": "SLOTS_RESERVED",
+      "root": "res://assets/production_placeholders/p3/",
+      "regions": ["Sunken Empire", "Void Sea", "Sovereign Waters"],
+      "focus": ["sovereign and abyssal guards", "sunken flora", "void vegetation", "legendary ships", "abyssal cannon and harpoon"]
+    },
+    "P4": {
+      "master_priority": "P3",
+      "production_subwave": "P4_ENDGAME_IMPLEMENTATION",
+      "scope": "Endgame, Hero and Ultimate Prestige production subwave",
+      "main_ship_range": [41, 50],
+      "state": "SLOTS_RESERVED",
+      "root": "res://assets/production_placeholders/p4/",
+      "regions": ["Abyssal Dominion"],
+      "focus": ["endgame and hero ships", "legendary admirals and monsters", "dominion world kit", "ultimate prestige presentation"]
+    }
+  },
+  "active_glb_slots": [
+    {"id":"ship_main_01","master_slot":"SHIP-PROG-001","file":"ship_main_01.glb","wave":"P1","state":"DEDICATED_PLACEHOLDER"},
+    {"id":"ship_main_02","master_slot":"SHIP-PROG-002","file":"ship_main_02.glb","wave":"P1","state":"DEDICATED_PLACEHOLDER"},
+    {"id":"ship_main_03","master_slot":"SHIP-PROG-003","file":"ship_main_03.glb","wave":"P1","state":"DEDICATED_PLACEHOLDER"},
+    {"id":"ship_main_04","master_slot":"SHIP-PROG-004","file":"ship_main_04.glb","wave":"P1","state":"DEDICATED_PLACEHOLDER"},
+    {"id":"ship_main_05","master_slot":"SHIP-PROG-005","file":"ship_main_05.glb","wave":"P1","state":"DEDICATED_PLACEHOLDER"},
+    {"id":"ship_main_06","master_slot":"SHIP-PROG-006","file":"ship_main_06.glb","wave":"P1","state":"DEDICATED_PLACEHOLDER"},
+    {"id":"ship_main_07","master_slot":"SHIP-PROG-007","file":"ship_main_07.glb","wave":"P1","state":"DEDICATED_PLACEHOLDER"},
+    {"id":"ship_main_08","master_slot":"SHIP-PROG-008","file":"ship_main_08.glb","wave":"P1","state":"DEDICATED_PLACEHOLDER"},
+    {"id":"ship_main_09","master_slot":"SHIP-PROG-009","file":"ship_main_09.glb","wave":"P1","state":"DEDICATED_PLACEHOLDER"},
+    {"id":"ship_main_10","master_slot":"SHIP-PROG-010","file":"ship_main_10.glb","wave":"P1","state":"DEDICATED_PLACEHOLDER"}
+  ],
+  "parallel_event_wave": {
+    "id": "P-EVENT",
+    "state": "RESERVED_SEPARATELY",
+    "root": "res://assets/production_placeholders/p_event/",
+    "rule": "Event production may run in parallel but never renumbers or replaces P1-P4 progression slots."
+  },
+  "global_rules": [
+    "P0 visual acceptance stays first.",
+    "Ship Mastery levels 1-10 never create ten GLBs per design.",
+    "Geometry belongs in GLB; movement, light, smoke, wake, foam, trails, impacts and magic stay in Godot.",
+    "Island GLBs contain landmass, underside and coast layers but no baked water, reef or foam.",
+    "Mobile oblique top-down gameplay zoom is the visual acceptance basis.",
+    "Reserved slot does not mean final asset, imported asset or live gameplay activation."
+  ]
+}

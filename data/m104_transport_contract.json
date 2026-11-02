@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "milestone": "M104",
+  "request_required": [
+    "request_id",
+    "environment",
+    "client_version",
+    "build_number",
+    "content_config_version",
+    "route",
+    "method",
+    "payload"
+  ],
+  "response_required": [
+    "request_id",
+    "status",
+    "server_time",
+    "revision",
+    "payload",
+    "error"
+  ],
+  "routes": [
+    "auth",
+    "profile",
+    "inventory",
+    "wallet",
+    "progression",
+    "entitlement",
+    "guild",
+    "event",
+    "support"
+  ],
+  "adapters": {
+    "offline_local": {
+      "network": false,
+      "authority": "local_prototype"
+    },
+    "future_http_api": {
+      "network": true,
+      "authority": "server_required"
+    },
+    "future_realtime": {
+      "network": true,
+      "authority": "server_required"
+    }
+  },
+  "rules": [
+    "Transport is replaceable; domain code does not directly own HTTP/WebSocket details.",
+    "GLOBAL/TEST authoritative mutations require server adapters.",
+    "Request IDs survive retries; duplicate authoritative writes are idempotent.",
+    "Client version/API/content compatibility is checked before authoritative session."
+  ]
+}

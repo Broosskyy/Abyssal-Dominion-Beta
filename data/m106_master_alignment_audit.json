@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "milestone": "M106",
+  "implemented": [
+    "ServiceLocator node",
+    "loot coin/material caller migration",
+    "encounter XP caller migration",
+    "Haven's Reach pirate dressing replacement under same module count",
+    "cove silhouette detail replacement under same cap",
+    "P0 final-art checklist"
+  ],
+  "behavior_preserved": [
+    "local rewards",
+    "local save ownership",
+    "Tap-to-Sail",
+    "HUD customization",
+    "guild island presentation",
+    "Halloween/Admin local QA"
+  ],
+  "authority_truth": {
+    "local_services": true,
+    "test_global_services": false,
+    "server_backend": false,
+    "staff_authority": false
+  },
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS/Desktop/Web",
+    "P0 final GLBs",
+    "mobile screenshot acceptance"
+  ]
+}

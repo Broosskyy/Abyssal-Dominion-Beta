@@ -1,0 +1,16 @@
+extends Node
+func _ready()->void:
+	var c:=GuildIslandComposer.contract()
+	assert(int(c.minimum_map_level)==2)
+	assert(GuildIslandComposer.should_spawn(2))
+	assert(not GuildIslandComposer.should_spawn(1))
+	assert(bool(c.server_authority_required))
+	assert(not bool(c.ownership_persistence))
+	assert(not bool(c.tower_contract.broadside_angle_damage))
+	assert(not bool(c.tower_contract.m89_live_damage))
+	var slots:=GuildContracts.read_island_slots()
+	assert(slots.slots.has("tower_cannon"))
+	assert(slots.slots.has("shield_core"))
+	var audit:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m89_guild_island_authority_audit.json"))
+	assert("tower damage" in audit.not_local_authority)
+	print("M89_GUILD_ISLAND_MAP2_PASS")

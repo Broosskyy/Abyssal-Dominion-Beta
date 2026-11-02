@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "milestone": "M178",
+  "master_concept": "V3.8",
+  "goal": "READABLE_DODGEABLE_MOBILE_BOSS_TELEGRAPHS",
+  "contracts": {
+    "target_zone_is_locked_at_cast_start": true,
+    "moving_outside_hit_radius_dodges": true,
+    "boss_self_cast_follows_boss": true,
+    "pending_cast_continues_outside_activation_range": true,
+    "one_world_telegraph_per_boss": true,
+    "hud_banner_preserves_locked_composition": true,
+    "ship_movement_remains_tap_to_sail": true,
+    "camera_joystick_never_moves_ship": true
+  },
+  "accessibility": {
+    "reduced_motion": "static_world_ring",
+    "effect_intensity": "scales_emission_not_gameplay_visibility",
+    "minimum_alpha": 0.42,
+    "hud_countdown": true,
+    "hud_progress_bar": true
+  },
+  "authority": {
+    "telegraph_visuals": "client_presentation",
+    "prototype_hit_resolution": "local_existing_combat_primitives",
+    "production_hit_resolution": "server_authoritative",
+    "visual_replacement_may_change_timing_or_damage": false
+  }
+}

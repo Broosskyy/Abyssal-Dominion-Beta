@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><!-- M204 veil_silk: visual-only replacement-ready placeholder -->
+<rect x="5" y="5" width="86" height="86" rx="18" fill="#081827" stroke="#d6a84f" stroke-width="4"/>
+<circle cx="48" cy="48" r="34" fill="#10293b" stroke="#31536a" stroke-width="2"/>
+<polygon points="48.0,31.0 51.1,40.6 60.0,36.0 55.4,44.9 65.0,48.0 55.4,51.1 60.0,60.0 51.1,55.4 48.0,65.0 44.9,55.4 36.0,60.0 40.6,51.1 31.0,48.0 40.6,44.9 36.0,36.0 44.9,40.6" fill="#64cfe8" fill-opacity=".20" stroke="#d6a84f" stroke-width="3" stroke-linejoin="round"/>
+<g fill="none" stroke="#64cfe8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M30 57 Q48 35 66 57 M33 63 H63"/></g>
+<circle cx="73" cy="23" r="5" fill="#64cfe8" stroke="#f4df9a" stroke-width="2"/></svg>

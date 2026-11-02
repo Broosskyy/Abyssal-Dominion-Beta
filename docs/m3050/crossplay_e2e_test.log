@@ -1,0 +1,4 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ZONE_READY ws://127.0.0.1:9080 (development guests, no persistence)
+{"engine":"4.7.2-stable (official)","failed":[],"scope":"Godot chart plus second real WebSocket client; local transport, not physical devices/browser exports","status":"PASS","test":"crossplay_e2e"}

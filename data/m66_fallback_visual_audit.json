@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "milestone": "M66",
+  "title": "P0 Fallback Differentiation Audit",
+  "current": {
+    "starter_small": "dedicated fallback GLB",
+    "starter_medium": "dedicated fallback GLB",
+    "starter_large": "dedicated fallback GLB",
+    "friendly/scout/raider/gunship": "shared npc_corsair fallback GLB + distinct M66 presentation profile",
+    "heavy": "npc_admiral fallback GLB + distinct M66 presentation profile"
+  },
+  "next_asset_rule": "Final dedicated GLBs remain the target. M66 profiles improve interim readability but do not pretend shared geometry is final art.",
+  "acceptance": "role must read by silhouette at gameplay camera; palette is secondary cue"
+}

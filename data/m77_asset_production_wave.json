@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "milestone": "M77",
+  "priority": "P0",
+  "next_models": [
+    "prop_harbor_crane_01",
+    "prop_rope_bundle_01",
+    "prop_fish_crates_01",
+    "poi_wreck_beacon_01",
+    "poi_monster_warning_totem_01",
+    "prop_salvage_hook_01"
+  ],
+  "final_art_priority": [
+    "ship_small",
+    "ship_medium",
+    "ship_large",
+    "npc_friendly_coastal_sloop",
+    "npc_scout_01",
+    "npc_raider_01",
+    "npc_gunship_01",
+    "npc_heavy_01",
+    "harbor_havens_reach",
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "monster_early_01"
+  ],
+  "acceptance": [
+    "mobile oblique readability",
+    "pirate/coastal identity",
+    "stable slot/pivot",
+    "no gameplay scripts in GLB",
+    "reuse material families",
+    "fallback remains functional"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "milestone": "M214",
+  "status": "MASTER_REFERENCE_WORLD_SCALE_STATIC_VERIFIED",
+  "master_concept": "V3.8",
+  "reference_basis": ["151866.png", "151878.png", "152093.png", "152969.png", "149437.png"],
+  "camera_lock": {
+    "projection": "perspective_oblique_top_down",
+    "base_offset": [16.8, 29.0, -25.2],
+    "fov_degrees": 40.0,
+    "zoom_factor_range": [0.82, 1.62],
+    "intent": "wide playable sea-chart view with several ships, islands and POIs visible simultaneously"
+  },
+  "screen_hierarchy": ["player_and_selected_target", "harbor_or_landmark_island", "combat_encounter", "medium_islands", "minor_navigation_punctuation", "loot_and_world_pois"],
+  "ship_visual_scale": {"player":1.0,"npc_light":0.88,"npc_standard":0.96,"npc_heavy":1.08,"elite":1.12,"admiral":1.18,"boss_ship":1.24},
+  "island_radius_classes": {"xs":[3.5,5.5],"small":[5.5,8.0],"medium":[8.0,12.0],"large":[12.0,18.0],"landmark":[18.0,28.0]},
+  "monster_visual_scale": {"normal":0.92,"hunter":1.04,"elite":1.14,"boss":1.28,"world_boss":1.42},
+  "loot": {"world_readable_at_default_zoom":true,"beacon_visual_only":true,"pickup_radius_unchanged":true},
+  "harbors": {"landmark_priority":true,"service_authority_unchanged":true,"collision_unchanged":true},
+  "gameplay_locks": {"damage_changed":false,"weapon_range_changed":false,"collision_changed":false,"navigation_changed":false,"spawn_rules_changed":false,"tap_to_sail":true},
+  "platform_parity": "same world, scale hierarchy, encounter composition and gameplay VFX on mobile/web/desktop; responsive HUD only",
+  "native_visual_qa_required": true
+}

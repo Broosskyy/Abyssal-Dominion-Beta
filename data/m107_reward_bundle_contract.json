@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "milestone": "M107",
+  "bundle_fields": [
+    "reward_id",
+    "reason",
+    "coins",
+    "xp",
+    "items",
+    "entitlements"
+  ],
+  "domains": [
+    "wallet",
+    "progression",
+    "inventory",
+    "entitlement"
+  ],
+  "local_behavior": "apply sequentially through service facades with explicit local_only receipt",
+  "future_server_behavior": "one authoritative transaction/ledger boundary; all-or-nothing commit",
+  "idempotency": "client_request_id/reward_id combination must not duplicate live rewards",
+  "rules": [
+    "Mission, daily, weekly, event and beginner rewards use one bundle seam.",
+    "Premium entitlements cannot be granted by the local adapter.",
+    "Failure in a future authoritative bundle rolls back the whole transaction.",
+    "M107 local receipts are development evidence, not server receipts."
+  ]
+}

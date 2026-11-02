@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "milestone": "M80",
+  "status": "STATIC_SOURCE_READY_NATIVE_PENDING",
+  "gdscript_files": 185,
+  "class_name_definitions": 122,
+  "selected_project_class_refs_missing": [],
+  "explicit_res_paths_scanned": 213,
+  "explicit_missing_res_paths": [],
+  "checks": [
+    "JSON contracts parse",
+    "M77-M79 migration order preserved",
+    "M79 marker priority references resolve",
+    "M80 fallback/wreck classes exist",
+    "shared primitive mesh cache reduces repeated procedural resource creation"
+  ],
+  "native_required": [
+    "Godot 4.7.2 parser validation",
+    "scene/import validation",
+    "Android safe-area/DPI screenshots",
+    "GPU/CPU profiler capture",
+    "touch/input playthrough PL1-5"
+  ],
+  "not_claimed": [
+    "native parser pass",
+    "device pass",
+    "GPU profile pass"
+  ],
+  "explicit_missing_res_paths_expected_test_fixtures": [
+    {
+      "source": "tests/m33_runtime_test.gd",
+      "ref": "res://assets/custom/missing.glb"
+    },
+    {
+      "source": "tests/m33_runtime_test.gd",
+      "ref": "res://assets/../scripts/test.tscn"
+    },
+    {
+      "source": "tests/m33_runtime_test.gd",
+      "ref": "res://assets/custom/missing.png"
+    },
+    {
+      "source": "tests/m10_encounters_test.gd",
+      "ref": "res://assets/recovered_test/m8/islands/%s_coast.obj"
+    }
+  ],
+  "explicit_missing_res_paths_unexpected": [],
+  "notes": [
+    "The four initially detected missing res:// strings are intentional negative/dynamic test fixtures in M10/M33 tests.",
+    "No unexpected explicit res:// file reference was found by the M80 heuristic scan."
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "milestone": "M93",
+  "phone": {
+    "semantic_world_markers_max": 10,
+    "combat_nameplates_max": 8,
+    "decorative_nameplates_max": 0,
+    "guild_range_rings_max": 1,
+    "monster_warning_props_max": 2,
+    "wreck_props_max": 3,
+    "island_secondary_details_max": 1,
+    "harbor_dressing": "quality_budgeted"
+  },
+  "shadow_policy": {
+    "hero_ship": "keep",
+    "active_target": "keep",
+    "major_landmark": "keep_if_budget",
+    "small_dressing": "off",
+    "fallback_ui_world_markers": "off"
+  },
+  "lod_policy": "final GLBs must provide mobile-readable silhouette before micro-detail; wrapper remains stable",
+  "authority": "visual/performance only"
+}

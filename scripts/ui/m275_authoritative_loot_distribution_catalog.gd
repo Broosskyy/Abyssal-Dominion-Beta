@@ -1,0 +1,10 @@
+class_name M275AuthoritativeLootDistributionCatalog
+extends RefCounted
+static func overview(runtime:M275AuthoritativeLootDistributionRuntime)->Dictionary:
+	if runtime==null:return {"title":"Loot Tables · Distribution","state":"SERVER REQUIRED","detail":"Keine autoritative Loot-Distribution-Replica gebunden."}
+	var s:=runtime.snapshot(); return {"title":"Loot Tables · Drop Pools · Distribution","state":"SERVER REPLICA" if int(s.get("loot_revision",-1))>=0 else "WAITING","detail":"Encounter %s · loot rev %d · distribution rev %d"%[str(s.get("encounter_id","UNBOUND")),int(s.get("loot_revision",-1)),int(s.get("distribution_revision",-1))]}
+static func pools()->Dictionary: return {"title":"NPC · Monster · Admiral · Boss · Event Pools","state":"DATA-DRIVEN FOUNDATION","detail":"Server wählt den gültigen Pool aus bestätigtem Encounter-/Content-Kontext. Finale Chancen, Mengen, Pity- oder Rarity-Werte bleiben ungesetzt."}
+static func personal()->Dictionary: return {"title":"Personal Loot · Eligibility","state":"M274 GATED","detail":"Nur M274-berechtigte Teilnehmer können in die serverseitige Drop-Auflösung gelangen. HUD-Anzeige, Last Hit oder lokaler Damage erzeugen keinen Drop."}
+static func groups()->Dictionary: return {"title":"Group · Fleet Reward Distribution","state":"SERVER AUTHORITATIVE","detail":"Personal-, Gruppen- und Fleet-Verteilung sind getrennte serverseitige Ergebnisse; finale Share-/Round-Robin-/Contribution-Regeln bleiben datengetrieben und ungesetzt."}
+static func settlement()->Dictionary: return {"title":"Drop Result · Atomic Ownership","state":"M266 REQUIRED","detail":"M275 löst Pool und Verteilung auf, erzeugt aber keinen dauerhaften Besitz. Inventar, Wallet, Ownership und Receipts werden ausschließlich atomar über M266 verbucht."}
+static func authority()->Dictionary: return {"title":"Loot Authority","state":"FAIL-CLOSED","detail":"Clients können weder Pool, Roll, Rarity, persönlichen Drop, Gruppen-/Fleet-Split noch Settlement autorisieren. TEST/GLOBAL bleiben strikt isoliert."}

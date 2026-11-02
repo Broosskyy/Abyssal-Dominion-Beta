@@ -1,0 +1,527 @@
+{
+  "schema": 1,
+  "milestone": "M164",
+  "goal": "NO_CODE_COMBAT_GUILD_UI_AUTHORING_AND_LEGACY_HARDCODE_AUDIT",
+  "design_rule": "Genre references inform breadth and utility only; names, values, visuals and progression are original.",
+  "ammo_extensions": [
+    {
+      "id": "storm_shot",
+      "label": "Sturmgeschoss",
+      "family": "control",
+      "role": "reload_disrupt",
+      "damage": 0.84,
+      "armor_pierce": 0.08,
+      "slow": 0.08,
+      "range": 1.03,
+      "crit": 0.07,
+      "effect": "reload_disrupt",
+      "effect_power": 0.12,
+      "effect_duration": 4.0,
+      "rarity": "epic",
+      "color": "87d9ff"
+    },
+    {
+      "id": "wardbreaker",
+      "label": "Wardbrecher",
+      "family": "siege",
+      "role": "anti_ward",
+      "damage": 1.02,
+      "armor_pierce": 0.24,
+      "slow": 0.0,
+      "range": 0.98,
+      "crit": 0.06,
+      "effect": "ward_break",
+      "effect_power": 0.18,
+      "effect_duration": 5.0,
+      "rarity": "epic",
+      "color": "e1b4ff"
+    },
+    {
+      "id": "hunter_shell",
+      "label": "Jägergeschoss",
+      "family": "hunter",
+      "role": "anti_monster",
+      "damage": 0.94,
+      "armor_pierce": 0.12,
+      "slow": 0.04,
+      "range": 1.04,
+      "crit": 0.1,
+      "effect": "prey_mark",
+      "effect_power": 0.12,
+      "effect_duration": 6.0,
+      "rarity": "rare",
+      "color": "d8c36a"
+    },
+    {
+      "id": "frostwake",
+      "label": "Frostwake-Kugel",
+      "family": "elemental",
+      "role": "hard_control",
+      "damage": 0.76,
+      "armor_pierce": 0.06,
+      "slow": 0.22,
+      "range": 0.96,
+      "crit": 0.05,
+      "effect": "chill",
+      "effect_power": 0.18,
+      "effect_duration": 5.0,
+      "rarity": "rare",
+      "color": "a9e9ff"
+    },
+    {
+      "id": "sunburst",
+      "label": "Sonnenkern-Geschoss",
+      "family": "boss",
+      "role": "anti_corruption",
+      "damage": 1.14,
+      "armor_pierce": 0.18,
+      "slow": 0.0,
+      "range": 1.0,
+      "crit": 0.09,
+      "effect": "purge_mark",
+      "effect_power": 0.15,
+      "effect_duration": 5.0,
+      "rarity": "legendary",
+      "color": "ffd982"
+    },
+    {
+      "id": "siege_core",
+      "label": "Belagerungskern",
+      "family": "siege",
+      "role": "structure_damage",
+      "damage": 1.28,
+      "armor_pierce": 0.1,
+      "slow": 0.0,
+      "range": 0.9,
+      "crit": 0.04,
+      "effect": "structure_break",
+      "effect_power": 0.2,
+      "effect_duration": 4.0,
+      "rarity": "epic",
+      "color": "ffad6e"
+    }
+  ],
+  "harpoon_extensions": [
+    {
+      "id": "harpoon_reefspike",
+      "label": "Riffstachel",
+      "family": "precision",
+      "damage_mult": 1.08,
+      "range_mult": 1.18,
+      "effect": "weakpoint_mark",
+      "rarity": "rare"
+    },
+    {
+      "id": "harpoon_moonchain",
+      "label": "Mondkette",
+      "family": "event",
+      "damage_mult": 1.2,
+      "range_mult": 1.05,
+      "effect": "lunar_bind",
+      "rarity": "event"
+    },
+    {
+      "id": "harpoon_dreadfang",
+      "label": "Schreckenszahn",
+      "family": "admiral",
+      "damage_mult": 1.5,
+      "range_mult": 0.94,
+      "effect": "admiral_break",
+      "rarity": "legendary"
+    }
+  ],
+  "cannon_evolution": [
+    {
+      "stage": 1,
+      "label": "Kalibriert",
+      "requirement": "base",
+      "visual": "clean_metal",
+      "max_mastery": 2
+    },
+    {
+      "stage": 2,
+      "label": "Verstärkt",
+      "requirement": "mastery_3",
+      "visual": "reinforced_mount",
+      "max_mastery": 4
+    },
+    {
+      "stage": 3,
+      "label": "Runengefasst",
+      "requirement": "mastery_5",
+      "visual": "rune_socket",
+      "max_mastery": 6
+    },
+    {
+      "stage": 4,
+      "label": "Abyssgehärtet",
+      "requirement": "mastery_7",
+      "visual": "abyss_inlay",
+      "max_mastery": 8
+    },
+    {
+      "stage": 5,
+      "label": "Dominion-Meisterwerk",
+      "requirement": "mastery_10",
+      "visual": "mastery_trim",
+      "max_mastery": 10
+    }
+  ],
+  "guild_upgrade_curves": {
+    "building_levels": [
+      {
+        "level": 1,
+        "resource_mult": 1.0,
+        "build_time_mult": 1.0,
+        "visual_stage": 1
+      },
+      {
+        "level": 2,
+        "resource_mult": 1.32,
+        "build_time_mult": 1.18,
+        "visual_stage": 1
+      },
+      {
+        "level": 3,
+        "resource_mult": 1.64,
+        "build_time_mult": 1.36,
+        "visual_stage": 3
+      },
+      {
+        "level": 4,
+        "resource_mult": 1.96,
+        "build_time_mult": 1.54,
+        "visual_stage": 3
+      },
+      {
+        "level": 5,
+        "resource_mult": 2.28,
+        "build_time_mult": 1.72,
+        "visual_stage": 5
+      },
+      {
+        "level": 6,
+        "resource_mult": 2.6,
+        "build_time_mult": 1.9,
+        "visual_stage": 5
+      },
+      {
+        "level": 7,
+        "resource_mult": 2.92,
+        "build_time_mult": 2.08,
+        "visual_stage": 7
+      },
+      {
+        "level": 8,
+        "resource_mult": 3.24,
+        "build_time_mult": 2.26,
+        "visual_stage": 7
+      },
+      {
+        "level": 9,
+        "resource_mult": 3.56,
+        "build_time_mult": 2.44,
+        "visual_stage": 7
+      },
+      {
+        "level": 10,
+        "resource_mult": 3.88,
+        "build_time_mult": 2.62,
+        "visual_stage": 10
+      }
+    ],
+    "tower_levels": [
+      {
+        "level": 1,
+        "damage_mult": 1.0,
+        "range_mult": 1.0,
+        "durability_mult": 1.0,
+        "visual_stage": 1
+      },
+      {
+        "level": 2,
+        "damage_mult": 1.14,
+        "range_mult": 1.025,
+        "durability_mult": 1.18,
+        "visual_stage": 1
+      },
+      {
+        "level": 3,
+        "damage_mult": 1.28,
+        "range_mult": 1.05,
+        "durability_mult": 1.36,
+        "visual_stage": 3
+      },
+      {
+        "level": 4,
+        "damage_mult": 1.42,
+        "range_mult": 1.075,
+        "durability_mult": 1.54,
+        "visual_stage": 3
+      },
+      {
+        "level": 5,
+        "damage_mult": 1.56,
+        "range_mult": 1.1,
+        "durability_mult": 1.72,
+        "visual_stage": 5
+      },
+      {
+        "level": 6,
+        "damage_mult": 1.7,
+        "range_mult": 1.125,
+        "durability_mult": 1.9,
+        "visual_stage": 5
+      },
+      {
+        "level": 7,
+        "damage_mult": 1.84,
+        "range_mult": 1.15,
+        "durability_mult": 2.08,
+        "visual_stage": 7
+      },
+      {
+        "level": 8,
+        "damage_mult": 1.98,
+        "range_mult": 1.175,
+        "durability_mult": 2.26,
+        "visual_stage": 7
+      },
+      {
+        "level": 9,
+        "damage_mult": 2.12,
+        "range_mult": 1.2,
+        "durability_mult": 2.44,
+        "visual_stage": 7
+      },
+      {
+        "level": 10,
+        "damage_mult": 2.26,
+        "range_mult": 1.225,
+        "durability_mult": 2.62,
+        "visual_stage": 10
+      }
+    ],
+    "server_authoritative": true,
+    "preview_only_client": true
+  },
+  "guild_island_modules": [
+    {
+      "id": "watch_beacon",
+      "label": "Wachtfeuer",
+      "role": "reveal_attackers",
+      "max_level": 10
+    },
+    {
+      "id": "repair_dock",
+      "label": "Trockendock",
+      "role": "siege_repair",
+      "max_level": 10
+    },
+    {
+      "id": "resource_pier",
+      "label": "Versorgungspier",
+      "role": "supply_flow",
+      "max_level": 10
+    },
+    {
+      "id": "war_room",
+      "label": "Kriegskammer",
+      "role": "siege_planning",
+      "max_level": 10
+    },
+    {
+      "id": "relic_vault",
+      "label": "Reliktgewölbe",
+      "role": "guild_relics",
+      "max_level": 10
+    }
+  ],
+  "item_families": [
+    {
+      "id": "battle_consumables",
+      "authorable_fields": [
+        "effect",
+        "value",
+        "duration",
+        "cooldown",
+        "stacking",
+        "icon",
+        "vfx",
+        "sources",
+        "price"
+      ]
+    },
+    {
+      "id": "upgrade_materials",
+      "authorable_fields": [
+        "rarity",
+        "stack_limit",
+        "sources",
+        "recipes",
+        "sell_value",
+        "icon"
+      ]
+    },
+    {
+      "id": "guild_supplies",
+      "authorable_fields": [
+        "guild_use",
+        "level_requirement",
+        "treasury_rule",
+        "sources",
+        "icon"
+      ]
+    },
+    {
+      "id": "navigation_items",
+      "authorable_fields": [
+        "reveal_rule",
+        "destination_rule",
+        "duration",
+        "cooldown",
+        "icon",
+        "vfx"
+      ]
+    },
+    {
+      "id": "event_relics",
+      "authorable_fields": [
+        "event_tag",
+        "effect",
+        "expiry_rule",
+        "exchange",
+        "icon",
+        "vfx"
+      ]
+    }
+  ],
+  "new_items": [
+    {
+      "id": "frostwake_powder",
+      "label": "Frostwake-Pulver",
+      "category": "material",
+      "stack_limit": 999,
+      "rarity": "rare"
+    },
+    {
+      "id": "sun_core_fragment",
+      "label": "Sonnenkernfragment",
+      "category": "material",
+      "stack_limit": 999,
+      "rarity": "epic"
+    },
+    {
+      "id": "guild_masonry",
+      "label": "Gildenmauerwerk",
+      "category": "guild_supply",
+      "stack_limit": 9999,
+      "rarity": "common"
+    },
+    {
+      "id": "ward_resin",
+      "label": "Wardharz",
+      "category": "guild_supply",
+      "stack_limit": 9999,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "master_gunlock",
+      "label": "Meister-Zündwerk",
+      "category": "cannon_material",
+      "stack_limit": 999,
+      "rarity": "epic"
+    },
+    {
+      "id": "talent_chart",
+      "label": "Taktische Sternkarte",
+      "category": "talent_material",
+      "stack_limit": 99,
+      "rarity": "rare"
+    },
+    {
+      "id": "citadel_blueprint",
+      "label": "Kastellbauplan",
+      "category": "citadel_material",
+      "stack_limit": 99,
+      "rarity": "rare"
+    },
+    {
+      "id": "siege_beacon",
+      "label": "Belagerungsbake",
+      "category": "guild_consumable",
+      "stack_limit": 20,
+      "rarity": "epic"
+    }
+  ],
+  "admin_runtime_editors": [
+    {
+      "id": "ingame_content_inspector",
+      "permission": "content.preview",
+      "risk": "low",
+      "mutates_production": false
+    },
+    {
+      "id": "ingame_liveops_console",
+      "permission": "liveops.manage",
+      "risk": "high",
+      "server_required": true,
+      "audit": true
+    },
+    {
+      "id": "ingame_shop_editor",
+      "permission": "commerce.edit",
+      "risk": "high",
+      "server_required": true,
+      "approval_for_publish": true
+    },
+    {
+      "id": "ingame_guild_ops",
+      "permission": "guild.ops",
+      "risk": "high",
+      "server_required": true,
+      "audit": true
+    },
+    {
+      "id": "ingame_player_support",
+      "permission": "player.support",
+      "risk": "high",
+      "server_required": true,
+      "audit": true
+    }
+  ],
+  "presentation": {
+    "icon_states": [
+      "default",
+      "selected",
+      "locked",
+      "upgradeable",
+      "new",
+      "event",
+      "admin_preview"
+    ],
+    "tooltip_layers": [
+      "summary",
+      "stats",
+      "source",
+      "upgrade",
+      "authority"
+    ],
+    "vfx_slots": [
+      "ammo_trail",
+      "ammo_impact",
+      "harpoon_trail",
+      "buff_aura",
+      "deck_aura",
+      "cannon_mastery",
+      "guild_tower",
+      "admin_badge"
+    ]
+  },
+  "hardcode_audit": {
+    "combat_catalog_cycle": "FIXED_DYNAMIC_COUNTS",
+    "ammo_id_resolution": "FIXED_DYNAMIC_ROW_ID",
+    "loadout_validation": "FIXED_DYNAMIC_COUNTS",
+    "new_content_requires_code": "REDUCED_FOR_EXISTING_BEHAVIOR_PRIMITIVES"
+  }
+}

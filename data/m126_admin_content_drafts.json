@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "content_version": "m126-draft-examples",
+  "records": [
+    {
+      "type": "item",
+      "id": "ITEM-EXAMPLE-SEAFLARE",
+      "name": "Sea Flare",
+      "category": "tactical",
+      "cooldown": 25.0,
+      "duration": 6.0,
+      "effects": [
+        {
+          "kind": "reveal",
+          "radius": 24.0
+        }
+      ],
+      "icon_slot": "UI-ITEM-SEAFLARE-001",
+      "enabled": false
+    },
+    {
+      "type": "ship",
+      "id": "SHIP-EXAMPLE-CORSAIR",
+      "name": "Corsair Prototype",
+      "hull": 1600,
+      "armor": 0.12,
+      "speed": 6.9,
+      "acceleration": 3.4,
+      "turn_speed": 58,
+      "damage": 90,
+      "mastery_levels": 10,
+      "asset_slot": "SHIP-EXAMPLE-CORSAIR-GLB",
+      "enabled": false
+    },
+    {
+      "type": "event",
+      "id": "EVENT-EXAMPLE-STORMTIDE",
+      "name": "Stormtide",
+      "schedule": {
+        "start": null,
+        "end": null
+      },
+      "regions": [],
+      "npc_ids": [],
+      "monster_ids": [],
+      "quests": [],
+      "shops": [],
+      "currencies": [],
+      "multipliers": {
+        "xp": 1.0,
+        "gold": 1.0
+      },
+      "visual_layer": "EVENT-STORMTIDE-VISUAL",
+      "enabled": false
+    }
+  ]
+}

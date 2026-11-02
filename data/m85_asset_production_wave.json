@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "milestone": "M85",
+  "priority": "P0",
+  "master_first_13": [
+    "ship_small",
+    "ship_medium",
+    "ship_large",
+    "npc_friendly_coastal_sloop",
+    "npc_scout_01",
+    "npc_raider_01",
+    "npc_gunship_01",
+    "npc_heavy_01",
+    "harbor_havens_reach",
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "monster_early_01"
+  ],
+  "wired_this_milestone": [
+    "prop_harbor_barrel_rack_01",
+    "prop_harbor_small_boat_01",
+    "prop_wreck_mast_broken_02",
+    "prop_wreck_rope_tangle_01",
+    "nature_shallow_rock_line_01",
+    "nature_foam_reef_line_01"
+  ],
+  "prepared_next": [
+    "prop_harbor_fish_basket_01",
+    "prop_harbor_anchor_display_01",
+    "prop_wreck_keel_section_01",
+    "prop_wreck_lantern_01",
+    "nature_coast_cliff_spur_01",
+    "nature_coast_tidepool_01",
+    "prop_monster_harpoon_post_01",
+    "prop_monster_warning_chain_01"
+  ],
+  "rule": "P0 first-13 final GLBs remain highest external production priority; M85 secondary slots improve swap-ready visual coverage only."
+}

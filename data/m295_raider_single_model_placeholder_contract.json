@@ -1,0 +1,22 @@
+{
+  "milestone": "M295",
+  "master_concept": "V3.8",
+  "asset_slot": "npc_raider_01",
+  "role": "NPC_RAIDER",
+  "clean_room_references": ["Seafight", "Battle of Sea"],
+  "genre_reference_scope": "Immediate NPC-role silhouette recognition only; no copied ships, assets, models or formulas.",
+  "source": "res://assets/production_placeholders/p0/npc_scout_01.glb",
+  "output": "res://assets/production_placeholders/m295/npc_raider_01.glb",
+  "generator": "res://tools/m295_build_raider_glb.py",
+  "sha256": "ce638fe7c8819a9417ae3b1ffe62274c8305b57321c65dd94e82fd50c2e85157",
+  "complete_model": true,
+  "single_node": true,
+  "single_mesh": true,
+  "runtime_structural_overlays": false,
+  "visual_difference": ["wider raider footprint", "shorter body", "broader lower crimson sails", "dark mahogany hull", "aged brass trim"],
+  "does_not_change": ["ShipMotor collision", "ship speed", "health or shield", "cannon or harpoon damage", "loot or rewards", "server combat truth"],
+  "final_art": false,
+  "replacement_slot_stable": true,
+  "modular_ship_construction": false,
+  "native_qa": "NOT_EVALUATED"
+}

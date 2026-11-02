@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "milestone": "M199",
+  "status": "VISUAL_MASTER_SEA_COMBAT_READABILITY_STATIC_VERIFIED",
+  "master_basis": "V3.8 visual master + explicit HUD exception + M194 cross-platform parity lock",
+  "world_visual_parity": {
+    "same_water_geometry_all_platforms": true,
+    "same_shoreline_geometry_all_platforms": true,
+    "same_combat_feedback_density_all_platforms": true,
+    "same_world_vfx_budget_all_platforms": true,
+    "only_allowed_platform_difference": "interface size spacing touch targets and safe areas"
+  },
+  "visual_convergence": {
+    "water": [
+      "full_chart_surface",
+      "layered_macro_wave_color",
+      "micro_highlight_detail",
+      "canonical_normal_depth"
+    ],
+    "coast": [
+      "primary_shore_foam",
+      "secondary_shallow_break",
+      "collision_unchanged"
+    ],
+    "combat": [
+      "stronger_target_ring",
+      "selected_target_nameplate_priority",
+      "selected_target_healthbar_priority",
+      "feedback_density_parity"
+    ]
+  },
+  "preserved_locks": {
+    "tap_to_sail": true,
+    "primary_attack_lower_right": true,
+    "persistent_bottom_command_bar": false,
+    "land_blocks_navigation": true,
+    "dynamic_actors_do_not_block": true,
+    "named_charts": true
+  },
+  "native_runtime_visual_qa_pending": true
+}

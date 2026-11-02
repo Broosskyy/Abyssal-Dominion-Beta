@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "milestone": "M74",
+  "provocation_flash_seconds": 2.4,
+  "boss_notice_seconds": 5.0,
+  "max_simultaneous_relation_flashes": 4,
+  "max_loot_feedback_vfx": 6,
+  "rules": [
+    "brief feedback beats persistent HUD clutter",
+    "rank/relation labels remain readable at phone scale",
+    "loot glow is secondary to silhouette",
+    "no VFX changes hit/reward/AI truth",
+    "low quality may shorten visual persistence but not gameplay state"
+  ]
+}

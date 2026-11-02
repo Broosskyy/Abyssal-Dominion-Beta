@@ -1,0 +1,233 @@
+{
+  "schema": 1,
+  "milestone": "M106",
+  "assets": [
+    {
+      "order": 1,
+      "id": "ship_small",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "+Z forward / correct top-down orientation",
+        "Y=0 waterline",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 2,
+      "id": "ship_medium",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "+Z forward / correct top-down orientation",
+        "Y=0 waterline",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 3,
+      "id": "ship_large",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "+Z forward / correct top-down orientation",
+        "Y=0 waterline",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 4,
+      "id": "npc_friendly_coastal_sloop",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "+Z forward / correct top-down orientation",
+        "Y=0 waterline",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 5,
+      "id": "npc_scout_01",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "+Z forward / correct top-down orientation",
+        "Y=0 waterline",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 6,
+      "id": "npc_raider_01",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "+Z forward / correct top-down orientation",
+        "Y=0 waterline",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 7,
+      "id": "npc_gunship_01",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "+Z forward / correct top-down orientation",
+        "Y=0 waterline",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 8,
+      "id": "npc_heavy_01",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "+Z forward / correct top-down orientation",
+        "Y=0 waterline",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 9,
+      "id": "harbor_havens_reach",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "correct world orientation",
+        "world-ground placement",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 10,
+      "id": "island_tropical_small",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "correct world orientation",
+        "world-ground placement",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 11,
+      "id": "island_tropical_medium",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "correct world orientation",
+        "world-ground placement",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 12,
+      "id": "island_cliff_cove",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "correct world orientation",
+        "world-ground placement",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    },
+    {
+      "order": 13,
+      "id": "monster_early_01",
+      "state": "FALLBACK_READY",
+      "checklist": [
+        "final GLB placed in override path",
+        "resource imports in Godot 4.7.2",
+        "bounds nonzero",
+        "+Z forward / correct top-down orientation",
+        "Y=0 waterline",
+        "mobile gameplay-zoom silhouette",
+        "materials/texture readability",
+        "fallback removal is non-breaking",
+        "anchors/nameplate/VFX verified"
+      ],
+      "native_status": "PENDING"
+    }
+  ],
+  "summary": {
+    "total": 13,
+    "native_pass": 0,
+    "final_overrides": 0
+  },
+  "rule": "Checklist is acceptance evidence structure, not a claimed native pass."
+}

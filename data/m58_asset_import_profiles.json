@@ -1,0 +1,762 @@
+{
+  "schema": 1,
+  "milestone": "M58",
+  "scope": "P0 user-created GLB integration readiness",
+  "rule": "Final visuals replace stable slots only. Gameplay/collision/input remains in wrappers.",
+  "profiles": {
+    "ship_small": {
+      "asset": "Starter Ship — Small",
+      "family": "ship",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Hull",
+        "Deck",
+        "Sail",
+        "Metal",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/ship_small.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "ship_medium": {
+      "asset": "Starter Ship — Medium",
+      "family": "ship",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Hull",
+        "Deck",
+        "Sail",
+        "Metal",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/ship_medium.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "ship_large": {
+      "asset": "Starter Ship — Large",
+      "family": "ship",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Hull",
+        "Deck",
+        "Sail",
+        "Metal",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/ship_large.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "npc_friendly_coastal_sloop": {
+      "asset": "NPC Friendly Coastal Sloop",
+      "family": "ship",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Hull",
+        "Deck",
+        "Sail",
+        "Metal",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/npc_friendly_coastal_sloop.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "npc_scout_01": {
+      "asset": "NPC Scout I",
+      "family": "ship",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Hull",
+        "Deck",
+        "Sail",
+        "Metal",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/npc_scout_01.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "npc_raider_01": {
+      "asset": "NPC Raider I",
+      "family": "ship",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Hull",
+        "Deck",
+        "Sail",
+        "Metal",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/npc_raider_01.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "npc_gunship_01": {
+      "asset": "NPC Gunship I",
+      "family": "ship",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Hull",
+        "Deck",
+        "Sail",
+        "Metal",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/npc_gunship_01.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "npc_heavy_01": {
+      "asset": "NPC Heavy I",
+      "family": "ship",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Hull",
+        "Deck",
+        "Sail",
+        "Metal",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/npc_heavy_01.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "harbor_havens_reach": {
+      "asset": "Haven's Reach Harbor",
+      "family": "harbor",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Structure",
+        "Wood",
+        "Stone",
+        "Metal",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/harbor_havens_reach.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "island_tropical_small": {
+      "asset": "Tropical Island — Small",
+      "family": "island",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Terrain",
+        "Cliff",
+        "Shore",
+        "Vegetation",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/island_tropical_small.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "island_tropical_medium": {
+      "asset": "Tropical Island — Medium",
+      "family": "island",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Terrain",
+        "Cliff",
+        "Shore",
+        "Vegetation",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/island_tropical_medium.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "island_cliff_cove": {
+      "asset": "Cliff/Cove Island",
+      "family": "island",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Terrain",
+        "Cliff",
+        "Shore",
+        "Vegetation",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/island_cliff_cove.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "monster_early_01": {
+      "asset": "First Early Sea Monster",
+      "family": "monster",
+      "priority": "P0",
+      "format": "glb",
+      "coordinate_contract": {
+        "up_axis": "+Y",
+        "forward": "+Z",
+        "units": "meters",
+        "waterline_y": 0.0,
+        "pivot": "waterline / gameplay center",
+        "no_embedded_water": true
+      },
+      "visual_contract": {
+        "mobile_topdown_readable": true,
+        "gameplay_logic_in_model": false,
+        "collisions_in_model": false,
+        "scripts_in_model": false,
+        "camera_in_model": false,
+        "navigation_in_model": false
+      },
+      "required_qa": [
+        "import_ok",
+        "pivot_ok",
+        "waterline_ok",
+        "forward_ok",
+        "scale_ok",
+        "silhouette_ok",
+        "mobile_readability_ok",
+        "fallback_ok"
+      ],
+      "recommended_material_groups": [
+        "Body",
+        "Armor",
+        "Eyes/Glow",
+        "Mouth/Weakpoint",
+        "Decoration"
+      ],
+      "override_example": {
+        "path": "res://assets/production/models/monster_early_01.glb",
+        "fit_reference": true,
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  }
+}

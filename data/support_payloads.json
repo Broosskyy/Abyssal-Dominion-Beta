@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "milestone": "M46",
+  "selectors": {
+    "cannon_ammo": "existing PlayerInventory.AMMO_IDS",
+    "harpoon_payload": "separate",
+    "support_ammo": "separate"
+  },
+  "harpoon_payloads": [
+    {
+      "id": "hunter_standard",
+      "label": "Hunter Harpoon",
+      "effect": "monster_damage",
+      "stock": 30,
+      "visual_slot": "payload_hunter_standard"
+    },
+    {
+      "id": "barbed_chain",
+      "label": "Barbed Payload",
+      "effect": "monster_slow",
+      "stock": 12,
+      "visual_slot": "payload_barbed_chain"
+    },
+    {
+      "id": "abyss_piercer",
+      "label": "Abyss Piercer",
+      "effect": "monster_armor_pierce",
+      "stock": 8,
+      "visual_slot": "payload_abyss_piercer"
+    },
+    {
+      "id": "abyssal_spike",
+      "label": "Abyssal Spike",
+      "effect": "monster_damage",
+      "tier": "abyss",
+      "unlock_level": 26
+    },
+    {
+      "id": "rift_piercer",
+      "label": "Rift Piercer",
+      "effect": "monster_armor_pierce",
+      "tier": "abyss",
+      "unlock_level": 27
+    },
+    {
+      "id": "leviathan_chain",
+      "label": "Leviathan Chain",
+      "effect": "monster_slow",
+      "tier": "abyss",
+      "unlock_level": 29
+    }
+  ],
+  "support_ammo": [
+    {
+      "id": "restoration_shell",
+      "label": "Restoration Shell",
+      "target": "friendly",
+      "effect": "hull_heal",
+      "stock": 20,
+      "visual_slot": "support_restoration_shell",
+      "heal_power": 180.0,
+      "reload_mult": 1.45,
+      "range": 26.0
+    },
+    {
+      "id": "ward_shell",
+      "label": "Ward Shell",
+      "target": "friendly",
+      "effect": "shield_restore",
+      "stock": 12,
+      "visual_slot": "support_ward_shell",
+      "shield_power": 150.0,
+      "reload_mult": 1.45,
+      "range": 26.0
+    },
+    {
+      "id": "event_restoration_shell",
+      "label": "Event Restoration Shell",
+      "target": "friendly_event_participant",
+      "effect": "event_support",
+      "stock": 0,
+      "visual_slot": "support_event_restoration_shell",
+      "heal_power": 130.0,
+      "reload_mult": 1.45,
+      "range": 26.0
+    },
+    {
+      "id": "hybrid_support_shell",
+      "label": "Hybrid Support Shell",
+      "target": "friendly",
+      "effect": "hybrid_heal",
+      "hull_power": 90.0,
+      "shield_power": 75.0,
+      "reload_mult": 1.6,
+      "range": 25.0,
+      "stock": 8,
+      "visual_slot": "support_hybrid_shell"
+    }
+  ],
+  "rules": {
+    "overheal_contribution": 0,
+    "support_target_range_reload_contract": true,
+    "no_broadside_angle_damage": true,
+    "server_authority_required_for_live_rewards": true
+  }
+}

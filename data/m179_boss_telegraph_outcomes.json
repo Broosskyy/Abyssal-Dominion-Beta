@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "milestone": "M179",
+  "master_concept": "V3.8",
+  "goal": "DISTINCT_TELEGRAPH_GEOMETRY_AND_OUTCOME_FEEDBACK",
+  "shapes": {
+    "circle": {"hit_test": "distance_to_locked_target", "required_fields": ["hit_radius"]},
+    "line": {"hit_test": "distance_to_locked_xz_segment", "required_fields": ["line_width", "range"]},
+    "boss_ring": {"hit_test": "self_cast", "required_fields": ["hit_radius"]}
+  },
+  "outcomes": {
+    "hit": {"notification": "boss_hit", "combat_values_remain_authoritative": true},
+    "dodged": {"notification": "boss_dodged", "target_effects_applied": false},
+    "self": {"notification": "existing_combat_feedback", "target_effects_applied": false},
+    "cancelled": {"notification": "none", "target_effects_applied": false}
+  },
+  "lifecycle": {
+    "cancel_if_target_missing_or_sunk": true,
+    "clear_on_boss_sink": true,
+    "clear_on_tree_exit": true,
+    "lock_cast_origin": true,
+    "lock_target_position": true
+  },
+  "mobile": {
+    "maximum_simultaneous_shape_per_boss": 1,
+    "procedural_fallback_meshes": ["TorusMesh", "BoxMesh"],
+    "authored_vfx_is_additive_and_cannot_replace_shape_geometry": true,
+    "reduced_motion_supported": true,
+    "no_new_touch_controls": true
+  },
+  "authority": {
+    "geometry_profile": "draft_review_publish_rollback",
+    "local_resolution": "prototype_only",
+    "production_resolution": "server_authoritative",
+    "presentation_may_grant_rewards": false
+  }
+}

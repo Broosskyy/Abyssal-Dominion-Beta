@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "milestone": "M77",
+  "title": "Haven's Reach First Dock Presentation",
+  "services": [
+    "shipyard",
+    "repair",
+    "market",
+    "arsenal",
+    "quests"
+  ],
+  "rules": [
+    "presentation only",
+    "service availability remains PortInteraction/harbor systems",
+    "one first-dock card per local session",
+    "mobile-readable and dismisses automatically",
+    "no free repair/refill beyond existing emergency-ammo rule"
+  ],
+  "icon_slots": {
+    "shipyard": "service_shipyard",
+    "repair": "service_repair",
+    "market": "service_market",
+    "arsenal": "service_arsenal",
+    "quests": "service_quests"
+  }
+}

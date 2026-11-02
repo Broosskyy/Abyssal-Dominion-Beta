@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "slot_id": "ISLAND-BASE-001",
+      "silhouette": "long_crescent",
+      "size_class": "medium",
+      "cliff_ratio": 0.32,
+      "coast_complexity": "medium",
+      "poi_socket_count": 3,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-002",
+      "silhouette": "split_cove",
+      "size_class": "large",
+      "cliff_ratio": 0.49,
+      "coast_complexity": "high",
+      "poi_socket_count": 4,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-003",
+      "silhouette": "high_cliff",
+      "size_class": "long",
+      "cliff_ratio": 0.66,
+      "coast_complexity": "low",
+      "poi_socket_count": 5,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-004",
+      "silhouette": "low_sandbar",
+      "size_class": "small",
+      "cliff_ratio": 0.28,
+      "coast_complexity": "medium",
+      "poi_socket_count": 2,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-005",
+      "silhouette": "hook_bay",
+      "size_class": "medium",
+      "cliff_ratio": 0.45,
+      "coast_complexity": "high",
+      "poi_socket_count": 3,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-006",
+      "silhouette": "needle_reef",
+      "size_class": "large",
+      "cliff_ratio": 0.62,
+      "coast_complexity": "low",
+      "poi_socket_count": 4,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-007",
+      "silhouette": "wide_lagoon",
+      "size_class": "long",
+      "cliff_ratio": 0.24,
+      "coast_complexity": "medium",
+      "poi_socket_count": 5,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-008",
+      "silhouette": "broken_ring",
+      "size_class": "small",
+      "cliff_ratio": 0.41,
+      "coast_complexity": "high",
+      "poi_socket_count": 2,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-009",
+      "silhouette": "twin_islet",
+      "size_class": "medium",
+      "cliff_ratio": 0.58,
+      "coast_complexity": "low",
+      "poi_socket_count": 3,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-010",
+      "silhouette": "stepped_cliff",
+      "size_class": "large",
+      "cliff_ratio": 0.2,
+      "coast_complexity": "medium",
+      "poi_socket_count": 4,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-011",
+      "silhouette": "thin_spit",
+      "size_class": "long",
+      "cliff_ratio": 0.37,
+      "coast_complexity": "high",
+      "poi_socket_count": 5,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-012",
+      "silhouette": "triangular_rock",
+      "size_class": "small",
+      "cliff_ratio": 0.54,
+      "coast_complexity": "low",
+      "poi_socket_count": 2,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-013",
+      "silhouette": "horseshoe",
+      "size_class": "medium",
+      "cliff_ratio": 0.16,
+      "coast_complexity": "medium",
+      "poi_socket_count": 3,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-014",
+      "silhouette": "jagged_fjord",
+      "size_class": "large",
+      "cliff_ratio": 0.33,
+      "coast_complexity": "high",
+      "poi_socket_count": 4,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-015",
+      "silhouette": "flat_palm",
+      "size_class": "long",
+      "cliff_ratio": 0.5,
+      "coast_complexity": "low",
+      "poi_socket_count": 5,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-016",
+      "silhouette": "volcanic_ridge",
+      "size_class": "small",
+      "cliff_ratio": 0.67,
+      "coast_complexity": "medium",
+      "poi_socket_count": 2,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-017",
+      "silhouette": "swamp_delta",
+      "size_class": "medium",
+      "cliff_ratio": 0.29,
+      "coast_complexity": "high",
+      "poi_socket_count": 3,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-018",
+      "silhouette": "abyss_shard",
+      "size_class": "large",
+      "cliff_ratio": 0.46,
+      "coast_complexity": "low",
+      "poi_socket_count": 4,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-019",
+      "silhouette": "fortress_shelf",
+      "size_class": "long",
+      "cliff_ratio": 0.63,
+      "coast_complexity": "medium",
+      "poi_socket_count": 5,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    },
+    {
+      "slot_id": "ISLAND-BASE-020",
+      "silhouette": "hidden_cove",
+      "size_class": "small",
+      "cliff_ratio": 0.25,
+      "coast_complexity": "high",
+      "poi_socket_count": 2,
+      "production_method": "single_base_glb_plus_biome_poi_modules",
+      "mobile_readability": "required",
+      "final_asset": "OPEN"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "milestone": "M106",
+  "hud": {
+    "min_touch_target_dp": 48,
+    "selected_target_always_readable": true,
+    "safe_area_required": true,
+    "custom_hud_layout_preserved": true,
+    "graphics_profile_marker_cap": true
+  },
+  "world": {
+    "havens_reach_module_count_before": 30,
+    "havens_reach_module_count_after": 30,
+    "harbor_replacement_slots": [
+      "prop_harbor_pirate_lantern_02",
+      "prop_harbor_pirate_rope_post_01"
+    ],
+    "cove_secondary_detail": "nature_island_cove_rock_spur_01",
+    "cove_detail_cap": 1
+  },
+  "guild": {
+    "existing_range/focus/objective presentation_preserved": true,
+    "server_authority": false
+  },
+  "performance": {
+    "no_marker_budget_increase": true,
+    "no_harbor_module_increase": true,
+    "no_island_detail_cap_increase": true
+  }
+}

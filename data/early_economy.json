@@ -1,0 +1,27 @@
+{
+  "milestone": "M36",
+  "scope": "PL1-5 local vertical-slice economy compatibility state",
+  "live_authority": false,
+  "currency": "gold",
+  "repair": {
+    "base_fee": 8,
+    "gold_per_missing_100_hull": 4,
+    "minimum_fee_when_damaged": 8,
+    "free_if_undamaged": true
+  },
+  "emergency_standard_ammo": {
+    "item": "iron",
+    "minimum_stock": 30,
+    "only_if_empty": true,
+    "cost": 0,
+    "reason": "prevents a PL1-5 combat dead end"
+  },
+  "offers": {
+    "iron": {"amount": 60, "price": 30, "category": "standard_supply"},
+    "explosive": {"amount": 30, "price": 60, "category": "ammo"},
+    "chain": {"amount": 30, "price": 45, "category": "ammo"},
+    "harpoon": {"amount": 30, "price": 35, "category": "hunter_supply"},
+    "repair": {"amount": 1, "price": 40, "category": "consumable"},
+    "boost": {"amount": 1, "price": 35, "category": "consumable"}
+  }
+}

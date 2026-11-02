@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource path="res://scripts/qa/m290_first_sortie_integration_qa.gd" type="Script" id="1_m290"]
+
+[node name="M290FirstSortieIntegrationQA" type="Node3D"]
+script = ExtResource("1_m290")
+

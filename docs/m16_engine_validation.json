@@ -1,0 +1,50 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "mode": "headless/dummy renderer",
+  "visual_verification": false,
+  "stages": [
+    {
+      "stage": "import",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "stage": "m10_behavior",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "stage": "m11_behavior",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "stage": "m12_behavior",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "stage": "m13_behavior",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "stage": "m14_behavior",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "stage": "m15_behavior",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "stage": "m16_behavior",
+      "exit_code": 0,
+      "passed": true
+    }
+  ],
+  "checks_passed": 1202,
+  "checks_total": 1202,
+  "passed": true
+}

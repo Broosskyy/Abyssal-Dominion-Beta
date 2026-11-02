@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "milestone": "M113",
+  "ship_mastery_levels_per_design": 10,
+  "combat_mastery_xp": true,
+  "new_main_design_boss_rewards": [],
+  "reason": "Accessible Master sources confirm 50 independent Main Progression GLBs and per-design Mastery 1-10, but retrieved PL21-25 snippets do not define exact design reward levels.",
+  "rule": "do not invent final Main Design cadence; keep existing designs/eligibility data-driven until supported"
+}

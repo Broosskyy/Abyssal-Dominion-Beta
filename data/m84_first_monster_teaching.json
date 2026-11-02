@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "milestone": "M84",
+  "title": "PL3 First Monster Teaching Presentation",
+  "trigger": "first monster visible/selected on PL3",
+  "steps": [
+    {
+      "id": "identify",
+      "text": "MONSTER · HARPUNE EMPFOHLEN",
+      "icon": "m76_first_monster"
+    },
+    {
+      "id": "weapon",
+      "text": "Harpunenmodus wählen",
+      "icon": "hud_icon_harpoon"
+    },
+    {
+      "id": "range",
+      "text": "Reichweite prüfen · Ziel halten",
+      "icon": "hud_icon_target"
+    }
+  ],
+  "rules": [
+    "presentation only",
+    "no forced weapon selection",
+    "no auto-target",
+    "no damage/reload changes",
+    "mobile shows one hint at a time",
+    "desktop may show compact secondary key/gamepad affordance"
+  ]
+}

@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://ctgt7m0onf6jr"
+path="res://.godot/imported/lighthouse.obj-12b1a25961dc7ff86584c87c0610a7ef.mesh"
+
+[deps]
+
+files=["res://.godot/imported/lighthouse.obj-12b1a25961dc7ff86584c87c0610a7ef.mesh"]
+
+source_file="res://assets/recovered_test/m8/harbor/lighthouse.obj"
+dest_files=["res://.godot/imported/lighthouse.obj-12b1a25961dc7ff86584c87c0610a7ef.mesh", "res://.godot/imported/lighthouse.obj-12b1a25961dc7ff86584c87c0610a7ef.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

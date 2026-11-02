@@ -1,0 +1,57 @@
+{
+  "milestone": "M289",
+  "contract": "native_playable_vertical_slice_readiness",
+  "master_concept": "V3.8",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "Genre, naval combat immediacy and sea-map usability reference only; no proprietary assets, UI, sounds, effects, content, formulas or timings.",
+  "goal": "One coherent first-session sea-map loop that can be executed and measured natively without claiming final art, balance, backend or release approval.",
+  "slice_stages": ["HARBOR_START", "UNDOCK", "TAP_TO_SAIL", "TARGET_CONTACT", "CANNON_COMBAT", "HARPOON_MONSTER", "REPAIR_OR_SHIELD", "LOOT_RECOVERY", "QUEST_COMPLETION", "SHIP_DEFEAT", "RESPAWN", "HARBOR_RETURN"],
+  "required_content": {
+    "sea_maps": 1,
+    "harbors": 1,
+    "starter_ships": 3,
+    "normal_npc_roles": 3,
+    "elite_roles": 1,
+    "admirals": 1,
+    "monsters": 1,
+    "loot_archetypes": 1,
+    "quest_chain": 1
+  },
+  "ship_model_strategy": {
+    "initial_production": "ONE_COMPLETE_3D_MODEL_PER_SHIP",
+    "required_complete_parts": ["hull", "bow", "stern", "deck", "masts", "sails", "characteristic_design_parts"],
+    "modular_ship_system_required": false,
+    "modular_ship_system_deferred": true,
+    "weapons_vfx_wake_targeting_damage_overlays_may_use_external_sockets": true,
+    "canonical_ship_parts_never_hidden_detached_or_replaced_by_m289": true
+  },
+  "gameplay_locks": {
+    "sea_map_is_core": true,
+    "tap_to_sail": true,
+    "camera_joystick_camera_only": true,
+    "pinch_zoom_and_recenter": true,
+    "tap_targeting_and_target_cycling": true,
+    "target_attack_reload_loop": true,
+    "default_auto_fire": false,
+    "auto_chase": false,
+    "broadside_angle_changes_damage": false,
+    "hull_and_shield_are_separate": true,
+    "cannons_primary_against_ships": true,
+    "harpoons_primary_against_monsters": true,
+    "sea_chart_center_remains_readable": true,
+    "mobile_safe_areas_required": true
+  },
+  "authority": {
+    "existing_server_contracts_own": ["movement", "target_legality", "range", "reload", "ammo", "hit", "damage", "healing", "defeat", "respawn", "loot", "quest_progress", "rewards", "inventory", "currency"],
+    "m289_may": ["audit source gates", "observe local-development slice stages", "ingest trusted native QA receipts", "show readiness status", "block release claims when evidence is absent"],
+    "m289_never": ["authorize combat", "commit movement", "grant loot", "grant progression", "grant rewards", "respawn a player", "mark native QA pass without a trusted receipt", "approve release"]
+  },
+  "evidence_policy": {
+    "static_tests_are_not_native_gameplay_qa": true,
+    "placeholder_presence_is_not_final_art_acceptance": true,
+    "source_ready_is_not_release_ready": true,
+    "missing_native_evidence_status": "NOT_EVALUATED",
+    "blocking_native_failure_status": "BLOCKED"
+  },
+  "unset_until_native_qa": ["camera_feel", "tap_tolerance", "hud_overlap_thresholds", "combat_feedback_timing", "wake_vfx_budget", "simultaneous_projectile_budget", "damage_vfx_budget", "sinking_duration", "mobile_frame_budget", "memory_budget", "audio_mix", "haptic_strength"]
+}

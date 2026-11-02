@@ -1,0 +1,3297 @@
+[
+  {
+    "path": "assets/classic/original_ui/ammo-chest.svg",
+    "bytes": 635,
+    "sha256": "96ccd0b151628eb83d0a801c669511031937038b4b57fab42c83c5d9e1529db0"
+  },
+  {
+    "path": "assets/classic/original_ui/cannonball.svg",
+    "bytes": 980,
+    "sha256": "8dcbdafe2a1e438028dcf002f1329d2ba2f426d5d5ae1e72f1734c64e7be1232"
+  },
+  {
+    "path": "assets/classic/original_ui/captain_ship.svg",
+    "bytes": 1570,
+    "sha256": "89969ec3a522b1f100e222af6301b10669d9e0718f20c2e7b682cfceccbc464c"
+  },
+  {
+    "path": "assets/classic/original_ui/chainshot.svg",
+    "bytes": 801,
+    "sha256": "dfad5e93ecf0f6000d7cd84ec9e4ffaaf7f53b34c982088953988760d1f571df"
+  },
+  {
+    "path": "assets/classic/original_ui/coin.svg",
+    "bytes": 565,
+    "sha256": "fe7e9bd45ca9ed4745b33b9e0888dd2ca96a183d3b4a607ae9ebef12a26d4b09"
+  },
+  {
+    "path": "assets/classic/original_ui/fire.svg",
+    "bytes": 514,
+    "sha256": "2f5cf1b2ea6d26bf901cdc07ca4ccf92a61b28b3d6152a4a4ce0dbac624f0ebb"
+  },
+  {
+    "path": "assets/classic/original_ui/harpoon.svg",
+    "bytes": 958,
+    "sha256": "f17c63a63b2cdd6b2e1691cac3c9411f58013632bb2c56684988e8ef58c1f3ae"
+  },
+  {
+    "path": "assets/classic/original_ui/helm.svg",
+    "bytes": 572,
+    "sha256": "089b011f7ad9238c0059f13a1e82ad205215dc7f4007d0345774383c78af9c3a"
+  },
+  {
+    "path": "assets/classic/original_ui/repair.svg",
+    "bytes": 584,
+    "sha256": "d726459b7d700b99b37e7498a7495355d1164311ceacb24b953666e7802f791f"
+  },
+  {
+    "path": "assets/classic/original_ui/ship-brig.svg",
+    "bytes": 681,
+    "sha256": "c1a5a6e96825559bc91d3bc32927b7da96bf2278792541f551bda57c2eaca766"
+  },
+  {
+    "path": "assets/classic/original_ui/ship-frigate.svg",
+    "bytes": 743,
+    "sha256": "68854e46c61c72e22c1aab42f491ab740d0273c325bb42a70b96161409b9c7ff"
+  },
+  {
+    "path": "assets/classic/original_ui/ship-ghost.svg",
+    "bytes": 720,
+    "sha256": "d1738434d505424e605b5eb260b3ba6bbe54fa3d8ed2e8f08868a5b233dfd69f"
+  },
+  {
+    "path": "assets/classic/original_ui/shipyard.svg",
+    "bytes": 381,
+    "sha256": "6767ce4bb9965e320216ea311fdfdf3477680bbb6390b1247c377064b1ec8fbc"
+  },
+  {
+    "path": "assets/classic/private_seabattles/islands/rock.png",
+    "bytes": 179010,
+    "sha256": "9a1f8fb937720975b6c91bfb4511e7d9d9ae9e0e0332f9b42861d797d02f4cb5"
+  },
+  {
+    "path": "assets/classic/private_seabattles/islands/snow.png",
+    "bytes": 516389,
+    "sha256": "c1d62837c658a4b422fd7aa1e205ab904e399a9fffdf9502f9959d0be7f91865"
+  },
+  {
+    "path": "assets/classic/private_seabattles/islands/snow2.png",
+    "bytes": 320228,
+    "sha256": "05955e637983727ab9bf7a9dc8428ed79f3e9198f59ff0371d12d0ab2d1a7624"
+  },
+  {
+    "path": "assets/classic/private_seabattles/islands/tropical.png",
+    "bytes": 840676,
+    "sha256": "06fa539c185d7d4b834cc4f20de05c429a53fb1aa5029b5c66ef5a8fe50b8d0b"
+  },
+  {
+    "path": "assets/classic/private_seabattles/monsters/tiamat.png",
+    "bytes": 2649129,
+    "sha256": "a5f78646b313043b8945d7b28649d4b97989fb3f6ac6fda2d7783df86153433d"
+  },
+  {
+    "path": "assets/classic/private_seabattles/ocean/wave_noise.png",
+    "bytes": 160997,
+    "sha256": "245452c5a32d5ab4358533cb2e80a1772c87f01d6449f1b9b9b588824c009c21"
+  },
+  {
+    "path": "assets/classic/private_seabattles/pack.json",
+    "bytes": 4510,
+    "sha256": "efee1a190e751b21c5e43e9a205ea8179373a0bb69a45189d7619188bdfe4fb9"
+  },
+  {
+    "path": "assets/classic/private_seabattles/ships/elite8.png",
+    "bytes": 528407,
+    "sha256": "2d2463b6dbe4e3e8c99bd3b89e42768ffc58d86a0c3600bbe4c0bb3a950e6d62"
+  },
+  {
+    "path": "assets/classic/private_seabattles/ships/flyingdutchman.png",
+    "bytes": 349733,
+    "sha256": "cdf2d19818ea0656049dc994c38c5dcc55ca0320185a3cb88729040ed784c2fd"
+  },
+  {
+    "path": "assets/classic/private_seabattles/ships/pinnace.png",
+    "bytes": 61305,
+    "sha256": "b6b04d1777f5fa3f2a53a6532b540bb77db64313ccbca8566d19281ef9facd50"
+  },
+  {
+    "path": "assets/classic/private_seabattles/ships/warship.png",
+    "bytes": 152239,
+    "sha256": "296ba591acb84140a79754cd32330ee22e6587cd6d5c7c449ea7982d740f4d3e"
+  },
+  {
+    "path": "assets/classic/sprites/captain_16dir.svg",
+    "bytes": 66678,
+    "sha256": "8ad0317888dd2624c46806751695ea0debce697fcf473e6d1d0e212fe4662678"
+  },
+  {
+    "path": "assets/classic/sprites/corsair_16dir.svg",
+    "bytes": 66678,
+    "sha256": "0869149f8e6c5a79da33ff71cdbbc801cf3ca8c607e2f692351287fed7c1d28e"
+  },
+  {
+    "path": "assets/custom/README.md",
+    "bytes": 276,
+    "sha256": "c4770a1e4e19b7d63616ed2550fad4f5e2ef274ef6a913b09897e1f678d63071"
+  },
+  {
+    "path": "assets/placeholder_pack/manifest.json",
+    "bytes": 15061,
+    "sha256": "42dd62f521ca947de68fc0424823216156c73b5f068a387523faf8c3ed14943a"
+  },
+  {
+    "path": "assets/placeholder_pack/models/buoy.glb",
+    "bytes": 11364,
+    "sha256": "fc016f29e3484909879d3f33929c318e46670a31666be5335db1d0060eea1e4d"
+  },
+  {
+    "path": "assets/placeholder_pack/models/cannon.glb",
+    "bytes": 5768,
+    "sha256": "980e4295534aa839f72b02a059153c98922d7ab091273045a9ceeaad426eba22"
+  },
+  {
+    "path": "assets/placeholder_pack/models/cannonball.glb",
+    "bytes": 9568,
+    "sha256": "97e8d714ca33f9cf19f10a2c1e6286b780423cc9cc1e53c465c6770b9594faa7"
+  },
+  {
+    "path": "assets/placeholder_pack/models/harbor.glb",
+    "bytes": 62148,
+    "sha256": "2cce76b62f11a06a9cbb01eba4f60ca382c7803dc5cb290efb12cacfb9563e3d"
+  },
+  {
+    "path": "assets/placeholder_pack/models/harpoon.glb",
+    "bytes": 4392,
+    "sha256": "dbdce5c5f323bf115e30e509fb1fd0e32244197a40d8e0ddaa1c4eb2f40a9903"
+  },
+  {
+    "path": "assets/placeholder_pack/models/island_rock.glb",
+    "bytes": 37336,
+    "sha256": "b9d180a69fdcddc988886513f4db924261ed61162a398eb7de638779f8308a27"
+  },
+  {
+    "path": "assets/placeholder_pack/models/island_snow.glb",
+    "bytes": 37336,
+    "sha256": "d31fc9beb37a92be2dcdc1132962101e71ecadbea5c18dad1258bbd766863aa5"
+  },
+  {
+    "path": "assets/placeholder_pack/models/island_tropical.glb",
+    "bytes": 52048,
+    "sha256": "5052668bad9870b84b2f7e75e2881872531e538ab3e1daf512b8ca0539019771"
+  },
+  {
+    "path": "assets/placeholder_pack/models/loot_chest.glb",
+    "bytes": 8948,
+    "sha256": "9e09ca5cc85592953559486db438654cf6aaf34d89adaf91c99029ab58889962"
+  },
+  {
+    "path": "assets/placeholder_pack/models/monster_kraken.glb",
+    "bytes": 54976,
+    "sha256": "ca7673010758a4ddc79c5de52a14e14a2e08b8298422a452f3a03e8f19b7b8ce"
+  },
+  {
+    "path": "assets/placeholder_pack/models/npc_admiral.glb",
+    "bytes": 157068,
+    "sha256": "c46ff6c449cbd117b3f1c9f2cc8aa0c5a4de6df3cdfc92d3e44bf6c54d6d055d"
+  },
+  {
+    "path": "assets/placeholder_pack/models/npc_corsair.glb",
+    "bytes": 123132,
+    "sha256": "736cfebb4ac521f3ae00c75e44f3930d2b2a48eab07f3724d388e8d92a1e8c00"
+  },
+  {
+    "path": "assets/placeholder_pack/models/npc_shadow.glb",
+    "bytes": 157068,
+    "sha256": "95e7c34d8b5031024c7e480346885e469dbf3a29d0c3d435b462b3038510e861"
+  },
+  {
+    "path": "assets/placeholder_pack/models/repair_crate.glb",
+    "bytes": 8952,
+    "sha256": "0be9007cab78b29809e567fad8961153c90a124b47fe8ceb92da5f7e9cab4df5"
+  },
+  {
+    "path": "assets/placeholder_pack/models/ship_large.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/placeholder_pack/models/ship_medium.glb",
+    "bytes": 123132,
+    "sha256": "611e8865c74f465effc7e00813244a2e7b6d64133771eaf1a3d8bfd873de7aba"
+  },
+  {
+    "path": "assets/placeholder_pack/models/ship_small.glb",
+    "bytes": 104712,
+    "sha256": "5f70d6d412787227691f49b1eb94f13a6f62a65ffeada0eb4c282f0e5161b55b"
+  },
+  {
+    "path": "assets/placeholder_pack/models/wreck.glb",
+    "bytes": 90248,
+    "sha256": "4af34facf6159d8143c34f67e5ee4d500b5b552b961db6c155cbbaf1ad039343"
+  },
+  {
+    "path": "assets/placeholder_pack/textures/m64/coast_foam_mask.png",
+    "bytes": 43899,
+    "sha256": "79b161d8d69e76912fd3b3618c8f1bd6d27a27b94d771c95125018d8e471194d"
+  },
+  {
+    "path": "assets/placeholder_pack/textures/m64/harbor_stone.png",
+    "bytes": 23667,
+    "sha256": "c8cb96aa19156907f1f404f6a51011691d5d8ab29952c313cc2eae8b507163e8"
+  },
+  {
+    "path": "assets/placeholder_pack/textures/m64/harbor_wood.png",
+    "bytes": 22643,
+    "sha256": "9ce433a633239a08d741125169b1bfa5320a3ff3bd4a7c2d0ad9cee28b83e31b"
+  },
+  {
+    "path": "assets/placeholder_pack/textures/m64/ocean_foam.png",
+    "bytes": 35199,
+    "sha256": "4159d993f5f1b83098a634e0964e2372c0f2023781884ca76191d726ef872dc6"
+  },
+  {
+    "path": "assets/placeholder_pack/textures/m64/ocean_normal_hint.png",
+    "bytes": 34972,
+    "sha256": "aad28ff2ffddf6ecce06ae06ad6e5b66e9017f323ebd6bebbcac0d2ec582e7b9"
+  },
+  {
+    "path": "assets/placeholder_pack/textures/m64/rock_base.png",
+    "bytes": 22631,
+    "sha256": "4a09b8418dd0ef565ce30cb64f53efcaa126c78327de610e70d3ba9dd8810f23"
+  },
+  {
+    "path": "assets/placeholder_pack/textures/m64/sand_base.png",
+    "bytes": 27602,
+    "sha256": "6cbc75605a8427d18d2da8f857566c706e1ced6de69d4b8f3ec9ef0b4a429383"
+  },
+  {
+    "path": "assets/placeholder_pack/textures/m64/vegetation_base.png",
+    "bytes": 29229,
+    "sha256": "1dd84632ec5e77200ad4d24cc06333db76abee641568552048d92b5b4c83a3e3"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/button_disabled.svg",
+    "bytes": 170,
+    "sha256": "a7dbf6711fc056766e8fdd515c839658c48127c5b04d1306fe9850e197cc3693"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/button_focus.svg",
+    "bytes": 167,
+    "sha256": "c093555d0f795c2159296ddd0344cadf80e37496fcfa1fbec77f07c21acb981b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/button_hover.svg",
+    "bytes": 249,
+    "sha256": "fc7ea1cabefc543ccc4023f0f50f5fb9c878e9f1af357baf4c375cf5dd56b02b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/button_normal.svg",
+    "bytes": 366,
+    "sha256": "2f5791c6fd8b30524c0daf47e6c1e306556c7f9ce918999e7b52e85831e49b9a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/button_pressed.svg",
+    "bytes": 226,
+    "sha256": "008505eff5e53e998ac40e20a9c83546c6cbf6e5c34ef3574d431ad57305f409"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/captain_crest.svg",
+    "bytes": 830,
+    "sha256": "6cc165bc77039970c7aa2607a3f85b2708031b95211fc6157e6f738c8c9205bb"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/captain_portrait.svg",
+    "bytes": 1146,
+    "sha256": "cba06d8426fee94b2b5af910d8e64bcec163d58df99a4f58c889eb7296a95b77"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/card.svg",
+    "bytes": 279,
+    "sha256": "7dcbbf4f57c13442a480008f0ddedd53c851d0134f2f6f50be98154e24f6c4a8"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/harbor_backdrop.svg",
+    "bytes": 1848,
+    "sha256": "cff505689db119e84b9b9418f76bbbe14317e61b3ce3f6eb12a1b675135e5b13"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/achievements.svg",
+    "bytes": 320,
+    "sha256": "e4780645edfd73e4d44d9549104b9f405d60915e7711f37072f279931a7988b5"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/arsenal.svg",
+    "bytes": 315,
+    "sha256": "b2e648d32e777999490eb0486ccff799e82cb01e0a1bbc4479ee8a0c0f91e72c"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/bonus.svg",
+    "bytes": 329,
+    "sha256": "53a0d1832358afbcfb54c21859edf44b4f7013ac19bbca930e97a71a4c044f53"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/boost.svg",
+    "bytes": 284,
+    "sha256": "54eeee3e88585ff4fa9b6e64c813acd192919112ef9538802abcbd98d23b0a8c"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/cannon.svg",
+    "bytes": 406,
+    "sha256": "6b9ce44107e001d669522d0b6523694edfcbd8f256bee94feadc83fba56b0831"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/chain.svg",
+    "bytes": 336,
+    "sha256": "16ea1f6298c134d72154d534c402b3c972097597ba75a652d0747fd29867c076"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/chat.svg",
+    "bytes": 383,
+    "sha256": "ed261d21cfb0544a39ee498ed727a9ea4a4942f52caa2de83442d482efbdb7f5"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/deck.svg",
+    "bytes": 303,
+    "sha256": "efa63bbcd936bcdfa104afd70220f1ee5681e0f4bc3d2e4bc21eaad697da5388"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/events.svg",
+    "bytes": 325,
+    "sha256": "c1377cfbcf06560cbd0d0a88d53b15d8a3422d6a20ae38dbd20493c65e3c2aeb"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/explosive.svg",
+    "bytes": 312,
+    "sha256": "0796ef5df259b06a6267f7a69662578228d9fa8634c6d4453dd23e4c4ab60051"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/group.svg",
+    "bytes": 384,
+    "sha256": "3dc0585caab06655c1dff1f0ce5cf618d0cbe2a7fa6db4288a2754f1aecbd00c"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/guild.svg",
+    "bytes": 278,
+    "sha256": "4f29b8ccc463d7cad29db70c4281bfbf3f6cb9a721917dd524d594a6d0fcb3b2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/harpoon.svg",
+    "bytes": 280,
+    "sha256": "bbbd121389fdbbefc6cf59820a3a1b901b6ef9fda2f861c80a0fcb651ab7e738"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/home.svg",
+    "bytes": 248,
+    "sha256": "a896a67da536aa127c201fa81561c0065492c7bf8f21973397775c9ac0108bda"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/iron.svg",
+    "bytes": 372,
+    "sha256": "e99b4a044272e583057f65138fc9db2891d6e1abe78849899e055484ab54ecb9"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/log.svg",
+    "bytes": 304,
+    "sha256": "bfd6cd38bc1cd14d1b66d1cc623f3bed972c04af46480d96746373c2e838c582"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/armor_corrosive.svg",
+    "bytes": 296,
+    "sha256": "da695699168c192c7b9dbc725b79d621ff8b49640983636cc5fa3207be09edb2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/boost.svg",
+    "bytes": 270,
+    "sha256": "92cb84734c5d091ace4460c764e46412a3e38baa8249e7516354d85543664087"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/chain.svg",
+    "bytes": 298,
+    "sha256": "0ac230d6265c4c26db2bf91d0ff5e428870f3f7437e5900d7daac998e0bb041a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/crystal_barrier.svg",
+    "bytes": 279,
+    "sha256": "532ba90c8d54400be9b163445d456cce61b338ca293fc3998af92c422663aa6a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/ember.svg",
+    "bytes": 296,
+    "sha256": "da695699168c192c7b9dbc725b79d621ff8b49640983636cc5fa3207be09edb2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/explosive.svg",
+    "bytes": 270,
+    "sha256": "92cb84734c5d091ace4460c764e46412a3e38baa8249e7516354d85543664087"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/harpoon.svg",
+    "bytes": 299,
+    "sha256": "eb02148be396cd2bc8ce50cda71c68ba13babdff02dce18a2f35e2b335ee38b8"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/infernal_barrel.svg",
+    "bytes": 298,
+    "sha256": "0ac230d6265c4c26db2bf91d0ff5e428870f3f7437e5900d7daac998e0bb041a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/iron.svg",
+    "bytes": 298,
+    "sha256": "0ac230d6265c4c26db2bf91d0ff5e428870f3f7437e5900d7daac998e0bb041a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/leviathan_hook.svg",
+    "bytes": 270,
+    "sha256": "92cb84734c5d091ace4460c764e46412a3e38baa8249e7516354d85543664087"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/piercing.svg",
+    "bytes": 298,
+    "sha256": "0ac230d6265c4c26db2bf91d0ff5e428870f3f7437e5900d7daac998e0bb041a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/plates.svg",
+    "bytes": 279,
+    "sha256": "532ba90c8d54400be9b163445d456cce61b338ca293fc3998af92c422663aa6a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/powder.svg",
+    "bytes": 296,
+    "sha256": "da695699168c192c7b9dbc725b79d621ff8b49640983636cc5fa3207be09edb2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/recall_compass.svg",
+    "bytes": 296,
+    "sha256": "da695699168c192c7b9dbc725b79d621ff8b49640983636cc5fa3207be09edb2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/repair.svg",
+    "bytes": 270,
+    "sha256": "92cb84734c5d091ace4460c764e46412a3e38baa8249e7516354d85543664087"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/repair_blocker.svg",
+    "bytes": 299,
+    "sha256": "eb02148be396cd2bc8ce50cda71c68ba13babdff02dce18a2f35e2b335ee38b8"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/shatter.svg",
+    "bytes": 299,
+    "sha256": "eb02148be396cd2bc8ce50cda71c68ba13babdff02dce18a2f35e2b335ee38b8"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/spectral.svg",
+    "bytes": 270,
+    "sha256": "92cb84734c5d091ace4460c764e46412a3e38baa8249e7516354d85543664087"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/storm_bolt.svg",
+    "bytes": 279,
+    "sha256": "532ba90c8d54400be9b163445d456cce61b338ca293fc3998af92c422663aa6a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/veil.svg",
+    "bytes": 306,
+    "sha256": "8eb44eeab026d41bb4ff2418af36688fac7c5c0ec0291740bab8998f1163deb3"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/m42/venom.svg",
+    "bytes": 306,
+    "sha256": "8eb44eeab026d41bb4ff2418af36688fac7c5c0ec0291740bab8998f1163deb3"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/mastery/mastery_badge_01.svg",
+    "bytes": 341,
+    "sha256": "c9b42560b8ed1365cf71e7318a098a5eb40598ed4a911e35e02e92cfaeeb7f41"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/mastery/mastery_badge_02.svg",
+    "bytes": 438,
+    "sha256": "d4b080446df58e062576fe60fdf5d06b3defeb8606fb2da48873518c4878a43b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/mastery/mastery_badge_03.svg",
+    "bytes": 535,
+    "sha256": "20d1331ddda75954f2d3f570f3993950f9e6e7b8ca50924b3b0d8063fb939e2b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/mastery/mastery_badge_04.svg",
+    "bytes": 632,
+    "sha256": "4c5f0a51988737345e372b60070f35e46c2bc76327cb71dd446b596ef2e2e5de"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/mastery/mastery_badge_05.svg",
+    "bytes": 729,
+    "sha256": "c1b3c1f0ecdbea008d5625d31f0c0a5d6020715778a15dee8c7889707d32450e"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/mastery/mastery_badge_06.svg",
+    "bytes": 826,
+    "sha256": "89d61cbee9c703e9ff27e0261ad2b5f2a5873b16978c51aca7ff104f51d069a3"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/mastery/mastery_badge_07.svg",
+    "bytes": 923,
+    "sha256": "f995643b2cceebdd46d8ecf1b4a40f9e62a38542b7a7f307f8c31139503d5be2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/mastery/mastery_badge_08.svg",
+    "bytes": 1020,
+    "sha256": "59998b285d1a70849a3db920522fcd39d364346e2492ec953c4b3551d54dc006"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/mastery/mastery_badge_09.svg",
+    "bytes": 1117,
+    "sha256": "6df6aa9482fa7afba0c38c68f70cdaeb9c3fcb99315f876df884a636aac3a757"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/mastery/mastery_badge_10.svg",
+    "bytes": 1214,
+    "sha256": "8d9e7b0ae8f70a0454f65f347e9e23d97d19edaac12bbeec1a421aa2ba645b59"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/mastery/ship_card_generic.svg",
+    "bytes": 467,
+    "sha256": "7ad74eb5039c98847cc29135d348a6a441b47e735b41bd900094e0160956cc2a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/progression/progression_track_boss.svg",
+    "bytes": 391,
+    "sha256": "965341d5367d1fd11d27899e118c5047463ea13461c81fe2dc2f4dd1d6801351"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/progression/progression_track_eligible.svg",
+    "bytes": 393,
+    "sha256": "dd735050ce8fb0eafba48dedb7bf62c111fe5bdf2a3ff84e0198eb77f7e6f66b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/progression/progression_track_history.svg",
+    "bytes": 365,
+    "sha256": "08f4fc7a75a8771dc2ec3b83176b3d4c3aec177140f36e32383ee0890cbb9e69"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/progression/progression_track_locked.svg",
+    "bytes": 633,
+    "sha256": "4599e90a5d852dc3a1dfae3803a239d38092322e937bdda81213bd11ffe32d2b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/progression/progression_track_owned.svg",
+    "bytes": 377,
+    "sha256": "04e4a1ab285b0157258b46a6579452d4c6ec1edfcc691da0b249ddb998550539"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/quests.svg",
+    "bytes": 293,
+    "sha256": "a9fec08c477bef9880d713d0aaee905fc0eabbbcf0c9f38d1bd9650d57c058cd"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/rankings.svg",
+    "bytes": 319,
+    "sha256": "31ac4d01aae48e132ea779e0df4ab83bc54e466874ecfba88210b1b1cd974ac0"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/repair.svg",
+    "bytes": 352,
+    "sha256": "5d62fb7b5c0a753a27ef96f70b0db5c381dd265c64957e3315f57d732ef2122b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/settings.svg",
+    "bytes": 339,
+    "sha256": "9173f04fc92c0aeb968e45cd0c7df4b389a72f2f3cf9e28019b5ffdcd2914186"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/shipyard.svg",
+    "bytes": 302,
+    "sha256": "1f428de10863562f60de6ce3060774c3fae640c531730c054d8dc640e7ef8226"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/shop.svg",
+    "bytes": 320,
+    "sha256": "bb06d3c4db91933e352687bc3df8b1731973ace808805419a8322cd88efc9d38"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/status/armor_break.svg",
+    "bytes": 306,
+    "sha256": "8eb44eeab026d41bb4ff2418af36688fac7c5c0ec0291740bab8998f1163deb3"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/status/barrier.svg",
+    "bytes": 296,
+    "sha256": "da695699168c192c7b9dbc725b79d621ff8b49640983636cc5fa3207be09edb2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/status/burn.svg",
+    "bytes": 296,
+    "sha256": "da695699168c192c7b9dbc725b79d621ff8b49640983636cc5fa3207be09edb2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/status/plates.svg",
+    "bytes": 279,
+    "sha256": "532ba90c8d54400be9b163445d456cce61b338ca293fc3998af92c422663aa6a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/status/powder.svg",
+    "bytes": 296,
+    "sha256": "da695699168c192c7b9dbc725b79d621ff8b49640983636cc5fa3207be09edb2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/status/repair_block.svg",
+    "bytes": 306,
+    "sha256": "8eb44eeab026d41bb4ff2418af36688fac7c5c0ec0291740bab8998f1163deb3"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/status/spectral_mark.svg",
+    "bytes": 306,
+    "sha256": "8eb44eeab026d41bb4ff2418af36688fac7c5c0ec0291740bab8998f1163deb3"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/status/veil.svg",
+    "bytes": 306,
+    "sha256": "8eb44eeab026d41bb4ff2418af36688fac7c5c0ec0291740bab8998f1163deb3"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/status/venom.svg",
+    "bytes": 306,
+    "sha256": "8eb44eeab026d41bb4ff2418af36688fac7c5c0ec0291740bab8998f1163deb3"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/target.svg",
+    "bytes": 299,
+    "sha256": "46ab284cfcab9711cb3cafd2871a4edc8d48b9c7071e228f885092b7ba51a58d"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/icons/world.svg",
+    "bytes": 310,
+    "sha256": "28967182ad491647545e1c20235b199acab204357b73e95f1102be4545f121ed"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m59/hud_ammo_selector_frame.svg",
+    "bytes": 552,
+    "sha256": "cb6df3d5c245da2884230c8e8bb148e243ac13059da194610be422e68ae39714"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m59/hud_bar_hull.svg",
+    "bytes": 333,
+    "sha256": "88a684442a5a8d1f8bc754633d2de21e54bb74c3980983b4f6f58037ced8da5c"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m59/hud_bar_shield.svg",
+    "bytes": 333,
+    "sha256": "8161112bbd9e6bd4a0babbe0f71ec2cd67eb475ba09734e9981e953cea4cf7e6"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m59/hud_combat_ring.svg",
+    "bytes": 752,
+    "sha256": "e7e9b066039a825f03a40d35f5953c87966b48f62c02cd3845f1f81f1ff39b27"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m59/hud_combat_ring_active.svg",
+    "bytes": 732,
+    "sha256": "06dfd213f942f2f198b045fc099a7503fc2ae8624fa57fe0b2500179b0046618"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m59/hud_picker_row.svg",
+    "bytes": 445,
+    "sha256": "a7b3d1aca7855bdd4dede3e873ac7bef2851565c63ba22dcd3523d7aa5e634e2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m59/hud_picker_row_selected.svg",
+    "bytes": 409,
+    "sha256": "3b45fdad6597504a1928792cd2cba9e04591bd1d5ce65205e9e1f5f4c796063b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m59/hud_quickslot_frame.svg",
+    "bytes": 481,
+    "sha256": "3771bb47aaae9ce0fc89e66f150734538e449f6c9af419249ec1bc657c345e1a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m59/hud_target_frame.svg",
+    "bytes": 483,
+    "sha256": "b36d1c360a572b5ca675f3041e08e199171c96090d66346220789fbc58a6b9d4"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_bar_fill_hull.svg",
+    "bytes": 413,
+    "sha256": "2898d54ddd261d286606a715c1543491012314db4d47067a5c44d14a4b2617ec"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_bar_fill_shield.svg",
+    "bytes": 413,
+    "sha256": "381357835f48704e0b93d38ef5012668599ecaabc6c2885e11df5ce0f2012527"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_icon_ammo.svg",
+    "bytes": 498,
+    "sha256": "eb8a27b15ab88089e9825fc11b176c243fda1b65ac7e0194b156fe607d3c60da"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_icon_attack.svg",
+    "bytes": 592,
+    "sha256": "27508c2d168b599dda6b3837af6e0bb8e6ceba4d60e61a0233e411d38299d65f"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_icon_harpoon.svg",
+    "bytes": 439,
+    "sha256": "4ea4bf2ea63dfb2665faa30ac537016d7867a8c32974aa497c542cc9c405235f"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_icon_hull.svg",
+    "bytes": 540,
+    "sha256": "3e01ea90cb55ae3017c37f4a141ecb102b2f523fbbbb91123b0ed00af755ef1a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_icon_repair.svg",
+    "bytes": 427,
+    "sha256": "ed7d85caf64c8c27980afad4d88dbd66471c904de50dd9626c66c76923b183bc"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_icon_shield.svg",
+    "bytes": 427,
+    "sha256": "b17d0997bac3264c28b7eb0f503f891d534d52827d744177ff68002f5d8d3456"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_icon_target.svg",
+    "bytes": 516,
+    "sha256": "b53795365e989045723a8345902eabb8153e77de3aada6ca897ba65af9b27491"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_status_chip_frame.svg",
+    "bytes": 322,
+    "sha256": "bf5a4b096d89e55728c2fcf77ad24daf3fef0a7f61fe088e83eaab6078564d54"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_target_admiral.svg",
+    "bytes": 625,
+    "sha256": "1016d4bd23d60e52878cf8832755ac23f7da563e383a73a3058c935bbba01a2d"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_target_elite.svg",
+    "bytes": 625,
+    "sha256": "bfa0484d5c5d1fe2fca5d79e079e15d81c2dde0d3762e4761f1f8e4e224e9247"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_target_hostile.svg",
+    "bytes": 625,
+    "sha256": "00d373451c4521325369432a2c613dc155412d943739e6980f6c5965524e7679"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_target_monster.svg",
+    "bytes": 625,
+    "sha256": "c3146e82ec6bbd941b95d81ebce141f3d9a7a52a4d4ff873088e4e4b65421b56"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m60/hud_target_neutral.svg",
+    "bytes": 625,
+    "sha256": "882be89a618d473f5c8f1c01d0799c46fab135d568e9e2da340d1859389981ef"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_armor_corrosive.svg",
+    "bytes": 644,
+    "sha256": "052e8c26b4635cfc833e43a95e12b538418b1137dd1d4e93d4845d25672c9227"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_boost.svg",
+    "bytes": 609,
+    "sha256": "0d3d6a62c9911adce1f69598a3492a6ad9e72ef117b2a5a7c325c5d938b972de"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_crystal_barrier.svg",
+    "bytes": 602,
+    "sha256": "79822161f2b92307012799741b7697133a38fb87d69bdda8e9e2db66ca8c6aeb"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_infernal_barrel.svg",
+    "bytes": 615,
+    "sha256": "e73441eae6e303603e76b959c1c7663e5ee58256ea69464d3726a89bf0bde2f9"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_leviathan_hook.svg",
+    "bytes": 614,
+    "sha256": "2de29d4584574f6acaac590291dce77c9c9b70989a4a5ee17a6ef0b58f65beef"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_plates.svg",
+    "bytes": 614,
+    "sha256": "5921b84c3fbd3e0480906f265b65bf2767c0b6c886beaad998083bcc2177207b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_powder.svg",
+    "bytes": 592,
+    "sha256": "8dbaa3f754e11a7550879500988052164dcebbc7b8bfdee272025320a2465190"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_recall_compass.svg",
+    "bytes": 610,
+    "sha256": "7d318de87fff42666e0e5145249574e217fd4279bf4336a0d6998b31d80b8e92"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_repair.svg",
+    "bytes": 533,
+    "sha256": "02c8b4b6e78809835d35b153058ccf37b958b570e85cb63d2cbbd9916dc4af5e"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_repair_blocker.svg",
+    "bytes": 592,
+    "sha256": "c6d88d621e7e6028c558bc803a3a12a03bdd8a5f2344e770559ec5573837e2d9"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_storm_bolt.svg",
+    "bytes": 524,
+    "sha256": "6a8ea0276c64d4f1927a897760eb63b479e0f5cb3a616777dfc15f2548ae01ed"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_action_veil.svg",
+    "bytes": 669,
+    "sha256": "9168124b8f225bde044a412a02eb7bf2e30904e34261350024dd8d74620c1051"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_ammo_chain.svg",
+    "bytes": 668,
+    "sha256": "e70f73587e1534dc7cd1af54c2f3ba67bff150928179ecab5f6c3f382bc6d4e8"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_ammo_ember.svg",
+    "bytes": 616,
+    "sha256": "29abf8ff96182f67a417e5a340ff4aa42f4628c81fecedbe3ecceb15a04c414f"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_ammo_explosive.svg",
+    "bytes": 571,
+    "sha256": "c7fe8120687d32fafc94132fdfceab72b2299079f7535a0f5b35665966c1ccf4"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_ammo_iron.svg",
+    "bytes": 594,
+    "sha256": "42055b759f93f06e271da71718cc8a4a6edbf6acd61dd6999c1a47c339f963c9"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_ammo_piercing.svg",
+    "bytes": 606,
+    "sha256": "8f1f45d649cf7a3d60eff47e45fa71dacafecdeec7d139a3a9ecf8028164b070"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_ammo_shatter.svg",
+    "bytes": 653,
+    "sha256": "5c08a91c975e5ddfb3ca6088fe7845c660fc2f6cdbe3e16525dd6d443a506c49"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_ammo_spectral.svg",
+    "bytes": 641,
+    "sha256": "c40f45f1175c1576ee96dd09e00d733ee8955f2cf5b4f3697dc6ebef8e088ae7"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_ammo_venom.svg",
+    "bytes": 686,
+    "sha256": "4adf09b73f1517c86a594096610ebdeab7de1acb3ea1cc260a4051b873a1fbaa"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_payload_abyss_piercer.svg",
+    "bytes": 606,
+    "sha256": "ea88e370e2056725be2ef3af8843a07cb8416ce25c7f7597cdd18c0cabe70b59"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_payload_barbed_chain.svg",
+    "bytes": 668,
+    "sha256": "a90e274278e1e6def39503a6efc0a7077a87cea47d5b7bbf7ca83d950a1cac79"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_payload_hunter_standard.svg",
+    "bytes": 571,
+    "sha256": "aae2b67b6863418c4cd23d324654e92efdc1fb6b160dadbf462acbd9e593be57"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_support_event_restoration_shell.svg",
+    "bytes": 533,
+    "sha256": "91a42553f94b38b3c6e2c02fed45f93424acb819051c2ac61da19907a71a7991"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_support_restoration_shell.svg",
+    "bytes": 533,
+    "sha256": "c3992c4c8dd9c8886ff46cf2032c20e25a52031964beb7ec38984e7e88f0a430"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/ui_support_ward_shell.svg",
+    "bytes": 602,
+    "sha256": "b4fa682983dffc6449eb5e9622894d28f33d4bf5a0a79a23bbb516f6aba37029"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/world_nameplate_admiral.svg",
+    "bytes": 341,
+    "sha256": "cfbd81c974e1cfdc3de683af0bfd7dcce64463b228e0c57321ea763fec8d7e7b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/world_nameplate_elite.svg",
+    "bytes": 341,
+    "sha256": "8b816b1b87a60fb79ee0a55293d02badd865cbeda2621252961e1c0703eea723"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/world_nameplate_friendly.svg",
+    "bytes": 341,
+    "sha256": "754560ad384e25261ab9e4358d0abb500893547ecac28533a3778e0c010f4440"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/world_nameplate_hostile.svg",
+    "bytes": 341,
+    "sha256": "bef7d34ecd76a778dd58d91bc91761f3da16b68970cd8d50fc0fccc7e3f6b65a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/world_nameplate_monster.svg",
+    "bytes": 341,
+    "sha256": "8de321c5d962fc91b81866ba3d71166bb60049db3deb1e4b40ecbee45bc00054"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m61/world_nameplate_neutral.svg",
+    "bytes": 341,
+    "sha256": "23567c9deb3aea587f6f02c3e6eaf540d1a6f72d104a0f5551be9357dfcb4bfc"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/marker_admiral.svg",
+    "bytes": 622,
+    "sha256": "487ffdd89d8854c6c686ac26a0df5ab89f1fd1cc773566935d6b5cf2b9f68d1b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/marker_elite.svg",
+    "bytes": 547,
+    "sha256": "f02d694b1d18f68bfa749b8861d3de38c256ecf8c7031259a4aeaba3fee5e704"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/marker_loot.svg",
+    "bytes": 645,
+    "sha256": "02e14d2f2296bbea2054f9b133ce553c1de3f64c5063589dde5a2b295f057ae8"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/marker_monster.svg",
+    "bytes": 625,
+    "sha256": "704d4d14c71ddc0eab6262faf83cc0fa67f693edf4cdcc324c0d1fc8fa1ded74"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/marker_objective.svg",
+    "bytes": 659,
+    "sha256": "9b4e46d3d1283ee0d783d3db8ab8f6f729a9cf458a6c932f7e3fc4326818a1bb"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/marker_quest.svg",
+    "bytes": 646,
+    "sha256": "2c0198d9d5e282d3ac4e6ee0abf15eb6be13d322d00f833d11b9b4c257bd253c"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/marker_repair.svg",
+    "bytes": 530,
+    "sha256": "db0264324af83d575a95b5e73699144cd5c191b1209cff2a9d3e3fda7a30df7f"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/minimap_player.svg",
+    "bytes": 515,
+    "sha256": "cd3b2261a5f4b9db4660f4d428576a58841b6c4f9d5900315badcd4c09ab22f1"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/minimap_port.svg",
+    "bytes": 551,
+    "sha256": "fa25673f3b32cca40b701401a5796cc0d1b0429cbd62ad4855f06f9a8962f822"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/service_arsenal.svg",
+    "bytes": 603,
+    "sha256": "7eae08e85339df6ac838655771a9d009b974d475b012c036b968bfa8435ac8a9"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/service_market.svg",
+    "bytes": 692,
+    "sha256": "6a18198f1f0f391f462f9a2835de14a9de99acc01a13b64b58a8c51544ccf76f"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/service_quests.svg",
+    "bytes": 700,
+    "sha256": "b84781459ac8670d3a2bf7fc8fdd648bf366d6f20bc87f3737990f4c1c6d2c5b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/service_repair.svg",
+    "bytes": 636,
+    "sha256": "c3f7abd9cb25a7f2df7e0d6bf7f5615e91fc45ce75f4a5332fb66a2337c81f33"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/service_shipyard.svg",
+    "bytes": 596,
+    "sha256": "6f3316e25dfee78803e2af29e57589d712678550329bb18eecf7266ba96c9c18"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/world_interact.svg",
+    "bytes": 653,
+    "sha256": "4ef947af1d1c3f49821bce1b8ee7af6d4bc6c03836e6397d912a483644d2b8ec"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m62/world_safe_harbor.svg",
+    "bytes": 644,
+    "sha256": "547cd7942e22c38f33c29df77718eb07b0c7d5e7a937e3ddc8f172b5db3749d0"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m70/content_locked.svg",
+    "bytes": 327,
+    "sha256": "cb466a6093c9008c62aa93ce56b4b62bcce55cb1101f7dac8681e94eccd797f4"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m70/tutorial_attack.svg",
+    "bytes": 283,
+    "sha256": "a3429386b833380995174a378c7a0f0fc48f37ebdf35dc2030bb514044f15497"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m70/tutorial_harbor.svg",
+    "bytes": 284,
+    "sha256": "36036e2490429d2f2ce5dfb8133d14066a91782db3fda26044d912f9278de740"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m70/tutorial_loot.svg",
+    "bytes": 295,
+    "sha256": "e9fdc45fcfc9d3f44b1fd8c8085849a1178270dd88dce94edcf57e5b8ee1bc21"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m70/tutorial_repair.svg",
+    "bytes": 258,
+    "sha256": "54511871b04d98f298dbca2f8446c89abcd11ad950cfc146995a533683dc0510"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m70/tutorial_sail.svg",
+    "bytes": 306,
+    "sha256": "b8d06e290ebdbfa1d14aa7afb94cfd0da4ad266343190a0a6c618b70c0a987c8"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m70/tutorial_target.svg",
+    "bytes": 315,
+    "sha256": "c38a8ba9610454701e5a5c252385cd4c8c53b4a0f8310b1123caf1b26f26ddc1"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m70/tutorial_trial.svg",
+    "bytes": 288,
+    "sha256": "2f8bdcd4dabcc1e98a4f25ad5d6e96848be834037f486dee1c0164c92985a1ca"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m72/poi_navigation.svg",
+    "bytes": 291,
+    "sha256": "5ecb8fb8211136793c97611c11cfbab840a5e6d98d386e375d05df8f57234785"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m72/poi_nest.svg",
+    "bytes": 367,
+    "sha256": "4f4b62dac6355df0aef94406c1fd41de71402e6b4b4bbee348f68e5d0ae179c4"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m72/poi_objective_frame.svg",
+    "bytes": 297,
+    "sha256": "cc26d93fd7282b98f9e8fea5d1fcaf4f0c5f3060b5236aff7a0a5e0beab73dd8"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m72/poi_reef.svg",
+    "bytes": 329,
+    "sha256": "21ff0d6a3a31e19b7d7b9053b1de8327f20017d1e7d691eefa66a5a130fee2e2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m72/poi_salvage.svg",
+    "bytes": 299,
+    "sha256": "ffd1a1765525568140c53862e25cce4e2368af39898fc7f015373658153d19ef"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m72/poi_shrine.svg",
+    "bytes": 289,
+    "sha256": "04a649a57c11fb4c68d5dcea7973b7e015f5b83f658fd02bba6d04129debfa41"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m72/poi_supply.svg",
+    "bytes": 322,
+    "sha256": "c851560bb603c2709fb3e11a43b57492fc3805c044f12135da48e7ef75ab98cb"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m72/poi_wreck.svg",
+    "bytes": 291,
+    "sha256": "57525cf48b96242ca95d330795156cb12020bea43dfff3b2ca8e378b7b482d4f"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m74/loot_legendary.svg",
+    "bytes": 308,
+    "sha256": "b43d6c7cc5b5003d4d39017c8ad5a7b4b5b5eedde1a9d05f3b49e4b2e496814f"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m74/loot_rare.svg",
+    "bytes": 299,
+    "sha256": "1c147e39bee45640ea2986f642f0e8c3383b4a2face74c2235cfbb3e2d590af6"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m74/rank_admiral.svg",
+    "bytes": 345,
+    "sha256": "2f59cf83e045eaa2c16c01b72bb506cda2d7996bb500b561e6de597d2fde9cd3"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m74/rank_elite.svg",
+    "bytes": 255,
+    "sha256": "40116c23c030571449dc94b6b8fdca3c2fb36fdb260b68bab7d91df8459ede73"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m74/rank_monster.svg",
+    "bytes": 387,
+    "sha256": "9b134bb76e257af04919badddadd28c9ed22f3e2a33898db024f253de899f440"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m74/relation_neutral.svg",
+    "bytes": 279,
+    "sha256": "c1ae5217bdc0f09a3d59422b120881182e166e83a0decde1e8f115ea0e137891"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m74/relation_provoked.svg",
+    "bytes": 286,
+    "sha256": "f618f16f19091a1c3e0332e050c008eb7aa457892367d18e5c9e565932f4a399"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m74/trial_complete.svg",
+    "bytes": 277,
+    "sha256": "edf7a7e790ad330bfa30f622c7579430291553796e5a2e60c59678b0610e37f5"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m76/first_admiral.svg",
+    "bytes": 281,
+    "sha256": "f5e329ca045a3bdf9eb84c04548f12ef7a20a7174bb103ab685bd82646aa384a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m76/first_monster.svg",
+    "bytes": 387,
+    "sha256": "97804120d833ad1948d5e17cb2d04544bd955fbdeba418f8abf9c562f818cb60"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m76/guide_combat.svg",
+    "bytes": 300,
+    "sha256": "6348584511f87720e456b637e810bc29a9b957a71a46c2c8381d7feb787ff7fb"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m76/guide_harbor.svg",
+    "bytes": 253,
+    "sha256": "3804dd9227f0f08d208afe328c83669f0d6315b8c6dc2fbc10157a7a988af6ff"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m76/guide_return.svg",
+    "bytes": 285,
+    "sha256": "14abf4b943e6ba6e89e48b1b61cca031a1f5a975f5c743b46c2702ec4f3e1d59"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m76/guide_salvage.svg",
+    "bytes": 288,
+    "sha256": "2899ffae696877cf883b3e64b7c359351662b1d848821e21ede25bde3d497db7"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m82/crossplay_ready.svg",
+    "bytes": 312,
+    "sha256": "a92296555d70e0ecdbd6d283fe67cfc568d346f40df13813bcd994ded74d611c"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m82/hud_desktop.svg",
+    "bytes": 301,
+    "sha256": "a58a7536c83c7d6db0e0743c98dc9f76b3304e8758983d5f97d7fd93fd980ac5"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m82/hud_mobile.svg",
+    "bytes": 302,
+    "sha256": "1a69f4e53e0d3aa9e7718ff716748c73a333b68d1d38022a3ca860ff6bec727f"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m82/input_gamepad.svg",
+    "bytes": 388,
+    "sha256": "70a84a53322f5a768047589c7c04b33c93dbd877b98f251153bdf728cab9e654"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m82/input_mouse.svg",
+    "bytes": 311,
+    "sha256": "0d392a73c58237398796a469cc19b8f652ad2784039a07a620c92d48362804e0"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m82/input_touch.svg",
+    "bytes": 311,
+    "sha256": "820e24fa13baf756af502fac376161759f7dfa998d4f8e8d07457350b8bbad4a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m84/drag_handle.svg",
+    "bytes": 468,
+    "sha256": "5b845fc858189b788288c6b68cb73f71ced85be6c5799164445606a9dda937f9"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m84/gamepad_fire.svg",
+    "bytes": 321,
+    "sha256": "4ddc98da96f1aa3d31214bcc220ebcec5adb29a89d8c7d3c0225f79b00c047c6"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m84/key_fire.svg",
+    "bytes": 269,
+    "sha256": "8096ea0e601faa7ce5ffee73bde47c210000d6675d56fd7ae70dbde45c82c864"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m84/key_target.svg",
+    "bytes": 314,
+    "sha256": "c5c0eecea85a695b972a1b10780154630ce4da4ba11ee7852cb71fbb007bb5c6"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m84/overlap_warning.svg",
+    "bytes": 249,
+    "sha256": "6cccd7176b64fa900baafc39ff4759349f87e1e89dc29e2807488ca63b873924"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m84/snap_guide.svg",
+    "bytes": 248,
+    "sha256": "12fb7b17f5040fa477eeaece87b7c4870151d8270c23d4902f388e8ee7e83c63"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m86/gamepad_sail.svg",
+    "bytes": 320,
+    "sha256": "336bfca1b769229aa06c2f8210c9fa7dd9f37005d470004b4438bc16a6f13366"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m86/gamepad_target.svg",
+    "bytes": 365,
+    "sha256": "b81fdfa117ec89988a716a47ea2d36cdcb4c2e64be0efb24d436b118a8799858"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m86/hud_locked.svg",
+    "bytes": 310,
+    "sha256": "23cc9e8ae9160b27e052ade43183900e0475d760a1ce00f5489b52e887307f2d"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m86/key_sail.svg",
+    "bytes": 278,
+    "sha256": "4f2a1c34fd8c1d8cda72db209d5ec8f200ba5cfd23667d892b495ac741fadb8b"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m86/notch.svg",
+    "bytes": 250,
+    "sha256": "5551452484b78dc38390daf37a08fa8ff452338dcf68cc452aa029e1dd5e8544"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m86/safe_area.svg",
+    "bytes": 289,
+    "sha256": "1cf81dac8e551d6feb4c2556fff43ff30ba564a3479dae0defac450c67a398ab"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m88/controller_focus.svg",
+    "bytes": 303,
+    "sha256": "5d4bfd77a24c2949491ab67ff1b4405f7be75310306619afb090ccd133dd4707"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m88/controller_help.svg",
+    "bytes": 275,
+    "sha256": "446e9ef990b99f0c01aab68c4aee2555d3dcfc4896b072385e351147d9ec2a38"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m88/hud_edge_warning.svg",
+    "bytes": 250,
+    "sha256": "4fe7ce6d2bff589aa732055401421428449853884059c1389c893c35185832ca"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m88/monster_hunt.svg",
+    "bytes": 304,
+    "sha256": "6cf4c02ae1d8baf50b8ff8a11d74b64c0797eedeb5c7710984c0d48e042bdf63"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m89/guild_defense.svg",
+    "bytes": 288,
+    "sha256": "e665d5670e734df866b056e79ce923ee7f7a12cf16df41562f0802badcd1cca4"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m89/guild_facility.svg",
+    "bytes": 261,
+    "sha256": "17da4a9150abb7c148544e649227e4ce73417d7ee2441f5f7c89576be88d25f0"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m89/guild_island.svg",
+    "bytes": 291,
+    "sha256": "c348f65be9978ff52a1ced9d945f79a1ad8d820e27bce85071f2b960e7bccbe1"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m89/guild_tower.svg",
+    "bytes": 270,
+    "sha256": "b9c9daf85d454d90dc2480a8bcb4742ead1b2ed8f9f9bdf8fc114c33f7935d0a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m94/admin_event.svg",
+    "bytes": 277,
+    "sha256": "1293132fd3f061cbcb0f4cb45b9732d9282ebd9345db045e07f2126d4a50e21a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m94/admin_mode.svg",
+    "bytes": 261,
+    "sha256": "fb2e0f31a58c505c5a943c6b7d1b3b4aee7602f82a5686bc5a5f01c18cb8ac35"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m94/admin_spawn.svg",
+    "bytes": 251,
+    "sha256": "c6a0da107512fa9901c4c20070dc90933a977a3f3dd4e57d1193520f7694e547"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m94/halloween_ammo.svg",
+    "bytes": 288,
+    "sha256": "a9948f3ada936cc1d666ee6979dcfa577ed0e78c7a2921824dd7a07fa590dcd1"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m94/halloween_currency.svg",
+    "bytes": 269,
+    "sha256": "388f4a3e7b5c122dd42f6ec4434a28aae01a641f86b9a5daf22ca585c0215222"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m94/halloween_event.svg",
+    "bytes": 277,
+    "sha256": "9911ab5a0ef4436047b07afcebf5c09215dcd178b03b513f27d94d9d9d59270d"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m94/halloween_quest.svg",
+    "bytes": 276,
+    "sha256": "42fc74b1bf94505a0f67f911728a18d6288bdb910662adcc4e8de6025365919d"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m95/admin_asset_browser.svg",
+    "bytes": 327,
+    "sha256": "0e0e90a4061f52b8715754e3bd42eb9c38c40018bc26b3362b05516bda0378d1"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m95/event_target.svg",
+    "bytes": 356,
+    "sha256": "f5b4897022a1666ef59196ad0602452b53946d006aec2ce1f7ca88dee3abc817"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m95/gravefire_impact.svg",
+    "bytes": 348,
+    "sha256": "b3f69a6e48d11f0527a9925f1ee6802a08d02b54d2de431bf145cb22c8fe00b2"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m95/halloween_boss_arrival.svg",
+    "bytes": 322,
+    "sha256": "b6150f63d27e555219383bc85aab26870c6773406c9cad0d31c42ce97e6b28f3"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m95/halloween_portal_vfx.svg",
+    "bytes": 361,
+    "sha256": "8880aede60a90df8d6222745738e025e81586d1b9a84434eada69d750ac6c871"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m99/guild_defense.svg",
+    "bytes": 270,
+    "sha256": "94cab9f9836fc8a6b2cbf95e69fc0cddaae060a77aaf9131c16e4d580b089362"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m99/guild_dock.svg",
+    "bytes": 241,
+    "sha256": "5765bdf2aad881a8484c087eb295447e28c8f41736d4a04a53fe3566da837ee7"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m99/guild_facilities.svg",
+    "bytes": 256,
+    "sha256": "0df2c846888d247129463e481917c5231c4011957d36f97b4b385e9402069344"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m99/guild_focus.svg",
+    "bytes": 273,
+    "sha256": "e7f7098daffee5ca62f4801360df7ccd87f06e15da4d350b104e4b4aa63f3d92"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m99/guild_hall.svg",
+    "bytes": 249,
+    "sha256": "b59ab07a0dc7ed56f1b4092a998f51630e4811a194291abf7ddc70799e21bd2a"
+  },
+  {
+    "path": "assets/placeholder_pack/ui/m99/guild_range.svg",
+    "bytes": 290,
+    "sha256": "fb3aa30496c5b00c7cebec4fcd260df942c3fe8ddca5ad230c516fbef8603060"
+  },
+  {
+    "path": "assets/production/README.md",
+    "bytes": 642,
+    "sha256": "f3e8c38ab31613c4d6c00b120c599a54d76db9956328931148231443f38fd779"
+  },
+  {
+    "path": "assets/production/shaders/recovered_coast.gdshader",
+    "bytes": 424,
+    "sha256": "0d5204bccf203a71731db57ad89d0f7a6324cd3e729fd0d097ba1e1ba4030b17"
+  },
+  {
+    "path": "assets/production/shaders/recovered_coast.gdshader.uid",
+    "bytes": 19,
+    "sha256": "570147149501692391ad1d5dbca84aafc72854bad9b60c483cada1764f8c3891"
+  },
+  {
+    "path": "assets/production/ui/app_icon.svg",
+    "bytes": 1145,
+    "sha256": "d268f84405c5f056c4ad8c0445ca21b26016d75b345bafa4ae03bfa18b9e3d96"
+  },
+  {
+    "path": "assets/production/ui/m152/afk_harbor_operations.svg",
+    "bytes": 454,
+    "sha256": "8dc853db5bf552b76897a5534f798b04ec7dd62fa8c99af1751172b60ae7a847"
+  },
+  {
+    "path": "assets/production/ui/m152/artifact_abyss_heart.svg",
+    "bytes": 411,
+    "sha256": "a26cb067250a2c0b6f3cdb60119219f17b56be03682c82ec0e55444ed0f7ba7d"
+  },
+  {
+    "path": "assets/production/ui/m152/artifact_fortune_idol.svg",
+    "bytes": 503,
+    "sha256": "b6b635ec50c40e461de2dbc358148ae7d786bf057fe6640c7e96832aa3e25c6d"
+  },
+  {
+    "path": "assets/production/ui/m152/artifact_leviathan_tooth.svg",
+    "bytes": 412,
+    "sha256": "05870030e1231c53763a43106441492c1de1f768648762100fdd708f7d058a75"
+  },
+  {
+    "path": "assets/production/ui/m152/artifact_star_compass.svg",
+    "bytes": 413,
+    "sha256": "9ac6835f47127391d553569bc65577f43ec32a774e63e29c56380b17db386308"
+  },
+  {
+    "path": "assets/production/ui/m152/artifact_tide_bulwark.svg",
+    "bytes": 392,
+    "sha256": "6367fe81bf9cc9ee870f0450d41f349a8081d60a8ba440dc62ff6da00e993c54"
+  },
+  {
+    "path": "assets/production/ui/m152/artifact_war_capstan.svg",
+    "bytes": 443,
+    "sha256": "b4143a4250b905ae84c7186a2897e3d553c71c4985608efd3fda43d411d7a336"
+  },
+  {
+    "path": "assets/production/ui/m152/companion_compass_gull.svg",
+    "bytes": 364,
+    "sha256": "563acf6a727d9a8443be1c21eca4283be40ed195696bc2f70f66d15b343d1233"
+  },
+  {
+    "path": "assets/production/ui/m152/companion_ghost_lantern.svg",
+    "bytes": 487,
+    "sha256": "7fd02c648db8887c0c688876af5e9c2d8b44486352c1333ac5f6a65f71eb86a6"
+  },
+  {
+    "path": "assets/production/ui/m152/companion_iron_skiff.svg",
+    "bytes": 483,
+    "sha256": "d07f45ed288fa952faa9985ff5a7a8f5d73298747a873da78115ae44caa9c307"
+  },
+  {
+    "path": "assets/production/ui/m152/companion_krakenling.svg",
+    "bytes": 471,
+    "sha256": "4823dd59ffae2a06f0ff516660b7710dcec81c4dcdcc7c7fece7d6bde7d46d76"
+  },
+  {
+    "path": "assets/production/ui/m152/companion_salvage_crab.svg",
+    "bytes": 541,
+    "sha256": "c798812ddb230c2c693a856bb0b4de023ecc81a9f34cb13c3cac6679af958118"
+  },
+  {
+    "path": "assets/production/ui/m152/companion_tide_sprite.svg",
+    "bytes": 498,
+    "sha256": "da539e0c6d660496edb1e4d312cc242aa1efd93e9c3657ba7d1bbd1c1e52ddb1"
+  },
+  {
+    "path": "assets/production/ui/splash.png",
+    "bytes": 94121,
+    "sha256": "c3de6995223a870e3eb944ac3bd7766bfb0601b4b0314662a125196099761442"
+  },
+  {
+    "path": "assets/production/ui/splash.svg",
+    "bytes": 1375,
+    "sha256": "3b0edb79fd44deb046dff4843199c9d524f3f4bea37416c7818f9d46e5427721"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/REPLACE_LATE_FLEET_HERE.md",
+    "bytes": 411,
+    "sha256": "0cd60cdcfd7739d16d1496a144865f0f9184d95f270bd799a512160e0d5e8478"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/prestige/.keep.md",
+    "bytes": 101,
+    "sha256": "80ae61680f360fb477e559a9b13da3f7f30afcdc3d40c6e18b27f6dd0202dd75"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/.keep.md",
+    "bytes": 52,
+    "sha256": "4efe4aed0fb1d9f9b3103397f1b9ef02cf2807fb4166a9481ee3f78fcde82dae"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_51.glb",
+    "bytes": 66040,
+    "sha256": "e8e176d297f5537967b7c260cad8d71fa6348fd7a21a79ee1973c1a020dfeb1a"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_51_lod1.glb",
+    "bytes": 49204,
+    "sha256": "85bd14314f064bd1e0ff7af3483d485022d9e875c140d25210a9de1bbc1f3034"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_51_lod2.glb",
+    "bytes": 28820,
+    "sha256": "554b2dfd747be59fc45e514f0449634d736fb2694f6a6a97b41216ab8799d3e2"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_52.glb",
+    "bytes": 80176,
+    "sha256": "da71480125e15c8cc4aed53dcb9316745d015e601b5d18bc61cb63cde4d88b16"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_52_lod1.glb",
+    "bytes": 51820,
+    "sha256": "e5414a2fcc4c4aa9012acc054d6bc9a213c924a53df93542f57d16fd941ce91f"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_52_lod2.glb",
+    "bytes": 31436,
+    "sha256": "d14c5fa93bc45900160525776e90f44f690ba905023186b9ca65f76e53569c15"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_53.glb",
+    "bytes": 54556,
+    "sha256": "edefd3366f75a6703d960483218a78193d67e182aed96fd26f14d6b6b0d7fe87"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_53_lod1.glb",
+    "bytes": 39492,
+    "sha256": "04377d4cc6399d7203ce98b7bf0f0a5c392ae2f9ba9adf27e768a177b5f45df5"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_53_lod2.glb",
+    "bytes": 28856,
+    "sha256": "cea97a44e0b1853bd79309fe3174aece5af733a477a9253367f6360f1de3d7c3"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_54.glb",
+    "bytes": 68520,
+    "sha256": "1badb4171f00323c6bba31ead73eb00bce33e1e04a3616b1184f36f2d1acef77"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_54_lod1.glb",
+    "bytes": 51684,
+    "sha256": "0e93834942ac9263c2afdf91f07ecc970879fcfc40e4786b8a325e568450a1c7"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_54_lod2.glb",
+    "bytes": 31296,
+    "sha256": "9cbc54ee89c60c2d345f63c8c7f3660aea88bf698b29b9f820d7bf1b05d805b0"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_55.glb",
+    "bytes": 85356,
+    "sha256": "4a3ee046410869f97cac72c6234df176407244a02082e421f2f4bcfc528bbe71"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_55_lod1.glb",
+    "bytes": 57004,
+    "sha256": "2feb91cc39e3043da25e039453009f828045aec0975a75e72f7c030487b2bb52"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_55_lod2.glb",
+    "bytes": 36620,
+    "sha256": "19203abb0c9a17fee78ce3b0cbda66288684788eb7424999ef91eb765091affc"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_56.glb",
+    "bytes": 94480,
+    "sha256": "a0950860506b2e4ae5e1bbb9546e82b0b4bf2e5068581a240636347d3582b3a6"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_56_lod1.glb",
+    "bytes": 66504,
+    "sha256": "d3cba700d68457d477abda9f5c12fef67b778a5f5066010ca896955112b76cab"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_56_lod2.glb",
+    "bytes": 32752,
+    "sha256": "94f4910bbf5d3bea155bf6a908aa910b910cda14abf50839105d99d3d15f2bef"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_57.glb",
+    "bytes": 90956,
+    "sha256": "5588ad623862e8e2eb43053442935c746e5d92bc6a64ebbc74b6e8cd0fae896f"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_57_lod1.glb",
+    "bytes": 61696,
+    "sha256": "b4ecf127ade507508eb0975c60fbbd6ceea1d9ec22f57099592aee481ca1edbd"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_57_lod2.glb",
+    "bytes": 38348,
+    "sha256": "8258af0682ae3bd204870c111582d9020aba4241d839e0ba4d5da56fa8142ede"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_58.glb",
+    "bytes": 64920,
+    "sha256": "6d9b7b34c153aaed49831efb7c8eaafe201913bc24c2a564f621c4b9b8b07575"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_58_lod1.glb",
+    "bytes": 48968,
+    "sha256": "62103ef5d16c309e523bce7879575374ba2e19f0baa995cfebf93edb14c3ec2b"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_58_lod2.glb",
+    "bytes": 35364,
+    "sha256": "849f5a4540cec48060595d346653fb4fdf67d6f40fe4d7843ef1e40145355b51"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_59.glb",
+    "bytes": 87984,
+    "sha256": "435cecfb438bf862b4ea5d676642afa7009d184ab087e4b83d809d0caf7a9bc8"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_59_lod1.glb",
+    "bytes": 68492,
+    "sha256": "41e007d43fdeb3ef7b2635cc11419479d9b95550dde38d012781da7ffcd4b6bf"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_59_lod2.glb",
+    "bytes": 35460,
+    "sha256": "8edba8636eafd28e56c83d655f00f4b1aa7d7b225333622e231a71e75ab0a3d8"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_60.glb",
+    "bytes": 93488,
+    "sha256": "151d36b2c54934357abfc597449a63cec00e76c993110241e0963e13b6c166f5"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_60_lod1.glb",
+    "bytes": 64232,
+    "sha256": "8259c964fd017df0610af84e81e1febe9d1e9d8e491147781d4e339b20cb39cf"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w5/ship_main_60_lod2.glb",
+    "bytes": 40876,
+    "sha256": "2d3ba667a382769b1203c632baa27d4439bc02bfb0c057ad0b946ee26409e3c7"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w6/.keep.md",
+    "bytes": 52,
+    "sha256": "619095a923dcdb76cc36bfcc6023c6e0fd66c633dbc6ebb46bd22d6ddfc69e03"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w7/.keep.md",
+    "bytes": 52,
+    "sha256": "2b54bd438c07727843a67f64dff3c36fc90fdecbd62ddb0b3d949899d56f1fca"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w8/.keep.md",
+    "bytes": 52,
+    "sha256": "e9c699b74781a549fde2adf1fe1d02f2335522b9d3a28564ab65d7f352e8891c"
+  },
+  {
+    "path": "assets/production_placeholders/late_fleet/w9/.keep.md",
+    "bytes": 53,
+    "sha256": "a8f2253146205d6b840739ad8624d098190e371b940883794680ae0cbce6bff3"
+  },
+  {
+    "path": "assets/production_placeholders/m155_loot/loot_admiral_vault.glb",
+    "bytes": 9108,
+    "sha256": "a90cf983587654dc72205a6cb18b6201ba78517e785d0346b9efcd6b4a7119ac"
+  },
+  {
+    "path": "assets/production_placeholders/m155_loot/loot_coin_cache.glb",
+    "bytes": 6044,
+    "sha256": "93c7b815b48957bafe59d38f0c6ebcdf1fc5757308ea500bcce61dd6beaaead3"
+  },
+  {
+    "path": "assets/production_placeholders/m155_loot/loot_salvage_bundle.glb",
+    "bytes": 6152,
+    "sha256": "8fec76983abf0656dbddd695169d0c54a67228a2d9150186f8887fc8382bbd3a"
+  },
+  {
+    "path": "assets/production_placeholders/m155_loot/loot_tier_chest.glb",
+    "bytes": 4056,
+    "sha256": "92b556bc90e6145438570dd75ce232d6d16eec7fda458da4ea4a41229daedcab"
+  },
+  {
+    "path": "assets/production_placeholders/m155_loot/repair_crate_m155.glb",
+    "bytes": 3820,
+    "sha256": "7a3e88ea138714ae17193263586271b51d3f617e6455552936c27d76e2b20c20"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/models/island_cliff_cove_m201.glb",
+    "bytes": 16668,
+    "sha256": "54d8efc1f491138deb732ef3b05719e8b9c1a9c87f26eecc8698dbc138a552aa"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/models/island_sandbar_long_m201.glb",
+    "bytes": 13464,
+    "sha256": "5ce74c992dba94c98ddd6ef943d4409aec05f94c6edbc77c4c3985e10007155e"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/models/island_tropical_medium_m201.glb",
+    "bytes": 16392,
+    "sha256": "dd643d444dbe762e188fd178566422ce0e5d0def946d1762b75cab0f27ac4754"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/models/island_tropical_small_m201.glb",
+    "bytes": 15400,
+    "sha256": "5edcca0a6920279a1630a7c615e287b6b4b5f458c34638888f1325621a22b536"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+    "bytes": 3764,
+    "sha256": "7749e44803cc23e3e2c312d63d98961ae7cc39d9c15fba143ecf6cc29b06d958"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/models/loot_coin_cache_m201.glb",
+    "bytes": 4204,
+    "sha256": "b22df0340401a9d1b30ab154840eae95aa1afeac86c3b7918d28a529bef77be2"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/models/loot_repair_crate_m201.glb",
+    "bytes": 3484,
+    "sha256": "cd0740176df4a129a6aa8fbb25381d5418d3685855de38d47fb5171f83e5e36f"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/models/loot_salvage_bundle_m201.glb",
+    "bytes": 2860,
+    "sha256": "2d14eed817258a5d08e8267810d757c0d53a0b604f986c72aaf6c1f5c16f0233"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/models/ship_starter_large_m201.glb",
+    "bytes": 13560,
+    "sha256": "a6dcd6beb4bb724c4eaa7e4fb207322d85f26667802027fd3c7fd4bdc0777a7b"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/models/ship_starter_medium_m201.glb",
+    "bytes": 12252,
+    "sha256": "5a374d90d6962fee387fbaa379ea083053eee42434ee583189490b403ab2358d"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/models/ship_starter_small_m201.glb",
+    "bytes": 12460,
+    "sha256": "c414e4c6b077a2296944d569e4933761270d162c8332a03a1f0e0428127929da"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/ui/icon_ammo_m201.svg",
+    "bytes": 338,
+    "sha256": "fa604a4b0d0505fdd3d3a8e84b11ef5158cb91a4173fbd7563b668df3894d229"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/ui/icon_combat_m201.svg",
+    "bytes": 325,
+    "sha256": "4a22ebc42bab437aa9f744a23d87e6b1ba7064f5971ba912119fde3efe49f2ae"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/ui/icon_harpoon_m201.svg",
+    "bytes": 314,
+    "sha256": "fd8c7a4218e00109219ec396763b08082f762b191b349e2c2bc2bc4b16a12d7e"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/ui/icon_map_m201.svg",
+    "bytes": 342,
+    "sha256": "a024c1856c2eac5bf6f5fad602c51395c506371bb4e5cc9d5c030afb19293218"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/ui/icon_quest_m201.svg",
+    "bytes": 319,
+    "sha256": "2ffe96d47d9165d5a0ead48ff9e138fd775f18c8c045806e029d87c8e232f6a2"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/ui/icon_repair_m201.svg",
+    "bytes": 321,
+    "sha256": "d6e1341a4d4eecef026fdb7594868cae4db0c31802ae0072d79a781052d1fc48"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/ui/icon_shield_m201.svg",
+    "bytes": 327,
+    "sha256": "c3f83b43c002d98f9b6070bac984a868c7ff4cef310466fcc66f65b40561b237"
+  },
+  {
+    "path": "assets/production_placeholders/m201_reference/ui/icon_support_m201.svg",
+    "bytes": 319,
+    "sha256": "fb439592b459c9360b76662729d235ac33779325929f6438bdc6f1961a31584c"
+  },
+  {
+    "path": "assets/production_placeholders/m202_interface/ui/icon_back_m202.svg",
+    "bytes": 304,
+    "sha256": "76d15f091659e03fce26d83ab3fe870aed391429f140829aabe869adecf61908"
+  },
+  {
+    "path": "assets/production_placeholders/m202_interface/ui/icon_close_m202.svg",
+    "bytes": 301,
+    "sha256": "be42ee8f77de94c6bdd94bcb5e0c2fe29d2faa33a2a3274f9772d9f6c6b18502"
+  },
+  {
+    "path": "assets/production_placeholders/m202_interface/ui/icon_fleet_m202.svg",
+    "bytes": 327,
+    "sha256": "bab4f786f7e551b855fdff661dbf9329eb2aca407514e97fa71cee0f53f29b17"
+  },
+  {
+    "path": "assets/production_placeholders/m202_interface/ui/icon_harbor_m202.svg",
+    "bytes": 327,
+    "sha256": "1015654c87d9f9221da8821cbc7e24b95115e1683fc8a82052469233d03567ff"
+  },
+  {
+    "path": "assets/production_placeholders/m202_interface/ui/icon_inventory_m202.svg",
+    "bytes": 326,
+    "sha256": "13ef556676913b43ad648064cc707aee2dac2ce5794eb8bdb3b4ac9c003689a0"
+  },
+  {
+    "path": "assets/production_placeholders/m202_interface/ui/icon_menu_m202.svg",
+    "bytes": 304,
+    "sha256": "13084f4a9ebc4b577dc3d8b18ce750637865429d4dbbdd361eeab2b08fabf9c2"
+  },
+  {
+    "path": "assets/production_placeholders/m202_interface/ui/icon_ranking_m202.svg",
+    "bytes": 322,
+    "sha256": "7bb2a66819828c4e4575504c9b422119d9285142bb1cb61bcb936a6439592c23"
+  },
+  {
+    "path": "assets/production_placeholders/m202_interface/ui/icon_settings_m202.svg",
+    "bytes": 386,
+    "sha256": "89dde07f8b9db5fa65d7b3ecc7c45d8b18dad110a033d1371861c93ce93965fc"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/actions/armor_corrosive.svg",
+    "bytes": 920,
+    "sha256": "6e937fdb9226800078d61ce7d7e17e696b620516f730aa7cd078d26197c50f86"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/actions/boost.svg",
+    "bytes": 878,
+    "sha256": "c842f8a07cd482564be03c6df3e04dbd90a893139f451d898d92410d740b59ae"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/actions/crystal_barrier.svg",
+    "bytes": 853,
+    "sha256": "8b421347f7bfbf0cae53aae58f65ea4c4dddb9e3fe1584f49263c9117e6a3d0e"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/actions/gravewake_lantern.svg",
+    "bytes": 920,
+    "sha256": "e64f546558f385a5e0ebd37ef3f305c1ea532bb0dcb43fde4c48d4cf16f438aa"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/actions/infernal_barrel.svg",
+    "bytes": 926,
+    "sha256": "b67cd0ef8cb197f5442b1e00b3dc4ba50381671589e352e6826ae271d6092477"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/actions/leviathan_hook.svg",
+    "bytes": 914,
+    "sha256": "afc1eed65106809cd08000c0b6aa389d8f2e7e21805ab699e3f51b06d460fcc6"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/actions/recall_compass.svg",
+    "bytes": 945,
+    "sha256": "7796060f60956ae88cde5295a0eac2b0ab15af17ca3d435bf7f2edfbe1703c0f"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/actions/repair.svg",
+    "bytes": 879,
+    "sha256": "b28a11a2bfa7b283ad4bc94744efc6fe42cd4b05c22ce117d812f12e29daa747"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/actions/repair_blocker.svg",
+    "bytes": 913,
+    "sha256": "ba99d9e87b0179be5180320295934ad2aed026510848e73d66d44728cd085859"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/actions/storm_bolt.svg",
+    "bytes": 783,
+    "sha256": "cb1d0e10914cfe1e4af2da2490d85e5e186ae27881124092205b9c91d00a9be5"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/actions/veil.svg",
+    "bytes": 871,
+    "sha256": "b3ea7708c183910994cfe64ad2c31c3522077893b0e58176265c72795e0c8942"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/ammo/chain.svg",
+    "bytes": 902,
+    "sha256": "c25589c298b619dbc55335a55e0a08188857bfbe1f9a21712ad72ded52370e2b"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/ammo/ember.svg",
+    "bytes": 976,
+    "sha256": "b349dc953cefb765ec32b23e2a4ac268232f09949ab13c5863fa078ba567a881"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/ammo/explosive.svg",
+    "bytes": 910,
+    "sha256": "00eadd722a2f150c3c633b9bd1d488f366a0def69f55bbc037f65cb231f1494f"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/ammo/iron.svg",
+    "bytes": 855,
+    "sha256": "685c69cde3f49b05f913dffd8bd53e9416624be5e63e862cea7265403dc9409a"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/ammo/piercing.svg",
+    "bytes": 846,
+    "sha256": "cb3168810d77de7ee82c70b7a0ff6d9e0f2fb8bcf4618b77d88ec642398ebb80"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/ammo/shatter.svg",
+    "bytes": 891,
+    "sha256": "424829ff0da937b27ff67acb7a7c14f63a07fe25e76955a2ae04f4efaa8c5ca4"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/ammo/spectral.svg",
+    "bytes": 973,
+    "sha256": "12bdaf75c6dfc05810cb2452e5f7d080231181c6480da88d084fafed6c2718f2"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/ammo/venom.svg",
+    "bytes": 956,
+    "sha256": "72830143716a6ad7f2356a8160329a963088b18ff46ed358aaa392d6981e388a"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/admiral_seal.svg",
+    "bytes": 851,
+    "sha256": "8b446ea8b5a0c23bb92481d2edb27369b33351e92d1bbe9f253b8513234052a1"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/cannon_oil.svg",
+    "bytes": 849,
+    "sha256": "f5be9b77ac90178beb897806fb1753b9205b1f1548d7cc6ea36615cfc8b662d8"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/crystal_blessing.svg",
+    "bytes": 864,
+    "sha256": "cb4d5c59b88ae30b1baa245debe0d2a9c13b28b6b4615ead571fd5fca4ad3a3b"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/enchanted_rope.svg",
+    "bytes": 897,
+    "sha256": "2e231cac51f4af7c13eedc0f01206f62822aacf9b96a12de8f8d1872004d2765"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/guild_steel.svg",
+    "bytes": 838,
+    "sha256": "45f67a192e99e2e4c8d1d5667dea80a6ae94999f1735ad04f06c005e90f07adc"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/guild_timber.svg",
+    "bytes": 879,
+    "sha256": "62b92b7a5313ea43153cb711445862d9ddbd082fa5a0eb34a36fd589695d3a47"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/monster_bait.svg",
+    "bytes": 919,
+    "sha256": "a500958487ecea3247fb967e5d67fb0f8bb439e0fc2da6a55642bbd76b716fdc"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/repair_crew.svg",
+    "bytes": 893,
+    "sha256": "f0120628cddf007c991b0ecb24061fdebb8ad874bbc94be8b353828a4763ebf6"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/sea_chart.svg",
+    "bytes": 915,
+    "sha256": "81c4094ac8200da9583aa20b18b0c59b3e846bfe6eddc625bde1ac361df7dacc"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/smoke_screen.svg",
+    "bytes": 913,
+    "sha256": "9843245e77b34cedef4a0b324ae00de6e19629e7b2103376c8514ed21dd090ee"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/tower_parts.svg",
+    "bytes": 850,
+    "sha256": "2b561aa97553e650988b1eba74e4575c24779c951dee17cc18961e6a5a039a49"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/items/war_banner.svg",
+    "bytes": 901,
+    "sha256": "fb8dd85bb7b9a8d2518045376fdbc66b0b8889aa82a9890944874e5fe6a47729"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/payloads/abyss_piercer.svg",
+    "bytes": 856,
+    "sha256": "e1be2272c64bc9b6a77959d984391021131ea16bc5df5b4a620cdd2119a4a8bf"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/payloads/barbed_chain.svg",
+    "bytes": 790,
+    "sha256": "ca95540c1ca8b60674150d09d5fe9a86ca1f5354b4fd889372f0bcff98fe3326"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/payloads/event_restoration_shell.svg",
+    "bytes": 901,
+    "sha256": "2eb253fa46141048090cba5a66c9f77bd69f2983746d661b808b815518341f68"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/payloads/hunter_standard.svg",
+    "bytes": 831,
+    "sha256": "8e5e8404f7d712c2a105bb4ac3d930bb16229ff2c1868596a724cc71771a38fd"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/payloads/restoration_shell.svg",
+    "bytes": 839,
+    "sha256": "8734e1a68bd79beed8c9b6bc0d9635865127118079fd7e2273f4ee2ec1799092"
+  },
+  {
+    "path": "assets/production_placeholders/m203_icons/payloads/ward_shell.svg",
+    "bytes": 868,
+    "sha256": "1daade816ab8d4b03ef96bbba783b7705ef67916a8961231fda74d5162fc7c57"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/currencies/abyss_chart_fragment.svg",
+    "bytes": 813,
+    "sha256": "b4cd710def608bd5a6c53ae68fc91d768d1d21c59e257b70198959d907c9efcb"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/currencies/dominion_crest.svg",
+    "bytes": 738,
+    "sha256": "e1b9111d99372ca9c002501c11ac13268244549a51edb4fdcae1dbd3b8ce982b"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/currencies/gold_chart_fragment.svg",
+    "bytes": 815,
+    "sha256": "f6f6bb519f67fc8f151e16e549cb4cb346609f887cf9732302ab0f57ee6696d7"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/currencies/gold_map_token.svg",
+    "bytes": 815,
+    "sha256": "21ce76125958bda0c7e291ecad758e3eb0b32891c4f8413703f783ae7c97da06"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/currencies/legendary_command_seal.svg",
+    "bytes": 768,
+    "sha256": "783fe35eb1558f72bb0f6c09ec610be6a630762d7da9f8ebd27920d33129aa15"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/currencies/silver_chart_fragment.svg",
+    "bytes": 765,
+    "sha256": "dc4fe3bf1db8b5a1ba3387700ff95b3a00411c9b573728c0d6bae964beaa4700"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/citadel_blueprint.svg",
+    "bytes": 833,
+    "sha256": "eb4366dccb2a992b19962c8dc9acc966dd5b8886b7c342c8e25e46c0ff9e06f2"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/harpoon_relic.svg",
+    "bytes": 797,
+    "sha256": "bb08e22c2bb900436ed45e4ddaf8ace370d8cf284b1b13360671d718ceb0191b"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/harpoon_stormhook.svg",
+    "bytes": 823,
+    "sha256": "c7671e15d67b7cab593c7e2adb2462f3f2544733c3377cd037cd0bb29c38d7ea"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/harpoon_tempered.svg",
+    "bytes": 757,
+    "sha256": "98f650599679a2d60ebc5ba75dd5e57fdf8454b43fbe1e7796e8a45b5900bd37"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/hunter_flare.svg",
+    "bytes": 733,
+    "sha256": "49786fc667c7525bd3397eeb488747bbee3b09638da7a1d3fcb74f5754637415"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/master_gunlock.svg",
+    "bytes": 778,
+    "sha256": "f2f6a2f1da41a186c05087121e5d9f986fed7dee9ca25e5d10ee96c9bd0eb352"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/powder_charge.svg",
+    "bytes": 726,
+    "sha256": "29656be9043c41953496cedb49350356f75d867300928ccb9b1b00e9862af71d"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/siege_beacon.svg",
+    "bytes": 825,
+    "sha256": "e41f56639397875862952765633949ea1b2066427f308f87e5c5f3bf315098aa"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/siege_powder.svg",
+    "bytes": 778,
+    "sha256": "3d0d3f3bf774bbc306a6ae0bfb48378ea4c0838b1aa8dced2aa9c264099a1986"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/siege_repair_kit.svg",
+    "bytes": 802,
+    "sha256": "ccd5ccd3a5ab12c1f85a46c269759aa70414cfad2770a1b2b09e48e6aafb1503"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/ward_crystal.svg",
+    "bytes": 713,
+    "sha256": "20cc5a4cb347d6d80146d24e034d0904eb96a84ec1c917933208fc3abddd07bc"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/equipment/ward_tonic.svg",
+    "bytes": 846,
+    "sha256": "4d96eb163d05ba22a36d19cafb836a02d3972ba48bd4e6e7188aab21772ee3e7"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/abyss_scale.svg",
+    "bytes": 784,
+    "sha256": "583f5b55fcbc94fea1b59b6ff712cfccd8b8fa7b3e10856ce56a927671e113b6"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/admiral_component.svg",
+    "bytes": 793,
+    "sha256": "c28e72812f4e4d384f67c1fc6148757d407a141836bc118447a579f782e6b3c6"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/ancient_guardian_fragment.svg",
+    "bytes": 871,
+    "sha256": "648a886edc850fd898ea16c192133ba8c8022909a132fa308c5fe34722a10091"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/ancient_relic_core.svg",
+    "bytes": 774,
+    "sha256": "1e9bbc3486943367b93ffd2abffc52d6d62a37dcf95e0a893870ef47c813ef32"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/arcane_shard.svg",
+    "bytes": 748,
+    "sha256": "dbd0b1f2bc8ceecf74437e08ce2828dd488bf045911f15436f63ac38ebdd30df"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/components.svg",
+    "bytes": 754,
+    "sha256": "34fc81a8ba0fb89ecf75e5491827cf06e463707e17e842fb8c5836e4baaa97b1"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/corrupted_pearl.svg",
+    "bytes": 796,
+    "sha256": "693f98df3a0911a9d60fef19305d5cbac55870284c236907d12dee3a1fbfa5bf"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/dominion_shard.svg",
+    "bytes": 767,
+    "sha256": "3b2416515fba8d854ebc3d38d2cbd49ea92ada12c58cc8f564d25e1d0726a3c9"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/ember_ore.svg",
+    "bytes": 802,
+    "sha256": "cc56c690d6d06ba82c0638b8a4cf11620d90e41f6ec8593f722c2f3506fcd3e1"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/guild_masonry.svg",
+    "bytes": 839,
+    "sha256": "603180e52dd27bdbc24661d7dab27f650192c6ffc7b4bbd3fe8c37957ebfcbef"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/legendary_fragment.svg",
+    "bytes": 722,
+    "sha256": "c12830ebbc8299a8890cf28d020b36a2156a34d0b6b8c004891ca9b53de3e66a"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/metal.svg",
+    "bytes": 771,
+    "sha256": "b36f7050d5906477de8b91b628fd4276776248820bf90cf2191a2f6aa4518467"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/precision_gears.svg",
+    "bytes": 739,
+    "sha256": "1975154f2ea13bfe9856a4dee9c616b8591731089ca4d6ae3b7c4f4eb28a5dec"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/reinforced_timber.svg",
+    "bytes": 763,
+    "sha256": "d5c117262e667bc1a63e6181ed783b08c40bbd2c85e96b20c73af3f21b83c83f"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/siege_core.svg",
+    "bytes": 743,
+    "sha256": "5628fd16d3d451eb4001dcf38ade07d58c76da29aca3ea884e91e7369caafac9"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/stormglass.svg",
+    "bytes": 806,
+    "sha256": "c8dc2d9f13777d7c55e2b662bd6d70b3ecb30a02de4ceef6b5bbbc18e71dff40"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/sun_core_fragment.svg",
+    "bytes": 778,
+    "sha256": "a7b9777bbd843bb7df953aeb97cd9a19acac4e79a03981b6ab330a54618569e0"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/veil_silk.svg",
+    "bytes": 810,
+    "sha256": "145b123f13615eb20fad56d9999532d4c6058fb2d2fd78dd6f9f86b11446628b"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/ward_resin.svg",
+    "bytes": 814,
+    "sha256": "c3e012d2f33afd4cf4d426cc28315635ddd05e3a6646b582cca23a6bb371f808"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/materials/wood.svg",
+    "bytes": 705,
+    "sha256": "305c4b10236e579dcfb21bae8f101d26035d1c938bb17d4e7efbb835ef962784"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/navigation/talent_chart.svg",
+    "bytes": 785,
+    "sha256": "e2a67d4132a2be51a51a8de2e6be10667e86172f85ed23573c6070c1a35525f5"
+  },
+  {
+    "path": "assets/production_placeholders/m204_inventory_icons/navigation/talent_compass.svg",
+    "bytes": 790,
+    "sha256": "fc7e446c6d682dc18a8516ff17732ce3bc6a45296e0e01c33de655f213161bb0"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/cannons/abyssal_repeater.svg",
+    "bytes": 718,
+    "sha256": "48f02cfe1f637b49a81451b3195295c6fab38bc92cf4299065cc0cdb6c49ec9e"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/cannons/heavy_bombard.svg",
+    "bytes": 677,
+    "sha256": "fddfa04a320f0a1c3522befe0c467e9afbb17b0f8a70f4d23ef2aa27fa37e694"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/cannons/light_culverin.svg",
+    "bytes": 575,
+    "sha256": "810beab068a745ec928c13da8a559cf67e871c09924d3dbb9db4deb2941754fd"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/cannons/long_nine.svg",
+    "bytes": 655,
+    "sha256": "da8c75aaa99c67cc06853d16725179809b46058cd34415f043e6b9de965fa75e"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/cannons/naval_cannon.svg",
+    "bytes": 562,
+    "sha256": "db2a566d2b64c716bfe9d087a6561d39ec007706d0083d4a38cedc766482937b"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/cannons/sovereign_mortar.svg",
+    "bytes": 681,
+    "sha256": "5a8e3c75fc0c81c725c46f36b2ca359396a4f54fe2ecff803e32469bace7bcff"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/cannons/storm_carronade.svg",
+    "bytes": 712,
+    "sha256": "60267cc9157e374225ebcdf8fca6f0cab6763fc60ebea39c5d26a1644a06da94"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tiers/tier_1_serviceable.svg",
+    "bytes": 504,
+    "sha256": "2e9496d668cb5204a9d03d084ff1dbb2d1a5e9bf0b915d4758c2f80048cf1754"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tiers/tier_2_reinforced.svg",
+    "bytes": 519,
+    "sha256": "169b1acdb7c5ffaf5ac317868a8608505985731d367f2a3773e09a6387ad7efb"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tiers/tier_3_veteran.svg",
+    "bytes": 520,
+    "sha256": "a9cf4f1373e54b191047904616c392a16de931c69027f051a7d4c9cf5fe74826"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tiers/tier_4_masterwork.svg",
+    "bytes": 573,
+    "sha256": "9e2521e89b8e845ba10644ba0cc708308ce19dcca46bfb1a395077d4a4675c83"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tiers/tier_5_dominion.svg",
+    "bytes": 586,
+    "sha256": "fba8ab31b79711eb3a5ce3ab8e11a9da7cb565d46c15fa7023c3de128fc7bf76"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/barrel_1.svg",
+    "bytes": 505,
+    "sha256": "c4b71bf801279505b2719ce291ce18be1b3b4f127d1188e6028909b0b6ed2318"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/barrel_10.svg",
+    "bytes": 690,
+    "sha256": "e230826106a370964243a7594c1eb0565927e7f22290a596c332b5536590e0c5"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/barrel_3.svg",
+    "bytes": 551,
+    "sha256": "d10432a7af01b0555ac131fb2d0dc03e80ffe5a2d0cbd5420d1c1b1db45b7e76"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/barrel_5.svg",
+    "bytes": 597,
+    "sha256": "e254e5239b2fa2937311860320ae733897be18079ca82304791842203decbdae"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/barrel_7.svg",
+    "bytes": 643,
+    "sha256": "d2c5a3161f91abf47dcf108f1466631106e07b1d0aa0dba52f6d34289ed235b3"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/carriage_1.svg",
+    "bytes": 621,
+    "sha256": "9a8d0ccdfb2b36bc9add487046d603bf4b7c54ad038d60da464cd17d2c9f8041"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/carriage_10.svg",
+    "bytes": 806,
+    "sha256": "bcd4ec454c1910c245138e91dc5e8412b9d5d5751010b7de3b42874ab9777291"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/carriage_3.svg",
+    "bytes": 667,
+    "sha256": "2528e35ea1a9c673ba691c6843c3b580473891622f9b5832872b6b0c90aed2cc"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/carriage_5.svg",
+    "bytes": 713,
+    "sha256": "bc150ada097300322ae8ae9dd7977151b23b27e94ff2ed67e997a556bd1d46a2"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/carriage_7.svg",
+    "bytes": 759,
+    "sha256": "db89f3cd98a5a6a2a5ae58f8e49972ecac3637535b5793630bc516ff6e769476"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/chamber_1.svg",
+    "bytes": 610,
+    "sha256": "63b9d7829f7a5ff6aceb75ccd703e41fdd0dfea1d8887678561cf9e3ef561396"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/chamber_10.svg",
+    "bytes": 795,
+    "sha256": "193b3253a9d65b0543d998a69cf5439144cc7860b515e21a00815dbcb5ba3aaf"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/chamber_3.svg",
+    "bytes": 656,
+    "sha256": "e504175b773702ebf9aa9bbcc137cb27446dfc0eabebb4fb7fee2b13793a551f"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/chamber_5.svg",
+    "bytes": 702,
+    "sha256": "c011d846dce2ab496a8d3cba403b01382bdf7a250e80aef1a9fa835d51b7de49"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/chamber_7.svg",
+    "bytes": 748,
+    "sha256": "685b37d79a92cac4e089467914b67fcf68f944ffb038c427130fe4afabb206be"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/runes_1.svg",
+    "bytes": 571,
+    "sha256": "5dc3d069b26adfddef809719ed21d1a9386b1a55df3f0537e4f090104aff06a7"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/runes_10.svg",
+    "bytes": 756,
+    "sha256": "ad7f3cbb3ef7419d9bbbcc561bd13221e8dc929a151f7192c145047c369a4e36"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/runes_3.svg",
+    "bytes": 617,
+    "sha256": "d43f46b2126dc0681babc049d7b1ee7415e801f5a967661900ed37950590a651"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/runes_5.svg",
+    "bytes": 663,
+    "sha256": "7f5f0d0c05589a66865bc8a2a98e8ab2920408fc5ecd85bef21c3094570d9638"
+  },
+  {
+    "path": "assets/production_placeholders/m205_cannon_icons/tracks/runes_7.svg",
+    "bytes": 709,
+    "sha256": "fa8f2fd5a24745760b51fc25680a5cc3c11a4ffc52cddb6935b7d4e1f016e23e"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/decks/deck_01.svg",
+    "bytes": 550,
+    "sha256": "d1bfb7d5a2fc9f3ac4dabfa6a64aa9661ea94e8535c3c422a50d32555c5ee153"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/decks/deck_02.svg",
+    "bytes": 694,
+    "sha256": "ca9c56ec362e2c92ae1b01d1a57c1d5318882c1ac9aad1957c685ce814730db5"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/decks/deck_03.svg",
+    "bytes": 838,
+    "sha256": "a563288ad9e8b964c467fab8b2c753958e32e345f17182cbfe53920b78cb04d4"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/decks/deck_04.svg",
+    "bytes": 982,
+    "sha256": "c962c83610233529e1303573d540537a1b265499db03772d1161c60ef5d892dd"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/decks/deck_05.svg",
+    "bytes": 1126,
+    "sha256": "e2c0dd5f31a3b4001c62945af40a07dfc108e12a9bb78a3a5ed05379d852b668"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/decks/deck_06.svg",
+    "bytes": 1172,
+    "sha256": "27280562acdc53db3b4a99f853fa29cb2db0d376e3635fee6818f5aa5ef50118"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/decks/deck_07.svg",
+    "bytes": 1218,
+    "sha256": "999bdb19addd57533317aa8ed969cee385a72ba864059e11ede4f30d5e8b959e"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/decks/deck_08.svg",
+    "bytes": 1264,
+    "sha256": "d64441a839801ebb76a3f84fb0ac702ebd6accef3488f21390249beb7e49aabd"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/decks/deck_09.svg",
+    "bytes": 1310,
+    "sha256": "cb265c20d617d5e770737d6acc3b5da98a58ae4c4f5d8723b3e1a13e44947464"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/decks/deck_10.svg",
+    "bytes": 1357,
+    "sha256": "706145988067512fe5926efd187979f4e9edbbfaa575af6c6dcffd7b74eb95cf"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/equipment/crew.svg",
+    "bytes": 616,
+    "sha256": "f619dc251c8ab91810e016f316540ca6b0343ed487cae8499d85018d079eabad"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/equipment/harpoon_mount.svg",
+    "bytes": 647,
+    "sha256": "8f6e3f0c87da0322d3120bf0945ca3146b07b54464694bc76650b62913d933ab"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/equipment/hull_armor.svg",
+    "bytes": 572,
+    "sha256": "d1019c7ed39520785b1f67d2d55458c38fcfe32312869a4ad93a7e58e4993100"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/equipment/ram.svg",
+    "bytes": 582,
+    "sha256": "6e5eccfe9a23e046e2b5c571b66a0f3d8edcc54e6a2d9ac9b82f0b6c392f2a61"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/equipment/sails.svg",
+    "bytes": 613,
+    "sha256": "e3841412d6d2d8a9603b2cb2d239e73602840bade1427eee599b02893b987d4e"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/equipment/ward.svg",
+    "bytes": 562,
+    "sha256": "bff9b488579a01017ca64f751d6b05f8779181642464af74339d29cc7a65c045"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/harpoons/harpoon.svg",
+    "bytes": 546,
+    "sha256": "464ea43b9bd40736f09583b05faffd765332e284ce486e032c9e5cb3023faade"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/harpoons/harpoon_relic.svg",
+    "bytes": 632,
+    "sha256": "1b9077093463ffc6aedf99b304f811ea8e236a55a24c8abfc02e36b5e5884e2f"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/harpoons/harpoon_stormhook.svg",
+    "bytes": 610,
+    "sha256": "033934724fb283ce299ef4aa0af418aaf0897a360f3f373a005513235b4fdd32"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/harpoons/harpoon_tempered.svg",
+    "bytes": 611,
+    "sha256": "74250f811af73ada30a939395aab4a8ec61b657bd55eae7518f3904904e656ec"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/special_decks/arcane_tide_deck.svg",
+    "bytes": 599,
+    "sha256": "2c5a56f45c95f6ac877957622617c5d8119605f2597d10c5366ba3dbe7790dbd"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/special_decks/corsair_oath_deck.svg",
+    "bytes": 655,
+    "sha256": "71334e6a069fcd2dfd466df2ff826d7d17caca9a080db4ce2f5f747e184f63e0"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/special_decks/gravewake_deck.svg",
+    "bytes": 612,
+    "sha256": "7551a54c7aac910f7271842ac7a2f7591bd230bd25d2570944c34593e6f94f7a"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/special_decks/iron_bastion_deck.svg",
+    "bytes": 632,
+    "sha256": "acc08fa46b85d48b4ad26f976ce4290fe553b3ac72efe7103586da2b6f99f809"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/special_decks/leviathan_deck.svg",
+    "bytes": 597,
+    "sha256": "e73a63593a6e7027254f08e2f9e9bc37372de0118885c9897015ba6a33d0b0fe"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/special_decks/stormwake_deck.svg",
+    "bytes": 570,
+    "sha256": "f4561661baf4d4cb54322de7726ed994e0851c84e587b087f9e2cd59b844fbb2"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/tiers/special_deck_level_1.svg",
+    "bytes": 670,
+    "sha256": "c3ed4a31118ec74c6ea4daceaea02d52d906a14ef3a221629bef00ca85126a22"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/tiers/special_deck_level_2.svg",
+    "bytes": 716,
+    "sha256": "f6eac5607f9cd86ffcfab2f223e6cf75b0c7db2e85bca239a30854b6e947b72b"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/tiers/special_deck_level_3.svg",
+    "bytes": 762,
+    "sha256": "15e87bc935fd1a6c23a8ba4cd1c7ce2adbe8198678c099feac99bf8eb70ea090"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/tiers/special_deck_level_4.svg",
+    "bytes": 808,
+    "sha256": "ea32065c973f89192c7f22811de5c1759942298007426d9818dca638b33132ee"
+  },
+  {
+    "path": "assets/production_placeholders/m206_deck_equipment_icons/tiers/special_deck_level_5.svg",
+    "bytes": 854,
+    "sha256": "2b38982da315eff44c94e2470d80384c263a71c67173011f1451d94b28d17627"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/cannon_battery/cannon_battery_1.svg",
+    "bytes": 735,
+    "sha256": "d03fc4936b84bd4709750fad21a04aa17ba6083af5b5dc64a0efd26402c8cffb"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/cannon_battery/cannon_battery_2.svg",
+    "bytes": 817,
+    "sha256": "7e90140f70a1ecaeabb4ff5f5989945caf4526cb8e42165e217b6e3d762c18d8"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/cannon_battery/cannon_battery_3.svg",
+    "bytes": 899,
+    "sha256": "51f67356b49ee5986f8780975564fa4a1525c68abcd9267714285955883846d3"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/cannon_battery/cannon_battery_4.svg",
+    "bytes": 981,
+    "sha256": "f43e67200ae760e4ff46e0d7e3a4190255c69a35333de365666b9812f36d8fba"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/cannon_battery/cannon_battery_5.svg",
+    "bytes": 1063,
+    "sha256": "78be96802bb67de7b13eda1772f862953f93331c58f6dc83e6a1f2c896c73844"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/harpoon_mount/harpoon_mount_1.svg",
+    "bytes": 801,
+    "sha256": "5d37370a0cd26f89a1153163961b47e1aaf5631f4fe691cd4f4660541606c876"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/harpoon_mount/harpoon_mount_2.svg",
+    "bytes": 857,
+    "sha256": "3459000d1010cee32a52124e585e4c2ac54dbe9fca0abf90d1aaed0aee48699d"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/harpoon_mount/harpoon_mount_3.svg",
+    "bytes": 913,
+    "sha256": "5a2f2f51439fbaf1d58d9657e6e05e95d113aff5fba64afb96e3d48c58663287"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/harpoon_mount/harpoon_mount_4.svg",
+    "bytes": 969,
+    "sha256": "eacec670f046415d019615f5f542f45755aceec8bad52933a39f22173429df5b"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/harpoon_mount/harpoon_mount_5.svg",
+    "bytes": 1025,
+    "sha256": "e5db5fcfab39bac5b37013034eecf87d0ce60407ebaaaba3e897cdcd36d409f2"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/hull_armor/hull_armor_1.svg",
+    "bytes": 736,
+    "sha256": "34681f55959a1aaf17035e77bf1408ceec05bc9c83ef41cbbd749d67a8320b46"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/hull_armor/hull_armor_2.svg",
+    "bytes": 784,
+    "sha256": "83a420247a195c70882e34585f2f464e52c6bf24f3b79ddba015c6d48f21ca19"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/hull_armor/hull_armor_3.svg",
+    "bytes": 832,
+    "sha256": "281019ad51d95c0dbcb7d52c2c5183f3309140522c08cb225cb2b8d8b81c732b"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/hull_armor/hull_armor_4.svg",
+    "bytes": 880,
+    "sha256": "1a003ece643304de6f0407ab35386c4a5d03a521c0507f8a4e76905b1e825337"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/hull_armor/hull_armor_5.svg",
+    "bytes": 928,
+    "sha256": "235c29a64208038928b1dd49aa0d8a9d6984c1ab0e4f25ccb3499288d8e54fa9"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/ram/ram_1.svg",
+    "bytes": 688,
+    "sha256": "bf5823a12f64237ab772e246c3e0af3fb98a78b56f4d40b25f25cfd977fad6d2"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/ram/ram_2.svg",
+    "bytes": 747,
+    "sha256": "58d0c759e9cacdf0e7e04fc79124e0b1e02de949cb0b23dadb76239ca6906d9a"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/ram/ram_3.svg",
+    "bytes": 806,
+    "sha256": "14b44060c6f5ffe631644bf7f76327049b014163ef6c8a48eb658ab4fee290b6"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/ram/ram_4.svg",
+    "bytes": 865,
+    "sha256": "7c721d59377eab64d6cd9a2bf74b946075d6d39c6326755ff9c30fdfd90a6eb9"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/ram/ram_5.svg",
+    "bytes": 924,
+    "sha256": "92d1ba9a3100bc5ff078ef1708df6c0bdac9459ce2a78622f9c37e86db8c6570"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/sails/sails_1.svg",
+    "bytes": 774,
+    "sha256": "c48481e16ad465c1d31f6d10906402fe0f2ba8c69a27b936cec42fb17e64c1e9"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/sails/sails_2.svg",
+    "bytes": 833,
+    "sha256": "8207d50645beb1bfc9344db251296610064427f7f0e0badaf6136c53c50c96bd"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/sails/sails_3.svg",
+    "bytes": 892,
+    "sha256": "d2b2e60ad187e66e64c4a12b21c0dc021f28f93a516122c46da32e73c850c0a1"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/sails/sails_4.svg",
+    "bytes": 951,
+    "sha256": "f8df0b1586d94b213b052a0714d148a3786e9fd863f41285806d67779305ec7b"
+  },
+  {
+    "path": "assets/production_placeholders/m207_ship_equipment_stages/sails/sails_5.svg",
+    "bytes": 1010,
+    "sha256": "d497d1cf6e3c0dd4d9481d8937171cfd69de3b41071fc3697b7277a80485b04d"
+  },
+  {
+    "path": "assets/production_placeholders/m295/npc_raider_01.glb",
+    "bytes": 123428,
+    "sha256": "ce638fe7c8819a9417ae3b1ffe62274c8305b57321c65dd94e82fd50c2e85157"
+  },
+  {
+    "path": "assets/production_placeholders/m296/npc_friendly_coastal_sloop.glb",
+    "bytes": 124572,
+    "sha256": "cc337d917ecdd9d4204997dc9fd89be7e0d1d8c39bf6017739e192bfc387324e"
+  },
+  {
+    "path": "assets/production_placeholders/m296/npc_gunship_01.glb",
+    "bytes": 130860,
+    "sha256": "fe7485b23bb99aafdb5a19e2d06d05f446212778c677b9576b322bc27b6c7489"
+  },
+  {
+    "path": "assets/production_placeholders/m297/npc_heavy_01.glb",
+    "bytes": 163336,
+    "sha256": "e0efa5bbe44147b83fa2ed01f14dec35fb5cb5905d38c2b87002b071be1beaba"
+  },
+  {
+    "path": "assets/production_placeholders/m297/npc_scout_01.glb",
+    "bytes": 126960,
+    "sha256": "043c2dfc89a13d47bd6114f70ef8731aa3efa9b99757675e871b7deb3671957a"
+  },
+  {
+    "path": "assets/production_placeholders/m301/event_halloween_npc_raider_01.glb",
+    "bytes": 123496,
+    "sha256": "65cff31532ab7e1392d8ca181d4403024987e6e10154263a89c22ce69485bc42"
+  },
+  {
+    "path": "assets/production_placeholders/m301/event_halloween_npc_sloop_01.glb",
+    "bytes": 123488,
+    "sha256": "8b7a59419bbb22c3c989290fadbc090885db887d8a77143d0894e50b02a93c8c"
+  },
+  {
+    "path": "assets/production_placeholders/m301/event_halloween_ship_design_01.glb",
+    "bytes": 123496,
+    "sha256": "eae86dd1a33e4437a6964454c61e7c389e83ebcc466b94f53a4f94763def35a7"
+  },
+  {
+    "path": "assets/production_placeholders/m301_icons/pumpkin_cannon_round.svg",
+    "bytes": 828,
+    "sha256": "117628838045e5751b7442c979ccd12bcca4b5b53bc2977a5ddcfa3c276815e9"
+  },
+  {
+    "path": "assets/production_placeholders/p0/REPLACE_ASSETS_HERE.md",
+    "bytes": 550,
+    "sha256": "8410b5c8db7fd035252d7b36719cba331800429d41f357789263324cdde8b8eb"
+  },
+  {
+    "path": "assets/production_placeholders/p0/harbor_havens_reach.glb",
+    "bytes": 62148,
+    "sha256": "2cce76b62f11a06a9cbb01eba4f60ca382c7803dc5cb290efb12cacfb9563e3d"
+  },
+  {
+    "path": "assets/production_placeholders/p0/island_cliff_cove.glb",
+    "bytes": 37336,
+    "sha256": "b9d180a69fdcddc988886513f4db924261ed61162a398eb7de638779f8308a27"
+  },
+  {
+    "path": "assets/production_placeholders/p0/island_sandbar_long.glb",
+    "bytes": 52048,
+    "sha256": "5052668bad9870b84b2f7e75e2881872531e538ab3e1daf512b8ca0539019771"
+  },
+  {
+    "path": "assets/production_placeholders/p0/island_tropical_medium.glb",
+    "bytes": 52048,
+    "sha256": "5052668bad9870b84b2f7e75e2881872531e538ab3e1daf512b8ca0539019771"
+  },
+  {
+    "path": "assets/production_placeholders/p0/island_tropical_small.glb",
+    "bytes": 52048,
+    "sha256": "5052668bad9870b84b2f7e75e2881872531e538ab3e1daf512b8ca0539019771"
+  },
+  {
+    "path": "assets/production_placeholders/p0/monster_early_01.glb",
+    "bytes": 54976,
+    "sha256": "ca7673010758a4ddc79c5de52a14e14a2e08b8298422a452f3a03e8f19b7b8ce"
+  },
+  {
+    "path": "assets/production_placeholders/p0/npc_friendly_coastal_sloop.glb",
+    "bytes": 123132,
+    "sha256": "736cfebb4ac521f3ae00c75e44f3930d2b2a48eab07f3724d388e8d92a1e8c00"
+  },
+  {
+    "path": "assets/production_placeholders/p0/npc_gunship_01.glb",
+    "bytes": 123132,
+    "sha256": "736cfebb4ac521f3ae00c75e44f3930d2b2a48eab07f3724d388e8d92a1e8c00"
+  },
+  {
+    "path": "assets/production_placeholders/p0/npc_heavy_01.glb",
+    "bytes": 157068,
+    "sha256": "c46ff6c449cbd117b3f1c9f2cc8aa0c5a4de6df3cdfc92d3e44bf6c54d6d055d"
+  },
+  {
+    "path": "assets/production_placeholders/p0/npc_raider_01.glb",
+    "bytes": 123132,
+    "sha256": "736cfebb4ac521f3ae00c75e44f3930d2b2a48eab07f3724d388e8d92a1e8c00"
+  },
+  {
+    "path": "assets/production_placeholders/p0/npc_scout_01.glb",
+    "bytes": 123132,
+    "sha256": "736cfebb4ac521f3ae00c75e44f3930d2b2a48eab07f3724d388e8d92a1e8c00"
+  },
+  {
+    "path": "assets/production_placeholders/p0/ship_large.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/production_placeholders/p0/ship_medium.glb",
+    "bytes": 123132,
+    "sha256": "611e8865c74f465effc7e00813244a2e7b6d64133771eaf1a3d8bfd873de7aba"
+  },
+  {
+    "path": "assets/production_placeholders/p0/ship_small.glb",
+    "bytes": 104712,
+    "sha256": "5f70d6d412787227691f49b1eb94f13a6f62a65ffeada0eb4c282f0e5161b55b"
+  },
+  {
+    "path": "assets/production_placeholders/p1/REPLACE_ASSETS_HERE.md",
+    "bytes": 409,
+    "sha256": "38b0abef98bc0a1f0dc47fb96e67b9fe0796d44a7334e9b172d6c7a9ac37d3ce"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/REPLACE_ASSETS_HERE.md",
+    "bytes": 632,
+    "sha256": "362e374f6f4267d0afd3fc3f30f2c8074ea8bb807c39e128eab1e9343c5d077c"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/harbors/harbor_mourning_port.glb",
+    "bytes": 62148,
+    "sha256": "2cce76b62f11a06a9cbb01eba4f60ca382c7803dc5cb290efb12cacfb9563e3d"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/harbors/harbor_redhaven.glb",
+    "bytes": 62148,
+    "sha256": "2cce76b62f11a06a9cbb01eba4f60ca382c7803dc5cb290efb12cacfb9563e3d"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/islands/island_module_crimson_coast.glb",
+    "bytes": 37336,
+    "sha256": "b9d180a69fdcddc988886513f4db924261ed61162a398eb7de638779f8308a27"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/islands/island_module_drowned_coast.glb",
+    "bytes": 52048,
+    "sha256": "5052668bad9870b84b2f7e75e2881872531e538ab3e1daf512b8ca0539019771"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/materials/crimson_harbor.tres",
+    "bytes": 136,
+    "sha256": "99abe86d0c7749bcf6fc36fbf4c753b87d657cd0d5ca6b23c6292af8ab750534"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/materials/crimson_monster.tres",
+    "bytes": 232,
+    "sha256": "d76e368aa0c991e50a4305a678f2f96b544245f5b6ed0756095097d467888768"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/materials/crimson_ship.tres",
+    "bytes": 136,
+    "sha256": "8f647a61c42465a654e832158e97dc70428d535f6956dbb04206dcbba9a68bfd"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/materials/crimson_world.tres",
+    "bytes": 120,
+    "sha256": "95931e0924d4694cb5bd5f611ae1716be1db8aa907b1333051a166832d673d70"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/materials/drowned_harbor.tres",
+    "bytes": 136,
+    "sha256": "260b4f8b11e524a35d010abb79d8c45b0ea8f9ed6b8c077907ee7b735072e5f0"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/materials/drowned_monster.tres",
+    "bytes": 232,
+    "sha256": "00e17a81046ee1eec8e17b949af7ac26188006399e23b981708df472b8d0f9a7"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/materials/drowned_ship.tres",
+    "bytes": 136,
+    "sha256": "84b274ef921569ac5373cd5eff3ced3cf108eed73e9d525590e2be3223251169"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/materials/drowned_world.tres",
+    "bytes": 120,
+    "sha256": "a2007240c75902c77a89faabb6800528a82eed9a4045975307a04b309dea561f"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/monsters/monster_drowned_beast.glb",
+    "bytes": 54976,
+    "sha256": "ca7673010758a4ddc79c5de52a14e14a2e08b8298422a452f3a03e8f19b7b8ce"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/monsters/monster_ember_ray.glb",
+    "bytes": 54976,
+    "sha256": "ca7673010758a4ddc79c5de52a14e14a2e08b8298422a452f3a03e8f19b7b8ce"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/monsters/monster_ghost_whale.glb",
+    "bytes": 54976,
+    "sha256": "ca7673010758a4ddc79c5de52a14e14a2e08b8298422a452f3a03e8f19b7b8ce"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/monsters/monster_krakenling.glb",
+    "bytes": 54976,
+    "sha256": "ca7673010758a4ddc79c5de52a14e14a2e08b8298422a452f3a03e8f19b7b8ce"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/monsters/monster_redfin.glb",
+    "bytes": 54976,
+    "sha256": "ca7673010758a4ddc79c5de52a14e14a2e08b8298422a452f3a03e8f19b7b8ce"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/monsters/monster_wraith_serpent.glb",
+    "bytes": 54976,
+    "sha256": "ca7673010758a4ddc79c5de52a14e14a2e08b8298422a452f3a03e8f19b7b8ce"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/monsters/monster_young_leviathan.glb",
+    "bytes": 54976,
+    "sha256": "ca7673010758a4ddc79c5de52a14e14a2e08b8298422a452f3a03e8f19b7b8ce"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/nature/flora_coastal_flowers.glb",
+    "bytes": 37336,
+    "sha256": "b9d180a69fdcddc988886513f4db924261ed61162a398eb7de638779f8308a27"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/nature/flora_coral_cluster.glb",
+    "bytes": 52048,
+    "sha256": "5052668bad9870b84b2f7e75e2881872531e538ab3e1daf512b8ca0539019771"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/nature/flora_mangrove.glb",
+    "bytes": 52048,
+    "sha256": "5052668bad9870b84b2f7e75e2881872531e538ab3e1daf512b8ca0539019771"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/nature/flora_reeds.glb",
+    "bytes": 52048,
+    "sha256": "5052668bad9870b84b2f7e75e2881872531e538ab3e1daf512b8ca0539019771"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/ships/npc_crimson_admiral.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/ships/npc_crimson_guard.glb",
+    "bytes": 104712,
+    "sha256": "5f70d6d412787227691f49b1eb94f13a6f62a65ffeada0eb4c282f0e5161b55b"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/ships/npc_crimson_hunter.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/ships/npc_crimson_raider.glb",
+    "bytes": 123132,
+    "sha256": "611e8865c74f465effc7e00813244a2e7b6d64133771eaf1a3d8bfd873de7aba"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/ships/npc_crimson_scout.glb",
+    "bytes": 123132,
+    "sha256": "611e8865c74f465effc7e00813244a2e7b6d64133771eaf1a3d8bfd873de7aba"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/ships/npc_drowned_admiral.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/ships/npc_drowned_guard.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/ships/npc_drowned_hunter.glb",
+    "bytes": 123132,
+    "sha256": "611e8865c74f465effc7e00813244a2e7b6d64133771eaf1a3d8bfd873de7aba"
+  },
+  {
+    "path": "assets/production_placeholders/p1/regional/ships/npc_drowned_raider.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/production_placeholders/p1/ship_main_01.glb",
+    "bytes": 104712,
+    "sha256": "5f70d6d412787227691f49b1eb94f13a6f62a65ffeada0eb4c282f0e5161b55b"
+  },
+  {
+    "path": "assets/production_placeholders/p1/ship_main_02.glb",
+    "bytes": 123132,
+    "sha256": "611e8865c74f465effc7e00813244a2e7b6d64133771eaf1a3d8bfd873de7aba"
+  },
+  {
+    "path": "assets/production_placeholders/p1/ship_main_03.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/production_placeholders/p1/ship_main_04.glb",
+    "bytes": 123132,
+    "sha256": "611e8865c74f465effc7e00813244a2e7b6d64133771eaf1a3d8bfd873de7aba"
+  },
+  {
+    "path": "assets/production_placeholders/p1/ship_main_05.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/production_placeholders/p1/ship_main_06.glb",
+    "bytes": 104712,
+    "sha256": "5f70d6d412787227691f49b1eb94f13a6f62a65ffeada0eb4c282f0e5161b55b"
+  },
+  {
+    "path": "assets/production_placeholders/p1/ship_main_07.glb",
+    "bytes": 123132,
+    "sha256": "611e8865c74f465effc7e00813244a2e7b6d64133771eaf1a3d8bfd873de7aba"
+  },
+  {
+    "path": "assets/production_placeholders/p1/ship_main_08.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/production_placeholders/p1/ship_main_09.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/production_placeholders/p1/ship_main_10.glb",
+    "bytes": 157064,
+    "sha256": "c8925e6edcc3cdc69226baeeb890d9509b89b035a3feeea54403e578d8ba63a5"
+  },
+  {
+    "path": "assets/production_placeholders/p2/README.md",
+    "bytes": 269,
+    "sha256": "0eeefc2bb64b7bc1c4712bb7ecc57e6e864f9589f2deec3353d063d4fb46bdfe"
+  },
+  {
+    "path": "assets/production_placeholders/p3/README.md",
+    "bytes": 208,
+    "sha256": "17fe43c045b4407cf9c570aa03591a5ccd089b67520b991f1a916b104b44ea9e"
+  },
+  {
+    "path": "assets/production_placeholders/p4/README.md",
+    "bytes": 264,
+    "sha256": "b9ea41ed62e32430b6a471f8ab75f82b3e646b688eb61d6c0daed12c74b127fd"
+  },
+  {
+    "path": "assets/production_placeholders/p_event/README.md",
+    "bytes": 182,
+    "sha256": "7abe11e15762de8343c662142833683327dbea7da35946cf78e089643613ee27"
+  },
+  {
+    "path": "assets/recovered_test/README.md",
+    "bytes": 570,
+    "sha256": "c5d8594fc2aed41ad35d5ba2e92267f48c2b5fe612df7a0d85215b304b5a09f6"
+  },
+  {
+    "path": "assets/recovered_test/m11/ui/boost.png",
+    "bytes": 72202,
+    "sha256": "3fbb2f07fbe85f54354aeb15b15a76bbe2f15b182eb5127dfcb3af2ede0c5624"
+  },
+  {
+    "path": "assets/recovered_test/m11/ui/cannon.png",
+    "bytes": 1287932,
+    "sha256": "31b04fae618f5cfc071c378d75205e7aed33d3440474a8b515669c8496f760f8"
+  },
+  {
+    "path": "assets/recovered_test/m11/ui/deck.png",
+    "bytes": 2031229,
+    "sha256": "200c8ecf66294391ccc76ab897824b35bc5ae045d6c3006511d78c058ebf6c4d"
+  },
+  {
+    "path": "assets/recovered_test/m11/ui/explosive.png",
+    "bytes": 83740,
+    "sha256": "dbb403cf3608d7af37ede14c11dc39fc00b1c51da19c0be429c2f120e7187341"
+  },
+  {
+    "path": "assets/recovered_test/m11/ui/gunpowder.png",
+    "bytes": 57406,
+    "sha256": "79a1f1a4adc999fb6e6dcef9b2af0d71c8e8afb10a647c67018c7c2cc781494b"
+  },
+  {
+    "path": "assets/recovered_test/m11/ui/iron.png",
+    "bytes": 8075,
+    "sha256": "a34d75df3d4d56d24e928f6282142fb689569524bbb41d6c5e0183cf001c134f"
+  },
+  {
+    "path": "assets/recovered_test/m11/ui/repair.png",
+    "bytes": 77818,
+    "sha256": "1601cd247092e1228d0690718ba6373fdeff3a87364b9cc88be3ee23b6b671ec"
+  },
+  {
+    "path": "assets/recovered_test/m11/ui/shield.png",
+    "bytes": 3558,
+    "sha256": "ce728e7928fa68b768ecb4c6b9ff567584570643dcd85c8c23de81bf73458aba"
+  },
+  {
+    "path": "assets/recovered_test/m12/clipper_details.obj",
+    "bytes": 10066,
+    "sha256": "61e070bd027dc1de50067e13717092a38e4cb9471ff25e2f16504b7a1d9a0f5b"
+  },
+  {
+    "path": "assets/recovered_test/m12/clipper_details.png",
+    "bytes": 7730906,
+    "sha256": "ef8afcb57fda30f59eba14e5259e851030de9e7d256cf2da250789e1ec06df71"
+  },
+  {
+    "path": "assets/recovered_test/m12/clipper_flags.obj",
+    "bytes": 3069,
+    "sha256": "1d385453f0e9231b822d2b958d59069c7b0a3465a17ededae49956a2b0a6278b"
+  },
+  {
+    "path": "assets/recovered_test/m12/clipper_hull.png",
+    "bytes": 8175617,
+    "sha256": "c2cf209e9205a00b5740d43d2bd99cbb58f38e6b6161edea2f0fd136afc5e13e"
+  },
+  {
+    "path": "assets/recovered_test/m12/coast_foam.png",
+    "bytes": 3365874,
+    "sha256": "fbef884c17dcaa182f96d256c9c33d08e4787675d4de49c21723497ac1bf1975"
+  },
+  {
+    "path": "assets/recovered_test/m8/audio/Blast-Test-10-4-23__570.wav",
+    "bytes": 184396,
+    "sha256": "610b04288989b7dfe96ead5c3cc761d1adf00812e0158ae03101d8b458d95a16"
+  },
+  {
+    "path": "assets/recovered_test/m8/audio/DESTROYED_SHIP_SINKING__571.wav",
+    "bytes": 622156,
+    "sha256": "512256b22b3eda451b050acde592fe10d1fb99811b3fccc0587c6ca12d1ee3e3"
+  },
+  {
+    "path": "assets/recovered_test/m8/audio/FIX_SHIP_1S__574.wav",
+    "bytes": 327244,
+    "sha256": "ad058a1f53ff62937d07fc49f44816454f95bb08a3253e7fa2b7d60959bdc65d"
+  },
+  {
+    "path": "assets/recovered_test/m8/audio/Money-Test-10-4-23__573.wav",
+    "bytes": 96844,
+    "sha256": "6e89eff3e2f9ac2503835896bf1e5d7ac425d5cf9ace307677023f8a12687d90"
+  },
+  {
+    "path": "assets/recovered_test/m8/audio/Movimiento_De_Barcos_4__576.wav",
+    "bytes": 514028,
+    "sha256": "4175d5b17cfb387b78d393a104adaf4a6c198d803cc3afefd52b4f9658e7dc1e"
+  },
+  {
+    "path": "assets/recovered_test/m8/audio/Oceano_en_Calma_1__1323.wav",
+    "bytes": 6193580,
+    "sha256": "14ae29e01e18869d0eac3cf51b12ba7cbb7afe7ccb04ba03632704876bb5a927"
+  },
+  {
+    "path": "assets/recovered_test/m8/audio/Option1-FuegoArtificial-2sec__575.wav",
+    "bytes": 456268,
+    "sha256": "8ea8702a2b44ee9c9a4c1227b2c7776cf3a7b94f4453abc4550c2b8b390885e1"
+  },
+  {
+    "path": "assets/recovered_test/m8/audio/Sound-triumph-11-4-23_form_WAV__572.wav",
+    "bytes": 792652,
+    "sha256": "54d1c472bf45cfbcd1b3aabc2d463fe4086e9a25471f7dc6e2cc56c93a15138a"
+  },
+  {
+    "path": "assets/recovered_test/m8/harbor/lighthouse.obj",
+    "bytes": 57295,
+    "sha256": "f40c82cca8b74b70d68c02cea89cb73b29d870d50668a33bdab2b1714b8a9328"
+  },
+  {
+    "path": "assets/recovered_test/m8/harbor/wooden_pier.obj",
+    "bytes": 269562,
+    "sha256": "ea41f5422f5676755bf6996de854ff507be8f8c924ee4ac54d449fe6d771b353"
+  },
+  {
+    "path": "assets/recovered_test/m8/islands/desert_island_06_main.obj",
+    "bytes": 399337,
+    "sha256": "46313b30caea332492bf1fc06a3ce6e3e7f7ad7f4964220ed36a6f9808dcd828"
+  },
+  {
+    "path": "assets/recovered_test/m8/islands/snow_island_02_bottom.obj",
+    "bytes": 390939,
+    "sha256": "5b52ee5484ca121c2404aa12b2a9abc37c4c602e3df8a7944f7afcf6ff6413fd"
+  },
+  {
+    "path": "assets/recovered_test/m8/islands/snow_island_02_coast.obj",
+    "bytes": 26603,
+    "sha256": "3dd009ba1b21eac2159aa5175d75addd366bd05a426afd4ec6b87d637f7a2606"
+  },
+  {
+    "path": "assets/recovered_test/m8/islands/snow_island_02_main.obj",
+    "bytes": 398302,
+    "sha256": "85c3f35900decb86b34cb7deeac10094346798e736d7cfb9244c7a7cae2a9932"
+  },
+  {
+    "path": "assets/recovered_test/m8/islands/tropical_island_01_bottom.obj",
+    "bytes": 391471,
+    "sha256": "28f623e35110fe67f855741dbdae925c01c7826477a0ba30752afc0cbdd8655d"
+  },
+  {
+    "path": "assets/recovered_test/m8/islands/tropical_island_01_coast.obj",
+    "bytes": 26738,
+    "sha256": "09bca9c36fafe9c2154246af0ad61900d9ac0ed225f4856f7ba217f0a5554a42"
+  },
+  {
+    "path": "assets/recovered_test/m8/islands/tropical_island_01_main.obj",
+    "bytes": 722233,
+    "sha256": "1c18928b568adf3c4f1de90098b2db285d7cdbdf77969b01f3543808052f47e8"
+  },
+  {
+    "path": "assets/recovered_test/m8/islands/tropical_island_04_bottom.obj",
+    "bytes": 192087,
+    "sha256": "70593fbd717a1fa81fe3c79a26ef6dca2e9e8b40b2215fd181ed4c26766c67f5"
+  },
+  {
+    "path": "assets/recovered_test/m8/islands/tropical_island_04_coast.obj",
+    "bytes": 17916,
+    "sha256": "ef5d2b00c23f438ed5a09003660c30c079b5a1c844eb583691576985b3fe0d43"
+  },
+  {
+    "path": "assets/recovered_test/m8/islands/tropical_island_04_main.obj",
+    "bytes": 895291,
+    "sha256": "9bd4e48c64256b3bc112034f23a703193d9fd11bade5156e1239f290f22d626c"
+  },
+  {
+    "path": "assets/recovered_test/m8/manifest.json",
+    "bytes": 628,
+    "sha256": "c375d9f1c4792639f9d11d70ce97c01665b94836cf7aa8b9ede761b5d751e048"
+  },
+  {
+    "path": "assets/recovered_test/m8/ships/barco_low.obj",
+    "bytes": 538314,
+    "sha256": "019c8c76c7d42c6b319ea83099dcd12b92ae6e29fa8569f16d3d85d1b01f448c"
+  },
+  {
+    "path": "assets/recovered_test/m8/ships/clipper_cannons_port_lod3.obj",
+    "bytes": 18772,
+    "sha256": "5c3d166f5e4aeb68e18d6d7a4e7db4ab0035552ad35a3315e1334c8ca17e1b35"
+  },
+  {
+    "path": "assets/recovered_test/m8/ships/clipper_cannons_starboard_lod3.obj",
+    "bytes": 18908,
+    "sha256": "b7fa8b8e66eee498d857a0a40e87189aa162e64da10a10750a73a44c4a317527"
+  },
+  {
+    "path": "assets/recovered_test/m8/ships/clipper_hull_lod3.obj",
+    "bytes": 337855,
+    "sha256": "f2ecb8414dce0823eff0667ab2bcbef3ebfd56817980fa30e219839e404d0a86"
+  },
+  {
+    "path": "assets/recovered_test/m8/ships/clipper_sails_lod3.obj",
+    "bytes": 52044,
+    "sha256": "7033529f8e3edf0667e09108a376b05ed8cc71e399f2fb6432c4a1d4b432618c"
+  },
+  {
+    "path": "assets/recovered_test/m8/ships/npc_chalupa.obj",
+    "bytes": 714334,
+    "sha256": "779480152628f8f52672204ef3716b711b5a9afe49cd1ae52d20873d9a84ddc8"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/barco_base_color.png",
+    "bytes": 545672,
+    "sha256": "ffb420f462e6474aa4d97ae36c34f8f66066c396456005f8384aa6ea297ec132"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/desert_island_06.png",
+    "bytes": 854597,
+    "sha256": "2de1e54532dc9e50d70ba234d49b99433f14ac0a39ca8ac274dd8143dedd7785"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/frigate_hull_blue.png",
+    "bytes": 358004,
+    "sha256": "fdd1883c4430fd6dcc5f4122b67c38db3bb777a661f60f76718986c3b10fa311"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/frigate_sails_blue.png",
+    "bytes": 563663,
+    "sha256": "bfe277d5bed73bac2db670af934d128b86a1c12dd40c89ab465fda4da7199766"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/island_color.png",
+    "bytes": 786927,
+    "sha256": "c87317bd97a569825327e91003f8bf68636e081ef55e31afd2b0baa996c83730"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/npc_chalupa_base_color.png",
+    "bytes": 1063963,
+    "sha256": "00216d2feda697b5de84704fe64c4296e50dc94abea7313a143786d8b79bd5b6"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/npc_chalupa_normal.png",
+    "bytes": 1218011,
+    "sha256": "e12a93e113c61f0acc02223452557882439d1ba2ae7a03d3dce1a484b5d01bae"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/snow_island_02.png",
+    "bytes": 813229,
+    "sha256": "9aa5216401dafbede85bcf5d7ee010cd45c5fd8756bc44f67db3cbdbe1cf2572"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/tropical_island_01.png",
+    "bytes": 1388317,
+    "sha256": "14f5e6c237d64c8f79157f56306fb5030b1a6547906ccd9039b56abeb8f0d50d"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/tropical_island_04.png",
+    "bytes": 849614,
+    "sha256": "ddc6c8216212ea9b8d93698ab16d521d09e80cf65cda1dfd4430d33c3ecdbef9"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/underwater_sand.png",
+    "bytes": 253349,
+    "sha256": "c2966875135046da18420bf6cbbca7a99f0b781ade2f837f953469814c483c7c"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/water_bump.png",
+    "bytes": 588284,
+    "sha256": "8dd127abb218544ac75bfeabed6128a5202e5f7f6b8c3b7efbcc02f426e4ae48"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/water_foam.png",
+    "bytes": 3375305,
+    "sha256": "84fd1586cf0dcf2765e2d17740552c0d51e93b1ad143b2e4678aba88233bc820"
+  },
+  {
+    "path": "assets/recovered_test/m8/textures/wooden_pier.png",
+    "bytes": 809672,
+    "sha256": "cc39983158a4e38e0838d998473b83460d3d5694ea38c0bf37e1c77c4ca22dd2"
+  }
+]

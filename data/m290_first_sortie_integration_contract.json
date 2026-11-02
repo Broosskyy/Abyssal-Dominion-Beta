@@ -1,0 +1,50 @@
+{
+  "milestone": "M290",
+  "contract": "first_sea_sortie_runtime_integration",
+  "master_concept": "V3.8",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "Reference only for naval immediacy, feedback hierarchy and sea-map readability; no proprietary assets, UI, audio, effects, formulas or timings.",
+  "stage_source": "M289_PLAYABLE_VERTICAL_SLICE",
+  "stages": ["HARBOR_START", "UNDOCK", "TAP_TO_SAIL", "TARGET_CONTACT", "CANNON_COMBAT", "HARPOON_MONSTER", "REPAIR_OR_SHIELD", "LOOT_RECOVERY", "QUEST_COMPLETION", "SHIP_DEFEAT", "RESPAWN", "HARBOR_RETURN"],
+  "event_bindings": {
+    "navigation_intent_created": ["UNDOCK", "TAP_TO_SAIL"],
+    "target_changed": ["TARGET_CONTACT"],
+    "presentation_salvo_fired": ["CANNON_COMBAT", "HARPOON_MONSTER"],
+    "repair_intent_created": ["REPAIR_OR_SHIELD"],
+    "presentation_collected": ["LOOT_RECOVERY"],
+    "mission_completed": ["QUEST_COMPLETION"],
+    "ship_sunk": ["SHIP_DEFEAT"],
+    "ship_respawned": ["RESPAWN"],
+    "docking_state_changed": ["HARBOR_RETURN"]
+  },
+  "ship_model_strategy": {
+    "initial_ships": "ONE_COMPLETE_GLB_PER_SHIP",
+    "complete_parts": ["hull", "bow", "stern", "deck", "masts", "sails", "characteristic_design_parts"],
+    "modular_ship_construction": false,
+    "modular_ship_system_deferred": true,
+    "external_sockets_allowed": ["weapons", "projectiles", "vfx", "audio", "wake", "damage_overlays", "target_markers"]
+  },
+  "control_locks": {
+    "tap_to_sail": true,
+    "camera_joystick_camera_only": true,
+    "auto_navigation": false,
+    "default_auto_fire": false,
+    "auto_chase": false,
+    "angle_damage": false,
+    "hull_and_shield_separate": true,
+    "cannons_against_ships": true,
+    "harpoons_against_monsters": true
+  },
+  "authority": {
+    "m290_is": ["local-development observation bridge", "trusted server receipt consumer", "presentation guidance provider"],
+    "m290_never": ["moves or steers ship", "selects target", "fires weapon", "confirms hit or damage", "confirms defeat or respawn", "grants loot", "grants quest progress", "grants rewards", "marks native QA pass", "approves release"]
+  },
+  "evidence": {
+    "local_observations_are_server_truth": false,
+    "presentation_fire_confirms_hit": false,
+    "static_tests_are_native_qa": false,
+    "placeholder_presence_is_final_art": false,
+    "missing_native_evidence": "NOT_EVALUATED"
+  }
+}
+

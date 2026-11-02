@@ -1,0 +1,15 @@
+extends Node
+func _ready()->void:
+	var ux:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m90_guild_island_world_ux.json"))
+	assert(bool(ux.world_marker.minimap))
+	assert(int(ux.world_marker.global_map_from_level)==2)
+	var auth:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m90_guild_tower_facility_authority.json"))
+	assert(bool(auth.no_broadside_angle_damage))
+	assert("damage ticks" in auth.tower_not_authoritative)
+	var island:=GuildIslandComposer.create(Vector3.ZERO,2)
+	assert(island.is_in_group("world_poi_markers"))
+	assert(GuildIslandComposer.tower_rows(island).size()==2)
+	assert(GuildIslandComposer.facility_rows(island).size()>=5)
+	var prod:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m90_asset_production_wave.json"))
+	assert(prod.master_first_13.size()==13)
+	print("M90_GUILD_WORLD_UX_PASS")

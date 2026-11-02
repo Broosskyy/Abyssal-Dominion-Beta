@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "milestone": "M250",
+  "master_concept": "V3.8",
+  "system": "guild_governance_treasury_diplomacy",
+  "status": "PARTIAL",
+  "roles": ["guild_master", "admiral", "quartermaster", "fleet_leader", "diplomat", "veteran", "member", "recruit"],
+  "permission_domains": ["member_management", "guild_profile", "treasury", "vault", "war", "diplomacy", "island_build", "defense", "events", "audit"],
+  "guild_progression_sources": ["guild_quests", "qualified_member_pve", "admirals_world_bosses", "guild_war_objectives", "guild_island_defense", "exploration_world_objectives", "seasonal_events", "voluntary_donations"],
+  "diplomacy_states": ["neutral", "allied", "enemy", "ceasefire", "non_aggression_optional"],
+  "war_types": ["fleet_war", "island_siege", "territory_war", "resource_war", "season_war", "event_war"],
+  "treasury_rules": {
+    "personal_gold_auto_tax": false,
+    "deposits_require_explicit_action": true,
+    "withdrawals_require_permission_and_limits": true,
+    "critical_spend_requires_audit": true
+  },
+  "alliance_rules": {
+    "shared_status_readable": true,
+    "automatic_shared_treasury": false,
+    "automatic_shared_rewards": false,
+    "war_support_requires_eligibility": true
+  },
+  "authority": {
+    "membership": "server_authoritative_online",
+    "roles_permissions": "server_authoritative_online",
+    "treasury_vault": "server_authoritative_online_atomic_ledger",
+    "war_diplomacy": "server_authoritative_online",
+    "guild_rating": "server_authoritative_online",
+    "island_ownership_upgrades": "server_authoritative_online",
+    "client": "read_only_replica_and_non_value_preview"
+  },
+  "client_mutations": {
+    "membership": false,
+    "roles": false,
+    "treasury": false,
+    "vault": false,
+    "war": false,
+    "diplomacy": false,
+    "rating": false,
+    "island_ownership": false
+  },
+  "prototype_balance": {"member_caps": null, "guild_xp_thresholds": null, "treasury_limits": null, "war_costs": null, "rating_values": null, "status": "UNSET_BY_MASTER_DO_NOT_INVENT"}
+}

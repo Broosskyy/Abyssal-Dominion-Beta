@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "milestone": "M78",
+  "status": "SOURCE_AUDITED",
+  "load_order": [
+    "progression",
+    "ship_roster",
+    "voyage",
+    "missions",
+    "encounters",
+    "world",
+    "player",
+    "inventory",
+    "weapons"
+  ],
+  "reason": "Voyage v1 migration may add grandfathered starter entitlements, so ShipRoster must already be loaded.",
+  "save_marker": "m77_beginner_progression_schema",
+  "global_save_version_changed": false,
+  "compatibility": [
+    "old valid save envelope remains readable",
+    "old owned ships preserved",
+    "reconciled schema is marked dirty and persisted on next safe save"
+  ],
+  "native_required": true
+}

@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "milestone": "M259",
+  "master": "V3.8",
+  "status": "SECURITY_SECRETS_ANTI_ABUSE_FOUNDATION",
+  "account_security": {
+    "passwords_plaintext_forbidden": true,
+    "secure_password_hashing_required": true,
+    "rate_limits_required": true,
+    "brute_force_protection_required": true,
+    "session_token_rotation_required": true,
+    "device_session_management_required": true,
+    "sensitive_actions_require_additional_verification": true,
+    "privileged_admin_2fa_required_for_production": true
+  },
+  "secrets": {
+    "classes": ["api_keys", "store_credentials", "signing_keys", "database_credentials", "service_secrets", "admin_credentials"],
+    "environment_scoped": true,
+    "local_test_global_separated": true,
+    "rotation_supported": true,
+    "revocation_supported": true,
+    "client_may_receive_secret_material": false,
+    "telemetry_may_contain_secret_material": false
+  },
+  "operational_permissions": {
+    "model": "RBAC_LEAST_PRIVILEGE",
+    "example_roles": ["support", "moderator", "liveops", "game_master", "economy_content_admin", "payment_support", "developer_qa", "server_operator", "super_admin"],
+    "sensitive_actions": ["premium_currency", "entitlement_change", "ban", "rollback", "global_server_configuration", "data_export", "production_recovery"],
+    "granular_permission_required": true,
+    "audit_required": true,
+    "direct_database_manipulation_by_support": false,
+    "commerce_and_staff_security_permissions_separated": true
+  },
+  "anti_abuse": {
+    "protected_surfaces": ["login", "payment", "trade", "bazaar", "pvp", "rewards", "inventory", "events", "rankings", "chat"],
+    "controls": ["rate_limit", "replay_protection", "plausibility_check", "server_permission_check", "risk_telemetry", "idempotent_transactions"],
+    "server_authoritative_enforcement": true,
+    "client_detection_is_not_proof": true,
+    "critical_sanctions_require_traceable_evidence": true,
+    "test_rules_may_be_looser_but_remain_isolated": true
+  },
+  "operations_security": {
+    "infrastructure_configuration_versioned": true,
+    "manual_global_changes_minimized": true,
+    "liveops_game_config_has_separate_audit_publish_flow": true,
+    "destructive_global_actions_require_stronger_authorization": true,
+    "staff_actions_do_not_bypass_monitoring": true
+  },
+  "client_boundary": {
+    "may_present_server_security_posture": true,
+    "may_present_sanitized_local_development_status": true,
+    "may_grant_staff_role": false,
+    "may_elevate_permission": false,
+    "may_read_secret_material": false,
+    "may_rotate_or_revoke_secret": false,
+    "may_disable_rate_limit": false,
+    "may_mark_abuse_case_confirmed": false,
+    "may_issue_critical_sanction": false,
+    "may_bypass_audit": false,
+    "may_merge_test_global_security_state": false
+  },
+  "configuration": {
+    "final_rate_limit_values_invented": false,
+    "final_lockout_windows_invented": false,
+    "final_risk_thresholds_invented": false,
+    "secret_provider_invented": false
+  }
+}

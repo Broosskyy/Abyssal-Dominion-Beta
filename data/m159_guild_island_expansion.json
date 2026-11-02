@@ -1,0 +1,12 @@
+{
+  "schema":1,"milestone":"M159","authority":"LOCAL_PRESENTATION_CONTRACT_SERVER_REQUIRED_FOR_PERSISTENCE",
+  "island":{"upgrade_tiers":10,"facilities":["guild_hall","warehouse","repair_station","harbor","shipyard","treasury","research_lodge","market_pier","siege_workshop"],
+    "towers":[
+      {"id":"cannon","label":"Cannon Bastion","role":"direct_damage","max_tier":10},
+      {"id":"chain","label":"Chain Tower","role":"slow_control","max_tier":10},
+      {"id":"mortar","label":"Mortar Spire","role":"area_denial","max_tier":10},
+      {"id":"ward","label":"Ward Beacon","role":"shield_support","max_tier":10}
+    ],
+    "states":["neutral","friendly","hostile","contested"],"damage_states":["intact","damaged","critical"]},
+  "rules":{"ownership_server_authoritative":true,"treasury_server_authoritative":true,"war_server_authoritative":true,"tower_damage_server_authoritative":true,"client_preview_only":true}
+}

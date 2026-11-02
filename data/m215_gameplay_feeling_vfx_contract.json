@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "milestone": "M215",
+  "status": "GAMEPLAY_FEELING_VFX_STATIC_VERIFIED",
+  "master_basis": "V3.8 + five gameplay master references + M213/M214 camera and world-composition locks",
+  "goals": {
+    "sea_motion": "readable at the higher/wider oblique gameplay camera without becoming noisy",
+    "ship_wake": "clear bow/stern/wake hierarchy tied to actual movement",
+    "projectiles": "direction and ammo identity remain readable at reference zoom",
+    "impacts": "fast core hit plus world-space water shock confirmation",
+    "loot_pickup": "immediate world-space confirmation plus existing HUD reward notice"
+  },
+  "cross_platform_visual_parity": true,
+  "responsive_only": ["hud_scale", "font_scale", "touch_targets", "spacing", "safe_areas"],
+  "visual_layers": [
+    "M215SternBreak",
+    "M215WakeSpine",
+    "M215WaterImpactRing",
+    "M215ImpactWaterShock",
+    "M215LootCollectionRing"
+  ],
+  "gameplay_locks": {
+    "damage_changed": false,
+    "weapon_range_changed": false,
+    "reload_changed": false,
+    "ship_speed_changed": false,
+    "steering_changed": false,
+    "collision_changed": false,
+    "loot_rewards_changed": false,
+    "loot_pickup_radius_changed": false,
+    "tap_to_sail_changed": false
+  },
+  "native_visual_qa_required": true
+}

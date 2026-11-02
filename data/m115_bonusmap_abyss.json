@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "milestone": "M115",
+  "id": "bonusmap_abyss",
+  "eligibility_level": 26,
+  "entry": {
+    "abyss_chart_fragments": 15,
+    "must_be_at_port": true
+  },
+  "role": "Abyss/Monster high risk",
+  "reward_focus": [
+    "abyss_materials",
+    "corruption_rewards",
+    "high_end_fragments"
+  ],
+  "structure": {
+    "waves": 6,
+    "monster_waves": [
+      3,
+      6
+    ],
+    "final": "abyss_guardian"
+  },
+  "rule": "optional accelerator; never replaces PL30 Pirate Trial",
+  "runtime_scope": "eligibility/fragments/harbor UX foundation; isolated scene loop pending"
+}

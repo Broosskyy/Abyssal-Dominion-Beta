@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "milestone": "M76",
+  "priority": "P0",
+  "next_models": [
+    "prop_harbor_wayfinder_01",
+    "prop_salvage_net_01",
+    "prop_floating_barrel_01",
+    "prop_broken_mast_01",
+    "nature_reef_edge_01",
+    "prop_warning_buoy_01"
+  ],
+  "hero_priority": [
+    "monster_early_01",
+    "harbor_havens_reach",
+    "ship_small",
+    "ship_medium",
+    "ship_large"
+  ],
+  "acceptance": [
+    "mobile oblique silhouette",
+    "pirate/coastal identity",
+    "visual-only",
+    "no embedded gameplay scripts",
+    "no baked UI text",
+    "shared material families where practical"
+  ]
+}

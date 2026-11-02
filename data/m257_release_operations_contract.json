@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "milestone": "M257",
+  "master": "V3.8",
+  "status": "RELEASE_OPERATIONS_FOUNDATION",
+  "release_identity": {
+    "required": ["environment", "channel", "client_version", "build_number", "content_config_version", "api_compatibility"],
+    "environments": ["LOCAL", "INTERNAL", "TEST", "GLOBAL"],
+    "test_global_isolation": true,
+    "production_truth_server_or_release_pipeline_owned": true
+  },
+  "minimum_version": {
+    "server_authoritative": true,
+    "states": ["supported", "update_recommended", "update_required", "maintenance", "service_degraded"],
+    "client_cannot_bypass_required_update": true,
+    "client_cannot_invent_minimum_version": true
+  },
+  "feature_flags": {
+    "server_or_signed_config_owned": true,
+    "environment_scoped": true,
+    "safe_defaults_fail_closed_for_value_or_competitive_features": true,
+    "client_cannot_enable_restricted_feature": true
+  },
+  "maintenance_incidents": {
+    "server_published": true,
+    "fields": ["incident_id", "state", "severity", "affected_services", "message_key", "started_at", "expected_end_at", "status_reference"],
+    "degraded_read_only_ux_supported": true,
+    "no_local_authoritative_progression_when_offline": true
+  },
+  "deployment_rollback": {
+    "pipeline_or_operations_owned": true,
+    "canary_supported": true,
+    "rollback_requires_audit": true,
+    "client_cannot_deploy": true,
+    "client_cannot_rollback": true,
+    "client_cannot_mark_release_healthy": true
+  },
+  "quality_gates": ["automated_tests", "config_validation", "migration_compatibility", "minimum_version_compatibility", "environment_isolation", "rollback_readiness", "monitoring_alert_readiness", "backup_restore_readiness"],
+  "launch_critical": ["account_auth", "persistent_ownership", "server_authoritative_combat_economy", "payment_verification", "monitoring_alerts", "backup_restore", "support_status_communication", "moderation", "minimum_version_control", "incident_rollback"],
+  "client_boundary": {
+    "may_present_server_release_state": true,
+    "may_request_retry": true,
+    "may_open_status_reference": true,
+    "may_mutate_release_channel": false,
+    "may_override_feature_flag": false,
+    "may_acknowledge_incident_as_resolved": false,
+    "may_promote_build": false
+  },
+  "balance": {
+    "final_rollout_percentages_invented": false,
+    "final_maintenance_windows_invented": false,
+    "final_retry_intervals_invented": false,
+    "final_alert_thresholds_invented": false
+  }
+}

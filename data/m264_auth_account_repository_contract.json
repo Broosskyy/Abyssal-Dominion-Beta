@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "milestone": "M264",
+  "master_concept": "V3.8",
+  "system": "AUTH_ACCOUNT_PERSISTENT_REPOSITORY_INTEGRATION_BOUNDARY",
+  "status": "CLIENT_SERVER_INTEGRATION_BOUNDARY",
+  "principles": {
+    "authentication_requires_provider_or_server_verification": true,
+    "local_profile_is_never_live_identity": true,
+    "account_and_captain_ids_immutable_after_verification": true,
+    "persistent_profile_requires_remote_repository": true,
+    "repository_writes_are_revision_guarded": true,
+    "transactions_require_idempotency_key": true,
+    "test_global_isolated": true,
+    "missing_backend_fails_closed": true
+  },
+  "identity": {
+    "providers_prepared": [
+      "guest",
+      "email",
+      "google",
+      "apple"
+    ],
+    "verified_fields": [
+      "account_id",
+      "captain_id",
+      "environment",
+      "profile_revision",
+      "server_profile_version"
+    ],
+    "client_may_self_verify": false,
+    "client_may_promote_local_profile": false,
+    "linking_requires_server_policy": true
+  },
+  "repository": {
+    "operations": [
+      "load_account_snapshot",
+      "load_player_profile",
+      "commit_profile_transaction",
+      "refresh_after_commit"
+    ],
+    "required_request_fields": [
+      "request_id",
+      "environment",
+      "account_id",
+      "expected_revision"
+    ],
+    "write_fields": [
+      "transaction_id",
+      "idempotency_key"
+    ],
+    "conflict_states": [
+      "REVISION_CONFLICT",
+      "ENVIRONMENT_MISMATCH",
+      "IDENTITY_MISMATCH",
+      "UNAUTHORIZED"
+    ],
+    "client_success_is_not_commit_evidence": true
+  },
+  "snapshot": {
+    "source": "SERVER only for authority",
+    "monotonic_revision": true,
+    "environment_values": [
+      "INTERNAL",
+      "TEST",
+      "GLOBAL"
+    ],
+    "local_state": "LOCAL_PREVIEW"
+  },
+  "safety": {
+    "client_can_verify_auth": false,
+    "client_can_assign_account_id": false,
+    "client_can_assign_captain_id": false,
+    "client_can_confirm_repository_write": false,
+    "client_can_override_revision_conflict": false,
+    "client_can_transfer_test_profile_to_global": false,
+    "client_can_mutate_server_profile_directly": false
+  },
+  "configuration": {
+    "token_lifetime_seconds": null,
+    "refresh_window_seconds": null,
+    "repository_timeout_ms": null,
+    "retry_count": null,
+    "profile_cache_ttl_seconds": null
+  },
+  "ui": {
+    "existing_system_page_only": true,
+    "no_new_main_page": true,
+    "no_permanent_gameplay_auth_hud": true,
+    "responsive_compact_cards": true
+  },
+  "production_gap": [
+    "production auth provider adapters",
+    "account identity service",
+    "persistent database/repository implementation",
+    "session/token issuance and refresh",
+    "account-linking conflict workflow",
+    "repository transaction/idempotency backend",
+    "migration/version compatibility service",
+    "native provider and persistence QA"
+  ]
+}

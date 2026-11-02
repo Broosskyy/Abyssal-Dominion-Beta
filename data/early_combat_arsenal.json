@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "milestone": "M40",
+  "scope": "PL1-5 early combat arsenal + mobile selector",
+  "ammo": [
+    {
+      "id": "iron",
+      "role": "baseline",
+      "effect": "none",
+      "available_from_start": true
+    },
+    {
+      "id": "explosive",
+      "role": "burst",
+      "effect": "direct_damage",
+      "available_from_start": true
+    },
+    {
+      "id": "chain",
+      "role": "control",
+      "effect": "slow",
+      "available_from_start": true
+    },
+    {
+      "id": "piercing",
+      "role": "anti_armor",
+      "effect": "armor_pierce",
+      "available_from_start": true
+    },
+    {
+      "id": "ember",
+      "role": "fire_dot",
+      "effect": "burn",
+      "available_from_start": true
+    },
+    {
+      "id": "venom",
+      "role": "poison_dot",
+      "effect": "venom",
+      "available_from_start": true
+    },
+    {
+      "id": "shatter",
+      "role": "debuff",
+      "effect": "armor_break",
+      "available_from_start": true
+    },
+    {
+      "id": "spectral",
+      "role": "rare_tactical",
+      "effect": "spectral_mark",
+      "available_from_start": true
+    }
+  ],
+  "utility_items": [
+    {
+      "id": "veil",
+      "name": "Abyssal Veil",
+      "role": "temporary_target_denial",
+      "duration_seconds": 8,
+      "cooldown_seconds": 45,
+      "breaks_on_attack": true,
+      "note": "Original Abyssal Dominion utility item; gameplay role only is genre-inspired."
+    }
+  ],
+  "rules": {
+    "same_target_range_reload_contract": true,
+    "no_broadside_angle_damage": true,
+    "mobile_expand_menu": true,
+    "effects_are_gameplay_not_cosmetic": true,
+    "baseline_ammo_restocks_prevent_softlock": true
+  }
+}

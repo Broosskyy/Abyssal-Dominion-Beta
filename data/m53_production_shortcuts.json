@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "milestone": "M53",
+  "shortcuts": [
+    {
+      "id": "p0_models",
+      "priority": "P0",
+      "kind": "models",
+      "target": "Asset Preview"
+    },
+    {
+      "id": "p0_ui",
+      "priority": "P0",
+      "kind": "ui",
+      "target": "Asset Preview"
+    },
+    {
+      "id": "p0_vfx",
+      "priority": "P0",
+      "kind": "vfx",
+      "target": "Asset Preview"
+    },
+    {
+      "id": "mobile_readability",
+      "target": "res://scenes/qa/mobile_readability_test.tscn"
+    },
+    {
+      "id": "gameplay_camera",
+      "target": "res://scenes/qa/gameplay_camera_asset_test.tscn"
+    }
+  ],
+  "rule": "Diagnostic navigation only; no runtime asset download or replacement is claimed."
+}

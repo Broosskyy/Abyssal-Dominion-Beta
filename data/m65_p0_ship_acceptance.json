@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "milestone": "M65",
+  "title": "P0 Ship GLB Acceptance",
+  "common": {
+    "axis": "+Y up, +Z forward",
+    "unit": "meters",
+    "waterline_y": 0.0,
+    "root_scale": "1,1,1 preferred after import",
+    "visual_only": true,
+    "forbidden_in_glb": [
+      "gameplay scripts",
+      "camera",
+      "navigation",
+      "authoritative collision",
+      "water plane"
+    ],
+    "required_qa": [
+      "import",
+      "bounds",
+      "pivot",
+      "waterline",
+      "forward",
+      "silhouette",
+      "materials",
+      "mobile readability",
+      "fallback",
+      "socket anchors"
+    ],
+    "mobile_rules": [
+      "avoid sub-pixel geometry clusters",
+      "prefer opaque materials",
+      "limit overlapping transparency",
+      "use simple shaders"
+    ]
+  },
+  "ships": {
+    "ship_small": {
+      "display": "Starter Ship — Small",
+      "target_length_m": [
+        5.0,
+        8.5
+      ],
+      "target_width_m": [
+        2.0,
+        4.5
+      ],
+      "camera_role": "PL1 starter",
+      "material_groups": [
+        "Hull",
+        "Deck",
+        "Sail",
+        "Metal",
+        "Decoration"
+      ]
+    },
+    "ship_medium": {
+      "display": "Starter Ship — Medium",
+      "target_length_m": [
+        7.0,
+        11.5
+      ],
+      "target_width_m": [
+        2.8,
+        5.5
+      ],
+      "camera_role": "PL2 starter",
+      "material_groups": [
+        "Hull",
+        "Deck",
+        "Sail",
+        "Metal",
+        "Decoration"
+      ]
+    },
+    "ship_large": {
+      "display": "Starter Ship — Large",
+      "target_length_m": [
+        9.0,
+        15.0
+      ],
+      "target_width_m": [
+        3.5,
+        7.0
+      ],
+      "camera_role": "PL3 starter",
+      "material_groups": [
+        "Hull",
+        "Deck",
+        "Sail",
+        "Metal",
+        "Decoration"
+      ]
+    },
+    "npc_friendly_coastal_sloop": {
+      "display": "Friendly Coastal Sloop",
+      "camera_role": "PL1–5 neutral patrol"
+    },
+    "npc_scout_01": {
+      "display": "NPC Scout I",
+      "camera_role": "PL1–5 early NPC"
+    },
+    "npc_raider_01": {
+      "display": "NPC Raider I",
+      "camera_role": "PL1–5 early NPC"
+    },
+    "npc_gunship_01": {
+      "display": "NPC Gunship I",
+      "camera_role": "PL1–5 early NPC"
+    },
+    "npc_heavy_01": {
+      "display": "NPC Heavy I",
+      "camera_role": "PL1–5 early NPC"
+    }
+  },
+  "note": "Starter target dimensions are acceptance/tuning envelopes for this project, not gameplay-stat derivation."
+}

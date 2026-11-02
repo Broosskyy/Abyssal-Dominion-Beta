@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "milestone": "M49",
+  "modules": {
+    "workshop": {
+      "stable_slot": "harbor_module_workshop",
+      "purpose": "crafting/equipment",
+      "fallback": "procedural shed"
+    },
+    "merchant": {
+      "stable_slot": "harbor_module_merchant",
+      "purpose": "regional market",
+      "fallback": "procedural stall"
+    },
+    "repair_yard": {
+      "stable_slot": "harbor_module_repair_yard",
+      "purpose": "repair/service",
+      "fallback": "procedural crane/yard"
+    },
+    "support_pier": {
+      "stable_slot": "harbor_module_support_pier",
+      "purpose": "support ally/service",
+      "fallback": "procedural pier marker"
+    }
+  },
+  "rule": "Harbor gameplay nodes own service logic; final GLBs are visual replacements only."
+}

@@ -1,0 +1,78 @@
+name: Abyssal Dominion M303.7 Android APK (fallback graphics)
+on:
+  push:
+    branches: [rebuild/classic-seafight-m3037]
+    paths:
+      - '.github/workflows/m3037-apk.yml'
+      - 'scripts/classic/**'
+      - 'scripts/ui/asset_preview.gd'
+      - 'scenes/classic/**'
+      - 'tests/m3037_combat_smoke.gd'
+      - 'tests/m3036_unified_smoke.gd'
+      - 'project.godot'
+      - 'export_presets.cfg'
+      - 'tools/build_m3035_android.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Download exact Godot 4.7.2 editor
+        run: |
+          set -euo pipefail
+          curl -fL --retry 4 --retry-delay 5 -o /tmp/godot.zip https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+          mkdir -p /tmp/godot-bin
+          unzip -q /tmp/godot.zip -d /tmp/godot-bin
+          exe="$(find /tmp/godot-bin -maxdepth 2 -type f -name '*linux.x86_64' | head -1)"
+          test -n "$exe"
+          chmod +x "$exe"
+          sudo install -m 0755 "$exe" /usr/local/bin/godot
+          godot --headless --version
+      - name: Install official Android debug export template
+        run: |
+          set -euo pipefail
+          curl -fL --retry 4 --retry-delay 5 -o /tmp/godot-templates.tpz https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.7.2.stable"
+          unzip -p /tmp/godot-templates.tpz 'templates/android_debug.apk' > "$HOME/.local/share/godot/export_templates/4.7.2.stable/android_debug.apk"
+          test -s "$HOME/.local/share/godot/export_templates/4.7.2.stable/android_debug.apk"
+          rm -f /tmp/godot-templates.tpz
+      - name: Create local debug signing key (never uploaded)
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Abyssal Dominion,C=DE"
+          fi
+      - name: Import project and check GDScript
+        run: |
+          set -euo pipefail
+          godot --headless --path . --editor --import --quit
+      - name: Gameplay regression smoke test
+        run: |
+          set -euo pipefail
+          godot --headless --path . --script res://tests/m3037_combat_smoke.gd
+      - name: Export and verify ARM64 debug APK
+        run: |
+          set -euo pipefail
+          test -n "$ANDROID_HOME"
+          python3 tools/build_m3035_android.py --godot godot --android-sdk "$ANDROID_HOME" --java-home "$JAVA_HOME" --debug-keystore "$HOME/.android/debug.keystore" --allow-placeholders --output builds/android/ABYSSAL_DOMINION_M303_7_TEST.apk
+      - name: Upload verified APK and build details
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Abyssal-Dominion-M3037-Android-TEST-no-private-art
+          path: |
+            builds/android/ABYSSAL_DOMINION_M303_7_TEST.apk
+            builds/android/ABYSSAL_DOMINION_M303_7_TEST.build.json
+            builds/android/ABYSSAL_DOMINION_M303_7_TEST.signature.txt
+          if-no-files-found: error
+          retention-days: 14

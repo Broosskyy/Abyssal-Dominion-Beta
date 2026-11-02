@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "milestone": "M110",
+  "maps": [
+    {
+      "level": 11,
+      "sector": "6-2 Leviathan Gate",
+      "region": "ember_shoals"
+    },
+    {
+      "level": 12,
+      "sector": "7-1 Veil Crossing",
+      "region": "veil_sea",
+      "ship_reward": "ship_main_04"
+    },
+    {
+      "level": 13,
+      "sector": "7-2 Mist Reaches",
+      "region": "veil_sea"
+    },
+    {
+      "level": 14,
+      "sector": "8-1 Abyssal Crown",
+      "region": "veil_sea",
+      "ship_reward": "ship_main_05"
+    },
+    {
+      "level": 15,
+      "sector": "8-2 Hunter's Verge",
+      "region": "veil_sea",
+      "pirate_trial": true
+    }
+  ],
+  "progression": "qualified combat + map XP + regional objectives + Hunter objective + Admiral; PL15 trial closes band",
+  "ship_mastery": "all qualified PL11-15 sinks feed selected design Mastery 1-10",
+  "visual_slots": "Veil fleet + two monster slots remain replaceable fallbacks"
+}

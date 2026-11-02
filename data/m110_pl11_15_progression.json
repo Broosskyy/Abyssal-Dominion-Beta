@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "milestone": "M110",
+  "range": [
+    11,
+    15
+  ],
+  "master_alignment": {
+    "phase": "PL11-15 Build/Admiral/Monster identity; several sessions, still brisk",
+    "pl15_trial_focus": "Shield/Deck/Module/Support foundations",
+    "pl15_gate": [
+      "qualified Admiral clear",
+      "Hunter objective",
+      "regional objective chain"
+    ],
+    "bonusmaps": "may accelerate but do not automatically replace the Pirate Trial"
+  },
+  "levels": {
+    "11": {
+      "region": "ember_shoals",
+      "title": "Leviathan Gate",
+      "map_xp_goal": 2100,
+      "mastery_xp_per_sink": 85,
+      "boss": "npc_ember_admiral",
+      "ship_reward": "",
+      "hunter_required": 1,
+      "region_objectives": 2
+    },
+    "12": {
+      "region": "veil_sea",
+      "title": "Veil Crossing",
+      "map_xp_goal": 2400,
+      "mastery_xp_per_sink": 90,
+      "boss": "npc_veil_admiral",
+      "ship_reward": "ship_main_04",
+      "hunter_required": 1,
+      "region_objectives": 2
+    },
+    "13": {
+      "region": "veil_sea",
+      "title": "Mist Reaches",
+      "map_xp_goal": 2750,
+      "mastery_xp_per_sink": 95,
+      "boss": "npc_veil_admiral",
+      "ship_reward": "",
+      "hunter_required": 1,
+      "region_objectives": 3
+    },
+    "14": {
+      "region": "veil_sea",
+      "title": "Abyssal Crown",
+      "map_xp_goal": 3150,
+      "mastery_xp_per_sink": 105,
+      "boss": "npc_veil_admiral",
+      "ship_reward": "ship_main_05",
+      "hunter_required": 1,
+      "region_objectives": 3
+    },
+    "15": {
+      "region": "veil_sea",
+      "title": "Hunter's Verge Trial",
+      "map_xp_goal": 3600,
+      "mastery_xp_per_sink": 115,
+      "boss": "npc_veil_admiral",
+      "ship_reward": "",
+      "hunter_required": 1,
+      "region_objectives": 3,
+      "pirate_trial": true,
+      "trial_focus": [
+        "shield",
+        "deck",
+        "module",
+        "support"
+      ]
+    }
+  },
+  "rules": {
+    "xp_alone_never_unlocks_next_band": true,
+    "qualified_actions_only": true,
+    "ship_mastery_per_design_1_10": true,
+    "map_level_is_eligibility_not_free_ship": true
+  },
+  "prototype_tuning": [
+    "map_xp_goal",
+    "mastery_xp_per_sink",
+    "region_objective_counts"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "milestone": "M285",
+  "status": "PLACEHOLDER_REPLACEABLE",
+  "production_boundary": "assets/production only; reference_only assets are never promoted",
+  "owner": "Godot runtime composition",
+  "ship_model_excludes": ["wake", "foam", "smoke", "fire", "glow", "target_ring", "trail", "hit_flash"],
+  "required_sockets": ["VFX_Damage_01", "VFX_Damage_02", "VFX_Shield", "VFX_Sink"],
+  "slots": [
+    {"id":"m285_vfx_ship_shield_placeholder","kind":"VFX","fallback":"runtime_sphere_shell","final_replacement":"authored shield impact scene"},
+    {"id":"m285_vfx_ship_hull_damage_placeholder","kind":"VFX","fallback":"runtime charred hull mark","final_replacement":"authored modular hull damage decal/mesh"},
+    {"id":"m285_vfx_ship_fire_placeholder","kind":"VFX","fallback":"runtime low-poly flame","final_replacement":"authored Godot fire effect"},
+    {"id":"m285_vfx_ship_smoke_placeholder","kind":"VFX","fallback":"runtime low-poly smoke","final_replacement":"authored Godot smoke effect"},
+    {"id":"m285_vfx_ship_critical_placeholder","kind":"VFX","fallback":"runtime restrained critical ring","final_replacement":"authored critical-state treatment"},
+    {"id":"m285_vfx_ship_sinking_placeholder","kind":"VFX","fallback":"runtime modular debris","final_replacement":"authored sinking/debris scene"}
+  ],
+  "lod_policy": {"native_desktop":"full placeholder set","native_mobile":"reduced persistent nodes","web_preview":"reduced persistent nodes","final_values":"native QA required"},
+  "authority": {"local_prototype":"may visualize local ShipHealth only","online":"server-confirmed M285 state/event only","never":["apply damage","confirm defeat","despawn","grant reward","create drop"]}
+}

@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "milestone": "M181",
+  "master_concept": "V3.8",
+  "evidence_source": "M177 Android screenshot and recording plus user runtime feedback",
+  "navigation": {
+    "contract": "tap_to_sail",
+    "camera_wheel_steers_ship": false,
+    "behind_target_behavior": "pivot_then_accelerate",
+    "pivot_threshold_degrees": 58.0,
+    "full_sail_alignment_degrees": 26.0,
+    "former_minimum_forward_throttle_removed": true
+  },
+  "defeat_respawn": {
+    "persistent_defeat_overlay": true,
+    "enemy_aggro_drops_while_sunk": true,
+    "respawn_location": "configured_safe_spawn",
+    "protection_seconds": 6.0,
+    "damage_blocked_during_protection": true,
+    "enemy_reacquisition_blocked_during_protection": true
+  },
+  "loot_rewards": {
+    "sink_notice": "xp_and_loot_in_water",
+    "pickup_notice": "exact_reward_and_material",
+    "proximity_collect_radius": 4.25,
+    "area_enter_collection_preserved": true,
+    "mission_and_quest_credit_preserved": true,
+    "reward_authority": "existing_runtime_local_preview_server_authoritative_online"
+  },
+  "preserved": {
+    "m180_mobile_hud": true,
+    "m180_water_presentation": true,
+    "boss_telegraphs_m175_m179": true,
+    "server_authority_boundaries": true
+  }
+}

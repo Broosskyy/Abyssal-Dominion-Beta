@@ -1,0 +1,368 @@
+{
+  "schema": 1,
+  "milestone": "M107",
+  "harbor_id": "havens_reach",
+  "visual_only": true,
+  "modules": [
+    {
+      "slot": "prop_lighthouse_01",
+      "position": [
+        -5.8,
+        0.55,
+        -1.8
+      ],
+      "yaw": -8,
+      "scale": 1.0,
+      "visual_tier": "landmark"
+    },
+    {
+      "slot": "prop_dock_wood_01",
+      "position": [
+        0,
+        0.2,
+        0
+      ],
+      "yaw": 0,
+      "scale": 1.0,
+      "visual_tier": "landmark"
+    },
+    {
+      "slot": "prop_warehouse_01",
+      "position": [
+        -5.2,
+        0.25,
+        4.8
+      ],
+      "yaw": 12,
+      "scale": 1.0,
+      "visual_tier": "landmark"
+    },
+    {
+      "slot": "prop_market_stall_01",
+      "position": [
+        4.7,
+        0.25,
+        3.6
+      ],
+      "yaw": -18,
+      "scale": 1.0,
+      "visual_tier": "secondary"
+    },
+    {
+      "slot": "prop_quest_board_01",
+      "position": [
+        2.9,
+        0.25,
+        6.0
+      ],
+      "yaw": -5,
+      "scale": 1.0,
+      "visual_tier": "secondary"
+    },
+    {
+      "slot": "prop_crate_stack_01",
+      "position": [
+        -2.8,
+        0.25,
+        2.7
+      ],
+      "yaw": 20,
+      "scale": 1.0,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_buoy_navigation_01",
+      "position": [
+        -6.5,
+        0.0,
+        8.5
+      ],
+      "yaw": 0,
+      "scale": 1.0,
+      "visual_tier": "secondary"
+    },
+    {
+      "slot": "prop_buoy_navigation_01",
+      "position": [
+        6.5,
+        0.0,
+        8.5
+      ],
+      "yaw": 0,
+      "scale": 1.0,
+      "visual_tier": "secondary"
+    },
+    {
+      "slot": "prop_harbor_crane_01",
+      "position": [
+        -6.4,
+        0.25,
+        5.8
+      ],
+      "yaw": 28,
+      "scale": 1.0,
+      "visual_tier": "secondary"
+    },
+    {
+      "slot": "prop_rope_bundle_01",
+      "position": [
+        -2.2,
+        0.24,
+        1.8
+      ],
+      "yaw": 8,
+      "scale": 1.0,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_rope_bundle_01",
+      "position": [
+        2.1,
+        0.24,
+        1.5
+      ],
+      "yaw": -15,
+      "scale": 0.9,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_fish_crates_01",
+      "position": [
+        4.1,
+        0.24,
+        5.2
+      ],
+      "yaw": -12,
+      "scale": 1.0,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_harbor_skull_sign_01",
+      "position": [
+        1.2,
+        0.24,
+        7.0
+      ],
+      "yaw": 0,
+      "scale": 1.0,
+      "visual_tier": "dressing",
+      "milestone": "M100"
+    },
+    {
+      "slot": "prop_salvage_hook_01",
+      "position": [
+        -4.2,
+        0.24,
+        2.2
+      ],
+      "yaw": 35,
+      "scale": 1.0,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_harbor_rope_gantry_01",
+      "position": [
+        5.6,
+        0.24,
+        1.6
+      ],
+      "yaw": -18,
+      "scale": 1.0,
+      "visual_tier": "dressing",
+      "milestone": "M97"
+    },
+    {
+      "slot": "prop_harbor_pirate_lantern_02",
+      "position": [
+        -2.7,
+        0.24,
+        6.7
+      ],
+      "yaw": 0,
+      "scale": 1.0,
+      "visual_tier": "dressing",
+      "milestone": "M100"
+    },
+    {
+      "slot": "prop_harbor_pirate_lantern_02",
+      "position": [
+        2.7,
+        0.24,
+        6.7
+      ],
+      "yaw": 0,
+      "scale": 1.0,
+      "visual_tier": "dressing",
+      "milestone": "M100"
+    },
+    {
+      "slot": "prop_harbor_pirate_sign_01",
+      "position": [
+        0.2,
+        0.24,
+        6.9
+      ],
+      "yaw": 6,
+      "scale": 1.0,
+      "visual_tier": "dressing",
+      "milestone": "M97"
+    },
+    {
+      "slot": "prop_harbor_canvas_awning_01",
+      "position": [
+        4.8,
+        0.25,
+        3.0
+      ],
+      "yaw": -18,
+      "scale": 1.0,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_harbor_mooring_post_01",
+      "position": [
+        -3.3,
+        0.22,
+        0.8
+      ],
+      "yaw": 0,
+      "scale": 1.0,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_harbor_mooring_post_01",
+      "position": [
+        3.3,
+        0.22,
+        0.8
+      ],
+      "yaw": 0,
+      "scale": 1.0,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_harbor_bell_01",
+      "position": [
+        -0.8,
+        0.25,
+        5.8
+      ],
+      "yaw": 10,
+      "scale": 1.0,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_harbor_barrel_rack_01",
+      "position": [
+        -4.8,
+        0.24,
+        4.0
+      ],
+      "yaw": 20,
+      "scale": 1.0,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_harbor_small_boat_01",
+      "position": [
+        5.7,
+        0.08,
+        8.2
+      ],
+      "yaw": -28,
+      "scale": 1.0,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_harbor_sailcloth_bundle_01",
+      "position": [
+        -1.7,
+        0.24,
+        2.4
+      ],
+      "yaw": 14,
+      "scale": 0.9,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_harbor_cart_01",
+      "position": [
+        4.3,
+        0.24,
+        4.5
+      ],
+      "yaw": -26,
+      "scale": 0.9,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_harbor_dock_stairs_01",
+      "position": [
+        1.7,
+        0.18,
+        0.5
+      ],
+      "yaw": 2,
+      "scale": 0.9,
+      "visual_tier": "secondary"
+    },
+    {
+      "slot": "prop_harbor_fish_drying_rack_01",
+      "position": [
+        5.0,
+        0.24,
+        5.7
+      ],
+      "yaw": -18,
+      "scale": 0.85,
+      "visual_tier": "dressing"
+    },
+    {
+      "slot": "prop_harbor_pirate_arch_01",
+      "position": [
+        -3.4,
+        0.3,
+        4.2
+      ],
+      "yaw": 8,
+      "scale": 0.92,
+      "visual_tier": "secondary"
+    },
+    {
+      "slot": "prop_harbor_hanging_net_01",
+      "position": [
+        3.8,
+        0.42,
+        2.8
+      ],
+      "yaw": -20,
+      "scale": 0.84,
+      "visual_tier": "dressing"
+    }
+  ],
+  "rule": "Visual hierarchy only; service/docking/collision/navigation truth stays gameplay-owned.",
+  "hierarchy_rule": "landmark > secondary > dressing; mobile suppresses dressing first.",
+  "runtime_density": "HarborVisualBudget preserves landmark/secondary modules and suppresses dressing first by device/quality.",
+  "mobile_rule": "Do not infer harbor service availability from visual suppression.",
+  "pirate_identity": "arch + nets + lighthouse/dock hierarchy; no navy-modern visual language",
+  "m97_rule": "Pirate identity replacements reuse existing dressing positions; object count unchanged.",
+  "m100_rule": "Two pirate dressing variants replace inherited positions; total module count unchanged.",
+  "replacement_note": "M106 pirate dressing replacements only; module count unchanged.",
+  "visual_hierarchy": {
+    "hero": [
+      "prop_lighthouse_01",
+      "prop_harbor_pirate_arch_01"
+    ],
+    "pirate_identity": [
+      "prop_harbor_pirate_sign_01",
+      "prop_harbor_rope_gantry_01",
+      "prop_harbor_pirate_lantern_02",
+      "prop_harbor_skull_sign_01"
+    ],
+    "navigation": [
+      "prop_dock_wood_01",
+      "prop_quest_board_01"
+    ],
+    "budget_locked": 30
+  }
+}

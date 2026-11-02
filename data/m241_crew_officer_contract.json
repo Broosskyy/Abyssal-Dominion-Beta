@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "milestone": "M241",
+  "master_concept": "V3.8",
+  "scope": "crew_officer_assignment_vertical_slice",
+  "authority": {
+    "local_prototype_roster_and_assignment": true,
+    "live_ownership_progression_and_economy": "server_required"
+  },
+  "crew_model": {
+    "abstracted": true,
+    "micro_management": false,
+    "prototype_officer_slots": 4,
+    "slot_count_final_balance": false
+  },
+  "starter_owned": ["repair_master_i", "shield_master_i"],
+  "starter_assignment": ["repair_master_i", "shield_master_i", "", ""],
+  "quality_order": ["common", "uncommon", "rare", "epic", "legendary"],
+  "officers": [
+    {
+      "id": "repair_master_i",
+      "family": "repair_master",
+      "tier": 1,
+      "label": "Reparaturmeister I",
+      "role": "Shipwright",
+      "quality": "common",
+      "max_level": 10,
+      "traits": ["field_engineering", "hull_sustain"],
+      "passive_contract": {"sustain_tier": 1},
+      "acquisition": "planbarer früher PvE-/Hafenfortschritt"
+    },
+    {
+      "id": "repair_master_ii",
+      "family": "repair_master",
+      "tier": 2,
+      "label": "Reparaturmeister II",
+      "role": "Shipwright",
+      "quality": "rare",
+      "max_level": 10,
+      "traits": ["field_engineering", "hull_sustain"],
+      "passive_contract": {"sustain_tier": 2},
+      "acquisition": "planbarer erspielbarer Fortschritt"
+    },
+    {
+      "id": "repair_master_iii",
+      "family": "repair_master",
+      "tier": 3,
+      "label": "Reparaturmeister III",
+      "role": "Shipwright",
+      "quality": "epic",
+      "max_level": 10,
+      "traits": ["field_engineering", "hull_sustain", "veteran_shipwright"],
+      "passive_contract": {"sustain_tier": 3},
+      "acquisition": "planbar erspielbar; nicht payment-exklusiv"
+    },
+    {
+      "id": "shield_master_i",
+      "family": "shield_master",
+      "tier": 1,
+      "label": "Schutzschildmeister I",
+      "role": "Engineer",
+      "quality": "common",
+      "max_level": 10,
+      "traits": ["shield_maintenance", "defensive_support"],
+      "passive_contract": {"sustain_tier": 1},
+      "acquisition": "planbarer früher PvE-/Hafenfortschritt"
+    },
+    {
+      "id": "shield_master_ii",
+      "family": "shield_master",
+      "tier": 2,
+      "label": "Schutzschildmeister II",
+      "role": "Engineer",
+      "quality": "rare",
+      "max_level": 10,
+      "traits": ["shield_maintenance", "defensive_support"],
+      "passive_contract": {"sustain_tier": 2},
+      "acquisition": "planbarer erspielbarer Fortschritt"
+    },
+    {
+      "id": "shield_master_iii",
+      "family": "shield_master",
+      "tier": 3,
+      "label": "Schutzschildmeister III",
+      "role": "Engineer",
+      "quality": "epic",
+      "max_level": 10,
+      "traits": ["shield_maintenance", "defensive_support", "ward_specialist"],
+      "passive_contract": {"sustain_tier": 3},
+      "acquisition": "planbar erspielbar; nicht payment-exklusiv"
+    }
+  ],
+  "canonical_role_registry": [
+    {"id":"master_gunner","label":"Master Gunner","status":"foundation_only"},
+    {"id":"harpoon_master","label":"Harpoon Master","status":"foundation_only"},
+    {"id":"navigator","label":"Navigator","status":"foundation_only"},
+    {"id":"shipwright","label":"Shipwright","status":"active_via_repair_master"},
+    {"id":"quartermaster","label":"Quartermaster","status":"foundation_only"},
+    {"id":"surgeon","label":"Surgeon","status":"foundation_only"}
+  ],
+  "rules": [
+    "An officer can occupy at most one slot at a time.",
+    "Repair Master and Shield Master are distinct contracts and may be assigned together when slots allow.",
+    "Only assigned officer contracts may affect the sustain runtime.",
+    "Officer ownership, progression, rewards and purchases require server authority in live service.",
+    "Core roles require planable earnable acquisition paths and must not become mandatory gacha-only progression.",
+    "Crew remains abstracted; no individual sailor micromanagement is introduced."
+  ],
+  "non_goals": [
+    "final officer economy",
+    "final slot count balance",
+    "gacha acquisition",
+    "client-authoritative live ownership",
+    "combat-stat rebalance outside sustain tier selection"
+  ]
+}

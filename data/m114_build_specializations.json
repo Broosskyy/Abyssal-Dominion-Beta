@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "milestone": "M114",
+  "unlock_level": 21,
+  "profiles": {
+    "cannon_dps": {
+      "label": "War Gunner",
+      "focus": "cannon DPS",
+      "tradeoff": "less utility",
+      "meta": {
+        "cannon_damage_mult": 1.08,
+        "support_mult": 0.94
+      }
+    },
+    "tank": {
+      "label": "Iron Bastion",
+      "focus": "hull/defense",
+      "tradeoff": "less speed",
+      "meta": {
+        "damage_taken_mult": 0.94,
+        "speed_mult": 0.96
+      }
+    },
+    "speed_farming": {
+      "label": "Freebooter",
+      "focus": "speed/farming",
+      "tradeoff": "less defense",
+      "meta": {
+        "speed_mult": 1.06,
+        "damage_taken_mult": 1.04
+      }
+    },
+    "monster_hunter": {
+      "label": "Deep Hunter",
+      "focus": "harpoon/monster",
+      "tradeoff": "less ship combat",
+      "meta": {
+        "harpoon_damage_mult": 1.1,
+        "cannon_damage_mult": 0.96
+      }
+    },
+    "explorer": {
+      "label": "Wayfinder",
+      "focus": "POI/treasure",
+      "tradeoff": "less max DPS",
+      "meta": {
+        "speed_mult": 1.03,
+        "cannon_damage_mult": 0.97
+      }
+    },
+    "hybrid": {
+      "label": "Corsair Generalist",
+      "focus": "balanced",
+      "tradeoff": "no extreme maximum",
+      "meta": {}
+    }
+  },
+  "rule": "choice is reversible at harbor in local prototype; exact tuning remains playtestable",
+  "excluded_from_core_gate": [
+    "forced PvP",
+    "cash-exclusive power"
+  ]
+}

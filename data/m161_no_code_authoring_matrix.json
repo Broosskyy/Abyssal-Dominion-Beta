@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "milestone": "M161",
+  "goal": "CONTENT_AUTHORING_WITHOUT_GAME_CLIENT_CODE_CHANGES",
+  "families": {
+    "gameplay": [
+      "item",
+      "ammo",
+      "cannon",
+      "harpoon",
+      "special_deck",
+      "talent_tree",
+      "talent_node",
+      "citadel_branch",
+      "buff_effect",
+      "upgrade_rule",
+      "equipment_module"
+    ],
+    "world": [
+      "region",
+      "sector",
+      "poi",
+      "spawn_table",
+      "formation",
+      "npc",
+      "monster",
+      "encounter",
+      "guild_building",
+      "guild_tower"
+    ],
+    "progression": [
+      "quest",
+      "loot_table",
+      "ship_reward",
+      "afk_reward_profile",
+      "artifact",
+      "companion"
+    ],
+    "liveops": [
+      "event",
+      "shop",
+      "shop_offer",
+      "commerce_campaign",
+      "price_rule"
+    ],
+    "commerce": [
+      "payment_product",
+      "currency",
+      "entitlement",
+      "bundle"
+    ],
+    "presentation": [
+      "badge",
+      "branding_asset",
+      "harbor_visual",
+      "island_visual",
+      "icon_slot",
+      "vfx_profile"
+    ],
+    "operations": [
+      "admin_command",
+      "role_profile",
+      "permission_profile"
+    ]
+  },
+  "common_fields": [
+    "stable_id",
+    "display_name",
+    "description",
+    "enabled",
+    "tags",
+    "requirements",
+    "effects",
+    "references",
+    "icon_slot",
+    "asset_slots",
+    "vfx_slots",
+    "schedule",
+    "environment",
+    "revision"
+  ],
+  "pipeline": [
+    "draft",
+    "validate",
+    "preview",
+    "review",
+    "approve",
+    "schedule",
+    "publish",
+    "disable",
+    "rollback"
+  ],
+  "exceptions_requiring_code": [
+    "new_behavior_primitive",
+    "new_network_protocol",
+    "new_payment_provider_adapter",
+    "new_engine_render_feature",
+    "security_boundary_change"
+  ],
+  "security": "All authoritative mutations are server validated; client definitions never elevate permissions or grant paid entitlements."
+}

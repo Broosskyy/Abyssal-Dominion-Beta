@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "milestone": "M87",
+  "mobile": {
+    "monster_warning_context_max": 2,
+    "monster_nest_context_max": 3,
+    "shallow_coast_context_max": 2,
+    "island_extra_silhouette_accent_max": 1,
+    "hud_critical_gesture_inset": 18
+  },
+  "desktop": {
+    "same_gameplay": "yes",
+    "visual_density": "may use existing quality profile only"
+  },
+  "rules": [
+    "no new gameplay collision from dressing",
+    "no service truth from harbor props",
+    "no loot/reward truth from wreck/monster props",
+    "no crossplay gameplay divergence"
+  ]
+}

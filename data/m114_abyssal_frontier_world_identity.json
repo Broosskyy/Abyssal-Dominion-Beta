@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "milestone": "M114",
+  "region": "abyssal_frontier",
+  "levels": [
+    21,
+    25
+  ],
+  "visual_language": [
+    "rift-lit wreck routes",
+    "broken sigils",
+    "asymmetric cliff/cove islands",
+    "hunter beacons",
+    "cursed salvage"
+  ],
+  "poi_rules": {
+    "enabled": true,
+    "mobile_budget_shared": true,
+    "guild_islands_from_map_level_2": true
+  },
+  "harbors": [
+    {
+      "level": 22,
+      "role": "hunter/status refit"
+    },
+    {
+      "level": 24,
+      "role": "frontier refuge"
+    },
+    {
+      "level": 25,
+      "role": "specialization trial anchorage"
+    }
+  ],
+  "asset_slots": [
+    "poi_rift_beacon_01",
+    "poi_broken_sigil_01",
+    "poi_cursed_wreck_01",
+    "prop_hunter_beacon_01"
+  ],
+  "final_assets_pending": true
+}

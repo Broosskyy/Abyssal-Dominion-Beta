@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "milestone": "M256",
+  "master": "V3.8",
+  "status": "CLIENT_OBSERVABILITY_FOUNDATION",
+  "event_architecture": {
+    "stable_event_names": true,
+    "schema_versioned": true,
+    "required_context": ["timestamp_server_or_provider", "environment", "build_version", "content_config_version", "event_name", "event_version"],
+    "optional_correlation": ["session_id", "request_id", "transaction_id", "world_id", "map_id", "feature_context"],
+    "analytics_is_not_gameplay_authority": true
+  },
+  "privacy": {
+    "data_minimization": true,
+    "forbidden_payload_classes": ["password", "auth_token", "refresh_token", "raw_store_receipt", "full_payment_data", "private_chat_body", "email_plaintext"],
+    "retention_policy_server_owned": true,
+    "consent_policy_server_or_platform_owned": true,
+    "client_cannot_disable_security_audit_events": true
+  },
+  "domains": [
+    "product", "gameplay", "economy", "pvp", "guild", "social_moderation", "liveops", "commerce", "network", "performance", "crash_diagnostics", "staff_admin"
+  ],
+  "core_metrics": {
+    "product": ["session_start", "session_end", "login_result", "onboarding_progress", "return_interval"],
+    "gameplay": ["map_population", "travel", "death_cause", "pve_activity", "pvp_activity", "npc_kill", "monster_kill", "boss_kill", "quest_progress", "event_progress", "abandon_point"],
+    "economy": ["reward_claim", "faucet", "sink", "drop_distribution", "bazaar_activity"],
+    "network": ["latency", "packet_loss", "disconnect", "reconnect", "queue_time", "session_resume"],
+    "commerce": ["offer_view", "purchase_start", "provider_result", "purchase_verification_result", "refund_status", "chargeback_status"],
+    "operations": ["service_health", "error_rate", "world_tick_health", "staff_action_failure", "deployment_state"]
+  },
+  "client_boundary": {
+    "local_preview_buffer_is_diagnostics_only": true,
+    "local_events_do_not_grant_rewards": true,
+    "local_events_do_not_change_balance": true,
+    "local_events_do_not_confirm_purchases": true,
+    "local_events_do_not_prove_player_guilt": true,
+    "production_ingestion_requires_remote_pipeline": true,
+    "alerts_require_operations_backend": true
+  },
+  "environment_isolation": {
+    "local_internal_test_global_tagged": true,
+    "global_and_test_dashboards_separate": true,
+    "test_telemetry_never_counts_as_global_revenue_or_economy": true
+  },
+  "balance": {
+    "new_final_thresholds_invented": false,
+    "new_final_alert_thresholds_invented": false,
+    "new_final_retention_windows_invented": false
+  }
+}

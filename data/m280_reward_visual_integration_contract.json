@@ -1,0 +1,24 @@
+{
+  "milestone": "M280",
+  "contract": "reward_presentation_visual_integration_combat_hud_loot_feedback_boss_reward_reveal_polish",
+  "master_concept": "V3.8",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "dependencies": {"presentation": "M279 presentation-only reward state", "inbox": "M278 reward inbox/claim queue", "settlement": "M266 atomic settlement"},
+  "authority": {
+    "server_owns": ["reward_title_truth", "reward_rarity_truth", "reward_quantity_truth", "reward_icon_identity", "claim_state", "delivery_and_settlement_truth"],
+    "client_may": ["render_confirmed_reward", "animate_reveal", "dismiss_visual", "navigate_to_inbox_or_claim"],
+    "client_never": ["mint_reward", "override_rarity", "override_quantity", "confirm_claim", "confirm_settlement"]
+  },
+  "visual_rules": {
+    "sea_chart_first": true,
+    "keep_center_readable": true,
+    "attack_button_bottom_right_unobstructed": true,
+    "camera_joystick_bottom_left_unobstructed": true,
+    "safe_area_aware": true,
+    "mobile_desktop_parity": true,
+    "reuse_master_item_icons": true,
+    "no_new_reward_main_menu": true,
+    "no_permanent_reward_debug_hud": true
+  },
+  "unset_until_measured": ["reveal_duration", "reward_banner_stack_limit", "boss_reveal_motion_timing", "vfx_intensity", "desktop_spacing_scale", "mobile_spacing_scale"]
+}

@@ -1,0 +1,31 @@
+{
+  "milestone": "M212",
+  "status": "COMBAT_HUD_READINESS_STATIC_VERIFIED",
+  "master_concept": "V3.8",
+  "goals": [
+    "keep the sea chart visually dominant",
+    "make target distance and weapon range readable at a glance",
+    "make primary fire state understandable without opening a menu",
+    "preserve the lower-right primary attack composition",
+    "keep mobile/web/desktop gameplay presentation identical"
+  ],
+  "target_panel": {
+    "states": ["OPTIMAL", "REICHWEITENGRENZE", "AUSSER REICHWEITE", "KEIN ZIEL"],
+    "shows_distance": true,
+    "shows_effective_range": true,
+    "shows_ammo": true,
+    "shows_health_and_shield": true
+  },
+  "primary_attack": {
+    "anchor": "lower_right",
+    "reload_percent_visible": true,
+    "out_of_range_feedback": "ZU WEIT",
+    "empty_ammo_feedback": "LEER"
+  },
+  "platform_parity": {
+    "world_and_gameplay_same": true,
+    "responsive_only": ["hud_scale", "font_scale", "touch_targets", "spacing", "safe_areas"]
+  },
+  "forbidden": ["persistent_bottom_menu_bar", "center_bottom_primary_attack", "platform_specific_gameplay_hierarchy"],
+  "gameplay_values_changed": false
+}

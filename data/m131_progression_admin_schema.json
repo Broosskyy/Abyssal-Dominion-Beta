@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "path": "rules.progression.levels.<pirate_level>",
+  "range": [
+    1,
+    60
+  ],
+  "editable_fields": [
+    "map_xp_goal",
+    "map_xp",
+    "hunter_required",
+    "hunter",
+    "region_objectives",
+    "status_objectives",
+    "build_objectives",
+    "corruption_objectives",
+    "guardian_fragments_required",
+    "prestige_required",
+    "legendary_chain",
+    "top_materials",
+    "trial",
+    "pirate_trial",
+    "requires_trial",
+    "mastery_xp",
+    "boss_requirements",
+    "unlock_rewards"
+  ],
+  "rule": "Band JSON remains fallback; verified live config overlays individual levels without client deployment.",
+  "validation": {
+    "level_min": 1,
+    "level_max": 60,
+    "non_negative_numeric": true,
+    "trial_gate_cannot_skip_required_band_transition": true
+  },
+  "milestone_update": "M156"
+}

@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "milestone": "M64",
+  "title": "Texture Import / Compression Contract",
+  "profiles": {
+    "ui": {
+      "preferred": [
+        "svg",
+        "png",
+        "webp"
+      ],
+      "max_dimension": 2048,
+      "mipmaps": false,
+      "lossy_allowed": false
+    },
+    "world_albedo": {
+      "preferred": [
+        "png",
+        "webp"
+      ],
+      "max_dimension": 2048,
+      "mipmaps": true,
+      "mobile_compression": "ETC2/ASTC"
+    },
+    "world_normal": {
+      "preferred": [
+        "png"
+      ],
+      "max_dimension": 2048,
+      "mipmaps": true,
+      "mobile_compression": "ETC2/ASTC",
+      "normal_map": true
+    },
+    "world_mask": {
+      "preferred": [
+        "png",
+        "webp"
+      ],
+      "max_dimension": 1024,
+      "mipmaps": true,
+      "mobile_compression": "ETC2/ASTC"
+    },
+    "hero_ship": {
+      "preferred": [
+        "png",
+        "webp"
+      ],
+      "max_dimension": 2048,
+      "mipmaps": true,
+      "atlas_where_sensible": true
+    },
+    "small_prop": {
+      "preferred": [
+        "png",
+        "webp"
+      ],
+      "max_dimension": 1024,
+      "mipmaps": true
+    }
+  },
+  "memory_rules": [
+    "prefer 1K for small props and repeated environment assets",
+    "reserve 2K for hero/readable ship or harbor surfaces",
+    "avoid unique 4K textures in PL1–5 mobile slice unless device profiling justifies them",
+    "reuse material families and atlases where visually acceptable",
+    "normal/roughness/mask maps must not silently become gameplay data"
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "milestone": "M265",
+  "master_concept": "V3.8",
+  "system": "AUTHORITATIVE_PLAYER_PROFILE_OWNERSHIP_PERSISTENCE",
+  "status": "CLIENT_SERVER_PERSISTENCE_BOUNDARY",
+  "principles": {
+    "verified_account_and_captain_identity_required": true,
+    "profile_truth_is_server_authoritative": true,
+    "ownership_truth_is_server_authoritative": true,
+    "equipped_state_must_reference_owned_instances": true,
+    "domain_revisions_are_monotonic": true,
+    "writes_use_expected_revision_and_idempotency": true,
+    "local_preview_never_grants_durable_ownership": true,
+    "test_global_isolated": true,
+    "missing_backend_fails_closed": true
+  },
+  "profile_domains": [
+    "identity",
+    "progression",
+    "fleet",
+    "ship_mastery",
+    "inventory",
+    "equipment",
+    "wallet",
+    "quest_progress",
+    "unlock_state",
+    "cosmetics"
+  ],
+  "ownership": {
+    "instance_kinds": [
+      "ship",
+      "ship_design",
+      "cannon",
+      "harpoon",
+      "deck",
+      "equipment",
+      "item",
+      "ammo_stack",
+      "cosmetic",
+      "companion",
+      "artifact"
+    ],
+    "required_fields": [
+      "instance_id",
+      "definition_id",
+      "ownership_state",
+      "acquired_revision"
+    ],
+    "states": [
+      "OWNED",
+      "BOUND",
+      "EQUIPPED",
+      "LOCKED_FOR_TRANSACTION",
+      "REVOKED"
+    ],
+    "client_may_create_owned_instance": false,
+    "client_may_promote_preview_item": false,
+    "equipped_requires_owned_instance": true
+  },
+  "persistence": {
+    "load_operations": [
+      "load_player_profile",
+      "load_ownership_snapshot",
+      "load_equipment_snapshot",
+      "load_progression_snapshot"
+    ],
+    "commit_operations": [
+      "commit_profile_transaction",
+      "commit_loadout_transaction",
+      "commit_progression_transaction"
+    ],
+    "required_request_fields": [
+      "request_id",
+      "transaction_id",
+      "idempotency_key",
+      "environment",
+      "account_id",
+      "captain_id",
+      "expected_profile_revision"
+    ],
+    "conflict_states": [
+      "REVISION_CONFLICT",
+      "OWNERSHIP_CONFLICT",
+      "EQUIPMENT_REFERENCE_INVALID",
+      "IDENTITY_MISMATCH",
+      "ENVIRONMENT_MISMATCH",
+      "UNAUTHORIZED"
+    ],
+    "client_success_is_not_commit_evidence": true
+  },
+  "safety": {
+    "client_can_grant_ownership": false,
+    "client_can_revoke_ownership": false,
+    "client_can_set_wallet_balance": false,
+    "client_can_set_progression": false,
+    "client_can_confirm_profile_commit": false,
+    "client_can_override_revision_conflict": false,
+    "client_can_equip_unowned_instance": false,
+    "client_can_transfer_test_ownership_to_global": false
+  },
+  "configuration": {
+    "profile_cache_ttl_seconds": null,
+    "max_owned_instances": null,
+    "transaction_timeout_ms": null,
+    "retry_count": null,
+    "snapshot_refresh_interval_seconds": null
+  },
+  "ui": {
+    "existing_system_page_only": true,
+    "no_new_main_page": true,
+    "no_permanent_gameplay_profile_hud": true,
+    "responsive_compact_cards": true
+  },
+  "production_gap": [
+    "production player-profile repository",
+    "durable ownership ledger",
+    "wallet/economy transaction service",
+    "inventory/equipment persistence backend",
+    "progression/quest persistence backend",
+    "schema migration and repair tooling",
+    "native multi-device/crossplay persistence QA"
+  ]
+}

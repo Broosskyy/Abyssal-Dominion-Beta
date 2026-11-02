@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "milestone": "M262",
+  "master": "V3.8",
+  "status": "LAUNCH_READINESS_GATE_RC_VERIFICATION_FOUNDATION",
+  "principles": {
+    "global_launch_requires_passed_launch_readiness_gate": true,
+    "online_alpha_prioritizes_technical_correctness_over_content_volume": true,
+    "test_server_closed_beta_expands_population_and_operational_coverage": true,
+    "missing_evidence_never_counts_as_pass": true,
+    "local_preview_never_production_readiness_truth": true,
+    "test_global_evidence_isolated": true
+  },
+  "gate_domains": [
+    "account_auth_persistence",
+    "world_session_reconnect",
+    "combat_data_integrity",
+    "payment_entitlements",
+    "support_moderation",
+    "telemetry_monitoring_alerts",
+    "backup_restore_disaster_recovery",
+    "security_anti_abuse",
+    "minimum_version_release_rollback",
+    "capacity_load_stability",
+    "crash_client_health_device_network_qa"
+  ],
+  "launch_critical_explicit": [
+    "payment",
+    "account_recovery",
+    "support",
+    "moderation",
+    "backup_restore",
+    "monitoring",
+    "anti_abuse",
+    "minimum_version",
+    "rollback"
+  ],
+  "gate_states": [
+    "NOT_EVALUATED",
+    "PASS",
+    "BLOCKED",
+    "WAIVED_WITH_APPROVAL"
+  ],
+  "release_candidate_evidence": {
+    "identity_required": [
+      "environment",
+      "channel",
+      "build_number",
+      "client_version",
+      "content_config_version",
+      "source_revision"
+    ],
+    "evidence_fields": [
+      "gate_id",
+      "status",
+      "evidence_refs",
+      "checked_at",
+      "owner",
+      "blockers",
+      "waiver_ref"
+    ],
+    "waiver_requires_privileged_approval": true,
+    "waiver_is_auditable": true,
+    "client_may_create_authoritative_evidence": false
+  },
+  "promotion": {
+    "channels": [
+      "LOCAL",
+      "INTERNAL",
+      "TEST",
+      "GLOBAL"
+    ],
+    "client_may_promote_build": false,
+    "client_may_override_blocker": false,
+    "client_may_mark_global_ready": false,
+    "client_may_issue_waiver": false,
+    "operations_pipeline_authority_required": true
+  },
+  "snapshot": {
+    "monotonic_revision_required": true,
+    "environments": [
+      "INTERNAL",
+      "TEST",
+      "GLOBAL"
+    ],
+    "fields": [
+      "revision",
+      "environment",
+      "candidate",
+      "gate_results",
+      "blockers",
+      "evidence_summary",
+      "decision"
+    ]
+  },
+  "configuration": {
+    "final_coverage_thresholds_invented": false,
+    "final_crash_thresholds_invented": false,
+    "final_capacity_thresholds_invented": false,
+    "final_rc_acceptance_thresholds_invented": false,
+    "final_waiver_policy_invented": false
+  }
+}

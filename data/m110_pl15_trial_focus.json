@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "milestone": "M110",
+  "trial_level": 15,
+  "binding_focus": [
+    "shield",
+    "deck",
+    "module",
+    "support"
+  ],
+  "readiness_objectives": [
+    "map progression goal",
+    "qualified Admiral clear",
+    "Hunter objective",
+    "regional objective chain"
+  ],
+  "support_qualification": "effective support only; empty/overheal-style actions must not count in future server authority",
+  "implementation_scope": "local progression gate + presentation contract; no fake server validation",
+  "future_authority": "server-validated qualified contribution"
+}

@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "milestone": "M74",
+  "priority": "P0",
+  "next_models": [
+    "loot_chest_rare",
+    "loot_chest_legendary",
+    "prop_admiral_banner_01",
+    "prop_monster_bones_01",
+    "prop_salvage_barrels_01",
+    "prop_broken_cannon_01"
+  ],
+  "next_vfx": [
+    "vfx_npc_provoked",
+    "vfx_loot_rare",
+    "vfx_loot_legendary",
+    "vfx_admiral_arrival",
+    "vfx_monster_arrival"
+  ],
+  "acceptance": [
+    "clear at mobile oblique camera",
+    "no baked text",
+    "visual-only",
+    "loot rarity readable without excessive glow",
+    "boss arrival VFX must not obscure target HUD",
+    "final assets replace stable slots without gameplay changes"
+  ]
+}

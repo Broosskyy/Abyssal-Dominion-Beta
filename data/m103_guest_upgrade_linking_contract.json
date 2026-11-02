@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "milestone": "M103",
+  "guest_upgrade_states": [
+    "guest_local",
+    "upgrade_requested",
+    "provider_verified",
+    "conflict_review",
+    "merge_confirmed",
+    "completed",
+    "cancelled"
+  ],
+  "provider_link_conflicts": [
+    "provider_already_linked_other_account",
+    "target_account_has_progress",
+    "guest_has_progress",
+    "ownership_overlap",
+    "currency_mismatch",
+    "entitlement_overlap",
+    "captain_name_conflict"
+  ],
+  "merge_policy": {
+    "automatic_merge": false,
+    "show_both_profiles_before_commit": true,
+    "server_transaction_required": true,
+    "preserve_audit_record": true,
+    "never_sum_premium_currency_blindly": true,
+    "never_duplicate_unique_entitlements": true,
+    "cancel_is_non_destructive": true
+  },
+  "local_behavior": "M103 can preview conflict classification only; it cannot link providers or merge live accounts."
+}

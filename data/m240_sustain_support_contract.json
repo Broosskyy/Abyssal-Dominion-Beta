@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "milestone": "M240",
+  "master_concept": "V3.8",
+  "scope": "repair_shield_support_vertical_slice",
+  "authority": {"prototype": "local", "live_rewards_and_competitive_contribution": "server_required"},
+  "repair_masters": [
+    {"tier": 1, "label": "Reparaturmeister I", "base_rate": 8.0, "interval": 1.0},
+    {"tier": 2, "label": "Reparaturmeister II", "base_rate": 13.0, "interval": 1.0},
+    {"tier": 3, "label": "Reparaturmeister III", "base_rate": 20.0, "interval": 1.0}
+  ],
+  "shield_masters": [
+    {"tier": 1, "label": "Schutzschildmeister I", "base_rate": 7.0, "delay": 5.0, "interval": 1.0},
+    {"tier": 2, "label": "Schutzschildmeister II", "base_rate": 12.0, "delay": 4.0, "interval": 1.0},
+    {"tier": 3, "label": "Schutzschildmeister III", "base_rate": 18.0, "delay": 3.0, "interval": 1.0}
+  ],
+  "prototype_balance_notice": "Rates and combat interruption/delay are provisional local prototype values pending TTK/PvP playtests.",
+  "separation": {"hull_repair_never_restores_shield": true, "shield_recovery_never_repairs_hull": true},
+  "repair_button": {"normal_repair": true, "consumes_repair_item": false, "mobile_first": true},
+  "support": {"friendly_target_required": true, "self_target_allowed": true, "range_required": true, "reload_required": true, "effective_heal_only_contribution": true, "overheal_contribution": 0},
+  "defense_order": ["temporary_barrier", "shield", "armor", "plates", "resistance", "hull"],
+  "supplies": {"powder": "valid_cannon_salvo_only", "plates": "valid_incoming_hull_damage_only"},
+  "non_goals": ["final_balance", "payment_unlocks", "client_authoritative_live_rewards"]
+}

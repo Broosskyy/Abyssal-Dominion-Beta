@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "milestone": "M210",
+  "master_concept": "V3.8",
+  "working_title": "Abyssal Dominion",
+  "status": "SOURCE_AND_ASSET_INTEGRATION_STATIC_VERIFIED",
+  "focus": [
+    "gameplay feeling",
+    "HUD scanability",
+    "menu reachability",
+    "authored asset replacement readiness",
+    "cross-platform presentation parity"
+  ],
+  "ui_rules": {
+    "sea_chart_primary": true,
+    "persistent_bottom_menu_bar": false,
+    "primary_attack": "lower_right",
+    "menu_back_close_always_reachable": true,
+    "touch_target_goal_px": 44,
+    "same_information_hierarchy_all_platforms": true,
+    "responsive_only": [
+      "hud_scale",
+      "font_scale",
+      "touch_targets",
+      "spacing",
+      "safe_areas",
+      "responsive_columns"
+    ]
+  },
+  "asset_pipeline": {
+    "generation_sheet_max_assets": 8,
+    "transparent_background": true,
+    "generous_spacing": true,
+    "extract_individual_masters_before_atlas": true,
+    "runtime_atlas_after_approval": true,
+    "stable_slot_replacement": true,
+    "art_cannot_change_gameplay": true
+  },
+  "next_authored_priority": [
+    "UI01 cannon ammo",
+    "UI02 harpoons & payloads",
+    "UI03 combat items",
+    "UI05 cannons",
+    "UI07-UI08 normal decks",
+    "special decks & ship equipment",
+    "HUD combat/navigation",
+    "starter ships",
+    "island calibration set"
+  ],
+  "native_qa_required": true
+}

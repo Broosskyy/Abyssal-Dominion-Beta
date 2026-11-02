@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "milestone": "M54",
+  "fixed": {
+    "subproperty_alpha_tweens": 4,
+    "quickbar_ammo_icon_prefix": "m42_<ammo_id>",
+    "combat_detail_bind_width": "responsive",
+    "combat_picker_vertical_clamp": "safe when content exceeds available height",
+    "duplicate_player_local": "renamed bind_player",
+    "text_svg_placeholders_replaced": 30,
+    "defense_stack": "barrier -> shield -> armor/plates -> hull",
+    "explicit_visual_slot_validator": true
+  },
+  "remaining_native_gate": [
+    "Godot 4.7.2 parser/runtime pass unavailable in this environment",
+    "TorusMesh usages retained because they are valid intended primitive APIs but still require native runtime QA",
+    "device-level Android/iOS safe-area and touch validation"
+  ],
+  "explicit_unknown_visual_refs": 0
+}

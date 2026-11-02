@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "milestone": "M219",
+  "title": "Zoomed-Out Combat & World Readability",
+  "master_reference_lock": "V3.8 + five gameplay master references + M213/M214 high/wide world composition",
+  "hierarchy": {
+    "order": [
+      "tracked_objective",
+      "selected_target",
+      "boss_or_admiral",
+      "high_tier_loot",
+      "mission_threat",
+      "nearby_loot",
+      "ambient_poi",
+      "nonselected_common_enemy"
+    ],
+    "rule": "Selection and gameplay relevance outrank raw marker count; the sea-chart center stays readable."
+  },
+  "nameplates": {
+    "selected_target": "always readable inside presentation distance; stronger frame, HP bar and range/state read",
+    "boss_admiral": "persistent high-priority read without making every common enemy equally loud",
+    "common_enemy": "compact and suppressible by distance/density",
+    "collision_rule": "Nameplates and world markers avoid permanent HUD and each other."
+  },
+  "loot": {
+    "tiers": {
+      "common": 62,
+      "uncommon": 64,
+      "rare": 68,
+      "epic": 72,
+      "legendary": 78,
+      "boss": 82
+    },
+    "rules": [
+      "High-tier/boss loot outranks ambient POIs.",
+      "Loot marker includes distance only when useful.",
+      "Pickup radius and reward values remain unchanged.",
+      "Loot collection keeps immediate world-space and HUD confirmation."
+    ]
+  },
+  "minimap": {
+    "selected_target_ring": "strongest combat ring",
+    "tracked_objective_ring": "strong navigation ring",
+    "priority_sorted_poi": true,
+    "rule": "Minimap remains circular/compact and does not become a second full-screen information panel."
+  },
+  "platform_parity": "Same world, targets, markers and priority semantics on mobile/web/desktop; only responsive size/density budgets may differ.",
+  "balance_changes": false
+}

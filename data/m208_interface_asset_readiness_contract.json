@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "milestone": "M208",
+  "status": "STATIC_VERIFIED_NATIVE_QA_PENDING",
+  "master_concept": "V3.8",
+  "goals": [
+    "Keep sea chart visually dominant while menus remain fast and understandable.",
+    "Use one menu/navigation icon language across Command Deck and destination actions.",
+    "Group arsenal/inventory presentation by readable item families instead of one flat list.",
+    "Keep quickslot identity visible without adding a persistent bottom command bar.",
+    "Make authored 2D and world-asset replacement a slot-preserving production workflow."
+  ],
+  "forbidden": [
+    "persistent_bottom_map_selection_bar",
+    "center_bottom_primary_attack",
+    "platform_specific_world_content",
+    "visual_asset_replacement_changing_collision_or_balance"
+  ],
+  "gameplay_unchanged": true,
+  "platform_parity": true
+}

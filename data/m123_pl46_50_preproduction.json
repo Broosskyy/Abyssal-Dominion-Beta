@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "milestone": "M123",
+  "status": "slots_only_no_unlock",
+  "master_contract": {
+    "band": "PL46-50",
+    "region": "Abyssal Dominion",
+    "content": "Legendary fleets / complex encounters / endgame materials-design-meta",
+    "pl46_49_admiral": "Abyssal High Admiral / Legendary Chain / Design-Meta-Top Mats",
+    "pl50": "Sovereign-Legendary Admiral / Prestige rotation / repeatable Endgame",
+    "trial50": "Abyssal Dominion finale Pr\u00fcfung"
+  },
+  "slots": [
+    "NPC-SHIP-DOM-001",
+    "NPC-SHIP-DOM-002",
+    "NPC-SHIP-DOM-003",
+    "NPC-ADMIRAL-DOM-001",
+    "NPC-ADMIRAL-DOM-LEGENDARY-001",
+    "MON-DOM-001",
+    "MON-DOM-002",
+    "ISLAND-DOM-001",
+    "ISLAND-DOM-002",
+    "ISLAND-DOM-003",
+    "HARBOR-DOMINION-001",
+    "POI-DOM-RIFT-001",
+    "POI-DOM-THRONE-001",
+    "VFX-DOM-LEGENDARY-001",
+    "UI-DOM-ENDGAME-001"
+  ],
+  "rule": "Do not unlock PL46 until physical progression and final-trial runtime are implemented."
+}

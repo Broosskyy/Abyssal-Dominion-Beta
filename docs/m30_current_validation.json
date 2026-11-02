@@ -1,0 +1,31 @@
+{
+  "milestone": "M30",
+  "engine": "4.5.1.stable.official.f62fdbde1",
+  "target_engine": "4.7.2.stable",
+  "target_engine_verified": false,
+  "supplementary": true,
+  "source_sha256": "86d2d6e6ff08473d7226e6ee74948879ae1b8095a00e39c4469683ef76681679",
+  "asset_count": 18,
+  "visual_verification": false,
+  "native_device_tests": false,
+  "release_approved": false,
+  "stages": [
+    {
+      "name": "import",
+      "passed": true,
+      "exit_code": 0
+    },
+    {
+      "name": "runtime",
+      "passed": true,
+      "exit_code": 0
+    }
+  ],
+  "passed": true,
+  "runtime": {
+    "checks": 1003,
+    "engine": "4.5.1-stable (official)",
+    "failures": [],
+    "suite": "M30"
+  }
+}

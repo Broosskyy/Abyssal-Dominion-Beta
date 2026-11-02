@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "milestone": "M91",
+  "layout": "height-aware proximity panel",
+  "reserved_hud_collision": "panel shifts above reserved HUD rectangles",
+  "touch_sailing_leak": "guild action hit-test precedes normal HUD/world sailing",
+  "range_ring": "hidden unless tower row selected",
+  "world_object_growth": "no new persistent gameplay objects; presentation nodes only",
+  "native_required": [
+    "compact Android landscape",
+    "notch safe area",
+    "desktop mouse",
+    "gamepad",
+    "orientation switch"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "milestone": "M288",
+  "status": "PLACEHOLDER_REPLACEABLE",
+  "production_boundary": "assets/production only; reference_only assets are never promoted",
+  "owner": "Godot runtime composition",
+  "ship_model_strategy": "ONE_COMPLETE_3D_MODEL_PER_SHIP; contact sockets host external presentation overlays only",
+  "required_sockets": ["CONTACT_WaterAnchor", "CONTACT_UpperAnchor"],
+  "slots": [
+    {"id":"m288_vfx_target_focus_ring_placeholder","kind":"VFX","fallback":"runtime torus focus ring","final_replacement":"authored selected-target focus scene"},
+    {"id":"m288_vfx_relation_arc_placeholder","kind":"VFX","fallback":"runtime relation ring","final_replacement":"authored relationship arc scene"},
+    {"id":"m288_vfx_threat_chevrons_placeholder","kind":"VFX","fallback":"runtime directional prism chevrons","final_replacement":"authored threat/aggro indicator scene"},
+    {"id":"m288_vfx_range_state_bracket_placeholder","kind":"VFX","fallback":"runtime range-state ring","final_replacement":"authored in/out-of-range bracket scene"},
+    {"id":"m288_vfx_priority_beacon_placeholder","kind":"VFX","fallback":"runtime upper beacon cone","final_replacement":"authored elite/admiral/monster/boss priority scene"},
+    {"id":"m288_ui_offscreen_contact_marker_placeholder","kind":"UI_VFX","fallback":"safe-edge HUD marker contract","final_replacement":"authored contact-class edge marker set"}
+  ],
+  "lod_policy": {
+    "native_desktop": "selected, relation, range, threat and priority layers",
+    "native_mobile": "selected target always; immediate threat and priority contacts budgeted",
+    "web_preview": "selected target always; secondary rings reduced",
+    "world_and_gameplay_truth_identical": true,
+    "final_values": "native QA required"
+  },
+  "authority": {
+    "online": "server-confirmed M288 contact state and event only",
+    "never": ["select target", "clear target", "decide range", "authorize attack", "set relationship", "set aggro", "remove protection", "require modular ship mesh", "hide detach or replace ship parts", "promote VFX to authority"]
+  }
+}

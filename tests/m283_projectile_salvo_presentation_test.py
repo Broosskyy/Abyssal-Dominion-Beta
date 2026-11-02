@@ -1,0 +1,13 @@
+from pathlib import Path
+import json
+ROOT=Path(__file__).resolve().parents[1]
+def read(p): return (ROOT/p).read_text()
+def load(p): return json.loads(read(p))
+def test_contract():
+ c=load("data/m283_projectile_salvo_presentation_contract.json"); assert c["milestone"]=="M283" and c["genre_ux_references"]==["Seafight","Battle of Sea"]; assert c["visual_rules"]["cannon_and_harpoon_readable_as_distinct_families"] and "haptic_pattern_strength" in c["unset_until_measured"]
+def test_runtime_fail_closed():
+ s=read("scripts/ui/m283_projectile_salvo_presentation_runtime.gd"); assert "class_name M283ProjectileSalvoPresentationRuntime" in s and "CANNON_SALVO" in s and "HARPOON_IMPACT" in s and "WATER_IMPACT" in s and "HULL_IMPACT" in s and "MONSTER_IMPACT" in s; assert "can_client_spawn_authoritative_projectile()->bool:return false" in s and "can_audio_or_haptics_confirm_hit()->bool:return false" in s
+def test_integration():
+ b=read("scripts/core/game_bootstrap.gd"); c=read("scripts/ui/command_deck.gd"); h=read("scripts/ui/game_hud.gd"); n=read("scripts/ui/nautical_hud.gd"); assert "M283ProjectileSalvoPresentationRuntime.new()" in b and "ProjectileSalvoPresentationReadiness" in b; assert "PROJECTILES · SALVOS · HARPOONS · AUDIO / HAPTICS" in c; assert "m283_projectile_presentation_state" in h and "_m283_sync_projectile_presentation_state" in h; assert "_draw_m283_projectile_salvo_presentation" in n
+def test_admin_convergence_release():
+ a=load("data/admin_content_type_registry.json"); assert a["milestone"] in {"M283","M284","M285","M286","M287","M288","M289","M290","M291","M292","M293","M294","M295","M296","M297","M298","M299","M300","M301"} and all(x in a["content_types"] for x in ["projectile_presentation_policy_definition","cannon_salvo_visual_policy_definition","harpoon_impact_visual_policy_definition","combat_audio_haptics_policy_definition"]); m=load("data/m239_master_convergence_matrix.json"); assert m["milestone"] in {"M283","M284","M285","M286","M287","M288","M289","M290","M291","M292","M293","M294","M295","M296","M297","M298","M299","M300","M301"} and any(x["domain"]=="projectile_travel_cannon_salvo_harpoon_impact_audio_haptics_presentation" for x in m["domains"]); r=load("data/release_identity.json"); assert r["milestone"] in {"M283","M284","M285","M286","M287","M288","M289","M290","M291","M292","M293","M294","M295","M296","M297","M298","M299","M300","M301"} and r["client_version"] in {"0.283.0","0.284.0","0.285.0","0.286.0","0.287.0","0.288.0","0.289.0","0.290.0","0.291.0","0.292.0","0.293.0","0.294.0","0.295.0","0.296.0","0.297.0","0.298.0","0.299.0","0.300.0","0.301.0"} and r["build_number"] in {283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301}

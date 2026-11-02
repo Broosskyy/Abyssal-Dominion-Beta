@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "master": "V3.7",
+  "hero_asset": {
+    "lod": [
+      "LOD0",
+      "LOD1",
+      "LOD2"
+    ],
+    "camera": "controlled_oblique_top_down",
+    "micro_detail": "prefer_normal_or_material",
+    "mobile_vfx_reduction": true
+  },
+  "monster": {
+    "animations": [
+      "idle",
+      "move_swim",
+      "attack",
+      "hit",
+      "phase",
+      "death_submerge"
+    ],
+    "sockets": [
+      "harpoon_impact",
+      "weakpoint_optional",
+      "vfx",
+      "audio"
+    ]
+  },
+  "ship": {
+    "required_sockets": [
+      "muzzle",
+      "damage",
+      "wake"
+    ],
+    "ship_levels": "same base GLB; stats/modules/material/VFX/emblem/sail variants"
+  },
+  "missing_final_asset": "fallback required; gameplay must remain functional"
+}

@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "milestone": "M64",
+  "slots": {
+    "ocean_normal": {
+      "fallback": "res://assets/placeholder_pack/textures/m64/ocean_normal_hint.png",
+      "role": "normal_hint",
+      "priority": "P0"
+    },
+    "ocean_foam": {
+      "fallback": "res://assets/placeholder_pack/textures/m64/ocean_foam.png",
+      "role": "foam",
+      "priority": "P0"
+    },
+    "sand_base": {
+      "fallback": "res://assets/placeholder_pack/textures/m64/sand_base.png",
+      "role": "albedo",
+      "priority": "P0"
+    },
+    "rock_base": {
+      "fallback": "res://assets/placeholder_pack/textures/m64/rock_base.png",
+      "role": "albedo",
+      "priority": "P0"
+    },
+    "vegetation_base": {
+      "fallback": "res://assets/placeholder_pack/textures/m64/vegetation_base.png",
+      "role": "albedo",
+      "priority": "P0"
+    },
+    "harbor_wood": {
+      "fallback": "res://assets/placeholder_pack/textures/m64/harbor_wood.png",
+      "role": "albedo",
+      "priority": "P0"
+    },
+    "harbor_stone": {
+      "fallback": "res://assets/placeholder_pack/textures/m64/harbor_stone.png",
+      "role": "albedo",
+      "priority": "P0"
+    },
+    "coast_foam_mask": {
+      "fallback": "res://assets/placeholder_pack/textures/m64/coast_foam_mask.png",
+      "role": "mask",
+      "priority": "P0"
+    }
+  },
+  "rules": {
+    "final_assets_replace_by_id": true,
+    "gameplay_never_reads_texture_pixels": true,
+    "mobile_memory_primary": true,
+    "missing_override_uses_fallback": true
+  }
+}

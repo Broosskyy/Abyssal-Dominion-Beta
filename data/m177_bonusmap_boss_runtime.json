@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "milestone": "M177",
+  "master_concept": "V3.8",
+  "goal": "DISTINCT_REACHABLE_BONUSMAP_BOSS_MECHANICS",
+  "activation_range": 64.0,
+  "maps": {
+    "silver": {"boss": "Silver Flagship", "reward_rarity": "rare", "mechanics": ["aimed_volley", "escort_break"]},
+    "gold": {"boss": "Gilded Sovereign", "reward_rarity": "epic", "mechanics": ["guard_call", "piercing_barrage"]},
+    "abyss": {"boss": "Crown Guardian", "reward_rarity": "abyssal", "mechanics": ["armor_shell", "hunter_pulse", "enrage"]},
+    "legendary": {"boss": "Void Sovereign", "reward_rarity": "legendary", "mechanics": ["command_mark", "mortar_zone", "last_stand"]}
+  },
+  "mechanics": {
+    "aimed_volley": {"label": "Gezielte Salve", "trigger": "interval", "cooldown": 8.0, "telegraph": 1.15, "range": 34.0, "action": "target_damage", "amount": 125.0, "armor_pierce": 0.12, "vfx_action": "boss_phase", "icon_slot": "status_aimed_volley", "telegraph_anchor": "target", "telegraph_shape": "line", "hit_radius": 4.2, "line_width": 4.8, "dodgeable": true, "telegraph_color": "#D8E6F2", "telegraph_slot": "vfx_boss_telegraph_silver"},
+    "escort_break": {"label": "Eskortenbrecher", "trigger": "interval", "cooldown": 11.0, "telegraph": 1.35, "range": 25.0, "action": "repair_block", "duration": 4.0, "amount": 70.0, "armor_pierce": 0.08, "vfx_action": "boss_phase", "icon_slot": "status_repair_block", "telegraph_anchor": "target", "telegraph_shape": "circle", "hit_radius": 4.8, "dodgeable": true, "telegraph_color": "#D8E6F2", "telegraph_slot": "vfx_boss_telegraph_silver"},
+    "guard_call": {"label": "Goldene Wache", "trigger": "interval", "cooldown": 10.0, "telegraph": 1.4, "action": "boss_barrier", "amount_ratio": 0.12, "duration": 5.0, "vfx_action": "shield_heal_impact", "icon_slot": "status_guard_call", "telegraph_anchor": "boss", "telegraph_shape": "boss_ring", "hit_radius": 5.2, "dodgeable": false, "telegraph_color": "#FFD35D", "telegraph_slot": "vfx_boss_telegraph_gold"},
+    "piercing_barrage": {"label": "Durchschlagssalve", "trigger": "interval", "cooldown": 9.0, "telegraph": 1.5, "range": 38.0, "action": "target_damage", "amount": 165.0, "armor_pierce": 0.42, "vfx_action": "boss_phase", "icon_slot": "status_piercing_barrage", "telegraph_anchor": "target", "telegraph_shape": "line", "hit_radius": 4.6, "line_width": 5.2, "dodgeable": true, "telegraph_color": "#FFD35D", "telegraph_slot": "vfx_boss_telegraph_gold"},
+    "armor_shell": {"label": "Abysspanzer", "trigger": "interval", "cooldown": 10.5, "telegraph": 1.3, "action": "boss_barrier", "amount_ratio": 0.16, "duration": 5.5, "vfx_action": "shield_heal_impact", "icon_slot": "status_armor_shell", "telegraph_anchor": "boss", "telegraph_shape": "boss_ring", "hit_radius": 5.6, "dodgeable": false, "telegraph_color": "#41E0D0", "telegraph_slot": "vfx_boss_telegraph_abyss"},
+    "hunter_pulse": {"label": "Jägerpuls", "trigger": "interval", "cooldown": 8.5, "telegraph": 1.25, "range": 28.0, "action": "target_status", "status_id": "spectral_mark", "power": 0.15, "duration": 5.0, "amount": 80.0, "vfx_action": "boss_phase", "icon_slot": "status_hunter_pulse", "telegraph_anchor": "target", "telegraph_shape": "circle", "hit_radius": 5.0, "dodgeable": true, "telegraph_color": "#41E0D0", "telegraph_slot": "vfx_boss_telegraph_abyss"},
+    "enrage": {"label": "Kronenzorn", "trigger": "phase_once", "phase": 3, "telegraph": 1.6, "action": "boss_enrage", "damage_mult": 1.12, "barrier_ratio": 0.08, "duration": 6.0, "vfx_action": "boss_enrage", "icon_slot": "status_enrage", "telegraph_anchor": "boss", "telegraph_shape": "boss_ring", "hit_radius": 6.0, "dodgeable": false, "telegraph_color": "#41E0D0", "telegraph_slot": "vfx_boss_telegraph_abyss"},
+    "command_mark": {"label": "Kommandofluch", "trigger": "interval", "cooldown": 8.0, "telegraph": 1.25, "range": 34.0, "action": "target_status", "status_id": "spectral_mark", "power": 0.18, "duration": 5.5, "amount": 65.0, "vfx_action": "boss_phase", "icon_slot": "status_command_mark", "telegraph_anchor": "target", "telegraph_shape": "circle", "hit_radius": 4.8, "dodgeable": true, "telegraph_color": "#B46CFF", "telegraph_slot": "vfx_boss_telegraph_legendary"},
+    "mortar_zone": {"label": "Mörserzone", "trigger": "interval", "cooldown": 10.0, "telegraph": 1.8, "range": 42.0, "action": "target_damage", "amount": 195.0, "armor_pierce": 0.2, "slow": 0.22, "vfx_action": "boss_enrage", "icon_slot": "status_mortar_zone", "telegraph_anchor": "target", "telegraph_shape": "circle", "hit_radius": 6.2, "dodgeable": true, "telegraph_color": "#B46CFF", "telegraph_slot": "vfx_boss_telegraph_legendary"},
+    "last_stand": {"label": "Letztes Gefecht", "trigger": "health_once", "health_ratio": 0.24, "telegraph": 1.5, "action": "boss_enrage", "damage_mult": 1.15, "barrier_ratio": 0.14, "duration": 7.0, "vfx_action": "boss_enrage", "icon_slot": "status_last_stand", "telegraph_anchor": "boss", "telegraph_shape": "boss_ring", "hit_radius": 6.4, "dodgeable": false, "telegraph_color": "#B46CFF", "telegraph_slot": "vfx_boss_telegraph_legendary"}
+  },
+  "bonus_objectives": {
+    "no_death": {"tracked": true, "presentation": "completion_accent", "reward": "server_profile_pending", "client_grant": false}
+  },
+  "performance": {"one_active_telegraph_per_boss": true, "max_boss_runtime_nodes_per_instance": 1, "reduced_motion_uses_static_scale": true, "minimum_critical_telegraph_alpha": 0.42},
+  "authority": {"mechanic_values": "local_prototype_existing_combat_primitives", "production_damage": "server_authoritative", "completion_rewards": "server_authoritative_online", "presentation_may_grant": false}
+}

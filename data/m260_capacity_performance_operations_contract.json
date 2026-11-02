@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "milestone": "M260",
+  "master": "V3.8",
+  "status": "CAPACITY_LOAD_SOAK_CHAOS_PERFORMANCE_FOUNDATION",
+  "capacity_planning": {
+    "dimensions": [
+      "ccu",
+      "players_per_map_instance",
+      "combat_load",
+      "npc_monster_count",
+      "chat_throughput",
+      "database_throughput",
+      "telemetry_throughput",
+      "event_spikes"
+    ],
+    "measured_not_assumed": true,
+    "global_event_capacity_requires_test_evidence": true,
+    "testserver_simulation_supported": true,
+    "client_may_publish_capacity_truth": false,
+    "client_may_select_production_scale": false
+  },
+  "resilience_testing": {
+    "test_types": [
+      "load",
+      "soak",
+      "reconnect_packet_loss",
+      "worldserver_restart",
+      "dependency_failure",
+      "selected_chaos"
+    ],
+    "destructive_tests_uncontrolled_on_global_forbidden": true,
+    "internal_test_preferred_for_destructive_scenarios": true,
+    "results_require_environment_build_config_identity": true,
+    "test_result_authority": "operations_qa_pipeline"
+  },
+  "client_performance": {
+    "profiles_data_driven": true,
+    "profile_dimensions": [
+      "render_scale",
+      "shadows",
+      "particles_vfx",
+      "water",
+      "view_detail_distance",
+      "lod",
+      "postprocessing",
+      "fps_target"
+    ],
+    "platform_parity_gameplay_world_preserved": true,
+    "quality_may_scale_not_gameplay_content": true,
+    "30_60_fps_compatible_target": true,
+    "battery_thermal_memory_real_device_qa_required": true,
+    "client_fps_does_not_drive_server_simulation": true
+  },
+  "operations_snapshot": {
+    "monotonic_revision_required": true,
+    "environments": [
+      "INTERNAL",
+      "TEST",
+      "GLOBAL"
+    ],
+    "local_preview_never_production_capacity_truth": true,
+    "fields": [
+      "revision",
+      "environment",
+      "capacity_health",
+      "performance_health",
+      "test_campaigns",
+      "bottlenecks",
+      "readiness"
+    ]
+  },
+  "client_boundary": {
+    "may_present_verified_capacity_health": true,
+    "may_present_verified_test_results": true,
+    "may_run_local_non_authoritative_diagnostics": true,
+    "may_start_production_load_test": false,
+    "may_start_destructive_global_chaos_test": false,
+    "may_change_autoscaling_or_capacity_limits": false,
+    "may_change_server_tick_or_combat_rate": false,
+    "may_mark_capacity_gate_passed": false,
+    "may_fabricate_test_result": false,
+    "may_merge_test_global_results": false
+  },
+  "configuration": {
+    "final_ccu_limits_invented": false,
+    "final_players_per_instance_invented": false,
+    "final_autoscaling_thresholds_invented": false,
+    "final_performance_budgets_invented": false,
+    "final_soak_duration_invented": false,
+    "final_packet_loss_latency_profiles_invented": false
+  }
+}

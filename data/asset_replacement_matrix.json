@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "milestone": "M45",
+  "source_of_truth": [
+    "ABYSSAL_DOMINION_MASTERKONZEPT_V3.0_COMPLETE_MASTER_BIBLE",
+    "ABYSSAL_DOMINION_MASTERKONZEPT_V3.1_AMMUNITION_SPECIAL_ITEMS_COMPLETE",
+    "ABYSSAL_DOMINION_ASSET_PRODUCTION_MASTERLIST_V2"
+  ],
+  "principles": {
+    "missing_final_assets_never_break_gameplay": true,
+    "stable_ids": true,
+    "data_driven_paths": true,
+    "gameplay_values_never_come_from_visual_assets": true,
+    "mobile_sea_camera_is_acceptance_basis": true,
+    "hero_assets_require_mobile_readability_qa": true
+  },
+  "families": [
+    {
+      "family": "starter_ships",
+      "priority": "P0",
+      "current_slots": [
+        "ship_small",
+        "ship_medium",
+        "ship_large"
+      ],
+      "final_format": "GLB",
+      "method": "Rodin/manual polish",
+      "fallback": "procedural/original placeholder"
+    },
+    {
+      "family": "main_progression_ships",
+      "priority": "P1",
+      "planned_ids": "ship_main_01..ship_main_50",
+      "final_format": "GLB",
+      "fallback": "ship archetype placeholder",
+      "note": "Ship mastery 1-10 does not create 10 GLBs."
+    },
+    {
+      "family": "npc_fleets",
+      "priority": "P0/P1",
+      "current_slots": [
+        "npc_corsair",
+        "npc_admiral",
+        "npc_shadow"
+      ],
+      "final_format": "GLB/material variants",
+      "fallback": "procedural ship placeholder"
+    },
+    {
+      "family": "islands",
+      "priority": "P0/P1",
+      "current_slots": [
+        "island_tropical",
+        "island_rock",
+        "island_snow"
+      ],
+      "planned": "ca. 20 bases + biome/POI modules",
+      "final_format": "GLB/modular kits",
+      "fallback": "procedural island"
+    },
+    {
+      "family": "harbors_buildings",
+      "priority": "P0/P1",
+      "current_slots": [
+        "harbor"
+      ],
+      "final_format": "modular GLB kits",
+      "fallback": "procedural harbor"
+    },
+    {
+      "family": "monsters_bosses",
+      "priority": "P0/P2",
+      "current_slots": [
+        "monster_kraken"
+      ],
+      "planned": [
+        "Kraken",
+        "Leviathan",
+        "Serpent",
+        "Crab",
+        "Ghost Whale",
+        "Abyss Guardian"
+      ],
+      "final_format": "rigged GLB where needed",
+      "fallback": "procedural/placeholder monster"
+    },
+    {
+      "family": "projectiles",
+      "priority": "P0/P1",
+      "current_slots": [
+        "cannonball",
+        "harpoon"
+      ],
+      "planned": [
+        "healing projectile",
+        "siege projectile",
+        "hunter payloads",
+        "event payloads"
+      ],
+      "final_format": "GLB/VFX",
+      "fallback": "primitive projectile"
+    },
+    {
+      "family": "combat_vfx",
+      "priority": "P0/P1",
+      "slot_group": "vfx",
+      "final_format": "TSCN/material/particles",
+      "fallback": "procedural CombatVfx"
+    },
+    {
+      "family": "ui_hud_icons",
+      "priority": "P0+",
+      "slot_group": "ui",
+      "planned_families": [
+        "combat",
+        "ammo",
+        "harpoon",
+        "repair",
+        "shield",
+        "powder",
+        "plates",
+        "support",
+        "quests",
+        "map",
+        "guild",
+        "PvP",
+        "event",
+        "bonusmap",
+        "oracle",
+        "currencies",
+        "status effects"
+      ],
+      "final_format": "SVG/PNG/WebP",
+      "fallback": "original placeholder icons"
+    },
+    {
+      "family": "audio",
+      "priority": "P0+",
+      "slot_group": "audio",
+      "final_format": "OGG/WAV",
+      "fallback": "silent/no-op"
+    },
+    {
+      "family": "ship_mastery_ui",
+      "priority": "P0/P1",
+      "planned": "3 starter cards + 50 main design cards + 10 mastery badges + mastery level-up VFX",
+      "final_format": "SVG/PNG/WebP or rendered card art + TSCN VFX",
+      "fallback": "generic original ship card + vector mastery badges"
+    }
+  ],
+  "qa_pipeline": [
+    "Canonical Scale Reference Scene",
+    "Gameplay Camera Asset Test Scene",
+    "Mobile Readability Test Scene",
+    "Material Calibration Scene",
+    "LOD/Performance Test Scene",
+    "Asset Preview Gallery",
+    "Placeholder Replacement Matrix",
+    "Asset Naming Convention",
+    "GLB Export Preset",
+    "Ingame Visual Acceptance Checklist"
+  ]
+}

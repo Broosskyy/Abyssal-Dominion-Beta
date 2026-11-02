@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "milestone": "M252",
+  "master_concept": "V3.8",
+  "system": "ONLINE_ACCOUNT_PERSISTENCE_TRANSPORT_READINESS",
+  "master_contract": {
+    "local_simulation_is_never_live_authority": true,
+    "shared_world_target": true,
+    "environment_profiles": [
+      "LOCAL_DEVELOPMENT",
+      "INTERNAL",
+      "TEST",
+      "GLOBAL"
+    ],
+    "environment_isolation": [
+      "profile",
+      "wallet",
+      "inventory",
+      "guild",
+      "ranking",
+      "entitlement",
+      "live_config"
+    ],
+    "service_domains": [
+      "auth_identity",
+      "account_profile",
+      "world_zone",
+      "realtime_session",
+      "movement_combat",
+      "inventory_items",
+      "economy_wallet",
+      "quest_progression",
+      "loot_rewards",
+      "guild_social",
+      "chat_moderation",
+      "bazaar_trading",
+      "events_liveops",
+      "rankings",
+      "payment_entitlements",
+      "notifications",
+      "telemetry_analytics",
+      "admin_operations"
+    ],
+    "crossplay_identity_target": true,
+    "immutable_account_and_captain_ids": true,
+    "request_and_transaction_ids_required": true,
+    "content_version_handshake_required": true,
+    "server_profile_version_required": true,
+    "reconnect_resume_required": true
+  },
+  "authority": {
+    "authentication": "server_provider_verification_required",
+    "persistent_profile": "server_repository_required",
+    "wallet_inventory_ownership": "server_authoritative_online",
+    "world_session": "server_authoritative_online",
+    "transport": "verified_remote_adapter_required_outside_local",
+    "trusted_time": "server_sync_required_for_reward_time",
+    "revisions": "server_monotonic",
+    "transactions": "server_atomic_idempotent",
+    "local_save": "local_development_preview_only"
+  },
+  "client_readiness": {
+    "fail_closed_nonlocal_transport": true,
+    "fail_closed_nonlocal_repository": true,
+    "fail_closed_nonlocal_auth": true,
+    "capability_reports_are_explicit": true,
+    "health_snapshot_is_read_only": true,
+    "no_fake_connected_state": true,
+    "no_fake_server_time": true,
+    "no_direct_ui_ownership_mutation": true
+  },
+  "session_snapshot_fields": [
+    "revision",
+    "environment",
+    "account",
+    "captain",
+    "transport",
+    "repository",
+    "trusted_time",
+    "content_version",
+    "server_profile_version",
+    "connection",
+    "resume",
+    "last_error"
+  ],
+  "polish": {
+    "command_deck_system_page": true,
+    "compact_status_cards": true,
+    "status_tones": [
+      "ready",
+      "warning",
+      "locked",
+      "info"
+    ],
+    "mobile_desktop_same_information_architecture": true,
+    "presentation_only_micro_animation": true,
+    "no_permanent_gameplay_hud_network_panel": true
+  },
+  "production_gap": [
+    "real_auth_provider",
+    "persistent_remote_repository",
+    "verified_remote_transport",
+    "authoritative_world_session_server",
+    "reconnect_resume_transport",
+    "native_network_device_qa"
+  ],
+  "balance": {
+    "new_final_gameplay_values_invented": false
+  }
+}

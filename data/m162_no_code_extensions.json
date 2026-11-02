@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "milestone": "M162",
+  "goal": "MOST_CONTENT_AND_LIVEOPS_WITHOUT_CLIENT_CODE_CHANGES",
+  "new_authorable_types": [
+    "interface_panel",
+    "interface_action",
+    "tooltip_profile",
+    "animation_profile",
+    "economy_formula",
+    "upgrade_tree",
+    "upgrade_node",
+    "guild_rank",
+    "guild_permission_set",
+    "guild_siege_rule",
+    "consumable_effect",
+    "harpoon_profile"
+  ],
+  "rules": {
+    "all_gameplay_values": "data_or_server_config",
+    "all_display_copy": "content_data",
+    "all_icons": "asset_slots",
+    "all_vfx": "vfx_profiles",
+    "all_shop_prices": "commerce_catalog_or_provider",
+    "production_mutations": "server_authorized_and_audited"
+  },
+  "code_required_only_for": [
+    "new_engine_primitive",
+    "new_network_protocol",
+    "new_security_boundary",
+    "new_payment_adapter",
+    "new_low_level_behavior_component"
+  ]
+}

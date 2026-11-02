@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "milestone": "M220",
+  "master_concept": "V3.8",
+  "purpose": "Tap-to-Sail course clarity, existing-target navigation, off-screen priority guidance and camera recenter readability for the five gameplay master references.",
+  "locks": {
+    "camera_profile": "M213/M214 high/wide oblique gameplay composition remains authoritative",
+    "movement": "Mobile ship movement remains Tap-to-Sail; desktop Click-to-Sail primary",
+    "camera_joystick": "camera only; never drives ship",
+    "world_parity": "same targets, map, route authority and gameplay on mobile/web/desktop",
+    "collision": "islands/solid land only; ships, NPCs, monsters, bosses and loot do not block movement",
+    "route_authority": "M192 island avoidance preserves the captain's final destination",
+    "objective_truth": "Seekarten navigation may only use targets that actually resolve in the current world",
+    "hud": "no persistent bottom command/map-selection bar; primary attack remains lower-right"
+  },
+  "presentation": {
+    "tap_marker": "final destination ring + compact intent/distance label",
+    "course_preview": "restrained dashed local leg; a bend may expose the existing island-detour steering point",
+    "offscreen_course": "single safe-area edge cue, not a breadcrumb trail",
+    "priority": ["tracked mission objective", "active course", "selected combat target", "boss/admiral", "high-value loot", "harbor", "secondary POI"],
+    "recenter": "returns camera pan to ship while preserving zoom and sailing destination"
+  },
+  "non_goals": [
+    "no teleportation",
+    "no invented mission target",
+    "no new gameplay pathfinder",
+    "no range/damage/speed/reward changes",
+    "no platform-specific world route"
+  ]
+}

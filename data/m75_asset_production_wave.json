@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "milestone": "M75",
+  "priority": "P0",
+  "next_models": [
+    "monster_early_01",
+    "monster_early_fin_detail_01",
+    "monster_early_crest_detail_01",
+    "prop_loot_float_debris_01",
+    "prop_wreck_plank_cluster_01",
+    "nature_shallow_foam_cluster_01",
+    "nature_seaweed_cluster_01"
+  ],
+  "highest_value_final_replacements": [
+    "ship_small",
+    "ship_medium",
+    "ship_large",
+    "npc_friendly_coastal_sloop",
+    "npc_scout_01",
+    "npc_raider_01",
+    "npc_gunship_01",
+    "npc_heavy_01",
+    "harbor_havens_reach",
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "monster_early_01"
+  ],
+  "acceptance": [
+    "mobile silhouette first",
+    "pirate identity over navy identity for ships",
+    "no baked gameplay collision",
+    "no embedded water in ordinary world GLBs",
+    "stable pivot/scale",
+    "fallback remains safe when final asset is absent"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "milestone": "M271",
+  "master_concept": "V3.8",
+  "contract": "authoritative_targeting_aggro_pvp_relationship_safe_zone_foundation",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "Use naval-MMO target readability, cycling and combat-legality conventions only; do not copy proprietary assets, layouts, values, names or content.",
+  "authority": {
+    "client_may": ["request_target_selection", "request_target_cycle", "clear_local_highlight", "render_relationship_hint", "render_threat_hint", "render_safe_zone_and_protection_state"],
+    "server_owns": ["target_legality", "relationship_classification", "friendly_fire_legality", "safe_zone_attack_rules", "pvp_protection", "npc_monster_aggro_and_threat", "target_loss_and_leash", "kill_legality_and_anti_farm_inputs", "targeting_revision"],
+    "client_never_commits": ["attack_authorization", "relationship", "aggro", "safe_zone_override", "pvp_protection_removal", "friendly_fire_override", "kill_legality"]
+  },
+  "relationship_families": ["SELF", "FRIENDLY", "GROUP", "GUILD", "ALLY", "NEUTRAL", "HOSTILE", "NPC_HOSTILE", "MONSTER_HOSTILE", "PROTECTED", "INVALID"],
+  "target_verdicts": ["ALLOWED", "REJECTED", "TARGET_LOST", "PROTECTED", "SAFE_ZONE_BLOCKED", "FRIENDLY_BLOCKED", "PVP_RULE_BLOCKED", "INVALID_RELATIONSHIP"],
+  "dependencies": {
+    "combat_resolution": "M269 consumes M271 attack-legality verdict before fire resolution",
+    "combat_state": "M270 temporal combat state follows legal M269 outcomes",
+    "world_transport": "M267 distributes authoritative relationship/zone/aggro replicas",
+    "movement": "M268 supplies server-confirmed positions used by range/zone/leash checks",
+    "wanted_bounty": "M243 remains the bounty/anti-farm presentation and authority contract",
+    "social": "M248/M250 provide group/guild/social relationship inputs"
+  },
+  "environment_isolation": ["INTERNAL", "TEST", "GLOBAL"],
+  "unset_until_measured": ["target_cycle_priority_weights", "aggro_radius", "threat_decay", "leash_distance", "target_loss_grace", "pvp_protection_duration", "anti_farm_windows", "safe_zone_boundary_tolerance"]
+}

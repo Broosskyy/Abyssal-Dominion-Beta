@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "milestone": "M224",
+  "master_concept": "V3.8",
+  "scope": "rectangular full sea-chart presentation and interaction polish",
+  "locks": {
+    "gameplay_minimap": "round_upper_right",
+    "full_sea_chart": "rectangular_full_screen",
+    "world_targets": "existing_nodes_only",
+    "navigation_authority": "PlayerShipInput.set_navigation_world_target",
+    "combat_target_authority": "TargetingSystem",
+    "quest_tracking_authority": "TrackedQuestRuntime",
+    "world_parity": "same_world_mobile_web_desktop"
+  },
+  "features": [
+    "distinct marker silhouettes for mission harbor boss event loot and enemy",
+    "single selected-target card with name type status and distance",
+    "compact map legend",
+    "presentation-only zoom and pan with bounded transform",
+    "selected mission and boss rings remain visually prioritized"
+  ],
+  "non_goals": ["new pathfinder", "teleportation", "spawn changes", "combat balance changes", "loot reward changes"]
+}

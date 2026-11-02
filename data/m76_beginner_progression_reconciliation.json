@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "milestone": "M76",
+  "status": "OPEN_RECONCILIATION_REQUIRED",
+  "current_code": {
+    "start_ship": "barco_low",
+    "ship_rewards": {
+      "1": "clipper",
+      "5": "chalupa"
+    }
+  },
+  "master_direction": "Three beginner ships total; medium and large are earned during PL1-5. A later V3.1 section records Medium at PL2 and Large at PL3.",
+  "risk": "Changing reward stages now would invalidate existing M31/M32 fixtures and local save expectations.",
+  "m76_action": "No silent balance migration. Preserve current executable rules and flag reconciliation for a dedicated migration/test pass.",
+  "required_next": [
+    "confirm canonical PL2/PL3 interpretation against full master text",
+    "define local-save migration",
+    "update runtime tests atomically if changed"
+  ]
+}

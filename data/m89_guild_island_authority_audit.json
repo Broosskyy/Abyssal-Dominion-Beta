@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "milestone": "M89",
+  "world_presence_from_map_level": 2,
+  "local_now": [
+    "visual island composition",
+    "tower/facility sockets",
+    "proximity interaction rows",
+    "world marker metadata"
+  ],
+  "not_local_authority": [
+    "guild membership",
+    "ownership",
+    "treasury",
+    "vault",
+    "war declaration",
+    "tower damage",
+    "facility upgrades",
+    "siege score",
+    "persistent damage"
+  ],
+  "tower_contract": [
+    "Target",
+    "Range",
+    "Reload",
+    "DamageDefinition"
+  ],
+  "broadside_angle_damage": false,
+  "loss_protection": "guild/facilities are not permanently deleted by siege loss",
+  "status": "STATIC_SOURCE_READY_NATIVE_PENDING"
+}

@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "milestone": "M115",
+  "range": [
+    26,
+    30
+  ],
+  "master_alignment": {
+    "phase": "PL26-30 Veteran/Abyss",
+    "pl30_trial_focus": "Abyss/Hunter/Corruption",
+    "xp_alone_unlocks": false
+  },
+  "levels": {
+    "26": {
+      "title": "Abyssal Threshold",
+      "region": "abyssal_depths",
+      "map_xp_goal": 10500,
+      "mastery_xp_per_sink": 235,
+      "boss": "npc_abyss_admiral",
+      "hunter_required": 2,
+      "region_objectives": 5,
+      "corruption_objectives": 0,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "27": {
+      "title": "Drowned Maw",
+      "region": "abyssal_depths",
+      "map_xp_goal": 11400,
+      "mastery_xp_per_sink": 247,
+      "boss": "npc_abyss_admiral",
+      "hunter_required": 2,
+      "region_objectives": 5,
+      "corruption_objectives": 1,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "28": {
+      "title": "Coral Grave",
+      "region": "abyssal_depths",
+      "map_xp_goal": 12300,
+      "mastery_xp_per_sink": 259,
+      "boss": "npc_abyss_admiral",
+      "hunter_required": 2,
+      "region_objectives": 5,
+      "corruption_objectives": 1,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "29": {
+      "title": "Leviathan Trench",
+      "region": "abyssal_depths",
+      "map_xp_goal": 13200,
+      "mastery_xp_per_sink": 271,
+      "boss": "npc_abyss_admiral",
+      "hunter_required": 2,
+      "region_objectives": 6,
+      "corruption_objectives": 1,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "30": {
+      "title": "Corruption Trial",
+      "region": "abyssal_depths",
+      "map_xp_goal": 14100,
+      "mastery_xp_per_sink": 283,
+      "boss": "npc_abyss_admiral",
+      "hunter_required": 3,
+      "region_objectives": 6,
+      "corruption_objectives": 1,
+      "pirate_trial": true,
+      "trial_focus": [
+        "abyss",
+        "hunter",
+        "corruption"
+      ]
+    }
+  },
+  "prototype_tuning": [
+    "xp goals",
+    "objective counts",
+    "mastery xp"
+  ],
+  "authority": "local prototype"
+}

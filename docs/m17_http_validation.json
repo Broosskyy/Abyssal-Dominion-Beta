@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "visual_verification": false,
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "milestone": "M17",
+  "source_sha256": "6b3c5bfff64463300f4944007cd99405d9eefcb0b1ab0247cce124ea1e2e5e75",
+  "html_current": true,
+  "wasm_mime": "application/wasm"
+}

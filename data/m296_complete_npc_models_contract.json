@@ -1,0 +1,17 @@
+{
+  "milestone": "M296",
+  "master_concept": "V3.8",
+  "clean_room_references": ["Seafight", "Battle of Sea"],
+  "initial_ship_rule": "Every initial ship is one complete individual 3D model, never assembled from runtime structural modules.",
+  "assets": [
+    {"id": "npc_friendly_coastal_sloop", "path": "res://assets/production_placeholders/m296/npc_friendly_coastal_sloop.glb", "sha256": "cc337d917ecdd9d4204997dc9fd89be7e0d1d8c39bf6017739e192bfc387324e", "bytes": 124572, "triangles": 1667, "surfaces": 7, "role": "friendly coastal"},
+    {"id": "npc_gunship_01", "path": "res://assets/production_placeholders/m296/npc_gunship_01.glb", "sha256": "fe7485b23bb99aafdb5a19e2d06d05f446212778c677b9576b322bc27b6c7489", "bytes": 130860, "triangles": 1775, "surfaces": 8, "role": "broadside gunship"}
+  ],
+  "both_single_node_single_mesh": true,
+  "structural_details_baked_into_glb": true,
+  "runtime_structural_overlays_for_new_assets": false,
+  "final_art": false,
+  "stable_slot_replacement": true,
+  "does_not_change": ["ship collision or hit boxes", "damage or reload", "server combat truth", "movement and Tap-to-Sail authority", "NPC AI", "rewards or ownership"],
+  "native_qa": "NOT_EVALUATED"
+}

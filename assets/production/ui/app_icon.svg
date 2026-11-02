@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="ocean" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#123d58"/>
+      <stop offset="1" stop-color="#071b2a"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe39a"/>
+      <stop offset="1" stop-color="#c8882d"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#ocean)"/>
+  <circle cx="256" cy="256" r="174" fill="none" stroke="#56cce7" stroke-width="13" opacity=".72"/>
+  <path d="M116 349c38-18 64-18 103 0s66 18 105 0 65-18 103 0" fill="none" stroke="#65d6ea" stroke-width="18" stroke-linecap="round"/>
+  <path d="M256 98v224M169 286h174" stroke="url(#gold)" stroke-width="19" stroke-linecap="round"/>
+  <path d="M256 111c-38 47-65 94-79 141h79V111z" fill="#f2e6c9"/>
+  <path d="M270 133c38 34 62 73 72 119h-72V133z" fill="#d7c69f"/>
+  <path d="M158 293h196l-41 59H200z" fill="url(#gold)"/>
+  <path d="M205 321h102" stroke="#5d321b" stroke-width="11" stroke-linecap="round" opacity=".75"/>
+</svg>

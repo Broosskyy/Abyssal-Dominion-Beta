@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "milestone": "M79",
+  "title": "PL1-5 Visual Object / Material Budget",
+  "sector_budget": {
+    "semantic_poi_max": 4,
+    "monster_context_props_per_poi_max": 3,
+    "island_dressing_per_island_max": 5,
+    "havens_reach_composition_modules": 17,
+    "salvage_dressing_per_pickup_max": 3
+  },
+  "material_policy": {
+    "procedural_world": [
+      "EnvironmentMaterialCatalog.rock",
+      "EnvironmentMaterialCatalog.harbor_wood",
+      "EnvironmentMaterialCatalog.harbor_stone"
+    ],
+    "rule": "Fallbacks reuse shared material catalog where possible; final GLBs should share atlas/material families where practical."
+  },
+  "mobile_policy": {
+    "low": "decorative props cull before semantic POIs/harbor landmarks",
+    "balanced": "current M79 fallback density",
+    "high": "same semantic truth; only visual density/visibility may increase"
+  },
+  "multimesh_status": "DEFERRED_UNTIL_NATIVE_PROFILING",
+  "reason": "Current PL1-5 repeated counts are still small; introducing MultiMesh without native profiling could worsen coarse culling and replacement flexibility."
+}

@@ -1,0 +1,1600 @@
+[17] #2576 Code.Demo.DemoPlayerInstaller
+  Fields: _wasdCamera, _playerUI, _eliteSelectionUI, _badgeSelectionUI, _uiElitePanels, _respawnPanel, _demoClientShopAndInventory, _guildDonationViewsInstaller, _uiBattleGroundHandler, _demoQuestPanel, _playerQuestPanel, _leaderboardView, _selectorCam, _actionBarController, _selectorObject, _portSkyboxMaterial, _mapSkyboxMaterial, _mapWaters, _gameUI, _abilitiesConfig, _abilitiesVisualConfig, _goSafeZoneButton, _testChangeEliteDesign, _uiPort, _isInsidePort, _currentPlayerShip, _currentPlayerAbilitiesController, _currentPlayerShipMapMover, _localPlayerData, _clientAuctionController, _localSimulationRewards, _gameBonusesService, _mainCamera, _puntero, _maxTargetMovePositionDistanceToHidePuntero, _logoutScript, _playerOnMapLimits
+  Methods: get_LocalPlayerData, Awake, Start, Update, FixedUpdate, OnDestroy, SetLocalPlayerData, ConfigureActionBarControllerView, InitializeGameBonusesAndSettings, ConfigureBadgeSelectionView, ConfigureEliteSelectionView, ConfigureQuests, SetLocalShipFromNetwork, SetLocalPlayerAbilitiesController, SetLocalPlayerNetworkObject, CurrentShipIsOnMapLimits, ConfigurePlayerShipOnUI, ConfigurePlayerAbilitiesOnUI, ConfigurePlayerNetworkInventoryOnUI, SetPlayerShipOnCameraFollow, ResetCurrentShipMovement, ShowPortWithTransition, LocalShipIsOnMap, ShowMapStuff, CurrentPlayerShipDied, LocalShipChangedMap, LocalShipInsidePort, SafeZoneButtonPressed, TryLeavePort, RespawnTriggered, ChangeToNextMap, Process, .ctor
+
+[15] #3579 Code.Core.Ship.Player.PlayerNetworkObject
+  Fields: _changeDetector, _PlayerShipInsidePort, _PlayerRegisteredOnArena, _PlayerRegisteredOnButhu, _PlayerInsideRaidMap, _CurrentAmmoSelectedId, _CurrentElitePoints, _NetworkAmmo, _NetworkConsumables, _IsVipPlayer, _IsWeakPlayer, _PlayerRewardsBonus, _PlayerXpBonus, _PlayerRegisterOnThunderBall, LocalElitePointsUpdated, CurrentAmmoChanged, PlayerVipFeatureChanged, OnInventoryChanged, _lastInputAuth, <PlayerId>k__BackingField, _serverRespawnTickTimer, _lastShipRespawnInfoData, _playerAbilitiesController, _currentPlayerShip, _currentShipWeapons, _currentPlayerShipMapMover, _playerShipSpawner, _playersEquipmentHandler, _worldRewards, _guildController, _designImprovementService, _pvpKillCallback, _respawningPlayerShip, BattleGroundSpawnCallback, _battleGroundRespawn, _ammoProvider, _consumableProvider, _serverPlayerCurrenciesHandler, _currentEliteLevel, _CurrentPlayerTeam, <BattleGroundMode>k__BackingField, <CurrentPlayerBadgeId>k__BackingField, <CurrentPlayerCountryId>k__BackingField, _IsBeginnerPlayer
+  Methods: get_PlayerShipInsidePort, set_PlayerShipInsidePort, get_PlayerRegisteredOnArena, set_PlayerRegisteredOnArena, get_PlayerRegisteredOnButhu, set_PlayerRegisteredOnButhu, get_PlayerInsideRaidMap, set_PlayerInsideRaidMap, get_CurrentAmmoSelectedId, set_CurrentAmmoSelectedId, get_CurrentElitePoints, set_CurrentElitePoints, get_NetworkAmmo, get_NetworkConsumables, get_IsVipPlayer, set_IsVipPlayer, get_IsWeakPlayer, set_IsWeakPlayer, get_PlayerRewardsBonus, set_PlayerRewardsBonus, get_PlayerXpBonus, set_PlayerXpBonus, get_PlayerRegisterOnThunderBall, set_PlayerRegisterOnThunderBall, SetPlayerRewardBonus, SetPlayerXpBonus, Spawned, Render, add_LocalElitePointsUpdated, remove_LocalElitePointsUpdated, add_CurrentAmmoChanged, remove_CurrentAmmoChanged, add_PlayerVipFeatureChanged, remove_PlayerVipFeatureChanged, add_OnInventoryChanged, remove_OnInventoryChanged, OnPlayerAmmoSelectedChanged, OnElitePointsChanged, OnVipFeatureChanged, OnNetworkAmmoChanged, InventorySyncChange, OnNetworkConsumablesChanged, CheckForInputAuth, UpdatePlayerRegisteredOnArena, UpdatePlayerRegisteredOnButhu, UpdatePlayerRegisteredOnThunderBall, get_PlayerId, set_PlayerId, OnPlayerShipInsidePortChanged, FixedUpdateNetwork, get_PlayerAbilitiesController, Initialize, SetVipToPlayer, SetToPlayer, EliteLeveledUp, SpawnPlayerShip, AddDamagePoints, AddElitePoints, AddBalanceElitePoints, AssignAuthorityToPlayerObjects, DestroyCallback, StartBattleGroundRespawnInSeconds, StartRespawnInSeconds, SaveLastShipInfoToRespawn, RespawnPlayerShip, UpdateProviders, InitializeInventoryMaps, UpdateCurrentShipProviders, ConfigurePlayerShip, ConfigurePLayerShipWithEquipment, SetGuildOnPlayerShip, ChangeCurrentAmmo, UpdatePlayerInsideRaidMap, get_CurrentPlayerTeam, set_CurrentPlayerTeam, SetCurrentPlayerTeam, get_BattleGroundMode, set_BattleGroundMode, SetCurrentPlayerBattleGroundMode, get_CurrentPlayerBadgeId, set_CurrentPlayerBadgeId, SetCurrentBadge, get_CurrentPlayerCountryId, set_CurrentPlayerCountryId, SetCurrentCountryId, get_IsBeginnerPlayer, set_IsBeginnerPlayer, .ctor, <InitializeInventoryMaps>b__122_0, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[15] #3042 Code.Networking.ServerStuff.ServerNetworkObject
+  Fields: _limboObject, _baseShipPrefab, _playerNetworkObjectPrefab, _serverGuildIslandsHandler, _serverArenaNetworkObject, _serverManager, _onPlayerLeftWorld, _onPlayerJoinedToWorld, _onPlayerConfiguredOnWorld, _playerShipSpawner, _playersEquipmentHandler, _worldRewardsGiver, _designsImprovementService, _serverPlayersCurrenciesUpdater, _guildController, _auctionController, _serverPlayerCurrenciesHandler, _serverMessagePublisher, _towerCatalogService, _guildWalletService, _serverConsumablePurchaseService, _serverCastlePurchaseService, _guildDonationOrchestratorService, _AdmiralSpawned, _changeDetector, _worldNpcHandler, _checkGameTimer, _playerCastleRemovalTimers
+  Methods: get_AdmiralSpawned, set_AdmiralSpawned, OnAdmiralSpawned, FixedUpdateNetwork, SendClientAdmiralMessage, SendAdmiralSpawned, Spawned, Update, FixedUpdate, Render, SetServerMessagePublisher, SetTowerCatalogService, SetServices, SetWorldNpcHandler, InitializeServer, RPC_RespawnPlayerShip, TeamPlayerShipRespawn, RPC_JoinPlayerToServer, CreatePlayerNetworkObject, OnShipSunkByPlayer, SendKillServerMessage, OnPlayerConfiguredOnWorldSuccessfully, RPC_PlayerShipSelection, RPC_DonateToGuild, RPC_GuildDonationResponse, RPC_RequestBuyConsumableItem, RPC_BuyConsumableItemResponse, RPC_TryBuildTower, RPC_PlaceTowerFailed, RPC_PlaceTowerSuccess, RPC_TryPlaceBid, RPC_BidFailedResponseToPlayer, RPC_BidResponseToPlayer, RPC_ChangeVisualDesign, ConfigurePlayerShip, RPC_ChangeVisualEliteDesign, RPC_ChangeBadgeForPlayer, RPC_ChangeDesignBonus, TestServerEquipOnJoin, RPC_UpdateShipEquipmentOnServer, UpdateEquipmentFromDbAndConfigureShipForPlayer, RPC_ChangePlayerShipAmmo, RPC_PlayerShipSkinChanged, RPC_GoToNextMap, RPC_GetPlayerShipOutOfPort, RPC_AddQuestCompletedExperience, RPC_SendPlayerToSafeZone, RPC_ConfirmPlayerMovedToSafeZone, RPC_ServerNotifyPlayerJoinedToWorld, RPC_ServerNotifyPlayerShipIsEquipped, RPC_ServerConfirmShipOnMap, RPC_ServerConfirmShipChangeMap, SendPlayerShipToPortZone, RPC_ServerNotifyPlayerEnterPort, TryOpenChestForPlayer, SendNotifyForChestPicked, RPC_ServerNotifyChestPicked, RPC_SendSplitRewardNotify, RPC_SunkPlayerNotification, RPC_NewGuildCreated, RPC_NewMemberOnGuild, RPC_PlayerLeftGuild, RPC_RemovedMemberFromGuild, RPC_LogoutPlayer, LogoutPlayer, RPC_ServerConfirmPlayerGuildChanged, RPC_RequestRemoveCastle, RPC_RefundCastleResponse, RPC_SetPlayerInfo, RPC_KickPlayer, RPC_SetPlayerExtra, OnObjectExitAOI, OnObjectEnterAOI, OnPlayerJoined, OnPlayerLeft, OnReliableDataProgress, OnInput, OnInputMissing, OnShutdown, OnDisconnectedFromServer, OnConnectedToServer, OnDisconnectedFromServer, OnConnectRequest, OnConnectFailed, OnUserSimulationMessage, OnReliableDataReceived, OnSessionListUpdated, OnCustomAuthenticationResponse, OnHostMigration, OnSceneLoadDone, OnSceneLoadStart, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields, RPC_RespawnPlayerShip@Invoker, RPC_JoinPlayerToServer@Invoker, RPC_PlayerShipSelection@Invoker, RPC_DonateToGuild@Invoker, RPC_GuildDonationResponse@Invoker, RPC_RequestBuyConsumableItem@Invoker, RPC_BuyConsumableItemResponse@Invoker, RPC_TryBuildTower@Invoker, RPC_PlaceTowerFailed@Invoker, RPC_PlaceTowerSuccess@Invoker, RPC_TryPlaceBid@Invoker, RPC_BidFailedResponseToPlayer@Invoker, RPC_BidResponseToPlayer@Invoker, RPC_ChangeVisualDesign@Invoker, RPC_ChangeVisualEliteDesign@Invoker, RPC_ChangeBadgeForPlayer@Invoker, RPC_ChangeDesignBonus@Invoker, RPC_UpdateShipEquipmentOnServer@Invoker, RPC_ChangePlayerShipAmmo@Invoker, RPC_PlayerShipSkinChanged@Invoker, RPC_GoToNextMap@Invoker, RPC_GetPlayerShipOutOfPort@Invoker, RPC_AddQuestCompletedExperience@Invoker, RPC_SendPlayerToSafeZone@Invoker, RPC_ConfirmPlayerMovedToSafeZone@Invoker, RPC_ServerNotifyPlayerJoinedToWorld@Invoker, RPC_ServerNotifyPlayerShipIsEquipped@Invoker, RPC_ServerConfirmShipOnMap@Invoker, RPC_ServerConfirmShipChangeMap@Invoker, RPC_ServerNotifyPlayerEnterPort@Invoker, RPC_ServerNotifyChestPicked@Invoker, RPC_SendSplitRewardNotify@Invoker, RPC_SunkPlayerNotification@Invoker, RPC_NewGuildCreated@Invoker, RPC_NewMemberOnGuild@Invoker, RPC_PlayerLeftGuild@Invoker, RPC_RemovedMemberFromGuild@Invoker, RPC_LogoutPlayer@Invoker, RPC_ServerConfirmPlayerGuildChanged@Invoker, RPC_RequestRemoveCastle@Invoker, RPC_RefundCastleResponse@Invoker, RPC_SetPlayerInfo@Invoker, RPC_KickPlayer@Invoker, RPC_SetPlayerExtra@Invoker
+
+[14] #3920 Code.Core.Common.EventQueue.EventIds
+  Fields: value__, ServerWorldInitialize, ConfirmPlayerConfiguredOnWorld, ConfirmPlayerShipEquipped, PlayerShipEnterToPort, PlayerLeftPort, LocalPlayerShipSpawned, LocalShipMapChanged, InitScreenEnded, GameUnitDestroyed, LocalDamageEvent, ServerConfirmPlayerSunk, SplitRewardNotify, ChestPickedNotify, AuctionItemNotify, QuestCompleted, GameRewardObtained, RealMoneyPackPurchased, IslandTakenDownNotifyFromServer, ServerGrantDesign, IslandDefenceAlert, GuildMemberHelpSignal, BattleGroundEnded, AdmiralSpawned, LastShotDesignObtained, BidPlaced, BuildTowerResponseEvent, BuyConsumableResponseEvent, RemoveCastleResponseEvent, BuyRealMoneyPackCompletedEvent, GuildDonationResponseEvent, TowerBuiltEvent, AuctionItemAcquired
+  Methods: -
+
+[14] #3530 Code.Core.Ship.ShipController
+  Fields: <CurrentTestMap>k__BackingField, _changeDetector, _shipMovement, _shipHealth, _shipWeapons, _shipObjectTransform, _shipVisuals, _uiShipInGame, _unitRewards, _shipAbilities, _canBeTargetable, OnBecomeUnreachable, _bonusDesignId, _hidePlayerInfo, _nickName, _NickName, _level, _Level, _rank, _Rank, _pvpRank, _PvpRank, _ClassId, _ShipState, _NetworkGuildTag, _NetworkShipDeckData, _BadgeId, LastNetworkDeckData, _guildTag, _onDestroyCallback, _isFirstLevelUp, _elitePointsBonus, _BattleGroundTeam, <BattleGroundMode>k__BackingField, <EliteLevel>k__BackingField, _HasBeginnerProtection
+  Methods: CheckForMapAttackSettings, CheckProtectionInMap, HandleProtectionAfterAttack, get_CurrentTestMap, set_CurrentTestMap, get_Rewards, get_UnitClassId, get_Name, get_MyId, get_GameObject, get_Transform, get_VisualReticle, get_Health, get_CanBeTargetable, get_CustomOwnerId, get_ShipVisuals, get_ShipWorldUI, get_ShipAbilities, add_OnBecomeUnreachable, remove_OnBecomeUnreachable, get_IsPlayer, get_VisualId, get_SkinId, get_BonusDesignId, ChangeBonusDesignId, get_NickName, set_NickName, get_Level, set_Level, get_Rank, set_Rank, get_PvpRank, set_PvpRank, get_ClassId, set_ClassId, get_ShipState, set_ShipState, get_NetworkGuildTag, set_NetworkGuildTag, get_NetworkShipDeckData, set_NetworkShipDeckData, get_BadgeId, set_BadgeId, get_CurrentDeckCount, get_GuildTag, Spawned, Render, Awake, HideProfileInfo, GetRealProfileName, EnableProfileInfo, SetPlayerGuildTag, SetDisplayName, UpdateLevel, UpdatePvpRank, UpdateRank, SetDestroyCallback, ConfigureItemProviders, ResetWeaponsCooldown, ConfigureBaseUnit, ChangeVisualObjectId, ResetVisualObject, ChangeVisualSkin, ChangeVisualObjectAndSkin, DoDieStuff, BecomeUntargetable, OnStateChanged, HandleStateChanged, OnDeckDataChanged, OnNickChanged, OnLevelChanged, OnPvpRankChanged, OnRankChanged, OnGuildTagChanged, UpdateDeckVisuals, UpdateDisplayName, LevelChanged, PvpRankChanged, RankChanged, SetExtraRepairBonus, SetRepairBonus, AddElitePointsBonus, GetElitePointsFromShot, get_BattleGroundTeam, set_BattleGroundTeam, get_BattleGroundMode, set_BattleGroundMode, get_TeamName, SetBattleGroundMode, SetBattleGroundTeam, OnTeamNameChanged, OnBadgeIdChanged, get_EliteLevel, set_EliteLevel, get_HasBeginnerProtection, set_HasBeginnerProtection, get_IsProtected, SetBeginnerProtectionStatus, OnProtectionChanged, .ctor, <Spawned>b__104_0, <Spawned>b__104_1, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[14] #2632 Code.Demo.UI.UIShipInGame
+  Fields: _display, _uiShowVisualDecks, _uiContainer, _nameText, _guildTagText, _rankImage, _nickColorsConfig, _minimapColorsConfig, _damageTextPrefab, _damageTextPoint, _damageTextPointNewCam, _minimapIndicator, _reloadIndicatorGameObject, _arenaBadgeImage, _arenaBadgeSprite, _hpBars, _hpGradient, _rankIcons, _pvpRankIcons, _itemSpritesConfig, _timeToRemoveHostileColor, _hostileTimer, _isHostile, _isAllyShip, _partyShip, _shipController, _shipWeapons, _isLocalShip, _isNpc, _isAdmiralShip, _displayName, _guildTag, AddedHostileShips, RemovedHostileShips, CurrentLocalPlayerTargetUnderAttack, LocalPlayerTeam, LocalPlayerTeamChanged
+  Methods: get_SpawnWorldTextsContainer, Awake, CheckTeam, Initialize, ChangeBadge, UpdateProtectionFlag, Configure, SetNeutralColors, SetHostileColors, RefreshDisplayName, UpdateDisplayName, UpdatePvpRank, UpdateDisplayRank, add_LocalPlayerTeamChanged, remove_LocalPlayerTeamChanged, LocalPlayerTeamUpdated, ShipTurnedHostile, ShipTurnedNeutral, TickFixedUpdate, FixedUpdate, CheckForLocalPlayerTeam, SetPartyShip, OnShipHealthChanged, UpdateShipWorldSpaceHealthBar, OnShipDied, ShowDamageReceived, UpdateDeckVisuals, .ctor, .cctor
+
+[13] #2811 Code.Demo.UI.ShopUI.UIDemoShopAndInventoryMediator
+  Fields: _weaponsCatalogShop, _cannonStoreShop, _beamStoreShop, _newDeckShop, _currentCannonsEquipmentPanel, _auctionsPanelHandler, _uiShopSkinView, _uiPlayerProfileView, _uiPlayerRankView, _uiSfGlobalMap, _guildIslandsPanelView, _buildTowerPanvelView, _achievementsView, _castlesShop, _uiShipAssistantsShop, _realMoneyPacksStoreView, _uiPlayerShipsShop, _uiConsumableItemsShop, _uiCurrentAssistantsEquipmentPanel, _itemSpritesConfig, _normalImprovementStoreShop, _arenaStoreShop, _buthuStoreShop, _realMoneyShop, _storeCanvasGroups, _buyMessageBox, _inventoryPanel, _shipSelector, _autoEquipButton, _battleLogsManager, _testActionBar, _localSimulationRewards, _localPlayerInventory, _playerNetworkObject
+  Methods: Awake, SetPlayerNetworkObject, Init, ConfigureCastleShop, ConfigureAchievementsView, ConfigureGuildIslandsView, ConfigureGlobalMapIslands, ConfigureShipShop, ConfigureRealMoneyPacksShop, ConfigureAssistantsShop, ConfigureItemConsumablesShop, ConfigureSkinShop, ConfigureProfileView, ConfigureRankView, ConfigureNewStores, ConfigureAuctionView, BuySfShipDeck, ShowMessageText, BuyStoreItem, BuyShipImprovement, BuyShipDeck, UpdateLocalInventoryAndNotifyServer, NotifyServerToUpdateEquipment, BuyWeaponItem, BuyShip, BuyShipSkin, PlaceBid, SetSyncedInventory, .ctor
+
+[11] #3607 Code.Core.Ship.NPC.GuildIslandController
+  Fields: _map, _towerPrefab, _spawnPoints, _conquestDetection, _towerId, _towerConfigsDictionary, _playersInsideConquestZone, _towers, _currentGuildOwnerTag, _oldGuildOwnerTag, _onIslandTakenDown, _islandAlive, _towersAvailable, _checkTimer, _towersToSpawn, _lastUnderAttackCheck, _onScheduledTowerSpawned, _onTowerDestroyed
+  Methods: get_IslandAlive, get_CurrentGuildOwnerTag, get_CurrentTowers, get_OldGuildOwnerTag, get_MapName, GetTowersUnderConstruction, CheckIfTowerSpotIsAvailable, GetTowerControllerInSpot, CheckIfCanUpgradeTowerTo, CheckIslandUnderAttack, FixedUpdateNetwork, CheckScheduledTowersToSpawn, NotifyTowerScheduleBuiltComplete, Configure, InitIsland, BuildTower, BuildExistingIsland, BuildIslandForGuild, ResetTowersAvailable, DestroyCurrentTowerInSpot, SpawnTower, TowerDamageReceived, OnTowerDestroyed, GuildIslandDefeated, GetRandomGuildTag, PlayerEnterConquestZone, PlayerLeftConquestZone, GetModifiedTowers, .ctor, <GetRandomGuildTag>b__48_0, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[11] #3547 Code.Core.Ship.Weapons.ShipWeapons
+  Fields: _maxRange, _testDamage, _attackCooldown, _changeDetector, __shotInfo, __lastAttackTargetId, __lastSelectedTargetId, __isAttacking, _ammoProvider, _consumableProvider, _cooldownTimer, _outOfBattleTimer, _weaponTypeToTickTimer, _weaponTypeToCooldownDuration, OnShoot, OnShootingElitePoints, _lastShipTarget, _myShip, _maxProjectileCountByDecks, _shots, _criticShots, _shipWeaponsCalculator, _dispersionBonus, _currentAmmoId, _damagePct, _pveDmgBonus, _pvpDmgBonus, _damagePctBonus, _criticalDamagePctBonus, _criticalChanceBonus, _temporaryDamageBonus, _temporaryCriticalDamageBonus, _temporaryCriticalChanceBonus, _baseEliteDamageBonus, _baseEliteCriticalDamageBonus, _baseEliteCriticalChanceBonus, _assistantCooldownBoost, _assistantReloadBonusInSeconds, _temporaryReloadBoost, _extraWeaponsRange, _firstConfigure, _rand
+  Methods: Spawned, Render, get__shotInfo, set__shotInfo, get__lastAttackTargetId, set__lastAttackTargetId, get__lastSelectedTargetId, set__lastSelectedTargetId, get__isAttacking, set__isAttacking, get_IsAttacking, get_IsOutOfBattle, get_WeaponsReadyToFire, get_MaxRange, add_OnShoot, remove_OnShoot, add_OnShootingElitePoints, remove_OnShootingElitePoints, get_CurrentAmmoId, AddDmgBoost, AddDamageImprovement, AddDamageBonus, AddPvpDamageBonus, AddPveDmgBonus, AddCriticalChanceBonus, AddTemporaryDamage, AddTemporaryCriticalChanceBonus, AddTemporaryCriticalDamageBonus, AddCriticalDamageBonus, AddEliteBaseDmgBonus, HasValidTargetForRange, AddTemporaryReloadSpeedBonus, RefreshWeaponCooldownsForCurrentBuff, ImproveReloadSpeed, AddRange, ImproveReloadInSeconds, ImproveWeapons, ImproveHitChance, Awake, SetItemProviders, ResetWeaponsCooldown, Configure, FixedUpdateNetwork, OnNetworkShotChanged, ClientVisualFire, GetVisualDelayMilliseconds, ForceAttackInput, HandleAttackInput, HandlePlayerAttack, GetBonusDamageFromShipOrAmmo, IsCriticShot, GetDamageMultiplier, GetCustomVisualBall, GetFinalWeaponCooldown, GetCurrentCooldownPct, HandleNpcAttack, IsOnAttackRange, GetDistanceFromTarget, StopAttack, HandleOldTarget, OnTargetBecomeUnreachable, StopRunning, Despawned, SetWeapons, SetCurrentAmmo, LaunchRocket, SetCurrentSelectedTargetId, SetMaxProjectileCount, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[11] #2928 Code.Demo.DemoRewards.UIBattleLogsManager
+  Fields: _textLogs, _playerLogBook, _guildLogBook, _normalColor, _commonColor, _diamondColor, _pvpColor, _questColor, _rewards, _npcs, _eventQueue, _demoRewardConverter, _playerNetworkObject
+  Methods: Start, Configure, OnDestroy, SendAuctionAcquiredItemLog, SendSpecialItemLog, SendUnitDestroyedLog, GetPlayerBonusFromNpcs, SendPvpPointsLog, SendChestRewardInfo, SendAdmiralSpawnedLog, ShowNoCannonsEquippedLog, SendGuildMemberHelpCallLog, SendServerDesignGrantedLog, SendIslandDefenceLog, SendIslandTakenDownLog, SendRealMoneyPackPurchased, SendGameRewardLogs, SendQuestDoneLogs, SendOutOfRangeLog, SendPlayerShipSpawnedLog, Process, SetPlayerNetworkObject, .ctor
+
+[11] #3021 Code.Networking.ServerStuff.ServerManager
+  Fields: _baseShipPrefab, _networkRunner, _playerSpawnPoints, _worldRewards, _eventQueue, _guildController, _baseShipConfigs, _playersEquipmentHandler, _playerConsumableInventoryService
+  Methods: .ctor, SetGuildOnPlayerShip, PlayerCanChangeShip, SendDestroyUnitRewards, PlayerBoughtShip, AddRewardsFromChest, GetPlayerPositionAtLimboZone, SetPlayerShipOnLimboZone, DespawnPlayerShip, GetPlayerShipOutOfPort, TryMovePlayerShipToNextMap, AddPlayerToGuild, RemovePlayerFromGuild, GetPlayerShipCharacterId, GetPlayerShipEquipmentFromDatabase, UpdatePlayerShipEquipmentFromDatabase, ConfigurePLayerShipWithEquipment
+
+[11] #3142 Code.Networking.ServerStuff.Arena.ThunderBallCustomMap
+  Fields: _thunderBallPrefab, _teamA, _teamB, _pointsToWin, _destinationA, _destinationB, _stepMoveDistance, _goalLockDistance, _goalDistance, _chestPrefab, _thunderBall, _ballUpdateTimer, _teamATotalDamage, _teamBTotalDamage, _teamABallDamageWindow, _teamBBallDamageWindow, _teamThatWillScore, _goalTarget, _TeamAScore, _TeamBScore, _teamWinsBattleGroundCallback, _backTeamDefeatedToNormalZone, _updateTeamsTimer, _shouldUpdateTeams, _worldChests, _leftChestSpawnGroup, _rightChestSpawnGroup
+  Methods: get_TeamAScore, set_TeamAScore, get_TeamBScore, set_TeamBScore, get_BattleGroundType, ConfigureThunderMap, TeamShipRespawned, InitNetworkState, ResetThunderBallPosition, OnThunderBallDamageReceived, MatchEndByDuration, ServerTick, OnGoalReached, SetTeamAsWinner, CheckWinCondition, UpdateBallDirection, ResetBall, ResetTeamScores, OnInitMatch, SetPlayerShipsRepairExtraBonus, SetTeamToPlayersObject, UpdateTeamOnPlayersObject, StartBattle, CloseMatch, DoFinishBattleActions, SetSameTeamOnShips, StopShipsAttack, SpawnHpChests, SpawnHpChest, OnChestPicked, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[11] #3096 Code.Networking.ServerStuff.MapServer.ServerWorldConfigure
+  Fields: _serverNetworkObjectPrefab, _basePrefab, _maps, _powerUpConfigs, _abilitiesConfig, _chestPrefab, _winterChestPrefab, _cupChestPrefab, _mapNpcSpawner, _worldRewards, _designsImprovementService, _serverGuildController, _serverAuctionController, _mapMapDropRewards, _playersCurrenciesHandler, _npcRewardsDict, _guildIslandFirestoreService, _serverMessagePublisher, _guildWalletService, _guildDonationOrchestrator, _serverConsumablePurchaseService, _serverCastlePurchaseService, _towerCatalogService, _playersEquipmentHandler, _playersConsumableInventoryService, _firestoreDb, _serverInventoryUpdater, _externalItemGrantEntyService, _serverNetworkObject, _amountOfCollectibleChests, _amountOfWinterChests, _amountOfCupChests, _networkRunner, _worldChests, _chestGenerator
+  Methods: Start, OnDestroy, Process, InitializeWorld, OnPlayerLevelChanged, InitializeServerGuildController, SpawnServerNetworkObject, InitializeMaps, InitializeMap, SpawnChests, SpawnCupChest, SpawnWinterChest, SpawnWorldChest, SelectRandomReward, OnCupChestPicked, OnWinterChestPicket, OnChestPicked, OnPlayerJoinedToWorld, OnPlayerConfiguredOnWorld, OnPlayerLeftWorld, UpdatePlayerLastMap, .ctor
+
+[10] #2617 Code.Demo.UI.UILocalPlayer
+  Fields: _playerShowCoordinates, _uiGlobalMap, _uiShowCoordinates, _playerShipDisplay, _playerStatisticsDisplay, _playerIdTexts, _playerNameTexts, _openAddEmailPanelButtons, _sendPasswordChangeEmailButtons, _enterEmailPanel, _addContactEmailButton, _emailText, _messageBox, _playerFastBar, _currentBoostsAndDebuffsView, _currentGameGlobalBonusesView, _ammoAndBarSyncView, _minimapObject, _mobileBarObject, _leavePortButton, _changeMapButton, _openShopButton, _playerInputManager, _currentPlayerTarget, OnChangeMapPerformed, OnLeavePortPerformed
+  Methods: add_OnChangeMapPerformed, remove_OnChangeMapPerformed, add_OnLeavePortPerformed, remove_OnLeavePortPerformed, SetVisibleChangeMapButton, Start, SendPasswordChangeEmail, UpdateEmailContact, OpenEnterEmailPanel, UpdateEmailAccountButtons, SetPlayerDataAndStatistics, SetPlayerShip, SetPlayerAbilitiesController, SetPlayerNetworkInventoryController, OnPlayerTargetChange, HandleOldTarget, SetNewTarget, OnEnterPort, ShipOnMap, InitializeGameBonuses, .ctor, <Start>b__31_0, <Start>b__31_1, <SetPlayerShip>b__37_0
+
+[10] #2985 Code.Networking.ServerStuff.ServerGuildIslandsHandlerNetworkObject
+  Fields: <RemovedIslandMessages>k__BackingField, <AddedIslandMessages>k__BackingField, _guildIslandMapper, _checkUnderAttackTimer, _islandSaveCooldownTimer, _guildIslands, _guildIslandService, _serverMessagePublisher, _clearListTimer
+  Methods: get_RemovedIslandMessages, set_RemovedIslandMessages, get_AddedIslandMessages, set_AddedIslandMessages, Awake, Spawned, GetGuildIslandCount, FixedUpdateNetwork, CheckAndModifiedTowersForSaving, CheckIslandsUnderAttackFlag, SetServerMessagesService, InitializeServerGuildIslands, CanUpgradeTowerForIsland, CanBuildTowerForIsland, TowerScheduledBuildDone, BuildOrUpgradeTowerForIsland, IslandTakenDown, SaveAllIslands, PeriodicallySaveIslands, ReplaceIslandData, SaveIsland, OnShutdown, OnDisconnectedFromServer, OnObjectExitAOI, OnObjectEnterAOI, OnPlayerJoined, OnPlayerLeft, OnReliableDataProgress, OnInput, OnInputMissing, OnConnectedToServer, OnDisconnectedFromServer, OnConnectRequest, OnConnectFailed, OnUserSimulationMessage, OnReliableDataReceived, OnSessionListUpdated, OnCustomAuthenticationResponse, OnHostMigration, OnReliableDataReceived, OnSceneLoadDone, OnSceneLoadStart, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[09] #2798 <Init>d__36
+  Fields: <>1__state, <>t__builder, playerProfileData, <>4__this, localSimulationRewards, playerPackInfoService, clientIslandController, guildIslandService, clientAuctionController, <localPlayerInventory>5__2, <shipCatalogList>5__3, <weaponsCatalogList>5__4, <improvementsCatalog>5__5, <decksCatalog>5__6, <shipSkinsPrices>5__7, <normalWeaponStore>5__8, <beamStore>5__9, <normalImprovementStore>5__10, <normalDecksStore>5__11, <improvementArenaStore>5__12, <arenaWeaponsStore>5__13, <buthuImprovementStore>5__14, <buthuWeaponsStore>5__15, <buthuDeckStore>5__16, <realMoneyStore>5__17, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[09] #2062 Npc
+  Fields: Name, Id, Id_Visual, SkinName, VisualRotationSpeed, MovementSpeed, Life, <MinSails>k__BackingField, <MaxSails>k__BackingField, <ReduceHpPerSail>k__BackingField, <RandomHpDifference>k__BackingField, AutoClearDamageReceivedList, AttackPower, FireRate, WeaponsRange, DetectRange, MaxChaseRange, MaxRangeToAttack, Type, Level, Faction, Events, AutoRepairConfig, SpawnInRandomMap, ShowAnnouncement
+  Methods: get_MinSails, set_MinSails, get_MaxSails, set_MaxSails, get_ReduceHpPerSail, set_ReduceHpPerSail, get_RandomHpDifference, set_RandomHpDifference, .ctor
+
+[09] #3714 Code.Core.GameGlobalBonuses.GlobalGameSettingsConfig
+  Fields: NormalShipRespawnHealthPct, VipShipRespawnHealthPct, MinRespawnHealth, MapChangeLockTime, TowerBuildTime, UseDeckBasedProjectileCount, CannonsPerAdditionalProjectileVisual, MaxProjectileVisuals, MaxPvpKillRewardsPerEnemy, SnowballsFreezingChance, SpawnAdmiralInLastKillPosition, MaxLevelForSmallShips, MaxXpForNoviceTideRaid, MaxXpForProtection
+  Methods: .ctor
+
+[09] #3715 Code.Core.GameGlobalBonuses.GlobalServerSettings
+  Fields: <NormalShipRespawnHealthPct>k__BackingField, <VipShipRespawnHealthPct>k__BackingField, <MinRespawnHealth>k__BackingField, <MapChangeLockTime>k__BackingField, <TowerBuildTime>k__BackingField, <UseDeckBasedProjectileCount>k__BackingField, <CannonsPerAdditionalProjectileVisual>k__BackingField, <MaxProjectileVisuals>k__BackingField, <MaxPvpKillRewardsPerEnemy>k__BackingField, <SnowballsFreezingChance>k__BackingField, <SpawnAdmiralInLastKillPosition>k__BackingField, <MaxLevelForSmallShips>k__BackingField, <RestartScheduled>k__BackingField, <MaxXpForNoviceTideRaid>k__BackingField, <MaxXpForProtection>k__BackingField
+  Methods: get_NormalShipRespawnHealthPct, set_NormalShipRespawnHealthPct, get_VipShipRespawnHealthPct, set_VipShipRespawnHealthPct, get_MinRespawnHealth, set_MinRespawnHealth, get_MapChangeLockTime, set_MapChangeLockTime, get_TowerBuildTime, set_TowerBuildTime, get_UseDeckBasedProjectileCount, set_UseDeckBasedProjectileCount, get_CannonsPerAdditionalProjectileVisual, set_CannonsPerAdditionalProjectileVisual, get_MaxProjectileVisuals, set_MaxProjectileVisuals, get_MaxPvpKillRewardsPerEnemy, set_MaxPvpKillRewardsPerEnemy, get_SnowballsFreezingChance, set_SnowballsFreezingChance, get_SpawnAdmiralInLastKillPosition, set_SpawnAdmiralInLastKillPosition, get_MaxLevelForSmallShips, set_MaxLevelForSmallShips, get_RestartScheduled, set_RestartScheduled, get_MaxXpForNoviceTideRaid, set_MaxXpForNoviceTideRaid, get_MaxXpForProtection, set_MaxXpForProtection, SetSettings, SetRestartScheduled
+
+[09] #3532 Code.Core.Ship.ShipMapMover
+  Fields: _playerShipController, _shipMovement, _networkTransform, _shipAoiSetter, _shipWeapons, _shipHealth, _lockTimer, <CurrentMapLimits>k__BackingField, ShipOnMapLimitsChanged, _shipInsidePort, _jumpMapScheduled
+  Methods: Awake, get_CurrentMap, get_CurrentMapLimits, set_CurrentMapLimits, get_ShipInsidePort, SetBorderNextMap, TryEnterPort, ShouldEnterPort, EnterPort, ShouldLeavePort, LeavePort, BackFromCustomZoneToPort, MoveToCustomZone, MoveToNewZone, MoveToNextMap, CanMoveToNextMap, CanMoveToOtherZone, AfterTick, .ctor
+
+[09] #3535 Code.Core.Ship.ShipVisuals
+  Fields: IdVisualToVisualObject, VisualObjectListsForMerchantBattleground, IdSkinToSailCount, _visualsContainer, _worldUIGameObject, _worldUIContainer, _changeDetector, _VisualId, _SkinId, _IsVisible, _lastVisibleFlag, _SailCount, _shipWeapons, _reticle, _currentVisualObject, _lastVisualId, _lastSkinName, _shipVisibility, _currentVisualId, _currentShipSkin, _ownerShip, _lastHeightValue
+  Methods: get_VisualId, set_VisualId, get_SkinId, set_SkinId, get_IsVisible, set_IsVisible, get_SailCount, set_SailCount, OnSailVisualCountChanged, get_Reticle, Spawned, Render, Awake, SetInvisibility, RemoveInvisibility, Configure, ChangeVisualObjectAndSkin, ResetVisuals, FixedUpdateNetwork, CheckForInvisibility, CheckForVisualId, CheckForVisualSkin, GetShipSkinSailCount, SpawnVisualObject, ConfigureReticleAndAnimation, UpdateVisualSailCount, SetAdmiralSize, FixedUpdate, .ctor, .cctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[09] #3583 Code.Core.Ship.Player.PlayerShipController
+  Fields: _shipRepairModule, _cameraFollowPoint, _clientPlayerMapDetector, <LastValidRespawnMap>k__BackingField, _PlayerID, <ShipCharacterId>k__BackingField, _hasInputAuthoritySet, _lastInputAuth
+  Methods: get_CustomOwnerId, get_IsPlayer, get_LastValidRespawnMap, set_LastValidRespawnMap, SetCurrentMap, get_PlayerID, set_PlayerID, get_ShipCharacterId, set_ShipCharacterId, get_CameraFollowPoint, Render, SetPlayerID, SetFullHP, SetHp, FixedUpdate, FixedUpdateNetwork, CheckForInputAuth, Spawned, Despawned, TryDespawn, ConfigureShipDesignBonus, ConfigureShipWithEquipment, HandleShipImprovements, SetShipCharacterId, SetBadge, ForceCancelAttack, SetEliteLevel, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[08] #2021 PlayfabServerManager
+  Fields: _instance, _keyToTitleData, _allWeaponsInfo, GuildIslandsTitleKey, TowerConfigsTitleKey
+  Methods: Awake, GetPlayerShipCharacterId, GetPlayerCurrentShipImprovements, GetPlayerCurrentShipWeaponsEquipment, GetPlayerInventory, Initialize, GetWeaponsInfo, GetConsumableIdList, GetAllAmmoInfo, GetShipImprovementsConfig, GetCastlesComponentsConfig, GetShipComponentsConfig, GetImprovementStats, GetShipsConfig, GetCatalogItems, GetTitleDataFromCachedData, SaveGuildIslandsData, initializeDataTitle, .ctor
+
+[08] #3892 Code.Core.Common.Input.PlayerInputManager
+  Fields: <Instance>k__BackingField, _clickLayerMask, _shipDetectionLayerMask, _puntero, _maxDelayTimeBetweenClicks, _fastBarButtons, _currentSameTargetClicks, _lastTargetClickTime, <PlayerNickName>k__BackingField, <HasNewTargetMovePosition>k__BackingField, <TargetMovePosition>k__BackingField, <AttackPressed>k__BackingField, <RepairPressed>k__BackingField, <CancelAttackPressed>k__BackingField, <BaseRocketAttackPressed>k__BackingField, <SpeedStoneKeyPressed>k__BackingField, <SlowRocketAttackPressed>k__BackingField, <TortugaLightPressed>k__BackingField, <LockCameraPressed>k__BackingField, <ForceAttackTriggered>k__BackingField, <ChangeMapPressed>k__BackingField, <AbilityPressed>k__BackingField, <AbilityType>k__BackingField, _currentTarget, OnTargetChanged, _mainCamera, _isInputBlocked, _results
+  Methods: get_Instance, set_Instance, get_PlayerNickName, set_PlayerNickName, get_HasNewTargetMovePosition, set_HasNewTargetMovePosition, get_TargetMovePosition, set_TargetMovePosition, get_CurrentTargetId, get_AttackPressed, set_AttackPressed, get_RepairPressed, set_RepairPressed, get_CancelAttackPressed, set_CancelAttackPressed, get_BaseRocketAttackPressed, set_BaseRocketAttackPressed, get_SpeedStoneKeyPressed, set_SpeedStoneKeyPressed, get_SlowRocketAttackPressed, set_SlowRocketAttackPressed, get_TortugaLightPressed, set_TortugaLightPressed, get_LockCameraPressed, set_LockCameraPressed, get_ForceAttackTriggered, set_ForceAttackTriggered, get_ChangeMapPressed, set_ChangeMapPressed, get_AbilityPressed, set_AbilityPressed, get_AbilityType, set_AbilityType, add_OnTargetChanged, remove_OnTargetChanged, OverrideCameraLockPressed, OverrideAttackInput, OverrideCancelAttackInput, OverrideBaseRocketInput, OverrideSpeedStoneInput, OverrideSlowRocketInput, OverrideRepairPressed, OverrideFastBarPressed, Awake, FixedUpdate, LateUpdate, SetInputBlocked, ReadInput, AutoTargetPlayer, AutoTargetNpc, SetNewTarget, ReadInputClick, HandleLeftClickInput, HandleRightClickInput, OnTargetBecomeUnreachable, ResetMoveInputOnMapChanged, ResetInput, HandleOldTarget, OverrideTargetMovementInput, SetPlayerName, .ctor
+
+[08] #3406 Code.Core.PlayerInventory.PlayerInventory
+  Fields: _allWeapons, _currentShipEquipment, OnShipEquipmentChanged, OnAssistantsEquipmentChanged, NewWeaponsAvailableOnStorage, PlayerPacksData, CastlesStorage
+  Methods: get_AllWeapons, get_CurrentShipEquipment, add_OnShipEquipmentChanged, remove_OnShipEquipmentChanged, add_OnAssistantsEquipmentChanged, remove_OnAssistantsEquipmentChanged, add_NewWeaponsAvailableOnStorage, remove_NewWeaponsAvailableOnStorage, .ctor, AddWeapons, RemoveWeaponsByType, SetCurrentEquipment, UpdateWeaponsInventory, UpdatePurchasedPacks, UpdateCannonCountAfterPurchaseShipOrDeck, AddNewShipImprovement, AddNewCastle, RemoveCastle, UpdateWeaponEquippedList
+
+[08] #3416 Code.Core.PlayerInventory.ShipEquipment
+  Fields: _weaponsEquipped, _improvementsEquipped, _equippedCastles, _shipDeckData, _shipClassId, <ShipMaxCannons>k__BackingField
+  Methods: get_WeaponsEquipped, get_ImprovementsEquipped, get_EquippedCastles, get_ShipClassId, get_ShipMaxCannons, set_ShipMaxCannons, get_CurrentDeckData, .ctor, .ctor, SetMaxCannons, SetImprovements, SetWeaponsEquipped, RemoveWeaponsByType
+
+[08] #3593 Code.Core.Ship.Health.ShipHealth
+  Fields: _changeDetector, _MaxHealth, maxxx, _CurrentHealth, _attackersDamage, _onDeadAction, <LastHitTick>k__BackingField, <LastAttackerId>k__BackingField, <LastCustomAttackerId>k__BackingField, _isInitialized, _isAlive, _timerToResetDamagerInfo, _timerBeforeRepair, _autoClearDamageReceivedList, _consumableProvider, _shipController, OnDied, OnDieServerEvent, OnHealthChanged, OnDamageReceived, _weapons, _unit, _eliteLevelHealthBonus, _dodgeChance, _defenseBonus, _temporaryDefenseBonus, _criticDefenseBonus, _criticalEvasionBonus
+  Methods: get_MaxHealth, set_MaxHealth, get_CurrentHealth, set_CurrentHealth, get_LastHitTick, set_LastHitTick, get_LastAttackerId, set_LastAttackerId, get_LastCustomAttackerId, set_LastCustomAttackerId, get_AbleToRepair, get_IsAlive, add_OnDied, remove_OnDied, add_OnDieServerEvent, remove_OnDieServerEvent, get_OwnerId, add_OnHealthChanged, remove_OnHealthChanged, add_OnDamageReceived, remove_OnDamageReceived, Spawned, Render, AddHealthBonus, TrySetInitHealth, SetItemProviders, Configure, FixedUpdateNetwork, CurrentHealthChanged, Heal, ExternalDamage, ApplyCannonDamage, ApplyDamage, CheckIsAlive, AddDamageToList, GetDamageList, AddEliteBonus, ResetDefenseBonus, AddDodgeBonus, AddDefenseBonus, AddTemporaryDefenseBonus, AddCriticalDefenseBonus, SetIsAlive, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[08] #3618 Code.Core.Ship.NPC.NpcShip
+  Fields: _randomPointInterval, _chestSpawner, _npcName, _isAggressive, _playerLayerMask, _detectRange, _maxChaseRange, __maxRangeToAttack, _isServer, _movePointsGiver, _nextPointTimer, _currentTargetMovementPosition, _playerDetector, _isChasingPlayer, _currentTarget, _lookingForNewTargetTimer, __currentChasingTargetId, _oldChasingTargetId, _lastChaseTime, _changeDetector, _interestedPlayers
+  Methods: get__maxRangeToAttack, set__maxRangeToAttack, get_CustomOwnerId, get_IsPlayer, get__currentChasingTargetId, set__currentChasingTargetId, MakeAggressive, ConfigureNpc, Spawned, Despawned, DoDieStuff, Render, FixedUpdate, FixedUpdateNetwork, HandleBehaviour, ChasePlayer, ReactToPlayerAttack, StartChasing, HandleOldTarget, StopChasing, DoMoveInPoints, NextPointReached, GetNewMoveDirection, get__interestedCount, InterestEnter, InterestExit, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[08] #3563 Code.Core.Ship.Ship_Fx.ShipVisualEffects
+  Fields: _movementTrail, _shipWeaponsEffects, _levelUpFx, _tortugaLightFx, _freezingFx, _repairAudioSource, _repairParticles, _damageEffects, _healthPctToShowDamageEffects, _damageObjects, _normalHealthRenderers, _normalHealthObjects, _healthPctToShowDestroyedObjects, _hitEffectPrefab, _hitEffectPosition, _hasRandomOffset, _deathEffectPrefab, _destroyEffectPosition, _fireAudioSource, _rocketOneAudioSource, _deadAudio, _chestPickAudioSource, _levelUpAudioSource, _audioDistanceVolume, _isLocalShip, _shipHealth, _repairModule, _movementComponent, _visibility, _shipVisuals, _lastCurrentSpeed, _shipIsAlmostDestroyed, ShootVisualDelayInMilliseconds, ElmoFireVisualDelayInMilliseconds, RocketVisualDelayInMilliseconds
+  Methods: EffectsOff, Awake, FixedUpdate, CheckFreezing, OnDestroy, OnShipDamaged, ShowHitEffect, ShowDeadEffect, Configure, LevelUp, LaunchProjectiles, GetVolumeFromDistance, ShowBoxEffect, .ctor, .cctor
+
+[08] #2759 Code.Demo.UI.ShopUI.UICurrentCannonsEquipmentPanel
+  Fields: _cannonInventoryRowPrefab, _storageContainer, _onShipContainer, _cannonsText, _canvasGroup, _autoEquipButton, _messageBox, _weaponsInfo, _itemSprites, _isInitialized, _localPlayerInventory, _onStorageRows, _onShipRows, _cannonCount, _shipCatalogList, _equipmentActionsViewModel, _equipByAmountPanel
+  Methods: Awake, Configure, Clear, UpdateView, TryAutoEquip, OnRemoveWeaponTypeClicked, OnEquipWeaponTypeClicked, TryEquipBeams, Show, UpdateMaxCannonsText, Hide, .ctor, <UpdateView>b__19_0
+
+[08] #3125 Code.Networking.ServerStuff.Arena.CustomBaseMatch
+  Fields: _teams, _map, _changeDetector, <TestName>k__BackingField, _InitMatchTimer, _CloseMatchTimer, _MaxDurationTimer, _WinnerTeamName, _PlayersStatsOnMatch, _playersOnCustomMap, _maxDurationTimeInSeconds, _initBattleTimeInSeconds, _allPlayersId, <MatchIsBusy>k__BackingField, _matchIsEnded
+  Methods: Spawned, Render, get_BattleGroundType, get_TestName, set_TestName, get_InitMatchTimer, set_InitMatchTimer, get_CloseMatchTimer, set_CloseMatchTimer, get_MaxDurationTimer, set_MaxDurationTimer, get_WinnerTeamName, set_WinnerTeamName, get_PlayersStatsOnMatch, OnMatchMembersStatsUpdated, MatchMembersStatsUpdated, get_MatchIsBusy, set_MatchIsBusy, Configure, InitMatch, InitMatch, ResetTeams, FixedUpdateNetwork, CheckForStartBattleTimer, CheckForMaxDurationTimer, MatchEndByDuration, FinishBattle, CheckForCloseMatchTimer, ServerTick, OnInitMatch, StartBattle, CloseMatch, DoFinishBattleActions, UnlockMovementOnTeams, LockMovementOnTeams, UnregisterShipsEventsOnTeams, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[08] #3131 Code.Networking.ServerStuff.Arena.MatchTeam
+  Fields: _teamSpots, _maxMemberCount, _usePlayerIdAsName, _map, <TestName>k__BackingField, _isActiveOnMatch, _respawnActive, _respawnDelay, OnTeamShipRespawned, _playersData, _playersShips, _playersAlive, _currentMembers, OnAllMembersDied, <TeamIndex>k__BackingField
+  Methods: get_TestName, set_TestName, get_IsActiveOnMatch, Configure, ConfigureRespawnConfig, get_TeamMembersData, get_PlayersInTeam, get_PlayerShips, get_CurrentMembers, get_MaxMembers, get_TeamIndex, set_TeamIndex, DoReset, UnlockMovement, LockMovement, AddPlayerShipToTeam, RespawnPlayerShip, OnShipRespawned, AddMemberTeamOnMatch, SetTeamName, OnDamageReceived, OnPlayerShoot, OnPlayerDead, UnregisterShipEvents, BackPlayersToNormalZone, GetListOfMemberStats, GetPlayerStats, GetTeamDamage, .ctor
+
+[08] #3115 Code.Networking.ServerStuff.MapServer.WorldRewardsGiver
+  Fields: _shipRewards, _networkRunner, _serverPlayerCurrenciesHandler, _playersEquipmentHandler, _demoRewardConverter, _playersKillCounter, _random, GiveToTopDamager, GiveToRandomAttacker, DesignChanceMap, AdmiralJackJackDesigns, AdmiralInfernoDesigns, AdmiralSwashEventDesigns, DesignMap, _eventSpecialLastHitPointsPerNpc, _eventNpcIds, MAX_KILL_COUNT
+  Methods: GameUnitDestroyed, GetRandomDesign, SendRpcToPlayer, GiveSingleRewardsToPlayer, GetPlayerBonus, CheckValidKillForLevels, CheckValidKillForPvpPoint, AddRewardsFromChest, PlayerBoughtShip, AddElitePoints, AddDamageStatistics, .ctor, .cctor
+
+[07] #1989 <>c__DisplayClass29_0
+  Fields: <>4__this, t, maxCannonsKey, deckDataKey, shipImprovementsKey, shipEquipmentDataKey, castlesStorageKey, user, lastMapAndShipKey, shipClassIdKey, currentQuestsProgressKey, currentQuestsInProgressKey, doneQuestsKey, levelKey, rankIndexKey
+  Methods: .ctor, <TestLoginXD>b__0, <TestLoginXD>b__1, <TestLoginXD>b__2
+
+[07] #3576 <SpawnPlayerShip>d__105
+  Fields: <>1__state, <>t__builder, <>4__this, playerId, displayName, playerRef, shipCharacterId, shipClassId, shipSkin, visualId, currentMap, <>8__1, initHealth, lastDesignBonusId, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[07] #2000 PlayerProfileData
+  Fields: PlayerID, Username, <Nickname>k__BackingField, AvatarURL, PlayerTitleId, CreatedAt, <VipUntil>k__BackingField, LastBadgeId, HasVipFeature, <EmailContact>k__BackingField, <PlayerGuildId>k__BackingField, <PlayerGuildTag>k__BackingField, <PlayerInventory>k__BackingField, <PlayerStatisticsAndCurrencies>k__BackingField, <PlayerShips>k__BackingField, <PlayerOwnedDesigns>k__BackingField, <PlayerOwnedBadges>k__BackingField, <FavoriteDesigns>k__BackingField, <PlayerShipSkins>k__BackingField, <LastPlayerMap>k__BackingField, <LastShipClassId>k__BackingField, <LastShipSkinId>k__BackingField, <LastVisualObjectId>k__BackingField, <PlayerLevel>k__BackingField, <PlayerRankIndex>k__BackingField, <QuestsData>k__BackingField
+  Methods: get_Nickname, set_Nickname, get_VipUntil, set_VipUntil, get_EmailContact, set_EmailContact, get_PlayerGuildId, set_PlayerGuildId, get_PlayerGuildTag, set_PlayerGuildTag, get_PlayerInventory, set_PlayerInventory, get_PlayerStatisticsAndCurrencies, set_PlayerStatisticsAndCurrencies, get_PlayerShips, set_PlayerShips, get_PlayerOwnedDesigns, set_PlayerOwnedDesigns, get_PlayerOwnedBadges, set_PlayerOwnedBadges, get_FavoriteDesigns, set_FavoriteDesigns, get_PlayerShipSkins, set_PlayerShipSkins, get_LastPlayerMap, set_LastPlayerMap, get_LastShipClassId, set_LastShipClassId, get_LastShipSkinId, set_LastShipSkinId, get_LastVisualObjectId, set_LastVisualObjectId, get_PlayerLevel, set_PlayerLevel, get_PlayerRankIndex, set_PlayerRankIndex, get_QuestsData, set_QuestsData, .ctor, .ctor, SetLastBadgeId, SetVipEndDate, SetVipFeature, HasEnoughCurrency, HasDesign, SetPlayerOwnedDesigns, SetPlayerOwnedBadges, SetPlayerQuestData, SetPlayerShipsAndSkins, UpdatePlayerShipsAndSkins, SetLastMapAndShip, SetPlayerCurrenciesAndStatistics, SetPlayerGuildId, SetPlayerGuildTag, SetLocalInventory, SetPlayerLevelAndRankIndex, UpdateContactEmail, UpdateDisplayName, SetLastPlayerShip
+
+[07] #3588 Code.Core.Ship.Player.ShipInputNetworked
+  Fields: _shipNetworkInputData, _oldTargetPosition, _targetPosition, _attackPressed, _forceAttackTriggered, _cancelAttackPressed, _repairPressed, _shouldSendInput, _path, _hasPath, _currentPathIndex, IsInitialized, _TESTLIST, _abilityPressed, _abilityType
+  Methods: Render, Spawned, Despawned, OnReliableDataProgress, OnInput, TryGetNextPathIndex, Update, OnInputMissing, OnConnectedToServer, OnShutdown, OnDisconnectedFromServer, OnObjectExitAOI, OnObjectEnterAOI, OnPlayerJoined, OnPlayerLeft, OnDisconnectedFromServer, OnConnectRequest, OnConnectFailed, OnUserSimulationMessage, OnReliableDataReceived, OnSessionListUpdated, OnCustomAuthenticationResponse, OnHostMigration, OnReliableDataReceived, OnSceneLoadDone, OnSceneLoadStart, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[07] #2922 Code.Demo.ShipSelection.UIShipSelector
+  Fields: _uiAutoShipEquipperTransition, _autoEquipButton, _uiShowShipStats, _previousButton, _nextButton, _selectedShipText, _skinSelectorObject, _previousSkinButton, _nextSkinButton, _skinNameText, _selectShipButton, _leavePortButton, _showShipInfo, _ships, _currentShipSelected, _currentShipSelectedVisibleIndex, _currentSkinSelectedIndex, _demoFastShop, _buyPanel, _buyShipButton, _logText, _localInventory, _playerStatistics, _playerShips, _playerSkins, _shipSkinsPrices, _clientShop, _shipsData, _firstSelect
+  Methods: Configure, CanEquipWeapons, Awake, Start, EnableColorsToCurrentShip, TryBuyShipOrSkin, AddShipToPlayerShipList, SetShipVisible, ShowNextShip, ShowNextSkin, SelectShipForPlayer, AutoEquipWeapons, OnlyAutoEquipShipWeapons, TryLeftPort, Process, ForceSelectShipOnJoinedServer, GetSelectedShipCharacterId, .ctor, <Awake>b__32_0, <Awake>b__32_1, <Awake>b__32_2, <Awake>b__32_3
+
+[07] #2748 Code.Demo.UI.ShopUI.EquipmentActionsViewModel
+  Fields: _localPlayerInventory
+  Methods: .ctor, TryAutoEquip, AutoEquipWeapons, TryRemoveCannons, TryEquipBeamsByAmount, TryEquipWeaponsFromType
+
+[07] #2833 Code.Demo.UI.ShopUI.UIShowCurrentEquipmentCannons
+  Fields: _inventoryItemRowPrefab, _headerRowPrefab, _onShipCountLocalizationKey, _cannonsContainer, _onShipText, _equippedOnShipText, _onStorageText, _improvementsText, _weaponsInfo, _localPlayerInventory, _isInitialized
+  Methods: Configure, Awake, UpdateCurrentEquipment, .ctor, <UpdateCurrentEquipment>b__13_0
+
+[07] #2967 Code.Networking.AOI.VisibilityCullingTest
+  Fields: _alwaysVisible, _checkTransform, _shipRenderer, _shipUIContainer, _uiShipInGame, _worldUIFader, _visuals, _minimapIndicator, _maxRange, _sqrMaxRange, <SqrDistance>k__BackingField, _lastOutVisibilityCheck, _ticksThreshold, _offTicks, _isInSimulation, _joinAoiOffset, _inSimulationTimer, _firstShowOrHide, _cullingON, _isInvisibilityEnabled, LastServerTick, <IsInsideVisibleArea>k__BackingField, ShipExitSimulation
+  Methods: get_MaxSqrDistance, get_SqrDistance, set_SqrDistance, get_IsInsideVisibleArea, set_IsInsideVisibleArea, add_ShipExitSimulation, remove_ShipExitSimulation, Spawned, Despawned, Render, SetCullingOff, UpdateInvisibility, Awake, FixedUpdate, FixedUpdateNetwork, CheckSimulationAndVisibility, CheckSimulationAndVisibilityWithNetworkedProperty, HandleVisibility, CheckShipInSimulation, IsInAreaSimulation, OutOfVisibilityRange, SimulationEnter, SimulationExit, InterestEnter, InterestExit, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[07] #3016 Code.Networking.ServerStuff.PlayersEquipmentHandler
+  Fields: _playersInventory, _playersShipsLastHealth
+  Methods: get_AllPlayersInventory, .ctor, GetPlayerShipLastHealth, SetPlayerShipLastHealth, AddNewPlayerShip, GetPlayerCurrentInventory, RemovePlayerEquipment, SetPlayerEquipment
+
+[07] #3116 Code.Networking.ServerStuff.Arena.PlayerDataBeforeBattleGround
+  Fields: PlayerShip, LastMap, WasInsidePort, LastPosition, LastHealthAmount
+  Methods: .ctor
+
+[07] #3137 Code.Networking.ServerStuff.Arena.ThunderBallBattleGroundHandler
+  Fields: _thunderBallMaps, _battleGroundMatchMaking, _serverPlayerCurrenciesHandler, _serverCurrenciesUpdater, _rpcServerConfirmShipEnterCustomMatchMap, _afkPlayers
+  Methods: .ctor, IsPlayerAfk, GiveRewards, GiveBattleGroundRewards, GetDamageRankBonus, MatchPlayersAndStartThunderBall
+
+[06] #3108 <OnNpcDied>d__35
+  Fields: <>1__state, <>t__builder, <>4__this, npcShip, npcConfig, map, respawnDelayInSeconds, npcDropTableId, zone, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[06] #3095 <OnPlayerJoinedToWorld>d__52
+  Fields: <>1__state, <>t__builder, playerRef, playerData, <>4__this, <guildId>5__2, <lastMap>5__3, <playerTitleId>5__4, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[06] #2570 <SetLocalShipFromNetwork>d__48
+  Fields: <>1__state, <>t__builder, <>4__this, spawnedPlayerShip
+  Methods: MoveNext, SetStateMachine
+
+[06] #2050 PlayfabGameData
+  Fields: _instance, maps, npcs, ships, rewardsNpcs, <GameDeckPrices>k__BackingField, <CastlesData>k__BackingField, <CastlesMapping>k__BackingField, <AvailableCastles>k__BackingField, <GameDeckStats>k__BackingField, <IdToRewards>k__BackingField, <DesignImprovements>k__BackingField, <IdToNpc>k__BackingField, <AllConsumableIds>k__BackingField, <IdToShipConfig>k__BackingField, <IdToShipSkinConfig>k__BackingField, <AdmiralSpawnConfig>k__BackingField, <MapsConfig>k__BackingField, <IdToTowerConfig>k__BackingField, <ServerIslandsData>k__BackingField, <CustomDropTables>k__BackingField
+  Methods: get_GameDeckPrices, set_GameDeckPrices, get_CastlesData, set_CastlesData, get_CastlesMapping, set_CastlesMapping, get_AvailableCastles, set_AvailableCastles, get_GameDeckStats, set_GameDeckStats, get_IdToRewards, set_IdToRewards, get_DesignImprovements, set_DesignImprovements, get_IdToNpc, set_IdToNpc, get_AllConsumableIds, set_AllConsumableIds, get_IdToShipConfig, set_IdToShipConfig, get_IdToShipSkinConfig, set_IdToShipSkinConfig, get_AdmiralSpawnConfig, set_AdmiralSpawnConfig, get_MapsConfig, set_MapsConfig, get_IdToTowerConfig, set_IdToTowerConfig, get_ServerIslandsData, set_ServerIslandsData, get_CustomDropTables, set_CustomDropTables, Awake, initializeGameDataMaps, initializeGameDataNpcs, initializeGameDataShips, InitializeGameDataRewards, InitializeDesignImprovements, InitializeDeckStats, InitializeDeckPrices, InitializeCastlesData, InitializeCastleImprovementList, InitializeAvailableCastlesLIst, .ctor
+
+[06] #3143 Code.Core.ITargetable
+  Fields: -
+  Methods: get_Name, get_Level, get_GuildTag, get_MyId, get_UnitClassId, get_GameObject, get_Transform, get_VisualReticle, get_Health, get_CanBeTargetable, add_OnBecomeUnreachable, remove_OnBecomeUnreachable, get_IsPlayer, get_VisualId, get_SkinId, get_TeamName, get_IsProtected
+
+[06] #3417 Code.Core.PlayerInventory.ShipEquipmentDto
+  Fields: WeaponsEquipped, ImprovementsEquipped, DeckData, ShipMaxCannons
+  Methods: .ctor
+
+[06] #3520 Code.Core.Ship.MovementComponent
+  Fields: _baseMovementSpeed, _rotationSpeed, MAX_SHIP_SPEED, _activeBuffs, _activeDebuffs, _oldMovementSpeed, _maxMovementSpeed, _maxSpeedBonus, _currentDesiredSpeed, <CurrentNormalSpeed>k__BackingField, _CurrentNetworkedFinalSpeed, _sailIntegrity, _hasBrokenSailBonus, _movementLocked, _shipFreezed, _freezedTimer
+  Methods: get_CurrentNormalSpeed, set_CurrentNormalSpeed, get_CurrentNetworkedFinalSpeed, set_CurrentNetworkedFinalSpeed, TickMovement, SetNewTargetPosition, ResetMovement, GetBuffMultiplier, GetDebuffMultiplier, GetFinalSpeed, LockMovement, UnlockMovement, SpeedUp, FixedUpdateNetwork, FreezeMovement, BoostSpeed, RemoveBoost, IncreaseMaxSpeed, IncreaseCurrentSpeed, AddSpeedImprovement, Configure, SetSailIntegrity, OverrideLookDirection, SetBrokenSailBonus, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[06] #3611 Code.Core.Ship.NPC.IslandConquestEnterDetection
+  Fields: _enabled, _guildIslandController
+  Methods: Configure, OnTriggerEnter, OnTriggerExit, .ctor
+
+[06] #3615 Code.Core.Ship.NPC.NpcWaveSpawner
+  Fields: _config, _hpPctToSpawn, _shipController, _wavesSpawned, _spawnCallback, _map
+  Methods: Configure, OwnerDamageReceived, SpawnWaves, .ctor
+
+[06] #3620 Code.Core.Ship.NPC.TowerController
+  Fields: _playerLayerMask, _detectRange, <TowerStatus>k__BackingField, _playerDetector, _lookingForNewTargetTimer, _isAttackingPlayer, _currentTarget, _hasTowerBeenUpdated
+  Methods: get_CustomOwnerId, get_IsPlayer, get_TowerStatus, set_TowerStatus, ChangeTowerStatus, HasTowerBeenUpdated, ConfigureTower, Despawned, Spawned, OnTowerHealtChanged, FixedUpdateNetwork, HandleAttack, StartAttacking, CancelAttack, HandleOldTarget, .ctor, <Spawned>b__19_0, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[06] #3571 Code.Core.Ship.Player.PlayerAbilitiesController
+  Fields: _myShip, _changeDetector, _lastInputAuth, _CurrentAbilitiesCooldown, _MyCurrentShip, <AddedAbilitiesCooldown>k__BackingField, <RemovedAbilitiesCooldown>k__BackingField, _consumableItemsProvider, _currentAbilityTypeInUse, _firstAbilitiesChange, _oldSnapshot
+  Methods: get_CurrentAbilitiesCooldown, get_MyCurrentShip, set_MyCurrentShip, get_AddedAbilitiesCooldown, set_AddedAbilitiesCooldown, get_RemovedAbilitiesCooldown, set_RemovedAbilitiesCooldown, Spawned, Render, SetConsumableProvider, OnAbilityCooldownChanged, AbilitiesCooldownListChanged, ClearAddedAndRemovedAbilitiesList, MyShipChanged, SetToPlayer, Configure, CheckSinkOrLogoutEndAbilities, CheckForInputAuth, FixedUpdateNetwork, CheckAbilitiesTimers, CanUseAbility, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[06] #3566 Code.Core.Ship.Ship_Fx.ShipWeaponsEffects
+  Fields: _attackPrefabxD, _flaresAmmoPrefab, _fireAmmoPrefab, _fire2AmmoPrefab, _plasmaAmmoPrefab, _iceAmmoPrefab, _krakenAmmoPrefab, _pyroAmmoPrefab, _pumpkinAmmoPrefab, _soccerAmmoPrefab, _goldSoccerAmmoPrefab, _confettiAmmoPrefab, _rocketPrefab, _elmoFirPrefab, _rightBroadsideFirePoints, _leftBroadsideFirePoints, _cannonFireEffectPrefab, _effectsContainer, _showCannonFxs, _yPositionForProjectiles, _mode
+  Methods: LaunchRocketTest, LaunchProjectiles, ShowFireEffects, FireBroadSideEffects, OnDisable, .ctor
+
+[06] #3544 Code.Core.Ship.Weapons.NetworkDamageInfo
+  Fields: Tick, Damage, TargetId, IsCritic, ShotBuffType, ShotEffectType, DamageType, CauseDestruction, ProjectileCount
+  Methods: Equals, GetHashCode, Equals
+
+[06] #2577 Code.Demo.LocalSimulationRewards
+  Fields: _rewards, _playerStatisticsAndCurrencies, _playerInventory, _demoRewardConverter, _eventNpcIds, _playerNetworkObject
+  Methods: .ctor, AddElitePoints, AddCurrency, AddStatistic, AddRewardsFromChest, AddLocalDamageDone, GetPlayerBonus, GameUnitDestroyed, AddSplitReward, AddGameRewards, AddRewardsFromQuest, AddItemFromAuction, AddServerPvpKillConfirmed, SetPlayerNetworkObject
+
+[06] #2700 Code.Demo.UI.Panels.MenuViewType
+  Fields: value__, Default, Shop, Inventory, Ranking, Guild, Battleground, Settings, Quests, Profile
+  Methods: -
+
+[06] #2663 Code.Demo.UI.ShipSelection.UIEliteSelection
+  Fields: _testChangeEliteDesign, _designSelectionCardPrefab, _scrollRect, _eliteContainer, _customDesignsContainer, _skinShopContainer, _favoriteDesignsContainer, _customDesigns, _showElitesButton, _showCustomDesignsButton, _showSkinShop, _showFavoriteDesignsButton, _eliteBonusText, _designBonusText, _visualDesignText, _textTooltip, _messageBox, _eliteSelectionCards, _customDesignCards, _favoriteDesignCards, _playerDesigns, _playerDesignsSubscription, _designImprovementsService, _currentDesignId, _favoriteDesignsService
+  Methods: Awake, ShowSkinShop, ShowEliteSelectionCards, ShowCustomDesignCards, ShowFavoriteDesignCards, Initialize, UpdateDesignBonusText, UpdateVisualDesignText, UpdateEliteBonusText, SpawnDesignCard, OnPlayerDesignsChanged, ChangeEliteDesign, RefreshFavoriteIcon, TryAddOrRemoveFavorite, ChangeBonusDesign, ChangeEliteLevelDesign, SetPlayerStatistics, EliteLevelUpdated, .ctor
+
+[06] #2959 Code.Networking.FusionLauncher
+  Fields: _networkRunner, _connectionCallback, _status
+  Methods: SetConnectionStatus, LaunchServer, Launch, WorldInitialized, OnConnectedToServer, OnDisconnectedFromServer, OnObjectExitAOI, OnObjectEnterAOI, OnPlayerJoined, OnPlayerLeft, OnDisconnectedFromServer, OnConnectRequest, OnConnectFailed, OnReliableDataProgress, OnInput, OnInputMissing, OnUserSimulationMessage, OnReliableDataReceived, OnSessionListUpdated, OnCustomAuthenticationResponse, OnHostMigration, OnReliableDataReceived, OnSceneLoadStart, OnSceneLoadDone, OnShutdown, .ctor
+
+[06] #3005 Code.Networking.ServerStuff.ButhuBattleGroundHandler
+  Fields: _buthuMaps, _battleGroundMatchMaking, _serverPlayerCurrenciesHandler, _serverCurrenciesUpdater, _rpcServerConfirmShipEnterCustomMatchMap
+  Methods: .ctor, GiveRewards, MatchPlayersAndStartButhu
+
+[06] #3060 Code.Networking.ServerStuff.SpawnPointsGiver
+  Fields: _movePoints, _playerSpawnPoints, MapName
+  Methods: GetAllPoints, get_ZoneCount, Awake, GetSpawnPointForPlayerShip, GetRandomChestPoint, GetRandomPointByParity, GetRandomPoint, GetNextPoint, CheckSpawnPointsPos, .ctor
+
+[06] #3067 Code.Networking.ServerStuff.WorldMapSpawnerTestOld
+  Fields: _npcsConfigToSpawn, _chestPrefab, _amountOfChests, _towerPrefab, _towers, _npcSpawnPoints, _chestSpawnPoints, _npcShips, _worldChests, _networkRunner
+  Methods: Start, OnDestroy, Initialize, InitializeMap, SpawnNpcs, SpawnNpc, ReAddNpc, OnNpcDied, RePopulateNpcCoroutine, SpawnChests, SpawnWorldChest, OnChestPicked, SpawnTowers, Process, .ctor, <SpawnWorldChest>g__OnBeforeSpawned|21_0
+
+[06] #3111 Code.Networking.ServerStuff.MapServer.WorldMapNpcSpawner
+  Fields: _networkRunner, _basePrefab, _npcDictionary, _worldRewards, _mapDropRewards, _spawnedNpcs, _mapNpcList, _worldAdmiralHandler, _ghostKiliTickTimer, _goldenKiliTickTimer, _icePearlGroupTickTimer, _random, _ghostKiliId, _goldenKiliId, _icePearlAdmiralId, _admiralList, _npcToAddWaves
+  Methods: get_SpawnedNpcs, .ctor, KillAllNpcsFromMap, KillAllAdmirals, HandleTick, ResetAdmiralCount, SpawnMapNpcs, SpawnAdmiralInPosition, SpawnAdmiral, SpawnAdmiralAtPosition, SpawnCustomAggressiveNpc, GetZoneForGlobalIndex, GetZoneForIndex, SpawnNpc, AddOnMapList, RemoveFromMapList, DestroyCallback, OnNpcDied, DespawnNpc, RePopulateNpcAsync
+
+[06] #2465 Code.Playfab.Guilds.ClientGuildHandler
+  Fields: IsInitialized, HasGuild, CurrentApplicationGuildId, <LocalPlayerGuildData>k__BackingField, <LocalPlayerTitleId>k__BackingField, LocalPlayerGuildRoleId, CurrentCachedGameGuilds, _localPlayerProfileData, LocalPlayerGuildUpdated, _firestoreGuildService
+  Methods: get_LocalPlayerGuildData, set_LocalPlayerGuildData, get_LocalPlayerTitleId, set_LocalPlayerTitleId, add_LocalPlayerGuildUpdated, remove_LocalPlayerGuildUpdated, Configure, Init, UpdateStuff, UpdateNoGuildStuff, UpdatePlayerGuildStuff, GetCurrentPlayerGuild, UpdateCurrentGuildApplications, GetPlayerApplicationGuildId, GetAllGuilds, CreateGuild, LeaveGuild, SetGuildToNone, ApplyToGuild, CancelMyCurrentApplication, RejectMemberApplication, TransferLead, UpgradeMemberToAdmin, DowngradeAdminToMember, TryAddOrRemoveEnemy, TryAddOrRemoveAlly, AcceptMemberOnGuild, RemoveMemberFromGuild, GetCurrentAppliedGuildInfo, GetCachedApplications, GetCurrentGuildApplications, GetGuildList, UpdateMyCurrentGuild, SetLocalPlayerData, HasAdminPermissions, UpdateLocalPlayerRole, .cctor
+
+[06] #2395 Code.Playfab.PlayfabClient.PlayFabClientEconomy
+  Fields: ShipsCatalogVersion, CannonsCatalogVersion
+  Methods: GetWeaponsCatalog, GetWeaponsInfo, GetAllShipsFromCatalog, GetAllRealMoneyItems, GetStoreItems, GetCatalogItems, GetCatalogItems, GetAllPlayerCharactersType, BuyShipSkin, BuyShip, BuyWeapons, GetShipEquipment, Test, TryEquipWeaponsByTypeAndAmount, TryEquipWeaponsByType, TryRemoveWeaponsByType, GetPlayerCurrentMaxCannons, AutoEquipShipWeapons, BuySeafightShipDeck, BuyShipDeck, BuyItemFromStore, BuyShipImprovement, GetShipSkinsPrices
+
+[05] #3082 <<SpawnServerNetworkObject>g__InitNetworkState|0>d
+  Fields: <>1__state, <>t__builder, <>4__this, networkObject, networkRunner, <serverIslandsNetworkObject>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #1988 <<TestLoginXD>b__0>d
+  Fields: <>1__state, <>t__builder, <>4__this, res, <>8__1, <data>5__2, <helper>5__3, <playerTitleId>5__4, <profileData>5__5, <favoriteDesigns>5__6, <firestoreDb>5__7, <firestorePlayerRepository>5__8, <getVipExpirationDate>5__9, <getBadges>5__10, <getDesigns>5__11, <checkChatBan>5__12, <dailyDoneQuestsFromFirestore>5__13, <getPlayerStatisticV2>5__14, <>u__1, <>u__2, <>u__3, <>u__4
+  Methods: MoveNext, SetStateMachine
+
+[05] #3603 <>c__DisplayClass44_0
+  Fields: towerIndex, initHealth, towerConfig, <>4__this, guildTag
+  Methods: .ctor, <SpawnTower>b__0, <SpawnTower>g__InitNetworkState|1
+
+[05] #3585 <>c__DisplayClass6_0
+  Fields: mapId, playerRef, playerId, playerNickName, map, t
+  Methods: .ctor, <SpawnShip>b__0, <SpawnShip>g__InitNetworkState|2, <SpawnShip>b__3
+
+[05] #3545 <ClientVisualFire>d__94
+  Fields: <>1__state, <>t__builder, <>4__this, <targetNetworkObject>5__2, <damage>5__3, <isCritic>5__4, <destruction>5__5, <usingGunpowder>5__6, <targetUsingShield>5__7, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #2749 <Configure>d__17
+  Fields: <>1__state, <>t__builder, <>4__this, equipmentActionsViewModel, shipList, localPlayerInventory, itemSprites, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #2799 <ConfigureCastleShop>d__37
+  Fields: <>1__state, <>t__builder, playerProfileData, localSimulationRewards, <>4__this, itemStoreService, <viewModel>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #2801 <ConfigureGlobalMapIslands>d__40
+  Fields: <>1__state, <>t__builder, clientIslandController, <>4__this, lastPlayerMap, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #2569 <ConfigureQuests>d__47
+  Fields: <>1__state, <>t__builder, firestoreDb, playerProfileData, playerQuestsData, <>4__this, questRewardsList, npcs, <getDailyQuestConfigs>5__2, <getNormalQuestConfigs>5__3, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #3109 <DespawnNpc>d__36
+  Fields: <>1__state, <>t__builder, <>4__this, npcShip, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #3564 <LaunchProjectiles>d__22
+  Fields: <>1__state, <>t__builder, <>4__this, targetTransform, shotVisualType, projectileCount
+  Methods: MoveNext, SetStateMachine
+
+[05] #3041 <RPC_RequestRemoveCastle>d__95
+  Fields: <>1__state, <>t__builder, rpcInfo, castleItemId, <>4__this, <playerID>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #3022 <RPC_RespawnPlayerShip>d__43
+  Fields: <>1__state, <>t__builder, rpcInfo
+  Methods: MoveNext, SetStateMachine
+
+[05] #3029 <RPC_TryBuildTower>d__55
+  Fields: <>1__state, <>t__builder, rpcInfo, <>4__this, mapName, towerIndex, towerId, <guildId>5__2, <islandsHandler>5__3, <currencyCode>5__4, <amount>5__5, <>u__1, <>u__2, <>u__3
+  Methods: MoveNext, SetStateMachine
+
+[05] #3477 <RequestBuildTower>d__4
+  Fields: <>1__state, <>t__builder, <>4__this, mapName, towerTypeId, islandIndex, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #3578 <RespawnPlayerShip>d__116
+  Fields: <>1__state, <>t__builder, <>4__this, <lastPlayerLevel>5__2, <lastPlayerRank>5__3, <lastPvpRank>5__4, <lastBadgeId>5__5, <hasGunPowderEnable>5__6, <hasShieldEnable>5__7, <lastAmmoId>5__8, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #2566 <SetLocalPlayerData>d__42
+  Fields: <>1__state, <>t__builder, <>4__this, playerProfileData, <firestoreDb>5__2, <guildIslandService>5__3, <clientIslandController>5__4, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[05] #3103 <SpawnAdmiralInPosition>d__24
+  Fields: <>1__state, <>t__builder, <>4__this, admiralIdToSpawn, map, position, <admiralNpcConfig>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #3104 <SpawnCustomAggressiveNpc>d__27
+  Fields: <>1__state, <>t__builder, <>4__this, npcId, map, position, count, <npcList>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #3023 <TeamPlayerShipRespawn>d__44
+  Fields: <>1__state, <>t__builder
+  Methods: MoveNext, SetStateMachine
+
+[05] #3031 <TestServerEquipOnJoin>d__66
+  Fields: <>1__state, <>t__builder, playerRef, <>4__this, <playerCurrentShip>5__2, <playerNetworkObject>5__3, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #3033 <UpdateEquipmentFromDbAndConfigureShipForPlayer>d__68
+  Fields: <>1__state, <>t__builder, playerID, <>4__this, <playerCurrentShip>5__2, <playerNetworkObject>5__3, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #2407 <UpdatePlayerStatusServer>d__1
+  Fields: <>1__state, <>t__builder, guildId, map, playerTitleId, status, <functionName>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[05] #3938 DropRewardType
+  Fields: value__, Gold, Diamond, Gold_Ammo, ExplosivesAmmo, Flares, GunPowder, Shield, BasicRocket, SlowRocket01, SpeedStone01, ArenaBasicCannon, ButhuCannon, ArenaPowerCannon, Snowball, WinterChestKey, FrozenShipDesign, ElitePoints, AP, FrostByteDesign, LunarShip01, GhostEternalDragon, Fireball, Plasma, Kraken, Pyro, FrostByteX, AbaddonDesign, LocustPrototype, Pumpkin, TortugaLight, RedRedemptionX, Privateer, KrakenLight, Handyman, EmergencyRepair, PumpkinSpeed, IronFist, HighSeasBandit, ReloadBoostBasic, Soccer, GoldSoccer, CupChestKey, CountryAlgeria, CountryArgentina, CountryAustralia, CountryAustria, CountryBelgium, CountryBosnia, CountryBrazil, CountryCanada, CountryCapeVerde, CountryColombia, CountryCroatia, CountryCuraçao, CountryCzechRepublic, CountryDRCongo, CountryEcuador, CountryEgypt, CountryEngland, CountryFrance, CountryGermany, CountryGhana, CountryHaiti, CountryIran, CountryIraq, CountryIvoryCoast, CountryJapan, CountryJordan, CountryMexico, CountryMorocco, CountryNetherlands, CountryNewZealand, CountryNorway, CountryPanama, CountryParaguay, CountryPortugal, CountryQatar, CountrySaudiArabia, CountryScotland, CountrySenegal, CountrySouthAfrica, CountrySouthKorea, CountrySpain, CountrySweden, CountrySwitzerland, CountryTunisia, CountryTurkey, CountryUnitedStates, CountryUruguay, CountryUzbekistan, CountryPeru, CountryNewCaledonia, CountryRomanEmpire, CountrySlovakia, CountryPoland, CountryDominicanRepublic, CountryVenezuela, CountryRomania, CountryBulgaria, CountryPalestine, CountryWinner, CountrySilverArg, CountrySilverBelgium, CountrySilverEngland, CountrySilverFrance, CountrySilverMorocco, CountrySilverNorway, CountrySilverSpain, CountrySilverSwitzerland, CountryGoldArgentina, CountryGoldEngland, CountryGoldFrance, CountryGoldSpain, CountryGrecia, CountryItaly, CountryHungary, CountryChile, CountryDinamarca, CountryGuatemala, CountryCostaRica, CountrySilverPeru, RestoreHealth, GreenHellHammer, Confetti
+  Methods: -
+
+[05] #3573 LastShipRespawnInfoData
+  Fields: LastValidPlayerMap, LastPlayerLevel, LastPlayerRank, LastPvpRank, LastInputAuth, LastClassId, LastShipSkin, LastShipVisualId, LastDisplayName, LastShipCharacterId, LastBadgeId, HasGunPowderEnable, HasShieldEnable, LastDesignBonusId
+  Methods: .ctor
+
+[05] #3982 Code.Core.Castles.CastlesShopViewModel
+  Fields: _playerProfileData, OnShipCastlessUpdated, _castleService, _castlesData
+  Methods: get_CatalogName, get_StoreName, .ctor, Init, GetPlayerCastles, GetAvailableCastlesFromStorage, GetCastleCatalogItem, GetCastleListForSlot, OnPostPurchase, GetCastlePrice, GetNextCastlePrice, RemoveCastleAsync, BuyCastleAsync, PlaceCastleAsync
+
+[05] #3472 Code.Core.Leaderboard.UILeaderboardView
+  Fields: _leaderboardRowPrefab, _localPlayerRow, _container, _statisticButtons, _guildsButton, _npcDmgV2Button, _normalColorButton, _selectedColorButton, _eventDropdown, _viewModel, _scoreRows, _allButtons, _currentSelected
+  Methods: Awake, OnEventDropdownValueChanged, PopulateAllButtonsList, Configure, UpdatePLayerScore, UpdateLeaderboardUI, ClearView, ShowError, ShowEventLeaderboard, ShowLeaderboard, ShowDamageNpcV2Leaderboard, ShowGuildLeaderboard, ShowDefaultLeaderboard, ChangeSelectedButton, .ctor
+
+[05] #3441 Code.Core.Map.TestMap
+  Fields: _mapName, _mapPrefix, _requiredLevel, _portOutSpawnPoint, _npcSpawnPoints, _zonesObject, _npcZonesSpawnPoints, _mapIcon, _pvp, _mapSize, _mapCenterPoint, _isNormalMap, _mapGeneralType, _mapReloadPct, <IsMapValidForRespawn>k__BackingField, <HasActiveNpcRespawn>k__BackingField, <MapElitePointsBonusMultiplier>k__BackingField, <MapType>k__BackingField
+  Methods: get_MapCenterPoint, get_MapSize, get_IsMapValidForRespawn, set_IsMapValidForRespawn, get_ZoneCount, get_HasActiveNpcRespawn, set_HasActiveNpcRespawn, get_IsNormalMap, get_MapGeneralType, get_MapReloadPct, Awake, get_NpcSpawnPoints, GetZoneSpawnPoint, get_MapElitePointsBonusMultiplier, set_MapElitePointsBonusMultiplier, ConfigureMap, DisableNpcRespawn, EnableNpcRespawn, get_RequiredLevel, get_MapName, get_MapPrefix, get_PortOutSpawnPoint, get_MapType, set_MapType, get_MapIcon, .ctor
+
+[05] #3516 Code.Core.Ship.DestroyedUnitInfo
+  Fields: UnitClassId, KillerObjectId, KillerCustomId, AttackersDamage, IsPlayerUnit, DestroyedUnitCustomId, DestroyedUnitGuildTag
+  Methods: .ctor
+
+[05] #3533 Code.Core.Ship.ShipMovement
+  Fields: _rotationRoot, _changeDetector, _CurrentNextPosition, _IsMoving, _path, _currentLookDirection, _currentTargetPosition, _currentPathIndex, _hasPathToFollow, _currentTargetTransform, _cachedTransform, _ship
+  Methods: get_CurrentNextPosition, set_CurrentNextPosition, get_IsMoving, set_IsMoving, Spawned, OnNextPositionChanged, GetDirectionMove, OverrideLookDirection, Render, TickMovement, ResetMovement, ResetTargetPositionToZero, SetNewTargetPosition, Awake, MoveShip, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[05] #3589 Code.Core.Ship.Health.AutoRepairShipModule
+  Fields: _myShip, _shipHealth, _shipHp, _outOfBattleRepairBonus, _repairInterval, _repairAmountEachInterval, _isRepairing, _repairTimer, _isOutOfBattle, _ableToRepairUnderAttack
+  Methods: get_IsRepairing, FixedUpdateNetwork, DoRepair, HandleRepairInput, ConfigureAutoRepairModule, .ctor
+
+[05] #3590 Code.Core.Ship.Health.IHealth
+  Fields: -
+  Methods: get_AbleToRepair, get_IsAlive, get_MaxHealth, get_CurrentHealth, ApplyDamage, ApplyCannonDamage, TrySetInitHealth, Heal, ExternalDamage, add_OnDied, remove_OnDied, add_OnHealthChanged, remove_OnHealthChanged, add_OnDamageReceived, remove_OnDamageReceived, add_OnDieServerEvent, remove_OnDieServerEvent, get_OwnerId
+
+[05] #3586 Code.Core.Ship.Player.PlayerShipSpawner
+  Fields: _baseShipPrefab, _limboSpawnPoints, _baseShipConfigs, _playersEquipmentHandler, _baseShipSkinConfigs
+  Methods: .ctor, SpawnShip, ConfigureBaseShip, GetShipSkinSailCount
+
+[05] #3550 Code.Core.Ship.Weapons.PirateStormWeaponCalculator
+  Fields: _weapons, _cannonCount, _averageScatter, _minSuccessProbability, _rnd, _averageDamage, _currentDispersionBonus, <MaxCurrentWeaponRange>k__BackingField, <TypesOfWeaponsEquipped>k__BackingField
+  Methods: AddDamageBonus, get_MaxCurrentWeaponRange, set_MaxCurrentWeaponRange, get_TypesOfWeaponsEquipped, .ctor, CalculateShotFromCannonType, CalculateShot, GetHitChance, SetHitChanceBonus, CalculateShotFromCannonType, SetDispersionBonus
+
+[05] #3553 Code.Core.Ship.Weapons.SfWeaponsCalculator
+  Fields: _weapons, _cannonCount, _rnd, _currentDispersionBonus, _bonusDamagePct, _hitChanceBonus, _temporaryHitChanceBonus, <MaxCurrentWeaponRange>k__BackingField, <TypesOfWeaponsEquipped>k__BackingField
+  Methods: get_MaxCurrentWeaponRange, set_MaxCurrentWeaponRange, get_TypesOfWeaponsEquipped, set_TypesOfWeaponsEquipped, .ctor, CalculateShotFromCannonType, SetDispersionBonus, SetHitChanceBonus, AddTemporaryHitChanceBonus, CalculateShot, GetHitChance
+
+[05] #2564 Code.Demo.PlayerMovementMouse
+  Fields: _rotationRoot, isActived, onMouseOverChat, agent, cameraPlayer, puntero, pos, velocity, path, _CurrentLookForward, _currentPathIndex, _rotationSpeed, _moveSpeed, _limitedTraverseAngle
+  Methods: get_CurrentLookForward, set_CurrentLookForward, SetActiveMovement, Start, Update, Render, FixedUpdateNetwork, MovementMouse, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[05] #2589 Code.Demo.UIBarInputLink
+  Fields: _attackButton, _cancelAttackButton, _repairButton, _lockCameraButton, _autoTargetPlayerButton, _autoTargetNpcButton, _mobileAttackButton, _mobileCancelAttackButton, _mobileRepairButton, _centerCameraButton
+  Methods: Awake, OnMobileCenterCameraPressed, OnBaseRocketButtonPressed, OnLockCameraButtonPressed, OnRepairPressed, OnAttackPressed, OnCancelAttackPressed, .ctor
+
+[05] #2594 Code.Demo.UI.MinimapClickHandler
+  Fields: _wasdCamera, _minimapClickSurfaceRect, _followObject, _isPressing, _wasInsideOnPress, _currentPlayerShip
+  Methods: SetPlayerShip, Update, OnMapClicked, RectTransformToNormalized, .ctor
+
+[05] #2611 Code.Demo.UI.UIDisplayShipWithImages
+  Fields: _nameText, _guildTagText, _rankImage, _pvpRankImage, _hpBars, _initFontSize
+  Methods: Awake, SetColors, UpdateRankIcon, UpdatePvpRankIcon, UpdateBadgeIcon, UpdateHealthBar, DisplayShip, UpdateProtectionFlag, .ctor
+
+[05] #2612 Code.Demo.UI.UIDisplayShipWithRenderer
+  Fields: _nameTextMesh, _guildTagTextMesh, _rankSpriteRenderer, _pvpRankSpriteRenderer, _badgeSpriteRenderer, _hpBarSpriteRenderer, _admiralBarRenderer, _protectionFlagRenderer, _initFontSize
+  Methods: Awake, SetColors, UpdateRankIcon, UpdatePvpRankIcon, UpdateBadgeIcon, UpdateProtectionFlag, UpdateHealthBar, DisplayShip, .ctor
+
+[05] #2595 Code.Demo.UI.UILocalPlayerMinimap
+  Fields: _showCoordinates, _minimapClickHandler, _minimapCameraFrustum, _playerShip, _mapSize
+  Methods: Configure, LateUpdate, .ctor
+
+[05] #2596 Code.Demo.UI.UIMinimapCameraFrustum
+  Fields: _minimap, _cameraViewRect, _mainCamera, _followObject, _offset, _useLateUpdate, _currentPlayerShip
+  Methods: Update, LateUpdate, UpdateCamPos, ShowPlayerPosInMap, SetPlayerShip, .ctor
+
+[05] #2878 Code.Demo.UI.GuildUI.GuildMemberInfoRow
+  Fields: _idText, _nameText, _roleText, _levelText, _lastMapText, _statusImage, _actionsContainer, _removeButton, _updateRoleButton, _transferLeadButton, _updateRoleButtonText, _joinedText, _playerId, _playerRoleId, _removeCallback, _updateRoleCallback, _transferLeadCallback
+  Methods: get_PlayerTitleId, Awake, UpdatePlayerPresence, UpdateMemberInfo, Configure, Clear, OnRemovePressed, OnUpdateRolePressed, OnTransferLeadPressed, .ctor
+
+[05] #2657 Code.Demo.UI.ShipSelection.UIDesignSelectionCard
+  Fields: _canvasGroup, _designNameText, _designImage, _elitePointsText, _bonusText, _selectButton, _selectBonusDesignButton, _favoriteButton, _hpText, _cannonsText, _selectionMouseEvents, _designCountContainer, _designCountText, _normalVaultDesignSprite, _favoriteVaultDesignSprite, _isCustomDesign, _designName, _designVisualId, <DesignId>k__BackingField
+  Methods: get_DesignId, set_DesignId, EnableForPlayer, UpdateCount, MarkAsFavorite, DisableFavoriteButton, Configure, AddDesignBonusStats, .ctor
+
+[05] #2739 Code.Demo.UI.ShopUI.UICannonInventoryRow
+  Fields: _itemImage, _itemNameText, _itemAmountText, _removeButton, _addButton, _itemSprites, _equipmentActionCallback, _itemId, _itemName, <Amount>k__BackingField
+  Methods: get_Amount, set_Amount, get_ItemId, get_ItemName, Awake, EnableAddButton, EnableRemoveButton, AddEquipmentCallbacks, Configure, .ctor, <EnableAddButton>b__18_0, <EnableRemoveButton>b__19_0
+
+[05] #2762 Code.Demo.UI.ShopUI.UICurrentShipAssistantsEquipmentPanel
+  Fields: _cannonInventoryRowPrefab, _storageContainer, _isInitialized, _itemSprites, _onStorageRows, _viewModel, _itemsInfo
+  Methods: Configure, Clear, UpdateView, .ctor
+
+[05] #2796 Code.Demo.UI.ShopUI.UIDemoInventoryPanel
+  Fields: _showCurrentEquipmentCannons, _showCurrentShipImprovements, _shouldUpdate
+  Methods: Configure, ShipEquipmentChanged, UpdateShipEquipment, .ctor
+
+[05] #2780 Code.Demo.UI.ShopUI.UIShipShopCardStats
+  Fields: _hpText, _cannonsText, _speedText
+  Methods: ShowStats, .ctor
+
+[05] #2835 Code.Demo.UI.ShopUI.UIShowCurrentShipImprovements
+  Fields: _inventoryItemRowPrefab, _headerRowPrefab, _container, _localPlayerInventory, _isInitialized, _allItems
+  Methods: Configure, UpdateShipImprovements, Awake, .ctor
+
+[05] #2965 Code.Networking.AOI.SetAreaOfInterest
+  Fields: MapExtents, PortExtents, CurrentExtents, _isOnMap, _firstTime, SourceTransform
+  Methods: Spawned, SetShipOnPort, SetShipOnMap, FixedUpdateNetwork, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[05] #2970 Code.Networking.ServerStuff.ClientIslandController
+  Fields: _guildIslandService, _islandsListener, <AllIslands>k__BackingField, OnIslandsInitialized
+  Methods: get_AllIslands, set_AllIslands, add_OnIslandsInitialized, remove_OnIslandsInitialized, .ctor, Init, OnGuildIslandsChange
+
+[05] #2972 Code.Networking.ServerStuff.GuildIslandMapper
+  Fields: -
+  Methods: ConvertAllIslandsData, ConvertTowerData, ConvertIslandData, .ctor
+
+[05] #2973 Code.Networking.ServerStuff.IGuildIslandMapper
+  Fields: -
+  Methods: ConvertAllIslandsData, ConvertIslandData, ConvertTowerData
+
+[05] #3009 Code.Networking.ServerStuff.ServerArenaNetworkObject
+  Fields: _NextArenaStartTick, _NextButhuStartTick, _NextThunderBallStartTick, _customMatchMaps, _playersOnCustomMatchMaps, _playersRegisteredIn1V1Arena, _playersRegisteredInButhuBattleGround, _playersRegisteredInThunderBall, _thunderBallRegistrationsByIp, _serverPlayerCurrenciesHandler, _serverArenasHandler, _serverButhuBattleGroundHandler, _serverThunderBallBattleGroundHandler, _arenaStartTimer, _buthuBattleGroundStartTimer, _thunderBallBattleGroundTimer
+  Methods: get_NextArenaStartTick, set_NextArenaStartTick, get_NextButhuStartTick, set_NextButhuStartTick, get_NextThunderBallStartTick, set_NextThunderBallStartTick, get_PlayersOnCustomMatchMaps, InitializeServerCustonMatchMaps, FirstArenaTimer, StartArenaTimer, FirstButhuTimer, StartButhuTimer, FirstThunderBallTimer, StartThunderBallTimer, FixedUpdateNetwork, RPC_PlayerRegisterToArena, RPC_PlayerUnRegisterToArena, UnregisterToArena, RPC_PlayerRegisterToButhuBattleGround, RPC_PlayerUnRegisterToButhuBattleGround, UnregisterToButhu, RPC_PlayerRegisterToThunderBall, RPC_PlayerUnRegisterToThunderBallBattleGround, UnregisterToThunderBall, SendDefeatedTeamToNormalZone, ShipEnterCustomMatchMap, RPC_ServerConfirmShipEnterCustomMatchMap, RPC_ConfirmPlayerOutOfBattleGround, PlayerJoinedToServer, PlayerJoined, PlayerLeft, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields, RPC_PlayerRegisterToArena@Invoker, RPC_PlayerUnRegisterToArena@Invoker, RPC_PlayerRegisterToButhuBattleGround@Invoker, RPC_PlayerUnRegisterToButhuBattleGround@Invoker, RPC_PlayerRegisterToThunderBall@Invoker, RPC_PlayerUnRegisterToThunderBallBattleGround@Invoker, RPC_ServerConfirmShipEnterCustomMatchMap@Invoker, RPC_ConfirmPlayerOutOfBattleGround@Invoker
+
+[05] #2975 Code.Networking.ServerStuff.ServerIslandUnderAttackData
+  Fields: GuildTag, Map, UnderAttack
+  Methods: -
+
+[05] #3051 Code.Networking.ServerStuff.ServerNetworkPlayerInventoryUpdater
+  Fields: _nextUpdateTimer, _playersEquipmentHandler, _firestoreDb
+  Methods: RemovePlayer, Configure, FixedUpdateNetwork, TestUpdate, ForceSavePlayerConsumables, SavePlayerConsumablesTask, GetPlayerInventoryUpdates, .ctor
+
+[05] #3123 Code.Networking.ServerStuff.Arena.ButhuEventCustomMap
+  Fields: _damageZoneStartTimer, _continuousDamageTimer, _continuousDamageIsActive, _remainingTeams, _RemainingTeams, _teamWinsButhuBattleGroundCallback, _backTeamDefeatedToNormalZone
+  Methods: get_BattleGroundType, get_RemainingTeams, set_RemainingTeams, ServerTick, DoDamageToAllPlayers, ConfigureButhuEventMatch, MatchEndByDuration, TestBackTeamToNormalMap, TeamHasAllMembersDead, NoWinnerEnd, BuhtuWinner, OnInitMatch, StartBattle, CloseMatch, DoFinishBattleActions, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[05] #3132 Code.Networking.ServerStuff.Arena.ServerArenasHandler
+  Fields: _arenaMaps, _arenaMatchMakingHistory, _eloRatingSystem, _arenaMatchMaking, _serverPlayerCurrenciesHandler, _serverCurrenciesUpdater, _rpcServerConfirmShipEnterArenaMap, _currentPlayersInArenaRatings
+  Methods: .ctor, MatchPlayersAndStartArenas, Start1v1Arenas, SetNewArenaRatings
+
+[05] #3098 Code.Networking.ServerStuff.MapServer.AdmiralSpawnConfig
+  Fields: RequiredNpcs, AdmiralNpcId
+  Methods: .ctor
+
+[05] #3101 Code.Networking.ServerStuff.MapServer.WorldAdmiralHandler
+  Fields: _requiredNpcToAdmiral, _allRequiredNpcs, _idToAdmiralCountHandler
+  Methods: .ctor, NpcIsRequiredForAdmiral, AddNpcKillCount, ResetAdmiralCount
+
+[05] #3078 Code.Networking.ServerStuff.ServerGuilds.ServerGuildController
+  Fields: _allGuilds, _playerIdToCurrentGuild, OnPlayerAddedToGuild, OnPlayedRemovedFromGuild, _firestoreGuildService
+  Methods: add_OnPlayerAddedToGuild, remove_OnPlayerAddedToGuild, add_OnPlayedRemovedFromGuild, remove_OnPlayedRemovedFromGuild, .ctor, InitGuilds, InitGuilds, PlayerJoinedToServer, PlayerLeftServer, AddMemberToGuild, RemoveMemberFromGuild, GetPlayerGuild, GetPlayerGuildId, GetGuildMembersId, GetAndAddGuildInfo, GuildExists, GetGuild, GetGuildTag, GetPlayerGuildTag, AddGuild
+
+[05] #2423 Code.Playfab.PlayfabClient.PlayFabGuildsApi
+  Fields: -
+  Methods: SendGuildHelpCall, UpdatePlayerStatusServer, UpdatePlayerStatus, CreateGuild, ApplyToGuild, LeaveGuild, GetPlayerGuildId, GetLocalPlayerGuildId, GetPlayerApplicationGroupId, CancelApplication, OnListApplications, TransferLeadTo, UpgradeMemberRole, UpgradeMemberRole, TryAddOrRemoveEnemy, TryAddOrRemoveAlly, AcceptMemberOnGroup, RemoveMemberFromGuild, OnApply, OnSharedError
+
+[05] #2345 Code.Playfab.ShipEquipmentTest.ShipBaseStats
+  Fields: Id_Visual, SkinName, VisualRotationSpeed, BaseSpeed, MovementSpeed, Crew, Life, AttackPower, FireRate, WeaponsRange, Capabilitymax, Faction, AvailableDecks, RequiredLevel
+  Methods: .ctor
+
+[04] #2990 <<GetGuildIslandsAndTowers>b__1>d
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3574 <>c
+  Fields: <>9, <>9__76_0, <>9__116_0, <>9__153_0, <>9__153_1, <>9__153_2, <>9__153_3, <>9__153_4, <>9__153_5
+  Methods: .cctor, .ctor, <CheckForInputAuth>b__76_0, <RespawnPlayerShip>b__116_0, <.ctor>b__153_0, <.ctor>b__153_1, <.ctor>b__153_2, <.ctor>b__153_3, <.ctor>b__153_4, <.ctor>b__153_5
+
+[04] #3105 <>c__DisplayClass31_0
+  Fields: npcConfig, <>4__this, map, respawnDelay, npcDropTableId, zone, mapSpawnPoints, isAdmiral
+  Methods: .ctor, <SpawnNpc>g__InitNetworkState|0
+
+[04] #2460 <>c__DisplayClass41_0
+  Fields: playerId
+  Methods: .ctor, <RemoveMemberFromGuild>b__0
+
+[04] #2010 <>c__DisplayClass8_0
+  Fields: t
+  Methods: .ctor, <GetPlayerCurrentShipWeaponsEquipment>b__0
+
+[04] #2994 <>c__DisplayClass8_0
+  Fields: mapName
+  Methods: .ctor, <OnGuildIslandsChange>b__0, <OnGuildIslandsChange>b__1
+
+[04] #1867 <>f__AnonymousType25`4
+  Fields: <GuildTag>i__Field, <Map>i__Field, <PlayerPosition>i__Field, <PlayerNickname>i__Field
+  Methods: get_GuildTag, get_Map, get_PlayerPosition, get_PlayerNickname, .ctor, Equals, GetHashCode, ToString
+
+[04] #2459 <AcceptMemberOnGuild>d__40
+  Fields: <>1__state, <>t__builder, playerId, nickname, <>8__1, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3646 <AddDonationRecordAsync>d__2
+  Fields: <>1__state, <>t__builder, playerTitleId, playerName, currencyCode, amount, donatedAtUtc, <>4__this, guildId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3017 <AddPlayerToGuild>d__20
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, playerId, <added>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2744 <AutoEquipWeapons>d__3
+  Fields: <>1__state, <>t__builder, shipClassId, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2920 <AutoEquipWeapons>d__42
+  Fields: <>1__state, <>t__builder, shipClassId, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2983 <BuildOrUpgradeTowerForIsland>d__25
+  Fields: <>1__state, <>t__builder, mapName, <>4__this, towerIndex, towerConfigId, <>8__1, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3830 <BuildShop>d__19
+  Fields: <>1__state, <>t__builder, <>4__this, <getPlayerPacksInfo>5__2, <getPackItems>5__3, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3734 <BuyPlayerShipAsync>d__1
+  Fields: <>1__state, <>t__builder, itemId, catalogName, storeId, currencyCode, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2383 <BuyShip>d__11
+  Fields: <>1__state, <>t__builder, buyTryInfo, shipName, <>8__1, <buyRequest>5__2, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[04] #2810 <BuyShipSkin>d__59
+  Fields: <>1__state, <>t__builder, playerSkins, buySkinInfo, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2997 <CleanGuildIslandTowers>d__12
+  Fields: <>1__state, <>t__builder, <>4__this, guildIsland, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2829 <Configure>d__11
+  Fields: <>1__state, <>t__builder, <>4__this, localPlayerInventory, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2834 <Configure>d__6
+  Fields: <>1__state, <>t__builder, <>4__this, localPlayerInventory, allItems
+  Methods: MoveNext, SetStateMachine
+
+[04] #2573 <CurrentPlayerShipDied>d__62
+  Fields: <>1__state, <>t__builder, <>4__this
+  Methods: MoveNext, SetStateMachine
+
+[04] #3577 <DestroyCallback>d__110
+  Fields: <>1__state, <>t__builder, <>4__this, unitDestroyInfo, playerShip, playerId, playerNickName, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2989 <GetAllGuildIslandOwners>d__5
+  Fields: <>1__state, <>t__builder, <>4__this, <guildIslandList>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2443 <GetCurrentPlayerGuild>d__24
+  Fields: <>1__state, <>t__builder, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[04] #2992 <GetGuildIslandsAndTowers>d__6
+  Fields: <>1__state, <>t__builder, <>4__this, guildTag, <guildIslandList>5__2, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[04] #3433 <GetInventoryAsync>d__2
+  Fields: <>1__state, <>t__builder, <>4__this, playerTitleId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2445 <GetPlayerApplicationGuildId>d__26
+  Fields: <>1__state, <>t__builder, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2523 <GetPlayerDailyDoneQuests>d__5
+  Fields: <>1__state, <>t__builder, <>4__this, playerTitleId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2402 <GetPlayerGuildId2>d__0
+  Fields: <>1__state, <>t__builder, playerId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3430 <GetPlayerInventoryAsync>d__4
+  Fields: <>1__state, <>t__builder, <>4__this, playerTitleId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3743 <GetPlayerMaxCannons>d__2
+  Fields: <>1__state, <>t__builder, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3018 <GetPlayerShipCharacterId>d__22
+  Fields: <>1__state, <>t__builder, playerId, shipId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3019 <GetPlayerShipEquipmentFromDatabase>d__23
+  Fields: <>1__state, <>t__builder
+  Methods: MoveNext, SetStateMachine
+
+[04] #3606 <GuildIslandDefeated>d__47
+  Fields: <>1__state, <>t__builder, <>4__this, <newGuildOwnerTag>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2567 <InitializeGameBonusesAndSettings>d__44
+  Fields: <>1__state, <>t__builder, <>4__this, clientIslandController, playerProfileData, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3207 <LoadDailyQuestsFromFirestore>d__6
+  Fields: <>1__state, <>t__builder, <>4__this, playerLevel, <>8__1, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3482 <LoadGuildIslandsAsync>d__4
+  Fields: <>1__state, <>t__builder, <>4__this, <guildIslands>5__2, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[04] #2484 <LocalPlayerGuildUpdated>d__23
+  Fields: <>1__state, <>t__builder, <>4__this
+  Methods: MoveNext, SetStateMachine
+
+[04] #2584 <LogoutCheckCoroutine>d__8
+  Fields: <>1__state, <>2__current, <>4__this, playerShip, isVip, <elapsed>5__2, <initialHealth>5__3
+  Methods: .ctor, System.IDisposable.Dispose, MoveNext, System.Collections.Generic.IEnumerator<System.Object>.get_Current, System.Collections.IEnumerator.Reset, System.Collections.IEnumerator.get_Current
+
+[04] #2756 <OnEquipWeaponTypeClicked>d__23
+  Fields: <>1__state, <>t__builder, cannonTypeId, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2754 <OnRemoveWeaponTypeClicked>d__21
+  Fields: <>1__state, <>t__builder, <>4__this, cannonTypeId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3435 <OnTriggerEnter>d__1
+  Fields: <>1__state, <>t__builder, other, <>4__this, <playerShip>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2921 <OnlyAutoEquipShipWeapons>d__43
+  Fields: <>1__state, <>t__builder, <>4__this, <serverProxyObject>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3027 <RPC_DonateToGuild>d__51
+  Fields: <>1__state, <>t__builder, rpcInfo, <>4__this, guildId, currencyCode, amount, <playerCurrencies>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3036 <RPC_NewMemberOnGuild>d__88
+  Fields: <>1__state, <>t__builder, rpcInfo, playerTitleId, <>4__this, guildId, <playerId>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3037 <RPC_PlayerLeftGuild>d__89
+  Fields: <>1__state, <>t__builder, rpcInfo, <>4__this, guildId
+  Methods: MoveNext, SetStateMachine
+
+[04] #3026 <RPC_PlayerShipSelection>d__50
+  Fields: <>1__state, <>t__builder, rpcInfo, <>4__this, selectedShipId, forced, skinId, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[04] #3038 <RPC_RemovedMemberFromGuild>d__90
+  Fields: <>1__state, <>t__builder, playerTitleId, rpcInfo, <>4__this, guildId
+  Methods: MoveNext, SetStateMachine
+
+[04] #3040 <RPC_ServerConfirmPlayerGuildChanged>d__93
+  Fields: <>1__state, <>t__builder
+  Methods: MoveNext, SetStateMachine
+
+[04] #2875 <RemoveEnemyClickCallback>d__23
+  Fields: <>1__state, <>t__builder, guildTag, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2461 <RemoveMemberFromGuild>d__41
+  Fields: <>1__state, <>t__builder, playerId, <>8__1, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2998 <SaveGuildIsland>d__13
+  Fields: <>1__state, <>t__builder, <>4__this, guildIsland, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2999 <SaveGuildIslands>d__14
+  Fields: <>1__state, <>t__builder, <>4__this, serverIslandsData, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2919 <SelectShipForPlayer>d__41
+  Fields: <>1__state, <>t__builder, <>4__this, <serverProxyObject>5__2, <currentSelectedShip>5__3, <currentSelectedSkinId>5__4, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2630 <ShowDamageReceived>d__63
+  Fields: <>1__state, <>t__builder, <>4__this, damage, isCriticDamage, usingGunpowder, targetHasShield
+  Methods: MoveNext, SetStateMachine
+
+[04] #2741 <TestBuy>d__10
+  Fields: <>1__state, <>t__builder, <>4__this, buyTryInfo, weaponShopRow, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2843 <TestBuy>d__8
+  Fields: <>1__state, <>t__builder, <>4__this, buyTryInfo, weaponShopRow, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2456 <TryAddOrRemoveEnemy>d__38
+  Fields: <>1__state, <>t__builder, enemyGuildTag, add, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3656 <TryDonateAsync>d__3
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, currencyCode, amount, playerTitleId, playerName, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[04] #2747 <TryEquipWeaponsFromType>d__6
+  Fields: <>1__state, <>t__builder, cannonTypeId, <>4__this, <serverProxyObject>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3796 <TryPurchaseConsumableItemsAsync>d__6
+  Fields: <>1__state, <>t__builder, catalogName, <>4__this, storeId, itemId, playerDiscount, currencyCode, playerId, quantity, playerTitleId, <inventoryType>5__2, <playerCurrencies>5__3, <totalItemsAmount>5__4, <totalPriceAmount>5__5, <playerInventory>5__6, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[04] #3949 <TryRefundCastle>d__0
+  Fields: <>1__state, <>t__builder, playerId, playerTitleId, castleItemId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3951 <TryRefundCastle>d__4
+  Fields: <>1__state, <>t__builder, <>4__this, playerId, playerTitleId, castleItemId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3641 <UpdatePlayerDonationTotalAsync>d__4
+  Fields: <>1__state, <>t__builder, playerTitleId, playerName, currencyCode, amount, <>4__this, guildId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #2441 <UpdatePlayerGuildStuff>d__22
+  Fields: <>1__state, <>t__builder, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[04] #3020 <UpdatePlayerShipEquipmentFromDatabase>d__24
+  Fields: <>1__state, <>t__builder
+  Methods: MoveNext, SetStateMachine
+
+[04] #2053 MapNpcConfig
+  Fields: ShipId, Quantity, RespawnDelay, Custom_Drop_Table
+  Methods: .ctor
+
+[04] #2100 Projectile
+  Fields: disappearAfterTime, disappearTimer, isActive, direction, startPosition, movementSpeed, targetPosition, distanceToTarget, movementValue
+  Methods: Start, Update, Move, MoveWithoutTargetHit, Fire, Explode, GetIsActive, .ctor
+
+[04] #2067 ShipData
+  Fields: Nameship, Id, Id_Visual, SkinName, VisualRotationSpeed, MovementSpeed, Life, AttackPower, FireRate, ShotRate, WeaponsRange, Capabilitymax, Extraboatdeck, Description, Faction
+  Methods: .ctor
+
+[04] #1928 UIShowAllAvailableQuests
+  Fields: _showSelectedQuestPanel, _questRowPrefab, _questRowContainer, _canvasGroup, _questIdToRewards, _allQuestConfigs, _doneQuests, _activeQuests, _playerStatisticsAndCurrencies, _questRows, _questActionTriggered, _lastSelectedQuestId
+  Methods: get_QuestRows, Configure, Start, OnActionButtonClicked, RemoveEliteDailyQuests, ListQuests, SelectNewQuestRow, OnCurrentSelectedQuestStepUpdated, ShowQuestInPanel, OnSelectQuestCallback, Clear, BlockActions, UnlockActions, RemoveQuestFromList, .ctor, <ListQuests>b__17_0, <SelectNewQuestRow>b__19_0
+
+[04] #2102 projectileActor
+  Fields: spawnLocator, spawnLocatorMuzzleFlare, shellLocator, recoilAnimator, shotgunLocator, bombList, FauxName, UiText, UImaster, CameraShake, rapidFireDelay, CameraShakeCaller, firingTimer, firing, bombType, swarmMissileLauncher, projectileSimFire, Torque, Tor_min, Tor_max, MinorRotate, MajorRotate, seq
+  Methods: Start, Update, Switch, Fire, RandomizeRotation, Major_RandomizeRotation, .ctor
+
+[04] #2329 Code.TestQualityChanger
+  Fields: _unityWaters, _waterQualitySlider, _resolutionDropdown, _settingsDropdown, _fpsDropdown, _waterText, _audioMixer, _musicVolumeSlider, _musicVolumeParameter, _sfxVolumeSlider, _sfxVolumeParameter, _multiplier, _fullScreenToggle, _showOnlyOwnDamageToggle, _showMapTransitionToggle, _showOnlyOneBallToggle, _showEffectTextsToggle, _useOldCameraSettings, _cameraChanger, _currentQualityLevel, ShowOnlyOwnDamage, ShowMapTransitionKey, ShowOnlyOneBallKey, FullScreenKey, ShowEffectTextKey, UseOldCameraSettingsKey, _filteredResolutions
+  Methods: OnDisable, Awake, Start, OnResolutionChange, UpdateWithSavedSettings, OnWaterQualityChanged, SetQualityLevel, ChangeFpsLevel, .ctor, <Start>b__29_0, <Start>b__29_1, <Start>b__29_2
+
+[04] #3964 Code.Core.Castles.CastleService
+  Fields: _globalCastlesData, _playerProfileData, _localSimulationRewards, _notifyServerToUpdateEquipmentCallback, _castlePurchaseRepository, _castleRefundRpcClient
+  Methods: .ctor, GetCastlesData, GetCastleLevelFromData, GetNextLevelPriceFromData, GetCastleRefundPrice, GetCastlePriceFromData, GetCastleImprovementType, TryRemoveCastleAsync, PlaceCastleAsync, PurchaseCastleAsync
+
+[04] #4014 Code.Core.Castles.UICastlesShop
+  Fields: _castleSlotList, _castleRowPrefab, _castleRowsContainer, _selectCastleText, _shopViewModel, _messageBox, _itemSpritesConfig, _castleSlots, _castleRowInfos, _castleSlotIdSelected, _canvasGroup
+  Methods: Awake, SlotSelected, CastleItemSelected, ClearCastleInfoRows, Init, CastlesUpdated, BuildShop, RefreshView, OnPlaceCastleButtonPressed, OnRemoveCastleButtonPressed, OnUpgradeButtonPressed, Show, Hide, .ctor
+
+[04] #3918 Code.Core.Common.EventQueue.GuildMemberPlayerSignalEventData
+  Fields: PlayerName, PlayerTitleId, Map, Position
+  Methods: .ctor
+
+[04] #3904 Code.Core.Common.EventQueue.PlayerConfiguredOnWorldEventData
+  Fields: ShipClassId, IsInsidePort
+  Methods: .ctor
+
+[04] #3700 Code.Core.GameGlobalBonuses.ClientGlobalBonusService
+  Fields: _repository, _clientIslandController, _currentGlobalBonusConfig, _playerGuildTag, _isVipPlayer, _islandsListener, _isInitialized
+  Methods: .ctor, IslandsInitialized, LocalPlayerGuildUpdated, UpdatePlayerVipFeature, ConfigureForPlayer, CalculateMarketDiscountBonus, OnGuildIslandsChange, Initialize, <CalculateMarketDiscountBonus>b__12_0
+
+[04] #3745 Code.Core.GameShop.UpdateLocalShipService
+  Fields: _playerProfileData
+  Methods: .ctor, GetPlayerMaxCannons, UpdateLocalShip
+
+[04] #3803 Code.Core.GameShop.Assistants.ConsumableItemsShopView
+  Fields: _viewCanvasGroup, _consumableItemShopCardPrefab, _container, _canvasGroup, _loadingObject, _cards, _shopViewModel, _messageBox, _itemSpritesConfig, _clientSyncedInventory
+  Methods: SetPlayerSyncedInventory, Configure, BuildShop, MarketBonusChanged, LoadItemsIntoShop, OnItemBuyPressed, ResetAllInputs, Show, Hide, .ctor, <BuildShop>b__12_0
+
+[04] #3797 Code.Core.GameShop.Assistants.ServerConsumablePurchaseService
+  Fields: _playerCurrenciesHandler, _playersEquipmentHandler, _serverItemStoreRepository, _serverItemsInventoryRepository
+  Methods: .ctor, LoadAllStores, TryPurchaseConsumableItemsAsync
+
+[04] #3766 Code.Core.GameShop.UI.UIPlayerShipsShop
+  Fields: _shipItemCard, _container, _canvasGroup, _cards, _shopViewModel, _messageBox, _itemSpritesConfig, _elitePanels
+  Methods: SetElitePanelVieW, Init, BuildShop, MarketDiscountChanged, OnItemBuyPressed, UpdateOwnedShip, RefreshView, .ctor
+
+[04] #3694 Code.Core.GlobalBonuses.GlobalBonus
+  Fields: <PveDamage>k__BackingField, <PvpDamage>k__BackingField, <XpBonus>k__BackingField, <GoldBonus>k__BackingField, <DiamondBonus>k__BackingField, <RewardsBonus>k__BackingField, <MarketDiscount>k__BackingField, <NewbieXpBonus>k__BackingField, <NewbieRewardBonus>k__BackingField, <MaxXpForNewbieBonus>k__BackingField, <LocalClientHasNewbieBonusActive>k__BackingField, ClientNewbieBonusChanged, ClientDiscountChanged
+  Methods: get_PveDamage, set_PveDamage, get_PvpDamage, set_PvpDamage, get_XpBonus, set_XpBonus, get_GoldBonus, set_GoldBonus, get_DiamondBonus, set_DiamondBonus, get_RewardsBonus, set_RewardsBonus, get_MarketDiscount, set_MarketDiscount, get_NewbieXpBonus, set_NewbieXpBonus, get_NewbieRewardBonus, set_NewbieRewardBonus, get_MaxXpForNewbieBonus, set_MaxXpForNewbieBonus, get_LocalClientHasNewbieBonusActive, set_LocalClientHasNewbieBonusActive, add_ClientNewbieBonusChanged, remove_ClientNewbieBonusChanged, UpdateLocalClientNewbieBonusActive, GetMaxIslandDiscount, add_ClientDiscountChanged, remove_ClientDiscountChanged, SetMarketDiscountBonus, SetBonuses, GetPlayerDiscount, .cctor
+
+[04] #3502 Code.Core.Islands.IslandsManagement.GuildIslandsPanelView
+  Fields: _viewCanvasGroup, _islandsContainerCanvasGroup, _buildTowerPanelView, _islandCardPrefab, _container, _viewModel, _islandCards, _itemSpritesConfig
+  Methods: Initialize, ClearView, LoadAndDisplayIslands, HandleRequestBuildTower, OnBuildTowerPanelClosed, Show, Hide, .ctor
+
+[04] #3506 Code.Core.Islands.IslandsManagement.UI.IslandOwnedCard
+  Fields: _towerCardPrefab, _container, _mapNameText, _ownedDateTimeText, _towerCards, OnRequestBuildTower, _islandDisplayData
+  Methods: ConfigureIslandCard, OnTowerBuiltResponse, BuildTowerCards, TowerButtonClickedCallback, CreateTowerCards, SetTowerBuilt, .ctor
+
+[04] #3507 Code.Core.Islands.IslandsManagement.UI.TowerDisplayTooltip
+  Fields: _nameText, _healthText, _damageText, _rangeText, _reloadText
+  Methods: Configure, .ctor
+
+[04] #3412 Code.Core.PlayerInventory.ServerPlayerInventory
+  Fields: _currentShipEquipment, _playerServerItemsInventory
+  Methods: get_CurrentShipEquipment, get_PlayerServerItemsInventory, .ctor, .ctor, UpdateEquipment
+
+[04] #3423 Code.Core.PlayerInventory.ExternalSync.ExternalGrantListener
+  Fields: _firestoreDb, _grantListener, _vipAndShipListener, OnGrantReceived, OnVipGrantedToPlayer, ShipGrantedToPlayer
+  Methods: add_OnGrantReceived, remove_OnGrantReceived, add_OnVipGrantedToPlayer, remove_OnVipGrantedToPlayer, add_ShipGrantedToPlayer, remove_ShipGrantedToPlayer, .ctor, StartListening, StopListening, <StartListening>b__13_0, <StartListening>b__13_1
+
+[04] #3425 Code.Core.PlayerInventory.ExternalSync.ExternalGrantSyncService
+  Fields: _grantEntryListener, _spendEntryListener, _playerCurrenciesHandler, _playersEquipmentHandler, GrantedShipToPlayerCallback
+  Methods: .ctor, ShipGrantedToPlayer, OnVipGrantedToPlayer, OnSpendEntryReceived, OnGrantReceived, Stop
+
+[04] #3269 Code.Core.Projectile.Missile
+  Fields: _rb, _target, _explosionPrefab, _speed, _rotateSpeed, _maxDistancePredict, _minDistancePredict, _maxTimePrediction, _standardPrediction, _deviatedPrediction, _deviationAmount, _deviationSpeed
+  Methods: FixedUpdate, PredictMovement, AddDeviation, RotateRocket, OnCollisionEnter, OnDrawGizmos, .ctor
+
+[04] #3187 Code.Core.RaidMap.NetworkedRaidMap
+  Fields: _map, _raidMapId, _initAdmiralSpawnPoints, _lastAdmiralSpawnPoints, _mapNpcConfigs, _mapSpawner, _raidCleanupTimer, _finalAdmiralTimer, _raidIsOpen, _raidIsClosing, _raidMapConfig, _RaidStartTimer, _RaidOpenTimer, _startSchedule, _raidOpenCount
+  Methods: get_RaidStartTimer, set_RaidStartTimer, get_RaidOpenTimer, set_RaidOpenTimer, get_RaidMapConfig, get_RaidIsOpen, get_RaidMapId, get_RaidMapName, get_Map, Configure, FixedUpdateNetwork, UpdateRaidTimers, SpawnFinalAdmiral, SpawnInitialAdmirals, StartRaidMap, CloseRaid, CleanupRaid, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[04] #3185 Code.Core.RaidMap.RaidMapConfig
+  Fields: RaidMapId, RaidMapName, FirstStartTimer, StartTimer, OpenTime, FinalAdmiralTimer, CleanupTime, AdmiralId, AdmiralStartId, AdmiralEndId, AdmiralsToSpawnAtStart, AdmiralsToSpawnAtEnd, ElitePointsMultiplier, ElitePointsBonus, MaxPlayerLevelForBonus, MaxPlayerLevel, MinPlayerLevel, IsPveMap, IsMixedPvPMap, MapNpcConfigs
+  Methods: .ctor
+
+[04] #3192 Code.Core.RaidMap.ServerRaidMapsNetworkObject
+  Fields: _playersDataBeforeRaidMap, _playersInsideRaidMaps, _raidMaps, _playerEnterTick
+  Methods: Configure, RPC_TryEnterRaidMap, CanEnterRaid, AddToRaid, PlayerDieOnRaidMap, RPC_TryExitRaidMap, RemoveFromRaid, PlayerJoined, PlayerLeft, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields, RPC_TryEnterRaidMap@Invoker, RPC_TryExitRaidMap@Invoker
+
+[04] #3194 Code.Core.RaidMap.UIRaidMapListController
+  Fields: _leaveRaidMapButton, _raidMapStatusPanelList, _serverRaidMapsNetworkObject, _playerNetworkObject
+  Methods: Awake, LeaveRaidMapButtonPressed, Start, LateUpdate, FixedUpdate, .ctor
+
+[04] #3175 Code.Core.ServerMessagePublisher.IslandDestroyedMessage
+  Fields: <GuildTag>k__BackingField, <CapturedByGuildTag>k__BackingField, <Map>k__BackingField
+  Methods: get_GuildTag, set_GuildTag, get_CapturedByGuildTag, set_CapturedByGuildTag, get_Map, set_Map, .ctor
+
+[04] #3515 Code.Core.Ship.BaseUnitVisualObject
+  Fields: _visualId, _uiIndicatorHeight, _newCamUiIndicatorHeightToChange, _oarsExtraObject, _defaultSkin, _skins, OnSkinChanged
+  Methods: add_OnSkinChanged, remove_OnSkinChanged, RaiseSkinChanged, get_VisualId, get_UiIndicatorHeight, SetVisualSkin, SetNumberOfSails, .ctor
+
+[04] #3517 Code.Core.Ship.EmptyMovement
+  Fields: -
+  Methods: TickMovement, SetNewTargetPosition, ResetMovement, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[04] #3534 Code.Core.Ship.ShipReticle
+  Fields: _reticleImage, _localPlayerReticle, _targetReticle, _reticleRotation, _allyColor, _enemyColor
+  Methods: Awake, get_ReticleEnabled, Configure, SetVisible, .ctor
+
+[04] #3610 Code.Core.Ship.NPC.ChestSpawner
+  Fields: _rewardChest, _onlyBoxForKiller, _playersToGiveBoxes, _dropBoxes, _boxSpawnPoints, _dropRewards
+  Methods: SetDropRewards, OnNpcDie, SpawnChests, .ctor
+
+[04] #3587 Code.Core.Ship.Player.ShipNetworkInputData
+  Fields: BUTTON_ATTACK, BUTTON_FORCE_ATTACK, BUTTON_CANCEL_ATTACK, BUTTON_REPAIR, BUTTON_ABILITY, TargetPosition, CurrentTargetId, Buttons, AbilityIndex
+  Methods: IsDown
+
+[04] #3567 Code.Core.Ship.Ship_Fx.WaterMovementTrail
+  Fields: _waterTrailParticles, _objectToCheck, _movementAudio, _oldPosition, _isMoving, _isLocalShip
+  Methods: Awake, FixedUpdate, HandleAudio, Configure, .ctor
+
+[04] #3549 Code.Core.Ship.Weapons.IShipWeaponsCalculator
+  Fields: -
+  Methods: CalculateShotFromCannonType, SetDispersionBonus, SetHitChanceBonus, get_MaxCurrentWeaponRange, get_TypesOfWeaponsEquipped
+
+[04] #3554 Code.Core.Ship.Weapons.ShootDamageInfo
+  Fields: NpcDamage, TowerDamage, PvpDamage, IsRocket, TotalDamage, UnitClassId
+  Methods: .ctor
+
+[04] #2925 Code.Demo.NotUsing.MoveInPoints
+  Fields: _spawnPointsGiver, _randomPointInterval, _currentTargetMovementPosition, _nextPointTimer
+  Methods: DoMoveInPoints, NextPointReached, GetNewMoveDirection, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[04] #2924 Code.Demo.ShipSelection.UIShowShipStats
+  Fields: _shipNameText, _hpText, _maxCannonsText, _baseSpeedText, _maxSpeedText, _factionText, _decksText
+  Methods: ShowShipStats, ClearStats, .ctor
+
+[04] #2626 Code.Demo.UI.ColorIndicatorsConfig
+  Fields: _npcNeutralColor, _neutralColor, _enemyColor, _partyColor, _guildColor, _mineColor, _allyColor
+  Methods: .ctor
+
+[04] #2598 Code.Demo.UI.UIPlayerShowCoordinates
+  Fields: _coordLetterText, _coordNumberText, _minimapPlayerPoint, _currentMapImage, _playerIndicatorContainer, _currentMapTitleImage, _currentMapLimitsImage, _gridSize, _mapSprites, _mapSize, _playerShip, CoordX, CoordY, BoxSize, PlayerPosInMap
+  Methods: Configure, LateUpdate, GetColumnLetter, UpdateCoordinates, ShowPlayerPosInMap, OnMapClicked, .ctor, <LateUpdate>b__12_0
+
+[04] #2603 Code.Demo.UI.UISfMapCard
+  Fields: _mapName, _island, _mapNameText, _guildOwnerText, _bgImage, _normalBgColor, _currentMapBgColor
+  Methods: get_MapName, Configure, ChangeIslandOwner, SetCurrentMapColor, SetNormalMapColor, .ctor
+
+[04] #2638 Code.Demo.UI.UITargetableDisplay
+  Fields: _canvasGroup, _nicknameText, _hitPointsText, _hpBar, _hpGradient, _targetIconImage, _defaultImage, _targetable, _disableOnDeath
+  Methods: OnDestroy, StopUpdating, SetEmptyTarget, SetSprite, SetTargetableToShow, OnTargetHealthChanged, UpdateNickName, UpdateHealth, HandleOldTarget, .ctor
+
+[04] #2876 Code.Demo.UI.GuildUI.GuildDiplomacyPanel
+  Fields: _diplomacyCanvasGroup, _diplomacyGuildRowPrefab, _alliesContainer, _enemiesContainer, _allyTagInputField, _addAllyButton, _addAllyErrorText, _enemyTagInputField, _addEnemyButton, _addEnemyErrorText, _guildAllies, _guildEnemies, _guildAlliesChangeSubscription, _guildEnemiesChangeSubscription, _allyRows, _enemyRows
+  Methods: Start, Init, AddAllyTagRow, RemoveAllyTagRow, AddAllyButtonPressed, RemoveAllyClickCallback, AddEnemyButtonPressed, RemoveEnemyClickCallback, AddEnemyTagRow, RemoveEnemyTagRow, GuildAlliesChanged, EnemiesChanged, Show, Hide, .ctor
+
+[04] #2890 Code.Demo.UI.GuildUI.ListGuildMembersPanel
+  Fields: _listMembersGuildPanel, _loadingObject, _memberInfoRows, _removeInfoText, _actionsObject, _prevPag, _initPag, _nextPag, _pageText, _guildMemberInfos, _guildMembersPresence, _rowsVisible, _pagCount, _currentPag, _presenceChangeSubscription, _guildMembersChangeSubscription
+  Methods: Awake, OnDestroy, Init, OnGuildAlliesChange, OnMemberInfoUpdated, OnPlayerPresenceUpdated, Show, Hide, GetRolePriority, ShowPag, OnTransferLeadPressed, OnUpdateRolePressed, OnRemovePressed, ShowPreviousPag, ShowNextPag, ShowInitPag, .ctor, <Init>b__18_0
+
+[04] #2859 Code.Demo.UI.Map.UIGlobalMap
+  Fields: _mapNames, _mapStarImages, _offStarSprite, _highlightStarSprite, _mapNameToStarImage, _playerShip, _lastPlayerMap
+  Methods: Awake, Configure, LateUpdate, .ctor
+
+[04] #2703 Code.Demo.UI.Panels.MenuView
+  Fields: _movePlayerCamera, _menuViewType, MenuViewsController
+  Methods: get_ViewType, get_MovePlayerCamera, Configure, Show, Hide, .ctor
+
+[04] #2705 Code.Demo.UI.Panels.ShopMenuView
+  Fields: _canvasGroupUtility, _leavePortButton, _weaponsCatalogShop
+  Methods: Show, Hide, .ctor
+
+[04] #2707 Code.Demo.UI.Panels.UIMapChangeHandler
+  Fields: _uiShowMapName, _mapBackgroundImage, _minimapCamera, _uiTargetsDisplay
+  Methods: Awake, OnDestroy, Process, .ctor
+
+[04] #2711 Code.Demo.UI.Panels.UIRegisterOnBattleGround
+  Fields: _arenaButton, _arenaButtonText, _arenaStartTimerText, _buthuButton, _buthuButtonText, _buthuStartTimerText, _thunderBallButton, _thunderBallButtonText, _thunderBallStartTimerText, _registerKey, _unregisterKey, _playerNetworkObject, _serverArenaNetworkObject
+  Methods: Awake, ButhuButtonPressed, ThunderBallButtonPressed, ArenaButtonPressed, FixedUpdate, .ctor
+
+[04] #2716 Code.Demo.UI.Panels.Arena.Arena1v1Panel
+  Fields: _battlegroundCanvasGroup, _initMatchTimerText, _durationMatchTimerText, _finishMatchTimerText, _canvasGroupUtility, _winnerText, _teamANameText, _teamBNameText, _prizesText, _showPlayerStatsPrefab, _container, _playerStats, _currentArenaMap, _currentCloseMatchTimeLeft
+  Methods: FixedUpdate, SetArenaMatch, ShowArenaStats, Clear, .ctor
+
+[04] #2717 Code.Demo.UI.Panels.Arena.BattleGroundPlayerStatsRow
+  Fields: _usernameText, _destructionsText, _deathsText, _damageDoneText, _damageReceivedText, _averageShotDamage, _positionText, _backgroundImage
+  Methods: SetBackgroundColor, Configure, .ctor
+
+[04] #2725 Code.Demo.UI.Panels.Arena.UIButhuBattleGroundPanel
+  Fields: _battlegroundCanvasGroup, _initMatchTimerText, _durationMatchTimerText, _finishMatchTimerText, _playersLeftText, _statsCanvasGroupUtility, _winnerText, _prizesText, _showPlayerStatsPrefab, _container, _losingPanel, _playerStats, _currentButhuMap, _currentCloseMatchTimeLeft
+  Methods: SetButhuCustomMap, ShowLosingPanel, ShowButhuStats, Clear, FixedUpdate, .ctor
+
+[04] #2728 Code.Demo.UI.Panels.Arena.UIThunderBallBattleGroundPanel
+  Fields: _battlegroundCanvasGroup, _initMatchTimerText, _durationMatchTimerText, _finishMatchTimerText, _teamAScoreText, _teamBScoreText, _statsCanvasGroupUtility, _winnerText, _prizesText, _showPlayerStatsPrefab, _battleGroundStatsDivisor, _container, _teamAColor, _teamBColor, _playerStats, _divisors, _thunderBallCustomMap, _currentCloseMatchTimeLeft
+  Methods: SetThunderBallMap, Clear, ShowBattleGroundStats, FixedUpdate, UpdateTimers, .ctor
+
+[04] #2671 Code.Demo.UI.Quests.UIListQuests
+  Fields: _questInfoRowPrefab, _container, _doneQuests, _activeQuests, _questInfoRows, _lastMapName, _questConfigsByMap, _questIdToRewards, _questActionTriggered, _stepDescriptionFactory, _playerCurrencies
+  Methods: Init, OnDestroy, RefreshMapQuests, ShowMapQuests, ShowCurrentActiveQuests, ShowMapQuests, ShowQuestInList, Clear, RefreshQuestList, Process, BlockActions, UnlockActions, .ctor
+
+[04] #2655 Code.Demo.UI.ShipSelection.FavoriteDesignsService
+  Fields: _favoriteDesignsRepository, _favoriteDesigns, _playerProfileData
+  Methods: .ctor, SaveFavoriteDesigns, AddDesign, RemoveDesign, IsFavoriteDesign, FavoriteCount, LimitReached, GetFavoriteDesigns
+
+[04] #2658 Code.Demo.UI.ShipSelection.UIElitePanels
+  Fields: _scrollRect, _eliteViewGameObject, _eliteViewport, _eliteContainer, _customDesignsContainer, _skinShopContainer, _favoriteDesignsContainer, _showElitesButton, _showCustomDesignsButton, _showSkinShop, _favoriteDesignsButton, _shipShopContainer, _shipShopViewport, _canvasGroup, _shipsShopView
+  Methods: Awake, ShowView, ShowSkinShop, ShowEliteSelectionCards, ShowCustomDesignCards, Show, Hide, .ctor
+
+[04] #2789 Code.Demo.UI.ShopUI.GuildDonationViewsInstaller
+  Fields: _guildDonationView, _guildDonationHistoryView, _guildWalletView, _itemSpritesConfig, _guildWalletViewModel, _guildDonationHistoryViewModel
+  Methods: Initialize, HandleLocalPlayerGuildChanged, CreateGuildWalletViewModel, CreateGuildDonationHistoryViewModel, ConfigureGuildDonationView, ConfigureGuildWalletView, ConfigureGuildDonationHistoryView, .ctor
+
+[04] #2845 Code.Demo.UI.ShopUI.IClientShop
+  Fields: -
+  Methods: BuySfShipDeck, BuyStoreItem, BuyWeaponItem, BuyShip, BuyShipSkin, PlaceBid
+
+[04] #2740 Code.Demo.UI.ShopUI.UICannonShopCardStats
+  Fields: _rangeText, _reloadText, _hitChanceText, _hpBonusText
+  Methods: ShowStats, .ctor
+
+[04] #2742 Code.Demo.UI.ShopUI.UICannonStoreShop
+  Fields: _weaponShopRowPrefab, _container, _warningText, _canvasGroup, _weaponShopRows, _clientShop
+  Methods: ResetView, ClearAll, Configure, MarketDiscountChanged, TestBuy, .ctor
+
+[04] #2764 Code.Demo.UI.ShopUI.UIDeckShop
+  Fields: _goldDeckCard, _diamondDeckCard, _warningText, _canvasGroup, _clientShop, _playerDeckData, _playerInventory, _goldDeckStats, _diamondDeckStats, _goldDeckPriceList, _diamondDeckPriceList
+  Methods: Configure, MarketBonusChanged, UpdateView, TryBuy, GetGoldDeckPrice, GetDiamondDeckPrice, .ctor
+
+[04] #2836 Code.Demo.UI.ShopUI.UIShowRealMoneyItems
+  Fields: _realMoneyItemRowPrefab, _container, _itemRows, _clientShop, _playerInventory
+  Methods: CheckAllItems, Configure, .ctor
+
+[04] #2842 Code.Demo.UI.ShopUI.UIStoreItemShop
+  Fields: _shopItemRowPrefab, _headerRowPrefab, _container, _warningText, _shopItemRows, _clientShop, _playerInventory
+  Methods: DoReset, Awake, AddStoreItems, Configure, UpdateAllRowsButton, TestBuy, .ctor
+
+[04] #2851 Code.Demo.UI.ShopUI.UIWeaponShopRow
+  Fields: _cannonsSprites, <ItemId>k__BackingField, <CatalogName>k__BackingField
+  Methods: get_ItemId, set_ItemId, get_CatalogName, set_CatalogName, Configure, .ctor
+
+[04] #2963 Code.Networking.NetworkPlayerShipsManager
+  Fields: _allPlayerShips, _playerShips, _playersUserIds, _playerTitleIds, _playerNames, _playerIdToCurrentShip, _playerNetworkObjects, <LocalPlayerShip>k__BackingField, <LastLocalPlayerShipTypeId>k__BackingField
+  Methods: get_LocalPlayerShip, set_LocalPlayerShip, get_LastLocalPlayerShipTypeId, set_LastLocalPlayerShipTypeId, get_PlayerUserIds, ResetPlayerManager, GetPlayerShipByRef, AddPlayerShip, RemovePlayerShip, LocalPlayerShipUnreachable, AddPlayerShipInServer, RemovePlayerShipInServer, GetPlayerServerShip, GetPlayerIdFromPlayerTitleId, AddPlayer, RemovePlayer, GetPlayerNameFromId, GetPlayerName, GetPlayerID, GetPlayerTitleIdById, GetPlayerTitleId, GetPlayerRefFromPlayerTitleId, GetPlayerRefFromPlayerId, AddPlayerNetworkObject, TryGetPlayerNetworkObject, .cctor
+
+[04] #3004 Code.Networking.ServerStuff.AdmiralSpawnedNetworkInfo
+  Fields: MapName, SpawnedNpc, Tick
+  Methods: Equals, Equals, GetHashCode
+
+[04] #3001 Code.Networking.ServerStuff.GuildIslandFirestoreService
+  Fields: _firestoreDb, _islandListener
+  Methods: .ctor, GetAllIslandsAndTowerData, GetIslandTowers, GetAllGuildIslandOwners, GetGuildIslandsAndTowers, SubscribeToGuildIslandChanges, OnGuildIslandsChange, UpdateUnderAttackIslandsFlag, UpdateChangedTowersAsync, UpdateTower, CleanGuildIslandTowers, SaveGuildIsland, SaveGuildIslands, <GetAllIslandsAndTowerData>b__3_0, <GetGuildIslandsAndTowers>b__6_0
+
+[04] #3006 Code.Networking.ServerStuff.IBattleGroundMatchMaking
+  Fields: -
+  Methods: MatchPlayers, MatchSinglePlayerTeams
+
+[04] #2974 Code.Networking.ServerStuff.IGuildIslandService
+  Fields: -
+  Methods: SaveGuildIslands, SaveGuildIsland, CleanGuildIslandTowers, UpdateTower, UpdateChangedTowersAsync, GetAllIslandsAndTowerData, GetAllGuildIslandOwners, GetGuildIslandsAndTowers, SubscribeToGuildIslandChanges, UpdateUnderAttackIslandsFlag
+
+[04] #3008 Code.Networking.ServerStuff.RandomBattleGroundMatchMaking
+  Fields: _minPlayersPerMatch, _maxPlayersPerMatch
+  Methods: .ctor, MatchPlayers, MatchSinglePlayerTeams
+
+[04] #3054 Code.Networking.ServerStuff.ServerData
+  Fields: ServerName, ServerLocation, ServerDatabaseName, ServerPhotonSessionName, DefaultShipId, EliteShipId, ServerChatChannelName, GuildChatPrefixName
+  Methods: -
+
+[04] #3046 Code.Networking.ServerStuff.ServerNetworkPlayerCurrenciesUpdater
+  Fields: _playerUpdateOnServerTimers, _playersStatistic, _maxCallCount, _maxCallCountRefreshTimer, _tickMaxCallCount, _statisticForV2
+  Methods: Configure, FixedUpdateNetwork, ForceUpdateStatisticsAndCurrenciesOnServer, OnPlayerDataReceivedInWorld, RemovePlayer, UpdateStatisticsAndCurrenciesOnServer, UpdateArenaStatisticsOnServer, OnPlayerLeveledUp, OnPlayerRankChanged, OnPvpPlayerRankChanged, .ctor
+
+[04] #3010 Code.Networking.ServerStuff.ThunderBallBattleGroundMatchMaking
+  Fields: _minPlayersPerTeam, _maxPlayersPerTeam, _teamCount
+  Methods: .ctor, MatchPlayers, MatchSinglePlayerTeams
+
+[04] #3119 Code.Networking.ServerStuff.Arena.ArenaMap
+  Fields: _playersOnCustomMap, _playersAlive, _whenTeamWinsArenaCallback
+  Methods: get_BattleGroundType, ServerTick, OnInitMatch, StartBattle, CloseMatch, DoFinishBattleActions, MatchEndByDuration, TeamHasAllMembersDead, NoArenaWinner, ArenaWinner, SetWinCallback, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[04] #3133 Code.Networking.ServerStuff.Arena.ThunderBall
+  Fields: _targetPosition, _isMoving, _ballLocked
+  Methods: get_CustomOwnerId, get_IsPlayer, get_BallLocked, ResetBallPosition, DisableDamageReception, SetNewTargetPosition, FixedUpdateNetwork, .ctor, CopyBackingFieldsToState, CopyStateToBackingFields
+
+[04] #3100 Code.Networking.ServerStuff.MapServer.AdmiralKillCountHandler
+  Fields: _npcRemainingCount, _perMapGroupCount, _spawnConfig
+  Methods: .ctor, CreateCountForSpecificMapGroups, AddKillCount, ResetCountForMap, ResetCount, CheckMapGroupCount, CheckAllNpcCount
+
+[04] #3097 Code.Networking.ServerStuff.MapServer.RequiredNpcCount
+  Fields: NpcId, Amount, GroupAmount
+  Methods: .ctor
+
+[04] #3069 Code.Networking.ServerStuff.StatisticsAndCurrencies.PlayerStatisticsAndCurrencies
+  Fields: <Currencies>k__BackingField, <CurrentStatistics>k__BackingField, _currentXpLevel, _currentRank, _currentPvpRank, _currentEliteLevel, <StatisticsChanged>k__BackingField, <CurrentTotalElitePoints>k__BackingField, <CurrentEliteProgressPoints>k__BackingField, <ElitePointsForNextLevel>k__BackingField, <XpForNextLevel>k__BackingField, OnChanged, OnLeveledUp, EliteLeveledUp, OnPvpRankUpdated, OnRankUpdated
+  Methods: get_Currencies, set_Currencies, get_CurrentStatistics, set_CurrentStatistics, get_StatisticsChanged, set_StatisticsChanged, get_CurrentXpLevel, get_CurrentRank, get_CurrentPvpRank, get_CurrentEliteLevel, get_CurrentTotalElitePoints, set_CurrentTotalElitePoints, get_CurrentEliteProgressPoints, set_CurrentEliteProgressPoints, get_ElitePointsForNextLevel, set_ElitePointsForNextLevel, get_XpForNextLevel, set_XpForNextLevel, add_OnChanged, remove_OnChanged, add_OnLeveledUp, remove_OnLeveledUp, add_EliteLeveledUp, remove_EliteLeveledUp, add_OnPvpRankUpdated, remove_OnPvpRankUpdated, add_OnRankUpdated, remove_OnRankUpdated, .ctor, .ctor, SetPlayerLevel, CheckEliteLevel, CheckPlayerLevel, GetLevelProgress, CheckPvpPlayerRank, AddRewards, AddCurrencies, AddStatistics, SetCurrencies, SpendCurrency, AddCurrency, BalanceAddCurrency, AddQuestXp, AddBalanceStatistic, AddStatistic, SetStatistic, RestartFlags, GetCurrency, GetStatistic
+
+[04] #3072 Code.Networking.ServerStuff.StatisticsAndCurrencies.ServerPlayerCurrenciesHandler
+  Fields: PlayersCurrenciesMap, PvpPlayerRankChanged
+  Methods: add_PvpPlayerRankChanged, remove_PvpPlayerRankChanged, .ctor, AddPlayer, GetPlayerCurrencies, RemovePlayer
+
+[04] #2430 Code.Playfab.Guilds.GuildCustomMessageType
+  Fields: value__, IslandAlert, PlayerHelpSignal
+  Methods: -
+
+[04] #2431 Code.Playfab.Guilds.GuildIslandDefenceAlert
+  Fields: <Map>k__BackingField
+  Methods: get_Map, set_Map, .ctor
+
+[04] #2427 Code.Playfab.Guilds.GuildMemberRequest
+  Fields: <PlayerTitleId>k__BackingField, <Nickname>k__BackingField, <RequestDate>k__BackingField, <Message>k__BackingField
+  Methods: get_PlayerTitleId, set_PlayerTitleId, get_Nickname, set_Nickname, get_RequestDate, set_RequestDate, get_Message, set_Message, .ctor
+
+[04] #2432 Code.Playfab.Guilds.PlayerHelpSignal
+  Fields: <Map>k__BackingField, <Position>k__BackingField, <PlayerTitleId>k__BackingField, <PlayerNickname>k__BackingField
+  Methods: get_Map, set_Map, get_Position, set_Position, get_PlayerTitleId, set_PlayerTitleId, get_PlayerNickname, set_PlayerNickname, .ctor
+
+[04] #2428 Code.Playfab.Guilds.PlayerPresence
+  Fields: <PlayerTitleId>k__BackingField, <LastMap>k__BackingField, <Status>k__BackingField
+  Methods: get_PlayerTitleId, set_PlayerTitleId, get_LastMap, set_LastMap, get_Status, set_Status, .ctor
+
+[04] #4119 Fusion.CodeGen.ReaderWriter@Code_Core_Ship_Player_AbilityUsedNetworkInfo
+  Fields: Instance
+  Methods: Read, ReadRef, Write, GetElementWordCount, GetElementHashCode, GetInstance
+
+[03] #3000 <<GetAllIslandsAndTowerData>b__3_0>d
+  Fields: <>1__state, <>t__builder, <>4__this, island, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3773 <<GrantConsumableItemsToPlayerAsync>b__0>d
+  Fields: <>1__state, <>t__builder, transaction, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3049 <<SavePlayerConsumablesTask>b__0>d
+  Fields: <>1__state, <>t__builder, <>4__this, <currentAmmo>5__2, <currentConsumables>5__3, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3639 <<UpdatePlayerDonationTotalAsync>b__0>d
+  Fields: <>1__state, <>t__builder, transaction, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2442 <>c
+  Fields: <>9, <>9__24_0, <>9__28_0, <>9__42_0
+  Methods: .cctor, .ctor, <GetCurrentPlayerGuild>b__24_0, <CreateGuild>b__28_0, <GetCurrentAppliedGuildInfo>b__42_0, <.cctor>b__50_0
+
+[03] #4007 <>c
+  Fields: <>9, <>9__13_0, <>9__16_0, <>9__16_1
+  Methods: .cctor, .ctor, <ClearCastleInfoRows>b__13_0, <BuildShop>b__16_0, <BuildShop>b__16_1
+
+[03] #3575 <>c__DisplayClass105_0
+  Fields: <>4__this, newPlayerShip, playerId, displayName
+  Methods: .ctor, <SpawnPlayerShip>b__0
+
+[03] #3191 <>c__DisplayClass10_0
+  Fields: shipMapMover
+  Methods: .ctor, <RPC_TryExitRaidMap>b__0
+
+[03] #2832 <>c__DisplayClass13_2
+  Fields: localPlayerWeaponStorage
+  Methods: .ctor, <UpdateCurrentEquipment>b__3, <UpdateCurrentEquipment>b__4
+
+[03] #2977 <>c__DisplayClass16_0
+  Fields: guildTag
+  Methods: .ctor, <GetGuildIslandCount>b__0
+
+[03] #3063 <>c__DisplayClass16_0
+  Fields: <>4__this, prefab
+  Methods: .ctor, <SpawnNpc>g__InitNetworkState|0
+
+[03] #2422 <>c__DisplayClass17_0
+  Fields: timer, t
+  Methods: .ctor, <RemoveMemberFromGuild>b__0, <RemoveMemberFromGuild>b__1, <RemoveMemberFromGuild>b__2
+
+[03] #2502 <>c__DisplayClass17_0
+  Fields: <>4__this, observableAllyList, observableEnemyList
+  Methods: .ctor, <SubscribeToGuildDiplomacy>b__0, <SubscribeToGuildDiplomacy>b__1
+
+[03] #2390 <>c__DisplayClass19_0
+  Fields: t, timer
+  Methods: .ctor, <AutoEquipShipWeapons>b__0, <AutoEquipShipWeapons>b__1, <AutoEquipShipWeapons>b__2
+
+[03] #2403 <>c__DisplayClass1_0
+  Fields: playerId, t, <>9__2, <>9__3
+  Methods: .ctor, <GetPlayerGuildId>b__0, <GetPlayerGuildId>b__2, <GetPlayerGuildId>b__3, <GetPlayerGuildId>b__1
+
+[03] #2979 <>c__DisplayClass21_0
+  Fields: guildIsland
+  Methods: .ctor, <InitializeServerGuildIslands>b__0
+
+[03] #3066 <>c__DisplayClass21_0
+  Fields: networkChest, <>4__this
+  Methods: .ctor, <SpawnWorldChest>b__1
+
+[03] #2020 <>c__DisplayClass22_0
+  Fields: t
+  Methods: .ctor, <SaveGuildIslandsData>b__0
+
+[03] #2755 <>c__DisplayClass23_0
+  Fields: cannonTypeId
+  Methods: .ctor, <OnEquipWeaponTypeClicked>b__0
+
+[03] #2981 <>c__DisplayClass23_0
+  Fields: mapName
+  Methods: .ctor, <CanBuildTowerForIsland>b__0
+
+[03] #3415 <>c__DisplayClass24_0
+  Fields: cannonTypeId
+  Methods: .ctor, <RemoveWeaponsByType>b__0
+
+[03] #2982 <>c__DisplayClass25_0
+  Fields: mapName
+  Methods: .ctor, <BuildOrUpgradeTowerForIsland>b__0
+
+[03] #2458 <>c__DisplayClass40_0
+  Fields: playerId
+  Methods: .ctor, <AcceptMemberOnGuild>b__0
+
+[03] #3090 <>c__DisplayClass47_1
+  Fields: networkChest, CS$<>8__locals1
+  Methods: .ctor, <SpawnWorldChest>b__1
+
+[03] #3140 <>c__DisplayClass59_1
+  Fields: networkChest, CS$<>8__locals1
+  Methods: .ctor, <SpawnHpChest>b__1
+
+[03] #2412 <>c__DisplayClass6_0
+  Fields: t
+  Methods: .ctor, <GetPlayerGuildId>b__0, <GetPlayerGuildId>b__1, <GetPlayerGuildId>b__2
+
+[03] #2991 <>c__DisplayClass6_0
+  Fields: island, <>4__this
+  Methods: .ctor, <GetGuildIslandsAndTowers>b__1
+
+[03] #2413 <>c__DisplayClass7_0
+  Fields: t
+  Methods: .ctor, <GetLocalPlayerGuildId>b__0, <GetLocalPlayerGuildId>b__1, <GetLocalPlayerGuildId>b__2
+
+[03] #2993 <>c__DisplayClass7_0
+  Fields: <>4__this, islandList
+  Methods: .ctor, <SubscribeToGuildIslandChanges>b__0
+
+[03] #1875 <>f__AnonymousType33`2
+  Fields: <PlayerGuildId>i__Field, <AllyGuildTag>i__Field
+  Methods: get_PlayerGuildId, get_AllyGuildTag, .ctor, Equals, GetHashCode, ToString
+
+[03] #3666 <AddCurrencyAsync>d__4
+  Fields: <>1__state, <>t__builder, currencyCode, amount, <>4__this, guildId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3669 <AddCurrencyAsync>d__4
+  Fields: <>1__state, <>t__builder, amount, <>4__this, guildId, currencyName, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3638 <AddDonationHistoryAsync>d__3
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, donationRecordData, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2874 <AddEnemyButtonPressed>d__22
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2861 <ApplyGuild>d__14
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2450 <ApplyToGuild>d__31
+  Fields: <>1__state, <>t__builder, guildId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3764 <BuildShop>d__10
+  Fields: <>1__state, <>t__builder, <>4__this, <getStoreItems>5__2, <getCatalogItems>5__3, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3800 <BuildShop>d__12
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #4008 <BuildShop>d__16
+  Fields: <>1__state, <>t__builder, <>4__this
+  Methods: MoveNext, SetStateMachine
+
+[03] #3767 <BuildShop>d__9
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3980 <BuyCastleAsync>d__18
+  Fields: <>1__state, <>t__builder, <>4__this, castleSlotId, castleSelectedItemId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2804 <BuySfShipDeck>d__50
+  Fields: <>1__state, <>t__builder, deckId, <>4__this, deckPrice, <isGoldDeck>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2937 <BuyShip>d__2
+  Fields: <>1__state, <>t__builder
+  Methods: MoveNext, SetStateMachine
+
+[03] #2809 <BuyShip>d__58
+  Fields: <>1__state, <>t__builder, buyTryInfo, shipName, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3738 <BuyShipAssistantImprovement>d__3
+  Fields: <>1__state, <>t__builder, itemId, catalogName, storeId, currencyCode, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2807 <BuyShipDeck>d__54
+  Fields: <>1__state, <>t__builder, <>4__this, buyTryInfo, itemClassId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2806 <BuyShipImprovement>d__53
+  Fields: <>1__state, <>t__builder, <>4__this, buyTryInfo, itemClassId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2808 <BuyWeaponItem>d__57
+  Fields: <>1__state, <>t__builder, buyTryInfo, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3229 <CancelQuest>d__26
+  Fields: <>1__state, <>t__builder, questId, <>4__this, <quest>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2524 <CheckPlayerHasBanForChat>d__6
+  Fields: <>1__state, <>t__builder, <>4__this, playerTitleId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2627 <Configure>d__37
+  Fields: <>1__state, <>t__builder, localShip, <>4__this, isAlly, badgeId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2800 <ConfigureAchievementsView>d__38
+  Fields: <>1__state, <>t__builder, playerProfileData, <>4__this, <achievementsViewModel>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2788 <ConfigureGuildDonationHistoryView>d__12
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2787 <ConfigureGuildWalletView>d__11
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2860 <CreateGuild>d__13
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2447 <CreateGuild>d__28
+  Fields: <>1__state, <>t__builder, guildTag, guildFullName, <>u__1, <>u__2, <>u__3
+  Methods: MoveNext, SetStateMachine
+
+[03] #3636 <DonateToGuild>d__2
+  Fields: <>1__state, <>t__builder, <>4__this, currencyCode, amount, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3634 <DonateToGuild>d__4
+  Fields: <>1__state, <>t__builder, <>4__this, currencyCode, amount, <>8__1, <timeoutTask>5__2, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[03] #2455 <DowngradeAdminToMember>d__37
+  Fields: <>1__state, <>t__builder, playerId, playerCurrentRole, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3462 <FetchLocalPlayerEntry>d__12
+  Fields: <>1__state, <>t__builder, <>4__this, leaderboardName, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3048 <ForceSavePlayerConsumables>d__7
+  Fields: <>1__state, <>t__builder, <>4__this, playerId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3043 <ForceUpdateStatisticsAndCurrenciesOnServer>d__7
+  Fields: <>1__state, <>t__builder, <>4__this, playerId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2496 <GetAllGuilds>d__2
+  Fields: <>1__state, <>t__builder, <>4__this, <guilds>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2446 <GetAllGuilds>d__27
+  Fields: <>1__state, <>t__builder, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2986 <GetAllIslandsAndTowerData>d__3
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[03] #2372 <GetAllShipsFromCatalog>d__4
+  Fields: <>1__state, <>t__builder, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3077 <GetAndAddGuildInfo>d__19
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3976 <GetCastleCatalogItem>d__12
+  Fields: <>1__state, <>t__builder, castleItemId, <>4__this, <>8__1, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3978 <GetCastleListForSlot>d__13
+  Fields: <>1__state, <>t__builder, <>4__this, castleType, <>8__1, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[03] #2016 <GetCastlesComponentsConfig>d__16
+  Fields: <>1__state, <>t__builder, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3956 <GetCastlesData>d__7
+  Fields: <>1__state, <>t__builder, <>4__this
+  Methods: MoveNext, SetStateMachine
+
+[03] #3660 <GetCurrenciesAsync>d__2
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3677 <GetCurrenciesAsync>d__3
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2462 <GetCurrentGuildApplications>d__44
+  Fields: <>1__state, <>t__builder
+  Methods: MoveNext, SetStateMachine
+
+[03] #2955 <GetFromIpApi>d__5
+  Fields: <>1__state, <>t__builder, <request>5__2, <operation>5__3, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2954 <GetFromIpWhoIs>d__4
+  Fields: <>1__state, <>t__builder, <request>5__2, <operation>5__3, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2499 <GetGuildApplications>d__6
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2497 <GetGuildById>d__3
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3680 <GetGuildCurrenciesAsync>d__2
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2498 <GetGuildData>d__4
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, <guildInfo>5__2, <observableGuildMembers>5__3, <observablePresenceList>5__4, <observableAllyList>5__5, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[03] #2463 <GetGuildList>d__45
+  Fields: <>1__state, <>t__builder
+  Methods: MoveNext, SetStateMachine
+
+[03] #2988 <GetIslandTowers>d__4
+  Fields: <>1__state, <>t__builder, islandRef, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3673 <GetLatestDonationsAsync>d__2
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, since, limit, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3454 <GetLocalPlayerEntryAsync>d__6
+  Fields: <>1__state, <>t__builder, <>4__this, leaderboardName, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #4069 <GetPlayerAchievementsAsync>d__8
+  Fields: <>1__state, <>t__builder, <>4__this, <>8__1, playerId, <achievements>5__2, <>u__1, <>u__2, <>u__3
+  Methods: MoveNext, SetStateMachine
+
+[03] #2527 <GetPlayerBadges>d__9
+  Fields: <>1__state, <>t__builder, <>4__this, playerTitleId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2529 <GetPlayerDesigns>d__11
+  Fields: <>1__state, <>t__builder, <>4__this, playerTitleId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3821 <GetPlayerPackDataAsync>d__11
+  Fields: <>1__state, <>t__builder, <>4__this, playerTitleId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3811 <GetPlayerPackDataAsync>d__7
+  Fields: <>1__state, <>t__builder, <>4__this, playerTitleId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3815 <GetPlayerPackInfoAsync>d__3
+  Fields: <>1__state, <>t__builder, <>4__this, playerTitleId, <data>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3841 <GetPlayerPacksInfo>d__12
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2525 <GetPlayerVipEndDate>d__7
+  Fields: <>1__state, <>t__builder, <>4__this, playerTitleId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3211 <GetQuestFromFirestore>d__10
+  Fields: <>1__state, <>t__builder, questId, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3643 <GetRecentDonationsAsync>d__5
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, limit, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2017 <GetShipComponentsConfig>d__17
+  Fields: <>1__state, <>t__builder, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2015 <GetShipImprovementsConfig>d__15
+  Fields: <>1__state, <>t__builder, <componentShipsConfig>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2018 <GetShipsConfig>d__19
+  Fields: <>1__state, <>t__builder, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2370 <GetWeaponsCatalog>d__2
+  Fields: <>1__state, <>t__builder, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2012 <GetWeaponsInfo>d__11
+  Fields: <>1__state, <>t__builder, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2371 <GetWeaponsInfo>d__3
+  Fields: <>1__state, <>t__builder, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3136 <GiveBattleGroundRewards>d__9
+  Fields: <>1__state, <>t__builder, thunderBallWinnerData, <>4__this, <otherTeamDataCopy>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3135 <GiveRewards>d__8
+  Fields: <>1__state, <>t__builder, teamData, <>4__this, basePoints, addVictory, <thunderBallPointsStatistic>5__2, <thunderBallVictoriesStatistic>5__3, <orderedPlayers>5__4, <i>5__5, <player>5__6, <thunderPoints>5__7, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3775 <GrantConsumableItemsToPlayerAsync>d__3
+  Fields: <>1__state, <>t__builder, itemId, amount, <>4__this, titlePlayerId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3076 <InitGuilds>d__10
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3081 <InitializeServerGuildController>d__34
+  Fields: <>1__state, <>t__builder, <>4__this, firestoreGuildService, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3080 <InitializeWorld>d__32
+  Fields: <>1__state, <>t__builder
+  Methods: MoveNext, SetStateMachine
+
+[03] #2140 <InstallShopSkinService>d__2
+  Fields: <>1__state, <>t__builder, serviceLocator, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2448 <LeaveGuild>d__29
+  Fields: <>1__state, <>t__builder, <leaved>5__2, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[03] #1958 <ListMembership>d__23
+  Fields: <>1__state, <>t__builder, <>4__this, entityId, entityType, <>u__1, <>u__2
+  Methods: MoveNext, SetStateMachine
+
+[03] #4090 <LoadAchievementsAsync>d__6
+  Fields: <>1__state, <>t__builder, <>4__this, playerId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3501 <LoadAndDisplayIslands>d__10
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3868 <LoadAsync>d__3
+  Fields: <>1__state, <>t__builder, <>4__this, playerTitleId, <result>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3682 <LoadAsync>d__9
+  Fields: <>1__state, <>t__builder, <>4__this, <guildId>5__2, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3675 <LoadInitialDonationsAsync>d__5
+  Fields: <>1__state, <>t__builder, <>4__this, guildId, since, limit, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3801 <LoadItemsIntoShop>d__14
+  Fields: <>1__state, <>t__builder, <>4__this, catalogName, storeId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3209 <LoadPirateQuestsFromFirestore>d__8
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3210 <LoadQuestFromFirestore>d__9
+  Fields: <>1__state, <>t__builder, <>4__this, questId, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #3208 <LoadQuestsFromFirestore>d__7
+  Fields: <>1__state, <>t__builder, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+
+[03] #2864 <OnAcceptPressed>d__16
+  Fields: <>1__state, <>t__builder, playerTitleId, nickname, <>4__this, <>u__1
+  Methods: MoveNext, SetStateMachine
+

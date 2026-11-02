@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "milestone": "M54",
+  "known_slots": 283,
+  "explicit_literal_references": [
+    "cannon",
+    "captain_crest",
+    "captain_portrait",
+    "harbor_backdrop",
+    "harpoon",
+    "mastery_level_up"
+  ],
+  "unknown_explicit_references": [],
+  "note": "Only complete literal calls are checked. Dynamic family composition such as button_ + state is validated by family contracts."
+}

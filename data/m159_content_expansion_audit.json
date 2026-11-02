@@ -1,0 +1,13 @@
+{
+ "schema":1,"milestone":"M159","status":"IMPLEMENTED_LOCAL_PRODUCTION_FOUNDATION",
+ "completed":[
+  "guild island expanded with shipyard, treasury, siege workshop, mortar and ward towers",
+  "guild island/tower persistence and combat remain server-authoritative by contract",
+  "deck cap expanded from 3 to 10 and visible layered deck presentation added below player ship",
+  "crystal blessing visual aura with rotating emissive crystals and pulse ring added",
+  "twelve additional item/material definitions added to inventory/content foundation",
+  "admin badge contract added; verified ADMIN is separated from DEV ADMIN local preview",
+  "existing M158 encounter, cannon, bonusmap and Halloween runtime preserved"
+ ],
+ "next":["motor/armor/cannon/crew/harpoon deck ownership runtime","guild membership/roles/treasury service integration","guild island upgrade costs and siege server transactions","more final GLB replacements","buff duration authority and persistence"]
+}

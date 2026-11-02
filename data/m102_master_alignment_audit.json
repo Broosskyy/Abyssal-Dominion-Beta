@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "milestone": "M102",
+  "source_alignment": {
+    "master_v3_2_v3_5": [
+      "Auth/Account abstractions",
+      "Repository/Persistence boundaries",
+      "Global/Test separation",
+      "server authority",
+      "provider linking"
+    ],
+    "master_v3_6": [
+      "multi-platform/crossplay architecture",
+      "versioned compatibility",
+      "release identity",
+      "telemetry/operations readiness"
+    ],
+    "v3_7": "requested by owner but not found in current library search; no unsupported clauses invented"
+  },
+  "truth": {
+    "live_auth": false,
+    "backend": false,
+    "server_persistence": false,
+    "server_combat": false,
+    "payment_entitlements": false,
+    "staff_authority": false,
+    "local_adapter_only": true
+  },
+  "p0_first13": 13,
+  "native_pending": [
+    "Godot 4.7.2 parse/runtime",
+    "Android/iOS",
+    "desktop/web",
+    "P0 final GLB import",
+    "monster final rig"
+  ]
+}

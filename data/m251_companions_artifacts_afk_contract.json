@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "milestone": "M251",
+  "master_concept": "V3.8",
+  "system": "COMPANIONS_ARTIFACTS_AFK_CONVERGENCE",
+  "master_scope": {
+    "companion_roles": ["combat", "defense", "support", "hunter", "loot_salvage", "navigation", "exploration", "utility"],
+    "companion_active_slots_initial": 1,
+    "artifact_families": ["war", "defense", "navigation", "hunter", "fortune", "support", "exploration", "guild", "event", "abyssal"],
+    "artifact_slot_policy": "few_active_slots_not_item_wall",
+    "afk_pool": "captain_expedition_or_harbor_operations",
+    "afk_active_play_superiority_required": true,
+    "afk_forbidden_background_content": ["pvp", "ranked", "guild_war", "admiral", "world_boss", "bonusmap_high_end", "event_ranking", "rare_endgame_drop"],
+    "rested_captain_bonus_separate": true
+  },
+  "authority": {
+    "companion_ownership": "server_authoritative_online",
+    "companion_level_mastery_traits": "server_authoritative_online",
+    "companion_loadout": "server_validated_online",
+    "artifact_ownership": "server_authoritative_online",
+    "artifact_progression_resonance_sets": "server_authoritative_online",
+    "artifact_loadout": "server_validated_online",
+    "afk_offline_time": "trusted_server_session_timestamps_only",
+    "afk_reward_resolution": "server_authoritative_online",
+    "afk_claim": "server_authoritative_idempotent_transaction_receipt",
+    "client_clock": "never_authoritative_for_afk_rewards",
+    "local_catalogs": "presentation_and_development_preview_only"
+  },
+  "snapshot": {
+    "revision": "monotonic_non_decreasing",
+    "fields": ["revision", "companions", "active_companion", "artifacts", "artifact_loadout", "afk", "claim_receipts"],
+    "never_fabricate": ["ownership", "level", "mastery", "traits", "fragments", "pity", "resonance", "reward_amounts", "offline_seconds", "claim_receipts"]
+  },
+  "companion_rules": {
+    "manual_combat_remains_primary": true,
+    "cannot_replace_cannons_or_harpoons": true,
+    "gameplay_relevant_companions_earnable": true,
+    "dominant_pvp_cash_exclusive_forbidden": true,
+    "sea_map_presentation": "concise_only",
+    "asset_slots": ["model", "icon", "portrait", "material_texture", "vfx", "audio", "animation_rig"]
+  },
+  "artifact_rules": {
+    "specialization_over_generic_stat_ladder": true,
+    "strong_effects_need": ["trigger", "limit", "cooldown", "tradeoff"],
+    "set_synergy_not_universal_mandatory_bis": true,
+    "competitive_power_earnable": true,
+    "dominant_cash_exclusive_forbidden": true
+  },
+  "afk_rules": {
+    "no_background_sea_map_simulation": true,
+    "claim_after_login": true,
+    "horizontal_focus_modifiers_allowed": ["materials", "monster_hunter", "salvage", "capacity", "reward_profile_choice"],
+    "modifiers_capped": true,
+    "exact_caps_rates_unlock_times_final": false,
+    "telemetry": ["claim_rate", "return_rate", "reward_value", "active_to_afk_value_ratio"]
+  },
+  "ui": {
+    "command_deck_page": "meta",
+    "sections": ["companion", "artifacts", "afk_rewards", "authority"],
+    "mobile_large_touch_targets": true,
+    "no_permanent_meta_hud_panel": true,
+    "responsive_information_architecture_equal_across_platforms": true,
+    "micro_animation_presentation_only": true
+  },
+  "balance": {
+    "m152_values": "local_prototype_only",
+    "new_final_values_invented": false,
+    "final_caps": null,
+    "final_progression_thresholds": null,
+    "final_drop_probabilities": null,
+    "final_afk_rates": null
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "milestone": "M242",
+  "master_concept": "V3.8",
+  "scope": "officer_progression_acquisition_and_role_readiness",
+  "authority": {
+    "live_ownership": "server_required",
+    "live_xp_level": "server_required",
+    "live_acquisition": "server_required",
+    "live_upgrade_costs": "server_required",
+    "local_qa_mutation": true
+  },
+  "progression": {
+    "level_cap_source": "per_officer_definition",
+    "xp_thresholds": "authoritative_snapshot_or_future_balance_config",
+    "invent_client_thresholds": false,
+    "invent_client_costs": false,
+    "downgrade_on_respec": false
+  },
+  "canonical_roles": [
+    {"id":"master_gunner","label":"Master Gunner","specialty":"cannon_build","effect_state":"contract_only_no_unbalanced_modifier"},
+    {"id":"harpoon_master","label":"Harpoon Master","specialty":"hunter_harpoon_build","effect_state":"contract_only_no_unbalanced_modifier"},
+    {"id":"navigator","label":"Navigator","specialty":"navigation_mobility","effect_state":"contract_only_no_unbalanced_modifier"},
+    {"id":"shipwright","label":"Shipwright","specialty":"hull_sustain","effect_state":"active_via_repair_master"},
+    {"id":"quartermaster","label":"Quartermaster","specialty":"supplies_logistics","effect_state":"contract_only_no_unbalanced_modifier"},
+    {"id":"surgeon","label":"Surgeon","specialty":"support_recovery","effect_state":"contract_only_no_unbalanced_modifier"}
+  ],
+  "acquisition_channels": [
+    "harbor_progression",
+    "pve_progression",
+    "quests_trials",
+    "events",
+    "achievements",
+    "future_server_offers"
+  ],
+  "rules": [
+    "Core officer roles require planable earnable acquisition paths and cannot be mandatory gacha-only progression.",
+    "Officer quality, level, traits, passives and optional special abilities are data-driven.",
+    "Exact officer percentages, XP thresholds, costs and combat modifiers remain unset until Combat/Economy playtests.",
+    "Assignment changes are loadout/respec operations and do not destroy ownership or progression.",
+    "The client never promotes an officer, invents an entitlement, spends live currency, or grants a live reward without authority.",
+    "Crew remains abstracted and never becomes individual sailor micromanagement."
+  ]
+}

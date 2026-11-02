@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "region": {
+    "id": "sovereign_waters",
+    "display_name": "Sovereign Waters",
+    "levels": [
+      41,
+      45
+    ],
+    "primary_harbor": "Crownwatch"
+  },
+  "levels": {
+    "41": {
+      "level": 41,
+      "name": "Sovereign Gate",
+      "map_xp_goal": 2550,
+      "region_objectives": 6,
+      "hunter_required": 0,
+      "prestige_required": 2,
+      "requires_trial": false,
+      "focus": "Sovereign Fleet entry",
+      "mastery_xp": {
+        "normal": 80,
+        "elite": 125,
+        "boss": 250
+      }
+    },
+    "42": {
+      "level": 42,
+      "name": "Crownwake Reach",
+      "map_xp_goal": 2870,
+      "region_objectives": 7,
+      "hunter_required": 0,
+      "prestige_required": 3,
+      "requires_trial": false,
+      "focus": "Hero escort / prestige",
+      "mastery_xp": {
+        "normal": 86,
+        "elite": 135,
+        "boss": 268
+      }
+    },
+    "43": {
+      "level": 43,
+      "name": "Bannerfall Sea",
+      "map_xp_goal": 3190,
+      "region_objectives": 8,
+      "hunter_required": 1,
+      "prestige_required": 4,
+      "requires_trial": false,
+      "focus": "World objectives",
+      "mastery_xp": {
+        "normal": 92,
+        "elite": 145,
+        "boss": 286
+      }
+    },
+    "44": {
+      "level": 44,
+      "name": "High Admiral Sound",
+      "map_xp_goal": 3510,
+      "region_objectives": 9,
+      "hunter_required": 1,
+      "prestige_required": 5,
+      "requires_trial": false,
+      "focus": "High Admiral / mastery",
+      "mastery_xp": {
+        "normal": 98,
+        "elite": 155,
+        "boss": 304
+      }
+    },
+    "45": {
+      "level": 45,
+      "name": "Sovereign Muster",
+      "map_xp_goal": 3830,
+      "region_objectives": 10,
+      "hunter_required": 1,
+      "prestige_required": 6,
+      "requires_trial": true,
+      "focus": "Prestige & mastery trial",
+      "mastery_xp": {
+        "normal": 104,
+        "elite": 165,
+        "boss": 322
+      }
+    }
+  },
+  "trial45": {
+    "name": "Sovereign Mastery",
+    "requirements": [
+      "map_xp",
+      "regional_objectives",
+      "prestige_objectives",
+      "high_admiral",
+      "hunter"
+    ],
+    "xp_alone_never_unlocks": true
+  },
+  "guild_note": "Guild-war hooks are presentation/contracts only until real server authority exists."
+}

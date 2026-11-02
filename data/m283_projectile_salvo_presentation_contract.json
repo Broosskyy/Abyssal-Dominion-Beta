@@ -1,0 +1,62 @@
+{
+  "milestone": "M283",
+  "contract": "projectile_travel_cannon_salvo_harpoon_impact_audio_haptics_presentation_foundation",
+  "master_concept": "V3.8",
+  "genre_ux_references": [
+    "Seafight",
+    "Battle of Sea"
+  ],
+  "dependencies": {
+    "projectile_truth": "M270",
+    "combat_feedback": "M282",
+    "combat_outcome": "M269",
+    "hud_convergence": "M281",
+    "world_replication": "M267"
+  },
+  "authority": {
+    "server_owns": [
+      "projectile_spawn_truth",
+      "projectile_impact_truth",
+      "impact_target_truth",
+      "combat_outcome_truth",
+      "presentation_event_ordering"
+    ],
+    "client_may": [
+      "render_projectile_travel",
+      "play_confirmed_impact_vfx",
+      "play_local_audio",
+      "play_local_haptics",
+      "apply_accessibility_preferences"
+    ],
+    "client_never": [
+      "spawn_authoritative_projectile",
+      "confirm_projectile_impact",
+      "apply_damage_from_vfx",
+      "treat_audio_or_haptics_as_hit_truth"
+    ]
+  },
+  "visual_rules": {
+    "sea_chart_first": true,
+    "cannon_and_harpoon_readable_as_distinct_families": true,
+    "water_hull_monster_impact_hooks": true,
+    "center_remains_readable": true,
+    "primary_attack_bottom_right_unobstructed": true,
+    "camera_joystick_bottom_left_unobstructed": true,
+    "safe_area_aware": true,
+    "mobile_desktop_parity": true,
+    "audio_haptics_optional_accessibility_safe": true,
+    "no_new_main_menu": true,
+    "no_permanent_debug_hud": true
+  },
+  "unset_until_measured": [
+    "projectile_visual_speed_scale",
+    "salvo_stagger_timing",
+    "muzzle_flash_duration",
+    "impact_vfx_intensity",
+    "water_splash_scale",
+    "screen_shake_strength",
+    "haptic_pattern_strength",
+    "audio_mix_levels",
+    "simultaneous_projectile_visual_budget"
+  ]
+}

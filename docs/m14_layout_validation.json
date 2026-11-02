@@ -1,0 +1,185 @@
+{
+	"layouts": [
+		{
+			"snapshot": {
+				"controls": {
+					"logout": {
+						"height": 50.0,
+						"width": 229.0,
+						"x": 673.5,
+						"y": 610.0
+					},
+					"play": {
+						"height": 50.0,
+						"width": 470.0,
+						"x": 553.0,
+						"y": 548.0
+					},
+					"settings": {
+						"height": 50.0,
+						"width": 229.0,
+						"x": 432.5,
+						"y": 610.0
+					}
+				},
+				"error": "",
+				"home": {
+					"sector_name": "1-1 Novice Tide",
+					"ship_id": "clipper",
+					"ship_name": "Clipper"
+				},
+				"name_input": "",
+				"screen": "home",
+				"settings": {
+					"effect_texts": true,
+					"map_transition": true,
+					"muted": false,
+					"only_own_damage": false,
+					"quality": "auto",
+					"single_visual_ball": false,
+					"volume": 0.8
+				}
+			},
+			"viewport": [
+				1600,
+				900
+			]
+		},
+		{
+			"snapshot": {
+				"controls": {
+					"logout": {
+						"height": 50.0,
+						"width": 180.0,
+						"x": 320.0,
+						"y": 318.0
+					},
+					"play": {
+						"height": 50.0,
+						"width": 372.0,
+						"x": 224.0,
+						"y": 256.0
+					},
+					"settings": {
+						"height": 50.0,
+						"width": 180.0,
+						"x": 128.0,
+						"y": 318.0
+					}
+				},
+				"error": "",
+				"home": {
+					"sector_name": "1-1 Novice Tide",
+					"ship_id": "clipper",
+					"ship_name": "Clipper"
+				},
+				"name_input": "",
+				"screen": "home",
+				"settings": {
+					"effect_texts": true,
+					"map_transition": true,
+					"muted": false,
+					"only_own_damage": false,
+					"quality": "auto",
+					"single_visual_ball": false,
+					"volume": 0.8
+				}
+			},
+			"viewport": [
+				844,
+				390
+			]
+		},
+		{
+			"snapshot": {
+				"controls": {
+					"logout": {
+						"height": 50.0,
+						"width": 198.0,
+						"x": 346.0,
+						"y": 329.0
+					},
+					"play": {
+						"height": 50.0,
+						"width": 407.0,
+						"x": 241.5,
+						"y": 267.0
+					},
+					"settings": {
+						"height": 50.0,
+						"width": 197.0,
+						"x": 136.5,
+						"y": 329.0
+					}
+				},
+				"error": "",
+				"home": {
+					"sector_name": "1-1 Novice Tide",
+					"ship_id": "clipper",
+					"ship_name": "Clipper"
+				},
+				"name_input": "",
+				"screen": "home",
+				"settings": {
+					"effect_texts": true,
+					"map_transition": true,
+					"muted": false,
+					"only_own_damage": false,
+					"quality": "auto",
+					"single_visual_ball": false,
+					"volume": 0.8
+				}
+			},
+			"viewport": [
+				915,
+				412
+			]
+		},
+		{
+			"snapshot": {
+				"controls": {
+					"logout": {
+						"height": 50.0,
+						"width": 151.0,
+						"x": 276.5,
+						"y": 533.0
+					},
+					"play": {
+						"height": 50.0,
+						"width": 314.0,
+						"x": 195.0,
+						"y": 471.0
+					},
+					"settings": {
+						"height": 50.0,
+						"width": 151.0,
+						"x": 113.5,
+						"y": 533.0
+					}
+				},
+				"error": "",
+				"home": {
+					"sector_name": "1-1 Novice Tide",
+					"ship_id": "clipper",
+					"ship_name": "Clipper"
+				},
+				"name_input": "",
+				"screen": "home",
+				"settings": {
+					"effect_texts": true,
+					"map_transition": true,
+					"muted": false,
+					"only_own_damage": false,
+					"quality": "auto",
+					"single_visual_ball": false,
+					"volume": 0.8
+				}
+			},
+			"viewport": [
+				390,
+				844
+			]
+		}
+	],
+	"rendering": "headless; geometry checks only, NOT visual acceptance"
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "milestone": "M145",
+  "default_profile": "TEST",
+  "api_base_path": "/api/admin/v1",
+  "profiles": {
+    "LOCAL": {"enabled": false, "base_url": "", "queue_writes": true, "queue_reads": false, "production_authority": false, "hard_locked": false},
+    "TEST": {"enabled": false, "base_url": "", "queue_writes": true, "queue_reads": false, "production_authority": false, "hard_locked": false},
+    "STAGING": {"enabled": false, "base_url": "", "queue_writes": true, "queue_reads": false, "production_authority": false, "hard_locked": false},
+    "GLOBAL": {"enabled": false, "base_url": "", "queue_writes": false, "queue_reads": false, "production_authority": false, "hard_locked": true}
+  },
+  "requirements": {
+    "scheme": "https",
+    "timeout_seconds": 15,
+    "maximum_attempts": 5,
+    "retry_delay_seconds": [2, 5, 15, 30, 60],
+    "persist_authentication": false,
+    "idempotency_field": "request_id",
+    "accept_only_server_verified_responses": true
+  },
+  "activation_rule": "A deployment must inject an HTTPS base URL and authentication at runtime. Credentials never enter project data or the persistent queue.",
+  "global_lock_rule": "GLOBAL stays hard locked until a signed release explicitly enables a real backend with MFA, server RBAC, approval policy, idempotency and immutable audit evidence."
+}

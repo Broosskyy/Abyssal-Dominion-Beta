@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "milestone": "M95",
+  "priority": "P0",
+  "master_first_13": [
+    "ship_small",
+    "ship_medium",
+    "ship_large",
+    "npc_friendly_coastal_sloop",
+    "npc_scout_01",
+    "npc_raider_01",
+    "npc_gunship_01",
+    "npc_heavy_01",
+    "harbor_havens_reach",
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "monster_early_01"
+  ],
+  "wired_this_milestone": [
+    "HalloweenEventEncounters",
+    "event quest sink hook",
+    "event harpoon monster hit hook",
+    "all 5 admin combat spawns",
+    "m95_gravefire_impact",
+    "m95_halloween_portal_vfx",
+    "m95_halloween_boss_arrival",
+    "m95_event_target",
+    "m95_admin_asset_browser"
+  ],
+  "prepared_next": [
+    "event_design_drowned_corsair_01",
+    "Halloween quest-world interaction trigger",
+    "Halloween VFX runtime resolver"
+  ],
+  "rule": "Master P0 first-13 remains final-art priority; M94 event/admin implementation is replaceable and local-development bounded.",
+  "guild_island_early_wave": [
+    "guild_island_base_01",
+    "guild_harbor_dock_01",
+    "guild_hall_01",
+    "guild_warehouse_01",
+    "guild_repair_station_01",
+    "guild_tower_cannon_01",
+    "guild_tower_chain_01",
+    "guild_tower_mortar_01",
+    "guild_tower_guardian_01",
+    "guild_wall_straight_01",
+    "guild_wall_corner_01",
+    "guild_shield_node_01"
+  ],
+  "next_locked": "M94 Admin Mode + Halloween Event foundation/vertical slice"
+}

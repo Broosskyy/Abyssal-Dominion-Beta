@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "milestone": "M66",
+  "palettes": {
+    "starter_sloop": {
+      "hull": "#79543a",
+      "deck": "#b78a55",
+      "sail": "#e2d7b9",
+      "metal": "#69757a",
+      "accent": "#2f7184"
+    },
+    "starter_brig": {
+      "hull": "#684832",
+      "deck": "#ae8150",
+      "sail": "#ded1ad",
+      "metal": "#66747b",
+      "accent": "#b58b45"
+    },
+    "starter_heavy": {
+      "hull": "#594034",
+      "deck": "#9d754b",
+      "sail": "#d7c8a6",
+      "metal": "#596970",
+      "accent": "#9b6c39"
+    },
+    "friendly_coast": {
+      "hull": "#755f48",
+      "deck": "#b29263",
+      "sail": "#ded9c5",
+      "metal": "#718087",
+      "accent": "#4d9b91"
+    },
+    "scout": {
+      "hull": "#4e5960",
+      "deck": "#8b8069",
+      "sail": "#c9d1cc",
+      "metal": "#687b84",
+      "accent": "#4fa3b3"
+    },
+    "raider": {
+      "hull": "#5a3934",
+      "deck": "#8e6248",
+      "sail": "#c8b59b",
+      "metal": "#64686b",
+      "accent": "#a85043"
+    },
+    "gunship": {
+      "hull": "#4b4140",
+      "deck": "#7d6651",
+      "sail": "#bcb7a8",
+      "metal": "#59656c",
+      "accent": "#b58243"
+    },
+    "heavy": {
+      "hull": "#393c40",
+      "deck": "#695b4c",
+      "sail": "#aaa79c",
+      "metal": "#515d64",
+      "accent": "#9b6a39"
+    }
+  },
+  "accessibility": "Role identity uses silhouette/scale plus palette; never color alone."
+}

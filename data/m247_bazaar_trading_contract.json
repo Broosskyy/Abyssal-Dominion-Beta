@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "milestone": "M247",
+  "master_concept": "V3.8",
+  "system": "PLAYER_BAZAAR_TRADING",
+  "master_contract": {
+    "listing": "player offers defined tradeable items",
+    "currency": "gold_primary",
+    "duration_options": [12, 24, 48],
+    "duration_unit": "hours_configurable_not_final",
+    "listing_fee": "small_non_refundable_gold_sink_server_configured",
+    "sale_tax": "percentage_on_success_server_configured",
+    "search_filters": ["item_type", "tier", "family", "price", "region", "tags"],
+    "price_history": "later_aggregated_market_information",
+    "direct_transfer": "no_uncontrolled_gold_transfer_as_standard",
+    "server_authority": "final_listings_and_trades_server_validated"
+  },
+  "binding": {
+    "statuses": ["tradeable", "bind_on_equip", "account_bound", "ship_bound", "guild_bound", "event_bound"],
+    "tradeability_from_item_definition": true,
+    "core_progression_fully_buyable": false,
+    "premium_currency_free_player_trade": false
+  },
+  "anti_manipulation": {
+    "gold_transfer_rmt": "bazaar_authority_limits_telemetry",
+    "price_fixing": "market_data_listing_limits_cluster_detection",
+    "bot_farming": "qualified_contribution_spawn_reward_limits_server_authority",
+    "alt_accounts": "risk_scoring_and_new_account_trade_limits",
+    "duplication": "server_item_instances_and_transaction_ids",
+    "cancel_abuse": "fees_and_rate_limits",
+    "event_hoarding": "definition_driven_binding_expiry_season_rules",
+    "insider_liveops": "audit_logs_for_admin_price_reward_changes"
+  },
+  "snapshot_contract": {
+    "fields": ["revision", "summary", "listings", "my_listings", "recent_trades", "price_history", "limits", "config"],
+    "listing_fields": ["listing_id", "item_id", "item_name", "quantity", "unit_price", "total_price", "tier", "family", "region", "tags", "seller_display", "expires_at", "state"],
+    "revision_rule": "monotonic_non_decreasing"
+  },
+  "authority": {
+    "browse": "server_replica",
+    "create_listing": "server_authoritative_idempotent_transaction",
+    "cancel_listing": "server_authoritative_idempotent_transaction",
+    "buy_listing": "server_authoritative_idempotent_transaction",
+    "escrow": "server_owned",
+    "gold_and_item_transfer": "server_atomic",
+    "fees": "server_live_config",
+    "client_may_create_or_transfer_live_value": false
+  },
+  "balance": {
+    "listing_fee_percent_start_hypothesis": 2.0,
+    "sale_tax_percent_start_hypothesis": 5.0,
+    "final": false,
+    "note": "V3.8 names 2% listing fee and 5% sale tax only as explicit starting balance hypotheses; live configurable and not final."
+  },
+  "ui": {
+    "surface": "Command Deck / Basar",
+    "normal_hud": "no permanent bazaar panel",
+    "mobile_desktop_web": "same information architecture; responsive sizing only",
+    "offline_empty_state": "contract and server-required state only; no fabricated listings, prices, trades or balances"
+  }
+}

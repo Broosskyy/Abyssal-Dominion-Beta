@@ -1,0 +1,27 @@
+{
+  "region": "void_sea",
+  "performance_profile": "mobile_high_level",
+  "water": {
+    "fallback": "deep_desaturated",
+    "final_slot": "MAT-WATER-VOID-001"
+  },
+  "fog": {
+    "density_hint": 0.18,
+    "final_slot": "VFX-VOID-FOG-001"
+  },
+  "islands": [
+    "ISLAND-VOID-001",
+    "ISLAND-VOID-002",
+    "ISLAND-VOID-003"
+  ],
+  "harbor": "HARBOR-LAST-LIGHT-001",
+  "pois": [
+    "POI-VOID-RIFT-001",
+    "POI-VOID-WRECK-001"
+  ],
+  "mobile": {
+    "max_major_vfx": 2,
+    "max_world_poi_markers": 5,
+    "prefer_silhouette_over_particles": true
+  }
+}

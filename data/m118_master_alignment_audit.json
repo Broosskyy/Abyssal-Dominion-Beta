@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "milestone": "M118",
+  "v3_7_found": false,
+  "implemented": [
+    "explicit deterministic Gold/Abyss wave definitions",
+    "dedicated BonusMapWaveDirector",
+    "generic EncounterDirector no longer progresses bonus maps",
+    "Ancient Guardian/Titan boss identities",
+    "Legendary Fragment -> Ancient Relic Core sink",
+    "PL31-35 harbor UX",
+    "save state for legendary forge"
+  ],
+  "truth_boundary": [
+    "monster mechanics are identified/data-driven but Relic Barrier/Pressure Pulse active ability scripts remain next pass",
+    "bonusmap arena is local runtime, not server-authoritative",
+    "numeric balance prototype"
+  ],
+  "native_pending": true
+}

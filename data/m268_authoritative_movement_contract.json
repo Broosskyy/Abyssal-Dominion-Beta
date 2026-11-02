@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "milestone": "M268",
+  "master_concept": "V3.8",
+  "contract": "authoritative_movement_prediction_reconciliation",
+  "input_model": "tap_to_sail_client_intent",
+  "authority": {
+    "client_may": ["request_tap_to_sail", "predict_for_presentation", "render_authoritative_state", "request_resync"],
+    "server_owns": ["accepted_position", "accepted_velocity", "accepted_heading", "movement_revision", "movement_command_ack", "speed_legality", "teleport_legality", "route_legality", "collision_legality", "movement_correction"],
+    "client_never_commits": ["position", "velocity", "heading", "teleport", "movement_revision", "command_ack", "anti_cheat_verdict"]
+  },
+  "ordering": ["command_sequence", "movement_revision", "server_tick", "spawn_generation"],
+  "reconciliation": ["server_acknowledges_commands", "drop_acknowledged_predictions", "apply_authoritative_state", "reapply_pending_presentation_prediction", "smooth_or_snap_only_from_server_correction_kind"],
+  "world_transport_dependency": "M267 authoritative baseline/delta replica",
+  "environment_isolation": ["INTERNAL", "TEST", "GLOBAL"],
+  "unset_until_measured": ["movement_tick_rate", "prediction_window", "correction_threshold", "snap_threshold", "speed_tolerance", "teleport_tolerance", "route_validation_budget"]
+}

@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "milestone": "M86",
+  "status": "STATIC_GUARDS_EXTENDED",
+  "guarded": [
+    "currency",
+    "mission",
+    "objective",
+    "minimap",
+    "world/group utilities",
+    "target",
+    "wheel",
+    "quickbar",
+    "ammo_menu",
+    "items_menu",
+    "log"
+  ],
+  "input": "NauticalLayout.action_at ignores zero-area controls; blocks_world/reserved handle hidden rectangles",
+  "native_required": "touch/mouse/gamepad input leak QA still required"
+}

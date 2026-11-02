@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "milestone": "M210",
+  "purpose": "Drop-in authored asset intake map. Keep source masters separate from generated sheets and runtime atlases.",
+  "intake": {
+    "2d_source_master": "assets/production/authored_2d/source_masters/<family>/<asset_id>.png",
+    "2d_runtime_single": "assets/production/authored_2d/runtime/<family>/<asset_id>.png",
+    "2d_runtime_atlas": "assets/production/authored_2d/atlases/<family>/",
+    "world_model": "assets/production/authored_3d/<family>/<asset_id>.glb"
+  },
+  "rules": [
+    "one asset id per isolated master",
+    "no sheet-coordinate dependency in gameplay",
+    "preserve transparent padding",
+    "atlas only after isolated masters pass 96/64/48 px review",
+    "world GLB contains no baked water/fog/glow",
+    "collision/navigation remain wrapper-owned"
+  ],
+  "first_day_batches": [
+    {
+      "sheet": "UI01",
+      "count": 8
+    },
+    {
+      "sheet": "UI02",
+      "count": 6
+    },
+    {
+      "sheet": "UI03",
+      "count": 8
+    },
+    {
+      "sheet": "UI05",
+      "count": 7
+    }
+  ]
+}

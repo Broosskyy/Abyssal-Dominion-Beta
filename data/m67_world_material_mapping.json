@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "milestone": "M67",
+  "families": {
+    "tropical": {
+      "ground": "sand_base",
+      "rock": "rock_base",
+      "nature": "vegetation_base",
+      "coast": "coast_foam_mask"
+    },
+    "cliff_cove": {
+      "ground": "rock_base",
+      "rock": "rock_base",
+      "nature": "vegetation_base",
+      "coast": "coast_foam_mask"
+    },
+    "havens_reach": {
+      "pier": "harbor_wood",
+      "architecture": "harbor_stone",
+      "nature": "vegetation_base",
+      "coast": "coast_foam_mask"
+    }
+  },
+  "rule": "M64 material slots are reused; final GLB embedded/override materials remain supported and gameplay never reads these textures."
+}

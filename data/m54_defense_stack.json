@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "milestone": "M54",
+  "scope": "local prototype combat defense ordering",
+  "order": [
+    "incoming modifiers / vulnerability",
+    "temporary barrier pool",
+    "shield pool",
+    "armor and armor-pierce/break",
+    "consumable plate mitigation",
+    "hull"
+  ],
+  "rules": {
+    "barrier_and_shield_are_separate_pools": true,
+    "hull_armor_does_not_reduce_barrier_or_shield_absorption": true,
+    "overheal_contribution": 0,
+    "broadside_angle_damage_modifier": false
+  },
+  "authority": "local prototype only"
+}

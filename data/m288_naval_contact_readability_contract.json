@@ -1,0 +1,61 @@
+{
+  "milestone": "M288",
+  "contract": "naval_contact_target_threat_range_offscreen_readability",
+  "master_concept": "V3.8",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "Genre, naval contact readability and immediate game-feel reference only; no proprietary assets, icons, layouts, effects, sounds, formulas or timings.",
+  "ship_model_strategy": {
+    "initial_production": "ONE_COMPLETE_3D_MODEL_PER_SHIP",
+    "modular_ship_system_required": false,
+    "modular_ship_system_deferred": true,
+    "contact_layers": "external world-space VFX and HUD edge indicators",
+    "separate_hull_mast_sail_mesh_required": false,
+    "canonical_model_parts_never_hidden_detached_or_replaced": true
+  },
+  "dependencies": {
+    "combat_truth": "M269/M270",
+    "target_relationship_protection_truth": "M271",
+    "aggro_threat_truth": "M272",
+    "world_replica": "M267",
+    "existing_combat_hud": "M281"
+  },
+  "input_model": "server-confirmed naval contact snapshots and presentation events",
+  "contact_classes": ["PLAYER", "FLEET_ALLY", "FRIENDLY", "NEUTRAL", "HOSTILE", "ELITE", "ADMIRAL", "MONSTER", "BOSS"],
+  "engagement_states": ["PASSIVE", "AWARE", "AGGRO", "TARGETED", "IN_RANGE", "OUT_OF_RANGE", "PROTECTED", "DEFEATED"],
+  "presentation_events": ["TARGET_ACQUIRED", "TARGET_CLEARED", "THREAT_ENTER", "THREAT_EXIT", "RANGE_ENTER", "RANGE_EXIT", "PROTECTION_CHANGED", "PRIORITY_CHANGED"],
+  "visual_layers": ["target_focus", "relation_arc", "threat_chevrons", "range_bracket", "priority_beacon", "offscreen_marker"],
+  "priority_policy": {
+    "first": ["selected_target", "immediate_threat"],
+    "second": ["boss", "admiral", "monster", "elite"],
+    "third": ["fleet_ally", "friendly", "neutral"],
+    "mobile_secondary_contact_reduction_allowed": true,
+    "selected_target_never_removed_by_visual_budget": true
+  },
+  "authority": {
+    "server_owns": ["selected_target", "relationship", "protection", "safe_zone_legality", "attack_legality", "range_state", "aggro", "threat", "entity_identity", "contact_priority", "presentation_seed"],
+    "client_may": ["render confirmed contact state", "animate confirmed transitions", "reduce secondary contact VFX", "use high-contrast relation palette", "place prioritized offscreen indicators inside safe area"],
+    "client_never": ["select or clear target from presentation", "decide attack legality", "calculate authoritative range", "set relationship or aggro", "remove protection", "invent hostile contacts", "promote contact VFX to gameplay truth"]
+  },
+  "master_locks": {
+    "sea_chart_center_remains_readable": true,
+    "lower_left_camera_control_unobstructed": true,
+    "lower_right_attack_cluster_unobstructed": true,
+    "bottom_center_ammo_weapon_controls_unobstructed": true,
+    "tap_to_sail_unchanged": true,
+    "camera_joystick_camera_only": true,
+    "round_gameplay_minimap_unchanged": true,
+    "rectangular_full_sea_chart_unchanged": true,
+    "mobile_web_desktop_world_and_gameplay_parity": true,
+    "one_complete_ship_model_initially": true,
+    "no_modular_ship_mesh_dependency": true
+  },
+  "replication": {
+    "idempotent_event_ids": true,
+    "monotonic_revisions": true,
+    "monotonic_event_sequence": true,
+    "server_tick_guard": true,
+    "deterministic_presentation_seed": true,
+    "world_resync_clears_contact_presentation": true
+  },
+  "unset_until_native_qa": ["ring_width", "relation_arc_opacity", "threat_pulse_rate", "range_bracket_scale", "priority_beacon_height", "offscreen_edge_padding", "offscreen_marker_count", "transition_duration", "audio_mix", "haptic_strength", "simultaneous_contact_vfx_budget"]
+}

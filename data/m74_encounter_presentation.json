@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "milestone": "M74",
+  "title": "Encounter Presentation Profiles",
+  "profiles": {
+    "neutral": {
+      "label": "NEUTRAL",
+      "icon": "m74_relation_neutral",
+      "priority": 2
+    },
+    "provoked": {
+      "label": "ALARM",
+      "icon": "m74_relation_provoked",
+      "priority": 4,
+      "flash_seconds": 2.4
+    },
+    "hostile": {
+      "label": "HOSTILE",
+      "icon": "hud_target_hostile",
+      "priority": 3
+    },
+    "elite": {
+      "label": "ELITE",
+      "icon": "m74_rank_elite",
+      "priority": 5
+    },
+    "admiral": {
+      "label": "ADMIRAL",
+      "icon": "m74_rank_admiral",
+      "priority": 6
+    },
+    "monster": {
+      "label": "MONSTER",
+      "icon": "m74_rank_monster",
+      "priority": 7
+    }
+  },
+  "rules": [
+    "relation state derives from EncounterRelation",
+    "rank presentation does not change combat stats",
+    "provocation flash is cosmetic and time-limited",
+    "boss/monster visuals must not cover target bars"
+  ]
+}

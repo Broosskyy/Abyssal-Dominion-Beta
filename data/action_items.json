@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "milestone": "M94",
+  "authority": "local_prototype_compatibility_state",
+  "items": [
+    {
+      "id": "repair",
+      "name": "Emergency Planks",
+      "category": "repair",
+      "effect": "hull_repair",
+      "amount": 240.0,
+      "cooldown": 0.0,
+      "target": "self",
+      "breaks_veil": false
+    },
+    {
+      "id": "boost",
+      "name": "Storm Sail",
+      "category": "movement",
+      "effect": "speed_boost",
+      "multiplier": 1.45,
+      "duration": 3.5,
+      "cooldown": 12.0,
+      "target": "self",
+      "breaks_veil": false
+    },
+    {
+      "id": "veil",
+      "name": "Abyssal Veil",
+      "category": "utility",
+      "effect": "target_denial",
+      "duration": 8.0,
+      "cooldown": 45.0,
+      "target": "self",
+      "breaks_veil": false
+    },
+    {
+      "id": "storm_bolt",
+      "name": "Storm Bolt",
+      "category": "direct_damage",
+      "effect": "damage",
+      "damage": 145.0,
+      "armor_pierce": 0.2,
+      "range": 34.0,
+      "cooldown": 18.0,
+      "target": "hostile",
+      "breaks_veil": true
+    },
+    {
+      "id": "infernal_barrel",
+      "name": "Infernal Barrel",
+      "category": "aoe",
+      "effect": "aoe_damage",
+      "damage": 90.0,
+      "radius": 13.0,
+      "cooldown": 22.0,
+      "target": "area_self",
+      "breaks_veil": true
+    },
+    {
+      "id": "crystal_barrier",
+      "name": "Crystal Barrier",
+      "category": "defensive",
+      "effect": "temporary_barrier",
+      "amount": 260.0,
+      "duration": 10.0,
+      "cooldown": 28.0,
+      "target": "self",
+      "breaks_veil": false
+    },
+    {
+      "id": "armor_corrosive",
+      "name": "Armor Corrosive",
+      "category": "debuff",
+      "effect": "armor_break",
+      "power": 0.24,
+      "duration": 7.0,
+      "range": 32.0,
+      "cooldown": 20.0,
+      "target": "hostile",
+      "breaks_veil": true
+    },
+    {
+      "id": "repair_blocker",
+      "name": "Repair Blocker",
+      "category": "debuff",
+      "effect": "repair_block",
+      "duration": 6.0,
+      "range": 30.0,
+      "cooldown": 26.0,
+      "target": "hostile",
+      "breaks_veil": true
+    },
+    {
+      "id": "leviathan_hook",
+      "name": "Leviathan Hook",
+      "category": "hunter",
+      "effect": "monster_damage",
+      "damage": 210.0,
+      "range": 31.0,
+      "cooldown": 20.0,
+      "target": "monster",
+      "breaks_veil": true
+    },
+    {
+      "id": "recall_compass",
+      "name": "Recall Compass",
+      "category": "utility",
+      "effect": "recall",
+      "cooldown": 60.0,
+      "target": "self",
+      "breaks_veil": true
+    },
+    {
+      "id": "gravewake_lantern",
+      "name": "Gravewake Lantern",
+      "category": "event_debuff",
+      "effect": "armor_break",
+      "power": 0.16,
+      "duration": 6.0,
+      "range": 31.0,
+      "cooldown": 20.0,
+      "target": "hostile",
+      "breaks_veil": true,
+      "event_id": "halloween_abyss_01"
+    }
+  ],
+  "rules": {
+    "individual_cooldowns": true,
+    "category_cooldown_ready": true,
+    "mobile_expand_menu": true,
+    "no_angle_damage": true,
+    "effects_are_runtime_gameplay": true
+  }
+}

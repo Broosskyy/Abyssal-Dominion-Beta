@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "milestone": "M82",
+  "title": "PL1-5 Encounter Cadence",
+  "levels": {
+    "1": {
+      "neutral_npcs": true,
+      "elite": false,
+      "boss": "none",
+      "monster": false
+    },
+    "2": {
+      "neutral_npcs": true,
+      "elite": false,
+      "boss": "none",
+      "monster": false
+    },
+    "3": {
+      "neutral_npcs": true,
+      "elite": false,
+      "boss": "first_monster",
+      "monster": true
+    },
+    "4": {
+      "neutral_npcs": true,
+      "elite": true,
+      "boss": "admiral",
+      "monster": false
+    },
+    "5": {
+      "neutral_npcs": true,
+      "elite": true,
+      "boss": "admiral",
+      "monster": false
+    }
+  },
+  "rules": [
+    "PL1-5 normal NPCs stay neutral until attacked",
+    "first monster is introduced at PL3",
+    "elite readability begins at PL4",
+    "admiral boss presentation begins at PL4 except the PL3 first-monster encounter",
+    "no balance-number invention in this cadence contract"
+  ]
+}

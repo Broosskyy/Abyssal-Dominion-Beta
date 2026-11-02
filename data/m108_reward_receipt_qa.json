@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "milestone": "M108",
+  "storage": "memory-only bounded local QA history",
+  "max_receipts": 64,
+  "dedupe_scope": "same local runtime session by reward_id",
+  "not_persistent_ledger": true,
+  "not_server_receipt": true,
+  "future": "server transaction ledger owns authoritative dedupe/revision/reward claim",
+  "risk_controls": [
+    "empty reward_id rejected",
+    "same-session duplicate returns original local receipt",
+    "entitlement grant blocked locally",
+    "TEST/GLOBAL reward bundle blocked without server"
+  ]
+}

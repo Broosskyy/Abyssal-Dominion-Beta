@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "milestone": "M119",
+  "v3_7_found": false,
+  "implemented": [
+    "active Relic Barrier",
+    "active telegraphed Titan Pressure Pulse",
+    "explicit PL35 WorldBossPrep",
+    "Ancient equipment craft/equip and capped consumers",
+    "safe inactive recovery of saved active bonusmaps"
+  ],
+  "limits": [
+    "final VFX assets pending",
+    "World Boss itself not implemented",
+    "local authority only",
+    "native QA pending"
+  ]
+}

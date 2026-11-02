@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "milestone": "M267",
+  "master_concept": "V3.8",
+  "contract": "authoritative_world_transport_snapshot_protocol",
+  "authority": {
+    "server_owns": ["world_baseline", "world_delta", "network_entity_identity", "spawn_generation", "server_tick", "snapshot_revision", "sequence", "spawn_despawn_verdict", "join_transfer_resync_verdict"],
+    "client_may": ["request_join", "request_transfer", "request_resync", "acknowledge_received_state", "interpolate_for_presentation", "predict_only_where_reconciled_by_server"],
+    "client_may_not": ["publish_authoritative_snapshot", "publish_authoritative_delta", "allocate_network_entity_id", "advance_tick_or_revision", "force_sequence", "authorize_spawn_or_despawn", "confirm_zone_transfer"]
+  },
+  "full_snapshot_required_for": ["initial_join", "rejoin", "hard_resync", "zone_transfer"],
+  "delta_ops": ["spawn", "patch", "despawn"],
+  "ordering": ["monotonic_server_tick", "monotonic_snapshot_revision", "contiguous_sequence", "reject_duplicate_or_stale", "resync_on_gap", "resync_on_baseline_mismatch"],
+  "entity_identity": ["network_entity_id", "spawn_generation", "entity_type", "world_entity_id", "owner_or_controller_reference"],
+  "environment_isolation": ["INTERNAL", "TEST", "GLOBAL"],
+  "interest_management": "foundation_only_no_final_distance_or_population_limits_invented",
+  "production_gaps": ["realtime transport backend", "authoritative world server", "interest management service", "join/transfer orchestration", "server movement/combat reconciliation", "native multiplayer latency/loss/load QA"]
+}

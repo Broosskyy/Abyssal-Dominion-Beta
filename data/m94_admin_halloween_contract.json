@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "planned_milestone": "M94",
+  "admin_mode": {
+    "required": true,
+    "activation": "developer/admin entitlement gate; local development fallback permitted only in debug builds",
+    "features": [
+      "admin overlay",
+      "map/level teleport",
+      "spawn NPC/monster",
+      "grant test currencies/resources",
+      "grant/test ammunition and tactical items",
+      "event start/stop/phase override",
+      "world debug/POI inspection",
+      "guild-island visual/relation test states",
+      "invulnerability/test repair",
+      "asset-slot preview"
+    ],
+    "production_rule": "Never trust a client-side admin flag for live economy, account, guild, war or event authority."
+  },
+  "halloween_event": {
+    "required": true,
+    "working_id": "halloween_abyss_01",
+    "original_ip": true,
+    "scope": [
+      "event sea-map dressing",
+      "Halloween NPC fleet",
+      "event admiral/boss",
+      "event monster",
+      "event ammunition",
+      "event tactical item",
+      "event quests",
+      "event currency",
+      "event shop/rewards",
+      "event ship/design rewards",
+      "event UI/HUD icons",
+      "event VFX/audio slots",
+      "guild-island event layer"
+    ],
+    "rule": "Inspired by classic seasonal naval MMO event depth, but no copied names, art, balance or exact implementation."
+  }
+}

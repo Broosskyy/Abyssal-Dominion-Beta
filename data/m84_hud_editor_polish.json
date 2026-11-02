@@ -1,0 +1,41 @@
+{
+  "schema": 2,
+  "milestone": "M84",
+  "title": "Advanced HUD/UI Customization",
+  "profiles": "independent per M82 HUD profile",
+  "presets": [
+    "standard",
+    "combat",
+    "minimal"
+  ],
+  "editable": [
+    "position",
+    "group_scale",
+    "visibility_for_noncritical_groups"
+  ],
+  "scale_range": [
+    0.8,
+    1.35
+  ],
+  "hideable_groups": [
+    "mission",
+    "objective",
+    "minimap",
+    "quickbar",
+    "target",
+    "currency"
+  ],
+  "always_visible": [
+    "profile_status",
+    "movement",
+    "combat"
+  ],
+  "editor": [
+    "touch_drag",
+    "mouse_drag",
+    "center/quarter snap guides",
+    "overlap warning",
+    "profile reset"
+  ],
+  "crossplay_boundary": "layout is device-local presentation; gameplay intents/values remain platform-neutral"
+}

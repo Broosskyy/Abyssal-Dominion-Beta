@@ -1,0 +1,9 @@
+import json
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+def test_m213_release():
+ d=json.loads((ROOT/'data/release_identity.json').read_text()); assert d['milestone'] in {'M213','M214','M215','M216','M217','M218','M219','M220','M221','M222','M223','M224','M225','M226','M227','M228','M229','M230','M231','M232','M233','M234','M235','M236','M237','M238','M239','M240','M241','M242','M243','M244', 'M245','M246','M247','M248','M249','M250','M251','M252','M253','M254','M255','M256','M257','M258','M259','M260','M261','M262','M263','M264','M265','M266','M267','M268','M269','M270','M271','M272','M273','M274','M275','M276','M277','M278','M279','M280','M281','M282','M283','M284','M285','M286','M287','M288','M289','M290','M291','M292','M293','M294','M295','M296','M297','M298','M299','M300','M301'} and d['build_number'] in {213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244, 245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301} and d['master_concept']=='V3.8'
+def test_m213_camera_master_framing():
+ s=(ROOT/'scripts/gameplay/camera_rig.gd').read_text(); assert 'var base_offset := Vector3(16.8, 29.0, -25.2)' in s; assert 'fov = 40.0' in s; assert '0.82, 1.62' in s; assert 'limit_length(32.0)' in s
+def test_m213_composition_contract():
+ d=json.loads((ROOT/'data/m213_master_reference_camera_composition.json').read_text()); assert len(d['reference_basis'])==5; assert d['world_composition']['sea_chart_dominant'] is True; assert d['hud_locks']['primary_attack_lower_right'] is True; assert d['hud_locks']['persistent_bottom_menu_bar'] is False; assert d['gameplay_locks']['tap_to_sail'] is True; assert d['gameplay_locks']['damage_changed'] is False

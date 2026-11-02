@@ -1,0 +1,25 @@
+{
+  "milestone": "M298",
+  "schema": 1,
+  "master_concept": "V3.8",
+  "default": {"heave_m": 0.035, "pitch_deg": 0.55, "roll_deg": 0.62, "turn_heel_deg": 0.82, "hull_hit_heel_deg": 1.28, "cycles_per_second": 0.30},
+  "slots": {
+    "ship_small": {"profile": "LIGHT", "heave_m": 0.043, "pitch_deg": 0.70, "roll_deg": 0.86, "turn_heel_deg": 1.08, "hull_hit_heel_deg": 1.54, "cycles_per_second": 0.36},
+    "ship_medium": {"profile": "BALANCED", "heave_m": 0.035, "pitch_deg": 0.55, "roll_deg": 0.64, "turn_heel_deg": 0.82, "hull_hit_heel_deg": 1.28, "cycles_per_second": 0.30},
+    "ship_large": {"profile": "HEAVY", "heave_m": 0.023, "pitch_deg": 0.34, "roll_deg": 0.38, "turn_heel_deg": 0.48, "hull_hit_heel_deg": 0.83, "cycles_per_second": 0.24},
+    "npc_friendly_coastal_sloop": {"profile": "LIGHT", "heave_m": 0.043, "pitch_deg": 0.68, "roll_deg": 0.78, "turn_heel_deg": 1.02, "hull_hit_heel_deg": 1.38, "cycles_per_second": 0.34},
+    "npc_scout_01": {"profile": "LIGHT", "heave_m": 0.047, "pitch_deg": 0.72, "roll_deg": 0.91, "turn_heel_deg": 1.12, "hull_hit_heel_deg": 1.55, "cycles_per_second": 0.37},
+    "npc_raider_01": {"profile": "BALANCED", "heave_m": 0.036, "pitch_deg": 0.57, "roll_deg": 0.72, "turn_heel_deg": 0.91, "hull_hit_heel_deg": 1.42, "cycles_per_second": 0.31},
+    "npc_gunship_01": {"profile": "HEAVY", "heave_m": 0.027, "pitch_deg": 0.41, "roll_deg": 0.49, "turn_heel_deg": 0.54, "hull_hit_heel_deg": 0.98, "cycles_per_second": 0.26},
+    "npc_heavy_01": {"profile": "HEAVY", "heave_m": 0.020, "pitch_deg": 0.30, "roll_deg": 0.36, "turn_heel_deg": 0.45, "hull_hit_heel_deg": 0.76, "cycles_per_second": 0.22}
+  },
+  "max_ambient_displacement_m": 0.09,
+  "max_ambient_roll_deg": 3.5,
+  "confirmed_defeat_phase_offsets_m": {"STAGGER": 0.0, "FLOODING": 0.22, "BREAKUP": 0.55, "SUBMERGED": 1.45, "CLEANUP_PENDING": 1.90},
+  "confirmed_defeat_phase_roll_deg": {"STAGGER": 1.2, "FLOODING": 2.5, "BREAKUP": 4.5, "SUBMERGED": 7.0, "CLEANUP_PENDING": 7.0},
+  "reduced_motion": "ambient model motion disabled; confirmed hull/shield response greatly damped",
+  "render_scope": "WORLD_SHIP_PLACEHOLDERS_ONLY",
+  "authoritative_input": "M287 motion presentation and M285 confirmed impact presentation; local preview only when their own LOCAL_DEVELOPMENT guard permits",
+  "gameplay_authority": "NONE",
+  "native_qa": "NOT_EVALUATED"
+}

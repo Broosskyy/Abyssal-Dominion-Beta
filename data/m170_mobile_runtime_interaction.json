@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "milestone": "M170",
+  "master_concept": "V3.8",
+  "goal": "MOBILE_OVERLAY_RUNTIME_CATALOG_AND_INTERACTION_HARDENING",
+  "principles": [
+    "seekarte/gameplay camera remains unchanged",
+    "existing panels are polished instead of replaced",
+    "ui_cancel closes the deepest active overlay first",
+    "runtime ammo and harpoon catalogs must reach every selector and detail panel",
+    "safe-area and vertical scrolling are mandatory on phone overlays",
+    "sensitive commerce/guild/admin mutations remain server-authoritative"
+  ],
+  "overlay_priority": [
+    "combat_detail",
+    "combat_picker",
+    "global_map",
+    "command_menu",
+    "progression_hub",
+    "journal",
+    "arsenal",
+    "meta_panel"
+  ],
+  "runtime_catalog_audit": [
+    {
+      "surface": "combat_picker",
+      "ammo": "CombatCatalog.ammo_ids",
+      "harpoon": "runtime profiles",
+      "status": "wired"
+    },
+    {
+      "surface": "combat_detail",
+      "ammo": "CombatCatalog.ammo_index_by_id",
+      "status": "wired"
+    },
+    {
+      "surface": "combat_icon_catalog",
+      "ammo": "CombatCatalog",
+      "status": "wired"
+    },
+    {
+      "surface": "admin_test_kit",
+      "ammo": "CombatCatalog.ammo_ids",
+      "status": "wired"
+    },
+    {
+      "surface": "progression_hub",
+      "harpoon": "PlayerInventory.runtime_harpoon_profiles",
+      "status": "wired"
+    }
+  ],
+  "mobile_screen_audit": [
+    {
+      "screen": "captain_journal",
+      "touch_target": 52,
+      "vertical_scroll": true,
+      "safe_area": true,
+      "back": "ui_cancel"
+    },
+    {
+      "screen": "meta_systems",
+      "touch_target": 52,
+      "vertical_scroll": true,
+      "safe_area": true,
+      "back": "ui_cancel"
+    },
+    {
+      "screen": "progression_hub",
+      "touch_target": 52,
+      "vertical_scroll": true,
+      "safe_area": true,
+      "back": "ui_cancel"
+    },
+    {
+      "screen": "arsenal",
+      "touch_target": 52,
+      "vertical_scroll": true,
+      "safe_area": true,
+      "back": "ui_cancel"
+    }
+  ],
+  "interaction_guards": [
+    {
+      "id": "single_dominant_overlay",
+      "rule": "new modal surfaces close or refuse conflicting gameplay overlays"
+    },
+    {
+      "id": "back_depth_first",
+      "rule": "detail closes before picker/map/menu"
+    },
+    {
+      "id": "runtime_catalog_no_fixed_ammo",
+      "rule": "active UI and admin selection paths must not depend on legacy AMMO_IDS"
+    },
+    {
+      "id": "harpoon_runtime_merge",
+      "rule": "M165 runtime harpoon profiles are selectable when owned"
+    }
+  ],
+  "no_code_types": [
+    "overlay_priority_profile",
+    "runtime_catalog_binding",
+    "mobile_screen_audit",
+    "interaction_guard_profile"
+  ]
+}

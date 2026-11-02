@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "milestone": "M99",
+  "minimum_map_level": 2,
+  "interaction_icons": {
+    "dock": "m99_guild_dock",
+    "guild": "m99_guild_hall",
+    "defense": "m99_guild_defense",
+    "facilities": "m99_guild_facilities",
+    "range": "m99_guild_range",
+    "focus": "m99_guild_focus"
+  },
+  "input": {
+    "touch_detail_row_focus": true,
+    "mouse_detail_row_focus": true,
+    "gamepad_cycle": "existing ship_previous/ship_next while panel active",
+    "tap_to_sail_precedence": "guild interaction/detail hit-test before world sailing"
+  },
+  "fortifications": {
+    "wall_straight": 2,
+    "wall_corner": 2,
+    "gate": 1,
+    "watch_platform": 1,
+    "visual_only": true,
+    "collision_authority": false,
+    "siege_authority": false,
+    "permanent_destruction": false
+  },
+  "mobile": {
+    "camera": "oblique sea-map",
+    "free_walk": false,
+    "large_touch_rows": true,
+    "tower_range_shadow": false,
+    "world_marker_budget_increase": false
+  },
+  "authority": {
+    "ownership": false,
+    "treasury": false,
+    "vault": false,
+    "war": false,
+    "persistent_damage": false,
+    "conquest": false
+  }
+}

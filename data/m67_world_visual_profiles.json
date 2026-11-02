@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "milestone": "M67",
+  "title": "P0 Island / Harbor Visual Profiles",
+  "profiles": {
+    "island_tropical_small": {
+      "scale": [
+        0.84,
+        0.9,
+        1.05
+      ],
+      "rotation_y_deg": -8,
+      "palette": "tropical",
+      "vegetation_density": 0.65,
+      "lod_bias": 0.72,
+      "silhouette": "small asymmetric beach island"
+    },
+    "island_tropical_medium": {
+      "scale": [
+        1.08,
+        1.0,
+        0.94
+      ],
+      "rotation_y_deg": 7,
+      "palette": "tropical",
+      "vegetation_density": 0.82,
+      "lod_bias": 0.82,
+      "silhouette": "medium broad landmark island"
+    },
+    "island_cliff_cove": {
+      "scale": [
+        1.14,
+        1.08,
+        0.82
+      ],
+      "rotation_y_deg": 16,
+      "palette": "cliff_cove",
+      "vegetation_density": 0.38,
+      "lod_bias": 0.86,
+      "silhouette": "elongated cliff/cove, deliberately non-round"
+    },
+    "island_sandbar_long": {
+      "scale": [
+        1.45,
+        0.72,
+        0.58
+      ],
+      "rotation_y_deg": -14,
+      "palette": "tropical",
+      "vegetation_density": 0.24,
+      "lod_bias": 0.76,
+      "silhouette": "long low sandbar with sparse vegetation, deliberately non-round"
+    },
+    "harbor_havens_reach": {
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation_y_deg": 0,
+      "palette": "havens_reach",
+      "vegetation_density": 0.45,
+      "lod_bias": 0.88,
+      "silhouette": "early-game harbor landmark with clear pier/lighthouse hierarchy"
+    }
+  },
+  "rule": "Fallback transforms are presentation-only. Final replacement GLBs keep authored proportions."
+}

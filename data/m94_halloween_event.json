@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "milestone": "M94",
+  "id": "halloween_abyss_01",
+  "display_name": "Night of the Drowned",
+  "active_for_local_test": true,
+  "map_presence_from_level": 2,
+  "spawn_budget": {
+    "world_landmarks": 2,
+    "fleet_visuals": 3,
+    "guild_event_props": 1
+  },
+  "ammo": {
+    "id": "gravefire",
+    "name": "Gravefire Shot",
+    "damage": 0.96,
+    "armor_pierce": 0.1,
+    "range": 0.96,
+    "crit": 0.08,
+    "effect": "burn",
+    "effect_power": 10.0,
+    "effect_duration": 5.0,
+    "event_bonus_contract": "future server/event modifier only"
+  },
+  "tactical_item": {
+    "id": "gravewake_lantern",
+    "name": "Gravewake Lantern",
+    "effect": "armor_break",
+    "power": 0.16,
+    "duration": 6.0,
+    "range": 31.0,
+    "cooldown": 20.0,
+    "target": "hostile"
+  },
+  "world_visuals": [
+    "event_halloween_portal_01",
+    "event_halloween_wreck_01",
+    "event_halloween_island_deco_01"
+  ],
+  "fleet_visuals": [
+    "event_halloween_npc_sloop_01",
+    "event_halloween_npc_raider_01",
+    "event_halloween_admiral_01",
+    "event_halloween_monster_01",
+    "event_halloween_boss_01"
+  ],
+  "guild_layer": "event_halloween_guild_deco_01",
+  "authority": "local presentation/test only; live schedule/rewards/economy/server state required later"
+}

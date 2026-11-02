@@ -1,0 +1,7 @@
+{
+  "milestone": "M18",
+  "visual_verification": false,
+  "browser_capture_attempted": false,
+  "reason": "Chromium executable remains unavailable; no M18 screenshot produced.",
+  "layout_validation": "Godot headless: 1280x720, 844x390, 390x844; not visual acceptance"
+}

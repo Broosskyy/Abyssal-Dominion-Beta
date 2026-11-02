@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Special deck level 4">
+<rect x="5" y="5" width="86" height="86" rx="18" fill="#07131d" stroke="#3c5363" stroke-width="3"/>
+<path d="M15 72 Q48 86 81 72" fill="none" stroke="#244656" stroke-width="5" stroke-linecap="round"/>
+<path d="M48 20 L67 31 V53 Q64 68 48 76 Q32 68 29 53 V31Z" fill="#223846" stroke="#d0a25c" stroke-width="3"/><path d="M38 51 L45 58 L60 40" fill="none" stroke="#e8d7a3" stroke-width="4" stroke-linecap="round"/><circle cx="28" cy="66" r="3" fill="#e9c77d"/><circle cx="38" cy="66" r="3" fill="#e9c77d"/><circle cx="48" cy="66" r="3" fill="#e9c77d"/><circle cx="58" cy="66" r="3" fill="#e9c77d"/>
+<circle cx="48" cy="48" r="35" fill="none" stroke="#c79a52" stroke-opacity=".28" stroke-width="2"/>
+</svg>

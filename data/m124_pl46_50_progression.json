@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "milestone": "M124",
+  "master": "V3.7",
+  "tuning": "local_prototype",
+  "band": {
+    "levels": [
+      46,
+      50
+    ],
+    "name": "Abyssal Dominion",
+    "identity": "Legendary fleets / complex encounters / endgame materials-design-meta"
+  },
+  "levels": {
+    "46": {
+      "map_xp": 1600,
+      "region_objectives": 5,
+      "hunter": 2,
+      "legendary_chain": 2,
+      "top_materials": 2,
+      "trial": false
+    },
+    "47": {
+      "map_xp": 1740,
+      "region_objectives": 5,
+      "hunter": 2,
+      "legendary_chain": 3,
+      "top_materials": 3,
+      "trial": false
+    },
+    "48": {
+      "map_xp": 1900,
+      "region_objectives": 6,
+      "hunter": 3,
+      "legendary_chain": 3,
+      "top_materials": 4,
+      "trial": false
+    },
+    "49": {
+      "map_xp": 2080,
+      "region_objectives": 6,
+      "hunter": 3,
+      "legendary_chain": 4,
+      "top_materials": 5,
+      "trial": false
+    },
+    "50": {
+      "map_xp": 2300,
+      "region_objectives": 7,
+      "hunter": 3,
+      "legendary_chain": 5,
+      "top_materials": 6,
+      "trial": true
+    }
+  },
+  "trial50": {
+    "focus": "Abyssal Dominion finale Pr\u00fcfung",
+    "requires_runtime": true
+  },
+  "endgame": {
+    "after_trial50": "prestige_rotation",
+    "repeatable": true,
+    "pirate_level_cap": 50,
+    "does_not_reset_ship_mastery": true
+  }
+}

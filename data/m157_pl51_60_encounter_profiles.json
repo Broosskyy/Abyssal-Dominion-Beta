@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "milestone": "M157",
+  "authority": "LOCAL_PROTOTYPE_DATA",
+  "levels": {
+    "51": {
+      "region": "dreadwater_march",
+      "identity": "fast pursuit / hunter pressure",
+      "roles": [
+        "vanguard",
+        "chain_hunter",
+        "rift_marksman"
+      ],
+      "signature_mechanic": "pressure_volley",
+      "admiral_title": "Dreadwater Pursuer",
+      "loot_profile": "hunter_salvage",
+      "bonus_dominion_shard_chance": 0.08,
+      "elite_hull_mult": 1.06,
+      "admiral_hull_mult": 1.12,
+      "damage_mult": 1.02
+    },
+    "52": {
+      "region": "dreadwater_march",
+      "identity": "fast pursuit / hunter pressure",
+      "roles": [
+        "vanguard",
+        "chain_hunter",
+        "rift_marksman"
+      ],
+      "signature_mechanic": "hunter_net",
+      "admiral_title": "Blackwake Commodore",
+      "loot_profile": "hunter_salvage",
+      "bonus_dominion_shard_chance": 0.092,
+      "elite_hull_mult": 1.07,
+      "admiral_hull_mult": 1.132,
+      "damage_mult": 1.028
+    },
+    "53": {
+      "region": "dreadwater_march",
+      "identity": "fast pursuit / hunter pressure",
+      "roles": [
+        "vanguard",
+        "chain_hunter",
+        "rift_marksman"
+      ],
+      "signature_mechanic": "rift_mark",
+      "admiral_title": "Rift Corsair Prime",
+      "loot_profile": "hunter_salvage",
+      "bonus_dominion_shard_chance": 0.104,
+      "elite_hull_mult": 1.08,
+      "admiral_hull_mult": 1.144,
+      "damage_mult": 1.036
+    },
+    "54": {
+      "region": "dreadwater_march",
+      "identity": "fast pursuit / hunter pressure",
+      "roles": [
+        "vanguard",
+        "chain_hunter",
+        "rift_marksman"
+      ],
+      "signature_mechanic": "escort_break",
+      "admiral_title": "Graves Hunter",
+      "loot_profile": "hunter_salvage",
+      "bonus_dominion_shard_chance": 0.116,
+      "elite_hull_mult": 1.09,
+      "admiral_hull_mult": 1.156,
+      "damage_mult": 1.044
+    },
+    "55": {
+      "region": "dreadwater_march",
+      "identity": "fast pursuit / hunter pressure",
+      "roles": [
+        "vanguard",
+        "chain_hunter",
+        "rift_marksman"
+      ],
+      "signature_mechanic": "blackwake_command",
+      "admiral_title": "Blackwake Vanguard",
+      "loot_profile": "hunter_salvage",
+      "bonus_dominion_shard_chance": 0.128,
+      "elite_hull_mult": 1.1,
+      "admiral_hull_mult": 1.168,
+      "damage_mult": 1.052
+    },
+    "56": {
+      "region": "iron_maw_reach",
+      "identity": "armored siege / formation pressure",
+      "roles": [
+        "siege_guard",
+        "mortar_line",
+        "iron_hunter"
+      ],
+      "signature_mechanic": "armor_wall",
+      "admiral_title": "Iron Maw Warden",
+      "loot_profile": "siege_salvage",
+      "bonus_dominion_shard_chance": 0.14,
+      "elite_hull_mult": 1.11,
+      "admiral_hull_mult": 1.18,
+      "damage_mult": 1.06
+    },
+    "57": {
+      "region": "iron_maw_reach",
+      "identity": "armored siege / formation pressure",
+      "roles": [
+        "siege_guard",
+        "mortar_line",
+        "iron_hunter"
+      ],
+      "signature_mechanic": "chain_field",
+      "admiral_title": "Chainbreaker Admiral",
+      "loot_profile": "siege_salvage",
+      "bonus_dominion_shard_chance": 0.152,
+      "elite_hull_mult": 1.12,
+      "admiral_hull_mult": 1.192,
+      "damage_mult": 1.068
+    },
+    "58": {
+      "region": "iron_maw_reach",
+      "identity": "armored siege / formation pressure",
+      "roles": [
+        "siege_guard",
+        "mortar_line",
+        "iron_hunter"
+      ],
+      "signature_mechanic": "mortar_barrage",
+      "admiral_title": "Furnace Bombardier",
+      "loot_profile": "siege_salvage",
+      "bonus_dominion_shard_chance": 0.164,
+      "elite_hull_mult": 1.13,
+      "admiral_hull_mult": 1.204,
+      "damage_mult": 1.076
+    },
+    "59": {
+      "region": "iron_maw_reach",
+      "identity": "armored siege / formation pressure",
+      "roles": [
+        "siege_guard",
+        "mortar_line",
+        "iron_hunter"
+      ],
+      "signature_mechanic": "furnace_overdrive",
+      "admiral_title": "Siegewake Tyrant",
+      "loot_profile": "siege_salvage",
+      "bonus_dominion_shard_chance": 0.176,
+      "elite_hull_mult": 1.14,
+      "admiral_hull_mult": 1.216,
+      "damage_mult": 1.084
+    },
+    "60": {
+      "region": "iron_maw_reach",
+      "identity": "armored siege / formation pressure",
+      "roles": [
+        "siege_guard",
+        "mortar_line",
+        "iron_hunter"
+      ],
+      "signature_mechanic": "iron_maw_command",
+      "admiral_title": "Iron Maw Sovereign",
+      "loot_profile": "siege_salvage",
+      "bonus_dominion_shard_chance": 0.188,
+      "elite_hull_mult": 1.15,
+      "admiral_hull_mult": 1.228,
+      "damage_mult": 1.092
+    }
+  },
+  "drop_profiles": {
+    "hunter_salvage": {
+      "elite": {
+        "precision_gears": 1
+      },
+      "admiral": {
+        "precision_gears": 2,
+        "dominion_shard": 1
+      }
+    },
+    "siege_salvage": {
+      "elite": {
+        "reinforced_timber": 1
+      },
+      "admiral": {
+        "reinforced_timber": 2,
+        "admiral_component": 1
+      }
+    }
+  },
+  "rules": [
+    "profiles add identity without bypassing existing progression authority",
+    "all rates and multipliers are admin/version candidates",
+    "visual slots remain replaceable"
+  ]
+}

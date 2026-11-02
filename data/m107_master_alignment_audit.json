@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "milestone": "M107",
+  "implemented": [
+    "RewardBundleService",
+    "mission/daily/weekly/event reward migration",
+    "beginner trial reward migration",
+    "PL1-5 visual hierarchy contract",
+    "guild shield objective readability metadata",
+    "P0 checklist visibility in Asset Preview",
+    "Haven's Reach pirate visual hierarchy metadata"
+  ],
+  "truth": {
+    "reward_bundle_server_atomic": false,
+    "local_bundle_only": true,
+    "real_backend": false,
+    "guild_capture_authority": false,
+    "native_mobile_qa": false
+  },
+  "preserved": [
+    "Tap-to-Sail",
+    "neutral PL1-5 NPC behavior",
+    "3 starter progression",
+    "HUD customization",
+    "30-module Haven's Reach budget",
+    "guild island from map level 2",
+    "P0 first-13 priority"
+  ],
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS/Desktop/Web",
+    "reward path playthrough",
+    "P0 final GLBs",
+    "first monster final rig",
+    "mobile screenshot acceptance"
+  ]
+}

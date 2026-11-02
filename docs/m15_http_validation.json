@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "visual_verification": false,
+  "milestone": "M15",
+  "source_sha256": "3734f4ce8deec84f8742ce4159a5c129918cbfba793f1f4ffa1b5100a238b7c3",
+  "html_current": true,
+  "wasm_mime": "application/wasm"
+}

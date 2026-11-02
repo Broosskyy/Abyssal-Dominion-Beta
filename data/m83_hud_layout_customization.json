@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "milestone": "M83",
+  "title": "Player HUD Layout Customization",
+  "status": "LOCAL_DEVICE_PRESENTATION",
+  "editable_groups": {
+    "profile_status": [
+      "top"
+    ],
+    "mission": [
+      "mission"
+    ],
+    "objective": [
+      "objective_strip"
+    ],
+    "minimap": [
+      "minimap",
+      "world",
+      "group"
+    ],
+    "movement": [
+      "wheel",
+      "zoom_in",
+      "zoom_out",
+      "recenter",
+      "auto_fire"
+    ],
+    "combat": [
+      "fire",
+      "repair",
+      "boost",
+      "target",
+      "ammo_menu",
+      "items_menu"
+    ],
+    "quickbar": [
+      "quick_0",
+      "quick_1",
+      "quick_2",
+      "quick_3"
+    ],
+    "target": [
+      "target_info"
+    ],
+    "currency": [
+      "currency"
+    ]
+  },
+  "rules": [
+    "Edit mode is entered from Settings > HUD / UI anpassen.",
+    "Elements drag inside fullscreen safe area on mobile and desktop.",
+    "Positions are stored as normalized safe-area offsets so aspect-ratio changes remain usable.",
+    "Mobile and desktop HUD profiles store independent layouts.",
+    "Critical controls are clamped to safe area and cannot be dragged completely off-screen.",
+    "Reset current profile and reset all profiles are available.",
+    "HUD layout is local presentation only and never affects crossplay gameplay values or server authority."
+  ]
+}

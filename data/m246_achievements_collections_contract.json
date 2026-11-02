@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "milestone": "M246",
+  "master_concept": "V3.8",
+  "system": "ACHIEVEMENTS_COLLECTIONS",
+  "master_scope": {
+    "collection_families": [
+      "ship_collection",
+      "admiral_codex",
+      "monster_codex",
+      "world_discovery",
+      "event_collection",
+      "cosmetics"
+    ],
+    "achievement_categories": [
+      "combat",
+      "pvp",
+      "monsters",
+      "admirals",
+      "guilds",
+      "events",
+      "exploration",
+      "economy",
+      "collection",
+      "progression"
+    ],
+    "reward_families": [
+      "fame",
+      "title",
+      "cosmetic",
+      "item",
+      "small_progression_reward"
+    ],
+    "profile_showcase_supported": true,
+    "older_content_relevance_supported": true
+  },
+  "authority": {
+    "definition_source": "content/admin definitions",
+    "progress": "server_authoritative_online",
+    "completion": "server_authoritative_online",
+    "collection_ownership": "server_authoritative_online",
+    "reward_claim": "server_authoritative_idempotent_receipt",
+    "profile_showcase": "server_validated_profile_state",
+    "client_may_infer_completion": false,
+    "client_may_grant_rewards": false,
+    "client_may_generate_receipts": false
+  },
+  "snapshot_contract": {
+    "fields": [
+      "revision",
+      "summary",
+      "achievements",
+      "collections",
+      "recent_completions",
+      "claim_receipts",
+      "profile_showcase"
+    ],
+    "achievement_fields": [
+      "id",
+      "category",
+      "title",
+      "description",
+      "progress",
+      "target",
+      "state",
+      "reward_summary",
+      "claim_state",
+      "receipt_id",
+      "profile_visible"
+    ],
+    "collection_fields": [
+      "id",
+      "family",
+      "title",
+      "discovered",
+      "total",
+      "milestones",
+      "state",
+      "reward_summary"
+    ],
+    "revision_rule": "monotonic_non_decreasing"
+  },
+  "ui": {
+    "surface": "Command Deck / Erfolge",
+    "normal_hud": "no permanent achievement/collection list",
+    "mobile_desktop_web": "same information architecture; responsive sizing only",
+    "offline_empty_state": "show categories and server-required state; never fabricate completions, ranks or rewards"
+  },
+  "content_admin_types": [
+    "achievement_definition",
+    "collection_definition",
+    "collection_milestone_definition"
+  ],
+  "balance": {
+    "final_thresholds": null,
+    "final_reward_quantities": null,
+    "note": "V3.8 defines reward families and coverage, not final numeric thresholds/reward amounts."
+  }
+}

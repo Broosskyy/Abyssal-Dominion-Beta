@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "milestone": "M157",
+  "authority": "LOCAL_PROTOTYPE_DATA",
+  "maps": {
+    "silver": {
+      "recommended_level": 12,
+      "completion_reward": {
+        "gold": 650,
+        "silver_chart_fragment": 3
+      },
+      "wave_bonus": [
+        {
+          "wave": 3,
+          "label": "Elite Salvage",
+          "items": {
+            "reinforced_timber": 1
+          }
+        },
+        {
+          "wave": 5,
+          "label": "Silver Admiral Cache",
+          "items": {
+            "precision_gears": 1
+          }
+        }
+      ]
+    },
+    "gold": {
+      "recommended_level": 18,
+      "completion_reward": {
+        "gold": 1250,
+        "gold_chart_fragment": 3
+      },
+      "wave_bonus": [
+        {
+          "wave": 4,
+          "label": "Gold Guard Cache",
+          "items": {
+            "precision_gears": 1
+          }
+        },
+        {
+          "wave": 6,
+          "label": "Gilded Admiral Vault",
+          "items": {
+            "admiral_component": 1
+          }
+        }
+      ]
+    },
+    "abyss": {
+      "recommended_level": 26,
+      "completion_reward": {
+        "gold": 2100,
+        "abyss_chart_fragment": 3,
+        "abyss_scale": 2
+      },
+      "wave_bonus": [
+        {
+          "wave": 5,
+          "label": "Abyss Hunter Cache",
+          "items": {
+            "corrupted_pearl": 1
+          }
+        },
+        {
+          "wave": 7,
+          "label": "Guardian Relic",
+          "items": {
+            "ancient_guardian_fragment": 1
+          }
+        }
+      ]
+    },
+    "legendary": {
+      "recommended_level": 40,
+      "completion_reward": {
+        "gold": 3400,
+        "legendary_fragment": 2,
+        "dominion_shard": 2
+      },
+      "wave_bonus": [
+        {
+          "wave": 5,
+          "label": "Void Commander Cache",
+          "items": {
+            "legendary_command_seal": 1
+          }
+        },
+        {
+          "wave": 7,
+          "label": "Sovereign Vault",
+          "items": {
+            "ancient_relic_core": 1
+          }
+        }
+      ]
+    }
+  },
+  "rules": [
+    "completion rewards are local prototype definitions until reward-service authority is connected",
+    "entry currency remains committed only after successful routing"
+  ]
+}

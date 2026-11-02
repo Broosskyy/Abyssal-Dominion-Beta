@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "milestone": "M62",
+  "title": "World Marker Mobile Density",
+  "rules": {
+    "minimum_marker_px": 24,
+    "preferred_marker_px": 32,
+    "max_world_markers_near_player": 12,
+    "max_nameplates": 10,
+    "overlap_avoidance": true,
+    "safe_area_clamp": true,
+    "priority": [
+      "objective",
+      "quest",
+      "admiral",
+      "monster",
+      "elite",
+      "port",
+      "loot",
+      "repair"
+    ],
+    "distance_fade_start_m": 65,
+    "distance_fade_end_m": 95,
+    "cluster_low_priority_when_dense": true
+  },
+  "note": "Presentation contract only; exact tuning remains playtestable."
+}

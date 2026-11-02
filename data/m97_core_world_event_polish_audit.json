@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "milestone": "M97",
+  "core_world": {
+    "irregular_island_slots_wired": 2,
+    "harbor_pirate_slots_wired": 2,
+    "wreck_slot_wired": 1,
+    "npc_pirate_slot_wired": 1,
+    "harbor_object_count_increased": false,
+    "wreck_object_count": 3,
+    "island_hero_cap": 1,
+    "replacement_slots_visual_only": true,
+    "harbor_module_count": 30
+  },
+  "halloween": {
+    "compact_quest_strip": true,
+    "quest_reward_double_guard": true,
+    "event_marker_labels_under_34m": true,
+    "boss_actual_marker_group": true,
+    "replacement_glb_suppresses_procedural_monster_visual": true,
+    "live_reward_authority": false
+  },
+  "admin": {
+    "category_filter": true,
+    "search_filter": true,
+    "clear_admin_spawns": true,
+    "production_authority": false
+  },
+  "performance": {
+    "global_mesh_lod_threshold_applied": true,
+    "event_ship_visibility_profile_applied": true,
+    "marker_budget_not_increased": true,
+    "harbor_budget_preserved": true
+  },
+  "preserved": [
+    "Tap-to-Sail",
+    "guild islands from map level 2",
+    "no broadside angle damage",
+    "PL1-5 progression",
+    "HUD customization",
+    "mobile/desktop presentation",
+    "P0 first-13 final-art priority"
+  ],
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS touch",
+    "desktop/gamepad",
+    "safe-area/orientation screenshots",
+    "LOD/shadow visual validation",
+    "GPU profile"
+  ]
+}

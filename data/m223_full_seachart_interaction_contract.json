@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "milestone": "M223",
+  "master_concept": "V3.8",
+  "purpose": "Make the rectangular full sea chart a concise interactive planning surface for existing current-sector targets while preserving the round gameplay minimap and all existing navigation/target/tracking authorities.",
+  "locks": {
+    "gameplay_minimap": "round/circular upper-right; unchanged from M221/M222",
+    "full_sea_chart": "rectangular/full-screen planning surface",
+    "default_view": "current sector detail",
+    "secondary_view": "region/map overview remains available without replacing current-sector detail",
+    "filters": ["all", "mission", "harbor", "boss", "event", "loot"],
+    "world_truth": "only nodes that currently exist in the active world may become interactive chart targets",
+    "navigation_authority": "PlayerShipInput.set_navigation_world_target remains authoritative; no second pathfinder",
+    "combat_authority": "TargetingSystem remains authoritative for hostile selection",
+    "tracking_authority": "TrackedQuestRuntime remains authoritative for objective track/untrack",
+    "platform_parity": "same chart targets/actions/world on mobile, web and desktop; responsive dimensions only"
+  },
+  "interaction": {
+    "tap_marker": "select existing target and expose a compact context card",
+    "mission": ["track/untrack", "navigate when resolve_target exists"],
+    "harbor": ["navigate"],
+    "boss_enemy": ["select combat target", "navigate"],
+    "event_poi_loot": ["navigate"],
+    "close": "returns directly to gameplay without changing the world"
+  },
+  "non_goals": [
+    "no teleportation",
+    "no invented POIs",
+    "no duplicated routing logic",
+    "no balance changes",
+    "no persistent bottom command/map-selection bar",
+    "no rectangular gameplay minimap"
+  ]
+}

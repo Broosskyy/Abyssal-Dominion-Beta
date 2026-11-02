@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "milestone": "M146",
+  "master": "V3.7",
+  "production_wave": "P0_VERTICAL_SLICE",
+  "replacement_root": "res://assets/production_placeholders/p0/",
+  "rules": {
+    "one_stable_path_per_slot": true,
+    "replace_file_without_code_change": true,
+    "visual_only_glb": true,
+    "wrapper_owns_collision_stats_input_and_sockets": true,
+    "forward_axis": "+Z",
+    "up_axis": "+Y",
+    "waterline_y": 0,
+    "unit": "meter",
+    "mobile_gameplay_zoom_is_acceptance_basis": true
+  },
+  "slots": [
+    {"order":1,"master_slot":"SHIP-STARTER-001","runtime_id":"ship_small","file":"ship_small.glb","family":"starter_ship","method":"Rodin","priority":"P0"},
+    {"order":2,"master_slot":"SHIP-STARTER-002","runtime_id":"ship_medium","file":"ship_medium.glb","family":"starter_ship","method":"Rodin","priority":"P0"},
+    {"order":3,"master_slot":"SHIP-STARTER-003","runtime_id":"ship_large","file":"ship_large.glb","family":"starter_ship","method":"Rodin","priority":"P0"},
+    {"order":4,"master_slot":"NPC-SHIP-EARLY-001","runtime_id":"npc_friendly_coastal_sloop","file":"npc_friendly_coastal_sloop.glb","family":"npc_ship","method":"Rodin","priority":"P0"},
+    {"order":5,"master_slot":"NPC-SHIP-EARLY-002","runtime_id":"npc_scout_01","file":"npc_scout_01.glb","family":"npc_ship","method":"Rodin","priority":"P0"},
+    {"order":6,"master_slot":"NPC-SHIP-EARLY-003","runtime_id":"npc_raider_01","file":"npc_raider_01.glb","family":"npc_ship","method":"Rodin","priority":"P0"},
+    {"order":7,"master_slot":"NPC-SHIP-EARLY-004","runtime_id":"npc_gunship_01","file":"npc_gunship_01.glb","family":"npc_ship","method":"Rodin","priority":"P0"},
+    {"order":8,"master_slot":"NPC-SHIP-EARLY-005","runtime_id":"npc_heavy_01","file":"npc_heavy_01.glb","family":"npc_ship","method":"Rodin","priority":"P0"},
+    {"order":9,"master_slot":"HARBOR-HAVENS-REACH","runtime_id":"harbor_havens_reach","file":"harbor_havens_reach.glb","family":"harbor","method":"Rodin","priority":"P0"},
+    {"order":10,"master_slot":"ISLAND-P0-001","runtime_id":"island_tropical_small","file":"island_tropical_small.glb","family":"island","method":"Rodin","priority":"P0"},
+    {"order":11,"master_slot":"ISLAND-P0-002","runtime_id":"island_tropical_medium","file":"island_tropical_medium.glb","family":"island","method":"Rodin","priority":"P0"},
+    {"order":12,"master_slot":"ISLAND-P0-003","runtime_id":"island_cliff_cove","file":"island_cliff_cove.glb","family":"island","method":"Rodin","priority":"P0"},
+    {"order":13,"master_slot":"ISLAND-P0-004","runtime_id":"island_sandbar_long","file":"island_sandbar_long.glb","family":"island","method":"Rodin","priority":"P0"},
+    {"order":14,"master_slot":"MON-KRAKEN-001","runtime_id":"monster_early_01","file":"monster_early_01.glb","family":"monster","method":"Rodin","priority":"P0"}
+  ],
+  "next_wave": "P1_PL6_15_AFTER_P0_VISUAL_ACCEPTANCE"
+}

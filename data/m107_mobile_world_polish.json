@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "milestone": "M107",
+  "pl1_5": {
+    "single_primary_teaching_card": true,
+    "guild_island_visible_from_map_level": 2,
+    "first_monster_map_level": 3,
+    "three_starters_by_level_3": true
+  },
+  "guild_objectives": {
+    "shield_core_priority": 91,
+    "shield_node_priority": 88,
+    "visual_only": true,
+    "capture_authority": false,
+    "persistent_damage": false
+  },
+  "havens_reach": {
+    "module_budget": 30,
+    "module_delta": 0,
+    "pirate_identity_hierarchy": true
+  },
+  "performance": {
+    "new_world_nodes": 0,
+    "new_hud_permanent_panels": 0,
+    "marker_budget_delta": 0
+  }
+}

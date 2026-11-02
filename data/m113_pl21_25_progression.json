@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "milestone": "M113",
+  "range": [
+    21,
+    25
+  ],
+  "master_alignment": {
+    "phase": "PL16-25 true midgame",
+    "pl25_trial_focus": "Status/Build-Spezialisierung",
+    "xp_alone_unlocks": false,
+    "pvp": "only for appropriate PvP quests; not forced into core trial"
+  },
+  "levels": {
+    "21": {
+      "title": "Riftwater",
+      "region": "abyssal_frontier",
+      "map_xp_goal": 6800,
+      "mastery_xp_per_sink": 175,
+      "boss": "npc_frontier_admiral",
+      "hunter_required": 1,
+      "region_objectives": 4,
+      "status_objectives": 0,
+      "build_objectives": 0,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "22": {
+      "title": "Hexed Convoy Sea",
+      "region": "abyssal_frontier",
+      "map_xp_goal": 7500,
+      "mastery_xp_per_sink": 187,
+      "boss": "npc_frontier_admiral",
+      "hunter_required": 1,
+      "region_objectives": 4,
+      "status_objectives": 1,
+      "build_objectives": 0,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "23": {
+      "title": "Broken Sigil",
+      "region": "abyssal_frontier",
+      "map_xp_goal": 8200,
+      "mastery_xp_per_sink": 199,
+      "boss": "npc_frontier_admiral",
+      "hunter_required": 1,
+      "region_objectives": 4,
+      "status_objectives": 1,
+      "build_objectives": 1,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "24": {
+      "title": "Frontier Maw",
+      "region": "abyssal_frontier",
+      "map_xp_goal": 8900,
+      "mastery_xp_per_sink": 211,
+      "boss": "npc_frontier_admiral",
+      "hunter_required": 1,
+      "region_objectives": 5,
+      "status_objectives": 1,
+      "build_objectives": 1,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "25": {
+      "title": "Specialist's Trial",
+      "region": "abyssal_frontier",
+      "map_xp_goal": 9600,
+      "mastery_xp_per_sink": 223,
+      "boss": "npc_frontier_admiral",
+      "hunter_required": 2,
+      "region_objectives": 5,
+      "status_objectives": 1,
+      "build_objectives": 1,
+      "pirate_trial": true,
+      "trial_focus": [
+        "status",
+        "build_specialization"
+      ]
+    }
+  },
+  "prototype_tuning": [
+    "xp goals",
+    "objective counts",
+    "mastery xp"
+  ],
+  "authority": "local prototype"
+}

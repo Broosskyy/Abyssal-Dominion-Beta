@@ -1,0 +1,2009 @@
+{
+  "schema": 1,
+  "milestone": "M53",
+  "total_slots": 285,
+  "configured_overrides": 0,
+  "missing_count": 285,
+  "missing_by_priority": {
+    "P0": 152,
+    "P1": 124,
+    "P2": 9
+  },
+  "missing": [
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "ship_small",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "ship_medium",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "ship_large",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_corsair",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_admiral",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_shadow",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_tropical",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_rock",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_snow",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "harbor",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P2",
+      "kind": "models",
+      "slot": "loot_chest",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P2",
+      "kind": "models",
+      "slot": "repair_crate",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P2",
+      "kind": "models",
+      "slot": "monster_kraken",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "cannonball",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "harpoon",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P2",
+      "kind": "models",
+      "slot": "wreck",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P2",
+      "kind": "models",
+      "slot": "cannon",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P2",
+      "kind": "models",
+      "slot": "buoy",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_01",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_02",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_03",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_04",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_05",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_06",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_07",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_08",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_09",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_10",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_11",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_12",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_13",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_14",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_15",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_16",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_17",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_18",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_19",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_20",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_21",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_22",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_23",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_24",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_25",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_26",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_27",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_28",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_29",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_30",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_31",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_32",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_33",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_34",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_35",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_36",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_37",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_38",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_39",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_40",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_41",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_42",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_43",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_44",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_45",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_46",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_47",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_48",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_49",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "ship_main_50",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_base_01",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_base_02",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_base_03",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_base_04",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_base_05",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_base_06",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_base_07",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_base_08",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "island_base_09",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_storm_raider",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_storm_scout",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_storm_guard",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_storm_admiral",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_ember_raider",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_ember_tank",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_ember_hunter",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_ember_admiral",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_veil_scout",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_veil_sniper",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_veil_guard",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_veil_admiral",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P2",
+      "kind": "models",
+      "slot": "harbor_stormreach",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P2",
+      "kind": "models",
+      "slot": "harbor_ember",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P2",
+      "kind": "models",
+      "slot": "harbor_veil",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "models",
+      "slot": "npc_support_escort",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "harbor_module_workshop",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "harbor_module_merchant",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "harbor_module_repair_yard",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "models",
+      "slot": "harbor_module_support_pier",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "harbor_backdrop",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "captain_crest",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "button_normal",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "button_hover",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "button_pressed",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "button_disabled",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "button_focus",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "captain_portrait",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "card",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "cannon",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "iron",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "explosive",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "chain",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "repair",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "boost",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "harpoon",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "deck",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "target",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "shipyard",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "events",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "quests",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "shop",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "guild",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "chat",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "achievements",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "log",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "rankings",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "bonus",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "arsenal",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "home",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "world",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "group",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "settings",
+      "status": "preview_only",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_iron",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_explosive",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_chain",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_piercing",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_ember",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_venom",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_shatter",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_spectral",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_repair",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_boost",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_veil",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_storm_bolt",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_infernal_barrel",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_crystal_barrier",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_armor_corrosive",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_repair_blocker",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_leviathan_hook",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_recall_compass",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_powder",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_plates",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "m42_harpoon",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "status_burn",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "status_venom",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "status_armor_break",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "status_spectral_mark",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "status_repair_block",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "status_barrier",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "status_veil",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "status_powder",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "status_plates",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "payload_hunter_standard",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "payload_barbed_chain",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "payload_abyss_piercer",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "support_restoration_shell",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "support_ward_shell",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "support_event_restoration_shell",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "material_stormglass",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "material_ember_ore",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "material_veil_silk",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "material_reinforced_timber",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "material_precision_gears",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "module_storm_hunter_rig",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "module_storm_guard_plating",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "module_ember_blast_chamber",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "module_ember_armor_lattice",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "module_veil_support_core",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "module_veil_sail_matrix",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "ship_card_barco_low",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "ship_card_clipper",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "ship_card_chalupa",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_01",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_02",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_03",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_04",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_05",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_06",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_07",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_08",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_09",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_10",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_11",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_12",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_13",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_14",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_15",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_16",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_17",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_18",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_19",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_20",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_21",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_22",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_23",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_24",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_25",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_26",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_27",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_28",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_29",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_30",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_31",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_32",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_33",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_34",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_35",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_36",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_37",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_38",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_39",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_40",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_41",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_42",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_43",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_44",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_45",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_46",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_47",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_48",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_49",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P1",
+      "kind": "ui",
+      "slot": "ship_card_main_50",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "mastery_badge_01",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "mastery_badge_02",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "mastery_badge_03",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "mastery_badge_04",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "mastery_badge_05",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "mastery_badge_06",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "mastery_badge_07",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "mastery_badge_08",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "mastery_badge_09",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "mastery_badge_10",
+      "status": "active",
+      "classification": "ORIGINAL_PLACEHOLDER"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "shipyard_frame",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "shipyard_stat_up",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "shipyard_stat_down",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "shipyard_card_background",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "shipyard_compare_bar",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "shipyard_asset_final",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "shipyard_asset_fallback",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "ui",
+      "slot": "shipyard_mastery_hook",
+      "status": "prepared",
+      "classification": "ORIGINAL_PLACEHOLDER_REQUIRED"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "burn",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "venom",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "armor_break",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "spectral_mark",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "repair_block",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "barrier",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "veil",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "ammo_iron_impact",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "ammo_explosive_impact",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "ammo_chain_impact",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "ammo_piercing_impact",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "ammo_ember_impact",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "ammo_venom_impact",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "ammo_shatter_impact",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "ammo_spectral_impact",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "harpoon_impact",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "heal_impact",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "shield_heal_impact",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "powder_activation",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "plates_activation",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "mastery_level_up",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "vfx",
+      "slot": "shipyard_equip",
+      "status": "prepared",
+      "classification": "PROCEDURAL_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "cannon_fire_standard",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "cannon_fire_heavy",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "ammo_chain_hit",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "ammo_burn_hit",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "ammo_venom_hit",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "ammo_spectral_hit",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "harpoon_fire",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "harpoon_hit",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "repair_use",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "shield_use",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "veil_use",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "barrier_use",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "status_apply",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P1",
+      "kind": "audio",
+      "slot": "status_expire",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    },
+    {
+      "priority": "P0",
+      "kind": "audio",
+      "slot": "shipyard_select",
+      "status": "prepared",
+      "classification": "SILENT_FALLBACK"
+    }
+  ]
+}

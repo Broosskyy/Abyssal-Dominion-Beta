@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "milestone": "M109",
+  "fleets": {
+    "stormreach": {
+      "npc_storm_raider": {
+        "role": "skirmisher",
+        "combat_level_offset": 0,
+        "ammo": "chain",
+        "identity": "fast pirate raider"
+      },
+      "npc_storm_scout": {
+        "role": "scout",
+        "combat_level_offset": 0,
+        "ammo": "iron",
+        "identity": "light corsair scout"
+      },
+      "npc_storm_guard": {
+        "role": "guard",
+        "combat_level_offset": 1,
+        "ammo": "piercing",
+        "identity": "armored pirate guard"
+      },
+      "npc_storm_hunter": {
+        "role": "hunter",
+        "combat_level_offset": 1,
+        "ammo": "shatter",
+        "identity": "hunter rig"
+      },
+      "npc_storm_admiral": {
+        "role": "admiral",
+        "combat_level_offset": 2,
+        "ammo": "piercing",
+        "identity": "Stormreach admiral"
+      }
+    },
+    "ember_shoals": {
+      "npc_ember_raider": {
+        "role": "brawler",
+        "combat_level_offset": 0,
+        "ammo": "ember",
+        "identity": "aggressive ember corsair"
+      },
+      "npc_ember_tank": {
+        "role": "bulwark",
+        "combat_level_offset": 1,
+        "ammo": "explosive",
+        "identity": "heavy plated pirate hull"
+      },
+      "npc_ember_hunter": {
+        "role": "artillery",
+        "combat_level_offset": 1,
+        "ammo": "explosive",
+        "identity": "long-range bombardier"
+      },
+      "npc_ember_admiral": {
+        "role": "admiral",
+        "combat_level_offset": 2,
+        "ammo": "ember",
+        "identity": "Ember admiral"
+      }
+    }
+  },
+  "visual_rule": "distinct pirate silhouettes/fallback profiles; no modern navy identity",
+  "authority": "local prototype combat tuning"
+}

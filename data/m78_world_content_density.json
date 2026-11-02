@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "milestone": "M78",
+  "pl1_5": {
+    "poi_cap_per_sector": 4,
+    "wreck_visual_cluster_cap": 3,
+    "monster_warning_min_level": 3,
+    "harbor_extra_props_havens_reach": 6
+  },
+  "mobile": {
+    "low": "reduce decorative dressing before POI/harbor landmarks",
+    "balanced": "full M78 semantic POIs, moderate dressing",
+    "high": "full semantic POIs and dressing within existing visibility budgets"
+  },
+  "rules": [
+    "semantic POIs are visual-only",
+    "no reward implied by beacon/totem",
+    "combat targets outrank wreck/monster warning markers",
+    "Haven's Reach service clarity outranks decorative clutter"
+  ]
+}

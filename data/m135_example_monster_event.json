@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "config_version": "m135-example-monster-time",
+  "content": {
+    "records": [
+      {
+        "type": "formation",
+        "id": "FORMATION-STORM-V",
+        "name": "Storm V",
+        "offsets": [
+          [
+            -5,
+            2
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            2,
+            -2
+          ]
+        ],
+        "rotation_mode": "face_player",
+        "enabled": false
+      },
+      {
+        "type": "monster",
+        "id": "MON-STORM-SERPENT-001",
+        "name": "Storm Serpent",
+        "hull": 2600,
+        "damage": 110,
+        "armor": 0.1,
+        "speed": 6.4,
+        "range": 26,
+        "reload": 1.4,
+        "loot_table_id": "LOOT-STORMTIDE-001",
+        "asset_slot": "MON-STORM-SERPENT-001",
+        "enabled": false
+      },
+      {
+        "type": "spawn_table",
+        "id": "SPAWN-STORM-001",
+        "name": "Stormtide Weighted Fleet",
+        "entries": [
+          {
+            "content_id": "NPC-EVENT-STORM-001",
+            "kind": "npc",
+            "weight": 5.0,
+            "tags": [
+              "stormtide",
+              "raider"
+            ]
+          },
+          {
+            "content_id": "NPC-EVENT-STORM-ELITE",
+            "kind": "npc",
+            "weight": 1.0,
+            "elite": true,
+            "tags": [
+              "stormtide",
+              "elite"
+            ]
+          },
+          {
+            "content_id": "NPC-ADMIRAL-STORM-001",
+            "kind": "admiral",
+            "weight": 1.0,
+            "tags": [
+              "stormtide",
+              "admiral"
+            ]
+          },
+          {
+            "content_id": "MON-STORM-SERPENT-001",
+            "kind": "monster",
+            "weight": 0.7,
+            "tags": [
+              "stormtide",
+              "monster",
+              "hunter"
+            ]
+          }
+        ],
+        "slot_count": 4,
+        "respawn_seconds": 3.0,
+        "admiral_kills_required": 8,
+        "admiral_cooldown_seconds": 30.0,
+        "formation_id": "FORMATION-STORM-V",
+        "region_ids": [
+          "crimson_sea"
+        ],
+        "enabled": false
+      },
+      {
+        "type": "quest",
+        "id": "QUEST-STORM-HUNTER",
+        "name": "Storm Hunter",
+        "requirements": {
+          "min_level": 6,
+          "max_level": 10
+        },
+        "objectives": [
+          {
+            "kind": "sink",
+            "target": 5,
+            "content_tags": [
+              "stormtide"
+            ]
+          }
+        ],
+        "rewards": {
+          "gold": 500,
+          "xp": 180
+        },
+        "enabled": false
+      },
+      {
+        "type": "event",
+        "id": "EVENT-STORM-WEIGHTED",
+        "name": "Stormtide Fleet Rotation",
+        "schedule": {
+          "require_trusted_time": true
+        },
+        "regions": [
+          "crimson_sea"
+        ],
+        "spawn_table_ids": [
+          "SPAWN-STORM-001"
+        ],
+        "quests": [
+          "QUEST-STORM-HUNTER"
+        ],
+        "multipliers": {
+          "xp": 1.15,
+          "gold": 1.1,
+          "loot": 1.0
+        },
+        "enabled": false
+      }
+    ]
+  }
+}

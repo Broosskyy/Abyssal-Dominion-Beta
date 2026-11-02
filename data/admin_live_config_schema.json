@@ -1,0 +1,635 @@
+{
+  "schema_version": 2,
+  "surface": "Admin Dashboard / Live Config",
+  "sections": [
+    {
+      "id": "content_studio",
+      "label": "Content Studio",
+      "fields": [
+        "content_type",
+        "stable_id",
+        "name",
+        "enabled",
+        "schedule",
+        "requirements",
+        "rewards",
+        "asset_slots",
+        "references"
+      ],
+      "actions": [
+        "create",
+        "duplicate",
+        "edit",
+        "validate",
+        "schedule",
+        "publish",
+        "disable",
+        "rollback"
+      ]
+    },
+    {
+      "id": "ships",
+      "label": "Schiffe",
+      "fields": [
+        "price",
+        "hull",
+        "armor",
+        "speed",
+        "acceleration",
+        "turn_speed",
+        "damage",
+        "mastery_scaling"
+      ]
+    },
+    {
+      "id": "npcs",
+      "label": "NPC / Elite / Admiral / Monster",
+      "fields": [
+        "hull",
+        "damage",
+        "armor",
+        "speed",
+        "range",
+        "reload",
+        "ai_profile",
+        "xp",
+        "gold",
+        "loot_table",
+        "spawn_weight"
+      ]
+    },
+    {
+      "id": "weapons",
+      "label": "Kanonen / Harpunen / Support",
+      "fields": [
+        "damage",
+        "reload",
+        "range",
+        "projectile_speed",
+        "capacity",
+        "effects"
+      ]
+    },
+    {
+      "id": "ammo",
+      "label": "Munition",
+      "fields": [
+        "damage",
+        "armor_pierce",
+        "slow",
+        "range",
+        "crit",
+        "effect",
+        "effect_power",
+        "effect_duration",
+        "shop_price",
+        "bundle_amount"
+      ]
+    },
+    {
+      "id": "economy",
+      "label": "Wirtschaft",
+      "fields": [
+        "shop_prices",
+        "repair_costs",
+        "crafting_costs",
+        "upgrade_costs",
+        "currencies",
+        "rewards",
+        "drop_rates"
+      ]
+    },
+    {
+      "id": "progression",
+      "label": "Progression",
+      "fields": [
+        "xp_goals",
+        "trial_goals",
+        "ship_mastery",
+        "unlock_requirements",
+        "quest_rewards"
+      ]
+    },
+    {
+      "id": "liveops",
+      "label": "LiveOps",
+      "fields": [
+        "event_schedule",
+        "event_multipliers",
+        "event_shop",
+        "event_drops",
+        "maintenance"
+      ]
+    },
+    {
+      "id": "monetization",
+      "label": "Itemshop / Payment",
+      "fields": [
+        "product_display",
+        "price_display",
+        "bundles",
+        "sales_windows",
+        "limits",
+        "entitlement_mapping",
+        "provider_product_ids"
+      ]
+    },
+    {
+      "id": "assets",
+      "label": "Assets / Slots",
+      "fields": [
+        "slot_id",
+        "content_id",
+        "asset_kind",
+        "upload",
+        "lod0",
+        "lod1",
+        "lod2",
+        "icon",
+        "vfx",
+        "fallback",
+        "platform_overrides"
+      ]
+    },
+    {
+      "id": "staff_roles",
+      "label": "Staff / Rollen / Rechte",
+      "fields": [
+        "staff_identity",
+        "roles",
+        "effective_permissions",
+        "critical_approvals",
+        "session_revoke",
+        "audit"
+      ],
+      "permission": "staff.read"
+    },
+    {
+      "id": "gameplay_rules",
+      "label": "Gameplay Rules",
+      "fields": [
+        "missions",
+        "daily_weekly_goals",
+        "rewards",
+        "loot_pickups",
+        "corruption",
+        "bonusmap_rules",
+        "ship_rewards"
+      ],
+      "permission": "balance.edit"
+    },
+    {
+      "id": "world_content",
+      "label": "World Content",
+      "fields": [
+        "regions",
+        "sectors",
+        "harbors",
+        "poi",
+        "spawn_tables",
+        "encounters",
+        "level_ranges"
+      ],
+      "permission": "content.edit"
+    },
+    {
+      "id": "progression_tuning",
+      "label": "Progression & Upgrades",
+      "fields": [
+        "player_xp_curve",
+        "level_rewards",
+        "upgrade_costs",
+        "upgrade_effects",
+        "ship_mastery_curve",
+        "beginner_trials",
+        "pirate_trials",
+        "bonusmap_entry",
+        "bonusmap_waves",
+        "bonusmap_rewards"
+      ],
+      "permission": "rules.edit"
+    },
+    {
+      "id": "inventory_catalog",
+      "label": "Inventar & Itemregeln",
+      "fields": [
+        "stack_limits",
+        "starter_stock",
+        "cannon_capacity",
+        "deck_limits",
+        "bundle_targets",
+        "dynamic_items"
+      ],
+      "permission": "economy.edit"
+    },
+    {
+      "id": "pirate_levels_1_60",
+      "label": "Piratenlevel 1–60",
+      "fields": [
+        "xp",
+        "objectives",
+        "hunter",
+        "boss",
+        "trial",
+        "mastery_xp",
+        "rewards",
+        "unlock"
+      ],
+      "permission": "rules.edit"
+    },
+    {
+      "id": "item_behaviors",
+      "label": "Item Behavior Composer",
+      "fields": [
+        "target",
+        "cooldown",
+        "range",
+        "behavior_components",
+        "vfx_slot",
+        "icon_slot",
+        "shop",
+        "requirements"
+      ],
+      "permission": "content.edit"
+    },
+    {
+      "id": "bonusmap_safety",
+      "label": "Bonusmap Eintritt / Recovery",
+      "fields": [
+        "entry_item",
+        "entry_cost",
+        "reentry_policy",
+        "death_policy",
+        "return_location",
+        "reward_claim"
+      ],
+      "permission": "rules.edit"
+    },
+    {
+      "id": "world_graph",
+      "label": "World / Seekarten-Graph",
+      "fields": [
+        "sector_id",
+        "display_name",
+        "pirate_level",
+        "region_id",
+        "biome",
+        "harbor",
+        "neighbors",
+        "map_type",
+        "npc_slots",
+        "monster_slots",
+        "admiral_slot",
+        "poi_slots",
+        "island_slots"
+      ],
+      "actions": [
+        "create_sector",
+        "connect_sector",
+        "disconnect_sector",
+        "validate_graph",
+        "schedule",
+        "publish"
+      ],
+      "permission": "world.edit"
+    },
+    {
+      "id": "spawn_pools",
+      "label": "Spawn Pools",
+      "fields": [
+        "sector_id",
+        "region_id",
+        "npc_ids",
+        "monster_ids",
+        "admiral_ids",
+        "weights",
+        "schedule",
+        "event_overrides"
+      ],
+      "permission": "content.edit"
+    },
+    {
+      "id": "quest_builder",
+      "label": "Quest Builder",
+      "fields": [
+        "requirements",
+        "objectives",
+        "content_ids",
+        "content_tags",
+        "rewards",
+        "next_quest_id",
+        "schedule"
+      ],
+      "permission": "content.edit"
+    },
+    {
+      "id": "publishing",
+      "label": "Versionen & Publishing",
+      "fields": [
+        "config_version",
+        "validation",
+        "approvals",
+        "schedule",
+        "active_version",
+        "rollback_target",
+        "audit"
+      ],
+      "permission": "content.publish"
+    },
+    {
+      "id": "spawn_designer",
+      "label": "Spawn Designer",
+      "fields": [
+        "entries",
+        "weights",
+        "elite_flags",
+        "tags",
+        "slot_count",
+        "respawn_seconds",
+        "admiral_kills_required",
+        "admiral_cooldown_seconds",
+        "formation_id",
+        "regions",
+        "sectors",
+        "schedule"
+      ],
+      "permission": "content.edit"
+    },
+    {
+      "id": "formation_designer",
+      "label": "Formationen",
+      "fields": [
+        "offsets",
+        "rotation_mode",
+        "spacing",
+        "jitter"
+      ],
+      "permission": "content.edit"
+    },
+    {
+      "id": "quest_activity_mapping",
+      "label": "Quest Activity Mapping",
+      "fields": [
+        "kind",
+        "content_ids",
+        "content_tags",
+        "target",
+        "requirements",
+        "rewards"
+      ],
+      "permission": "content.edit"
+    },
+    {
+      "id": "server_time",
+      "label": "Serverzeit / Schedule Authority",
+      "fields": [
+        "time_authority",
+        "last_sync",
+        "event_schedule",
+        "require_trusted_time",
+        "timezone_display"
+      ],
+      "permission": "liveops.edit"
+    },
+    {
+      "id": "poi_builder",
+      "label": "POI Builder",
+      "fields": [
+        "content_id",
+        "label",
+        "tags",
+        "interaction_radius",
+        "repeatable",
+        "quest_hooks",
+        "asset_slot",
+        "marker_slot"
+      ],
+      "permission": "content.edit"
+    },
+    {
+      "id": "world_map_layout",
+      "label": "World Map Layout",
+      "fields": [
+        "sector_id",
+        "map_position",
+        "region_cluster",
+        "label_priority",
+        "map_icon_slot"
+      ],
+      "permission": "world.edit"
+    },
+    {
+      "id": "asset_production",
+      "label": "Asset Production / Placeholder",
+      "fields": [
+        "stable_slot_id",
+        "priority",
+        "replacement_path",
+        "lod0",
+        "lod1",
+        "lod2",
+        "mobile_profile",
+        "anchors",
+        "qa_status"
+      ],
+      "permission": "content.edit"
+    },
+    {
+      "id": "world_graph_runtime",
+      "label": "World Graph Runtime",
+      "fields": [
+        "sector_id",
+        "neighbors",
+        "pirate_level",
+        "map_position",
+        "region_id",
+        "poi_ids",
+        "island_slots"
+      ],
+      "permission": "world.edit"
+    },
+    {
+      "id": "sector_graph_publish",
+      "label": "Sector Graph Publish",
+      "fields": [
+        "sector_id",
+        "overlay_existing",
+        "neighbors",
+        "map_position",
+        "legacy_coord_optional",
+        "validation",
+        "migration_alias"
+      ],
+      "permission": "world.edit"
+    },
+    {
+      "id": "placeholder_silhouettes",
+      "label": "Placeholder Silhouettes",
+      "fields": [
+        "slot_id",
+        "silhouette",
+        "length_class",
+        "mast_profile",
+        "sail_profile",
+        "ornament_tier",
+        "mobile_readability"
+      ],
+      "permission": "content.edit"
+    },
+    {
+      "id": "graph_validation",
+      "label": "World Graph Validation",
+      "fields": [
+        "reciprocal_neighbors",
+        "reference_graph",
+        "level_range",
+        "map_position",
+        "stable_ids",
+        "publish_errors"
+      ],
+      "permission": "world.edit"
+    },
+    {
+      "id": "p0_asset_readiness",
+      "label": "P0 Asset Readiness",
+      "fields": [
+        "slot_id",
+        "reference_status",
+        "asset_status",
+        "import_status",
+        "mobile_readability",
+        "anchors",
+        "replacement_ready"
+      ],
+      "permission": "content.edit"
+    },
+    {
+      "id": "commerce_studio",
+      "label": "Itemshop / Commerce Studio",
+      "fields": [
+        "shop",
+        "offers",
+        "bundles",
+        "currencies",
+        "price_rules",
+        "campaigns",
+        "eligibility",
+        "purchase_limits",
+        "schedule",
+        "entitlement_mapping",
+        "icons",
+        "preview"
+      ],
+      "actions": [
+        "create",
+        "duplicate",
+        "validate",
+        "review",
+        "schedule",
+        "publish",
+        "disable",
+        "rollback"
+      ],
+      "permission": "commerce.read"
+    },
+    {
+      "id": "payment_operations",
+      "label": "Payment Operations",
+      "fields": [
+        "provider_product_id",
+        "provider_environment",
+        "receipt_status",
+        "entitlement_id",
+        "refund_policy",
+        "regional_price_source",
+        "tax_display"
+      ],
+      "permission": "payment.read",
+      "server_only": true
+    },
+    {
+      "id": "staff_command_console",
+      "label": "GM / Admin Command Console",
+      "fields": [
+        "command_id",
+        "arguments",
+        "target",
+        "environment",
+        "risk",
+        "required_permission",
+        "confirmation",
+        "audit_reason"
+      ],
+      "actions": [
+        "preview",
+        "execute"
+      ],
+      "permission": "command.read",
+      "server_execution_required": true
+    },
+    {
+      "id": "roles_permissions",
+      "label": "Rollen & Berechtigungen",
+      "fields": [
+        "role",
+        "permissions",
+        "surface",
+        "environment",
+        "command_scope",
+        "critical_approval",
+        "session_revoke"
+      ],
+      "permission": "staff.read"
+    }
+  ],
+  "workflow": {
+    "states": [
+      "draft",
+      "validated",
+      "scheduled",
+      "active",
+      "rolled_back"
+    ],
+    "four_eyes_for": [
+      "real_money_price",
+      "premium_currency",
+      "entitlement_mapping",
+      "commerce_publish",
+      "payment_refund",
+      "admin_grant",
+      "admin_ban",
+      "server_operation"
+    ],
+    "audit_log": true,
+    "versioned": true,
+    "rollback": true
+  },
+  "authority": {
+    "gameplay_balance": "active server config eventually",
+    "real_money_price": "server/payment provider",
+    "entitlement_grant": "server only",
+    "client": "read-only effective config + fallback defaults"
+  },
+  "validation": {
+    "numeric_min_max_required": true,
+    "referential_integrity": true,
+    "currency_mismatch_blocked": true,
+    "unknown_item_blocked": true,
+    "production_publish_requires_permission": true
+  },
+  "surfaces": {
+    "web_admin": "full content/balance/liveops/payment management",
+    "ingame_admin": "same content service with role-filtered mobile/desktop UI",
+    "shared_backend": true
+  },
+  "rbac": {
+    "enabled": true,
+    "contract": "res://data/admin_rbac_contract.json",
+    "same_roles_on": [
+      "web_admin",
+      "ingame_admin"
+    ],
+    "deny_by_default": true,
+    "server_verified": true
+  }
+}

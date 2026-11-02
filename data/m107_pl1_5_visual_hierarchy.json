@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "milestone": "M107",
+  "principles": [
+    "one primary teaching objective",
+    "contextual secondary hint only",
+    "no permanent tutorial wall",
+    "48dp minimum touch target",
+    "selected combat target outranks ambient POIs",
+    "port/safe-zone remains obvious"
+  ],
+  "levels": {
+    "1": {
+      "primary": "Tap-to-Sail + first neutral NPC attack",
+      "world_anchor": "Haven's Reach",
+      "ship": "ship_small"
+    },
+    "2": {
+      "primary": "medium starter + guild island awareness",
+      "world_anchor": "guild island visible/interactable",
+      "ship": "ship_medium"
+    },
+    "3": {
+      "primary": "large starter + first monster/harpoon lesson",
+      "world_anchor": "monster area",
+      "ship": "ship_large"
+    },
+    "4": {
+      "primary": "elite/admiral preparation + equipment/ammo differentiation",
+      "world_anchor": "combat encounter"
+    },
+    "5": {
+      "primary": "Pirate Trial closure + transition to main progression",
+      "world_anchor": "Haven's Reach / trial"
+    }
+  },
+  "mobile": {
+    "max_simultaneous_teaching_cards": 1,
+    "secondary_hint_auto_hide_seconds": 5,
+    "respect_custom_hud": true,
+    "respect_safe_area": true
+  }
+}

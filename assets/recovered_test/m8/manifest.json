@@ -1,0 +1,16 @@
+{
+  "classification": "RECOVERED_TEST_ASSET",
+  "source": [
+    "SeeFight 3D_Data.zip",
+    "sharedassets1.assets.zip",
+    "22AugustSF3D-PC.zip"
+  ],
+  "runtime_export": "INCLUDED_FOR_PRIVATE_TESTING",
+  "ship_profiles": ["clipper", "barco_low", "chalupa"],
+  "island_profiles": ["tropical_04", "tropical_01", "desert_06", "snow_02"],
+  "harbor_profiles": ["wooden_pier", "lighthouse"],
+  "audio_roles": ["ocean_ambience", "broadside", "ship_sinking", "repair", "reward"],
+  "coordinate_contract": "+Z bow, -Z stern, +X starboard, -X port, +Y up",
+  "public_distribution": false,
+  "commercial_use": "REQUIRES_RIGHTS_REVIEW"
+}

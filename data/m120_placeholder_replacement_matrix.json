@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "milestone": "M120",
+  "priority": [
+    {
+      "wave": "P0",
+      "families": [
+        "SHIP-STARTER-001..003",
+        "PL1-5 NPC",
+        "first monster",
+        "Haven's Reach",
+        "HUD icons"
+      ],
+      "status": "slots_ready"
+    },
+    {
+      "wave": "P1",
+      "families": [
+        "PL6-15 ships",
+        "NPC",
+        "islands",
+        "harbors"
+      ],
+      "status": "slots_ready_or_existing"
+    },
+    {
+      "wave": "P2",
+      "families": [
+        "Admirals",
+        "bonusmaps",
+        "support",
+        "monster set"
+      ],
+      "status": "slots_ready_or_existing"
+    },
+    {
+      "wave": "P3",
+      "families": [
+        "midgame regions/content"
+      ],
+      "status": "slots_ready_or_existing"
+    },
+    {
+      "wave": "P4",
+      "families": [
+        "Legendary",
+        "endgame",
+        "guild",
+        "event heroes",
+        "Void PL36-40"
+      ],
+      "status": "M120_slots_ready"
+    }
+  ],
+  "replacement_rule": "Final assets replace paths/slots only; gameplay IDs and anchors remain stable."
+}

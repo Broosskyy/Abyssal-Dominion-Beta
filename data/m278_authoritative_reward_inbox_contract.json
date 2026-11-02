@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "milestone": "M278",
+  "master_concept": "V3.8",
+  "contract": "authoritative_reward_inbox_claim_queue_capacity_overflow_expiry_compensation_recovery",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "References inform only readable naval-MMO reward inbox and claim feedback. No proprietary reward values, expiry rules, layouts, names, assets or mechanics are copied.",
+  "authority": {
+    "server_owns": ["inbox_entry_identity", "queue_order", "claim_processing_state", "capacity_verdict", "overflow_state", "expiry_state", "retention_state", "compensation_authorization", "recovery_revision", "settlement_link"],
+    "client_may": ["render_confirmed_inbox", "render_confirmed_queue_state", "submit_claim_queue_intent", "request_inbox_refresh"],
+    "client_must_never": ["create_inbox_entry", "attach_reward_value", "reorder_authoritative_queue", "override_capacity", "extend_expiry", "reactivate_expired_reward", "authorize_compensation", "mint_compensation_value", "settle_reward"]
+  },
+  "entry_states": ["PENDING", "CLAIMABLE", "QUEUED", "DELIVERING", "OVERFLOW", "MAIL_FALLBACK", "RECOVERY_PENDING", "SETTLED", "EXPIRED", "REVOKED"],
+  "queue_states": ["IDLE", "READY", "PROCESSING", "BLOCKED_CAPACITY", "BLOCKED_DEPENDENCY", "RECOVERY_PENDING"],
+  "rules": {
+    "each_entry_links_existing_m277_receipt": true,
+    "claim_queue_intent_creates_no_value": true,
+    "capacity_failure_creates_no_local_replacement": true,
+    "overflow_mail_path_uses_m254_m277_server_channel": true,
+    "expiry_is_server_policy_only": true,
+    "compensation_requires_server_authorization_and_audit": true,
+    "compensation_durable_value_requires_m266_commit": true,
+    "retry_reconnect_must_converge_to_existing_entry": true,
+    "test_global_isolation": true
+  },
+  "dependencies": {
+    "delivery_receipt": "M277 authoritative reward receipt/delivery/recovery",
+    "mail": "M254 server-authoritative mail/claim channel",
+    "settlement": "M266 atomic economy/inventory transaction boundary",
+    "roll_integrity": "M276 authoritative loot-roll integrity"
+  },
+  "unset_until_measured": ["inbox_capacity", "claim_queue_batch_size", "claim_queue_processing_rate", "overflow_retention", "expiry_duration", "expiry_grace", "compensation_thresholds", "compensation_values", "recovery_retry_count", "recovery_backoff"],
+  "production_status": "PARTIAL"
+}

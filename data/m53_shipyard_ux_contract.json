@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "milestone": "M53",
+  "shipyard_ux": {
+    "responsive_portrait_single_column": true,
+    "responsive_landscape_two_column": true,
+    "scrollable_details": true,
+    "stat_bars": 5,
+    "asset_override_diagnostics": true,
+    "minimum_touch_height": 52
+  },
+  "mastery_hooks": {
+    "presentation_only": true,
+    "economy_rewards_invented": false,
+    "event_payload_hook": true
+  },
+  "production": {
+    "p0_shortcuts_contract": true,
+    "missing_report_updated": true,
+    "fallback_nonfatal": true
+  },
+  "authority": "local prototype only"
+}

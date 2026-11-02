@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource path="res://scripts/visual/p1_regional_visual_qa_scene.gd" type="Script" id="1"]
+
+[node name="M150P1RegionalVisualAcceptance" type="Node3D"]
+script = ExtResource("1")
+metadata/purpose = "Crimson Sea and Drowned Reach mobile gameplay-camera visual acceptance"
+metadata/milestone = "M150"

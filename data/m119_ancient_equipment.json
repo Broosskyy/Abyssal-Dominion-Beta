@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "milestone": "M119",
+  "unlock_level": 31,
+  "items": [
+    {
+      "id": "ancient_hull",
+      "label": "Ancient Reinforced Hull",
+      "cost_core": 1,
+      "modifiers": {
+        "armor_add": 0.035
+      }
+    },
+    {
+      "id": "relic_cannon",
+      "label": "Relic Cannon Matrix",
+      "cost_core": 1,
+      "modifiers": {
+        "cannon_damage_mult": 1.08
+      }
+    },
+    {
+      "id": "guardian_harpoon_rig",
+      "label": "Guardian Hunter Rig",
+      "cost_core": 1,
+      "modifiers": {
+        "harpoon_damage_mult": 1.12
+      }
+    },
+    {
+      "id": "titan_sails",
+      "label": "Titanwake Sails",
+      "cost_core": 1,
+      "modifiers": {
+        "speed_mult": 1.06
+      }
+    }
+  ],
+  "rules": [
+    "one active",
+    "capped",
+    "no cash-exclusive power"
+  ],
+  "tuning": "prototype"
+}

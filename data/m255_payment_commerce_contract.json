@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "milestone": "M255",
+  "master_concept": "V3.8",
+  "status": "CLIENT_SERVER_REPLICA_FOUNDATION",
+  "source_sections": [
+    "76-78",
+    "105",
+    "603",
+    "607",
+    "615",
+    "618",
+    "622-632",
+    "668",
+    "716-718",
+    "728-734",
+    "816",
+    "837"
+  ],
+  "master_contract": {
+    "client_starts_purchase_only": true,
+    "ownership_after_server_verification_only": true,
+    "server_catalog_service": true,
+    "server_receipt_validation": true,
+    "idempotent_purchase_transaction": true,
+    "entitlements_server_authoritative": true,
+    "refund_chargeback_revocation_tracked": true,
+    "global_test_isolation": true,
+    "hard_pay_to_win_excluded": true
+  },
+  "catalog": {
+    "fields": [
+      "product_id",
+      "offer_id",
+      "bundle_id",
+      "price_reference",
+      "availability",
+      "start_at",
+      "end_at",
+      "purchase_limit",
+      "segment",
+      "entitlement_ids",
+      "platform_mapping",
+      "environment"
+    ],
+    "real_money_price_source": "STORE_PROVIDER_OR_SERVER_CATALOG",
+    "client_may_invent_price": false
+  },
+  "providers": {
+    "android": "Google Play Billing prepared",
+    "ios": "StoreKit/App Store IAP prepared",
+    "web": "provider adapter prepared",
+    "provider_is_final_in_client": false
+  },
+  "purchase_flow": [
+    "offer_view",
+    "purchase_start_intent",
+    "provider_result",
+    "server_receipt_validation",
+    "purchase_transaction",
+    "entitlement_projection",
+    "client_confirmed_view"
+  ],
+  "security": {
+    "replay_protection": true,
+    "duplicate_receipt_rejected": true,
+    "consumed_token_reuse_rejected": true,
+    "client_response_not_authority": true,
+    "request_transaction_ids_required": true
+  },
+  "refunds": {
+    "statuses": [
+      "pending",
+      "active",
+      "refunded",
+      "revoked",
+      "chargeback"
+    ],
+    "history_server_owned": true,
+    "inventory_wallet_mutation_only_via_server_policy": true
+  },
+  "fairness": {
+    "payment_focus": [
+      "cosmetics",
+      "ship_skins",
+      "sails",
+      "flags",
+      "wakes",
+      "vfx",
+      "nameplates",
+      "captain_cosmetics",
+      "convenience",
+      "loadouts",
+      "storage",
+      "moderate_boosters",
+      "seasons",
+      "bundles"
+    ],
+    "dominant_pvp_power_cash_exclusive": false,
+    "relevant_combat_power_must_be_earnable": true,
+    "test_value_transfer_to_global": false
+  },
+  "offline": {
+    "fake_purchases": false,
+    "fake_entitlements": false,
+    "fake_receipts": false,
+    "fake_store_prices": false
+  },
+  "balance": {
+    "new_final_prices_invented": false,
+    "new_final_booster_values_invented": false,
+    "new_final_payment_power_values_invented": false
+  },
+  "ui": {
+    "shop_is_global_destination": true,
+    "provider_price_only_when_server_or_provider_confirmed": true,
+    "purchase_states": [
+      "loading",
+      "pending",
+      "confirmed",
+      "failed",
+      "refunded",
+      "revoked"
+    ],
+    "no_permanent_commerce_hud": true,
+    "world_center_stays_clear": true
+  }
+}

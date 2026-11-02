@@ -1,0 +1,111 @@
+name: Abyssal Dominion M303.9 shoreline and ship classes Android test
+
+on:
+  push:
+    branches: [rebuild/m3039-world-ship-pass]
+    paths:
+      - '.github/workflows/m3039-world-ships.yml'
+      - 'tests/m3037_graphics_integration_smoke.gd'
+      - 'tests/m3037_combat_smoke.gd'
+      - 'tools/build_m3035_android.py'
+      - 'scripts/classic/**'
+      - 'assets/classic/original_ui/**'
+      - 'tests/m3038_ammo_visual_smoke.gd'
+      - 'tests/m3038_world_loot_smoke.gd'
+      - 'tests/m3039_world_ships_smoke.gd'
+      - 'project.godot'
+      - 'scripts/visual/p0_replacement_qa.gd'
+      - 'scenes/classic/**'
+      - 'export_presets.cfg'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage existing M303.6 source graphics into build workspace only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/rebuild/classic-seafight-m303
+          git restore --source=FETCH_HEAD --worktree -- assets/classic/private_seabattles assets/classic/private_seaofbones
+          # Original OBJ/large textures are not runtime sprites and must not be packaged.
+          rm -rf assets/classic/private_seaofbones/models
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('assets/classic')
+          for folder in ('private_seabattles', 'private_seaofbones'):
+              d = root/folder
+              pack = json.loads((d/'pack.json').read_text())
+              for name, spec in pack['actors'].items():
+                  image = d/spec['path']
+                  assert image.is_file() and image.stat().st_size > 1024, f'{folder}/{name} missing or tiny'
+              assert (d/pack['ocean']['path']).is_file()
+              print('STAGED', folder, 'actors', len(pack['actors']), 'source', pack['source_label'])
+          PY
+          test -z "$(git diff --name-only)"  # No persistent art changes on integration branch
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Download Godot 4.7.2
+        run: |
+          set -euo pipefail
+          curl -fL --retry 4 --retry-delay 5 -o /tmp/godot.zip https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+          mkdir -p /tmp/godot-bin
+          unzip -q /tmp/godot.zip -d /tmp/godot-bin
+          exe="$(find /tmp/godot-bin -maxdepth 2 -type f -name '*linux.x86_64' | head -1)"
+          test -n "$exe"
+          sudo install -m 0755 "$exe" /usr/local/bin/godot
+          godot --headless --version
+      - name: Install official Android export template
+        run: |
+          set -euo pipefail
+          curl -fL --retry 4 --retry-delay 5 -o /tmp/templates.tpz https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.7.2.stable"
+          unzip -p /tmp/templates.tpz templates/android_debug.apk > "$HOME/.local/share/godot/export_templates/4.7.2.stable/android_debug.apk"
+          test -s "$HOME/.local/share/godot/export_templates/4.7.2.stable/android_debug.apk"
+          rm -f /tmp/templates.tpz
+      - name: Generate ephemeral Android debug signing key
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          keytool -genkeypair -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Abyssal Dominion,C=DE"
+      - name: Import source with all private test sprites
+        run: godot --headless --path . --editor --import --quit
+      - name: Headless M303.7 gameplay regression test
+        run: godot --headless --path . --script res://tests/m3037_combat_smoke.gd
+      - name: Verify both graphics packs in actual game scene and live swap
+        run: godot --headless --path . --script res://tests/m3037_graphics_integration_smoke.gd
+      - name: Verify actual in-game ammo meshes and functional quickbar
+        run: godot --headless --path . --script res://tests/m3038_ammo_visual_smoke.gd
+      - name: Verify extra NPCs and physical treasure pickup
+        run: godot --headless --path . --script res://tests/m3038_world_loot_smoke.gd
+      - name: Verify shoreline, combat ship classes, and wake correction
+        run: godot --headless --path . --script res://tests/m3039_world_ships_smoke.gd
+      - name: Build Android test APK with real integrated graphics (no placeholder option)
+        run: |
+          set -euo pipefail
+          python3 tools/build_m3035_android.py --godot godot --android-sdk "$ANDROID_HOME" --java-home "$JAVA_HOME" --debug-keystore "$HOME/.android/debug.keystore" --output builds/android/ABYSSAL_DOMINION_M303_9_WORLD_SHIPS.apk 2>&1 | tee /tmp/m3039-apk-export.log
+          if grep -Eq 'SCRIPT ERROR|Parse Error|ERROR: Failed to load script' /tmp/m3039-apk-export.log; then
+            echo "Godot reported script errors during Android export"
+            exit 1
+          fi
+      - name: Upload M303.9 playable test APK (reference graphics; not public release)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Abyssal-Dominion-M3039-World-Ships-TEST-Reference-Art
+          path: |
+            builds/android/ABYSSAL_DOMINION_M303_9_WORLD_SHIPS.apk
+            builds/android/ABYSSAL_DOMINION_M303_9_WORLD_SHIPS.build.json
+            builds/android/ABYSSAL_DOMINION_M303_9_WORLD_SHIPS.signature.txt
+          if-no-files-found: error
+          retention-days: 7

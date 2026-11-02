@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "milestone": "M142",
+  "master": "V3.7",
+  "scope": "PL1-5 P0 vertical slice",
+  "starter_fleet": [
+    {
+      "level": 1,
+      "slot": "SHIP-STARTER-001",
+      "size": "small",
+      "role": "baseline"
+    },
+    {
+      "level": 2,
+      "slot": "SHIP-STARTER-002",
+      "size": "medium",
+      "role": "earned beginner upgrade"
+    },
+    {
+      "level": 3,
+      "slot": "SHIP-STARTER-003",
+      "size": "large",
+      "role": "earned beginner upgrade"
+    }
+  ],
+  "npc_visual_rotation": {
+    "1": [
+      "NPC-SHIP-EARLY-002",
+      "NPC-SHIP-EARLY-003",
+      "NPC-SHIP-EARLY-004"
+    ],
+    "2": [
+      "NPC-SHIP-EARLY-003",
+      "NPC-SHIP-EARLY-004",
+      "NPC-SHIP-EARLY-005"
+    ],
+    "3": [
+      "NPC-SHIP-EARLY-004",
+      "NPC-SHIP-EARLY-005",
+      "NPC-SHIP-EARLY-001"
+    ],
+    "4": [
+      "NPC-SHIP-EARLY-005",
+      "NPC-SHIP-EARLY-001",
+      "NPC-SHIP-EARLY-002"
+    ],
+    "5": [
+      "NPC-SHIP-EARLY-001",
+      "NPC-SHIP-EARLY-002",
+      "NPC-SHIP-EARLY-003"
+    ]
+  },
+  "monster": {
+    "slot": "MON-KRAKEN-001",
+    "teaching_level": 3,
+    "neutral_rule": "monster contract separate from PL1-5 neutral ship patrol"
+  },
+  "harbor": {
+    "slot": "HARBOR-HAVENS-REACH",
+    "modules": [
+      "DOCK",
+      "WAREHOUSE",
+      "MARKET",
+      "SHIPYARD",
+      "BEACON"
+    ]
+  },
+  "mobile": {
+    "poi_prompt_min_height": 46,
+    "touch_target_min": 48,
+    "gameplay_zoom_readability": true
+  },
+  "replacement_contract": {
+    "gameplay_wrapper_survives_visual_swap": true,
+    "missing_hero_asset_uses_fallback": true,
+    "final_glb_required": false
+  }
+}

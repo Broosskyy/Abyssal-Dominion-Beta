@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "region": "abyssal_dominion",
+  "camera": "controlled_oblique_top_down",
+  "palette_role": "deep cold water + pale rift highlights; avoid black-on-black",
+  "islands": {
+    "silhouettes": [
+      "long_broken_cliff",
+      "split_rift_cove",
+      "asymmetric_throne_shelf"
+    ],
+    "round_default_forbidden": true
+  },
+  "ships": {
+    "style": "pirate wood sails ornamentation; no modern navy",
+    "legendary_readability": "large silhouette features, not micro detail"
+  },
+  "monsters": {
+    "lod": [
+      "LOD0",
+      "LOD1",
+      "LOD2"
+    ],
+    "animations": [
+      "idle",
+      "move_swim",
+      "attack",
+      "hit",
+      "phase",
+      "death_submerge"
+    ]
+  },
+  "mobile": {
+    "max_major_vfx": 2,
+    "reduced_particles": true,
+    "high_contrast_targeting": true
+  },
+  "all_final_assets_replaceable": true
+}

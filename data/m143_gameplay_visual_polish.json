@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "milestone": "M143",
+  "preserve": ["three_starter_progression", "fifty_main_design_slots", "weapons", "cannons", "ammo", "cannonballs", "harpoons", "support_weapons", "ships", "npcs", "monsters", "quests", "events", "guilds", "badges", "logos", "settings", "mobile_controls", "desktop_controls", "asset_slots"],
+  "mobile": {"minimum_touch_target": 56, "admin_touch_target": 52, "safe_area_required": true, "drag_to_sail": true, "tap_to_sail": true, "pinch_zoom": true, "hud_overlap_guard": true},
+  "gameplay": {"starter_npcs_passive_until_attacked": true, "free_heading_control": true, "target_lock_optional": true, "weapon_and_ammo_selection_preserved": true},
+  "visual": {"camera":"isometric_top_down", "ocean_layers":true, "ship_silhouette_priority":true, "mobile_lod":true, "replaceable_glb_slots":true, "runtime_vfx_separate_from_glb":true},
+  "quality_rule": "Every milestone must preserve existing systems and improve at least one measurable gameplay, visual, mobile, content or production-readiness area."
+}

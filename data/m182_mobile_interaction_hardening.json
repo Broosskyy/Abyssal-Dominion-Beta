@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "milestone": "M182",
+  "master_concept": "V3.8",
+  "goal": "MOBILE_INPUT_OWNERSHIP_RESPAWN_VISIBILITY_AND_LOOT_GUIDANCE",
+  "modal_input_ownership": {
+    "blocked_world_input_states": [
+      "inventory_open",
+      "journal_open",
+      "admin_panel_open",
+      "meta_panel_open",
+      "settings_open",
+      "command_open"
+    ],
+    "blocked_actions": ["tap_to_sail", "repair", "boost", "fire"],
+    "camera_motion_paused": true,
+    "background_world_taps_may_leak": false
+  },
+  "respawn_protection": {
+    "visible_status_chip": true,
+    "countdown_seconds": true,
+    "attack_ends_protection": true,
+    "damage_and_enemy_reacquisition_rules": "preserved_from_m181"
+  },
+  "loot_guidance": {
+    "world_marker_group": "world_poi_markers",
+    "marker_kind": "loot",
+    "marker_priority": 60,
+    "distance_label_range": 34.0,
+    "tap_target_radius_pixels": 44.0,
+    "tap_visible_loot_to_sail": true,
+    "proximity_collection": "preserved_from_m181",
+    "reward_authority_changed": false
+  },
+  "preserved": [
+    "M180 mobile HUD and water repair",
+    "M181 pivot-first Tap-to-Sail",
+    "M181 defeat and respawn flow",
+    "M181 reward and loot collection feedback",
+    "server-authoritative online economy and rewards"
+  ]
+}

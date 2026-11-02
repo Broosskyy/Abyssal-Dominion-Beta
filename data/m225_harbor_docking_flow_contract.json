@@ -1,0 +1,27 @@
+{
+  "milestone": "M225",
+  "master_concept": "V3.8",
+  "scope": "harbor docking flow and contextual harbor HUD",
+  "states": ["at_sea", "approach", "docked"],
+  "interaction": {
+    "approach_action": "ANLEGEN",
+    "docked_action": "ABLEGEN",
+    "same_contextual_interaction": true,
+    "sets_respawn_point_on_dock": true,
+    "stops_ship_on_dock": true
+  },
+  "docked_hud": {
+    "compact": true,
+    "world_remains_visible": true,
+    "services": ["shipyard", "repair", "market", "arsenal"],
+    "center_gameplay_area_remains_clear": true
+  },
+  "system_boundaries": {
+    "local_services_require_valid_nearby_port": true,
+    "global_shipyard_and_meta_systems_remain_globally_accessible": true,
+    "navigation_authority_unchanged": true,
+    "collision_authority_unchanged": true,
+    "combat_balance_unchanged": true,
+    "cross_platform_world_parity": true
+  }
+}

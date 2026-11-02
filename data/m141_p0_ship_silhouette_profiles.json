@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "milestone": "M141",
+  "profiles": {
+    "SHIP-STARTER-001": {
+      "silhouette": "starter_sloop",
+      "length_class": "small",
+      "mast_profile": "low",
+      "sail_profile": "lateen",
+      "width_mult": 0.74,
+      "height_mult": 0.76,
+      "length_mult": 0.78,
+      "ornament_tier": 0,
+      "role": "first_ship",
+      "readability": "small_light_simple"
+    },
+    "SHIP-STARTER-002": {
+      "silhouette": "starter_brigantine",
+      "length_class": "medium",
+      "mast_profile": "balanced",
+      "sail_profile": "mixed",
+      "width_mult": 0.96,
+      "height_mult": 0.94,
+      "length_mult": 1.0,
+      "ornament_tier": 0,
+      "role": "second_beginner_ship",
+      "readability": "medium_two_mast"
+    },
+    "SHIP-STARTER-003": {
+      "silhouette": "starter_galleon",
+      "length_class": "large",
+      "mast_profile": "tall",
+      "sail_profile": "square",
+      "width_mult": 1.2,
+      "height_mult": 1.14,
+      "length_mult": 1.18,
+      "ornament_tier": 1,
+      "role": "final_beginner_ship",
+      "readability": "large_high_stern"
+    },
+    "NPC-SHIP-EARLY-001": {
+      "silhouette": "coastal_sloop",
+      "length_class": "small",
+      "mast_profile": "low",
+      "sail_profile": "lateen",
+      "width_mult": 0.72,
+      "height_mult": 0.74,
+      "length_mult": 0.82,
+      "role": "neutral_patrol"
+    },
+    "NPC-SHIP-EARLY-002": {
+      "silhouette": "corsair_cutter",
+      "length_class": "small_long",
+      "mast_profile": "balanced",
+      "sail_profile": "mixed",
+      "width_mult": 0.68,
+      "height_mult": 0.84,
+      "length_mult": 1.05,
+      "role": "neutral_patrol"
+    },
+    "NPC-SHIP-EARLY-003": {
+      "silhouette": "patrol_brig",
+      "length_class": "medium",
+      "mast_profile": "balanced",
+      "sail_profile": "square",
+      "width_mult": 1.0,
+      "height_mult": 0.96,
+      "length_mult": 1.0,
+      "role": "neutral_patrol"
+    },
+    "NPC-SHIP-EARLY-004": {
+      "silhouette": "heavy_barque",
+      "length_class": "large",
+      "mast_profile": "tall",
+      "sail_profile": "square",
+      "width_mult": 1.22,
+      "height_mult": 1.08,
+      "length_mult": 1.12,
+      "role": "elite_patrol"
+    },
+    "NPC-SHIP-EARLY-005": {
+      "silhouette": "hunter_schooner",
+      "length_class": "long",
+      "mast_profile": "low",
+      "sail_profile": "split",
+      "width_mult": 0.78,
+      "height_mult": 0.78,
+      "length_mult": 1.28,
+      "role": "hunter_patrol"
+    }
+  }
+}

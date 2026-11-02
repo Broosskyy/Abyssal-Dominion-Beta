@@ -1,0 +1,7 @@
+{
+  "schema":1,
+  "milestone":"M155",
+  "live_map_cap":50,
+  "staged_next_band":{"levels":[51,52,53,54,55,56,57,58,59,60],"status":"CONTENT_PREPRODUCTION","ship_slots":[51,52,53,54,55,56,57,58,59,60],"world_band_required":true,"balance_final":false},
+  "guardrails":["do not raise live map cap until regions/encounters/trials/rewards exist","M153 W5 ship GLBs are visual placeholders, not automatic gameplay unlocks","all future bands must be admin/content-service addressable"]
+}

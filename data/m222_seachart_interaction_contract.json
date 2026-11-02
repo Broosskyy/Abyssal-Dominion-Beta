@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "milestone": "M222",
+  "master_concept": "V3.8",
+  "purpose": "Lock the round gameplay minimap versus rectangular/full-screen sea chart and unify existing-world target actions without creating a second navigation authority.",
+  "locks": {
+    "gameplay_minimap": "round/circular, upper-right, north-up with explicit player heading",
+    "full_sea_chart": "rectangular/full-screen planning surface with more room for precise world context",
+    "world_truth": "actions may only resolve nodes/targets that actually exist in the current world",
+    "movement": "Tap-to-Sail mobile and Click-to-Sail desktop remain authoritative; set_navigation_world_target only receives resolved existing targets",
+    "selection": "combat target selection remains TargetingSystem authority; quest tracking remains TrackedQuestRuntime authority",
+    "parity": "same world, targets, POIs and navigation authority on mobile/web/desktop; only responsive UI dimensions differ",
+    "hud": "no persistent bottom map-selection bar; primary attack remains lower-right"
+  },
+  "context_actions": {
+    "harbor": [
+      "ANSTEUERN",
+      "HAFEN when docking/interact rules permit"
+    ],
+    "tracked_objective": [
+      "VERFOLGEN / NICHT MEHR VERFOLGEN",
+      "ANSTEUERN only when resolve_target returns an existing world node"
+    ],
+    "enemy": [
+      "ZIEL AUSWAEHLEN",
+      "ANSTEUERN as presentation/navigation intent only"
+    ],
+    "loot": [
+      "ANSTEUERN"
+    ],
+    "poi": [
+      "ANSTEUERN when existing and navigable"
+    ]
+  },
+  "non_goals": [
+    "no invented destinations",
+    "no teleportation",
+    "no second pathfinder",
+    "no gameplay balance changes",
+    "no rectangular gameplay minimap"
+  ]
+}

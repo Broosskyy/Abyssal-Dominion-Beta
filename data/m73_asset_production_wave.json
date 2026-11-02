@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "milestone": "M73",
+  "priority": "P0",
+  "next_models": [
+    "nature_palm_single_01",
+    "nature_rock_small_01",
+    "nature_reef_shallow_01",
+    "prop_shipwreck_mast_01",
+    "prop_anchor_wreck_01",
+    "prop_barrel_cluster_01"
+  ],
+  "already_prepared_high_priority": [
+    "nature_palm_cluster_01",
+    "nature_rock_cluster_01",
+    "nature_reef_cluster_01",
+    "poi_wreck_site_01",
+    "poi_salvage_cache_01",
+    "poi_monster_nest_01"
+  ],
+  "acceptance": [
+    "oblique/mobile silhouette first",
+    "no baked text",
+    "no water plane",
+    "visual-only",
+    "stable scale/pivot",
+    "shared materials where sensible"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "milestone": "M47",
+  "runtime_features": {
+    "world_grid": "4x4 with map levels through 15",
+    "regional_content_driven": true,
+    "regional_visual_slots_applied": true,
+    "main_design_unlock_runtime": true,
+    "post_beginner_boss_advancement": true,
+    "harpoon_payload_selector_runtime": true,
+    "support_ammo_selector_runtime": true,
+    "support_fire_runtime": true,
+    "production_qa_scenes_visible": true
+  },
+  "support_rules": {
+    "friendly_targeting": "player plus support_allies group",
+    "overheal_contribution": 0,
+    "self_support_allowed": true,
+    "event_support_requires_event_participant": true
+  },
+  "authority": "local prototype only"
+}

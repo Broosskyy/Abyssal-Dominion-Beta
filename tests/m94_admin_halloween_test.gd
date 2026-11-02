@@ -1,0 +1,20 @@
+extends Node
+func _ready()->void:
+	var admin_data:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m94_admin_mode.json"))
+	assert(bool(admin_data.local_default_enabled))
+	assert(str(admin_data.authority)=="local_development_only")
+	var event:=JSON.parse_string(FileAccess.get_file_as_string("res://data/event_framework.json"))
+	assert(str(event.active_event)=="halloween_abyss_01")
+	var halloween:Dictionary=event.events.halloween_abyss_01
+	assert(halloween.phases.size()==3)
+	assert(str(halloween.currency.id)=="drowned_embers")
+	assert(str(halloween.combat_hooks.ammo[0].id)=="gravefire")
+	assert(str(halloween.combat_hooks.items[0].id)=="gravewake_lantern")
+	assert(PlayerInventory.AMMO_IDS.has("gravefire"))
+	assert(not ActionItemCatalog.item("gravewake_lantern").is_empty())
+	var audit:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m94_admin_halloween_audit.json"))
+	assert(not bool(audit.admin.production_authority))
+	assert(not bool(audit.halloween.live_rewards_authority))
+	var prod:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m94_asset_production_wave.json"))
+	assert(prod.master_first_13.size()==13)
+	print("M94_ADMIN_HALLOWEEN_PASS")

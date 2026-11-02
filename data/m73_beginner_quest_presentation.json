@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "milestone": "M73",
+  "authority": "presentation_only",
+  "rules": [
+    "Does not alter BeginnerRules goals/rewards.",
+    "Does not complete trials or grant rewards.",
+    "Uses existing VoyageProgress sink/loot/dock counters.",
+    "Phone-first: one primary instruction at a time."
+  ],
+  "levels": {
+    "1": {
+      "title": "Erste Ausfahrt",
+      "brief": "Lerne Kurs, Zielwahl, Bergung und sichere Rückkehr nach Haven's Reach.",
+      "map_hint": "Novice Tide · Haven's Reach",
+      "icon": "m70_tutorial_sail"
+    },
+    "2": {
+      "title": "Küstenpatrouille",
+      "brief": "Festige Navigation und Gefechtsablauf auf der nächsten Karte.",
+      "map_hint": "Green Frontier",
+      "icon": "m72_poi_navigation"
+    },
+    "3": {
+      "title": "Gefährliche Gewässer",
+      "brief": "Monster und stärkere Begegnungen werden sichtbar. Nutze Reparatur und Schild bewusst.",
+      "map_hint": "Port Royale",
+      "icon": "m72_poi_nest"
+    },
+    "4": {
+      "title": "Grenzfahrt",
+      "brief": "Verbinde Kampf, Bergung und Rückweg ohne die Übersicht zu verlieren.",
+      "map_hint": "Drake Passage / Ember Coast",
+      "icon": "m72_poi_wreck"
+    },
+    "5": {
+      "title": "Piratenprüfung",
+      "brief": "Schließe die Anfängerphase ab und bereite den Übergang zur Hauptprogression vor.",
+      "map_hint": "Amazigh Sahil",
+      "icon": "m72_poi_objective_frame"
+    }
+  },
+  "objective_order": [
+    "sink",
+    "loot",
+    "dock"
+  ],
+  "objective_copy": {
+    "sink": {
+      "title": "GEFECHT",
+      "hint": "Ziele bekämpfen",
+      "icon": "m70_tutorial_attack"
+    },
+    "loot": {
+      "title": "BERGUNG",
+      "hint": "Salvage aufnehmen",
+      "icon": "m72_poi_salvage"
+    },
+    "dock": {
+      "title": "RÜCKKEHR",
+      "hint": "Im Hafen anlegen",
+      "icon": "m70_tutorial_harbor"
+    }
+  }
+}

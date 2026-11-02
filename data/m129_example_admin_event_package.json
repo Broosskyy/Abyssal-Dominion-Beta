@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "config_version": "m129-example-draft",
+  "content": {
+    "records": [
+      {
+        "type": "loot_table",
+        "id": "LOOT-STORMTIDE-001",
+        "entries": [
+          {
+            "item_id": "ITEM-STORM-SHARD",
+            "amount": 1,
+            "chance": 0.25
+          }
+        ],
+        "enabled": false
+      },
+      {
+        "type": "item",
+        "id": "ITEM-STORM-SHARD",
+        "name": "Storm Shard",
+        "category": "event_material",
+        "stack_limit": 999,
+        "icon_slot": "UI-ITEM-STORM-SHARD",
+        "enabled": false
+      },
+      {
+        "type": "npc",
+        "id": "NPC-EVENT-STORM-001",
+        "name": "Storm Reaver",
+        "archetype": "raider",
+        "hull": 1800,
+        "damage": 92,
+        "armor": 0.12,
+        "speed": 7.2,
+        "range": 28,
+        "reload": 1.25,
+        "loot_table_id": "LOOT-STORMTIDE-001",
+        "asset_slot": "NPC-EVENT-STORM-001",
+        "enabled": false
+      },
+      {
+        "type": "quest",
+        "id": "QUEST-STORMTIDE-001",
+        "name": "Eye of the Storm",
+        "objectives": [
+          {
+            "kind": "sink",
+            "target": 8,
+            "content_tags": [
+              "stormtide"
+            ]
+          }
+        ],
+        "rewards": {
+          "gold": 600,
+          "item_id": "ITEM-STORM-SHARD",
+          "amount": 3
+        },
+        "enabled": false
+      },
+      {
+        "type": "shop",
+        "id": "SHOP-STORMTIDE-001",
+        "offers": [
+          {
+            "content_id": "ITEM-STORM-SHARD",
+            "amount": 1,
+            "price": 100
+          }
+        ],
+        "currency": "gold",
+        "enabled": false
+      },
+      {
+        "type": "event",
+        "id": "EVENT-STORMTIDE-002",
+        "name": "Stormtide Fleet",
+        "schedule": {},
+        "npc_ids": [
+          "NPC-EVENT-STORM-001"
+        ],
+        "quests": [
+          "QUEST-STORMTIDE-001"
+        ],
+        "shops": [
+          "SHOP-STORMTIDE-001"
+        ],
+        "multipliers": {
+          "xp": 1.15,
+          "gold": 1.1,
+          "loot": 1.0
+        },
+        "visual_layer": "EVENT-STORMTIDE-VISUAL",
+        "enabled": false
+      }
+    ]
+  }
+}

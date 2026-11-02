@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "milestone": "M159",
+  "note": "Clean-room genre-inspired expansion; no copied proprietary values/assets.",
+  "items": [
+    {
+      "id": "crystal_blessing",
+      "label": "Kristallsegen",
+      "kind": "blessing",
+      "visual": "crystal_aura",
+      "stack": 99
+    },
+    {
+      "id": "sea_chart",
+      "label": "Seekartenrolle",
+      "kind": "navigation",
+      "stack": 250
+    },
+    {
+      "id": "repair_crew",
+      "label": "Reparaturmannschaft",
+      "kind": "support",
+      "stack": 100
+    },
+    {
+      "id": "smoke_screen",
+      "label": "Nebelwerfer",
+      "kind": "tactical",
+      "stack": 100
+    },
+    {
+      "id": "war_banner",
+      "label": "Kriegsbanner",
+      "kind": "guild",
+      "stack": 50
+    },
+    {
+      "id": "tower_parts",
+      "label": "Turmbauteile",
+      "kind": "guild_material",
+      "stack": 9999
+    },
+    {
+      "id": "guild_timber",
+      "label": "Gildenholz",
+      "kind": "guild_material",
+      "stack": 9999
+    },
+    {
+      "id": "guild_steel",
+      "label": "Gildenstahl",
+      "kind": "guild_material",
+      "stack": 9999
+    },
+    {
+      "id": "enchanted_rope",
+      "label": "Verzaubertes Tauwerk",
+      "kind": "crafting",
+      "stack": 9999
+    },
+    {
+      "id": "cannon_oil",
+      "label": "Kanonenöl",
+      "kind": "combat_support",
+      "stack": 500
+    },
+    {
+      "id": "monster_bait",
+      "label": "Monsterköder",
+      "kind": "hunter",
+      "stack": 100
+    },
+    {
+      "id": "admiral_seal",
+      "label": "Admiralssiegel",
+      "kind": "progression",
+      "stack": 999
+    }
+  ],
+  "ship_extensions": {
+    "decks": {
+      "min": 1,
+      "max": 10,
+      "visual_rule": "layered_under_hull"
+    },
+    "extras_deprecated": [
+      {
+        "id": "motor_deck",
+        "label": "Motordeck",
+        "role": "mobility"
+      },
+      {
+        "id": "armor_deck",
+        "label": "Panzerdeck",
+        "role": "defense"
+      },
+      {
+        "id": "cannon_deck",
+        "label": "Kanonendeck",
+        "role": "offense"
+      },
+      {
+        "id": "crew_deck",
+        "label": "Mannschaftsdeck",
+        "role": "utility"
+      },
+      {
+        "id": "harpoon_deck",
+        "label": "Harpunendeck",
+        "role": "hunter"
+      }
+    ],
+    "migration": "M160 replaces generic motor/armor/cannon/crew/harpoon deck placeholders with data-driven special deck families."
+  }
+}

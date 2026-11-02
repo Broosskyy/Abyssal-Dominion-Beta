@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "milestone": "M71",
+  "mobile_first": true,
+  "low": {
+    "decor_density": 0.55,
+    "vegetation_density": 0.5,
+    "landmark_detail_distance": 42,
+    "minor_prop_distance": 28
+  },
+  "balanced": {
+    "decor_density": 0.78,
+    "vegetation_density": 0.72,
+    "landmark_detail_distance": 58,
+    "minor_prop_distance": 40
+  },
+  "high": {
+    "decor_density": 1.0,
+    "vegetation_density": 1.0,
+    "landmark_detail_distance": 76,
+    "minor_prop_distance": 54
+  },
+  "rules": [
+    "collision/navigation never depend on decorative density",
+    "prefer instancing for repeated nature/props",
+    "island silhouette must survive removal of minor props",
+    "shoreline remains readable without bright halo",
+    "final GLB replacement preserves stable slot and wrapper"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "milestone": "M85",
+  "mobile": {
+    "touch_hints": "no keyboard/gamepad badges",
+    "monster_teaching": "single compact card"
+  },
+  "desktop": {
+    "mouse_keyboard": [
+      "m84_key_fire",
+      "m84_key_target"
+    ],
+    "gamepad": [
+      "m84_gamepad_fire"
+    ],
+    "monster_teaching": "compact secondary explanation"
+  },
+  "crossplay_rule": "Input affordances differ by device; gameplay intent vocabulary and values do not."
+}

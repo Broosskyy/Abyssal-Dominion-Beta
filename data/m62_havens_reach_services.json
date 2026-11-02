@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "milestone": "M62",
+  "harbor_id": "havens_reach",
+  "display_name": "Haven's Reach",
+  "safe_harbor": true,
+  "services": [
+    {
+      "id": "shipyard",
+      "icon_slot": "service_shipyard",
+      "state_owner": "harbor/gameplay code"
+    },
+    {
+      "id": "repair",
+      "icon_slot": "service_repair",
+      "state_owner": "PlayerInventory repair quote / harbor code"
+    },
+    {
+      "id": "market",
+      "icon_slot": "service_market",
+      "state_owner": "economy code"
+    },
+    {
+      "id": "arsenal",
+      "icon_slot": "service_arsenal",
+      "state_owner": "arsenal/equipment code"
+    },
+    {
+      "id": "quests",
+      "icon_slot": "service_quests",
+      "state_owner": "MissionSystem"
+    }
+  ],
+  "rule": "Icons never imply service availability unless runtime service state confirms it."
+}

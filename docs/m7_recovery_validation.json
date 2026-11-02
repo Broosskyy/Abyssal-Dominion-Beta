@@ -1,0 +1,21 @@
+{
+  "milestone": "M7",
+  "passed": true,
+  "checks_passed": 13,
+  "checks_total": 13,
+  "checks": {
+    "m7_or_newer_version": true,
+    "unity_2021_3_45": true,
+    "complete_object_inventory": true,
+    "complete_mesh_inventory": true,
+    "complete_texture_inventory": true,
+    "complete_behaviour_inventory": true,
+    "project_script_types": true,
+    "recovery_report": true,
+    "inventory_tool": true,
+    "asset_extractor": true,
+    "structure_recovery": true,
+    "audio_recovery": true,
+    "six_reference_exclusions": true
+  }
+}

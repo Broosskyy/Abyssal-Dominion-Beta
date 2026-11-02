@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "milestone": "M65",
+  "title": "Ship Visual Socket Contract",
+  "required": [
+    {
+      "id": "socket_muzzle_port",
+      "purpose": "visual cannon muzzle/VFX origin",
+      "required_on": [
+        "ship_small",
+        "ship_medium",
+        "ship_large"
+      ],
+      "fallback": "wrapper-derived port broadside anchor"
+    },
+    {
+      "id": "socket_muzzle_starboard",
+      "purpose": "visual cannon muzzle/VFX origin",
+      "required_on": [
+        "ship_small",
+        "ship_medium",
+        "ship_large"
+      ],
+      "fallback": "wrapper-derived starboard broadside anchor"
+    },
+    {
+      "id": "socket_wake",
+      "purpose": "wake origin",
+      "required_on": [
+        "ship_small",
+        "ship_medium",
+        "ship_large"
+      ],
+      "fallback": "bounds stern anchor"
+    },
+    {
+      "id": "socket_bow_foam",
+      "purpose": "bow foam origin",
+      "required_on": [
+        "ship_small",
+        "ship_medium",
+        "ship_large"
+      ],
+      "fallback": "bounds bow anchor"
+    },
+    {
+      "id": "socket_nameplate",
+      "purpose": "world nameplate anchor",
+      "required_on": [
+        "ship_small",
+        "ship_medium",
+        "ship_large"
+      ],
+      "fallback": "bounds top center"
+    },
+    {
+      "id": "socket_selection",
+      "purpose": "selection ring center",
+      "required_on": [
+        "ship_small",
+        "ship_medium",
+        "ship_large"
+      ],
+      "fallback": "waterline bounds center"
+    }
+  ],
+  "rule": "Sockets are visual anchors only. Visible cannon count or socket count never defines gameplay cannon stats."
+}

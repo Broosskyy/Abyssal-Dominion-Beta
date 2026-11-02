@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "milestone": "M111",
+  "scope": "PL6-20 local prototype tuning",
+  "rule": "Map level only creates eligibility. Ownership is awarded by explicit combat/progression milestones.",
+  "boss_rewards": [
+    {
+      "defeated_map_level": 6,
+      "ship_id": "ship_main_01",
+      "label": "Stormreach First Admiral"
+    },
+    {
+      "defeated_map_level": 8,
+      "ship_id": "ship_main_02",
+      "label": "Stormreach Deep Hunt"
+    },
+    {
+      "defeated_map_level": 10,
+      "ship_id": "ship_main_03",
+      "label": "Ember Shoals Admiral"
+    },
+    {
+      "defeated_map_level": 12,
+      "ship_id": "ship_main_04",
+      "label": "Veil Gate Hunt"
+    },
+    {
+      "defeated_map_level": 14,
+      "ship_id": "ship_main_05",
+      "label": "Veil Sea Admiral"
+    },
+    {
+      "defeated_map_level": 16,
+      "ship_id": "ship_main_06",
+      "label": "Cursed Wake Admiral"
+    },
+    {
+      "defeated_map_level": 18,
+      "ship_id": "ship_main_07",
+      "label": "Gilded Grave Admiral"
+    },
+    {
+      "defeated_map_level": 20,
+      "ship_id": "ship_main_08",
+      "label": "Crown of Ash Trial Admiral"
+    }
+  ],
+  "future_rule": "Beyond PL20 cadence remains data-driven and must follow newest binding progression design.",
+  "authority": "local prototype only",
+  "duplicate_policy": "A design reward is one-time. Repeating the boss does not duplicate ownership or create a second reward-history row.",
+  "audit_policy": "Successful first-time award creates a local save-persisted reward history entry."
+}

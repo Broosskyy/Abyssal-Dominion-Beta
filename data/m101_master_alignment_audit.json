@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "milestone": "M101",
+  "master_alignment": {
+    "requested_latest": "V3.7",
+    "available_and_read": [
+      "V3.2",
+      "V3.3",
+      "V3.4",
+      "V3.5",
+      "V3.6"
+    ],
+    "v3_7_source_available_in_files": false,
+    "rule": "Do not invent V3.7 clauses not present in accessible source."
+  },
+  "p0": {
+    "first_13_matrix": true,
+    "asset_preview_filter": true,
+    "fallback_never_breaks_gameplay": true
+  },
+  "online_architecture": {
+    "environment_contract": true,
+    "build_identity": true,
+    "authority_boundary": true,
+    "telemetry_envelope_local_only": true,
+    "real_backend": false,
+    "real_auth": false,
+    "real_persistence": false
+  },
+  "staff": {
+    "local_admin_is_staff_identity": false,
+    "staff_identity_verified": false,
+    "production_admin_authority": false
+  },
+  "release": {
+    "current_channel": "LOCAL_DEVELOPMENT",
+    "global_test_separation_contract": true,
+    "minimum_version_server_future": true
+  },
+  "mobile": {
+    "data_driven_graphics_profiles": true,
+    "gameplay_unchanged": true
+  },
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS profile/device QA",
+    "Asset Preview F6",
+    "desktop/web export",
+    "real backend/auth/release infrastructure"
+  ]
+}

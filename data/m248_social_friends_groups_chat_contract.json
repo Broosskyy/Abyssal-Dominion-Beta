@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "milestone": "M248",
+  "master_concept": "V3.8",
+  "system": "SOCIAL_FRIENDS_GROUPS_CHAT",
+  "master_contract": {
+    "pillars": [
+      "friends",
+      "groups",
+      "raid_fleet_later",
+      "chat",
+      "profile_inspect",
+      "ping",
+      "block_mute",
+      "report"
+    ],
+    "friends": "friend_list_status_invite",
+    "groups": "small_fleet_party",
+    "group_initial_target_size": 5,
+    "group_size_final": false,
+    "group_features": [
+      "leader",
+      "invites",
+      "kick_leave",
+      "ready",
+      "target_pings",
+      "shared_objective_credit",
+      "personal_loot"
+    ],
+    "contribution": [
+      "damage",
+      "effective_healing",
+      "shield_restore",
+      "cleanse",
+      "objectives"
+    ],
+    "excluded_contribution": [
+      "overheal",
+      "afk_proximity"
+    ],
+    "quest_credit": "groupwide_or_contribution_based_per_objective",
+    "chat_channels": [
+      "world_global",
+      "region",
+      "map_optional",
+      "group",
+      "guild",
+      "alliance",
+      "whisper",
+      "system"
+    ],
+    "chat_gameplay_authority": false,
+    "profile_public_fields": [
+      "pirate_level",
+      "world_level",
+      "current_ship_mastery",
+      "fame",
+      "honor",
+      "battle_rank",
+      "guild",
+      "selected_achievements_titles",
+      "released_cosmetics"
+    ],
+    "private_inventory_account_data_exposed": false
+  },
+  "data_model": {
+    "definitions": [
+      "FriendDefinition",
+      "GroupDefinition",
+      "ChatChannelDefinition",
+      "PlayerProfileDefinition",
+      "ReportDefinition"
+    ],
+    "snapshot_fields": [
+      "revision",
+      "summary",
+      "friends",
+      "group",
+      "chat",
+      "public_profiles",
+      "safety",
+      "permissions"
+    ],
+    "revision_rule": "monotonic_non_decreasing"
+  },
+  "safety_moderation": {
+    "requirements": [
+      "block",
+      "mute",
+      "report",
+      "rate_limits",
+      "spam_protection",
+      "server_moderation_logs"
+    ],
+    "server_enforcement": [
+      "chat_mute",
+      "timeout",
+      "invite_social_restriction",
+      "audit_log"
+    ],
+    "client_may_self_assign_staff_badge": false,
+    "staff_chat_role_badges": "server_verified_only"
+  },
+  "authority": {
+    "friends": "server_authoritative",
+    "group_membership_leader_ready": "server_authoritative",
+    "chat_delivery_permissions_rate_limits": "server_authoritative",
+    "block_mute_report": "server_authoritative_live_service",
+    "public_profile": "server_filtered_replica",
+    "group_contribution_rewards": "server_authoritative",
+    "client_may_authoritatively_change_social_state": false
+  },
+  "ui": {
+    "surface": "Command Deck / Soziales",
+    "normal_hud": "group_guild_alerts_only_when_relevant; no permanent social panel",
+    "mobile_desktop_web": "same information architecture; responsive sizing only",
+    "offline_empty_state": "contract/server-required state only; no fabricated friends, party members, chat messages or profiles"
+  },
+  "future": {
+    "mail": "still separate missing service",
+    "raid_fleet": "later larger content group",
+    "transport": "requires shared account/realtime foundations before live social"
+  }
+}

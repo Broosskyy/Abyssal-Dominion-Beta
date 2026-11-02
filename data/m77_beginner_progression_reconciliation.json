@@ -1,0 +1,27 @@
+{
+  "schema": 2,
+  "milestone": "M77",
+  "status": "RECONCILED",
+  "canonical": {
+    "small": {
+      "ship_id": "barco_low",
+      "availability": "start"
+    },
+    "medium": {
+      "ship_id": "clipper",
+      "reward_after_beginner_assignment": 2
+    },
+    "large": {
+      "ship_id": "chalupa",
+      "reward_after_beginner_assignment": 3
+    }
+  },
+  "migration": {
+    "new_save_version": 2,
+    "v1_rule": "Existing v1 saves retain stage-1 Clipper and stage-5 Chalupa entitlements.",
+    "pre_version_rule": "M31 trial_passed still maps to one completed assignment; no new PL2 reward is fabricated.",
+    "ownership_rule": "Already-owned ships are never removed or downgraded."
+  },
+  "main_design_rule": "Unowned ship_main_* designs are never purchasable through preview. Eligibility is not ownership.",
+  "authority": "local source/save migration only; no server-authority claim"
+}

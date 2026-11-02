@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "milestone": "M60",
+  "title": "Mobile HUD Readability QA Presets",
+  "rule": "QA presets do not change gameplay. They define visual acceptance windows and safe-area expectations.",
+  "presets": [
+    {
+      "id": "phone_landscape_compact",
+      "viewport": [
+        1280,
+        720
+      ],
+      "safe_insets": [
+        36,
+        18,
+        36,
+        18
+      ],
+      "orientation": "landscape",
+      "min_touch_dp": 52,
+      "primary": true
+    },
+    {
+      "id": "phone_landscape_wide",
+      "viewport": [
+        2340,
+        1080
+      ],
+      "safe_insets": [
+        80,
+        24,
+        80,
+        24
+      ],
+      "orientation": "landscape",
+      "min_touch_dp": 52,
+      "primary": true
+    },
+    {
+      "id": "phone_landscape_tall",
+      "viewport": [
+        2400,
+        1080
+      ],
+      "safe_insets": [
+        90,
+        28,
+        90,
+        28
+      ],
+      "orientation": "landscape",
+      "min_touch_dp": 52,
+      "primary": true
+    },
+    {
+      "id": "tablet_landscape",
+      "viewport": [
+        1920,
+        1200
+      ],
+      "safe_insets": [
+        32,
+        24,
+        32,
+        24
+      ],
+      "orientation": "landscape",
+      "min_touch_dp": 52,
+      "primary": false
+    },
+    {
+      "id": "phone_portrait_fallback",
+      "viewport": [
+        1080,
+        2400
+      ],
+      "safe_insets": [
+        32,
+        80,
+        32,
+        70
+      ],
+      "orientation": "portrait",
+      "min_touch_dp": 52,
+      "primary": false
+    }
+  ],
+  "acceptance": [
+    "attack/ammo/items controls do not overlap system safe areas",
+    "target frame remains readable during combat",
+    "hull/shield values and bars are distinguishable without color alone",
+    "quickslots remain reachable with thumb",
+    "picker rows remain >=52dp",
+    "labels are code-rendered and remain readable at device scale"
+  ]
+}

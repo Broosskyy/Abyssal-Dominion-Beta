@@ -1,0 +1,103 @@
+{
+  "milestone": "M5",
+  "passed": true,
+  "checks_passed": 19,
+  "checks_total": 19,
+  "checks": [
+    {
+      "name": "Godot 4.7 feature",
+      "passed": true,
+      "detail": "Project declares Godot 4.7"
+    },
+    {
+      "name": "Compatibility renderer",
+      "passed": true,
+      "detail": "Desktop renderer"
+    },
+    {
+      "name": "Mobile Compatibility renderer",
+      "passed": true,
+      "detail": "Mobile renderer"
+    },
+    {
+      "name": "Landscape orientation",
+      "passed": true,
+      "detail": "Landscape sensor mode"
+    },
+    {
+      "name": "Adaptive stretch",
+      "passed": true,
+      "detail": "Aspect-ratio expansion"
+    },
+    {
+      "name": "Mobile compression",
+      "passed": true,
+      "detail": "ETC2/ASTC import"
+    },
+    {
+      "name": "Desktop compression",
+      "passed": true,
+      "detail": "S3TC/BPTC import"
+    },
+    {
+      "name": "All export presets",
+      "passed": true,
+      "detail": "Web, Android, iOS, Windows Desktop, macOS, Linux"
+    },
+    {
+      "name": "Reference exclusion",
+      "passed": true,
+      "detail": "Six protected presets"
+    },
+    {
+      "name": "Input actions",
+      "passed": true,
+      "detail": "move_forward, move_back, turn_left, turn_right, fire, map_toggle, target_next, repair, ability, interact"
+    },
+    {
+      "name": "Controller mappings",
+      "passed": true,
+      "detail": "Joypad axes and buttons"
+    },
+    {
+      "name": "Touch input",
+      "passed": true,
+      "detail": "Touch and drag"
+    },
+    {
+      "name": "Pinch zoom",
+      "passed": true,
+      "detail": "Two-finger zoom path"
+    },
+    {
+      "name": "Safe area",
+      "passed": true,
+      "detail": "HUD and input safe-area transforms"
+    },
+    {
+      "name": "Focus pause",
+      "passed": true,
+      "detail": "Suspend/resume handling"
+    },
+    {
+      "name": "Adaptive quality",
+      "passed": true,
+      "detail": "Runtime quality profile"
+    },
+    {
+      "name": "Dynamic reference loading",
+      "passed": true,
+      "detail": "No hard release dependency"
+    },
+    {
+      "name": "Production icon",
+      "passed": true,
+      "detail": "SVG app icon"
+    },
+    {
+      "name": "Production splash",
+      "passed": true,
+      "detail": "PNG boot splash"
+    }
+  ]
+}

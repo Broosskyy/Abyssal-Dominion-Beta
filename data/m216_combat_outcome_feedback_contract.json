@@ -1,0 +1,21 @@
+{
+  "milestone": "M216",
+  "master_concept": "V3.8",
+  "purpose": "Combat discharge, hit, sink, respawn and loot-drop readability at the five gameplay master-reference camera scale.",
+  "visual_only": true,
+  "gameplay_values_unchanged": ["damage", "range", "reload", "movement", "collision", "respawn_delay", "respawn_protection", "loot_rewards", "pickup_radius"],
+  "features": {
+    "broadside_discharge": ["M216BroadsideMuzzleFlash", "M216MuzzleBlastCone", "existing cannon audio"],
+    "hit_confirmation": ["M216HullHitRead", "existing ImpactFX", "existing CombatFeedback damage text"],
+    "sinking": ["M216SinkBurst", "M216SinkFireCore", "M216SinkDebris", "explicit HUD defeat overlay"],
+    "respawn": ["M216RespawnProtectionRing", "existing respawn protection rules", "explicit harbor-return HUD notice"],
+    "loot_drop": ["M216LootDropBurst", "existing world-space LootPickup", "existing reward notice"]
+  },
+  "camera_lock": "M213 high/wide oblique master-reference composition remains authoritative.",
+  "platform_parity": "Same combat/world visual logic on mobile, web and desktop; only responsive interface sizing may differ.",
+  "hud_lock": {
+    "primary_attack": "lower_right",
+    "persistent_bottom_command_bar": false,
+    "world_center_priority": true
+  }
+}

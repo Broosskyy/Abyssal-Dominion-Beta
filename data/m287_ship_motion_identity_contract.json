@@ -1,0 +1,54 @@
+{
+  "milestone": "M287",
+  "contract": "ship_motion_identity_wake_water_sail_presentation",
+  "master_concept": "V3.8",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "Genre, naval motion readability and immediate game-feel reference only; no proprietary assets, effects, sounds, layouts, formulas or timings.",
+  "ship_model_strategy": {
+    "initial_production": "ONE_COMPLETE_3D_MODEL_PER_SHIP",
+    "modular_ship_system_required": false,
+    "modular_ship_system_deferred": true,
+    "motion_layers": "external wake/water VFX plus optional socketed sail-flow cue",
+    "separate_sail_mesh_or_bone_required": false,
+    "canonical_model_parts_never_detached_or_replaced": true
+  },
+  "dependencies": {
+    "world_transport": "M267",
+    "movement_truth": "M268",
+    "ship_damage_defeat": "M285",
+    "ship_destruction_presentation": "M286"
+  },
+  "input_model": "server-confirmed movement presentation snapshot and events",
+  "motion_states": ["ANCHORED", "IDLE", "ACCELERATING", "CRUISE", "TURNING", "BRAKING", "DRIFTING", "CORRECTING"],
+  "motion_profiles": ["LIGHT", "BALANCED", "HEAVY", "ADMIRAL", "ABYSSAL"],
+  "presentation_events": ["ANCHOR_SETTLE", "ACCELERATION_START", "TURN_ENTER", "BRAKE_START", "DRIFT_ENTER", "CORRECTION_PRESENTATION"],
+  "visual_layers": ["bow_displacement", "stern_wake", "turn_curl", "hull_waterline", "anchor_ripple", "sail_response"],
+  "authority": {
+    "server_owns": ["accepted_position", "accepted_velocity", "accepted_heading", "movement_state", "speed_ratio", "turn_ratio", "route_legality", "collision_legality", "movement_revision", "correction_kind", "motion_profile_assignment", "presentation_seed"],
+    "client_may": ["render confirmed motion state", "interpolate wake and sail presentation", "reduce secondary motion VFX", "render labelled local-development fallback"],
+    "client_never": ["commit position", "commit velocity", "commit heading", "decide speed or route", "convert camera joystick into ship input", "derive authority from wake length", "promote visual motion to movement truth"]
+  },
+  "replication": {
+    "idempotent_event_ids": true,
+    "monotonic_revisions": true,
+    "monotonic_event_sequence": true,
+    "server_tick_guard": true,
+    "deterministic_presentation_seed": true,
+    "world_resync_releases_server_visual_state": true
+  },
+  "master_locks": {
+    "tap_to_sail_only": true,
+    "camera_joystick_camera_only": true,
+    "tap_behind_ship_may_route_directly_without_forced_forward_arc": true,
+    "islands_are_navigation_obstacles": true,
+    "units_and_loot_do_not_block_navigation": true,
+    "sea_chart_center_remains_readable": true,
+    "lower_left_camera_control_unobstructed": true,
+    "lower_right_attack_cluster_unobstructed": true,
+    "mobile_web_desktop_world_and_gameplay_parity": true,
+    "wake_foam_water_and_sail_motion_not_baked_into_ship_glb": true,
+    "one_complete_ship_model_initially": true,
+    "no_modular_ship_mesh_dependency": true
+  },
+  "unset_until_native_qa": ["wake_length_curve", "wake_opacity", "bow_foam_width", "turn_curl_size", "waterline_opacity", "anchor_ripple_period", "sail_response_angle", "sail_response_frequency", "correction_feedback_duration", "motion_audio_mix", "haptic_strength", "simultaneous_ship_motion_vfx_budget"]
+}

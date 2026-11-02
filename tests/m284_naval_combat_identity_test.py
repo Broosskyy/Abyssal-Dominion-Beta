@@ -1,0 +1,13 @@
+from pathlib import Path
+import json
+ROOT=Path(__file__).resolve().parents[1]
+def read(p): return (ROOT/p).read_text()
+def load(p): return json.loads(read(p))
+def test_contract():
+ c=load("data/m284_naval_combat_identity_contract.json"); assert c["milestone"]=="M284" and c["genre_ux_references"]==["Seafight","Battle of Sea"]; assert "IMPACT_MATERIAL" in c["profile_kinds"] and "salvo_stagger_timing" in c["unset_until_measured"]
+def test_runtime_fail_closed():
+ s=read("scripts/ui/m284_naval_combat_identity_runtime.gd"); assert "class_name M284NavalCombatIdentityRuntime" in s and "SALVO_RHYTHM" in s and "IMPACT_MATERIAL" in s; assert "can_client_change_damage_from_profile()->bool:return false" in s and "can_audio_profile_confirm_hit()->bool:return false" in s
+def test_integration_and_hud_regression_fix():
+ b=read("scripts/core/game_bootstrap.gd"); c=read("scripts/ui/command_deck.gd"); h=read("scripts/ui/game_hud.gd"); n=read("scripts/ui/nautical_hud.gd"); assert "M284NavalCombatIdentityRuntime.new()" in b and "NavalCombatIdentityReadiness" in b; assert "NAVAL COMBAT IDENTITY · CANNONS · HARPOONS · IMPACT MATERIAL" in c; assert "m284_naval_combat_identity_state" in h and "_m284_sync_naval_combat_identity_state" in h; assert "_draw_m284_naval_combat_identity" in n; assert "func _m282_sync_combat_feedback_state() -> void:" in h and "_m283_sync_projectile_presentation_state()" in h
+def test_admin_convergence_release():
+ a=load("data/admin_content_type_registry.json"); assert a["milestone"] in {"M284","M285","M286","M287","M288","M289","M290","M291","M292","M293","M294","M295","M296","M297","M298","M299","M300","M301"} and all(x in a["content_types"] for x in ["naval_combat_identity_policy_definition","cannon_family_presentation_profile_definition","impact_material_profile_definition","salvo_audio_rhythm_profile_definition"]); m=load("data/m239_master_convergence_matrix.json"); assert m["milestone"] in {"M284","M285","M286","M287","M288","M289","M290","M291","M292","M293","M294","M295","M296","M297","M298","M299","M300","M301"} and any(x["domain"]=="naval_combat_audio_cannon_family_harpoon_identity_impact_material_salvo_rhythm" for x in m["domains"]); r=load("data/release_identity.json"); assert r["milestone"] in {"M284","M285","M286","M287","M288","M289","M290","M291","M292","M293","M294","M295","M296","M297","M298","M299","M300","M301"} and r["client_version"] in {"0.284.0","0.285.0","0.286.0","0.287.0","0.288.0","0.289.0","0.290.0","0.291.0","0.292.0","0.293.0","0.294.0","0.295.0","0.296.0","0.297.0","0.298.0","0.299.0","0.300.0","0.301.0"} and r["build_number"] in {284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301}

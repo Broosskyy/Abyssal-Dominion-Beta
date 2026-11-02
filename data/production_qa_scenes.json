@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "milestone": "M46",
+  "production_positions": "698-707",
+  "scenes": [
+    {
+      "id": "canonical_scale",
+      "path": "res://scenes/qa/canonical_scale_reference.tscn",
+      "purpose": "ship/island/harbor/monster relative scale"
+    },
+    {
+      "id": "gameplay_camera",
+      "path": "res://scenes/qa/gameplay_camera_asset_test.tscn",
+      "purpose": "oblique sea-map silhouette/occlusion"
+    },
+    {
+      "id": "mobile_readability",
+      "path": "res://scenes/qa/mobile_readability_test.tscn",
+      "purpose": "phone HUD/icon/target readability"
+    },
+    {
+      "id": "material_calibration",
+      "path": "res://scenes/qa/material_calibration.tscn",
+      "purpose": "PBR/material consistency"
+    },
+    {
+      "id": "lod_performance",
+      "path": "res://scenes/qa/lod_performance_test.tscn",
+      "purpose": "LOD/performance budgets"
+    }
+  ],
+  "support": [
+    "Asset Preview Gallery",
+    "Placeholder Replacement Matrix",
+    "Asset Naming Convention",
+    "GLB Export Preset",
+    "Ingame Visual Acceptance Checklist"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "milestone": "M10",
+  "kind": "data_and_source_contracts",
+  "passed": true,
+  "checks_passed": 16,
+  "checks_total": 16,
+  "checks": {
+    "three_biomes": true,
+    "four_bounded_slots": true,
+    "valid_archetype_references": true,
+    "distinct_compositions": true,
+    "positive_counters_and_delays": true,
+    "positive_stats_and_rewards": true,
+    "valid_weapon_indices": true,
+    "explicit_test_provenance": true,
+    "six_export_data_filters": true,
+    "old_enemy_reposition_removed": true,
+    "sector_detaches_old_content": true,
+    "director_owns_respawn": true,
+    "lethal_guard_before_signal": true,
+    "encounter_persistence": true,
+    "deferred_reward_owner_guard": true,
+    "headless_test_present": true
+  }
+}

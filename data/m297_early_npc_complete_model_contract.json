@@ -1,0 +1,17 @@
+{
+  "milestone": "M297",
+  "master_concept": "V3.8",
+  "clean_room_references": ["Seafight", "Battle of Sea"],
+  "model_rule": "Each early NPC ship is one complete individual GLB model, with no runtime structural hull, sail, deck or mast assembly for active placeholder slots.",
+  "new_models": [
+    {"id": "npc_scout_01", "path": "res://assets/production_placeholders/m297/npc_scout_01.glb", "sha256": "043c2dfc89a13d47bd6114f70ef8731aa3efa9b99757675e871b7deb3671957a", "bytes": 126960, "surfaces": 8, "triangles": 1703},
+    {"id": "npc_heavy_01", "path": "res://assets/production_placeholders/m297/npc_heavy_01.glb", "sha256": "e0efa5bbe44147b83fa2ed01f14dec35fb5cb5905d38c2b87002b071be1beaba", "bytes": 163336, "surfaces": 9, "triangles": 2211}
+  ],
+  "active_early_npc_slots": ["npc_friendly_coastal_sloop", "npc_scout_01", "npc_raider_01", "npc_gunship_01", "npc_heavy_01"],
+  "new_models_single_node_single_mesh": true,
+  "old_sources_preserved_as_fallback": true,
+  "final_art": false,
+  "replacement_same_stable_slot": true,
+  "does_not_change": ["ship collision", "Tap-to-Sail or M268 movement authority", "server combat truth", "damage or reload", "NPC AI", "rewards or ownership"],
+  "native_qa": "NOT_EVALUATED"
+}

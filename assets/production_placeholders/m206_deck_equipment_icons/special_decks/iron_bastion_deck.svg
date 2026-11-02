@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="iron bastion deck">
+<rect x="5" y="5" width="86" height="86" rx="18" fill="#07131d" stroke="#3c5363" stroke-width="3"/>
+<path d="M15 72 Q48 86 81 72" fill="none" stroke="#244656" stroke-width="5" stroke-linecap="round"/>
+<path d="M24 57 L30 31 H66 L72 57 L64 68 H32 Z" fill="#293137" stroke="#b8c0c8" stroke-width="3"/><path d="M35 41 H61 V61 H35Z" fill="none" stroke="#e2e7eb" stroke-width="3"/><circle cx="48" cy="51" r="5" fill="#b8c0c8"/>
+<circle cx="48" cy="48" r="35" fill="none" stroke="#b8c0c8" stroke-opacity=".28" stroke-width="2"/>
+</svg>

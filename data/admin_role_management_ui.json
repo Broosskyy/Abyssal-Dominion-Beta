@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "surface": "shared_web_and_ingame_admin",
+  "pages": [
+    {
+      "id": "staff_roles",
+      "label": "Staff & Rollen",
+      "permission": "staff.read",
+      "features": [
+        "staff_list",
+        "assigned_roles",
+        "effective_permissions",
+        "session_status"
+      ]
+    },
+    {
+      "id": "role_editor",
+      "label": "Rollen bearbeiten",
+      "permission": "staff.manage_roles",
+      "features": [
+        "create_role",
+        "clone_role",
+        "permission_matrix",
+        "assign_role",
+        "revoke_role"
+      ]
+    },
+    {
+      "id": "permission_editor",
+      "label": "Berechtigungen",
+      "permission": "staff.manage_permissions",
+      "features": [
+        "granular_permission_matrix",
+        "critical_action_flags",
+        "approval_policy"
+      ]
+    },
+    {
+      "id": "audit",
+      "label": "Audit Log",
+      "permission": "audit.read",
+      "features": [
+        "filter_actor",
+        "filter_action",
+        "before_after",
+        "request_id",
+        "surface",
+        "result"
+      ]
+    }
+  ],
+  "ux": {
+    "hide_unauthorized_navigation": true,
+    "disable_unauthorized_actions": true,
+    "server_rechecks_every_write": true,
+    "show_effective_role_reason": true
+  },
+  "rule": "UI visibility is convenience only; backend permission check is authoritative."
+}

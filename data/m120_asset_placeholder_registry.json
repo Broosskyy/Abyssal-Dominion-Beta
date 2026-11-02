@@ -1,0 +1,677 @@
+{
+  "schema": 1,
+  "milestone": "M120",
+  "source": "Masterkonzept V3.7",
+  "rules": {
+    "stable_ids": true,
+    "missing_asset_fallback_required": true,
+    "ship_levels_use_same_base_glb": true,
+    "effect_states_use_material_vfx_layers": true,
+    "final_balance_from_playtests": true
+  },
+  "starter": [
+    {
+      "id": "SHIP-STARTER-001",
+      "path": "res://assets/ships/starter/ship_starter_001.glb",
+      "fallback": "procedural_pirate_ship"
+    },
+    {
+      "id": "SHIP-STARTER-002",
+      "path": "res://assets/ships/starter/ship_starter_002.glb",
+      "fallback": "procedural_pirate_ship"
+    },
+    {
+      "id": "SHIP-STARTER-003",
+      "path": "res://assets/ships/starter/ship_starter_003.glb",
+      "fallback": "procedural_pirate_ship"
+    }
+  ],
+  "main_progression": [
+    {
+      "id": "SHIP-PROG-001",
+      "path": "res://assets/ships/progression/ship_prog_001.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-002",
+      "path": "res://assets/ships/progression/ship_prog_002.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-003",
+      "path": "res://assets/ships/progression/ship_prog_003.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-004",
+      "path": "res://assets/ships/progression/ship_prog_004.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-005",
+      "path": "res://assets/ships/progression/ship_prog_005.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-006",
+      "path": "res://assets/ships/progression/ship_prog_006.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-007",
+      "path": "res://assets/ships/progression/ship_prog_007.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-008",
+      "path": "res://assets/ships/progression/ship_prog_008.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-009",
+      "path": "res://assets/ships/progression/ship_prog_009.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-010",
+      "path": "res://assets/ships/progression/ship_prog_010.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-011",
+      "path": "res://assets/ships/progression/ship_prog_011.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-012",
+      "path": "res://assets/ships/progression/ship_prog_012.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-013",
+      "path": "res://assets/ships/progression/ship_prog_013.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-014",
+      "path": "res://assets/ships/progression/ship_prog_014.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-015",
+      "path": "res://assets/ships/progression/ship_prog_015.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-016",
+      "path": "res://assets/ships/progression/ship_prog_016.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-017",
+      "path": "res://assets/ships/progression/ship_prog_017.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-018",
+      "path": "res://assets/ships/progression/ship_prog_018.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-019",
+      "path": "res://assets/ships/progression/ship_prog_019.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-020",
+      "path": "res://assets/ships/progression/ship_prog_020.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb"
+    },
+    {
+      "id": "SHIP-PROG-021",
+      "path": "res://assets/ships/progression/ship_prog_021.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-022",
+      "path": "res://assets/ships/progression/ship_prog_022.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-023",
+      "path": "res://assets/ships/progression/ship_prog_023.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-024",
+      "path": "res://assets/ships/progression/ship_prog_024.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-025",
+      "path": "res://assets/ships/progression/ship_prog_025.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-026",
+      "path": "res://assets/ships/progression/ship_prog_026.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-027",
+      "path": "res://assets/ships/progression/ship_prog_027.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-028",
+      "path": "res://assets/ships/progression/ship_prog_028.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-029",
+      "path": "res://assets/ships/progression/ship_prog_029.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-030",
+      "path": "res://assets/ships/progression/ship_prog_030.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-031",
+      "path": "res://assets/ships/progression/ship_prog_031.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-032",
+      "path": "res://assets/ships/progression/ship_prog_032.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-033",
+      "path": "res://assets/ships/progression/ship_prog_033.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-034",
+      "path": "res://assets/ships/progression/ship_prog_034.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-035",
+      "path": "res://assets/ships/progression/ship_prog_035.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-036",
+      "path": "res://assets/ships/progression/ship_prog_036.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-037",
+      "path": "res://assets/ships/progression/ship_prog_037.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-038",
+      "path": "res://assets/ships/progression/ship_prog_038.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-039",
+      "path": "res://assets/ships/progression/ship_prog_039.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-040",
+      "path": "res://assets/ships/progression/ship_prog_040.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "full_glb_vfx"
+    },
+    {
+      "id": "SHIP-PROG-041",
+      "path": "res://assets/ships/progression/ship_prog_041.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "hero_modular"
+    },
+    {
+      "id": "SHIP-PROG-042",
+      "path": "res://assets/ships/progression/ship_prog_042.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "hero_modular"
+    },
+    {
+      "id": "SHIP-PROG-043",
+      "path": "res://assets/ships/progression/ship_prog_043.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "hero_modular"
+    },
+    {
+      "id": "SHIP-PROG-044",
+      "path": "res://assets/ships/progression/ship_prog_044.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "hero_modular"
+    },
+    {
+      "id": "SHIP-PROG-045",
+      "path": "res://assets/ships/progression/ship_prog_045.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "hero_modular"
+    },
+    {
+      "id": "SHIP-PROG-046",
+      "path": "res://assets/ships/progression/ship_prog_046.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "hero_modular"
+    },
+    {
+      "id": "SHIP-PROG-047",
+      "path": "res://assets/ships/progression/ship_prog_047.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "hero_modular"
+    },
+    {
+      "id": "SHIP-PROG-048",
+      "path": "res://assets/ships/progression/ship_prog_048.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "hero_modular"
+    },
+    {
+      "id": "SHIP-PROG-049",
+      "path": "res://assets/ships/progression/ship_prog_049.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "hero_modular"
+    },
+    {
+      "id": "SHIP-PROG-050",
+      "path": "res://assets/ships/progression/ship_prog_050.glb",
+      "fallback": "procedural_pirate_ship",
+      "ship_levels": [
+        1,
+        10
+      ],
+      "production_strategy": "hero_modular"
+    }
+  ],
+  "void_pl36_40": [
+    {
+      "id": "NPC-SHIP-VOID-001",
+      "role": "void_raider",
+      "fallback": "procedural_pirate_ship"
+    },
+    {
+      "id": "NPC-SHIP-VOID-002",
+      "role": "void_guard",
+      "fallback": "procedural_pirate_ship"
+    },
+    {
+      "id": "NPC-SHIP-VOID-003",
+      "role": "void_hunter",
+      "fallback": "procedural_pirate_ship"
+    },
+    {
+      "id": "NPC-ADMIRAL-VOID-001",
+      "role": "void_admiral",
+      "fallback": "procedural_admiral"
+    },
+    {
+      "id": "MON-VOID-001",
+      "role": "void_serpent",
+      "fallback": "procedural_monster"
+    },
+    {
+      "id": "MON-VOID-002",
+      "role": "void_leviathan",
+      "fallback": "procedural_monster"
+    },
+    {
+      "id": "BMAP-LEGENDARY-001",
+      "role": "legendary_bonusmap",
+      "fallback": "procedural_bonusmap"
+    }
+  ],
+  "world_placeholders": [
+    {
+      "id": "ISLAND-VOID-001",
+      "role": "void_spire",
+      "fallback": "procedural_irregular_island"
+    },
+    {
+      "id": "ISLAND-VOID-002",
+      "role": "void_crescent",
+      "fallback": "procedural_irregular_island"
+    },
+    {
+      "id": "ISLAND-VOID-003",
+      "role": "fractured_archipelago",
+      "fallback": "procedural_irregular_island"
+    },
+    {
+      "id": "HARBOR-LAST-LIGHT-001",
+      "role": "regional_harbor",
+      "fallback": "procedural_harbor"
+    },
+    {
+      "id": "POI-VOID-RIFT-001",
+      "role": "world_event_rift",
+      "fallback": "procedural_poi"
+    },
+    {
+      "id": "POI-VOID-WRECK-001",
+      "role": "exploration_wreck",
+      "fallback": "procedural_poi"
+    }
+  ],
+  "sovereign_pl41_45": [
+    {
+      "id": "NPC-SHIP-SOV-001",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "NPC-SHIP-SOV-002",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "NPC-SHIP-SOV-003",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "NPC-SHIP-SOV-004",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "NPC-ADMIRAL-SOV-001",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "MON-SOV-001",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "ISLAND-SOV-001",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "ISLAND-SOV-002",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "ISLAND-SOV-003",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "HARBOR-CROWNWATCH-001",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "POI-SOV-BANNER-001",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "POI-SOV-WRECK-001",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "POI-SOV-BEACON-001",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "VFX-SOV-AURA-001",
+      "fallback": "procedural",
+      "replacement_ready": true
+    },
+    {
+      "id": "UI-SOV-PRESTIGE-001",
+      "fallback": "procedural",
+      "replacement_ready": true
+    }
+  ]
+}

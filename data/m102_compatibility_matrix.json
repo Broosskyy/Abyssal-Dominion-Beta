@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "milestone": "M102",
+  "client": {
+    "version": "0.102.0",
+    "build": 102
+  },
+  "content": {
+    "version": "m102",
+    "definition_schema": 1
+  },
+  "api": {
+    "compatibility": "local-prototype-v1",
+    "server_minimum_future": true
+  },
+  "environments": {
+    "LOCAL_DEVELOPMENT": {
+      "allowed": true,
+      "requires_server": false
+    },
+    "INTERNAL_STAGING": {
+      "allowed": false,
+      "requires_server": true
+    },
+    "TESTSERVER": {
+      "allowed": false,
+      "requires_server": true
+    },
+    "GLOBAL_PRODUCTION": {
+      "allowed": false,
+      "requires_server": true
+    }
+  },
+  "mismatch_policy": {
+    "content_schema_newer": "fail_closed_for_authoritative_content",
+    "client_below_minimum": "future_server_blocks_session",
+    "api_incompatible": "future_server_blocks_authoritative_session",
+    "local_prototype": "show_identity_and_continue_local"
+  }
+}

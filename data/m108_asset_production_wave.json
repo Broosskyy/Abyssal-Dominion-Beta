@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "milestone": "M108",
+  "p0_batch_export": "res://data/m108_p0_replacement_batch.json",
+  "visible_focus": [
+    "guild shield core/node objective readability",
+    "single-card beginner teaching",
+    "P0 final-art replacement visibility"
+  ],
+  "performance": {
+    "new_marker_renderer": false,
+    "shared_marker_budget": true,
+    "world_node_budget_increase": 0
+  },
+  "next": [
+    "safe-area marker collision polish",
+    "reward receipt dev viewer",
+    "P0 bounds diagnostics thresholds",
+    "Haven's Reach and guild island mobile screenshot acceptance"
+  ]
+}

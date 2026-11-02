@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource path="res://scripts/visual/m155_loot_qa_scene.gd" type="Script" id="1"]
+
+[node name="M155LootQA" type="Node3D"]
+script = ExtResource("1")
+metadata/milestone = "M155"
+metadata/purpose = "Clean-room loot GLB gameplay readability / replacement QA"

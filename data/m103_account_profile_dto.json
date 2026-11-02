@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "milestone": "M103",
+  "dto_versions": {
+    "account": 1,
+    "captain_profile": 1,
+    "linked_provider": 1,
+    "session": 1
+  },
+  "account": {
+    "required": [
+      "account_id",
+      "revision",
+      "created_at",
+      "status"
+    ],
+    "immutable": [
+      "account_id",
+      "created_at"
+    ],
+    "status": [
+      "active",
+      "restricted",
+      "deletion_pending",
+      "deleted"
+    ]
+  },
+  "captain_profile": {
+    "required": [
+      "captain_id",
+      "account_id",
+      "captain_name",
+      "revision"
+    ],
+    "immutable": [
+      "captain_id",
+      "account_id"
+    ],
+    "mutable": [
+      "captain_name",
+      "locale",
+      "preferences"
+    ]
+  },
+  "linked_provider": {
+    "required": [
+      "provider",
+      "provider_subject",
+      "verified_at"
+    ],
+    "providers": [
+      "email",
+      "google",
+      "apple"
+    ],
+    "rule": "provider_subject is server-derived and never trusted from client display data"
+  },
+  "session": {
+    "required": [
+      "session_id",
+      "account_id",
+      "environment",
+      "issued_at",
+      "expires_at"
+    ],
+    "rule": "future live sessions are server-issued; local preview cannot construct a verified session"
+  }
+}

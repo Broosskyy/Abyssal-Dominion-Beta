@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "milestone": "M202",
+  "status": "GAMEPLAY_HUD_MENU_INTERACTION_STATIC_VERIFIED",
+  "master_basis": "V3.8 visual masters plus explicit post-master locks",
+  "locks": {
+    "sea_is_primary_play_space": true,
+    "persistent_bottom_command_bar": false,
+    "centered_primary_attack_button": false,
+    "primary_attack_anchor": "lower_right",
+    "cross_platform_information_architecture": "identical",
+    "platform_differences": ["responsive_size", "spacing", "touch_targets", "safe_areas", "responsive_columns"]
+  },
+  "menu_shell": {
+    "quick_destinations": ["home", "progress", "quests", "equipment", "shop", "harbor"],
+    "all_destinations_picker": true,
+    "back_and_close_always_visible": true,
+    "scroll_resets_on_destination_change": true,
+    "touch_minimum_target_px_policy": 58,
+    "disabled_actions_explain_state": true,
+    "no_forced_touch_focus_highlight": true
+  },
+  "placeholder_assets": {
+    "interface_icons_added": ["menu", "back", "close", "harbor", "fleet", "inventory", "ranking", "settings"],
+    "style": "navy_gold_reference_placeholder",
+    "replacement_ready": true
+  }
+}

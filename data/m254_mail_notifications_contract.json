@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "milestone": "M254",
+  "master_concept": "V3.8",
+  "system": "MAIL_NOTIFICATIONS_CLAIMS",
+  "master_contract": {
+    "server_authoritative_mail_claims": true,
+    "mail_uses_stable_ids": true,
+    "claims_are_idempotent": true,
+    "notification_spam_is_not_allowed": true,
+    "rejoin_communication_is_state_driven": true
+  },
+  "mail": {
+    "purposes": ["event_rewards", "ranking_rewards", "compensation", "promotions", "support"],
+    "fields": ["mail_id", "category", "title", "body_summary", "created_at", "expires_at", "read_state", "claim_state", "claim_request_id", "server_id"],
+    "expiry_and_segment_rules_server_owned": true,
+    "client_may_not_attach_rewards": true
+  },
+  "notifications": {
+    "priorities": ["critical", "important", "normal"],
+    "channels": ["in_game", "mail", "system"],
+    "critical_examples": ["maintenance", "reconnect", "version_required", "server_incident", "war_or_island_alert"],
+    "normal_notifications_must_not_create_permanent_hud_spam": true
+  },
+  "claims": {
+    "request_transaction_ids_required": true,
+    "retries_after_timeout_or_reconnect_must_not_duplicate_rewards": true,
+    "client_animation_never_confirms_claim": true
+  },
+  "authority": ["mail_delivery", "mail_expiry", "audience_segmentation", "read_sync", "claim_eligibility", "claim_settlement", "claim_receipt", "compensation", "notification_delivery"],
+  "offline": {"fake_mail": false, "fake_claimable_rewards": false, "fake_notifications": false},
+  "balance": {"new_final_reward_values_invented": false}
+}

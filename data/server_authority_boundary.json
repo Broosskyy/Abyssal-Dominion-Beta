@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "milestone": "M101",
+  "client_local_only_now": [
+    "camera",
+    "HUD layout",
+    "graphics settings",
+    "input preferences",
+    "local QA previews"
+  ],
+  "future_server_authoritative": [
+    "account identity",
+    "movement validation",
+    "combat",
+    "HP/shield/status",
+    "loot/rewards",
+    "EXP/progression",
+    "currency/wallet",
+    "inventory",
+    "trading/bazaar",
+    "PvP/rankings",
+    "guild ownership/war/treasury/vault",
+    "events/live rewards",
+    "premium entitlements",
+    "staff roles/actions"
+  ],
+  "staff_rule": "Local AdminModeRuntime is development tooling only and must never establish ADMIN/GM/MOD/QA identity.",
+  "payment_rule": "No real-money reward or entitlement may be granted from client success state.",
+  "claim_rule": "Future reward/payment claims require idempotent server transactions."
+}

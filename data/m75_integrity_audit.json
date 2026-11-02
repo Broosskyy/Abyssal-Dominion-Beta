@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "milestone": "M75",
+  "scope": "M70-M74 source integrity",
+  "confirmed_fixes": [
+    "BeginnerQuestPresentation avoids Dictionary dot access for dynamic objective values.",
+    "Objective strip now has a reserved NauticalLayout rectangle and participates in world-input blocking/nameplate reservation.",
+    "World and minimap POI counts now use a viewport/DPI-aware presentation budget.",
+    "M74 transient feedback now obeys a mobile budget.",
+    "Decorative island geometry receives visibility_range_end HLOD-style culling.",
+    "First-monster procedural fallback has stronger mobile silhouette/head identity."
+  ],
+  "native_validation_required": [
+    "Godot 4.7.2 parser/import validation for all M70-M75 scripts.",
+    "Actual safe-area/DPI behavior on Android devices.",
+    "Visibility-range behavior and pop/fade quality under the project camera.",
+    "GPU/CPU profiler measurement before converting decorative families to MultiMesh.",
+    "Touch hit testing with expanded hit boxes on narrow landscape screens."
+  ],
+  "not_claimed": [
+    "native runtime pass",
+    "Android device pass",
+    "GPU profiler pass",
+    "final art acceptance"
+  ]
+}

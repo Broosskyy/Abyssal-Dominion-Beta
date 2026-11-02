@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "milestone": "M206",
+  "status": "DECK_EQUIPMENT_PRESENTATION_STATIC_VERIFIED",
+  "master_concept": "V3.8",
+  "normal_decks": {
+    "levels": 10,
+    "visible_under_ship": true,
+    "visual_only": true,
+    "progressive_silhouette": true,
+    "collision_unchanged": true
+  },
+  "special_decks": {
+    "families": [
+      "arcane_tide_deck",
+      "stormwake_deck",
+      "leviathan_deck",
+      "iron_bastion_deck",
+      "corsair_oath_deck",
+      "gravewake_deck"
+    ],
+    "upgrade_levels": 5,
+    "distinct_silhouettes": true,
+    "under_ship_role_vfx": true
+  },
+  "harpoons": {
+    "families": [
+      "harpoon",
+      "harpoon_tempered",
+      "harpoon_stormhook",
+      "harpoon_relic"
+    ],
+    "distinct_silhouettes": true
+  },
+  "equipment_icons": [
+    "hull_armor",
+    "sails",
+    "crew",
+    "ram",
+    "ward",
+    "harpoon_mount"
+  ],
+  "cross_platform": {
+    "gameplay_world_identical": true,
+    "presentation_identical": true,
+    "responsive_only": [
+      "hud_scale",
+      "font_scale",
+      "touch_targets",
+      "spacing",
+      "safe_areas"
+    ]
+  },
+  "gameplay_unchanged": [
+    "deck capacity rules",
+    "upgrade costs",
+    "special deck effects",
+    "harpoon damage",
+    "harpoon range",
+    "ship collision",
+    "tap-to-sail"
+  ]
+}

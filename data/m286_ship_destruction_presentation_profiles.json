@@ -1,0 +1,20 @@
+{
+  "milestone": "M286",
+  "status": "FOUNDATION_UNTUNED",
+  "ship_model_strategy": "profiles target complete individual ship models and select overlays only",
+  "profiles": [
+    {"id":"light_ship_damage","applies_to":["STARTER", "SCOUT", "LIGHT_NPC"],"silhouette_priority":["SAILS", "MAST", "BOW"],"sinking_profile_candidates":["BOW_FIRST", "STERN_FIRST"],"final_assets_required":true},
+    {"id":"heavy_ship_damage","applies_to":["HEAVY", "TANK", "SIEGE_NPC"],"silhouette_priority":["DECK", "PORT_HULL", "STARBOARD_HULL"],"sinking_profile_candidates":["HEAVY_SETTLE", "BROADSIDE_ROLL"],"final_assets_required":true},
+    {"id":"player_ship_damage","applies_to":["PLAYER"],"silhouette_priority":["DECK", "MAST", "STERN"],"sinking_profile_candidates":["BOW_FIRST", "BROADSIDE_ROLL"],"final_assets_required":true},
+    {"id":"admiral_ship_damage","applies_to":["ELITE", "ADMIRAL", "BOSS_SHIP"],"silhouette_priority":["DECK", "MAST", "BOW", "STERN"],"sinking_profile_candidates":["HEAVY_SETTLE", "BROADSIDE_ROLL"],"final_assets_required":true},
+    {"id":"abyssal_ship_damage","applies_to":["ABYSSAL", "CURSED", "EVENT_SHIP"],"silhouette_priority":["PORT_HULL", "STARBOARD_HULL", "DECK"],"sinking_profile_candidates":["ABYSSAL_DISSOLVE", "HEAVY_SETTLE"],"final_assets_required":true}
+  ],
+  "rules": {
+    "profile_selection": "SERVER_OR_VERSIONED_CONTENT",
+    "profile_does_not_change_damage": true,
+    "profile_does_not_change_reload_or_movement": true,
+    "profile_does_not_require_modular_ship_parts": true,
+    "sinking_profile_requires_confirmed_defeat": true,
+    "authored_assets_replace_same_slot_ids": true
+  }
+}

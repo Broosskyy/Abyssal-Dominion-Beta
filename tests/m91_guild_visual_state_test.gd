@@ -1,0 +1,18 @@
+extends Node
+func _ready()->void:
+	var island:=GuildIslandComposer.create(Vector3.ZERO,2)
+	assert(str(island.get_meta("relation",""))=="neutral_preview")
+	assert(not bool(island.get_meta("relation_authoritative",true)))
+	var towers:=GuildIslandComposer.tower_rows(island)
+	assert(towers.size()==2)
+	assert(not bool(towers[0].live_damage))
+	assert(int(towers[0].visual_tier)==1)
+	var facilities:=GuildIslandComposer.facility_rows(island)
+	assert(facilities.size()>=5)
+	assert(str(facilities[0].visual_damage_state)=="intact")
+	var state:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m91_guild_visual_states.json"))
+	assert(not bool(state.tower_selection.live_targeting))
+	assert("ownership" in state.backend_required)
+	var prod:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m91_asset_production_wave.json"))
+	assert(prod.master_first_13.size()==13)
+	print("M91_GUILD_VISUAL_STATE_PASS")

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "milestone": "M133",
+  "pipeline": [
+    "draft",
+    "validate_schema",
+    "validate_references",
+    "validate_world_graph",
+    "validate_assets",
+    "request_approval",
+    "schedule_or_publish",
+    "build_content_version",
+    "server_activate",
+    "client_sync",
+    "audit"
+  ],
+  "surfaces": [
+    "web_admin",
+    "ingame_admin"
+  ],
+  "roles": {
+    "draft": "content.create/content.edit",
+    "validate": "content.validate",
+    "world_graph": "world.edit",
+    "publish": "content.publish + optional critical approvals",
+    "rollback": "content.rollback"
+  },
+  "server_boundaries": {
+    "production_publish": true,
+    "staff_identity": true,
+    "approval_resolution": true,
+    "audit_write": true,
+    "payment_products": true,
+    "premium_wallet": true,
+    "entitlements": true
+  },
+  "client_capabilities": [
+    "local draft preview",
+    "validate package",
+    "request publish envelope",
+    "consume verified snapshot"
+  ],
+  "no_fake_server": true
+}

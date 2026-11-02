@@ -1,0 +1,12 @@
+{
+  "milestone": "M290",
+  "status": "UNTUNED_UNTIL_NATIVE_QA",
+  "profiles": {
+    "mission_strip": {"density":"COMPACT", "placement":"EXISTING_MISSION_PANEL", "center_chart_obstruction":false},
+    "world_beacon": {"count_max":1, "presentation_only":true, "auto_navigation":false, "auto_target":false},
+    "completion": {"label":"ERSTE AUSFAHRT ABGESCHLOSSEN", "reward_claim":false, "release_claim":false}
+  },
+  "unset_until_native_qa": ["beacon_scale", "beacon_pulse_speed", "mission_strip_opacity", "guidance_duration", "mobile_font_size", "audio_cue_level", "haptic_strength"],
+  "priority_rules": ["combat HUD outranks guidance", "target state outranks route marker", "safe areas remain clear", "only one guidance beacon visible", "no proprietary reference timing"]
+}
+

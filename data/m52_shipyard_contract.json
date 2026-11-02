@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "milestone": "M52",
+  "shipyard": {
+    "dedicated_3d_preview": true,
+    "all_3_starter_and_50_main_designs_browsable": true,
+    "current_vs_selected_stat_deltas": true,
+    "mastery_scaled_stats": true,
+    "mastery_milestones_visible": true,
+    "harbor_only_equip": true,
+    "rotation_controls": true
+  },
+  "pipeline": {
+    "glb_to_preview_slot": true,
+    "independent_card_slot": true,
+    "runtime_thumbnail_capture_claimed": false,
+    "fallback_nonfatal": true
+  },
+  "authority": "local prototype only"
+}

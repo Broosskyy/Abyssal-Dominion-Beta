@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "milestone": "M54",
+  "risk_repair": {
+    "alpha_tween_subproperties_removed": true,
+    "quickbar_ammo_icon_mapping_fixed": true,
+    "portrait_picker_clamp_hardened": true,
+    "detail_quickslot_bind_layout_responsive": true,
+    "gameplay_svg_text_removed": true,
+    "defense_stack_explicit": true,
+    "visual_reference_validation_added": true
+  },
+  "authority": "local prototype only"
+}

@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "milestone": "M184",
+  "master_concept": "V3.8",
+  "goal": "SINGLE_OWNER_PANEL_ROUTING_AND_CONTEXT_RETURN",
+  "rules": [
+    "one_fullscreen_panel_owner",
+    "command_deck_closes_before_child_panel",
+    "child_close_returns_to_origin_page",
+    "nested_panel_transition_preserves_origin",
+    "world_camera_navigation_and_weapons_block_while_panel_open",
+    "escape_closes_only_topmost_surface",
+    "persistent_panels_are_hidden_not_destroyed"
+  ],
+  "modal_input_key": "external_panel_open",
+  "routes": [
+    {"panel": "shipyard", "default_return": "progress", "lifetime": "transient"},
+    {"panel": "progression_track", "default_return": "progress", "lifetime": "transient"},
+    {"panel": "ship_mastery", "default_return": "progress", "lifetime": "transient"},
+    {"panel": "harbor_equipment", "default_return": "equipment", "lifetime": "transient"},
+    {"panel": "progression_hub", "default_return": "equipment", "lifetime": "persistent"},
+    {"panel": "captain_meta", "default_return": "home", "lifetime": "persistent"}
+  ],
+  "header_contract": {
+    "player_facing_milestone_labels": false,
+    "close_action": "always_reachable",
+    "touch_target_min": 56,
+    "active_context_required": true
+  },
+  "authority": {
+    "routing": "client_presentation",
+    "inventory_and_progression_mutations": "existing_runtime_validation",
+    "payment_guild_and_admin": "server_authoritative"
+  },
+  "no_code_types": [
+    "panel_route_profile",
+    "panel_lifetime_profile",
+    "panel_return_policy",
+    "modal_input_ownership_profile"
+  ]
+}
+

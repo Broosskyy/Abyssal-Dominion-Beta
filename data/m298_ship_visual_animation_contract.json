@@ -1,0 +1,16 @@
+{
+  "milestone": "M298",
+  "master_concept": "V3.8",
+  "clean_room_references": ["Seafight", "Battle of Sea"],
+  "scope": "WORLD_SHIP_PLACEHOLDER_MODEL_LOCAL_TRANSFORM_ONLY",
+  "covered_slots": ["ship_small", "ship_medium", "ship_large", "npc_friendly_coastal_sloop", "npc_scout_01", "npc_raider_01", "npc_gunship_01", "npc_heavy_01"],
+  "inputs": ["M287 motion presentation snapshot", "M285 confirmed reaction strengths", "M286 verified defeat phase", "LOCAL_DEVELOPMENT guarded preview when not server verified"],
+  "channels": ["water_heave", "hull_pitch", "hull_roll", "turn_heel", "confirmed_hull_recoil", "confirmed_shield_response", "verified_staged_sinking"],
+  "ship_construction": "ONE_COMPLETE_INDIVIDUAL_3D_MODEL_PER_SHIP",
+  "replacement_policy": "Do not attach the placeholder animation rig to user-replacement GLBs or UI previews; later authored GLBs may provide their own animations.",
+  "accessibility": "reduced motion disables ambient sway and greatly dampens confirmed hit response; verified sinking remains readable",
+  "mobile_budget": "no added animated meshes; reduced visual motion and 0.08s state sampling",
+  "authority": "PRESENTATION_ONLY",
+  "must_not_change": ["ShipMotor transform or movement", "Tap-to-Sail course", "camera-only joystick", "collision", "combat hit confirmation", "damage or reload", "server reward truth"],
+  "native_qa": "NOT_EVALUATED"
+}

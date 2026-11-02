@@ -1,0 +1,41 @@
+.godot/
+__pycache__/
+node_modules/
+.tools/
+builds/
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+.env
+tools/local_config.json
+tools/godot-4.7.2/
+docs/qa_m302/videos/
+docs/qa_m302/**/frames/
+user://qa_video_m302/
+
+# Private, non-redistributable SeaBattles APK analysis graphics.
+assets/classic/private_seabattles/
+assets/classic/private_seaofbones/
+
+assets/private/seabattles/
+
+# Private test captures and locally signed application packages.
+qa_private/
+qa_seabattles/
+qa_m3036/
+*.apk
+*.apks
+SeaBattles*.zip
+SeaOfBones*.zip
+
+# Local APK research packs remain private across all source platforms.
+assets/classic/private_captainofsea/
+assets/classic/private_user_art/
+
+# User-authorized reference art backup in the new private development repo.
+!assets/classic/private_seabattles/
+!assets/classic/private_seabattles/**
+# Retain the verified APK requested for this development snapshot.
+!releases/
+!releases/**/*.apk

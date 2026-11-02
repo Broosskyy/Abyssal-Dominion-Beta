@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "milestone": "M156",
+  "master": "V3.7",
+  "levels": {
+    "40": {
+      "boss_kind": "admiral",
+      "boss_slot": "NPC-ADMIRAL-VOID-001",
+      "boss_title": "Void Admiral",
+      "hunter_slot": "MON-VOID-002",
+      "hunter_title": "Void Leviathan"
+    },
+    "45": {
+      "boss_kind": "admiral",
+      "boss_slot": "NPC-ADMIRAL-SOV-001",
+      "boss_title": "Sovereign Admiral",
+      "hunter_slot": "MON-SOV-001",
+      "hunter_title": "Sovereign Leviathan"
+    },
+    "50": {
+      "boss_kind": "admiral",
+      "boss_slot": "NPC-ADMIRAL-DOM-LEGENDARY-001",
+      "boss_title": "Legendary Dominion Admiral",
+      "hunter_slot": "MON-DOM-002",
+      "hunter_title": "Dominion Crown Guardian"
+    },
+    "55": {
+      "boss_kind": "admiral",
+      "boss_slot": "SHIP-PROG-055",
+      "boss_title": "Blackwake Vanguard Admiral",
+      "hunter_slot": "MON-DOM-002",
+      "hunter_title": "Dreadwater Crown Guardian"
+    },
+    "60": {
+      "boss_kind": "admiral",
+      "boss_slot": "SHIP-PROG-060",
+      "boss_title": "Iron Maw Siege Admiral",
+      "hunter_slot": "MON-VOID-002",
+      "hunter_title": "Iron Maw Leviathan"
+    }
+  },
+  "rule": "Capstone Admiral clear and Hunter/Monster clear are distinct qualified objectives."
+}

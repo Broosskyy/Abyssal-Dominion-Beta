@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "milestone": "M60",
+  "title": "HUD Readability + Target/Status Production",
+  "features": {
+    "target_relation_frames": [
+      "neutral",
+      "hostile",
+      "elite",
+      "admiral",
+      "monster"
+    ],
+    "target_hull_bar": true,
+    "target_shield_bar": true,
+    "polished_core_icons": [
+      "attack",
+      "repair",
+      "harpoon",
+      "target",
+      "hull",
+      "shield",
+      "ammo"
+    ],
+    "status_chip_frame": true,
+    "mobile_qa_presets": 5,
+    "code_owned_labels_counts_cooldowns": true,
+    "safe_area_contract": true,
+    "visual_overrides_replaceable": true
+  },
+  "authority": "visual/presentation only; no backend or server state claimed"
+}

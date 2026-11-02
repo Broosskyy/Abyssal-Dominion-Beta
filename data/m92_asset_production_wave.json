@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "milestone": "M92",
+  "priority": "P0",
+  "master_first_13": [
+    "ship_small",
+    "ship_medium",
+    "ship_large",
+    "npc_friendly_coastal_sloop",
+    "npc_scout_01",
+    "npc_raider_01",
+    "npc_gunship_01",
+    "npc_heavy_01",
+    "harbor_havens_reach",
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "monster_early_01"
+  ],
+  "wired_this_milestone": [
+    "Haven's Reach runtime visual hierarchy",
+    "prop_wreck_stern_gallery_01",
+    "prop_wreck_torn_flag_01",
+    "prop_monster_hunter_banner_01",
+    "cached NPC sails/pennants",
+    "guild focus rings"
+  ],
+  "prepared_next": [
+    "prop_harbor_pirate_arch_01",
+    "prop_harbor_hanging_net_01",
+    "nature_island_cove_cliff_large_01",
+    "nature_island_spit_rocks_01",
+    "prop_wreck_broken_deck_01",
+    "prop_wreck_sunken_cannon_01",
+    "prop_monster_hunter_totem_01",
+    "prop_monster_bone_arch_01",
+    "guild_wall_gate_01",
+    "guild_repair_crane_01"
+  ],
+  "rule": "Master P0 first-13 final assets remain highest immediate priority; world/guild secondary slots remain parallel and directly replaceable.",
+  "guild_island_early_wave": [
+    "guild_island_base_01",
+    "guild_harbor_dock_01",
+    "guild_hall_01",
+    "guild_warehouse_01",
+    "guild_repair_station_01",
+    "guild_tower_cannon_01",
+    "guild_tower_chain_01",
+    "guild_tower_mortar_01",
+    "guild_tower_guardian_01",
+    "guild_wall_straight_01",
+    "guild_wall_corner_01",
+    "guild_shield_node_01"
+  ]
+}

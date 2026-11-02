@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "milestone": "M279",
+  "master_concept": "V3.8",
+  "contract": "authoritative_reward_notification_loot_presentation_claim_ux_state_foundation",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "References inform only readable naval-MMO reward feedback, encounter reward reveal and claim-state clarity. No proprietary layouts, reward values, animations, names, assets or mechanics are copied.",
+  "authority": {
+    "server_owns": ["reward_notification_truth", "reward_payload_identity", "reward_value_and_quantity", "rarity_truth", "inbox_badge_truth", "claim_ux_state", "delivery_state", "settlement_state"],
+    "client_may": ["render_confirmed_reward_feedback", "animate_confirmed_reward_presentation", "dismiss_local_visual", "navigate_to_claim_surface", "render_confirmed_badges"],
+    "client_must_never": ["create_reward_notification", "define_reward_value", "override_rarity_or_quantity", "confirm_claim_success", "set_badge_authoritatively", "mark_delivery_settled"]
+  },
+  "presentation_surfaces": ["SEA_CHART_REWARD_BANNER", "BOSS_ADMIRAL_REWARD_REVEAL", "LOOT_FEEDBACK", "INBOX_BADGE", "CLAIM_SURFACE_STATE", "MAIL_FALLBACK_STATE", "RECOVERY_STATE"],
+  "rules": {
+    "presentation_requires_server_confirmed_m278_state": true,
+    "sea_chart_feedback_is_primary_and_brief": true,
+    "inbox_claim_surface_is_secondary": true,
+    "visible_reward_never_proves_ownership": true,
+    "claim_success_requires_server_state": true,
+    "dismiss_visual_changes_no_reward_state": true,
+    "mobile_desktop_parity": true,
+    "no_new_reward_main_menu": true,
+    "test_global_isolation": true
+  },
+  "dependencies": {
+    "inbox": "M278 authoritative reward inbox/claim queue",
+    "delivery": "M277 authoritative receipt/delivery/recovery",
+    "roll_integrity": "M276 authoritative loot-roll integrity",
+    "settlement": "M266 atomic economy/inventory transaction boundary",
+    "encounter": "M273 authoritative encounter orchestration"
+  },
+  "unset_until_measured": ["banner_duration", "notification_coalescing_window", "reward_reveal_timing", "animation_duration", "badge_refresh_interval", "toast_queue_limit", "claim_surface_auto_open_rules"],
+  "production_status": "PARTIAL"
+}

@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "milestone": "M114",
+  "v3_7_found": false,
+  "grounded": {
+    "gold_bonusmap": "PL18+, challenging PvE, Epic targets/Admiral components",
+    "bonusmap_contract": "multi-wave, wave rewards, completion chest, pity/token, replay access",
+    "pl21_25_builds": "Epic Gear, Curse/Status Builds, specialized Officers, real build choice",
+    "pl25_trial": "Status/Build specialization",
+    "pl26_30_next": "Abyssal Harpoons/Materials, Corruption Gear, Advanced Castles; PL30 Abyss/Hunter/Corruption"
+  },
+  "implemented": [
+    "Gold fragment drops PL18+",
+    "5-wave Gold Bonusmap state loop",
+    "completion/pity/token path",
+    "build specialization harbor UI/runtime",
+    "PL25 requires selected specialization",
+    "PL21-25 POI population"
+  ],
+  "prototype_limits": [
+    "bonusmap currently reuses qualified open-sea sinks rather than isolated instance scene",
+    "specialization modifiers stored as runtime metadata; full stat consumers remain incremental",
+    "no server authority"
+  ],
+  "native_pending": true
+}

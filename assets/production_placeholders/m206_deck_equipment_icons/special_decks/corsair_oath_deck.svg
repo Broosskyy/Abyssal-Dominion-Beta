@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="corsair oath deck">
+<rect x="5" y="5" width="86" height="86" rx="18" fill="#07131d" stroke="#3c5363" stroke-width="3"/>
+<path d="M15 72 Q48 86 81 72" fill="none" stroke="#244656" stroke-width="5" stroke-linecap="round"/>
+<path d="M23 59 L34 31 H62 L73 59 L61 68 H35 Z" fill="#37181c" stroke="#e14f54" stroke-width="3"/><path d="M34 47 L48 37 L62 47 L55 61 H41Z" fill="none" stroke="#ff8b8e" stroke-width="3"/><path d="M48 38 V63" stroke="#ff8b8e" stroke-width="3"/>
+<circle cx="48" cy="48" r="35" fill="none" stroke="#e14f54" stroke-opacity=".28" stroke-width="2"/>
+</svg>

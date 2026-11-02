@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "milestone": "M105",
+  "implemented": [
+    "Profile/Inventory/Wallet/Progression/Entitlement service facades",
+    "environment transport adapter factory",
+    "P0 13-slot replacement dashboard",
+    "GLB diagnostic contract/runtime inspector",
+    "Command Deck service/P0 truth status"
+  ],
+  "migration": {
+    "working_local_gameplay_preserved": true,
+    "global_writes_enabled": false,
+    "test_writes_enabled": false,
+    "local_service_writes": true,
+    "gradual_caller_migration": true
+  },
+  "p0": {
+    "total": 13,
+    "source_ready": 13,
+    "final": 0,
+    "native_mobile_pass": 0
+  },
+  "authority_truth": {
+    "real_backend": false,
+    "real_auth": false,
+    "server_repository": false,
+    "payment_entitlement": false
+  },
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS/Desktop/Web",
+    "P0 final GLB imports",
+    "GLB waterline/anchor screenshots"
+  ]
+}

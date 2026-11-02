@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "milestone": "M78",
+  "priority": "P0",
+  "next_models": [
+    "prop_wreck_cannon_01",
+    "prop_wreck_sail_torn_01",
+    "prop_harbor_net_rack_01",
+    "prop_harbor_lantern_post_01",
+    "nature_reef_marker_01",
+    "prop_monster_bone_rib_01"
+  ],
+  "wired_now": [
+    "prop_harbor_crane_01",
+    "prop_rope_bundle_01",
+    "prop_fish_crates_01",
+    "prop_harbor_wayfinder_01",
+    "prop_salvage_hook_01",
+    "poi_wreck_beacon_01",
+    "poi_monster_warning_totem_01"
+  ],
+  "highest_value_final_glbs": [
+    "ship_small",
+    "ship_medium",
+    "ship_large",
+    "harbor_havens_reach",
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "monster_early_01"
+  ],
+  "acceptance": [
+    "oblique/mobile silhouette",
+    "pirate/coastal readability",
+    "no baked text",
+    "no gameplay scripts/collision authority in GLB",
+    "stable scale/pivot",
+    "fallback safe"
+  ]
+}

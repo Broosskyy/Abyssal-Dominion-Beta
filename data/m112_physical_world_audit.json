@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "milestone": "M112",
+  "grid": [
+    5,
+    5
+  ],
+  "legacy_coordinates_preserved": true,
+  "physical_maps": {
+    "16": {
+      "coordinate": [
+        4,
+        3
+      ],
+      "name": "Cursed Wake"
+    },
+    "17": {
+      "coordinate": [
+        4,
+        4
+      ],
+      "name": "Black Lantern Sea"
+    },
+    "18": {
+      "coordinate": [
+        3,
+        4
+      ],
+      "name": "Gilded Grave"
+    },
+    "19": {
+      "coordinate": [
+        2,
+        4
+      ],
+      "name": "Admiral's Scar"
+    },
+    "20": {
+      "coordinate": [
+        1,
+        4
+      ],
+      "name": "Crown of Ash"
+    }
+  },
+  "adjacency_chain": [
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "world_budget": {
+    "extra_maps_loaded_simultaneously": 0,
+    "sector_rebuild_model_preserved": true
+  },
+  "mobile": {
+    "minimap_uses_GRID_SIZE": true,
+    "expanded_grid_native_qa_pending": true
+  },
+  "truth": {
+    "physical_registration": true,
+    "native_runtime_verified": false
+  }
+}

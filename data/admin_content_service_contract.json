@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "service": "ContentAdminService",
+  "clients": [
+    "web_admin",
+    "ingame_admin"
+  ],
+  "operations": {
+    "list_types": {
+      "permission": "content.read"
+    },
+    "list_records": {
+      "permission": "content.read"
+    },
+    "create_draft": {
+      "permission": "content.create"
+    },
+    "update_draft": {
+      "permission": "content.edit"
+    },
+    "validate_draft": {
+      "permission": "content.validate"
+    },
+    "publish": {
+      "permission": "content.publish",
+      "server_only": true
+    },
+    "schedule": {
+      "permission": "content.schedule",
+      "server_only": true
+    },
+    "rollback": {
+      "permission": "content.rollback",
+      "server_only": true
+    },
+    "upload_asset": {
+      "permission": "asset.upload",
+      "server_only": true
+    },
+    "set_payment_product": {
+      "permission": "monetization.edit",
+      "server_only": true
+    }
+  },
+  "publish_pipeline": [
+    "draft",
+    "schema_validation",
+    "reference_validation",
+    "permission_check",
+    "audit_record",
+    "version_build",
+    "scheduled_or_active",
+    "client_content_version_sync"
+  ],
+  "critical": [
+    "payment_product",
+    "premium_currency",
+    "entitlement",
+    "production_publish"
+  ],
+  "transport": "future authenticated server API; local prototype must not impersonate it",
+  "authorization": {
+    "model": "RBAC",
+    "contract": "res://data/admin_rbac_contract.json",
+    "server_rechecks_every_write": true,
+    "same_permissions_web_and_ingame": true,
+    "local_admin_mode_never_grants_production_permission": true
+  }
+}

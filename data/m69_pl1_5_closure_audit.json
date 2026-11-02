@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "milestone": "M69",
+  "scope": "PL1-5 vertical slice closure audit",
+  "source_basis": [
+    "Master V3.1: first session/tutorial, 3 starter fleet, low-level NPC neutrality, PL1-5 learning order",
+    "Master V3.1: Haven's Reach, selected Shattered Shores maps, 3 starters, NPCs, at least one monster, elite/admiral, quests, harbor/arsenal/repair/hull/shield/basic loot/Pirate Trial PL5",
+    "Asset Production Masterlist: P0 starter ships, PL1-5 NPCs, Haven's Reach, P0 islands, first monster, mobile sea-map readability"
+  ],
+  "matrix": [
+    {
+      "area": "3 starter ships",
+      "source_status": "required",
+      "project_status": "implemented + replaceable slots",
+      "native_qa": "pending"
+    },
+    {
+      "area": "starter unlock within PL1-5",
+      "source_status": "required",
+      "project_status": "implemented via BeginnerRules/Voyage",
+      "native_qa": "pending"
+    },
+    {
+      "area": "low-level NPC neutral until attacked",
+      "source_status": "required",
+      "project_status": "implemented; relation presentation unified M69",
+      "native_qa": "pending"
+    },
+    {
+      "area": "Haven's Reach harbor",
+      "source_status": "required",
+      "project_status": "implemented placeholder + modular replacement slots",
+      "native_qa": "pending"
+    },
+    {
+      "area": "arsenal/repair/basic harbor economy",
+      "source_status": "required",
+      "project_status": "implemented local vertical-slice systems",
+      "native_qa": "pending"
+    },
+    {
+      "area": "hull/shield/basic loot",
+      "source_status": "required",
+      "project_status": "implemented",
+      "native_qa": "pending"
+    },
+    {
+      "area": "first monster",
+      "source_status": "required",
+      "project_status": "implemented fallback + M68 Hero slot pipeline",
+      "native_qa": "pending"
+    },
+    {
+      "area": "elite/admiral encounter",
+      "source_status": "required",
+      "project_status": "implemented encounter director",
+      "native_qa": "pending"
+    },
+    {
+      "area": "quests/missions",
+      "source_status": "required",
+      "project_status": "implemented local mission system; depth audit pending",
+      "native_qa": "pending"
+    },
+    {
+      "area": "Pirate Trial PL5",
+      "source_status": "required",
+      "project_status": "present in voyage/beginner progression contracts; full playthrough pending",
+      "native_qa": "pending"
+    },
+    {
+      "area": "mobile-readable HUD",
+      "source_status": "required",
+      "project_status": "multiple M38-M62 polish passes; device acceptance pending",
+      "native_qa": "pending"
+    },
+    {
+      "area": "real multiplayer/backend/login",
+      "source_status": "later major phase",
+      "project_status": "not faked / not implemented",
+      "native_qa": "not_applicable"
+    }
+  ],
+  "closure_state": "SOURCE_READY_BUT_NOT_NATIVE_ACCEPTED",
+  "rule": "PL1-5 is not declared gameplay-closed until Godot 4.7.2 native parser/runtime and phone playthrough pass."
+}

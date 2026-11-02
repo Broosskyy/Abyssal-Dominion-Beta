@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "milestone": "M158",
+  "authority": "LOCAL_PROTOTYPE_DATA",
+  "maps": {
+    "silver": {
+      "boss_wave": 5,
+      "boss": "Silver Flagship",
+      "mechanics": [
+        "aimed_volley",
+        "escort_break"
+      ],
+      "phase_profile": "mobile_pressure",
+      "loot_visual": "tier_chest"
+    },
+    "gold": {
+      "boss_wave": 6,
+      "boss": "Gilded Sovereign",
+      "mechanics": [
+        "guard_call",
+        "piercing_barrage"
+      ],
+      "phase_profile": "burst_command",
+      "loot_visual": "admiral_vault"
+    },
+    "abyss": {
+      "boss_wave": 7,
+      "boss": "Crown Guardian",
+      "mechanics": [
+        "armor_shell",
+        "hunter_pulse",
+        "enrage"
+      ],
+      "phase_profile": "curse_pressure",
+      "loot_visual": "salvage_bundle"
+    },
+    "legendary": {
+      "boss_wave": 7,
+      "boss": "Void Sovereign",
+      "mechanics": [
+        "command_mark",
+        "mortar_zone",
+        "last_stand"
+      ],
+      "phase_profile": "dominion_command",
+      "loot_visual": "admiral_vault"
+    }
+  },
+  "rules": [
+    "completion rewards stay reward-service previews until server authority exists",
+    "wave completion cannot grant normal-sea progression twice"
+  ]
+}

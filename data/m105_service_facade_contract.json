@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "milestone": "M105",
+  "services": {
+    "profile": {
+      "reads": [
+        "snapshot"
+      ],
+      "writes": [
+        "save_snapshot"
+      ],
+      "current": "local GameState adapter",
+      "future": "server ProfileRepository"
+    },
+    "inventory": {
+      "reads": [
+        "count",
+        "snapshot"
+      ],
+      "writes": [
+        "set_count",
+        "consume"
+      ],
+      "current": "PlayerInventory adapter",
+      "future": "server InventoryRepository"
+    },
+    "wallet": {
+      "reads": [
+        "coins"
+      ],
+      "writes": [
+        "add_coins"
+      ],
+      "current": "PlayerProgression adapter",
+      "future": "server WalletRepository"
+    },
+    "progression": {
+      "reads": [
+        "level",
+        "xp",
+        "snapshot"
+      ],
+      "writes": [
+        "add_xp"
+      ],
+      "current": "PlayerProgression adapter",
+      "future": "server ProgressionRepository"
+    },
+    "entitlement": {
+      "reads": [
+        "has"
+      ],
+      "writes": [],
+      "current": "empty local entitlement adapter",
+      "future": "server EntitlementRepository"
+    }
+  },
+  "migration_rule": "Gameplay callers may move behind services incrementally; M105 does not reset working local systems.",
+  "live_rule": "TEST/GLOBAL service writes require a server-authoritative adapter before they are enabled."
+}

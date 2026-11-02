@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "milestone": "M75",
+  "representative_viewports": [
+    {
+      "name": "compact_landscape",
+      "size": [
+        960,
+        540
+      ]
+    },
+    {
+      "name": "16_9_phone",
+      "size": [
+        1280,
+        720
+      ]
+    },
+    {
+      "name": "19_5_9_phone",
+      "size": [
+        1560,
+        720
+      ]
+    },
+    {
+      "name": "20_9_phone",
+      "size": [
+        1600,
+        720
+      ]
+    },
+    {
+      "name": "tablet_landscape",
+      "size": [
+        1920,
+        1200
+      ]
+    }
+  ],
+  "acceptance": [
+    "fire/ammo/items remain reachable",
+    "wheel does not overlap objective strip",
+    "target panel outranks world labels",
+    "mission/objective lanes do not overlap",
+    "selected target stays readable",
+    "POIs reduce before combat UI on compact displays"
+  ],
+  "note": "Geometry contract only; device DPI/safe-area still needs native screenshot QA."
+}

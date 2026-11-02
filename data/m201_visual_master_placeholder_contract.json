@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "milestone": "M201",
+  "status": "VISUAL_MASTER_PLACEHOLDER_FOUNDATION_STATIC_VERIFIED",
+  "master_basis": "V3.8 + visual master references + explicit lower HUD bar exception",
+  "cross_platform_lock": {
+    "same_world": true,
+    "same_models": true,
+    "same_world_vfx": true,
+    "same_gameplay_geometry": true,
+    "responsive_only": ["hud_scale", "font_scale", "touch_targets", "spacing", "safe_areas"]
+  },
+  "placeholder_assets": {
+    "classification": "REFERENCE_GRADE_PLACEHOLDER_NOT_FINAL_ART",
+    "ships": 3,
+    "islands": 4,
+    "loot_models": 4,
+    "ui_icons": 8,
+    "style": "maritime dark-fantasy, navy/gold UI, readable angled top-down gameplay silhouettes",
+    "replacement_rule": "visual-only model/icon swap; gameplay wrappers, sockets, collision and authority remain unchanged"
+  },
+  "world_composition": {
+    "chart_world_units": 360,
+    "canonical_island_slots": 8,
+    "harbor_modules_gain_visual_only_roof_and_gold_accent": true,
+    "island_collision_unchanged": true,
+    "actor_overlap_unchanged": true
+  },
+  "forbidden": [
+    "permanent_bottom_menu_bar",
+    "center_bottom_primary_attack",
+    "platform_specific_world_content",
+    "platform_specific_gameplay_vfx",
+    "placeholder_assets_marked_as_final"
+  ],
+  "native_runtime_visual_qa_pending": true
+}

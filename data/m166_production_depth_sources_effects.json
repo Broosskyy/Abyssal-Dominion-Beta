@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "milestone": "M166",
+  "goal": "PRODUCTION_DEPTH_SOURCE_GRAPH_EFFECT_RUNTIME_CRAFTING_AND_GUILD_PRESENTATION",
+  "design_rule": "Reference titles inform breadth only. Names, balance, source graph, visuals and progression are original and remain authorable.",
+  "effect_runtime": [
+    {"id":"burn","category":"dot","tick_rate":1.0,"stacking":"refresh_stronger","damage_scale":1.0,"authorable":true},
+    {"id":"venom","category":"dot","tick_rate":1.0,"stacking":"refresh_stronger","damage_scale":1.0,"authorable":true},
+    {"id":"armor_break","category":"defense_debuff","stat":"armor","authorable":true},
+    {"id":"spectral_mark","category":"vulnerability","stat":"damage_taken","authorable":true},
+    {"id":"reload_disrupt","category":"weapon_debuff","stat":"reload","authorable":true},
+    {"id":"ward_break","category":"defense_debuff","stat":"barrier","authorable":true},
+    {"id":"prey_mark","category":"hunter_mark","target_rule":"monster","authorable":true},
+    {"id":"chill","category":"control","stat":"speed","authorable":true},
+    {"id":"purge_mark","category":"buff_suppression","authorable":true},
+    {"id":"structure_break","category":"siege_debuff","target_rule":"structure_or_ship","authorable":true},
+    {"id":"monster_wound","category":"hunter_mark","target_rule":"monster","authorable":true},
+    {"id":"guardian_break","category":"defense_debuff","target_rule":"monster","authorable":true},
+    {"id":"corruption_mark","category":"vulnerability","target_rule":"monster","authorable":true},
+    {"id":"boss_break","category":"hunter_mark","target_rule":"boss","authorable":true},
+    {"id":"weakpoint_mark","category":"vulnerability","target_rule":"monster","authorable":true},
+    {"id":"admiral_break","category":"vulnerability","target_rule":"admiral","authorable":true}
+  ],
+  "crafting_recipes": [
+    {"id":"recipe_ember_shot","label":"Glutgeschoss-Los","station":"powder_magazine","station_level":2,"gold":850,"inputs":[{"id":"powder_charge","amount":2},{"id":"arcane_shard","amount":1}],"output":{"id":"ember","amount":25},"tags":["ammo","dot"]},
+    {"id":"recipe_venom_shot","label":"Giftgeschoss-Los","station":"hunter_lodge","station_level":3,"gold":1100,"inputs":[{"id":"enchanted_rope","amount":2},{"id":"arcane_shard","amount":1}],"output":{"id":"venom","amount":20},"tags":["ammo","hunter"]},
+    {"id":"recipe_shatter_shot","label":"Splittergeschoss-Los","station":"powder_magazine","station_level":4,"gold":1450,"inputs":[{"id":"guild_steel","amount":2},{"id":"cannon_oil","amount":1}],"output":{"id":"shatter","amount":20},"tags":["ammo","anti_armor"]},
+    {"id":"recipe_spectral_shot","label":"Spektralgeschoss-Los","station":"rune_foundry","station_level":5,"gold":2400,"inputs":[{"id":"arcane_shard","amount":3},{"id":"ward_crystal","amount":1}],"output":{"id":"spectral","amount":15},"tags":["ammo","arcane"]},
+    {"id":"recipe_hunter_shell","label":"Jägergeschoss-Los","station":"hunter_lodge","station_level":4,"gold":1600,"inputs":[{"id":"monster_bait","amount":2},{"id":"cannon_oil","amount":1}],"output":{"id":"hunter_shell","amount":20},"tags":["ammo","monster"]},
+    {"id":"recipe_sunburst","label":"Sonnenkern-Los","station":"rune_foundry","station_level":7,"gold":4200,"inputs":[{"id":"arcane_shard","amount":4},{"id":"ward_crystal","amount":2},{"id":"admiral_seal","amount":1}],"output":{"id":"sunburst","amount":12},"tags":["ammo","legendary"]},
+    {"id":"recipe_harpoon_tempered","label":"Gehärtete Harpunen","station":"hunter_lodge","station_level":2,"gold":900,"inputs":[{"id":"guild_steel","amount":1},{"id":"enchanted_rope","amount":2}],"output":{"id":"harpoon_tempered","amount":10},"tags":["harpoon"]},
+    {"id":"recipe_harpoon_chainbite","label":"Kettenbiss-Harpunen","station":"hunter_lodge","station_level":4,"gold":1800,"inputs":[{"id":"guild_steel","amount":2},{"id":"enchanted_rope","amount":3}],"output":{"id":"harpoon_chainbite","amount":8},"tags":["harpoon","control"]},
+    {"id":"recipe_harpoon_abyssal","label":"Abgrundlanzen","station":"rune_foundry","station_level":6,"gold":3300,"inputs":[{"id":"arcane_shard","amount":3},{"id":"enchanted_rope","amount":2}],"output":{"id":"harpoon_abyssal","amount":6},"tags":["harpoon","abyss"]},
+    {"id":"recipe_ward_brew","label":"Wardsud","station":"rune_foundry","station_level":3,"gold":1200,"inputs":[{"id":"ward_crystal","amount":1},{"id":"arcane_shard","amount":1}],"output":{"id":"ward_brew","amount":2},"tags":["consumable","defense"]},
+    {"id":"recipe_siege_repair","label":"Belagerungs-Reparaturkit","station":"siege_workshop","station_level":3,"gold":1800,"inputs":[{"id":"guild_wood","amount":3},{"id":"guild_steel","amount":2}],"output":{"id":"siege_repair_kit","amount":2},"tags":["guild","consumable"]},
+    {"id":"recipe_hunter_beacon","label":"Jägerleuchtfeuer","station":"hunter_lodge","station_level":5,"gold":2600,"inputs":[{"id":"monster_bait","amount":3},{"id":"compass_fragment","amount":2}],"output":{"id":"hunter_beacon","amount":1},"tags":["hunter","consumable"]}
+  ],
+  "source_graph": [
+    {"content_id":"ember","sources":["crafting:powder_magazine","loot:ember_fleet","shop:rotation_ammo"]},
+    {"content_id":"venom","sources":["crafting:hunter_lodge","loot:monster_hunt"]},
+    {"content_id":"spectral","sources":["crafting:rune_foundry","bonusmap:abyss","event:rotation"]},
+    {"content_id":"storm_shot","sources":["crafting:powder_magazine","loot:storm_fleet","shop:rotation_ammo"]},
+    {"content_id":"wardbreaker","sources":["crafting:rune_foundry","guild:siege_reward"]},
+    {"content_id":"hunter_shell","sources":["crafting:hunter_lodge","loot:monster_hunt"]},
+    {"content_id":"frostwake","sources":["crafting:powder_magazine","event:winter_rotation"]},
+    {"content_id":"sunburst","sources":["crafting:rune_foundry","admiral:high_tier"]},
+    {"content_id":"siege_core","sources":["crafting:siege_workshop","guild:siege_reward"]},
+    {"content_id":"harpoon_tempered","sources":["crafting:hunter_lodge","shop:hunter_stock"]},
+    {"content_id":"harpoon_relic","sources":["bonusmap:gold","loot:guardian"]},
+    {"content_id":"harpoon_abyssal","sources":["crafting:rune_foundry","bonusmap:abyss"]},
+    {"content_id":"harpoon_dreadfang","sources":["crafting:hunter_lodge","admiral:high_tier"]},
+    {"content_id":"ward_brew","sources":["crafting:rune_foundry","shop:harbor_consumables"]},
+    {"content_id":"siege_repair_kit","sources":["crafting:siege_workshop","guild:island_stock"]},
+    {"content_id":"hunter_beacon","sources":["crafting:hunter_lodge","quest:hunter_contract"]},
+    {"content_id":"arcane_shard","sources":["loot:arcane_enemy","bonusmap:all","event:rotation"]},
+    {"content_id":"ward_crystal","sources":["loot:ward_enemy","guild:island_defense"]},
+    {"content_id":"guild_steel","sources":["guild:island_production","loot:siege"]},
+    {"content_id":"guild_wood","sources":["guild:island_production","quest:guild_contract"]}
+  ],
+  "cannon_presentation": {
+    "visible_mastery_breakpoints":[1,3,5,7,10],
+    "badge_source":"content:cannon_visual_stage",
+    "model_variant_source":"asset_slot",
+    "ship_mount_visuals":"authorable",
+    "tooltip_layers":["base_stats","role","mastery","ammo_synergy","source","upgrade_cost"]
+  },
+  "guild_island_presentation": {
+    "building_level_visuals":[1,3,5,7,10],
+    "tower_level_visuals":[1,4,6,8,10],
+    "damage_states":["intact","damaged","critical"],
+    "ownership_states":["neutral","friendly","hostile","contested"],
+    "live_mutations":"server_authoritative"
+  },
+  "admin_authoring": [
+    "content_source_graph","crafting_recipe","crafting_station_requirement","effect_runtime_primitive","cannon_mastery_presentation","guild_island_visual_stage","loot_source_binding","shop_source_binding","quest_source_binding"
+  ],
+  "authority": {
+    "local_preview":["inspect_sources","preview_effects","preview_recipes","preview_visual_stages"],
+    "server_required":["paid_entitlement","guild_treasury_spend","guild_upgrade","siege_mutation","production_publish","player_grant"]
+  }
+}
