@@ -1,0 +1,575 @@
+extends Node2D
+const SIM = preload("res://simulation.gd")
+const MINI = preload("res://minimap.gd")
+const USER_ROOT := "res://assets/user/"
+const SAVE := "user://captain_m3052.json"
+const GOLD := Color("dcc18a")
+const CYAN := Color("80e3dc")
+var sim := SIM.new()
+var camera: Camera2D
+var water: ColorRect
+var ocean: ShaderMaterial
+var ui: Control
+var chart_mini: Control
+var desired_zoom := 0.82
+var pan := Vector2.ZERO
+var camera_locked := true
+var accumulator := 0.0
+var refresh_clock := 0.0
+var save_clock := 0.0
+var elapsed := 0.0
+var skins: Array[Dictionary] = []
+var ship_textures: Array[Texture2D] = []
+var skin_previews: Array[Texture2D] = []
+var atlas_textures: Array[Texture2D] = []
+var island_textures: Dictionary = {}
+var icons: Dictionary = {}
+var beast: Texture2D
+var font: Font = ThemeDB.fallback_font
+var chrome: Panel
+var title: Label
+var resources: Label
+var player_panel: Panel
+var player_name: Label
+var player_hp: ProgressBar
+var player_numbers: Label
+var target_panel: Panel
+var target_name: Label
+var target_hp: ProgressBar
+var target_numbers: Label
+var status: Label
+var attack: Button
+var repair: Button
+var center_button: Button
+var zoom_in: Button
+var zoom_out: Button
+var ammo_buttons: Array[Button] = []
+var nav_buttons: Array[Button] = []
+var quest_panel: Panel
+var quest_text: Label
+var quest_claim: Button
+var modal: Panel
+var modal_title: Label
+var modal_close: Button
+var modal_scroll: ScrollContainer
+var modal_body: VBoxContainer
+var modal_kind := ""
+var drag_start := Vector2.ZERO
+var dragging := false
+var last_mouse := Vector2.ZERO
+var touch_points: Dictionary = {}
+var pinch_distance := 0.0
+var suppress_tap_until := 0
+var drawn_shots := 0
+var last_touch_ms := -10000
+
+func _ready() -> void:
+	_load_assets()
+	_load_progress()
+	camera = Camera2D.new()
+	camera.position = sim.player.pos
+	camera.zoom = Vector2.ONE*desired_zoom
+	add_child(camera)
+	var backdrop = CanvasLayer.new()
+	backdrop.layer = -10
+	add_child(backdrop)
+	water = ColorRect.new()
+	water.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	backdrop.add_child(water)
+	ocean = ShaderMaterial.new()
+	ocean.shader = preload("res://ocean.gdshader")
+	ocean.set_shader_parameter("wave_noise",load("res://assets/reference/ocean/wave_noise.png"))
+	water.material = ocean
+	_build_ui()
+	get_viewport().size_changed.connect(_layout)
+	_layout()
+	_refresh_ui()
+
+func _load_assets() -> void:
+	var pack: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(USER_ROOT+"pack.json"))
+	for item: Dictionary in pack.ship_catalog:
+		skins.append(item)
+		ship_textures.append(load(USER_ROOT+str(item.path)))
+		skin_previews.append(ship_textures.back())
+	for name in ["redkorsar","elite2","elite3","elite4","elite5","elite6","elite7","elite9","elite10","boneship","burningdutchman1","blackbeardspirates"]:
+		atlas_textures.append(load("res://assets/fleet/"+str(name)+".png"))
+	for name in ["elite8","warship","pinnace","flyingdutchman"]:
+		atlas_textures.append(load("res://assets/reference/ships/"+str(name)+".png"))
+	var hull_names = ["Roter Korsar","Jadebrigg","Kupfersegler","Küstenfregatte","Goldene Armada","Eisfregatte","Schattensegler","Admiralswache","Elite-Galeone","Knochenschiff","Brennender Holländer","Schwarzbart","Königsgaleone","Kriegsschiff","Schmuggler","Fliegender Holländer"]
+	for i in atlas_textures.size():
+		skins.append({"name":hull_names[i],"directional":true,"atlas":i})
+		var preview = AtlasTexture.new()
+		preview.atlas=atlas_textures[i]
+		var cell = atlas_textures[i].get_size()/Vector2(4,2)
+		preview.region=Rect2(Vector2(0,cell.y),cell)
+		skin_previews.append(preview)
+	for name in ["tropical","rock","snow","snow2"]:
+		island_textures[name] = load("res://assets/reference/islands/"+name+".png")
+	for name in ["cannonball","harpoon","chain","repair_chest","portal"]:
+		icons[name] = load(USER_ROOT+"ui/"+name+".png")
+	beast = load("res://assets/reference/monsters/tiamat.png")
+
+func _process(delta: float) -> void:
+	elapsed += delta
+	accumulator = minf(accumulator+delta,0.2)
+	while accumulator >= 1.0/30.0:
+		sim.step(1.0/30.0)
+		accumulator -= 1.0/30.0
+	var goal: Vector2 = sim.player.pos+pan
+	camera.position = camera.position.lerp(goal,1.0-exp(-delta*5.0))
+	camera.zoom = camera.zoom.lerp(Vector2.ONE*desired_zoom,1.0-exp(-delta*8.0))
+	ocean.set_shader_parameter("camera_world",camera.position)
+	ocean.set_shader_parameter("map_zoom",camera.zoom.x)
+	ocean.set_shader_parameter("viewport_size",get_viewport_rect().size)
+	chart_mini.camera_world = camera.position
+	chart_mini.view_world = get_viewport_rect().size/camera.zoom
+	chart_mini.queue_redraw()
+	refresh_clock += delta
+	if refresh_clock > 0.12:
+		refresh_clock = 0
+		_refresh_ui()
+	save_clock += delta
+	if save_clock > 8.0:
+		save_clock = 0
+		_save_progress()
+	queue_redraw()
+
+func _draw() -> void:
+	if camera == null: return
+	var view = Rect2(camera.position-get_viewport_rect().size/camera.zoom*0.5,get_viewport_rect().size/camera.zoom).grow(350)
+	# Projected art is drawn on the same 2D chart as movement and collision.
+	for island in sim.islands:
+		if not view.has_point(island.pos): continue
+		var tex: Texture2D = island_textures[island.art]
+		var width: float = island.width
+		var dimensions = tex.get_size()*width/tex.get_width()
+		var point: Vector2 = island.pos
+		_ellipse(point+Vector2(0,20),Vector2(width*0.46,width*0.19),Color(0.09,0.49,0.48,0.15))
+		var foam = Color(0.6,0.87,0.8,0.08+0.025*sin(elapsed*1.5))
+		_ellipse_line(point+Vector2(0,20),Vector2(width*0.43,width*0.17),foam,2.0)
+		draw_texture_rect(tex,Rect2(point-dimensions*Vector2(0.5,0.65),dimensions),false)
+		_label(point+Vector2(0,dimensions.y*0.31+20),island.name,16,GOLD)
+	# Planned route and tap marker remain visible without obscuring the sea.
+	if not sim.player.path.is_empty():
+		var before: Vector2 = sim.player.pos
+		for point: Vector2 in sim.player.path:
+			draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
+			before = point
+		var goal: Vector2 = sim.player.path.back()
+		draw_arc(goal,16+sin(elapsed*3)*2,0,TAU,32,Color(0.54,0.92,0.85,0.7),1.7,true)
+		draw_line(goal-Vector2(22,0),goal+Vector2(22,0),Color(0.5,0.9,0.84,0.5),1.0)
+		draw_line(goal-Vector2(0,16),goal+Vector2(0,16),Color(0.5,0.9,0.84,0.5),1.0)
+	for drop in sim.drops:
+		if not view.has_point(drop.pos): continue
+		var p: Vector2 = drop.pos+Vector2(0,sin(elapsed*2+drop.id)*3)
+		_ellipse(p,Vector2(31,13),Color(0.95,0.7,0.2,0.1))
+		var tex: Texture2D = icons.repair_chest
+		var dims = tex.get_size()*36.0/maxf(tex.get_width(),tex.get_height())
+		draw_texture_rect(tex,Rect2(p-dims*0.5,dims),false)
+		_label(p+Vector2(0,31),"BEUTE",10,GOLD)
+	var fleet: Array[Dictionary] = []
+	fleet.append(sim.player)
+	for npc in sim.npcs:
+		if view.has_point(npc.pos): fleet.append(npc)
+	fleet.sort_custom(func(a,b):return a.pos.y < b.pos.y)
+	for actor: Dictionary in fleet:
+		if int(actor.hp)>0: _draw_actor(actor)
+	drawn_shots = 0
+	for shot in sim.shots:
+		if float(shot.age)<0: continue
+		drawn_shots += 1
+		var progress = clampf(float(shot.traveled)/float(shot.distance),0,1)
+		var p: Vector2 = shot.pos-Vector2(0,sin(progress*PI)*28)
+		var victim = sim.actor(int(shot.target))
+		if victim.is_empty(): continue
+		var direction: Vector2=(victim.pos-shot.pos).normalized()
+		var color = Color("ffe0a2") if int(shot.source)==0 else Color("ff8c56")
+		draw_line(p-direction*18,p,color,2.4,true)
+		draw_circle(p,4.2,Color(0,0,0,0.5))
+		draw_circle(p,2.7,color)
+		if shot.weapon=="chain": draw_arc(p,6,0,TAU,12,color,1.2,true)
+		if shot.weapon=="harpoon": draw_line(p-direction*30,p,color,1.4,true)
+	for event in sim.events:
+		var age: float = sim.clock-float(event.time)
+		if age>1.2: continue
+		var p: Vector2 = event.pos
+		if event.type=="impact":
+			var fade = maxf(0,1-age/0.6)
+			_ellipse_line(p,Vector2(12+age*45,8+age*22),Color(0.95,0.84,0.60,fade),2.3)
+			_label(p+Vector2(0,-65-age*33),"−%d"%int(event.value),19,Color(1,0.65,0.33,1-age/1.2))
+		elif event.type=="muzzle" and age<0.35:
+			draw_circle(p,8+age*18,Color(1,0.73,0.3,(1-age/0.35)*0.65))
+		elif event.type=="sunk":
+			_ellipse(p,Vector2(70*age+5,36*age+5),Color(0.38,0.55,0.56,(1-age/1.2)*0.4))
+		elif event.type=="loot":
+			_label(p+Vector2(0,-30-age*45),"+%d GOLD"%int(event.value),19,Color(0.95,0.81,0.4,1-age/1.2))
+
+func _draw_actor(actor: Dictionary) -> void:
+	var is_player = int(actor.id)==0
+	var point: Vector2=actor.pos
+	var heading: Vector2=actor.heading
+	if not actor.path.is_empty():
+		for j in 5:
+			var p = point-heading*(30+float(j)*17)
+			var fade = (1.0-float(j)/5.0)*0.24
+			_ellipse_line(p,Vector2(11+j*2,4+j),Color(0.68,0.91,0.9,fade),1.4)
+	_ellipse(point+Vector2(2,8),Vector2(58,19),Color(0.005,0.03,0.045,0.28))
+	if sim.target==int(actor.id):
+		_ellipse_line(point+Vector2(0,8),Vector2(70,28),Color("ed9d67"),2.0)
+	if is_player:
+		_ellipse_line(point+Vector2(0,8),Vector2(67,25),Color(0.37,0.84,0.83,0.4),1.1)
+	var monster = not is_player and actor.kind=="monster"
+	if monster:
+		var col = posmod(roundi((heading.angle()+PI*0.25)/TAU*4),4)
+		var row = int(elapsed*6)%8
+		_draw_atlas(beast,point,210.0,col,row,4,8)
+	elif is_player and int(sim.player.skin)<10:
+		var index: int = int(sim.player.skin) if is_player else int(actor.art)
+		var tex = ship_textures[posmod(index,ship_textures.size())]
+		var width = 160.0 if is_player else (153.0 if actor.elite else 136.0)
+		var dims = tex.get_size()*width/tex.get_width()
+		var rect = Rect2(point-dims*Vector2(0.5,0.73)+Vector2(0,sin(elapsed*1.7+actor.id)*1.6),dims)
+		if heading.x>0.1:
+			rect.position.x+=dims.x
+			rect.size.x=-dims.x
+		draw_texture_rect(tex,rect,false)
+	else:
+		var tex = atlas_textures[int(sim.player.skin)-10] if is_player else atlas_textures[posmod(int(actor.art),atlas_textures.size())]
+		var col = posmod(roundi((heading.angle()+PI*0.25)/TAU*4),4)
+		_draw_atlas(tex,point,178.0 if is_player else (169.0 if actor.elite else 148.0),col,1,4,2)
+	var name: String = str(skins[int(sim.player.skin)].name) if is_player else str(actor.name)
+	var color = CYAN if is_player else (Color("e4b6ee") if monster else Color("e4c596"))
+	var baseline = point+Vector2(0,47)
+	_label(baseline,("✦ "+name) if is_player else name,14 if is_player else 13,color)
+	var bar = Rect2(point+Vector2(-43,55),Vector2(86,4))
+	draw_rect(bar,Color("071820"))
+	draw_rect(Rect2(bar.position,Vector2(bar.size.x*float(actor.hp)/float(actor.max_hp),4)),Color("60b682") if is_player else Color("b36452"))
+	if float(actor.slow)>0: _label(point+Vector2(0,80),"VERLANGSAMT",10,Color("9fdbf4"))
+
+func _draw_atlas(tex: Texture2D,point: Vector2,width: float,col: int,row: int,columns: int,rows: int) -> void:
+	var cell = tex.get_size()/Vector2(columns,rows)
+	var dims = cell*width/cell.x
+	draw_texture_rect_region(tex,Rect2(point-dims*Vector2(0.5,0.68),dims),Rect2(Vector2(col,row)*cell,cell))
+
+func _ellipse(point: Vector2,radii: Vector2,color: Color) -> void:
+	var vertices = PackedVector2Array()
+	for i in 32: vertices.append(point+Vector2(cos(float(i)*TAU/32),sin(float(i)*TAU/32))*radii)
+	draw_colored_polygon(vertices,color)
+
+func _ellipse_line(point: Vector2,radii: Vector2,color: Color,width: float) -> void:
+	var vertices = PackedVector2Array()
+	for i in 33: vertices.append(point+Vector2(cos(float(i)*TAU/32),sin(float(i)*TAU/32))*radii)
+	draw_polyline(vertices,color,width,true)
+
+func _label(point: Vector2,text: String,fontsize: int,color: Color) -> void:
+	var width = font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize).x
+	var p = point-Vector2(width*0.5,0)
+	draw_string_outline(font,p,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,3,Color(0.01,0.035,0.05,color.a))
+	draw_string(font,p,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,color)
+
+func _panel(parent: Node) -> Panel:
+	var p =Panel.new()
+	var style =StyleBoxFlat.new()
+	style.bg_color=Color(0.025,0.07,0.09,0.94)
+	style.border_color=Color("93764b")
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(4)
+	style.shadow_color=Color(0,0,0,0.25)
+	style.shadow_size=5
+	p.add_theme_stylebox_override("panel",style)
+	parent.add_child(p)
+	return p
+
+func _text(parent: Node,text: String,fontsize: int=14,color: Color=GOLD) -> Label:
+	var l =Label.new()
+	l.text=text
+	l.add_theme_font_size_override("font_size",fontsize)
+	l.add_theme_color_override("font_color",color)
+	l.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	parent.add_child(l)
+	return l
+
+func _button(parent: Node,text: String,callback: Callable) -> Button:
+	var b =Button.new()
+	b.text=text
+	b.focus_mode=Control.FOCUS_NONE
+	b.add_theme_font_size_override("font_size",14)
+	b.add_theme_color_override("font_color",GOLD)
+	for state in ["normal","hover","pressed","disabled"]:
+		var style =StyleBoxFlat.new()
+		style.bg_color=Color("102b37") if state=="normal" else Color("234858")
+		style.border_color=Color("75603f") if state=="normal" else GOLD
+		style.set_border_width_all(1)
+		style.set_corner_radius_all(4)
+		style.set_content_margin_all(6)
+		b.add_theme_stylebox_override(state,style)
+	b.pressed.connect(callback)
+	parent.add_child(b)
+	return b
+
+func _bar(parent: Node) -> ProgressBar:
+	var b =ProgressBar.new()
+	b.show_percentage=false
+	b.max_value=sim.PLAYER_HP
+	var bg =StyleBoxFlat.new();bg.bg_color=Color("07161f");bg.set_corner_radius_all(2)
+	var fill =StyleBoxFlat.new();fill.bg_color=Color("4fa788");fill.set_corner_radius_all(2)
+	b.add_theme_stylebox_override("background",bg)
+	b.add_theme_stylebox_override("fill",fill)
+	parent.add_child(b)
+	return b
+
+func _build_ui() -> void:
+	var layer =CanvasLayer.new()
+	add_child(layer)
+	ui=Control.new()
+	ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	ui.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	layer.add_child(ui)
+	chrome=_panel(ui)
+	title=_text(chrome,"ABYSSAL DOMINION",17)
+	resources=_text(chrome,"",13,CYAN)
+	nav_buttons.append(_button(chrome,"WERFT",func():_open_modal("Werft")))
+	nav_buttons.append(_button(chrome,"AUFTRAG",func():quest_panel.visible=not quest_panel.visible))
+	nav_buttons.append(_button(chrome,"MENÜ",func():_open_modal("Seekarten-Menü")))
+	player_panel=_panel(ui)
+	player_name=_text(player_panel,"",15,CYAN)
+	player_hp=_bar(player_panel)
+	player_numbers=_text(player_panel,"",11)
+	target_panel=_panel(ui)
+	target_name=_text(target_panel,"",14)
+	target_hp=_bar(target_panel)
+	target_numbers=_text(target_panel,"",11)
+	chart_mini=MINI.new()
+	chart_mini.simulation=sim
+	chart_mini.course_requested.connect(func(point):sim.course(point))
+	ui.add_child(chart_mini)
+	attack=_button(ui,"FEUER",_toggle_fire)
+	attack.name="FireButton"
+	attack.add_theme_font_size_override("font_size",18)
+	repair=_button(ui,"REPARATUR",func():sim.toggle_repair())
+	repair.name="RepairButton"
+	for i in 3:
+		var index =i
+		var b =_button(ui,"",func():sim.set_ammo(index))
+		b.name="Ammo%d"%i
+		b.icon=icons[["cannonball","chain","harpoon"][i]]
+		b.expand_icon=true
+		b.add_theme_constant_override("icon_max_width",26)
+		ammo_buttons.append(b)
+	center_button=_button(ui,"ZIEL",func():pan=Vector2.ZERO;camera_locked=true)
+	center_button.tooltip_text="Kamera zum Schiff"
+	zoom_in=_button(ui,"+",func():_zoom(1.15))
+	zoom_out=_button(ui,"−",func():_zoom(1.0/1.15))
+	status=_text(ui,"",12,Color("b3ccd0"))
+	status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	quest_panel=_panel(ui)
+	quest_text=_text(quest_panel,"",12)
+	quest_text.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	quest_claim=_button(quest_panel,"BELOHNUNG ABHOLEN",func():sim.claim_quest();_save_progress())
+	modal=_panel(ui)
+	modal.z_index=20
+	modal.visible=false
+	modal_title=_text(modal,"",20)
+	modal_close=_button(modal,"SCHLIESSEN",func():modal.hide();_save_progress())
+	modal_scroll=ScrollContainer.new()
+	modal.add_child(modal_scroll)
+	modal_body=VBoxContainer.new()
+	modal_body.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	modal_body.add_theme_constant_override("separation",10)
+	modal_scroll.add_child(modal_body)
+
+func _place(c: Control,x: float,y: float,w: float,h: float) -> void:
+	c.position=Vector2(x,y)
+	c.size=Vector2(maxf(w,1),maxf(h,1))
+
+func _layout() -> void:
+	if ui==null:return
+	var s =get_viewport_rect().size
+	var compact =s.y<560 or s.x<1000
+	if compact and elapsed<0.1:
+		desired_zoom=0.67
+		camera.zoom=Vector2.ONE*desired_zoom
+	water.size=s
+	_place(chrome,0,0,s.x,42)
+	_place(title,14,6,230,30)
+	_place(resources,260 if compact else 300,8,250,25)
+	resources.visible=s.x>=800
+	for i in nav_buttons.size(): _place(nav_buttons[i],s.x-267+i*87,5,82,32)
+	_place(player_panel,12,54,208 if s.x<800 else 236,78)
+	_place(player_name,12,7,216,24)
+	_place(player_hp,12,36,player_panel.size.x-24,10)
+	_place(player_numbers,12,49,216,20)
+	var tw = 204.0 if s.x<800 else 240.0
+	_place(target_panel,s.x*0.5-tw*0.5,54,tw,78)
+	_place(target_name,12,7,218,24)
+	_place(target_hp,12,36,tw-24,10)
+	_place(target_numbers,12,49,216,20)
+	var mw =155.0 if compact else 185.0
+	_place(chart_mini,s.x-mw-12,54,mw,126 if compact else 155)
+	_place(zoom_out,s.x-108,chart_mini.position.y+chart_mini.size.y+8,44,40)
+	_place(zoom_in,s.x-59,chart_mini.position.y+chart_mini.size.y+8,44,40)
+	_place(center_button,s.x-59,chart_mini.position.y+chart_mini.size.y+53,44,40)
+	var bottom =s.y-76
+	var bw =102.0 if compact else 124.0
+	var total =bw*3+12
+	for i in 3:_place(ammo_buttons[i],s.x*0.5-total*0.5-(90 if compact else 0)+i*(bw+6),bottom,bw,51)
+	_place(repair,s.x-275,bottom,122,51)
+	_place(attack,s.x-145,bottom-10,132,65)
+	_place(status,maxf(12,s.x*0.5-260),s.y-23,520,20)
+	_place(quest_panel,12,s.y-179,228,103)
+	quest_panel.visible=not compact
+	_place(quest_text,12,8,204,50)
+	_place(quest_claim,10,62,208,31)
+	var width =minf(640,s.x-32)
+	var height =minf(560,s.y-60)
+	_place(modal,(s.x-width)*0.5,(s.y-height)*0.5,width,height)
+	_place(modal_title,18,12,width-170,32)
+	_place(modal_close,width-145,10,130,36)
+	_place(modal_scroll,18,58,width-36,height-75)
+
+func _refresh_ui() -> void:
+	if player_name==null:return
+	player_name.text="✦ "+str(skins[int(sim.player.skin)].name)+" · Lv. 1"
+	player_hp.value=sim.player.hp
+	player_numbers.text="RUMPF %d / %d"%[int(sim.player.hp),sim.PLAYER_HP]
+	resources.text="GOLD  %s     VERSENKT  %d"%[str(sim.player.gold),sim.kills]
+	var selected =sim.actor(sim.target)
+	target_panel.visible=not selected.is_empty() and sim.target>0 and int(selected.hp)>0
+	if target_panel.visible:
+		target_name.text=str(selected.name)
+		target_hp.max_value=selected.max_hp
+		target_hp.value=selected.hp
+		target_numbers.text="%d / %d HP · %d m"%[int(selected.hp),int(selected.max_hp),roundi(sim.player.pos.distance_to(selected.pos))]
+	attack.text="FEUER STOPP" if sim.firing else "FEUER"
+	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0
+	repair.text="REPAR. STOPP" if sim.repairing else "REPARATUR"
+	for i in 3:
+		ammo_buttons[i].text=("● " if sim.ammo_mode==i else "")+str(sim.player.ammo[i])
+		ammo_buttons[i].tooltip_text=["Vollkugeln: gegen Schiffe","Kettenkugeln: verlangsamen Schiffe","Harpunen: gegen Monster"][i]
+	status.text=sim.message
+	quest_text.text="KÜSTENWACHE\nVersenke 3 Gegner: %d / 3 · 180 Gold"%mini(sim.kills,3)
+	quest_claim.disabled=sim.kills<3 or sim.claimed
+	quest_claim.text="ABGESCHLOSSEN" if sim.claimed else "BELOHNUNG ABHOLEN"
+
+func _toggle_fire() -> void:
+	if sim.target<1:return
+	sim.firing=not sim.firing
+	sim.repairing=false
+	_refresh_ui()
+
+func _open_modal(kind: String) -> void:
+	modal_kind=kind
+	modal_title.text=kind
+	for child in modal_body.get_children():
+		modal_body.remove_child(child)
+		child.queue_free()
+	if kind=="Werft":
+		_text(modal_body,"SCHIFFSDESIGNS · Alle 26 Designs im Test frei auswählbar",14,CYAN)
+		for i in skins.size():
+			var index =i
+			var b =_button(modal_body,str(skins[i].name)+("   ✓ AUSGERÜSTET" if int(sim.player.skin)==i else "   AUSRÜSTEN"),func():_equip(index))
+			b.custom_minimum_size.y=64
+			b.icon=skin_previews[i]
+			b.expand_icon=true
+			b.add_theme_constant_override("icon_max_width",72)
+		_text(modal_body,"MUNITIONSNACHSCHUB · Je 30 Gold",14,CYAN)
+		for i in 3:
+			var index =i
+			var b =_button(modal_body,["150 Vollkugeln","60 Kettenkugeln","40 Harpunen"][i]+" · 30 Gold",func():sim.buy_ammo(index);_save_progress();_refresh_ui())
+			b.custom_minimum_size.y=48
+	else:
+		var info =_text(modal_body,"M3052 · NEUE LOKALE SEEKARTE\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nZwei Finger / Mausrad: Zoom. Rechte Maustaste: Kamera verschieben.\n⌖ zentriert die Kamera wieder auf deinem Schiff.\n\nGastfortschritt wird auf diesem Gerät gespeichert.\nDiese neue Seekarte ist noch nicht mit dem Online-Testserver verbunden.",15)
+		info.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		info.custom_minimum_size=Vector2(modal.size.x-50,300)
+	modal.show()
+
+func _equip(index: int) -> void:
+	sim.player.skin=index
+	sim.message="Schiffsdesign ausgerüstet: "+str(skins[index].name)
+	_save_progress()
+	_open_modal("Werft")
+	_refresh_ui()
+
+func _zoom(factor: float) -> void:
+	desired_zoom=clampf(desired_zoom*factor,0.5,1.4)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		last_touch_ms=Time.get_ticks_msec()
+		if event.pressed:
+			touch_points[event.index]=event.position
+			if touch_points.size()==1:drag_start=event.position;dragging=false
+			if touch_points.size()>1:suppress_tap_until=Time.get_ticks_msec()+400
+		else:
+			if touch_points.size()==1 and not dragging and Time.get_ticks_msec()>suppress_tap_until:
+				_tap(event.position)
+			touch_points.erase(event.index)
+			pinch_distance=0
+			suppress_tap_until=Time.get_ticks_msec()+180
+		get_viewport().set_input_as_handled()
+	elif event is InputEventScreenDrag:
+		touch_points[event.index]=event.position
+		if touch_points.size()>=2:
+			var values =touch_points.values()
+			var distance: float=values[0].distance_to(values[1])
+			if pinch_distance>0:_zoom(distance/pinch_distance)
+			pinch_distance=distance
+			dragging=true
+		elif event.position.distance_to(drag_start)>20:
+			dragging=true
+			pan-=event.relative/camera.zoom
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton:
+		if event.button_index==MOUSE_BUTTON_WHEEL_UP and event.pressed:_zoom(1.10)
+		elif event.button_index==MOUSE_BUTTON_WHEEL_DOWN and event.pressed:_zoom(1/1.10)
+		elif event.button_index==MOUSE_BUTTON_LEFT and event.pressed and Time.get_ticks_msec()-last_touch_ms>350:
+			_tap(event.position)
+		elif event.button_index==MOUSE_BUTTON_RIGHT:
+			dragging=event.pressed
+	elif event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		pan-=event.relative/camera.zoom
+	elif event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode==KEY_SPACE:_toggle_fire()
+		if event.keycode==KEY_ESCAPE:modal.hide()
+		if event.keycode==KEY_R:sim.toggle_repair()
+		if event.keycode==KEY_1:sim.set_ammo(0)
+		if event.keycode==KEY_2:sim.set_ammo(1)
+		if event.keycode==KEY_3:sim.set_ammo(2)
+
+func _tap(screen: Vector2) -> void:
+	if modal.visible:return
+	var point: Vector2=get_canvas_transform().affine_inverse()*screen
+	var nearest =-1
+	var distance =82.0/camera.zoom.x
+	for npc in sim.npcs:
+		if int(npc.hp)<=0:continue
+		var d: float=point.distance_to(npc.pos-Vector2(0,25))
+		if d<distance:distance=d;nearest=int(npc.id)
+	if nearest>0:
+		sim.select(nearest)
+	else:
+		sim.course(point)
+	_refresh_ui()
+
+func _save_progress() -> void:
+	var data: Dictionary={"schema":1,"gold":sim.player.gold,"ammo":sim.player.ammo,"skin":sim.player.skin,
+		"kills":sim.kills,"claimed":sim.claimed}
+	var file =FileAccess.open(SAVE,FileAccess.WRITE)
+	if file!=null:file.store_string(JSON.stringify(data));file.close()
+
+func _load_progress() -> void:
+	if not FileAccess.file_exists(SAVE):return
+	var data: Variant=JSON.parse_string(FileAccess.get_file_as_string(SAVE))
+	if not data is Dictionary or data.get("schema")!=1:return
+	sim.player.gold=clampi(int(data.get("gold",240)),0,99999999)
+	sim.player.skin=clampi(int(data.get("skin",22)),0,skins.size()-1)
+	sim.kills=maxi(0,int(data.get("kills",0)))
+	sim.claimed=bool(data.get("claimed",false))
+	var ammo: Variant=data.get("ammo",[])
+	if ammo is Array and ammo.size()==3:
+		for i in 3:sim.player.ammo[i]=clampi(int(ammo[i]),0,999999)
+
+func _notification(what: int) -> void:
+	if what==NOTIFICATION_APPLICATION_PAUSED or what==NOTIFICATION_WM_CLOSE_REQUEST:
+		_save_progress()

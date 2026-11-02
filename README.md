@@ -1,5 +1,11 @@
 # Abyssal Dominion
 
+**Current gameplay rebuild: [M3052](rebuild/m3052/README.md).** Open `rebuild/m3052/project.godot` with Godot 4.7.2. This independent sea chart includes moving NPCs, impact-based cannon combat, collectible loot, 26 selectable test designs and a responsive shipyard/HUD. Android builds and verification use `.github/workflows/m3052.yml`; APKs are preserved under `releases/M3052/` after successful CI.
+
+The new scene is local guest gameplay. Networking and cross-device acceptance remain open. The M3051 root project below is retained as a historical working snapshot, including its separate server test.
+
+## M3051 historical snapshot
+
 Godot **4.7.2**, mobile-first naval combat prototype. Android test version **M3051 / 0.305.1-test.1**.
 
 ## Current build
@@ -44,3 +50,4 @@ This is a new independent Git snapshot of the existing local M3050 work, based o
 `assets/classic/private_seabattles/pack.json` records the selected reference assets and checksums. These are supplied APK reference graphics; public redistribution rights have not been established. This private test snapshot does not grant a license to third-party art. No raw APK source archives, credentials or signing keys are committed.
 
 The older milestone documents and build scripts are historical records. For the current build use this README, `tools/build_android.py`, `docs/m3051/BUILD_REPORT.md` and `releases/M3051/`. Historical workflows are under `docs/legacy_workflows/`; they are not active CI.
+
