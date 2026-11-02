@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "milestone": "M96",
+  "title": "World / Minimap Marker Priority",
+  "priority": {
+    "objective": 100,
+    "port": 90,
+    "monster_nest": 78,
+    "monster_warning": 76,
+    "elite": 74,
+    "admiral": 82,
+    "wreck_beacon": 58,
+    "salvage": 52,
+    "loot": 60,
+    "supply": 48,
+    "wreck": 44,
+    "shrine": 40,
+    "navigation": 34,
+    "event_boss": 96,
+    "event_portal": 84,
+    "event_wreck": 73,
+    "guild_objective": 84
+  },
+  "world": {
+    "avoid_nameplates": true,
+    "avoid_reserved_hud": true,
+    "minimum_gap_px": 4,
+    "distance_tiebreaker": "nearest_first"
+  },
+  "minimap": {
+    "priority_before_distance": true,
+    "selected_target_never_suppressed": true,
+    "combat_groups_before_semantic_poi": true
+  },
+  "rules": [
+    "objective and harbor truth outrank semantic POIs",
+    "combat targets outrank wreck/salvage markers",
+    "semantic POIs may be hidden for density without changing gameplay",
+    "marker priority is presentation-only",
+    "Halloween markers use the same density budget; event boss/portal/wreck priority is presentation-only."
+  ]
+}

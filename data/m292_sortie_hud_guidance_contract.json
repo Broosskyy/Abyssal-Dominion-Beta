@@ -1,0 +1,27 @@
+{
+  "milestone": "M292",
+  "master_concept": "V3.8",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room": "Use only broad sea-chart readability and responsiveness principles; no proprietary content or timing.",
+  "layout": {
+    "no_tracked_objective": "Reuse the existing mission panel for first-sortie next step, hint and observed progress.",
+    "tracked_objective": "Keep the player-selected quest primary; display a small sortie count only when panel width permits.",
+    "narrow_panel": "Omit secondary sortie counter. Never overlap quest title or place additional center-chart chrome.",
+    "mobile_primary_attack": "bottom_right_unchanged",
+    "camera_joystick": "bottom_left_camera_only_unchanged",
+    "movement": "water_tap_to_sail_unchanged",
+    "beacons": "one_existing_replaceable_world_beacon_maximum"
+  },
+  "evidence": {
+    "core_counts": ["local_core", "server_verified_core"],
+    "defeat_respawn": "optional_separate_native_qa",
+    "navigation_intent_proves_arrival": false,
+    "presentation_fire_proves_hit": false,
+    "repair_intent_proves_healing": false,
+    "static_tests_prove_native_playability": false,
+    "native_status": "NOT_EVALUATED",
+    "release_approved": false
+  },
+  "initial_ship_model": "ONE_COMPLETE_GLB_PER_SHIP",
+  "placeholders": "Reuse complete stable individual ship GLBs and the external M290 beacon; no new modular asset or separate replacement art per UI context."
+}

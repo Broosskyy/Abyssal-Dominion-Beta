@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "milestone": "M145",
+  "quality_targets": ["Windows", "macOS", "Linux", "Android", "iOS"],
+  "preview_target": "Web",
+  "shared_contracts": ["admin_request_envelope_v1", "content_snapshot_v1", "asset_slot_v1", "account_profile_dto_v1"],
+  "transport": {
+    "native_and_mobile": "HTTPS JSON",
+    "web_preview": "same-origin HTTPS proxy",
+    "server_authoritative_crossplay": true
+  },
+  "asset_rule": "Stable AssetSlot IDs are shared by every platform; platform variants may change meshes, textures, materials and LODs without changing content IDs.",
+  "crossplay_rule": "Clients submit intents only. Accounts, inventory, progression, rewards, combat truth and admin mutations remain server authoritative."
+}

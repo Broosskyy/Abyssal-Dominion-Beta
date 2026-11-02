@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "milestone": "M168",
+  "master_concept": "V3.8",
+  "focus": [
+    "mobile_hud",
+    "menu_interaction",
+    "runtime_ammo_resolution",
+    "crafting_station_progression",
+    "legacy_hardcode_removal",
+    "no_code_content"
+  ],
+  "crafting_station_runtime": [
+    {
+      "id": "powder_magazine",
+      "label": "Pulvermagazin",
+      "max_level": 10,
+      "base_cost": 220,
+      "cost_step": 140,
+      "required_level_by_recipe_tier": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10
+      ]
+    },
+    {
+      "id": "rune_foundry",
+      "label": "Runengießerei",
+      "max_level": 10,
+      "base_cost": 300,
+      "cost_step": 175,
+      "required_level_by_recipe_tier": [
+        1,
+        3,
+        5,
+        7,
+        9,
+        10
+      ]
+    },
+    {
+      "id": "hunter_lodge",
+      "label": "Jägerloge",
+      "max_level": 10,
+      "base_cost": 260,
+      "cost_step": 155,
+      "required_level_by_recipe_tier": [
+        1,
+        2,
+        5,
+        7,
+        9,
+        10
+      ]
+    },
+    {
+      "id": "siege_workshop",
+      "label": "Belagerungswerkstatt",
+      "max_level": 10,
+      "base_cost": 380,
+      "cost_step": 220,
+      "required_level_by_recipe_tier": [
+        1,
+        3,
+        5,
+        6,
+        8,
+        10
+      ]
+    }
+  ],
+  "menu_runtime_contracts": [
+    {
+      "id": "arsenal",
+      "checks": [
+        "deck cap from rules",
+        "cannon cap/price from rules",
+        "ammo from CombatCatalog",
+        "stock limits per item",
+        "scrollable on phone",
+        "close/back reachable"
+      ]
+    },
+    {
+      "id": "combat_picker",
+      "checks": [
+        "all runtime ammo selectable",
+        "quickslots resolve runtime ammo ids",
+        "no fixed ammo allowlist",
+        "invalid ids fallback safely"
+      ]
+    },
+    {
+      "id": "game_state",
+      "checks": [
+        "ammo restore uses runtime ammo count",
+        "loadout restore clamps to runtime catalogs"
+      ]
+    },
+    {
+      "id": "crafting",
+      "checks": [
+        "station level saved",
+        "station upgrade cost data-driven",
+        "recipe station requirement enforced when declared",
+        "success/failure refresh"
+      ]
+    }
+  ],
+  "mobile_polish": {
+    "minimum_touch_target": 52,
+    "compact_width_threshold": 390,
+    "phone_width_threshold": 700,
+    "hud_rules": [
+      "combat actions stay clear of safe area",
+      "picker rows scroll vertically",
+      "primary close/back action remains reachable",
+      "no horizontal content scrolling"
+    ],
+    "menu_rules": [
+      "one dominant action per row on compact phone",
+      "long labels wrap or clip safely",
+      "state changes refresh immediately",
+      "disabled state explains requirements where possible"
+    ]
+  },
+  "no_code_guards": {
+    "editable_without_client_code": [
+      "ammo rows using existing effect primitives",
+      "cannon rows using existing weapon primitives",
+      "crafting station costs/levels",
+      "recipe station requirements",
+      "shop/loot/quest/event bindings",
+      "labels/icons/vfx/tooltips",
+      "mobile profile values"
+    ],
+    "code_review_required": [
+      "new behavior primitive",
+      "new network protocol",
+      "new payment provider adapter",
+      "new authority boundary",
+      "new rendering primitive"
+    ]
+  }
+}

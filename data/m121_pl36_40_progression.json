@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "region": {
+    "id": "void_sea",
+    "display_name": "The Void Sea",
+    "levels": [
+      36,
+      40
+    ],
+    "primary_harbor": "Last Light"
+  },
+  "levels": {
+    "36": {
+      "level": 36,
+      "name": "Void Threshold",
+      "map_xp_goal": 1500,
+      "region_objectives": 4,
+      "hunter_required": 0,
+      "requires_trial": false,
+      "focus": "Void Fleet entry",
+      "mastery_xp": {
+        "normal": 55,
+        "elite": 90,
+        "boss": 180
+      }
+    },
+    "37": {
+      "level": 37,
+      "name": "Blackglass Current",
+      "map_xp_goal": 1760,
+      "region_objectives": 5,
+      "hunter_required": 1,
+      "requires_trial": false,
+      "focus": "Elite chain",
+      "mastery_xp": {
+        "normal": 60,
+        "elite": 98,
+        "boss": 195
+      }
+    },
+    "38": {
+      "level": 38,
+      "name": "Hollow Stars",
+      "map_xp_goal": 2020,
+      "region_objectives": 6,
+      "hunter_required": 1,
+      "requires_trial": false,
+      "focus": "Legendary fragments",
+      "mastery_xp": {
+        "normal": 65,
+        "elite": 106,
+        "boss": 210
+      }
+    },
+    "39": {
+      "level": 39,
+      "name": "Admiral's Eclipse",
+      "map_xp_goal": 2280,
+      "region_objectives": 7,
+      "hunter_required": 1,
+      "requires_trial": false,
+      "focus": "Void Admiral / monster phases",
+      "mastery_xp": {
+        "normal": 70,
+        "elite": 114,
+        "boss": 225
+      }
+    },
+    "40": {
+      "level": 40,
+      "name": "Last Light Trial",
+      "map_xp_goal": 2540,
+      "region_objectives": 8,
+      "hunter_required": 1,
+      "requires_trial": true,
+      "focus": "Void-Sea High Risk trial",
+      "mastery_xp": {
+        "normal": 75,
+        "elite": 122,
+        "boss": 240
+      }
+    }
+  },
+  "trial40": {
+    "name": "Void-Sea High Risk",
+    "requirements": [
+      "map_xp",
+      "regional_objectives",
+      "void_elite_chain",
+      "void_admiral",
+      "void_hunter"
+    ],
+    "xp_alone_never_unlocks": true
+  }
+}

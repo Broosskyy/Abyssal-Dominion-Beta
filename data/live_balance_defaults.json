@@ -1,0 +1,360 @@
+{
+  "schema_version": 1,
+  "config_version": "m125-local-defaults",
+  "status": "LOCAL_FALLBACK_NOT_SERVER_AUTHORITY",
+  "economy": {
+    "currency": {
+      "soft": "gold",
+      "premium": "pearls_placeholder"
+    },
+    "repair": {
+      "base_fee": 8,
+      "gold_per_100_hull": 4
+    },
+    "harbor_bundle_price": 120,
+    "shop_offers": {
+      "harpoon": {
+        "amount": 30,
+        "price": 35
+      },
+      "iron": {
+        "amount": 60,
+        "price": 30
+      },
+      "explosive": {
+        "amount": 30,
+        "price": 60
+      },
+      "chain": {
+        "amount": 30,
+        "price": 45
+      },
+      "piercing": {
+        "amount": 20,
+        "price": 55
+      },
+      "ember": {
+        "amount": 20,
+        "price": 65
+      },
+      "venom": {
+        "amount": 20,
+        "price": 65
+      },
+      "shatter": {
+        "amount": 15,
+        "price": 70
+      },
+      "spectral": {
+        "amount": 10,
+        "price": 90
+      },
+      "repair": {
+        "amount": 1,
+        "price": 40
+      },
+      "boost": {
+        "amount": 1,
+        "price": 35
+      },
+      "veil": {
+        "amount": 1,
+        "price": 85
+      },
+      "storm_bolt": {
+        "amount": 1,
+        "price": 70
+      },
+      "infernal_barrel": {
+        "amount": 1,
+        "price": 80
+      },
+      "crystal_barrier": {
+        "amount": 1,
+        "price": 85
+      },
+      "armor_corrosive": {
+        "amount": 1,
+        "price": 75
+      },
+      "repair_blocker": {
+        "amount": 1,
+        "price": 90
+      },
+      "leviathan_hook": {
+        "amount": 1,
+        "price": 75
+      },
+      "recall_compass": {
+        "amount": 1,
+        "price": 110
+      },
+      "powder": {
+        "amount": 6,
+        "price": 45
+      },
+      "plates": {
+        "amount": 6,
+        "price": 50
+      }
+    }
+  },
+  "ships": {
+    "clipper": {
+      "price": 0,
+      "hull": 1000.0,
+      "armor": 0.08,
+      "speed": 6.5,
+      "acceleration": 3.2,
+      "turn_speed": 56.0,
+      "damage": 72.0
+    },
+    "barco_low": {
+      "price": 600,
+      "hull": 720.0,
+      "armor": 0.04,
+      "speed": 8.2,
+      "acceleration": 4.4,
+      "turn_speed": 74.0,
+      "damage": 61.0
+    },
+    "chalupa": {
+      "price": 1200,
+      "hull": 1350.0,
+      "armor": 0.16,
+      "speed": 5.4,
+      "acceleration": 2.6,
+      "turn_speed": 44.0,
+      "damage": 84.0
+    },
+    "main_progression_scaling": {
+      "hull_per_tier": 0.035,
+      "damage_per_tier": 0.03,
+      "speed_per_tier": 0.01,
+      "mastery_stat_per_level": 0.02
+    }
+  },
+  "combat": {
+    "cannons": [
+      {
+        "name": "Light Culverin",
+        "damage": 0.78,
+        "reload": 0.72,
+        "speed": 1.18,
+        "range": 0.92,
+        "role": "rapid"
+      },
+      {
+        "name": "Naval Cannon",
+        "damage": 1.0,
+        "reload": 1.0,
+        "speed": 1.0,
+        "range": 1.0,
+        "role": "balanced"
+      },
+      {
+        "name": "Heavy Bombard",
+        "damage": 1.48,
+        "reload": 1.48,
+        "speed": 0.84,
+        "range": 1.12,
+        "role": "siege"
+      }
+    ],
+    "ammo": [
+      {
+        "id": "iron",
+        "name": "Iron Shot",
+        "damage": 1.0,
+        "armor_pierce": 0.1,
+        "slow": 0.0,
+        "range": 1.0,
+        "crit": 0.08,
+        "color": "ff9c45",
+        "role": "baseline",
+        "effect": "none",
+        "effect_power": 0.0,
+        "effect_duration": 0.0
+      },
+      {
+        "id": "explosive",
+        "name": "Blast Shot",
+        "damage": 1.22,
+        "armor_pierce": 0.02,
+        "slow": 0.0,
+        "range": 0.92,
+        "crit": 0.12,
+        "color": "ff512f",
+        "role": "burst",
+        "effect": "none",
+        "effect_power": 0.0,
+        "effect_duration": 0.0
+      },
+      {
+        "id": "chain",
+        "name": "Chain Shot",
+        "damage": 0.66,
+        "armor_pierce": 0.0,
+        "slow": 0.32,
+        "range": 0.86,
+        "crit": 0.05,
+        "color": "d4efff",
+        "role": "control",
+        "effect": "none",
+        "effect_power": 0.0,
+        "effect_duration": 0.0
+      },
+      {
+        "id": "piercing",
+        "name": "Piercing Shot",
+        "damage": 0.92,
+        "armor_pierce": 0.42,
+        "slow": 0.0,
+        "range": 1.02,
+        "crit": 0.07,
+        "color": "f2e6b1",
+        "role": "anti_armor",
+        "effect": "none",
+        "effect_power": 0.0,
+        "effect_duration": 0.0
+      },
+      {
+        "id": "ember",
+        "name": "Ember Shot",
+        "damage": 0.88,
+        "armor_pierce": 0.04,
+        "slow": 0.0,
+        "range": 0.94,
+        "crit": 0.06,
+        "color": "ff7b24",
+        "role": "fire_dot",
+        "effect": "burn",
+        "effect_power": 12.0,
+        "effect_duration": 4.0
+      },
+      {
+        "id": "venom",
+        "name": "Venom Shot",
+        "damage": 0.78,
+        "armor_pierce": 0.08,
+        "slow": 0.0,
+        "range": 0.96,
+        "crit": 0.05,
+        "color": "72d66b",
+        "role": "poison_dot",
+        "effect": "venom",
+        "effect_power": 8.0,
+        "effect_duration": 6.0
+      },
+      {
+        "id": "shatter",
+        "name": "Shatter Shot",
+        "damage": 0.82,
+        "armor_pierce": 0.16,
+        "slow": 0.0,
+        "range": 0.93,
+        "crit": 0.06,
+        "color": "b7d7ff",
+        "role": "armor_break",
+        "effect": "armor_break",
+        "effect_power": 0.18,
+        "effect_duration": 5.0
+      },
+      {
+        "id": "spectral",
+        "name": "Spectral Shot",
+        "damage": 1.08,
+        "armor_pierce": 0.2,
+        "slow": 0.0,
+        "range": 1.04,
+        "crit": 0.1,
+        "color": "b985ff",
+        "role": "rare_tactical",
+        "effect": "spectral_mark",
+        "effect_power": 0.1,
+        "effect_duration": 5.0
+      },
+      {
+        "id": "gravefire",
+        "name": "Gravefire Shot",
+        "damage": 0.96,
+        "armor_pierce": 0.1,
+        "slow": 0.0,
+        "range": 0.96,
+        "crit": 0.08,
+        "color": "8fd15a",
+        "role": "halloween_burn",
+        "effect": "burn",
+        "effect_power": 10.0,
+        "effect_duration": 5.0
+      },
+      {
+        "id": "pumpkin",
+        "name": "Pumpkin Round",
+        "damage": 1.0,
+        "armor_pierce": 0.1,
+        "slow": 0.0,
+        "range": 1.0,
+        "crit": 0.08,
+        "color": "e58c35",
+        "role": "halloween_event",
+        "effect": "none",
+        "effect_power": 0.0,
+        "effect_duration": 0.0
+      }
+    ]
+  },
+  "npc": {
+    "source": "res://data/encounters.json",
+    "admin_editable_paths": [
+      "archetypes.*.hull",
+      "archetypes.*.damage",
+      "archetypes.*.range",
+      "archetypes.*.reload",
+      "archetypes.*.xp",
+      "archetypes.*.coins",
+      "scaling.*",
+      "elite.*",
+      "admiral.*",
+      "loot_tiers.*"
+    ]
+  },
+  "progression": {
+    "source_overrides": [
+      "m124_pl46_50_progression.json",
+      "pl6_10",
+      "pl11_15",
+      "pl16_20",
+      "pl21_25",
+      "pl26_30",
+      "pl31_35",
+      "pl36_40",
+      "pl41_45"
+    ],
+    "admin_editable": [
+      "map_xp",
+      "objectives",
+      "trials",
+      "rewards",
+      "drop_rates",
+      "mastery_xp"
+    ]
+  },
+  "monetization": {
+    "enabled": false,
+    "real_money_catalog": [],
+    "payment_provider": "UNCONFIGURED",
+    "premium_currency_grants": "SERVER_ONLY",
+    "entitlements": "SERVER_ONLY",
+    "receipt_validation": "SERVER_ONLY"
+  },
+  "liveops": {
+    "events": {},
+    "multipliers": {
+      "xp": 1.0,
+      "gold": 1.0,
+      "loot": 1.0
+    },
+    "maintenance": false
+  }
+}

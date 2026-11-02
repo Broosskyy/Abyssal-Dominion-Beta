@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "milestone": "M200",
+  "status": "GAMEPLAY_VISUAL_COMPOSITION_STATIC_VERIFIED",
+  "master_basis": "V3.8 + visual master references + explicit lower HUD bar exception",
+  "locks": {
+    "cross_platform_gameplay_visual_parity": true,
+    "same_world_and_gameplay_vfx_across_mobile_web_desktop": true,
+    "responsive_only": [
+      "hud_scale",
+      "font_scale",
+      "touch_targets",
+      "spacing",
+      "safe_areas"
+    ],
+    "forbidden": [
+      "permanent_bottom_menu_bar",
+      "center_bottom_primary_attack",
+      "platform_specific_world_content"
+    ]
+  },
+  "visual_pass": {
+    "loot": [
+      "larger pickup halo",
+      "visual-only water beacon for sea-chart readability"
+    ],
+    "projectiles": [
+      "stronger cannonball silhouette",
+      "longer/brighter trail",
+      "ammo profiles retained"
+    ],
+    "impacts": [
+      "larger core",
+      "visual-only impact ring",
+      "smoke/sparks retained"
+    ],
+    "islands": [
+      "large procedural islands gain visual-only coastal navigation anchor",
+      "collision unchanged"
+    ],
+    "ships": [
+      "existing silhouette profiles and wake retained",
+      "collision scale unchanged"
+    ]
+  },
+  "gameplay_unchanged": [
+    "damage",
+    "range",
+    "reload",
+    "loot rewards",
+    "pickup radius",
+    "island collision",
+    "tap-to-sail",
+    "actor overlap"
+  ],
+  "native_runtime_visual_qa_pending": true
+}

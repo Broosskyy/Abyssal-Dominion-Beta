@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource path="res://scripts/visual/production_qa_scene.gd" type="Script" id="1"]
+
+[node name="lod_performance_test" type="Node3D"]
+script = ExtResource("1")
+mode = "lod_performance"
+metadata/purpose = "LOD/performance budgets"
+metadata/milestone = "M47"

@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "milestone": "M44",
+  "quickbar": {
+    "slots": 4,
+    "per_ship_persistent": true,
+    "assign_from_combat_detail": true,
+    "supported_binding_kinds": [
+      "ammo",
+      "item",
+      "supply",
+      "mode"
+    ],
+    "default": [
+      {
+        "id": "iron",
+        "kind": "ammo"
+      },
+      {
+        "id": "repair",
+        "kind": "item"
+      },
+      {
+        "id": "boost",
+        "kind": "item"
+      },
+      {
+        "id": "veil",
+        "kind": "item"
+      }
+    ],
+    "mobile_rule": "few_prioritized_touch_slots_not_mmo_hotbar",
+    "minimum_target_scaled_from_layout": true
+  },
+  "status_readability": {
+    "player_status_chips": true,
+    "target_status_summary": true,
+    "tracked": [
+      "burn",
+      "venom",
+      "armor_break",
+      "spectral_mark",
+      "repair_block",
+      "veil",
+      "barrier"
+    ]
+  },
+  "authority": "local_prototype_state_only"
+}

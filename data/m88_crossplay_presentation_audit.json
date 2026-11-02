@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "milestone": "M88",
+  "status": "PRESENTATION_READY_NATIVE_PENDING",
+  "same_gameplay_intents": [
+    "sail",
+    "target",
+    "fire",
+    "repair",
+    "boost",
+    "ammo",
+    "items"
+  ],
+  "device_specific": [
+    "touch hit areas",
+    "safe/gesture inset",
+    "keyboard hints",
+    "gamepad hints",
+    "HUD density"
+  ],
+  "forbidden": [
+    "device-specific damage",
+    "device-specific movement speed",
+    "device-specific reward rate",
+    "fake online authority"
+  ],
+  "multiplayer_boundary": "No backend/server authority is claimed in M88."
+}

@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "milestone": "M76",
+  "title": "First Session Closure QA",
+  "sequence": [
+    {
+      "id": "spawn",
+      "expect": "small starter in PL1 / Haven's Reach sector"
+    },
+    {
+      "id": "sail",
+      "expect": "tap/drag sail remains direct; camera wheel does not steer ship"
+    },
+    {
+      "id": "target",
+      "expect": "neutral NPC visibly neutral before provocation"
+    },
+    {
+      "id": "fight",
+      "expect": "player attack can provoke neutral NPC; no auto-chase"
+    },
+    {
+      "id": "salvage",
+      "expect": "loot counts only through existing VoyageProgress record path"
+    },
+    {
+      "id": "return",
+      "expect": "single contextual harbor guide cue; no auto-navigation"
+    },
+    {
+      "id": "dock",
+      "expect": "existing PortInteraction records dock once per visit and opens services"
+    },
+    {
+      "id": "claim",
+      "expect": "existing trial claim rules/rewards unchanged"
+    }
+  ],
+  "mobile": [
+    "objective strip uses reserved layout rect",
+    "guide cue clamped to safe area",
+    "combat HUD outranks guide/POI markers"
+  ],
+  "native_required": true
+}

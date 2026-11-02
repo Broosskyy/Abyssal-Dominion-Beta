@@ -1,0 +1,14 @@
+{
+  "name": "abyssal-dominion-preview",
+  "version": "0.295.0",
+  "private": true,
+  "description": "Abyssal Dominion Godot/GDScript local preview launcher",
+  "scripts": {
+    "start": "node tools/launch_preview.cjs",
+    "preview": "node tools/launch_preview.cjs",
+    "preview:lan": "node tools/launch_preview.cjs --lan",
+    "preview:watch": "node tools/launch_preview.cjs --watch",
+    "build:web": "node tools/launch_preview.cjs --build-only --rebuild",
+    "doctor": "node tools/launch_preview.cjs --doctor"
+  }
+}

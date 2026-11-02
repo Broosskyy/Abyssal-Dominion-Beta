@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "milestone": "M111",
+  "fixed": [
+    "PL15 trial previously did not advance advanced_map_level; now advances to 16",
+    "post-beginner state supports levels 6-20",
+    "boss progression cap extended to 20 while PL20 remains trial-gated"
+  ],
+  "known_limits": [
+    "physical runtime world sector grid is still 4x4 and ends at PL15",
+    "PL16-20 maps are registered contracts, not yet physical sea-map sectors",
+    "PL20 trial completion does not fake PL21 world access",
+    "native Godot parser/runtime/device QA unavailable"
+  ],
+  "v3_7_found": false
+}

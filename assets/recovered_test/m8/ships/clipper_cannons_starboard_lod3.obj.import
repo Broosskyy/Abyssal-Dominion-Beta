@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cb2m3totqhup"
+path="res://.godot/imported/clipper_cannons_starboard_lod3.obj-46b39101bdb8b05af363593b5452c26d.mesh"
+
+[deps]
+
+files=["res://.godot/imported/clipper_cannons_starboard_lod3.obj-46b39101bdb8b05af363593b5452c26d.mesh"]
+
+source_file="res://assets/recovered_test/m8/ships/clipper_cannons_starboard_lod3.obj"
+dest_files=["res://.godot/imported/clipper_cannons_starboard_lod3.obj-46b39101bdb8b05af363593b5452c26d.mesh", "res://.godot/imported/clipper_cannons_starboard_lod3.obj-46b39101bdb8b05af363593b5452c26d.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

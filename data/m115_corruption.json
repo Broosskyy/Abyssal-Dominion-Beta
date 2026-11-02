@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "milestone": "M115",
+  "unlock_level": 26,
+  "signature_system": true,
+  "opt_in": true,
+  "bands": [
+    {
+      "min": 0,
+      "max": 25,
+      "damage_taken_mult": 1.0,
+      "reward_mult": 1.0
+    },
+    {
+      "min": 25,
+      "max": 50,
+      "damage_taken_mult": 1.03,
+      "reward_mult": 1.05
+    },
+    {
+      "min": 50,
+      "max": 75,
+      "damage_taken_mult": 1.07,
+      "reward_mult": 1.12
+    },
+    {
+      "min": 75,
+      "max": 100,
+      "damage_taken_mult": 1.12,
+      "reward_mult": 1.22
+    }
+  ],
+  "gain": {
+    "normal_sink": 1.0,
+    "elite_sink": 2.0,
+    "admiral_sink": 5.0,
+    "abyss_monster": 4.0
+  },
+  "cleanse": {
+    "harbor_only": true,
+    "amount": "all",
+    "gold_cost": 0
+  },
+  "rule": "player can cleanse or deliberately retain; never hidden mandatory debuff",
+  "authority": "local prototype; server validation later"
+}

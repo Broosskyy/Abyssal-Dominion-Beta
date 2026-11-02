@@ -1,0 +1,40 @@
+{
+  "id": "legendary",
+  "display_name": "Legendary Chart",
+  "min_pirate_level": 36,
+  "acquisition": [
+    "high_admirals",
+    "meta_objectives",
+    "rare_fragments"
+  ],
+  "entry_fragments": 16,
+  "waves": [
+    {
+      "wave": 1,
+      "kind": "void_fleet",
+      "kills": 4
+    },
+    {
+      "wave": 2,
+      "kind": "elite_chain",
+      "kills": 4
+    },
+    {
+      "wave": 3,
+      "kind": "void_monster",
+      "kills": 1
+    },
+    {
+      "wave": 4,
+      "kind": "void_admiral",
+      "kills": 1
+    }
+  ],
+  "completion": {
+    "legendary_fragments": 2,
+    "high_end_progress": 1
+  },
+  "trial_bypass": false,
+  "instance_contract": "BonusMapInstanceRouter",
+  "prototype_balance": true
+}

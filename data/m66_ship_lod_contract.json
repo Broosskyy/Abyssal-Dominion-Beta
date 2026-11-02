@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "milestone": "M66",
+  "title": "Ship LOD / Visibility / Shadow Contract",
+  "tiers": {
+    "low": {
+      "mesh_lod_threshold": 3.0,
+      "npc_shadow_distance": 34,
+      "minor_vfx_distance": 42,
+      "nameplate_distance": 55
+    },
+    "balanced": {
+      "mesh_lod_threshold": 2.0,
+      "npc_shadow_distance": 48,
+      "minor_vfx_distance": 58,
+      "nameplate_distance": 68
+    },
+    "high": {
+      "mesh_lod_threshold": 1.0,
+      "npc_shadow_distance": 64,
+      "minor_vfx_distance": 76,
+      "nameplate_distance": 82
+    }
+  },
+  "rules": [
+    "prefer automatic imported mesh LOD for final GLBs",
+    "use visibility ranges for distant labels, particles and optional manual HLOD",
+    "avoid alpha-fade LOD on low-end mobile where hysteresis is sufficient",
+    "simplify distant materials before adding extra unique materials",
+    "ship gameplay/collision remains active independently of visual LOD"
+  ]
+}

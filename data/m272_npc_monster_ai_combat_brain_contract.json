@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "milestone": "M272",
+  "master_concept": "V3.8",
+  "contract": "authoritative_npc_monster_ai_combat_brain_threat_resolution_foundation",
+  "genre_ux_references": [
+    "Seafight",
+    "Battle of Sea"
+  ],
+  "clean_room_rule": "Use readable naval-MMO encounter cadence, target telegraphs and enemy-role clarity only; do not copy proprietary AI rules, assets, layouts, names, values or content.",
+  "authority": {
+    "client_may": [
+      "render_confirmed_ai_state",
+      "render_target_and_threat_hints",
+      "interpolate_server_confirmed_navigation",
+      "render_attack_and_phase_telegraphs"
+    ],
+    "server_owns": [
+      "ai_state_transitions",
+      "threat_resolution",
+      "ai_target_choice",
+      "patrol_and_pursuit_decisions",
+      "attack_and_reposition_decisions",
+      "leash_and_return",
+      "boss_phase_decisions",
+      "ai_decision_revision"
+    ],
+    "client_never_commits": [
+      "aggro",
+      "threat",
+      "ai_target",
+      "ai_state",
+      "path_legality",
+      "attack_authorization",
+      "leash_override",
+      "boss_phase"
+    ]
+  },
+  "archetypes": [
+    "NPC",
+    "MONSTER",
+    "ADMIRAL",
+    "BOSS"
+  ],
+  "brain_states": [
+    "IDLE",
+    "PATROL",
+    "ACQUIRE",
+    "PURSUE",
+    "ATTACK",
+    "REPOSITION",
+    "EVADE",
+    "LEASH",
+    "RETURN",
+    "DISABLED",
+    "DEFEATED"
+  ],
+  "decision_families": [
+    "HOLD",
+    "PATROL",
+    "ACQUIRE_TARGET",
+    "PURSUE_TARGET",
+    "ATTACK_TARGET",
+    "REPOSITION",
+    "EVADE",
+    "BREAK_TARGET",
+    "LEASH_RETURN",
+    "RETURN_HOME",
+    "ENTER_PHASE",
+    "DISABLE",
+    "DEFEATED"
+  ],
+  "dependencies": {
+    "target_legality": "M271 provides relationship/target legality before M272 commits hostile target intent",
+    "movement": "M268 validates authoritative AI movement/path results",
+    "combat_resolution": "M269 resolves legal AI fire/attack intents",
+    "combat_state": "M270 owns temporal reload/status/projectile state after AI combat outcomes",
+    "world_transport": "M267 replicates confirmed AI/world state",
+    "rewards": "M266 remains durable settlement boundary for resulting loot/rewards"
+  },
+  "environment_isolation": [
+    "INTERNAL",
+    "TEST",
+    "GLOBAL"
+  ],
+  "unset_until_measured": [
+    "aggro_radius",
+    "threat_weights",
+    "threat_decay",
+    "target_switch_hysteresis",
+    "patrol_waits",
+    "pursuit_repath_interval",
+    "attack_standoff_distance",
+    "reposition_bias",
+    "leash_distance",
+    "return_tolerance",
+    "boss_phase_thresholds",
+    "decision_tick_rate"
+  ]
+}

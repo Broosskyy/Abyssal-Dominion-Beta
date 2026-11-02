@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "milestone": "M269",
+  "master_concept": "V3.8",
+  "contract": "authoritative_combat_resolution_fire_command_pipeline",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "Use genre conventions and readability goals only; do not copy proprietary assets, layouts, values, names or content.",
+  "input_model": "target_selection_plus_fire_client_intent",
+  "authority": {
+    "client_may": ["select_target_for_preview", "cycle_targets", "request_fire", "show_unconfirmed_muzzle_feedback", "render_server_combat_outcome"],
+    "server_owns": ["target_legality", "range_legality", "line_of_fire_legality", "reload_cooldown", "weapon_legality", "ammo_legality", "ammo_consumption", "hit_miss_block_crit", "damage", "healing", "death", "combat_revision", "fire_command_ack", "combat_reward_settlement_link"],
+    "client_never_commits": ["confirmed_hit", "damage", "healing", "ammo_consumption", "cooldown_completion", "death", "kill_credit", "combat_reward", "combat_revision"]
+  },
+  "weapon_families": ["CANNON", "HARPOON", "SUPPORT", "SPECIAL"],
+  "ordering": ["fire_sequence", "combat_revision", "server_tick", "attacker_spawn_generation", "target_spawn_generation"],
+  "resolution_pipeline": ["validate_session_and_environment", "validate_attacker_and_target_generation", "validate_target_and_relationship", "validate_weapon_and_ammo_ownership", "validate_range_and_line_of_fire", "validate_reload_cooldown_and_status", "resolve_hit_block_crit_or_heal", "apply_authoritative_combat_state", "consume_or_reserve_ammo_atomically_when_required", "publish_combat_delta", "link_kill_reward_to_atomic_settlement"],
+  "dependencies": {
+    "world_transport": "M267 authoritative baseline/delta replica",
+    "movement": "M268 authoritative movement state",
+    "economy_inventory": "M266 atomic transaction layer for ammo/value/reward settlement"
+  },
+  "environment_isolation": ["INTERNAL", "TEST", "GLOBAL"],
+  "unset_until_measured": ["combat_tick_rate", "fire_queue_window", "range_tolerance", "line_of_fire_tolerance", "reload_grace", "latency_compensation_window", "projectile_resolution_budget", "anti_spam_rate_limit"]
+}

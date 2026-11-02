@@ -1,0 +1,26 @@
+{
+  "milestone": "M290",
+  "status": "RUNTIME_BOUND_REPLACEABLE_PLACEHOLDERS",
+  "stable_model_slots": [
+    {"id":"ship_small", "role":"STARTER_SMALL", "path":"res://assets/production_placeholders/p0/ship_small.glb", "model_strategy":"ONE_COMPLETE_GLB", "final_required":true},
+    {"id":"ship_medium", "role":"STARTER_MEDIUM", "path":"res://assets/production_placeholders/p0/ship_medium.glb", "model_strategy":"ONE_COMPLETE_GLB", "final_required":true},
+    {"id":"ship_large", "role":"STARTER_LARGE", "path":"res://assets/production_placeholders/p0/ship_large.glb", "model_strategy":"ONE_COMPLETE_GLB", "final_required":true},
+    {"id":"npc_scout_01", "role":"NPC_SCOUT", "path":"res://assets/production_placeholders/m297/npc_scout_01.glb", "model_strategy":"ONE_COMPLETE_GLB", "final_required":true},
+    {"id":"npc_raider_01", "role":"NPC_RAIDER", "path":"res://assets/production_placeholders/m295/npc_raider_01.glb", "model_strategy":"ONE_COMPLETE_GLB", "final_required":true},
+    {"id":"npc_heavy_01", "role":"NPC_HEAVY", "path":"res://assets/production_placeholders/m297/npc_heavy_01.glb", "model_strategy":"ONE_COMPLETE_GLB", "final_required":true},
+    {"id":"monster_early_01", "role":"EARLY_MONSTER", "path":"res://assets/production_placeholders/p0/monster_early_01.glb", "model_strategy":"ONE_COMPLETE_GLB", "final_required":true},
+    {"id":"harbor_havens_reach", "role":"HOME_HARBOR", "path":"res://assets/production_placeholders/p0/harbor_havens_reach.glb", "model_strategy":"ONE_COMPLETE_GLB", "final_required":true}
+  ],
+  "procedural_presentation_placeholders": [
+    {"id":"m290_route_ring", "consumer":"M290FirstSortieVisualRig", "replaceable":true},
+    {"id":"m290_guidance_mast", "consumer":"M290FirstSortieVisualRig", "replaceable":true},
+    {"id":"m290_objective_beacon", "consumer":"M290FirstSortieVisualRig", "replaceable":true}
+  ],
+  "rules": {
+    "ship_parts_are_not_runtime_modules": true,
+    "guidance_markers_never_enter_ship_glb": true,
+    "wake_water_smoke_fire_damage_and_targeting_remain_external": true,
+    "placeholder_assets_are_not_final_art": true,
+    "stable_slot_replacement_requires_no_gameplay_rewrite": true
+  }
+}

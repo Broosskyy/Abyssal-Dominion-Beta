@@ -1,0 +1,57 @@
+{
+  "milestone": "M286",
+  "contract": "single_model_ship_damage_overlay_staged_sinking_wreck_presentation",
+  "master_concept": "V3.8",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "Genre, naval readability and satisfying escalation reference only; no proprietary assets, sounds, effects, formulas, layouts or timings.",
+  "ship_model_strategy": {
+    "initial_production": "ONE_COMPLETE_3D_MODEL_PER_SHIP",
+    "full_model_contains": ["hull", "bow", "stern", "deck", "masts", "sails", "design_parts"],
+    "modular_ship_system_required": false,
+    "modular_ship_system_deferred": true,
+    "damage_layers": "socketed VFX/material/animation overlays only",
+    "overlay_never_hides_detaches_or_replaces_model_parts": true
+  },
+  "dependencies": {
+    "combat_outcome": "M269",
+    "combat_state": "M270",
+    "world_replica": "M267",
+    "confirmed_feedback": "M282",
+    "ship_damage_defeat": "M285"
+  },
+  "segments": ["BOW", "PORT_HULL", "STARBOARD_HULL", "DECK", "MAST", "SAILS", "STERN"],
+  "segment_states": ["INTACT", "DAMAGED", "BREACHED", "DESTROYED"],
+  "defeat_phases": ["NONE", "STAGGER", "FLOODING", "BREAKUP", "SUBMERGED", "CLEANUP_PENDING"],
+  "transition_events": ["DECK_BREACH", "MAST_BREAK", "SAIL_TEAR", "BOW_BREACH", "STERN_BREAK", "FLOODING_START", "BREAKUP_START", "SUBMERGED", "WRECK_REVEAL", "VISUAL_CLEANUP_CONFIRMED"],
+  "sinking_profiles": ["BOW_FIRST", "STERN_FIRST", "BROADSIDE_ROLL", "HEAVY_SETTLE", "ABYSSAL_DISSOLVE"],
+  "authority": {
+    "server_owns": ["segment_state", "equipment_function", "mobility", "defeat_sequence", "sinking_profile", "phase_order", "despawn", "wreck_world_entity", "loot", "rewards", "presentation_seed"],
+    "client_may": ["render confirmed segment state", "interpolate confirmed defeat phase", "reduce secondary VFX locally", "swap placeholder payload through stable slots"],
+    "client_never": ["derive segment state from decals", "break mast or sails", "modify ship transform from sinking visuals", "advance defeat phase", "spawn wreck world entity", "despawn entity", "grant loot or reward"]
+  },
+  "replication": {
+    "idempotent_event_ids": true,
+    "monotonic_revisions": true,
+    "monotonic_event_sequence": true,
+    "server_tick_guard": true,
+    "deterministic_presentation_seed": true,
+    "defeat_events_require_m285_confirmation": true,
+    "resync_invalidates_transient_state": true,
+    "cleanup_requires_confirmation": true
+  },
+  "visual_rules": {
+    "sea_chart_first": true,
+    "mid_zoom_master": true,
+    "angled_top_down": true,
+    "silhouette_before_micro_detail": true,
+    "ship_glb_is_one_complete_model": true,
+    "ship_glb_unchanged": true,
+    "no_modular_mesh_dependency": true,
+    "runtime_vfx_separate": true,
+    "controls_unobstructed": true,
+    "mobile_desktop_gameplay_parity": true,
+    "mobile_may_reduce_secondary_vfx": true,
+    "no_new_main_menu": true
+  },
+  "unset_until_native_qa": ["segment_transition_duration", "mast_break_angle", "sail_flutter_rate", "flooding_ring_size", "bubble_density", "sinking_curve", "roll_angle", "breakup_offset", "wreck_visibility_duration", "debris_count", "smoke_density", "audio_mix", "screen_shake", "haptics"]
+}

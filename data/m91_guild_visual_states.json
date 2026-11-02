@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "milestone": "M91",
+  "relation_styles": {
+    "neutral_preview": "gold",
+    "owned": "teal",
+    "ally": "green",
+    "enemy": "orange_red",
+    "war": "red"
+  },
+  "tower_selection": {
+    "range_ring": "presentation_only",
+    "focus": "presentation_only",
+    "live_targeting": false
+  },
+  "facility_states": {
+    "tiers": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "damage": [
+      "intact",
+      "worn",
+      "damaged",
+      "critical"
+    ],
+    "authoritative": false
+  },
+  "siege_loss_rule": "Never delete the guild or permanently destroy years of facilities.",
+  "mobile": {
+    "compact_height_threshold": 620,
+    "narrow_width_threshold": 900,
+    "touch_rows_min_intent": "large"
+  },
+  "desktop_gamepad": {
+    "focus_actions": [
+      "ship_previous",
+      "ship_next"
+    ],
+    "shared_contract": true
+  },
+  "backend_required": [
+    "ownership",
+    "relation",
+    "upgrade tier",
+    "damage state",
+    "tower target",
+    "tower damage",
+    "siege state"
+  ]
+}

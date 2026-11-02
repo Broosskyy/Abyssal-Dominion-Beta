@@ -1,0 +1,27 @@
+{
+  "milestone": "M192",
+  "title": "Chart Navigation, Unit Overlap & World Scale",
+  "map_contract": {
+    "visible_number_grid_forbidden": true,
+    "stable_internal_sector_ids_preserved": true,
+    "visible_hierarchy": "Pirate level -> region -> named chart",
+    "sector_size_world_units": 360.0,
+    "player_coordinates": "positive X/Y chart coordinates"
+  },
+  "movement_contract": {
+    "islands_block": true,
+    "land_auto_detour": true,
+    "detour_does_not_issue_stop_or_slow": true,
+    "ships_overlap": true,
+    "npcs_overlap": true,
+    "monsters_overlap": true,
+    "bosses_overlap": true,
+    "loot_nonblocking": true
+  },
+  "locks": {
+    "tap_to_sail_preserved": true,
+    "camera_joystick_camera_only": true,
+    "combat_targeting_independent_of_movement_collision": true,
+    "no_1_1_2_1_visible_map_naming": true
+  }
+}

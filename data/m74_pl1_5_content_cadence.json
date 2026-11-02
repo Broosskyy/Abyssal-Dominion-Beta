@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "milestone": "M74",
+  "title": "PL1-5 Content Cadence & Learning Order",
+  "source_alignment": [
+    "PL1-5 is the beginner vertical slice.",
+    "Three starter ships are earned during the first five levels.",
+    "Low-level NPCs are neutral until attacked.",
+    "Haven's Reach, quests, harbor/repair/arsenal, basic loot, hull/shield, an early monster and elite/admiral encounters belong to the slice."
+  ],
+  "levels": {
+    "1": {
+      "focus": [
+        "movement",
+        "targeting",
+        "first combat",
+        "salvage",
+        "harbor return"
+      ],
+      "presentation": [
+        "neutral NPC label",
+        "Tap-to-Sail objective",
+        "salvage highlight",
+        "Haven's Reach return"
+      ]
+    },
+    "2": {
+      "focus": [
+        "navigation repetition",
+        "ammo awareness",
+        "starter progression"
+      ],
+      "presentation": [
+        "route POIs",
+        "objective strip",
+        "ammo reminder without forced modal"
+      ]
+    },
+    "3": {
+      "focus": [
+        "first monster",
+        "repair/shield awareness",
+        "larger starter readability"
+      ],
+      "presentation": [
+        "monster encounter banner",
+        "monster target identity",
+        "repair/shield feedback"
+      ]
+    },
+    "4": {
+      "focus": [
+        "combat+loot cadence",
+        "elite/admiral preparation"
+      ],
+      "presentation": [
+        "elite/admiral hierarchy",
+        "world density stays below HUD priority"
+      ]
+    },
+    "5": {
+      "focus": [
+        "Pirate Trial closure",
+        "large starter earned",
+        "transition readiness"
+      ],
+      "presentation": [
+        "trial completion state",
+        "clear PL6 transition messaging",
+        "no automatic main-design ownership"
+      ]
+    }
+  },
+  "rule": "Presentation may clarify existing systems but must not alter BeginnerRules goals/rewards or fabricate completion."
+}

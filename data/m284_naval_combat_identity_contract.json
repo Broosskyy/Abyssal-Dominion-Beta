@@ -1,0 +1,16 @@
+{
+  "milestone": "M284",
+  "contract": "naval_combat_audio_cannon_family_harpoon_identity_impact_material_salvo_rhythm_polish",
+  "master_concept": "V3.8",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "dependencies": {"projectile_presentation":"M283","projectile_truth":"M270","combat_outcome":"M269","combat_feedback":"M282","asset_identity":"master_item_and_weapon_asset_hooks"},
+  "profile_kinds": ["CANNON","AMMO","HARPOON","IMPACT_MATERIAL","AUDIO","SALVO_RHYTHM"],
+  "impact_material_hooks": ["WATER","HULL_WOOD","HULL_ARMORED","SHIELD","MONSTER","WORLD_OBJECT"],
+  "authority": {
+    "server_or_versioned_content_owns": ["profile_identity","profile_version","weapon_ammo_profile_binding","confirmed_impact_material","presentation_event_ordering"],
+    "client_may": ["render_confirmed_profile","play_profile_audio","play_profile_vfx","apply_accessibility_motion_haptics_preferences"],
+    "client_never": ["change_damage_from_profile","change_reload_from_salvo_rhythm","change_projectile_truth_from_visual_profile","confirm_hit_from_audio"]
+  },
+  "visual_rules": {"sea_chart_first":true,"cannon_families_visually_distinct":true,"ammo_identity_preserved":true,"harpoon_identity_preserved":true,"impact_material_readable":true,"master_asset_hooks_reused":true,"mobile_desktop_parity":true,"no_new_main_menu":true,"no_permanent_debug_hud":true},
+  "unset_until_measured": ["salvo_stagger_timing","family_audio_mix","impact_audio_mix","projectile_visual_speed_scale","muzzle_flash_duration","impact_vfx_intensity","screen_shake_strength","haptic_pattern_strength","simultaneous_audio_voice_budget"]
+}

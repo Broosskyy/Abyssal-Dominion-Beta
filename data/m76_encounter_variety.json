@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "milestone": "M76",
+  "title": "PL1-5 Encounter Presentation Variety",
+  "roles": {
+    "coastal_neutral": {
+      "levels": [
+        1,
+        2
+      ],
+      "tone": "civilian_coastal",
+      "behavior_truth": "neutral_until_attacked"
+    },
+    "scout": {
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "tone": "fast_recon",
+      "behavior_truth": "existing AI"
+    },
+    "raider": {
+      "levels": [
+        2,
+        3,
+        4
+      ],
+      "tone": "pirate_skirmisher",
+      "behavior_truth": "existing AI"
+    },
+    "gunship": {
+      "levels": [
+        3,
+        4,
+        5
+      ],
+      "tone": "heavier_broadside_read",
+      "behavior_truth": "existing AI"
+    },
+    "heavy": {
+      "levels": [
+        4,
+        5
+      ],
+      "tone": "bulky_threat",
+      "behavior_truth": "existing AI"
+    },
+    "monster": {
+      "levels": [
+        3,
+        4,
+        5
+      ],
+      "tone": "hero_creature",
+      "behavior_truth": "existing monster combat"
+    },
+    "elite_admiral": {
+      "levels": [
+        4,
+        5
+      ],
+      "tone": "high_priority_encounter",
+      "behavior_truth": "existing boss combat"
+    }
+  },
+  "rules": [
+    "presentation roles do not modify damage/hp/speed",
+    "low-level neutrality remains authoritative",
+    "monster/admiral hierarchy must remain visually distinct on mobile"
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "templates": {
+    "ship": {
+      "type": "ship",
+      "hull": 1000,
+      "armor": 0.08,
+      "speed": 6.5,
+      "acceleration": 3.2,
+      "turn_speed": 56,
+      "damage": 72,
+      "mastery_levels": 10,
+      "asset_slot": "",
+      "unlock": {
+        "min_level": 1
+      },
+      "enabled": false
+    },
+    "npc": {
+      "type": "npc",
+      "archetype": "brawler",
+      "hull": 800,
+      "damage": 50,
+      "armor": 0.05,
+      "speed": 5.5,
+      "range": 25,
+      "reload": 1.5,
+      "ai_profile": "brawler",
+      "rewards": {
+        "xp": 0,
+        "gold": 0
+      },
+      "loot_table_id": "",
+      "asset_slot": "",
+      "spawn_tags": [],
+      "enabled": false
+    },
+    "monster": {
+      "type": "monster",
+      "hull": 4000,
+      "damage": 100,
+      "phases": [],
+      "rewards": {
+        "xp": 0,
+        "gold": 0
+      },
+      "loot_table_id": "",
+      "asset_slot": "",
+      "animations": [],
+      "spawn_tags": [],
+      "enabled": false
+    },
+    "event": {
+      "type": "event",
+      "schedule": {},
+      "regions": [],
+      "npc_ids": [],
+      "monster_ids": [],
+      "quests": [],
+      "shops": [],
+      "currencies": [],
+      "multipliers": {
+        "xp": 1.0,
+        "gold": 1.0,
+        "loot": 1.0
+      },
+      "enabled": false
+    },
+    "encounter": {
+      "type": "encounter",
+      "base_level": 1,
+      "arena_size": 64,
+      "waves": [],
+      "entry_cost": {},
+      "death_policy": "retain_progress",
+      "rewards": {},
+      "enabled": false
+    },
+    "loot_table": {
+      "type": "loot_table",
+      "entries": [],
+      "pity": {},
+      "guaranteed": [],
+      "conditions": {},
+      "enabled": false
+    },
+    "spawn_table": {
+      "type": "spawn_table",
+      "entries": [
+        {
+          "content_id": "",
+          "kind": "npc",
+          "weight": 1.0,
+          "elite": false,
+          "tags": []
+        }
+      ],
+      "slot_count": 4,
+      "respawn_seconds": 2.0,
+      "admiral_kills_required": 6,
+      "admiral_cooldown_seconds": 20.0,
+      "formation_id": "",
+      "region_ids": [],
+      "sector_ids": [],
+      "enabled": false
+    },
+    "formation": {
+      "type": "formation",
+      "offsets": [
+        [
+          -3,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          0,
+          -3
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      "rotation_mode": "face_player",
+      "spacing": 1.0,
+      "jitter": 0.0,
+      "enabled": false
+    }
+  }
+}

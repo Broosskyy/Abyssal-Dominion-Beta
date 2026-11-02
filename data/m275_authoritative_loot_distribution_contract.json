@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "milestone": "M275",
+  "master_concept": "V3.8",
+  "contract": "authoritative_loot_table_drop_pool_group_fleet_reward_distribution_foundation",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "Use readable naval-MMO loot feedback, personal/group reward clarity and boss/admiral reward anticipation only; do not copy proprietary drop tables, currencies, probabilities, reward formulas, names, layouts, assets or mechanics.",
+  "authority": {
+    "client_may": ["render_confirmed_drop_result", "render_confirmed_distribution", "render_reward_pending_or_settled_state"],
+    "server_owns": ["loot_pool_selection", "drop_roll_resolution", "rarity_resolution", "personal_drop_assignment", "group_reward_distribution", "fleet_reward_distribution", "settlement_authorization", "loot_revision", "distribution_revision"],
+    "client_never_commits": ["loot_pool", "drop_roll", "rarity", "personal_drop", "group_split", "fleet_split", "reward_instance", "settlement"]
+  },
+  "drop_states": ["UNKNOWN", "PENDING", "RESOLVED", "DISTRIBUTED", "SETTLEMENT_PENDING", "SETTLED", "REVOKED"],
+  "pool_contexts": ["npc", "monster", "admiral", "boss", "event", "bonusmap", "quest", "special_pve"],
+  "distribution_channels": ["personal", "group", "fleet", "encounter_shared"],
+  "dependencies": {
+    "eligibility": "M274 confirms authoritative participant/reward eligibility before any drop resolution",
+    "encounter": "M273 supplies authoritative encounter identity/completion context",
+    "content": "Admin/No-Code definitions select authored loot-table/drop-pool policy; client never authors live pools",
+    "settlement": "M266 atomically creates durable inventory/wallet/ownership mutations and receipts from authorized results"
+  },
+  "environment_isolation": ["INTERNAL", "TEST", "GLOBAL"],
+  "unset_until_measured": ["drop_probabilities", "rarity_weights", "loot_quantities", "pity_rules", "guaranteed_drop_rules", "personal_vs_shared_mix", "group_share_formula", "fleet_share_formula", "round_robin_rules", "contribution_scaling", "duplicate_protection", "daily_or_weekly_caps", "reward_values"]
+}

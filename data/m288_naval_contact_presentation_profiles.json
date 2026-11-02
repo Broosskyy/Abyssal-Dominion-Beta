@@ -1,0 +1,26 @@
+{
+  "milestone": "M288",
+  "status": "FOUNDATION_UNTUNED",
+  "ship_model_strategy": "each profile is external presentation metadata for one complete individual ship model or other contact entity",
+  "profiles": [
+    {"id":"PLAYER","identity":"cool cyan own-ship orientation","priority":"OWN_SHIP","final_assets_required":true},
+    {"id":"FLEET_ALLY","identity":"clear teal fleet support","priority":"ALLY_RELEVANT","final_assets_required":true},
+    {"id":"FRIENDLY","identity":"restrained green friendly relation","priority":"SECONDARY","final_assets_required":true},
+    {"id":"NEUTRAL","identity":"muted slate neutral contact","priority":"SECONDARY","final_assets_required":true},
+    {"id":"HOSTILE","identity":"red hostile threat without excessive screen fill","priority":"COMBAT_RELEVANT","final_assets_required":true},
+    {"id":"ELITE","identity":"amber elite escalation","priority":"HIGH","final_assets_required":true},
+    {"id":"ADMIRAL","identity":"gold command-vessel presence","priority":"VERY_HIGH","final_assets_required":true},
+    {"id":"MONSTER","identity":"violet non-ship threat identity","priority":"VERY_HIGH","final_assets_required":true},
+    {"id":"BOSS","identity":"gold-red encounter focus","priority":"CRITICAL","final_assets_required":true}
+  ],
+  "rules": {
+    "profile_assignment": "SERVER_OR_VERSIONED_CONTENT",
+    "profile_does_not_select_target": true,
+    "profile_does_not_change_relationship_aggro_range_or_protection": true,
+    "profile_does_not_require_modular_ship_parts": true,
+    "same_semantics_on_mobile_web_desktop": true,
+    "platforms_may_reduce_secondary_vfx_only": true,
+    "selected_target_always_preserved": true,
+    "authored_assets_replace_same_slot_ids": true
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "milestone": "M80",
+  "title": "Fallback Resource Consolidation",
+  "shared_resource_library": "FallbackPrimitiveLibrary",
+  "converted_consumers": [
+    "HarborContentComposer",
+    "WorldDressingComposer",
+    "SalvageDressing",
+    "MonsterAreaDressing",
+    "WorldPoiComposer",
+    "WreckLandmarkComposer"
+  ],
+  "policy": {
+    "mesh_resources": "reuse identical primitive Mesh resources",
+    "materials": "reuse EnvironmentMaterialCatalog",
+    "nodes": "remain separate because transform/visibility/replacement are per instance",
+    "multimesh": "still deferred until native profiling"
+  },
+  "goal": "Lower avoidable runtime resource churn without sacrificing stable per-slot replacement."
+}

@@ -1,0 +1,3910 @@
+{
+  "schema_version": 1,
+  "milestone": "M301",
+  "master": "V3.8",
+  "content_types": {
+    "item": {
+      "id_prefix": "ITEM-",
+      "required": [
+        "id",
+        "name",
+        "category"
+      ],
+      "fields": [
+        "stack_limit",
+        "rarity",
+        "effects",
+        "cooldown",
+        "duration",
+        "icon_slot",
+        "shop",
+        "loot_tags",
+        "enabled",
+        "behavior_components",
+        "requirements",
+        "charges"
+      ]
+    },
+    "ammo": {
+      "id_prefix": "AMMO-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "damage",
+        "armor_pierce",
+        "slow",
+        "range",
+        "crit",
+        "effect",
+        "effect_power",
+        "effect_duration",
+        "projectile_slot",
+        "vfx_slot",
+        "shop",
+        "enabled"
+      ]
+    },
+    "weapon": {
+      "id_prefix": "WPN-",
+      "required": [
+        "id",
+        "name",
+        "weapon_type"
+      ],
+      "fields": [
+        "damage",
+        "reload",
+        "range",
+        "projectile_speed",
+        "capacity",
+        "effects",
+        "asset_slot",
+        "enabled",
+        "behavior_components",
+        "ammo_tags"
+      ]
+    },
+    "ship": {
+      "id_prefix": "SHIP-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "price",
+        "hull",
+        "armor",
+        "speed",
+        "acceleration",
+        "turn_speed",
+        "damage",
+        "mastery_levels",
+        "asset_slot",
+        "sockets",
+        "unlock",
+        "shop",
+        "enabled",
+        "lod0_path",
+        "lod1_path",
+        "lod2_path",
+        "mobile_vfx_profile",
+        "silhouette_profile",
+        "production_priority",
+        "reference_status",
+        "import_status"
+      ]
+    },
+    "npc": {
+      "id_prefix": "NPC-",
+      "required": [
+        "id",
+        "name",
+        "archetype"
+      ],
+      "fields": [
+        "hull",
+        "damage",
+        "armor",
+        "speed",
+        "range",
+        "reload",
+        "ai_profile",
+        "rewards",
+        "loot_table_id",
+        "asset_slot",
+        "spawn_tags",
+        "enabled",
+        "behavior_components",
+        "weapon_ids",
+        "ammo_ids",
+        "lod0_path",
+        "lod1_path",
+        "lod2_path",
+        "mobile_vfx_profile",
+        "visual_family",
+        "silhouette_profile",
+        "production_priority"
+      ]
+    },
+    "monster": {
+      "id_prefix": "MON-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "hull",
+        "damage",
+        "phases",
+        "weakpoints",
+        "rewards",
+        "loot_table_id",
+        "asset_slot",
+        "animations",
+        "spawn_tags",
+        "enabled",
+        "behavior_components",
+        "phase_components",
+        "lod0_path",
+        "lod1_path",
+        "lod2_path",
+        "mobile_vfx_profile"
+      ]
+    },
+    "loot_table": {
+      "id_prefix": "LOOT-",
+      "required": [
+        "id",
+        "entries"
+      ],
+      "fields": [
+        "entries",
+        "pity",
+        "guaranteed",
+        "conditions",
+        "enabled"
+      ]
+    },
+    "quest": {
+      "id_prefix": "QUEST-",
+      "required": [
+        "id",
+        "name",
+        "objectives"
+      ],
+      "fields": [
+        "objectives",
+        "requirements",
+        "rewards",
+        "next_quest_id",
+        "schedule",
+        "enabled",
+        "objective_components",
+        "reward_components",
+        "target_groups",
+        "content_ids",
+        "content_tags",
+        "map_target_policy"
+      ]
+    },
+    "encounter": {
+      "id_prefix": "ENC-",
+      "required": [
+        "id",
+        "waves"
+      ],
+      "fields": [
+        "waves",
+        "arena",
+        "entry_cost",
+        "death_policy",
+        "rewards",
+        "boss_id",
+        "schedule",
+        "enabled",
+        "wave_components",
+        "completion_rewards"
+      ]
+    },
+    "event": {
+      "id_prefix": "EVENT-",
+      "required": [
+        "id",
+        "name",
+        "schedule"
+      ],
+      "fields": [
+        "schedule",
+        "regions",
+        "npc_ids",
+        "monster_ids",
+        "quests",
+        "shops",
+        "currencies",
+        "multipliers",
+        "loot_overrides",
+        "visual_layer",
+        "enabled",
+        "content_overrides",
+        "event_rules",
+        "admiral_ids",
+        "spawn_table_ids",
+        "formation_ids",
+        "cadence_overrides"
+      ]
+    },
+    "shop": {
+      "id_prefix": "SHOP-",
+      "required": [
+        "id",
+        "offers"
+      ],
+      "fields": [
+        "offers",
+        "currency",
+        "schedule",
+        "requirements",
+        "limits",
+        "enabled"
+      ]
+    },
+    "payment_product": {
+      "id_prefix": "PAY-",
+      "required": [
+        "id",
+        "provider_product_id",
+        "entitlement_id"
+      ],
+      "fields": [
+        "display_name",
+        "description",
+        "display_price",
+        "provider_product_id",
+        "entitlement_id",
+        "bundle_contents",
+        "sale_window",
+        "limits",
+        "enabled"
+      ]
+    },
+    "harpoon": {
+      "id_prefix": "HARP-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "damage",
+        "range",
+        "reload",
+        "effect",
+        "effect_power",
+        "effect_duration",
+        "projectile_slot",
+        "vfx_slot",
+        "shop",
+        "requirements",
+        "enabled"
+      ]
+    },
+    "support": {
+      "id_prefix": "SUP-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "heal_hull",
+        "heal_shield",
+        "barrier",
+        "range",
+        "reload",
+        "effect",
+        "effect_power",
+        "effect_duration",
+        "projectile_slot",
+        "vfx_slot",
+        "shop",
+        "requirements",
+        "enabled"
+      ]
+    },
+    "ship_reward": {
+      "id_prefix": "SHIP-REWARD-",
+      "required": [
+        "id",
+        "ship_id",
+        "trigger"
+      ],
+      "fields": [
+        "ship_id",
+        "trigger",
+        "defeated_map_level",
+        "requirements",
+        "label",
+        "enabled"
+      ]
+    },
+    "equipment_module": {
+      "id_prefix": "MODULE-",
+      "required": [
+        "id",
+        "name",
+        "slot"
+      ],
+      "fields": [
+        "slot",
+        "region",
+        "effects",
+        "cost",
+        "requirements",
+        "asset_slot",
+        "icon_slot",
+        "enabled"
+      ]
+    },
+    "upgrade_rule": {
+      "id_prefix": "UPGRADE-",
+      "required": [
+        "id",
+        "stat"
+      ],
+      "fields": [
+        "stat",
+        "max_level",
+        "cost_curve",
+        "effect_per_level",
+        "requirements",
+        "enabled"
+      ]
+    },
+    "sector": {
+      "id_prefix": "SECTOR-",
+      "required": [
+        "id",
+        "name",
+        "pirate_level",
+        "region_id"
+      ],
+      "fields": [
+        "pirate_level",
+        "region_id",
+        "biome",
+        "harbor_id",
+        "neighbors",
+        "map_type",
+        "npc_ids",
+        "monster_ids",
+        "admiral_id",
+        "poi_ids",
+        "island_slots",
+        "environment_profile",
+        "enabled",
+        "legacy_coord",
+        "map_position",
+        "production_priority",
+        "visual_budget"
+      ]
+    },
+    "region": {
+      "id_prefix": "REGION-",
+      "required": [
+        "id",
+        "name",
+        "level_range"
+      ],
+      "fields": [
+        "level_range",
+        "harbor_id",
+        "biome_profile",
+        "npc_pool",
+        "monster_pool",
+        "admiral_pool",
+        "island_pool",
+        "poi_pool",
+        "visual_profile",
+        "music_profile",
+        "enabled",
+        "canonical_harbor",
+        "production_priority",
+        "asset_budget",
+        "environment_profile"
+      ]
+    },
+    "spawn_table": {
+      "id_prefix": "SPAWN-",
+      "required": [
+        "id",
+        "entries"
+      ],
+      "fields": [
+        "entries",
+        "slot_count",
+        "respawn_seconds",
+        "admiral_kills_required",
+        "admiral_cooldown_seconds",
+        "formation_id",
+        "region_ids",
+        "sector_ids",
+        "schedule",
+        "enabled"
+      ]
+    },
+    "formation": {
+      "id_prefix": "FORMATION-",
+      "required": [
+        "id",
+        "offsets"
+      ],
+      "fields": [
+        "offsets",
+        "rotation_mode",
+        "spacing",
+        "jitter",
+        "enabled"
+      ]
+    },
+    "poi": {
+      "id_prefix": "POI-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "tags",
+        "interaction_radius",
+        "repeatable",
+        "asset_slot",
+        "marker_slot",
+        "quest_hooks",
+        "region_ids",
+        "sector_ids",
+        "enabled",
+        "local_position",
+        "min_pirate_level",
+        "max_pirate_level",
+        "event_ids"
+      ]
+    },
+    "island_visual": {
+      "id_prefix": "ISLAND-",
+      "required": [
+        "id",
+        "name",
+        "asset_slot"
+      ],
+      "fields": [
+        "asset_slot",
+        "biome_tags",
+        "size_class",
+        "silhouette",
+        "density",
+        "region_ids",
+        "sector_ids",
+        "weight",
+        "production_priority",
+        "enabled"
+      ]
+    },
+    "harbor_visual": {
+      "id_prefix": "HARBOR-",
+      "required": [
+        "id",
+        "name",
+        "asset_slot"
+      ],
+      "fields": [
+        "asset_slot",
+        "module_slots",
+        "safe_zone_radius",
+        "dock_anchor",
+        "shop_anchor",
+        "quest_anchor",
+        "region_ids",
+        "sector_ids",
+        "production_priority",
+        "enabled",
+        "mobile_readability_profile"
+      ]
+    },
+    "cannon": {
+      "id_prefix": "CANNON-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "damage",
+        "reload",
+        "range",
+        "projectile_speed",
+        "ammo_tags",
+        "sockets",
+        "asset_slot",
+        "projectile_slot",
+        "muzzle_vfx_slot",
+        "shop",
+        "requirements",
+        "enabled"
+      ]
+    },
+    "badge": {
+      "id_prefix": "BADGE-",
+      "required": [
+        "id",
+        "name",
+        "icon_slot"
+      ],
+      "fields": [
+        "description",
+        "icon_slot",
+        "rarity",
+        "unlock",
+        "category",
+        "display_priority",
+        "enabled"
+      ]
+    },
+    "branding_asset": {
+      "id_prefix": "BRAND-",
+      "required": [
+        "id",
+        "name",
+        "asset_slot"
+      ],
+      "fields": [
+        "asset_slot",
+        "usage",
+        "light_variant_slot",
+        "dark_variant_slot",
+        "mobile_variant_slot",
+        "locale_overrides",
+        "enabled"
+      ]
+    },
+    "companion": {
+      "id_prefix": "COMPANION-",
+      "required": [
+        "id",
+        "name",
+        "role",
+        "asset_slots"
+      ],
+      "fields": [
+        "rarity",
+        "level_cap",
+        "mastery",
+        "traits",
+        "effect_components",
+        "sources",
+        "fragments",
+        "upgrade_costs",
+        "active_slot_rules",
+        "asset_slots",
+        "mobile_readability_profile",
+        "pvp_modifiers",
+        "enabled"
+      ]
+    },
+    "artifact": {
+      "id_prefix": "ARTIFACT-",
+      "required": [
+        "id",
+        "name",
+        "family",
+        "effect_components"
+      ],
+      "fields": [
+        "rarity",
+        "mastery_cap",
+        "resonance",
+        "effect_components",
+        "trigger",
+        "limits",
+        "cooldown",
+        "tradeoffs",
+        "set_id",
+        "drop_sources",
+        "pity",
+        "pvp_modifiers",
+        "icon_slot",
+        "world_prop_slot",
+        "enabled"
+      ]
+    },
+    "afk_reward_profile": {
+      "id_prefix": "AFK-PROFILE-",
+      "required": [
+        "id",
+        "name",
+        "cap_seconds",
+        "reward_rates"
+      ],
+      "fields": [
+        "reward_rates",
+        "cap_seconds",
+        "catch_up_multiplier",
+        "event_overrides",
+        "companion_modifiers",
+        "artifact_modifiers",
+        "forbidden_reward_tags",
+        "eligibility",
+        "telemetry_profile",
+        "content_version",
+        "enabled"
+      ]
+    },
+    "special_deck": {
+      "id_prefix": "SDECK-",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "supports_assets": true,
+      "supports_behavior_components": true,
+      "versioned": true
+    },
+    "talent_tree": {
+      "id_prefix": "TALENT-",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "supports_assets": true,
+      "supports_behavior_components": true,
+      "versioned": true
+    },
+    "talent_node": {
+      "id_prefix": "TNODE-",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "supports_assets": true,
+      "supports_behavior_components": true,
+      "versioned": true
+    },
+    "citadel_branch": {
+      "id_prefix": "CASTLE-",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "supports_assets": true,
+      "supports_behavior_components": true,
+      "versioned": true
+    },
+    "cannon_upgrade_track": {
+      "id_prefix": "CUPG-",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "supports_assets": true,
+      "supports_behavior_components": true,
+      "versioned": true
+    },
+    "buff_effect": {
+      "id_prefix": "BUFF-",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "supports_assets": true,
+      "supports_behavior_components": true,
+      "versioned": true
+    },
+    "guild_building": {
+      "id_prefix": "GBLD-",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "supports_assets": true,
+      "supports_behavior_components": true,
+      "versioned": true
+    },
+    "guild_tower": {
+      "id_prefix": "GTWR-",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "supports_assets": true,
+      "supports_behavior_components": true,
+      "versioned": true
+    },
+    "shop_offer": {
+      "id_prefix": "OFFER-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true
+    },
+    "currency": {
+      "id_prefix": "CUR-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true
+    },
+    "commerce_campaign": {
+      "id_prefix": "CAMPAIGN-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true
+    },
+    "price_rule": {
+      "id_prefix": "PRICE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true
+    },
+    "entitlement": {
+      "id_prefix": "ENT-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true
+    },
+    "bundle": {
+      "id_prefix": "BUNDLE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true
+    },
+    "admin_command": {
+      "id_prefix": "CMD-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true
+    },
+    "role_profile": {
+      "id_prefix": "ROLE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true
+    },
+    "permission_profile": {
+      "id_prefix": "PERM-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true
+    },
+    "icon_slot": {
+      "id_prefix": "ICON-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true
+    },
+    "vfx_profile": {
+      "id_prefix": "VFX-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true
+    },
+    "interface_panel": {
+      "id_prefix": "UIPANEL-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": true
+    },
+    "interface_action": {
+      "id_prefix": "UIACT-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": false
+    },
+    "tooltip_profile": {
+      "id_prefix": "TIP-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": true
+    },
+    "animation_profile": {
+      "id_prefix": "ANIM-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": true
+    },
+    "economy_formula": {
+      "id_prefix": "ECO-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": false
+    },
+    "upgrade_tree": {
+      "id_prefix": "UPTREE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": false
+    },
+    "upgrade_node": {
+      "id_prefix": "UPNODE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": false
+    },
+    "guild_rank": {
+      "id_prefix": "GRANK-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": false
+    },
+    "guild_permission_set": {
+      "id_prefix": "GPERM-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": false
+    },
+    "guild_siege_rule": {
+      "id_prefix": "GSIEGE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": false
+    },
+    "consumable_effect": {
+      "id_prefix": "CONS-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": true
+    },
+    "harpoon_profile": {
+      "id_prefix": "HARP-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "versioned": true,
+      "scheduleable": true,
+      "supports_assets": true
+    },
+    "ammo_profile": {
+      "id_prefix": "AMMO-PROFILE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "ammo_effect": {
+      "id_prefix": "AMMO-EFFECT-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "harpoon_family": {
+      "id_prefix": "HARPOON-FAMILY-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "harpoon_upgrade_track": {
+      "id_prefix": "HARPOON-UPGRADE-TRACK-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "cannon_visual_stage": {
+      "id_prefix": "CANNON-VISUAL-STAGE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "guild_building_level": {
+      "id_prefix": "GUILD-BUILDING-LEVEL-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "guild_tower_level": {
+      "id_prefix": "GUILD-TOWER-LEVEL-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "guild_treasury_rule": {
+      "id_prefix": "GUILD-TREASURY-RULE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "guild_war_rule": {
+      "id_prefix": "GUILD-WAR-RULE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "guild_rank_rule": {
+      "id_prefix": "GUILD-RANK-RULE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "admin_editor_schema": {
+      "id_prefix": "ADMIN-EDITOR-SCHEMA-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "content_form_schema": {
+      "id_prefix": "CONTENT-FORM-SCHEMA-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "content_validation_rule": {
+      "id_prefix": "CONTENT-VALIDATION-RULE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "content_preview_profile": {
+      "id_prefix": "CONTENT-PREVIEW-PROFILE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "enabled",
+        "icon_slot",
+        "asset_slot",
+        "rules",
+        "requirements",
+        "effects",
+        "version"
+      ],
+      "server_validation": true
+    },
+    "guild_island_module": {
+      "id_prefix": "GIM-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "role",
+        "max_level",
+        "asset_slot",
+        "requirements",
+        "enabled"
+      ]
+    },
+    "guild_upgrade_curve": {
+      "id_prefix": "GUC-",
+      "required": [
+        "id",
+        "levels"
+      ],
+      "fields": [
+        "resource_costs",
+        "time_curve",
+        "visual_stages",
+        "authority",
+        "enabled"
+      ]
+    },
+    "cannon_evolution_stage": {
+      "id_prefix": "CES-",
+      "required": [
+        "id",
+        "stage"
+      ],
+      "fields": [
+        "label",
+        "requirement",
+        "visual",
+        "icon_slot",
+        "vfx_slot",
+        "enabled"
+      ]
+    },
+    "item_family": {
+      "id_prefix": "IFAM-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "authorable_fields",
+        "defaults",
+        "validation",
+        "enabled"
+      ]
+    },
+    "icon_state_profile": {
+      "id_prefix": "ICON-STATE-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "states",
+        "asset_slots",
+        "rarity_frames",
+        "enabled"
+      ]
+    },
+    "tooltip_layer_profile": {
+      "id_prefix": "TIP-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "layers",
+        "fields",
+        "visibility_rules",
+        "enabled"
+      ]
+    },
+    "runtime_editor_schema": {
+      "id_prefix": "RTE-",
+      "required": [
+        "id",
+        "permission"
+      ],
+      "fields": [
+        "risk",
+        "server_required",
+        "audit",
+        "approval_for_publish",
+        "tabs",
+        "enabled"
+      ]
+    },
+    "crafting_recipe": {
+      "id_prefix": "REC-",
+      "required": [
+        "id",
+        "output",
+        "inputs"
+      ],
+      "fields": [
+        "station",
+        "gold",
+        "requirements",
+        "availability",
+        "icon_slot",
+        "enabled"
+      ]
+    },
+    "crafting_station": {
+      "id_prefix": "STATION-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "source",
+        "max_level",
+        "unlock_rule",
+        "asset_slot",
+        "enabled"
+      ]
+    },
+    "guild_tower_specialization": {
+      "id_prefix": "GTS-",
+      "required": [
+        "id",
+        "tower"
+      ],
+      "fields": [
+        "unlock_level",
+        "effect",
+        "costs",
+        "icon_slot",
+        "vfx_slot",
+        "enabled"
+      ]
+    },
+    "combat_effect_primitive": {
+      "id_prefix": "FXP-",
+      "required": [
+        "id",
+        "category"
+      ],
+      "fields": [
+        "power",
+        "duration",
+        "tick_rate",
+        "stacking",
+        "target_rule",
+        "vfx",
+        "enabled"
+      ]
+    },
+    "content_source_graph": {
+      "label": "Content Source Graph",
+      "id_prefix": "source.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "crafting_station_requirement": {
+      "label": "Crafting Station Requirement",
+      "id_prefix": "craftreq.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "effect_runtime_primitive": {
+      "label": "Effect Runtime Primitive",
+      "id_prefix": "effect.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "cannon_mastery_presentation": {
+      "label": "Cannon Mastery Presentation",
+      "id_prefix": "cannonvis.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "guild_island_visual_stage": {
+      "label": "Guild Island Visual Stage",
+      "id_prefix": "guildvis.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "loot_source_binding": {
+      "label": "Loot Source Binding",
+      "id_prefix": "lootsrc.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "shop_source_binding": {
+      "label": "Shop Source Binding",
+      "id_prefix": "shopsrc.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "quest_source_binding": {
+      "label": "Quest Source Binding",
+      "id_prefix": "questsrc.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "event_source_binding": {
+      "label": "Event Source Binding",
+      "id_prefix": "eventsrc.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "admiral_source_binding": {
+      "label": "Admiral Source Binding",
+      "id_prefix": "admiralsrc.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "bonusmap_source_binding": {
+      "label": "Bonusmap Source Binding",
+      "id_prefix": "bonusmapsrc.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "crafting_station_progression": {
+      "label": "Crafting Station Progression",
+      "id_prefix": "stationprog.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "mobile_ui_profile": {
+      "label": "Mobile UI Profile",
+      "id_prefix": "mobileui.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "interaction_contract": {
+      "label": "Interaction Contract",
+      "id_prefix": "interaction.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "menu_navigation_profile": {
+      "label": "Menu Navigation Profile",
+      "id_prefix": "menunav.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "qa_device_profile": {
+      "label": "QA Device Profile",
+      "id_prefix": "qadevice.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "crafting_station_runtime": {
+      "label": "Crafting Station Runtime",
+      "id_prefix": "stationruntime.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "runtime_ammo_selection_profile": {
+      "label": "Runtime Ammo Selection Profile",
+      "id_prefix": "ammo.runtime.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "menu_interaction_audit": {
+      "label": "Menu Interaction Audit",
+      "id_prefix": "menuaudit.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "mobile_hud_profile": {
+      "label": "Mobile HUD Profile",
+      "id_prefix": "mobilehud.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "runtime_content_guard": {
+      "label": "Runtime Content Guard",
+      "id_prefix": "runtimeguard.",
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "authority": "server_publish"
+    },
+    "mobile_menu_profile": {
+      "fields": [
+        "id",
+        "max_width",
+        "touch_target",
+        "edge_margin",
+        "tab_mode"
+      ],
+      "server_authoritative": false,
+      "draftable": true
+    },
+    "harbor_tab_profile": {
+      "fields": [
+        "id",
+        "label",
+        "short_label",
+        "order",
+        "visible"
+      ],
+      "server_authoritative": false,
+      "draftable": true
+    },
+    "interaction_audit_profile": {
+      "fields": [
+        "id",
+        "screen",
+        "requirements",
+        "severity"
+      ],
+      "server_authoritative": false,
+      "draftable": true
+    },
+    "progression_connection": {
+      "fields": [
+        "id",
+        "system",
+        "from",
+        "to",
+        "authority"
+      ],
+      "server_authoritative": false,
+      "draftable": true
+    },
+    "overlay_priority_profile": {
+      "id_prefix": "OVL-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "layers",
+        "close_order",
+        "conflict_groups",
+        "enabled"
+      ]
+    },
+    "runtime_catalog_binding": {
+      "id_prefix": "RCB-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "surface",
+        "catalog",
+        "resolver",
+        "fallback",
+        "enabled"
+      ]
+    },
+    "mobile_screen_audit": {
+      "id_prefix": "MSA-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "screen",
+        "touch_target",
+        "safe_area",
+        "scroll_mode",
+        "back_behavior",
+        "enabled"
+      ]
+    },
+    "interaction_guard_profile": {
+      "id_prefix": "IGP-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "guard_id",
+        "rule",
+        "risk",
+        "authority",
+        "enabled"
+      ]
+    },
+    "runtime_presentation_binding": {
+      "label": "Runtime Presentation Binding",
+      "schema": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "optional": [
+          "enabled",
+          "priority",
+          "source",
+          "presentation",
+          "mobile",
+          "notes"
+        ]
+      },
+      "workflow": "draft_review_publish",
+      "server_authoritative": false
+    },
+    "status_chip_profile": {
+      "label": "Status Chip Profile",
+      "schema": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "optional": [
+          "enabled",
+          "priority",
+          "source",
+          "presentation",
+          "mobile",
+          "notes"
+        ]
+      },
+      "workflow": "draft_review_publish",
+      "server_authoritative": false
+    },
+    "arsenal_offer_presentation": {
+      "label": "Arsenal Offer Presentation",
+      "schema": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "optional": [
+          "enabled",
+          "priority",
+          "source",
+          "presentation",
+          "mobile",
+          "notes"
+        ]
+      },
+      "workflow": "draft_review_publish",
+      "server_authoritative": false
+    },
+    "action_item_selector_profile": {
+      "label": "Action Item Selector Profile",
+      "schema": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "optional": [
+          "enabled",
+          "priority",
+          "source",
+          "presentation",
+          "mobile",
+          "notes"
+        ]
+      },
+      "workflow": "draft_review_publish",
+      "server_authoritative": false
+    },
+    "bonusmap_entry_profile": {
+      "id_prefix": "M172-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "kind",
+        "eligibility_level",
+        "entry_item",
+        "entry_cost",
+        "label",
+        "enabled"
+      ]
+    },
+    "crafting_requirement_profile": {
+      "id_prefix": "M172-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "recipe_id",
+        "station",
+        "station_level",
+        "inputs",
+        "gold",
+        "output"
+      ]
+    },
+    "shipyard_catalog_profile": {
+      "id_prefix": "M172-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "ship_id",
+        "display_order",
+        "unlock_summary",
+        "asset_slots"
+      ]
+    },
+    "interaction_feedback_profile": {
+      "id_prefix": "M172-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "state",
+        "label",
+        "severity",
+        "mobile_label"
+      ]
+    },
+    "progression_panel_profile": {
+      "schema": "progression_panel_profile",
+      "workflow": "draft_review_publish_rollback"
+    },
+    "upgrade_requirement_feedback_profile": {
+      "schema": "upgrade_requirement_feedback_profile",
+      "workflow": "draft_review_publish_rollback"
+    },
+    "guild_detail_navigation_profile": {
+      "schema": "guild_detail_navigation_profile",
+      "workflow": "draft_review_publish_rollback"
+    },
+    "progression_selection_profile": {
+      "schema": "progression_selection_profile",
+      "workflow": "draft_review_publish_rollback"
+    },
+    "transaction_feedback_profile": {
+      "schema": "m174",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "shipyard_selection_profile": {
+      "schema": "m174",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "panel_state_profile": {
+      "schema": "m174",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "mobile_action_profile": {
+      "schema": "m174",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "damage_number_profile": {
+      "schema": "m175",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "reward_presentation_profile": {
+      "schema": "m175",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only_no_grants"
+    },
+    "vfx_presentation_profile": {
+      "schema": "m175",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "notification_family_profile": {
+      "schema": "m175",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "screen_feedback_profile": {
+      "schema": "m175",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "runtime_notification_profile": {
+      "schema": "m176",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "combat_value_feedback_profile": {
+      "schema": "m176",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "bonusmap_feedback_profile": {
+      "schema": "m176",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only_no_grants"
+    },
+    "boss_phase_feedback_profile": {
+      "schema": "m176",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "bonusmap_boss_runtime_profile": {
+      "schema": "m177",
+      "draft_review_publish": true,
+      "server_authority": "local_preview_server_authoritative_online"
+    },
+    "boss_mechanic_profile": {
+      "schema": "m177",
+      "draft_review_publish": true,
+      "server_authority": "local_preview_server_authoritative_online"
+    },
+    "bonus_objective_profile": {
+      "schema": "m177",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only_no_grants"
+    },
+    "boss_telegraph_profile": {
+      "schema": "m178",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "boss_safe_zone_profile": {
+      "schema": "m178",
+      "draft_review_publish": true,
+      "server_authority": "local_preview_server_authoritative_online"
+    },
+    "boss_mechanic_readability_profile": {
+      "schema": "m178",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "boss_telegraph_shape_profile": {
+      "schema": "m179",
+      "draft_review_publish": true,
+      "server_authority": "local_preview_server_authoritative_online"
+    },
+    "boss_mechanic_outcome_profile": {
+      "schema": "m179",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "mobile_hud_composition_profile": {
+      "schema": "m180",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "water_surface_presentation_profile": {
+      "schema": "m180",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "modal_menu_layout_profile": {
+      "schema": "m180",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "mobile_interaction_safety_profile": {
+      "schema": "m182",
+      "draft_review_publish": true,
+      "server_authority": "presentation_and_input_routing_only"
+    },
+    "loot_guidance_profile": {
+      "schema": "m182",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only_reward_authority_unchanged"
+    },
+    "command_deck_destination_profile": {
+      "schema": "m183",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "command_deck_section_profile": {
+      "schema": "m183",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "modal_navigation_policy": {
+      "schema": "m183",
+      "draft_review_publish": true,
+      "server_authority": "presentation_and_input_routing_only"
+    },
+    "mobile_menu_shell_profile": {
+      "schema": "m183",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "panel_route_profile": {
+      "schema": "m184",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "panel_lifetime_profile": {
+      "schema": "m184",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "panel_return_policy": {
+      "schema": "m184",
+      "draft_review_publish": true,
+      "server_authority": "presentation_and_input_routing_only"
+    },
+    "modal_input_ownership_profile": {
+      "schema": "m184",
+      "draft_review_publish": true,
+      "server_authority": "presentation_and_input_routing_only"
+    },
+    "menu_status_card_profile": {
+      "schema": "m185",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "menu_state_vocabulary": {
+      "schema": "m185",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "quest_group_profile": {
+      "schema": "m185",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "bonusmap_requirement_card_profile": {
+      "schema": "m185",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only_transaction_unchanged"
+    },
+    "quest_tracking_profile": {
+      "schema": "m186",
+      "draft_review_publish": true,
+      "server_authority": "player_presentation_state_only"
+    },
+    "objective_navigation_profile": {
+      "schema": "m186",
+      "draft_review_publish": true,
+      "server_authority": "existing_world_target_resolution_only"
+    },
+    "tracked_objective_priority": {
+      "schema": "m186",
+      "draft_review_publish": true,
+      "server_authority": "presentation_only"
+    },
+    "quest_map_target_policy": {
+      "schema": "m186",
+      "draft_review_publish": true,
+      "server_authority": "no_spawn_no_teleport_no_reward_authority"
+    },
+    "salvage_definition": {
+      "id_prefix": "SALVAGE-",
+      "required": [
+        "id",
+        "input",
+        "returns"
+      ],
+      "fields": [
+        "input",
+        "returns",
+        "requirements",
+        "binding_rule",
+        "station",
+        "enabled"
+      ]
+    },
+    "oracle_reward_pool": {
+      "id_prefix": "ORACLE-POOL-",
+      "required": [
+        "id",
+        "categories"
+      ],
+      "fields": [
+        "categories",
+        "rarities",
+        "weights",
+        "pity",
+        "duplicate_rule",
+        "enabled"
+      ],
+      "authority": "server_reward_resolution"
+    },
+    "special_pve_profile": {
+      "id_prefix": "SPVE-",
+      "required": [
+        "id",
+        "pillar"
+      ],
+      "fields": [
+        "pillar",
+        "access",
+        "objectives",
+        "eligibility",
+        "rewards",
+        "enabled"
+      ],
+      "authority": "server_content_definition"
+    },
+    "achievement_definition": {
+      "id_prefix": "ACH-",
+      "required": [
+        "id",
+        "title",
+        "category",
+        "criteria"
+      ],
+      "fields": [
+        "description",
+        "target",
+        "reward",
+        "profile_visible",
+        "hidden",
+        "seasonal",
+        "enabled"
+      ]
+    },
+    "collection_definition": {
+      "id_prefix": "COL-",
+      "required": [
+        "id",
+        "title",
+        "family"
+      ],
+      "fields": [
+        "entries",
+        "milestones",
+        "reward",
+        "profile_visible",
+        "enabled"
+      ]
+    },
+    "collection_milestone_definition": {
+      "id_prefix": "COLM-",
+      "required": [
+        "id",
+        "collection_id",
+        "threshold"
+      ],
+      "fields": [
+        "reward",
+        "title",
+        "fame",
+        "cosmetic",
+        "enabled"
+      ]
+    },
+    "market_definition": {
+      "id_prefix": "MARKET-",
+      "required": [
+        "id",
+        "currency"
+      ],
+      "fields": [
+        "fees",
+        "durations",
+        "limits",
+        "filters",
+        "binding_rules",
+        "rate_limits",
+        "enabled"
+      ],
+      "authority": "server_live_config"
+    },
+    "bazaar_listing_policy": {
+      "id_prefix": "BAZAAR-POLICY-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "allowed_item_tags",
+        "blocked_binding_states",
+        "listing_limits",
+        "account_age_limits",
+        "risk_rules",
+        "enabled"
+      ],
+      "authority": "server_market_policy"
+    },
+    "friend_policy": {
+      "id_prefix": "FRIEND-POLICY-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "invite_rules",
+        "presence_visibility",
+        "limits",
+        "privacy",
+        "enabled"
+      ],
+      "authority": "server_social_policy"
+    },
+    "group_policy": {
+      "id_prefix": "GROUP-POLICY-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "member_limit",
+        "leader_rules",
+        "invite_rules",
+        "ready_rules",
+        "objective_credit",
+        "personal_loot",
+        "enabled"
+      ],
+      "authority": "server_social_policy"
+    },
+    "chat_channel_definition": {
+      "id_prefix": "CHAT-CHANNEL-",
+      "required": [
+        "id",
+        "scope"
+      ],
+      "fields": [
+        "permissions",
+        "rate_limit",
+        "moderation",
+        "retention",
+        "enabled"
+      ],
+      "authority": "server_social_policy"
+    },
+    "report_definition": {
+      "id_prefix": "REPORT-",
+      "required": [
+        "id",
+        "category"
+      ],
+      "fields": [
+        "target_type",
+        "evidence_refs",
+        "routing",
+        "retention",
+        "enabled"
+      ],
+      "authority": "server_moderation_policy"
+    },
+    "pvp_zone_definition": {
+      "id_prefix": "PVP-ZONE-",
+      "required": [
+        "id",
+        "type"
+      ],
+      "fields": [
+        "eligibility",
+        "protection",
+        "rewards",
+        "flagging",
+        "world_rules",
+        "enabled"
+      ],
+      "authority": "server_competitive_live_config"
+    },
+    "honor_definition": {
+      "id_prefix": "HONOR-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "gain_loss",
+        "modifiers",
+        "caps",
+        "anti_farm",
+        "enabled"
+      ],
+      "authority": "server_competitive_live_config"
+    },
+    "battle_rank_definition": {
+      "id_prefix": "BATTLE-RANK-",
+      "required": [
+        "id",
+        "division"
+      ],
+      "fields": [
+        "rank_points",
+        "mmr_mapping",
+        "placement",
+        "decay",
+        "season_reset",
+        "rewards",
+        "enabled"
+      ],
+      "authority": "server_ranked_live_config"
+    },
+    "ranked_mode_definition": {
+      "id_prefix": "RANKED-MODE-",
+      "required": [
+        "id",
+        "team_size"
+      ],
+      "fields": [
+        "objectives",
+        "eligibility",
+        "normalization",
+        "matchmaking",
+        "rewards",
+        "enabled"
+      ],
+      "authority": "server_ranked_live_config"
+    },
+    "pvp_modifier_definition": {
+      "id_prefix": "PVP-MOD-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "damage",
+        "heal",
+        "shield",
+        "repair",
+        "cc",
+        "crit",
+        "armor_penetration",
+        "event_overrides",
+        "enabled"
+      ],
+      "authority": "server_combat_live_config"
+    },
+    "combat_timer_definition": {
+      "id_prefix": "COMBAT-TIMER-",
+      "required": [
+        "id",
+        "triggers"
+      ],
+      "fields": [
+        "restrictions",
+        "duration",
+        "escape_rules",
+        "enabled"
+      ],
+      "authority": "server_competitive_live_config"
+    },
+    "companion_trait_definition": {
+      "id_prefix": "COMP-TRAIT-",
+      "required": [
+        "id",
+        "role",
+        "effect_components"
+      ],
+      "fields": [
+        "name",
+        "role",
+        "effect_components",
+        "limits",
+        "pvp_modifiers",
+        "asset_hooks",
+        "enabled"
+      ]
+    },
+    "companion_progression_definition": {
+      "id_prefix": "COMP-PROG-",
+      "required": [
+        "id",
+        "companion_id"
+      ],
+      "fields": [
+        "level_curve",
+        "mastery",
+        "fragments",
+        "materials",
+        "requirements",
+        "cosmetic_stages",
+        "enabled"
+      ]
+    },
+    "companion_loadout_definition": {
+      "id_prefix": "COMP-LOADOUT-",
+      "required": [
+        "id",
+        "slot_rules"
+      ],
+      "fields": [
+        "slot_rules",
+        "eligibility",
+        "restrictions",
+        "ui_profile",
+        "enabled"
+      ]
+    },
+    "artifact_effect_definition": {
+      "id_prefix": "ART-EFFECT-",
+      "required": [
+        "id",
+        "effect_components"
+      ],
+      "fields": [
+        "trigger",
+        "limits",
+        "cooldown",
+        "tradeoffs",
+        "pvp_modifiers",
+        "event_modifiers",
+        "enabled"
+      ]
+    },
+    "artifact_set_definition": {
+      "id_prefix": "ART-SET-",
+      "required": [
+        "id",
+        "members"
+      ],
+      "fields": [
+        "members",
+        "synergies",
+        "requirements",
+        "limits",
+        "pvp_modifiers",
+        "enabled"
+      ]
+    },
+    "artifact_progression_definition": {
+      "id_prefix": "ART-PROG-",
+      "required": [
+        "id",
+        "artifact_id"
+      ],
+      "fields": [
+        "mastery",
+        "resonance",
+        "fragments",
+        "tokens",
+        "pity",
+        "requirements",
+        "enabled"
+      ]
+    },
+    "artifact_loadout_definition": {
+      "id_prefix": "ART-LOADOUT-",
+      "required": [
+        "id",
+        "slot_rules"
+      ],
+      "fields": [
+        "slot_rules",
+        "eligibility",
+        "set_rules",
+        "restrictions",
+        "ui_profile",
+        "enabled"
+      ]
+    },
+    "mail_definition": {
+      "id_prefix": "MAIL-",
+      "required": [
+        "id",
+        "category"
+      ],
+      "fields": [
+        "title",
+        "body",
+        "expiry",
+        "audience",
+        "reward_reference",
+        "server_scope",
+        "enabled"
+      ]
+    },
+    "notification_definition": {
+      "id_prefix": "NOTIFY-",
+      "required": [
+        "id",
+        "priority"
+      ],
+      "fields": [
+        "title",
+        "detail",
+        "channel",
+        "audience",
+        "server_scope",
+        "start",
+        "end",
+        "hud_eligible",
+        "enabled"
+      ]
+    },
+    "compensation_definition": {
+      "id_prefix": "COMP-",
+      "required": [
+        "id",
+        "reason"
+      ],
+      "fields": [
+        "audience",
+        "reward_reference",
+        "expiry",
+        "preview_required",
+        "audit_reason",
+        "enabled"
+      ]
+    },
+    "store_product_definition": {
+      "id_prefix": "STORE-PROD-",
+      "required": [
+        "id",
+        "product_key"
+      ],
+      "fields": [
+        "label",
+        "product_key",
+        "entitlement_ids",
+        "platforms",
+        "category",
+        "asset_id",
+        "enabled"
+      ]
+    },
+    "store_product_mapping_definition": {
+      "id_prefix": "STORE-MAP-",
+      "required": [
+        "id",
+        "product_id",
+        "platform"
+      ],
+      "fields": [
+        "product_id",
+        "platform",
+        "provider_product_id",
+        "environment",
+        "region_rules",
+        "enabled"
+      ]
+    },
+    "shop_offer_definition": {
+      "id_prefix": "OFFER-",
+      "required": [
+        "id",
+        "product_ids"
+      ],
+      "fields": [
+        "product_ids",
+        "bundle_id",
+        "start",
+        "end",
+        "segment",
+        "purchase_limit",
+        "minimum_level",
+        "event_id",
+        "sort_order",
+        "asset_id",
+        "enabled"
+      ]
+    },
+    "commerce_bundle_definition": {
+      "id_prefix": "BUNDLE-",
+      "required": [
+        "id",
+        "contents"
+      ],
+      "fields": [
+        "contents",
+        "entitlement_ids",
+        "display",
+        "availability",
+        "enabled"
+      ]
+    },
+    "entitlement_policy_definition": {
+      "id_prefix": "ENT-POL-",
+      "required": [
+        "id",
+        "entitlement_id"
+      ],
+      "fields": [
+        "entitlement_id",
+        "grant_rule",
+        "revoke_rule",
+        "refund_rule",
+        "environment_scope",
+        "audit_required",
+        "enabled"
+      ]
+    },
+    "telemetry_event_definition": {
+      "id_prefix": "TEL-EVT-",
+      "required": [
+        "id",
+        "event_name",
+        "event_version"
+      ],
+      "fields": [
+        "domain",
+        "allowed_context",
+        "privacy_class",
+        "environment_scope",
+        "enabled"
+      ]
+    },
+    "analytics_metric_definition": {
+      "id_prefix": "AN-MET-",
+      "required": [
+        "id",
+        "metric_key"
+      ],
+      "fields": [
+        "domain",
+        "aggregation",
+        "dimensions",
+        "environment_scope",
+        "dashboard_group",
+        "enabled"
+      ]
+    },
+    "operations_alert_definition": {
+      "id_prefix": "OPS-ALT-",
+      "required": [
+        "id",
+        "signal"
+      ],
+      "fields": [
+        "service",
+        "severity",
+        "environment_scope",
+        "routing_policy",
+        "runbook_ref",
+        "enabled"
+      ]
+    },
+    "retention_policy_definition": {
+      "id_prefix": "RET-",
+      "required": [
+        "id",
+        "data_class"
+      ],
+      "fields": [
+        "purpose",
+        "environment_scope",
+        "retention_class",
+        "deletion_workflow",
+        "legal_review_required",
+        "enabled"
+      ]
+    },
+    "feature_flag_definition": {
+      "id_prefix": "FLAG-",
+      "required": [
+        "id",
+        "environment",
+        "enabled"
+      ],
+      "fields": [
+        "rollout_rule",
+        "segment",
+        "start",
+        "end",
+        "safe_default",
+        "audit_note"
+      ]
+    },
+    "maintenance_notice_definition": {
+      "id_prefix": "MAINT-",
+      "required": [
+        "id",
+        "environment",
+        "state"
+      ],
+      "fields": [
+        "affected_services",
+        "message_key",
+        "start",
+        "expected_end",
+        "status_reference"
+      ]
+    },
+    "release_channel_definition": {
+      "id_prefix": "REL-",
+      "required": [
+        "id",
+        "environment",
+        "channel"
+      ],
+      "fields": [
+        "minimum_version",
+        "recommended_version",
+        "content_config_version",
+        "api_compatibility",
+        "enabled"
+      ]
+    },
+    "operations_runbook_definition": {
+      "id_prefix": "RUNBOOK-",
+      "required": [
+        "id",
+        "incident_type"
+      ],
+      "fields": [
+        "safe_actions",
+        "rollback_reference",
+        "owner_role",
+        "audit_required"
+      ]
+    },
+    "backup_policy_definition": {
+      "status": "FOUNDATION",
+      "authority": "operations_admin",
+      "versioned": true,
+      "audited": true
+    },
+    "restore_policy_definition": {
+      "status": "FOUNDATION",
+      "authority": "operations_admin",
+      "versioned": true,
+      "audited": true
+    },
+    "disaster_recovery_plan_definition": {
+      "status": "FOUNDATION",
+      "authority": "operations_admin",
+      "versioned": true,
+      "audited": true
+    },
+    "recovery_runbook_definition": {
+      "status": "FOUNDATION",
+      "authority": "operations_admin",
+      "versioned": true,
+      "audited": true
+    },
+    "security_policy_definition": {
+      "status": "FOUNDATION",
+      "authority": "security_admin",
+      "versioned": true,
+      "audited": true
+    },
+    "rate_limit_policy_definition": {
+      "status": "FOUNDATION",
+      "authority": "security_admin",
+      "versioned": true,
+      "audited": true
+    },
+    "operational_permission_definition": {
+      "status": "FOUNDATION",
+      "authority": "security_admin",
+      "versioned": true,
+      "audited": true
+    },
+    "secret_rotation_policy_definition": {
+      "status": "FOUNDATION",
+      "authority": "security_operations",
+      "versioned": true,
+      "audited": true
+    },
+    "capacity_plan_definition": {
+      "status": "FOUNDATION",
+      "authority": "server_operations",
+      "versioned": true,
+      "audited": true
+    },
+    "load_test_scenario_definition": {
+      "status": "FOUNDATION",
+      "authority": "qa_operations",
+      "versioned": true,
+      "audited": true
+    },
+    "performance_budget_definition": {
+      "status": "FOUNDATION",
+      "authority": "client_platform_operations",
+      "versioned": true,
+      "audited": true
+    },
+    "resilience_test_scenario_definition": {
+      "status": "FOUNDATION",
+      "authority": "qa_operations",
+      "versioned": true,
+      "audited": true
+    },
+    "crash_diagnostic_policy_definition": {
+      "fields": [
+        "enabled",
+        "environment",
+        "platform_scope",
+        "capture_context",
+        "redaction_policy",
+        "support_opt_in"
+      ]
+    },
+    "qa_matrix_definition": {
+      "fields": [
+        "platform",
+        "device_class",
+        "browser_or_os",
+        "network_profile",
+        "account_state",
+        "required_coverage"
+      ]
+    },
+    "network_qa_profile_definition": {
+      "fields": [
+        "bandwidth_class",
+        "jitter_profile",
+        "packet_loss_profile",
+        "latency_profile",
+        "reconnect_case",
+        "resume_case"
+      ]
+    },
+    "client_health_budget_definition": {
+      "fields": [
+        "platform_profile",
+        "fps_target",
+        "memory_budget_ref",
+        "thermal_budget_ref",
+        "long_session_case",
+        "streaming_case"
+      ]
+    },
+    "launch_readiness_gate_definition": {
+      "id_prefix": "LRG-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "domains",
+        "required_evidence",
+        "blocking",
+        "environment",
+        "enabled"
+      ]
+    },
+    "release_candidate_definition": {
+      "id_prefix": "RC-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "channel",
+        "build_number",
+        "client_version",
+        "content_config_version",
+        "source_revision",
+        "environment"
+      ]
+    },
+    "release_evidence_definition": {
+      "id_prefix": "EVID-",
+      "required": [
+        "id",
+        "gate_id"
+      ],
+      "fields": [
+        "status",
+        "evidence_refs",
+        "owner",
+        "checked_at",
+        "environment",
+        "build_number"
+      ]
+    },
+    "release_waiver_policy_definition": {
+      "id_prefix": "WAIVER-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "scope",
+        "approval_role",
+        "audit_required",
+        "expires_at",
+        "enabled"
+      ]
+    },
+    "online_alpha_flow_definition": {
+      "id_prefix": "OAF-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "phases",
+        "required_evidence",
+        "environment",
+        "enabled"
+      ]
+    },
+    "server_contract_endpoint_definition": {
+      "id_prefix": "SCE-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "domain",
+        "request_kind",
+        "response_kind",
+        "authority",
+        "environment",
+        "enabled"
+      ]
+    },
+    "session_integrity_policy_definition": {
+      "id_prefix": "SIP-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "world_revision_required",
+        "resume_verdict_required",
+        "stale_state_policy",
+        "environment",
+        "enabled"
+      ]
+    },
+    "e2e_test_scenario_definition": {
+      "id_prefix": "E2E-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "flow_steps",
+        "account_state",
+        "network_profile",
+        "expected_authority",
+        "environment",
+        "enabled"
+      ]
+    },
+    "auth_provider_policy_definition": {
+      "label": "Auth Provider Policy",
+      "fields": [
+        "provider_id",
+        "environment",
+        "enabled",
+        "linking_policy",
+        "verification_policy"
+      ]
+    },
+    "account_profile_schema_definition": {
+      "label": "Account Profile Schema",
+      "fields": [
+        "schema_version",
+        "server_profile_version",
+        "migration_policy",
+        "required_fields"
+      ]
+    },
+    "repository_transaction_policy_definition": {
+      "label": "Repository Transaction Policy",
+      "fields": [
+        "domain",
+        "revision_guard",
+        "idempotency_required",
+        "conflict_policy"
+      ]
+    },
+    "account_migration_policy_definition": {
+      "label": "Account Migration Policy",
+      "fields": [
+        "from_version",
+        "to_version",
+        "environment",
+        "validation_policy",
+        "rollback_policy"
+      ]
+    },
+    "player_profile_schema_definition": {
+      "label": "Player Profile Schema",
+      "fields": [
+        "schema_version",
+        "profile_domains",
+        "required_identity_fields",
+        "migration_policy"
+      ]
+    },
+    "ownership_instance_policy_definition": {
+      "label": "Ownership Instance Policy",
+      "fields": [
+        "instance_kind",
+        "ownership_states",
+        "binding_policy",
+        "revocation_policy"
+      ]
+    },
+    "loadout_integrity_policy_definition": {
+      "label": "Loadout Integrity Policy",
+      "fields": [
+        "slot_family",
+        "owned_instance_required",
+        "compatibility_policy",
+        "conflict_policy"
+      ]
+    },
+    "profile_transaction_policy_definition": {
+      "label": "Profile Transaction Policy",
+      "fields": [
+        "domain",
+        "revision_guard",
+        "idempotency_required",
+        "audit_policy"
+      ]
+    },
+    "economy_transaction_policy_definition": {
+      "id_prefix": "ECOTX-",
+      "required": [
+        "id",
+        "domain"
+      ],
+      "fields": [
+        "domain",
+        "allowed_operations",
+        "validation_policy",
+        "idempotency_policy",
+        "revision_policy",
+        "audit_policy",
+        "enabled"
+      ]
+    },
+    "wallet_ledger_policy_definition": {
+      "id_prefix": "WALLET-POL-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "currency_ids",
+        "debit_rules",
+        "credit_rules",
+        "limits",
+        "environment",
+        "audit_policy",
+        "enabled"
+      ]
+    },
+    "inventory_mutation_policy_definition": {
+      "id_prefix": "INVMUT-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "instance_kinds",
+        "capacity_policy",
+        "binding_policy",
+        "equip_policy",
+        "lock_policy",
+        "audit_policy",
+        "enabled"
+      ]
+    },
+    "transaction_receipt_policy_definition": {
+      "id_prefix": "TXR-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "receipt_fields",
+        "retention_class",
+        "replay_policy",
+        "correlation_fields",
+        "audit_policy",
+        "enabled"
+      ]
+    },
+    "world_snapshot_policy_definition": {
+      "id_prefix": "WSP-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "entity_schema",
+        "baseline_fields",
+        "revision_policy",
+        "tick_policy",
+        "environment",
+        "enabled"
+      ]
+    },
+    "world_delta_policy_definition": {
+      "id_prefix": "WDP-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "allowed_ops",
+        "sequence_policy",
+        "patch_fields",
+        "stale_policy",
+        "resync_policy",
+        "enabled"
+      ]
+    },
+    "network_entity_identity_policy_definition": {
+      "id_prefix": "NEI-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "entity_types",
+        "identity_fields",
+        "spawn_generation_policy",
+        "ownership_reference_policy",
+        "reuse_policy",
+        "enabled"
+      ]
+    },
+    "world_transfer_resync_policy_definition": {
+      "id_prefix": "WTR-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "join_policy",
+        "transfer_policy",
+        "rejoin_policy",
+        "resync_policy",
+        "environment_isolation",
+        "audit_policy",
+        "enabled"
+      ]
+    },
+    "movement_authority_policy_definition": {
+      "id_prefix": "MOV-AUTH-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "allowed_intents",
+        "server_owned_fields",
+        "revision_policy",
+        "environment",
+        "audit_policy",
+        "enabled"
+      ]
+    },
+    "movement_prediction_policy_definition": {
+      "id_prefix": "MOV-PRED-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "prediction_modes",
+        "presentation_only",
+        "pending_command_policy",
+        "replay_policy",
+        "enabled"
+      ]
+    },
+    "movement_reconciliation_policy_definition": {
+      "id_prefix": "MOV-REC-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "ack_policy",
+        "correction_modes",
+        "stale_policy",
+        "world_resync_policy",
+        "audit_policy",
+        "enabled"
+      ]
+    },
+    "movement_abuse_guard_policy_definition": {
+      "id_prefix": "MOV-GUARD-",
+      "required": [
+        "id"
+      ],
+      "fields": [
+        "speed_policy",
+        "teleport_policy",
+        "route_policy",
+        "collision_policy",
+        "server_verdict_required",
+        "environment",
+        "enabled"
+      ]
+    },
+    "combat_resolution_policy_definition": {
+      "fields": [
+        "allowed_weapon_families",
+        "target_rules",
+        "range_rule_ref",
+        "line_of_fire_rule_ref",
+        "status_rule_ref",
+        "enabled"
+      ]
+    },
+    "fire_command_policy_definition": {
+      "fields": [
+        "sequence_policy",
+        "request_id_policy",
+        "cooldown_rule_ref",
+        "ammo_rule_ref",
+        "enabled"
+      ]
+    },
+    "combat_outcome_policy_definition": {
+      "fields": [
+        "allowed_outcomes",
+        "damage_rule_ref",
+        "healing_rule_ref",
+        "death_rule_ref",
+        "feedback_profile_ref",
+        "enabled"
+      ]
+    },
+    "combat_settlement_policy_definition": {
+      "fields": [
+        "ammo_transaction_policy_ref",
+        "reward_transaction_policy_ref",
+        "kill_credit_rule_ref",
+        "environment_scope",
+        "enabled"
+      ]
+    },
+    "combat_state_policy_definition": {
+      "id_prefix": "POLICY-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "phase_rules",
+        "combat_exit_policy",
+        "defeat_policy",
+        "environment_scope",
+        "enabled"
+      ]
+    },
+    "reload_state_policy_definition": {
+      "id_prefix": "POLICY-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "weapon_family",
+        "reload_state_model",
+        "interrupt_rules",
+        "display_policy",
+        "enabled"
+      ]
+    },
+    "status_effect_policy_definition": {
+      "id_prefix": "POLICY-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "effect_family",
+        "stack_policy",
+        "refresh_policy",
+        "tick_policy",
+        "dispel_policy",
+        "enabled"
+      ]
+    },
+    "projectile_resolution_policy_definition": {
+      "id_prefix": "POLICY-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "weapon_family",
+        "lifecycle_model",
+        "impact_policy",
+        "presentation_policy",
+        "enabled"
+      ]
+    },
+    "targeting_policy_definition": {
+      "id_prefix": "POLICY-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "targetability_rules",
+        "cycle_priority_policy",
+        "target_loss_policy",
+        "enabled"
+      ]
+    },
+    "relationship_policy_definition": {
+      "id_prefix": "POLICY-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "relationship_families",
+        "group_guild_rules",
+        "friendly_fire_policy",
+        "diplomacy_rule_ref",
+        "enabled"
+      ]
+    },
+    "aggro_threat_policy_definition": {
+      "id_prefix": "POLICY-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "actor_family",
+        "threat_model",
+        "aggro_rule_ref",
+        "leash_rule_ref",
+        "target_switch_policy",
+        "enabled"
+      ]
+    },
+    "safe_zone_pvp_protection_policy_definition": {
+      "id_prefix": "POLICY-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "zone_rule_ref",
+        "pvp_protection_rule_ref",
+        "attack_block_policy",
+        "anti_farm_rule_ref",
+        "environment_scope",
+        "enabled"
+      ]
+    },
+    "ai_combat_brain_policy_definition": {
+      "id_prefix": "AI-BRAIN-",
+      "required": [
+        "id",
+        "name",
+        "archetype"
+      ],
+      "fields": [
+        "allowed_states",
+        "decision_profile",
+        "target_policy_ref",
+        "movement_policy_ref",
+        "combat_policy_ref",
+        "phase_policy_ref",
+        "enabled"
+      ]
+    },
+    "threat_resolution_policy_definition": {
+      "id_prefix": "AI-THREAT-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "eligible_relationships",
+        "threat_sources",
+        "switch_policy",
+        "decay_policy",
+        "assist_policy",
+        "enabled"
+      ]
+    },
+    "npc_archetype_behavior_definition": {
+      "id_prefix": "AI-ARCH-",
+      "required": [
+        "id",
+        "name",
+        "archetype"
+      ],
+      "fields": [
+        "brain_policy_ref",
+        "threat_policy_ref",
+        "movement_profile_ref",
+        "combat_profile_ref",
+        "telegraph_profile_ref",
+        "phase_profile_ref",
+        "enabled"
+      ]
+    },
+    "encounter_leash_return_policy_definition": {
+      "id_prefix": "AI-LEASH-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "home_anchor_policy",
+        "leash_policy",
+        "return_policy",
+        "reset_policy",
+        "target_loss_policy",
+        "enabled"
+      ]
+    },
+    "encounter_orchestration_policy_definition": {
+      "fields": [
+        "id",
+        "environment",
+        "enabled",
+        "encounter_kind",
+        "lifecycle_rules",
+        "spawn_group_refs",
+        "phase_profile_ref",
+        "reward_handoff_policy_ref",
+        "revision",
+        "status"
+      ]
+    },
+    "spawn_group_policy_definition": {
+      "fields": [
+        "id",
+        "environment",
+        "encounter_kind",
+        "entity_archetype_refs",
+        "formation_profile_ref",
+        "spawn_anchor_policy_ref",
+        "despawn_policy_ref",
+        "population_policy_ref",
+        "revision",
+        "status"
+      ]
+    },
+    "respawn_reset_policy_definition": {
+      "fields": [
+        "id",
+        "environment",
+        "encounter_kind",
+        "respawn_policy",
+        "reset_policy",
+        "wipe_policy",
+        "reentry_policy",
+        "cleanup_policy",
+        "revision",
+        "status"
+      ]
+    },
+    "boss_admiral_phase_policy_definition": {
+      "fields": [
+        "id",
+        "environment",
+        "encounter_kind",
+        "phase_ids",
+        "transition_rules",
+        "wave_refs",
+        "add_group_refs",
+        "telegraph_profile_ref",
+        "completion_rules",
+        "revision",
+        "status"
+      ]
+    },
+    "kill_credit_policy_definition": {
+      "fields": [
+        "id",
+        "environment",
+        "encounter_kind",
+        "credit_sources",
+        "group_policy_ref",
+        "anti_farm_policy_ref",
+        "revision",
+        "status"
+      ]
+    },
+    "contribution_eligibility_policy_definition": {
+      "fields": [
+        "id",
+        "environment",
+        "contribution_dimensions",
+        "eligibility_rules",
+        "group_policy_ref",
+        "disconnect_policy_ref",
+        "revision",
+        "status"
+      ]
+    },
+    "loot_reward_authorization_policy_definition": {
+      "fields": [
+        "id",
+        "environment",
+        "encounter_kind",
+        "eligibility_policy_ref",
+        "loot_pool_ref",
+        "reward_pool_ref",
+        "settlement_policy_ref",
+        "revision",
+        "status"
+      ]
+    },
+    "encounter_persistence_recovery_policy_definition": {
+      "fields": [
+        "id",
+        "environment",
+        "persisted_state",
+        "checkpoint_policy",
+        "reconnect_policy",
+        "recovery_policy",
+        "revision",
+        "status"
+      ]
+    },
+    "loot_table_policy_definition": {
+      "category": "online_reward_authority",
+      "authority": "server_only",
+      "status": "foundation"
+    },
+    "drop_pool_policy_definition": {
+      "category": "online_reward_authority",
+      "authority": "server_only",
+      "status": "foundation"
+    },
+    "group_fleet_reward_distribution_policy_definition": {
+      "category": "online_reward_authority",
+      "authority": "server_only",
+      "status": "foundation"
+    },
+    "loot_settlement_authorization_policy_definition": {
+      "category": "online_reward_authority",
+      "authority": "server_only",
+      "status": "foundation"
+    },
+    "loot_roll_integrity_policy_definition": {
+      "category": "online_reward_authority",
+      "authority": "server_only",
+      "status": "foundation"
+    },
+    "loot_duplicate_guard_policy_definition": {
+      "category": "online_reward_authority",
+      "authority": "server_only",
+      "status": "foundation"
+    },
+    "guaranteed_drop_policy_definition": {
+      "category": "online_reward_authority",
+      "authority": "server_only",
+      "status": "foundation"
+    },
+    "loot_pity_policy_definition": {
+      "category": "online_reward_authority",
+      "authority": "server_only",
+      "status": "foundation"
+    },
+    "reward_receipt_policy_definition": {
+      "category": "online_reward_delivery",
+      "authority": "server_only",
+      "fields": [
+        "id",
+        "environment",
+        "receipt_identity_policy",
+        "transaction_link_policy",
+        "beneficiary_policy",
+        "idempotency_policy",
+        "revision",
+        "status"
+      ]
+    },
+    "reward_claim_delivery_policy_definition": {
+      "category": "online_reward_delivery",
+      "authority": "server_only",
+      "fields": [
+        "id",
+        "environment",
+        "claim_policy",
+        "delivery_channel_policy",
+        "capacity_failure_policy",
+        "settlement_policy_ref",
+        "revision",
+        "status"
+      ]
+    },
+    "reward_mail_fallback_policy_definition": {
+      "category": "online_reward_delivery",
+      "authority": "server_only",
+      "fields": [
+        "id",
+        "environment",
+        "mail_policy_ref",
+        "claim_inbox_policy",
+        "fallback_policy",
+        "attachment_policy",
+        "revision",
+        "status"
+      ]
+    },
+    "reward_recovery_audit_policy_definition": {
+      "category": "online_reward_delivery",
+      "authority": "server_only",
+      "fields": [
+        "id",
+        "environment",
+        "recovery_policy",
+        "retry_policy",
+        "receipt_retention_policy",
+        "audit_policy",
+        "revision",
+        "status"
+      ]
+    },
+    "reward_inbox_policy_definition": {
+      "category": "reward_delivery",
+      "authority": "SERVER",
+      "description": "Server-owned reward inbox entry/visibility/retention policy.",
+      "no_code": true
+    },
+    "reward_claim_queue_policy_definition": {
+      "category": "reward_delivery",
+      "authority": "SERVER",
+      "description": "Server-owned claim queue ordering, blocking and processing policy.",
+      "no_code": true
+    },
+    "reward_overflow_expiry_policy_definition": {
+      "category": "reward_delivery",
+      "authority": "SERVER",
+      "description": "Server-owned capacity overflow, retention and expiry policy.",
+      "no_code": true
+    },
+    "reward_compensation_recovery_policy_definition": {
+      "category": "reward_delivery",
+      "authority": "SERVER",
+      "description": "Server-owned audited compensation/recovery authorization policy.",
+      "no_code": true
+    },
+    "reward_notification_presentation_policy_definition": {
+      "description": "Server-confirmed reward notification and presentation policy; visual timing/hierarchy only, never reward authority."
+    },
+    "reward_loot_feedback_policy_definition": {
+      "description": "Sea-chart loot/reward feedback presentation policy for confirmed rewards and encounter outcomes."
+    },
+    "reward_claim_ux_policy_definition": {
+      "description": "Claim UX state mapping for confirmed inbox/delivery states across mobile and desktop."
+    },
+    "reward_badge_hierarchy_policy_definition": {
+      "description": "Inbox badge/notification hierarchy policy derived from authoritative reward state."
+    },
+    "reward_visual_layout_policy_definition": {
+      "description": "Safe-area-aware sea-chart reward visual layout policy for mobile/desktop; presentation only."
+    },
+    "reward_reveal_presentation_policy_definition": {
+      "description": "Boss/admiral and standard reward reveal hierarchy policy bound to server-confirmed M279 state."
+    },
+    "reward_icon_binding_policy_definition": {
+      "description": "Stable master-item/currency icon binding policy for confirmed reward presentation; UI frames remain foundation-driven."
+    },
+    "reward_vfx_motion_policy_definition": {
+      "description": "Presentation-only reward reveal/pulse/VFX hook policy; visual motion never proves ownership or settlement."
+    },
+    "combat_hud_visual_policy_definition": {
+      "description": "Presentation-only combat HUD hierarchy policy for target/reload/ammo/status feedback; never combat authority."
+    },
+    "target_header_visual_policy_definition": {
+      "description": "Compact target-header visual policy bound to M271 legality/relationship state and existing target master hierarchy."
+    },
+    "combat_feedback_presentation_policy_definition": {
+      "description": "Reload/salvo/damage/heal/status feedback presentation policy bound to M269/M270 server-confirmed state."
+    },
+    "boss_admiral_telegraph_visual_policy_definition": {
+      "description": "Boss/admiral phase and danger telegraph visual policy; readable, safe-area-aware and non-authoritative."
+    },
+    "combat_event_feedback_policy_definition": {
+      "description": "Presentation-only server-confirmed combat event feed/coalescing policy; never damage/heal authority."
+    },
+    "damage_heal_number_presentation_policy_definition": {
+      "description": "Damage/heal number hierarchy and coalescing presentation policy bound to confirmed combat outcomes."
+    },
+    "combat_impact_vfx_policy_definition": {
+      "description": "Impact VFX hook policy bound to server-confirmed projectile/combat events; VFX never applies damage or confirms impact."
+    },
+    "combat_feedback_density_policy_definition": {
+      "description": "Mobile/desktop combat-feedback density and prioritization policy; final budgets/timings remain measurement-driven."
+    },
+    "projectile_presentation_policy_definition": {
+      "id_prefix": "PROJ-PRES-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "weapon_family",
+        "travel_visual_profile",
+        "impact_profile",
+        "enabled"
+      ]
+    },
+    "cannon_salvo_visual_policy_definition": {
+      "id_prefix": "SALVO-VIS-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "muzzle_hook",
+        "travel_hook",
+        "impact_hook",
+        "enabled"
+      ]
+    },
+    "harpoon_impact_visual_policy_definition": {
+      "id_prefix": "HARPOON-VIS-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "launch_hook",
+        "travel_hook",
+        "monster_impact_hook",
+        "enabled"
+      ]
+    },
+    "combat_audio_haptics_policy_definition": {
+      "id_prefix": "COMBAT-AH-",
+      "required": [
+        "id",
+        "name"
+      ],
+      "fields": [
+        "audio_hook",
+        "haptic_hook",
+        "accessibility_safe",
+        "enabled"
+      ]
+    },
+    "naval_combat_identity_policy_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "cannon_family_presentation_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "impact_material_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "salvo_audio_rhythm_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "ship_damage_presentation_policy_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "ship_hit_reaction_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "ship_damage_state_visual_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "ship_sinking_defeat_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "ship_damage_segment_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "ship_damage_overlay_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "sinking_presentation_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "wreck_visual_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "ship_motion_identity_policy_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "ship_wake_presentation_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "ship_sail_motion_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "ship_water_displacement_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "naval_contact_readability_policy_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "contact_relationship_presentation_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "contact_threat_range_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "offscreen_contact_marker_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "playable_vertical_slice_definition": {
+      "authority": "VERSIONED_CONTENT",
+      "scope": "integration_and_qa",
+      "status": "FOUNDATION"
+    },
+    "vertical_slice_content_manifest_definition": {
+      "authority": "VERSIONED_CONTENT",
+      "scope": "integration_and_qa",
+      "status": "FOUNDATION"
+    },
+    "native_gameplay_qa_evidence_definition": {
+      "authority": "QA_OR_OPERATIONS",
+      "scope": "evidence_only",
+      "status": "FOUNDATION"
+    },
+    "vertical_slice_performance_capture_profile_definition": {
+      "authority": "QA_OR_OPERATIONS",
+      "scope": "evidence_only",
+      "status": "FOUNDATION"
+    },
+    "first_sortie_integration_definition": {
+      "authority": "VERSIONED_CONTENT",
+      "scope": "integration_and_qa",
+      "status": "FOUNDATION"
+    },
+    "first_sortie_guidance_profile_definition": {
+      "authority": "SERVER_OR_VERSIONED_CONTENT",
+      "scope": "presentation_only",
+      "status": "FOUNDATION"
+    },
+    "first_sortie_event_receipt_policy_definition": {
+      "authority": "QA_OR_OPERATIONS",
+      "scope": "evidence_only",
+      "status": "FOUNDATION"
+    },
+    "first_sortie_placeholder_profile_definition": {
+      "authority": "VERSIONED_CONTENT",
+      "scope": "asset_intake",
+      "status": "FOUNDATION"
+    },
+    "ship_visual_animation_profile_definition": {
+      "authority": "VERSIONED_CONTENT",
+      "scope": "visual_presentation",
+      "status": "FOUNDATION"
+    }
+  },
+  "asset_rule": "Every visual content record references a stable AssetSlot. Upload/import pipeline may replace slot payload without changing gameplay IDs.",
+  "no_code_rule": "Creating records of these supported types must not require a client code deployment.",
+  "behavior_components": {
+    "damage": {
+      "fields": [
+        "amount",
+        "damage_type",
+        "armor_pierce",
+        "shield_modifier"
+      ]
+    },
+    "status": {
+      "fields": [
+        "status_id",
+        "power",
+        "duration",
+        "stack_rule"
+      ]
+    },
+    "heal": {
+      "fields": [
+        "hull",
+        "shield",
+        "radius"
+      ]
+    },
+    "movement_modifier": {
+      "fields": [
+        "speed_mult",
+        "turn_mult",
+        "duration"
+      ]
+    },
+    "barrier": {
+      "fields": [
+        "amount",
+        "duration"
+      ]
+    },
+    "spawn": {
+      "fields": [
+        "content_id",
+        "count",
+        "formation"
+      ]
+    },
+    "reward": {
+      "fields": [
+        "currency",
+        "item_id",
+        "amount",
+        "chance"
+      ]
+    },
+    "objective": {
+      "fields": [
+        "kind",
+        "target",
+        "content_tags",
+        "region_ids"
+      ]
+    },
+    "wave": {
+      "fields": [
+        "content_id",
+        "count",
+        "level_offset",
+        "formation",
+        "completion"
+      ]
+    },
+    "schedule": {
+      "fields": [
+        "start",
+        "end",
+        "timezone",
+        "recurrence"
+      ]
+    },
+    "aoe_damage": {
+      "fields": [
+        "amount",
+        "radius",
+        "armor_pierce",
+        "target_group"
+      ]
+    },
+    "target_denial": {
+      "fields": [
+        "duration",
+        "break_on_attack"
+      ]
+    },
+    "repair_block": {
+      "fields": [
+        "duration"
+      ]
+    },
+    "recall": {
+      "fields": [
+        "destination",
+        "disallow_in_safe_zone",
+        "requires_no_target"
+      ]
+    }
+  },
+  "security_rule": "Admin content may compose only whitelisted behavior components; it cannot upload/execute arbitrary gameplay code."
+}

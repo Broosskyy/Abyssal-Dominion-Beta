@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "milestone": "M57",
+  "scope": "Main-design progression contribution vocabulary; balance intentionally unbound.",
+  "authority": "local prototype telemetry only; future authoritative evaluation belongs to backend/combat authority.",
+  "unlock_rule": "No contribution count in this file grants ownership. Existing explicit reward hooks remain the only PL6-15 ownership path.",
+  "categories": [
+    {
+      "id": "valid_damage",
+      "label": "Wirksamer Schaden",
+      "qualifies": "Damage applied to a valid target",
+      "weight": null
+    },
+    {
+      "id": "qualified_ammo_use",
+      "label": "Qualifizierter Munitionsverbrauch",
+      "qualifies": "Valid cannon salvo against a valid target",
+      "weight": null
+    },
+    {
+      "id": "kill_or_assist",
+      "label": "Kill / Assist",
+      "qualifies": "Credited kill or assist",
+      "weight": null
+    },
+    {
+      "id": "elite_admiral_boss",
+      "label": "Elite / Admiral / Boss",
+      "qualifies": "Meaningful participation",
+      "weight": null
+    },
+    {
+      "id": "bonusmap",
+      "label": "Bonusmap-Aktivität",
+      "qualifies": "Eligible bonusmap activity",
+      "weight": null
+    },
+    {
+      "id": "event",
+      "label": "Event-Aktivität",
+      "qualifies": "Eligible event activity",
+      "weight": null
+    },
+    {
+      "id": "pvp_pve",
+      "label": "Passende PvP-/PvE-Aktivität",
+      "qualifies": "Eligible activity defined by future content rules",
+      "weight": null
+    }
+  ],
+  "anti_farm": [
+    "empty_shot",
+    "afk_fire",
+    "invalid_target_consumption"
+  ],
+  "balance_status": "TBD_AFTER_PLAYTESTS"
+}

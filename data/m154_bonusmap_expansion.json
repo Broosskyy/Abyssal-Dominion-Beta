@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "milestone": "M154",
+  "maps": {
+    "silver": {
+      "eligibility_level": 12, "entry_item": "silver_chart_fragment", "entry_cost": 8,
+      "kills_per_wave": [3,4,4,1],
+      "waves": [
+        {"wave":1,"kind":"ship","count":3,"slot":"npc_silver_raider","archetype":"brawler","level_offset":0},
+        {"wave":2,"kind":"ship","count":4,"slot":"npc_silver_skirmisher","archetype":"skirmisher","level_offset":1},
+        {"wave":3,"kind":"elite","count":4,"slot":"npc_silver_elite","archetype":"artillery","level_offset":2},
+        {"wave":4,"kind":"admiral","count":1,"slot":"npc_silver_admiral","archetype":"tank","level_offset":3}
+      ],
+      "wave_reward":{"coins_base":90,"coins_per_wave":30,"mastery_base":40,"mastery_per_wave":15},
+      "completion":{"coins":650,"items":{"gold_chart_fragment":2,"precision_gears":1}}
+    },
+    "legendary": {
+      "eligibility_level": 36, "entry_item": "legendary_fragment", "entry_cost": 16,
+      "kills_per_wave": [4,4,1,1],
+      "waves": [
+        {"wave":1,"kind":"ship","count":4,"slot":"npc_legendary_void_fleet","archetype":"brawler","level_offset":0},
+        {"wave":2,"kind":"elite","count":4,"slot":"npc_legendary_elite","archetype":"skirmisher","level_offset":2},
+        {"wave":3,"kind":"guardian","count":1,"slot":"monster_legendary_void","archetype":"tank","level_offset":4},
+        {"wave":4,"kind":"admiral","count":1,"slot":"npc_legendary_admiral","archetype":"artillery","level_offset":6}
+      ],
+      "wave_reward":{"coins_base":280,"coins_per_wave":85,"mastery_base":160,"mastery_per_wave":45},
+      "completion":{"coins":2400,"items":{"legendary_fragment":2,"ancient_relic_core":1}}
+    }
+  },
+  "rules":["optional progression accelerator","instance-owned sinks only","never bypass Pirate Trials","all tuning remains data-driven"]
+}

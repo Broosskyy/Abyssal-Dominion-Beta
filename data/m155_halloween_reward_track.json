@@ -1,0 +1,17 @@
+{
+  "schema":1,
+  "milestone":"M155",
+  "event_id":"halloween_abyss_01",
+  "authority":"LOCAL_PREVIEW_ONLY",
+  "track":[
+    {"score":25,"label":"Gravewake Cache","preview_items":[{"id":"gravefire","amount":20}]},
+    {"score":50,"label":"Lantern Salvage","preview_items":[{"id":"reinforced_timber","amount":2}]},
+    {"score":80,"label":"Spectral Powder","preview_items":[{"id":"spectral","amount":15}]},
+    {"score":120,"label":"Hollow-Eye Chest","preview_items":[{"id":"precision_gears","amount":2}]},
+    {"score":170,"label":"Drowned Sovereign Cache","preview_items":[{"id":"legendary_fragment","amount":1}]},
+    {"score":230,"label":"Abyss Lantern Trophy","preview_cosmetic":"event_halloween_lantern_trophy_01"},
+    {"score":300,"label":"Gravewake Sails Preview","preview_cosmetic":"event_halloween_sails_01"},
+    {"score":380,"label":"Sovereign Figurehead Preview","preview_cosmetic":"event_halloween_figurehead_01"}
+  ],
+  "rules":["no payment requirement","no live claim without reward service receipt","schedule comes from event content, not code","cosmetics remain replaceable asset slots"]
+}

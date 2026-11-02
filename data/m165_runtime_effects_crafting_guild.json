@@ -1,0 +1,795 @@
+{
+  "schema": 1,
+  "milestone": "M165",
+  "goal": "RUNTIME_EFFECT_DEPTH_CRAFTING_GUILD_SPECIALIZATION_AND_AUTHORING_POLISH",
+  "design_rule": "Reference games inform breadth and retention loops only. All IDs, names, values, visuals and progression contracts here are original.",
+  "harpoon_runtime_profiles": [
+    {
+      "id": "harpoon",
+      "label": "Standardharpune",
+      "family": "standard",
+      "damage_mult": 1.0,
+      "range_mult": 1.0,
+      "effect": "none",
+      "rarity": "common",
+      "status_effect": "none",
+      "effect_power": 0.0,
+      "effect_duration": 0.0,
+      "reload_mult": 1.05,
+      "crit": 0.04,
+      "armor_pierce": 0.1,
+      "color": "76e7c5",
+      "authorable": true
+    },
+    {
+      "id": "harpoon_tempered",
+      "label": "Gehärtete Harpune",
+      "family": "heavy",
+      "damage_mult": 1.18,
+      "range_mult": 0.96,
+      "effect": "wound",
+      "rarity": "uncommon",
+      "status_effect": "monster_wound",
+      "effect_power": 0.12,
+      "effect_duration": 5.0,
+      "reload_mult": 1.113,
+      "crit": 0.062,
+      "armor_pierce": 0.1,
+      "color": "76e7c5",
+      "authorable": true
+    },
+    {
+      "id": "harpoon_stormhook",
+      "label": "Sturmhaken",
+      "family": "control",
+      "damage_mult": 0.92,
+      "range_mult": 1.06,
+      "effect": "slow",
+      "rarity": "rare",
+      "status_effect": "monster_slow",
+      "effect_power": 0.22,
+      "effect_duration": 4.0,
+      "reload_mult": 1.05,
+      "crit": 0.04,
+      "armor_pierce": 0.1,
+      "color": "76e7c5",
+      "authorable": true
+    },
+    {
+      "id": "harpoon_relic",
+      "label": "Reliktharpune",
+      "family": "guardian",
+      "damage_mult": 1.28,
+      "range_mult": 1.04,
+      "effect": "guardian_break",
+      "rarity": "epic",
+      "status_effect": "guardian_break",
+      "effect_power": 0.18,
+      "effect_duration": 5.0,
+      "reload_mult": 1.148,
+      "crit": 0.074,
+      "armor_pierce": 0.24,
+      "color": "76e7c5",
+      "authorable": true
+    },
+    {
+      "id": "harpoon_abyssal",
+      "label": "Abgrundlanze",
+      "family": "abyss",
+      "damage_mult": 1.34,
+      "range_mult": 0.92,
+      "effect": "corruption",
+      "rarity": "epic",
+      "status_effect": "corruption_mark",
+      "effect_power": 0.14,
+      "effect_duration": 6.0,
+      "reload_mult": 1.169,
+      "crit": 0.081,
+      "armor_pierce": 0.1,
+      "color": "b985ff",
+      "authorable": true
+    },
+    {
+      "id": "harpoon_chainbite",
+      "label": "Kettenbiss",
+      "family": "control",
+      "damage_mult": 1.02,
+      "range_mult": 0.95,
+      "effect": "snare",
+      "rarity": "rare",
+      "status_effect": "monster_slow",
+      "effect_power": 0.3,
+      "effect_duration": 3.5,
+      "reload_mult": 1.057,
+      "crit": 0.042,
+      "armor_pierce": 0.1,
+      "color": "76e7c5",
+      "authorable": true
+    },
+    {
+      "id": "harpoon_sunsteel",
+      "label": "Sonnenstahl-Harpune",
+      "family": "boss",
+      "damage_mult": 1.42,
+      "range_mult": 1.0,
+      "effect": "boss_break",
+      "rarity": "legendary",
+      "status_effect": "boss_break",
+      "effect_power": 0.2,
+      "effect_duration": 5.0,
+      "reload_mult": 1.197,
+      "crit": 0.09,
+      "armor_pierce": 0.24,
+      "color": "ffd982",
+      "authorable": true
+    },
+    {
+      "id": "harpoon_ghostline",
+      "label": "Geisterleine",
+      "family": "event",
+      "damage_mult": 1.12,
+      "range_mult": 1.12,
+      "effect": "spectral_mark",
+      "rarity": "event",
+      "status_effect": "spectral_mark",
+      "effect_power": 0.12,
+      "effect_duration": 6.0,
+      "reload_mult": 1.092,
+      "crit": 0.054,
+      "armor_pierce": 0.1,
+      "color": "b985ff",
+      "authorable": true
+    },
+    {
+      "id": "harpoon_reefspike",
+      "label": "Riffstachel",
+      "family": "precision",
+      "damage_mult": 1.08,
+      "range_mult": 1.18,
+      "effect": "weakpoint_mark",
+      "rarity": "rare",
+      "status_effect": "weakpoint_mark",
+      "effect_power": 0.14,
+      "effect_duration": 5.0,
+      "reload_mult": 1.078,
+      "crit": 0.05,
+      "armor_pierce": 0.1,
+      "color": "76e7c5",
+      "authorable": true
+    },
+    {
+      "id": "harpoon_moonchain",
+      "label": "Mondkette",
+      "family": "event",
+      "damage_mult": 1.2,
+      "range_mult": 1.05,
+      "effect": "lunar_bind",
+      "rarity": "event",
+      "status_effect": "monster_slow",
+      "effect_power": 0.26,
+      "effect_duration": 4.5,
+      "reload_mult": 1.12,
+      "crit": 0.064,
+      "armor_pierce": 0.1,
+      "color": "b985ff",
+      "authorable": true
+    },
+    {
+      "id": "harpoon_dreadfang",
+      "label": "Schreckenszahn",
+      "family": "admiral",
+      "damage_mult": 1.5,
+      "range_mult": 0.94,
+      "effect": "admiral_break",
+      "rarity": "legendary",
+      "status_effect": "admiral_break",
+      "effect_power": 0.22,
+      "effect_duration": 5.0,
+      "reload_mult": 1.225,
+      "crit": 0.1,
+      "armor_pierce": 0.24,
+      "color": "ffd982",
+      "authorable": true
+    }
+  ],
+  "ammo_effect_primitives": [
+    {
+      "id": "burn",
+      "category": "dot",
+      "authorable_fields": [
+        "power",
+        "duration",
+        "tick_rate",
+        "vfx",
+        "stacking"
+      ]
+    },
+    {
+      "id": "venom",
+      "category": "dot",
+      "authorable_fields": [
+        "power",
+        "duration",
+        "tick_rate",
+        "vfx",
+        "stacking"
+      ]
+    },
+    {
+      "id": "armor_break",
+      "category": "debuff",
+      "authorable_fields": [
+        "power",
+        "duration",
+        "vfx",
+        "stacking"
+      ]
+    },
+    {
+      "id": "spectral_mark",
+      "category": "mark",
+      "authorable_fields": [
+        "power",
+        "duration",
+        "vfx",
+        "target_rule"
+      ]
+    },
+    {
+      "id": "reload_disrupt",
+      "category": "debuff",
+      "authorable_fields": [
+        "power",
+        "duration",
+        "vfx"
+      ]
+    },
+    {
+      "id": "ward_break",
+      "category": "debuff",
+      "authorable_fields": [
+        "power",
+        "duration",
+        "vfx"
+      ]
+    },
+    {
+      "id": "prey_mark",
+      "category": "mark",
+      "authorable_fields": [
+        "power",
+        "duration",
+        "vfx",
+        "monster_only"
+      ]
+    },
+    {
+      "id": "chill",
+      "category": "control",
+      "authorable_fields": [
+        "power",
+        "duration",
+        "vfx",
+        "slow_cap"
+      ]
+    },
+    {
+      "id": "purge_mark",
+      "category": "mark",
+      "authorable_fields": [
+        "power",
+        "duration",
+        "vfx",
+        "corruption_bonus"
+      ]
+    },
+    {
+      "id": "structure_break",
+      "category": "siege",
+      "authorable_fields": [
+        "power",
+        "duration",
+        "vfx",
+        "structure_only"
+      ]
+    }
+  ],
+  "crafting_recipes": [
+    {
+      "id": "recipe_storm_shot",
+      "label": "Sturmgeschoss-Bündel",
+      "output": {
+        "id": "storm_shot",
+        "amount": 20
+      },
+      "inputs": [
+        {
+          "id": "powder",
+          "amount": 2
+        },
+        {
+          "id": "stormglass",
+          "amount": 1
+        }
+      ],
+      "station": "powder_magazine",
+      "gold": 450
+    },
+    {
+      "id": "recipe_wardbreaker",
+      "label": "Wardbrecher-Bündel",
+      "output": {
+        "id": "wardbreaker",
+        "amount": 15
+      },
+      "inputs": [
+        {
+          "id": "powder",
+          "amount": 2
+        },
+        {
+          "id": "ward_crystal",
+          "amount": 1
+        }
+      ],
+      "station": "rune_foundry",
+      "gold": 700
+    },
+    {
+      "id": "recipe_frostwake",
+      "label": "Frostwake-Kugeln",
+      "output": {
+        "id": "frostwake",
+        "amount": 15
+      },
+      "inputs": [
+        {
+          "id": "powder",
+          "amount": 2
+        },
+        {
+          "id": "frostwake_powder",
+          "amount": 1
+        }
+      ],
+      "station": "powder_magazine",
+      "gold": 650
+    },
+    {
+      "id": "recipe_siege_core",
+      "label": "Belagerungskerne",
+      "output": {
+        "id": "siege_core",
+        "amount": 10
+      },
+      "inputs": [
+        {
+          "id": "siege_powder",
+          "amount": 2
+        },
+        {
+          "id": "master_gunlock",
+          "amount": 1
+        }
+      ],
+      "station": "siege_workshop",
+      "gold": 1100
+    },
+    {
+      "id": "recipe_harpoon_reefspike",
+      "label": "Riffstachel-Harpunen",
+      "output": {
+        "id": "harpoon_reefspike",
+        "amount": 8
+      },
+      "inputs": [
+        {
+          "id": "enchanted_rope",
+          "amount": 1
+        },
+        {
+          "id": "metal",
+          "amount": 2
+        }
+      ],
+      "station": "hunter_lodge",
+      "gold": 700
+    },
+    {
+      "id": "recipe_harpoon_dreadfang",
+      "label": "Schreckenszahn-Harpunen",
+      "output": {
+        "id": "harpoon_dreadfang",
+        "amount": 5
+      },
+      "inputs": [
+        {
+          "id": "admiral_seal",
+          "amount": 1
+        },
+        {
+          "id": "abyss_scale",
+          "amount": 2
+        }
+      ],
+      "station": "hunter_lodge",
+      "gold": 1600
+    }
+  ],
+  "crafting_stations": [
+    {
+      "id": "powder_magazine",
+      "label": "Pulvermagazin",
+      "source": "citadel",
+      "max_level": 10
+    },
+    {
+      "id": "rune_foundry",
+      "label": "Runengießerei",
+      "source": "citadel",
+      "max_level": 10
+    },
+    {
+      "id": "hunter_lodge",
+      "label": "Jägerloge",
+      "source": "citadel",
+      "max_level": 10
+    },
+    {
+      "id": "siege_workshop",
+      "label": "Belagerungswerkstatt",
+      "source": "guild_island",
+      "max_level": 10
+    }
+  ],
+  "cannon_visual_stage_rules": [
+    {
+      "track": "barrel",
+      "level": 1,
+      "badge": "barrel_1",
+      "vfx": "none",
+      "authorable": true
+    },
+    {
+      "track": "barrel",
+      "level": 3,
+      "badge": "barrel_3",
+      "vfx": "none",
+      "authorable": true
+    },
+    {
+      "track": "barrel",
+      "level": 5,
+      "badge": "barrel_5",
+      "vfx": "subtle_glow",
+      "authorable": true
+    },
+    {
+      "track": "barrel",
+      "level": 7,
+      "badge": "barrel_7",
+      "vfx": "subtle_glow",
+      "authorable": true
+    },
+    {
+      "track": "barrel",
+      "level": 10,
+      "badge": "barrel_10",
+      "vfx": "mastery_glow",
+      "authorable": true
+    },
+    {
+      "track": "carriage",
+      "level": 1,
+      "badge": "carriage_1",
+      "vfx": "none",
+      "authorable": true
+    },
+    {
+      "track": "carriage",
+      "level": 3,
+      "badge": "carriage_3",
+      "vfx": "none",
+      "authorable": true
+    },
+    {
+      "track": "carriage",
+      "level": 5,
+      "badge": "carriage_5",
+      "vfx": "subtle_glow",
+      "authorable": true
+    },
+    {
+      "track": "carriage",
+      "level": 7,
+      "badge": "carriage_7",
+      "vfx": "subtle_glow",
+      "authorable": true
+    },
+    {
+      "track": "carriage",
+      "level": 10,
+      "badge": "carriage_10",
+      "vfx": "mastery_glow",
+      "authorable": true
+    },
+    {
+      "track": "chamber",
+      "level": 1,
+      "badge": "chamber_1",
+      "vfx": "none",
+      "authorable": true
+    },
+    {
+      "track": "chamber",
+      "level": 3,
+      "badge": "chamber_3",
+      "vfx": "none",
+      "authorable": true
+    },
+    {
+      "track": "chamber",
+      "level": 5,
+      "badge": "chamber_5",
+      "vfx": "subtle_glow",
+      "authorable": true
+    },
+    {
+      "track": "chamber",
+      "level": 7,
+      "badge": "chamber_7",
+      "vfx": "subtle_glow",
+      "authorable": true
+    },
+    {
+      "track": "chamber",
+      "level": 10,
+      "badge": "chamber_10",
+      "vfx": "mastery_glow",
+      "authorable": true
+    },
+    {
+      "track": "rune_socket",
+      "level": 1,
+      "badge": "rune_socket_1",
+      "vfx": "none",
+      "authorable": true
+    },
+    {
+      "track": "rune_socket",
+      "level": 3,
+      "badge": "rune_socket_3",
+      "vfx": "none",
+      "authorable": true
+    },
+    {
+      "track": "rune_socket",
+      "level": 5,
+      "badge": "rune_socket_5",
+      "vfx": "subtle_glow",
+      "authorable": true
+    },
+    {
+      "track": "rune_socket",
+      "level": 7,
+      "badge": "rune_socket_7",
+      "vfx": "subtle_glow",
+      "authorable": true
+    },
+    {
+      "track": "rune_socket",
+      "level": 10,
+      "badge": "rune_socket_10",
+      "vfx": "mastery_glow",
+      "authorable": true
+    }
+  ],
+  "guild_tower_specializations": [
+    {
+      "tower": "cannon",
+      "specializations": [
+        {
+          "id": "barrage",
+          "label": "Breitseitenbatterie",
+          "unlock_level": 4,
+          "effect": "salvo_damage"
+        },
+        {
+          "id": "fortbreaker",
+          "label": "Bollwerkbrecher",
+          "unlock_level": 8,
+          "effect": "structure_pierce"
+        }
+      ]
+    },
+    {
+      "tower": "chain",
+      "specializations": [
+        {
+          "id": "drag_net",
+          "label": "Schleppnetz",
+          "unlock_level": 4,
+          "effect": "slow_cluster"
+        },
+        {
+          "id": "anchor_lock",
+          "label": "Ankersperre",
+          "unlock_level": 8,
+          "effect": "reload_slow"
+        }
+      ]
+    },
+    {
+      "tower": "mortar",
+      "specializations": [
+        {
+          "id": "scatter",
+          "label": "Splittersalve",
+          "unlock_level": 4,
+          "effect": "wide_aoe"
+        },
+        {
+          "id": "deep_charge",
+          "label": "Tiefenladung",
+          "unlock_level": 8,
+          "effect": "heavy_aoe"
+        }
+      ]
+    },
+    {
+      "tower": "ward",
+      "specializations": [
+        {
+          "id": "pulse",
+          "label": "Wardpuls",
+          "unlock_level": 4,
+          "effect": "shield_pulse"
+        },
+        {
+          "id": "sanctuary",
+          "label": "Hafenheiligtum",
+          "unlock_level": 8,
+          "effect": "structure_guard"
+        }
+      ]
+    },
+    {
+      "tower": "hunter",
+      "specializations": [
+        {
+          "id": "mark",
+          "label": "Jägermarke",
+          "unlock_level": 4,
+          "effect": "monster_mark"
+        },
+        {
+          "id": "leviathan",
+          "label": "Leviathan-Bolzen",
+          "unlock_level": 8,
+          "effect": "boss_damage"
+        }
+      ]
+    }
+  ],
+  "guild_operation_contracts": [
+    {
+      "id": "treasury_deposit",
+      "permission": "guild.treasury.deposit",
+      "risk": "medium",
+      "server_required": true,
+      "audit": true
+    },
+    {
+      "id": "treasury_spend",
+      "permission": "guild.treasury.spend",
+      "risk": "high",
+      "server_required": true,
+      "audit": true,
+      "approval_threshold_authorable": true
+    },
+    {
+      "id": "island_upgrade",
+      "permission": "guild.island.upgrade",
+      "risk": "high",
+      "server_required": true,
+      "audit": true
+    },
+    {
+      "id": "tower_specialize",
+      "permission": "guild.tower.specialize",
+      "risk": "high",
+      "server_required": true,
+      "audit": true
+    },
+    {
+      "id": "siege_declare",
+      "permission": "guild.siege.declare",
+      "risk": "critical",
+      "server_required": true,
+      "audit": true,
+      "approval": true
+    }
+  ],
+  "admin_editor_expansion": [
+    {
+      "id": "combat_effect_editor",
+      "content_types": [
+        "ammo",
+        "harpoon",
+        "buff_effect"
+      ],
+      "permissions": [
+        "content.edit",
+        "combat.balance"
+      ],
+      "publish": "review_required"
+    },
+    {
+      "id": "crafting_editor",
+      "content_types": [
+        "crafting_recipe",
+        "crafting_station"
+      ],
+      "permissions": [
+        "content.edit",
+        "economy.balance"
+      ],
+      "publish": "review_required"
+    },
+    {
+      "id": "guild_island_editor",
+      "content_types": [
+        "guild_island_module",
+        "guild_upgrade_curve",
+        "guild_tower_specialization"
+      ],
+      "permissions": [
+        "content.edit",
+        "guild.ops"
+      ],
+      "publish": "review_required"
+    },
+    {
+      "id": "presentation_editor",
+      "content_types": [
+        "icon_state_profile",
+        "tooltip_layer_profile",
+        "vfx_profile",
+        "cannon_visual_stage"
+      ],
+      "permissions": [
+        "content.edit",
+        "asset.manage"
+      ],
+      "publish": "review_required"
+    }
+  ],
+  "interface": {
+    "tabs": [
+      "decks",
+      "special",
+      "cannons",
+      "ammo",
+      "crafting",
+      "talents",
+      "citadel",
+      "guild",
+      "buffs"
+    ],
+    "mobile_min_button_dp": 48,
+    "stage_badges": true,
+    "rarity_icons": true,
+    "authority_tooltips": true
+  },
+  "authority": {
+    "local_preview_can_mutate_production": false,
+    "commerce_payment_guild_war_account_actions": "SERVER_ONLY",
+    "publish_flow": [
+      "draft",
+      "validate",
+      "review",
+      "publish",
+      "rollback"
+    ]
+  }
+}

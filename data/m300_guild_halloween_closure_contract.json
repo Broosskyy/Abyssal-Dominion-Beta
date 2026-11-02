@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "milestone": "M300",
+  "master_concept": "V3.8",
+  "environment": "LOCAL_DEVELOPMENT",
+  "guild_island": {
+    "minimum_map_level": 2,
+    "tower_roles": ["cannon", "chain", "mortar", "ward", "hunter"],
+    "enemy_and_war_preview": "one noncombat warning beacon per tower",
+    "relation_source": "local admin preview only",
+    "live_tower_damage": false,
+    "ownership_authority": "future server"
+  },
+  "halloween": {
+    "event_id": "halloween_abyss_01",
+    "local_prototype": true,
+    "requires_active_event_and_map_level": 2,
+    "world_slots": ["event_halloween_portal_01", "event_halloween_wreck_01", "event_halloween_guild_deco_01"],
+    "sector_scoped_decoration": true,
+    "deactivation_clears_decoration": true,
+    "reward_authority": "local preview only"
+  },
+  "ship_rule": "one complete 3D model per ship; world towers and decorations are separate world assets",
+  "genre_references": "Seafight and Battle of Sea: clean-room genre/UX reference only",
+  "native_qa": "NOT_EVALUATED",
+  "release_approved": false
+}

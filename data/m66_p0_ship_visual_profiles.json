@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "milestone": "M66",
+  "title": "P0 Ship Visual Differentiation",
+  "profiles": {
+    "ship_small": {
+      "scale": [
+        0.92,
+        0.94,
+        1.0
+      ],
+      "palette": "starter_sloop",
+      "lod_bias": 0.82,
+      "shadow_distance": 48,
+      "silhouette": "compact single-mast coastal sloop"
+    },
+    "ship_medium": {
+      "scale": [
+        1.0,
+        1.0,
+        1.03
+      ],
+      "palette": "starter_brig",
+      "lod_bias": 0.88,
+      "shadow_distance": 52,
+      "silhouette": "balanced two-deck starter brig"
+    },
+    "ship_large": {
+      "scale": [
+        1.08,
+        1.02,
+        1.08
+      ],
+      "palette": "starter_heavy",
+      "lod_bias": 0.94,
+      "shadow_distance": 58,
+      "silhouette": "broad heavy starter hull"
+    },
+    "npc_friendly_coastal_sloop": {
+      "scale": [
+        0.88,
+        0.92,
+        0.98
+      ],
+      "palette": "friendly_coast",
+      "lod_bias": 0.76,
+      "shadow_distance": 42,
+      "silhouette": "light civilian/coastal patrol"
+    },
+    "npc_scout_01": {
+      "scale": [
+        0.78,
+        0.9,
+        1.06
+      ],
+      "palette": "scout",
+      "lod_bias": 0.7,
+      "shadow_distance": 38,
+      "silhouette": "narrow long scout"
+    },
+    "npc_raider_01": {
+      "scale": [
+        0.94,
+        0.96,
+        1.0
+      ],
+      "palette": "raider",
+      "lod_bias": 0.76,
+      "shadow_distance": 44,
+      "silhouette": "aggressive midweight raider"
+    },
+    "npc_gunship_01": {
+      "scale": [
+        1.06,
+        0.98,
+        0.94
+      ],
+      "palette": "gunship",
+      "lod_bias": 0.82,
+      "shadow_distance": 48,
+      "silhouette": "wide gun deck"
+    },
+    "npc_heavy_01": {
+      "scale": [
+        1.16,
+        1.05,
+        1.08
+      ],
+      "palette": "heavy",
+      "lod_bias": 0.9,
+      "shadow_distance": 54,
+      "silhouette": "large armored heavy"
+    }
+  },
+  "rule": "Scale/palette/LOD are presentation only; stats, collision and weapon count remain wrapper-owned."
+}

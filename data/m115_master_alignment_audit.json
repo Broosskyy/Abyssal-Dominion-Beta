@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "milestone": "M115",
+  "v3_7_found": false,
+  "grounded": {
+    "PL26_30": "Abyssal Harpoons/Materials, Corruption Gear, Advanced Castles",
+    "PL30_trial": "Abyss/Hunter/Corruption",
+    "corruption": "voluntary risk/reward; cleanse or deliberately retain",
+    "monsters_26_30": "Abyss creatures, corruption risk/reward, Abyss Hunter progress",
+    "abyss_bonusmap": "PL26+, Abyss/Monster high risk, Abyss mats/corruption rewards/high-end fragments"
+  },
+  "implemented": [
+    "physical PL26-30 sectors",
+    "PL26-30 progression catalog",
+    "PL30 trial gate",
+    "opt-in Corruption runtime",
+    "Abyss drops/fragments",
+    "Abyss Bonusmap contract foundation",
+    "Abyss region NPC/monster/island/harbor slots",
+    "harbor Abyss UX"
+  ],
+  "limits": [
+    "Abyss Bonusmap isolated scene loop pending",
+    "Corruption damage/reward multipliers exposed as ship metadata; full combat/reward consumers pending",
+    "Abyssal Harpoon/Corruption Gear/Advanced Castle full equipment items pending",
+    "native Godot QA pending"
+  ]
+}

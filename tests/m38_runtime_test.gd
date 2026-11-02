@@ -1,0 +1,22 @@
+extends Node
+
+func _ready() -> void:
+	var file := FileAccess.open("res://data/mobile_ui_contract.json", FileAccess.READ)
+	assert(file != null)
+	var data: Dictionary = JSON.parse_string(file.get_as_text())
+	assert(data.get("milestone") == "M38")
+	assert(int(data.density.touch_dpi_threshold) == 180)
+	assert(float(data.density.touch_scale_max) >= 1.7)
+	assert(data.pickers.ammo.size() == 4)
+	assert(data.pickers.items.size() == 5)
+	assert(bool(data.comfort.picker_taps_block_world_navigation))
+	var layout_source := FileAccess.get_file_as_string("res://scripts/ui/nautical_layout.gd")
+	var hud_source := FileAccess.get_file_as_string("res://scripts/ui/nautical_hud.gd")
+	var input_source := FileAccess.get_file_as_string("res://scripts/gameplay/player_input.gd")
+	assert(layout_source.contains("touch_density"))
+	assert(layout_source.contains("ammo_menu"))
+	assert(layout_source.contains("items_menu"))
+	assert(hud_source.contains("MUNITION AUSWÄHLEN"))
+	assert(hud_source.contains("ITEMS & SUPPLIES"))
+	assert(input_source.contains("combat_picker_action_at"))
+	print("M38_RUNTIME_CONTRACT_PASS")

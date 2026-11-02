@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "milestone": "M161",
+  "prefix": "/",
+  "authority": "SERVER_VERIFIED_STAFF_COMMANDS",
+  "rules": {
+    "client_never_self_grants_role": true,
+    "audit_every_execution": true,
+    "rate_limit": true,
+    "critical_requires_confirmation_or_second_approval": true,
+    "production_commands_server_only": true
+  },
+  "commands": [
+    {
+      "id": "help",
+      "aliases": [
+        "commands"
+      ],
+      "permission": "admin.access",
+      "risk": "read",
+      "args": [],
+      "description": "Verfügbare Staff-Befehle anzeigen.",
+      "server_only": false
+    },
+    {
+      "id": "whois",
+      "permission": "player.read",
+      "risk": "read",
+      "args": [
+        "player"
+      ],
+      "description": "Spieler-/Account-Kontext lesen.",
+      "server_only": true
+    },
+    {
+      "id": "teleport",
+      "permission": "world.edit",
+      "risk": "moderate",
+      "args": [
+        "target",
+        "sector"
+      ],
+      "description": "Staff-/Spielerteleport mit Audit.",
+      "server_only": true
+    },
+    {
+      "id": "spawn",
+      "permission": "content.edit",
+      "risk": "moderate",
+      "args": [
+        "content_id",
+        "count?"
+      ],
+      "description": "Test-/Event-Content aus registrierter Definition spawnen.",
+      "server_only": true,
+      "environment_allow": [
+        "INTERNAL",
+        "TEST"
+      ]
+    },
+    {
+      "id": "event",
+      "permission": "liveops.edit",
+      "risk": "high",
+      "args": [
+        "action",
+        "event_id"
+      ],
+      "description": "Event vorbereiten/steuern; Publish folgt LiveOps-Workflow.",
+      "server_only": true
+    },
+    {
+      "id": "grant",
+      "permission": "entitlement.adjust",
+      "risk": "critical",
+      "args": [
+        "player",
+        "content_id",
+        "amount"
+      ],
+      "description": "Serverseitige Support-/QA-Gutschrift mit Receipt.",
+      "server_only": true,
+      "confirmation": true
+    },
+    {
+      "id": "mute",
+      "permission": "player.moderate",
+      "risk": "moderate",
+      "args": [
+        "player",
+        "duration",
+        "reason"
+      ],
+      "description": "Chatmoderation.",
+      "server_only": true
+    },
+    {
+      "id": "kick",
+      "permission": "player.moderate",
+      "risk": "high",
+      "args": [
+        "player",
+        "reason"
+      ],
+      "description": "Session beenden.",
+      "server_only": true
+    },
+    {
+      "id": "ban",
+      "permission": "player.sanction",
+      "risk": "critical",
+      "args": [
+        "player",
+        "duration",
+        "reason"
+      ],
+      "description": "Sanktion mit Audit und Bestätigung.",
+      "server_only": true,
+      "confirmation": true
+    },
+    {
+      "id": "guild",
+      "permission": "guild.moderate",
+      "risk": "high",
+      "args": [
+        "action",
+        "guild_id",
+        "value?"
+      ],
+      "description": "Gilden-Support/Moderation; keine clientseitige Eigentumsänderung.",
+      "server_only": true
+    },
+    {
+      "id": "shop",
+      "permission": "monetization.edit",
+      "risk": "high",
+      "args": [
+        "action",
+        "offer_id"
+      ],
+      "description": "Commerce-Draft/Status verwalten. Preis-Publish separat.",
+      "server_only": true
+    },
+    {
+      "id": "snapshot",
+      "permission": "content.read",
+      "risk": "read",
+      "args": [
+        "scope?"
+      ],
+      "description": "Aktive Content-Version anzeigen.",
+      "server_only": true
+    },
+    {
+      "id": "rollback",
+      "permission": "content.rollback",
+      "risk": "critical",
+      "args": [
+        "version"
+      ],
+      "description": "Rollback anfragen; Server/Approval erforderlich.",
+      "server_only": true,
+      "confirmation": true
+    },
+    {
+      "id": "server",
+      "permission": "server.manage",
+      "risk": "critical",
+      "args": [
+        "action"
+      ],
+      "description": "Serveroperationen; stark eingeschränkt.",
+      "server_only": true,
+      "confirmation": true
+    }
+  ]
+}

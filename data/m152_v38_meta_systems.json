@@ -1,0 +1,11 @@
+{
+  "schema_version":1,"milestone":"M152","master":"V3.8","state":"FOUNDATION_VERTICAL_SLICE_LOCAL_SIMULATION",
+  "resolution":{"v38_is_additive":true,"ship_direction":"M150 binding remains 3 starters + 100 regular classes + Prestige P1-P5; older 3+50 passages are superseded.","sea_map_core_unchanged":true},
+  "domains":{
+    "companions":{"CLIENT":"TEILWEISE","BACKEND":"GEPLANT","DB":"GEPLANT","ADMIN":"TEILWEISE","WEB_SUPPORT":"GEPLANT","ASSET":"TEILWEISE","QA":"BESTEHT"},
+    "artifacts":{"CLIENT":"TEILWEISE","BACKEND":"GEPLANT","DB":"GEPLANT","ADMIN":"TEILWEISE","WEB_SUPPORT":"GEPLANT","ASSET":"TEILWEISE","QA":"BESTEHT"},
+    "afk_rewards":{"CLIENT":"TEILWEISE","BACKEND":"GEPLANT","DB":"GEPLANT","ADMIN":"TEILWEISE","WEB_SUPPORT":"GEPLANT","ASSET":"TEILWEISE","QA":"BESTEHT"}
+  },
+  "boundaries":["Local prototype state is never an MMO security model.","Online ownership, level, traits, artifact instances, offline duration and reward claims are server-authoritative.","Client clock and local save edits cannot produce production rewards.","Every claim uses a stable reward/transaction ID and is idempotent.","AFK rewards remain capped and materially weaker than active play.","AFK never simulates PvP, Admirals, World Bosses, Bonusmaps, Event rankings, Guild War or rare Endgame drops.","Rested Captain Bonus remains separate from the offline reward pool.","All definitions, caps, profiles, multipliers, drop sources and event overrides are versioned Admin/LiveOps content."],
+  "platform":{"native_quality_targets":["Windows","macOS","Linux","Android","iOS"],"web":"PREVIEW_AND_ACCEPTANCE_ONLY","camera":"controlled oblique top-down sea-map","water_axis":"fixed WATER_Y; gameplay X/Z","renderer":"GL Compatibility"}
+}

@@ -1,0 +1,721 @@
+{
+  "schema": 1,
+  "milestone": "M57",
+  "rule": "3 starter ships remain separate. Main fleet has 50 stable design IDs. Map-level thresholds create eligibility only; ownership requires explicit earned reward hooks.",
+  "master_design_count": 50,
+  "active_foundation_range": {
+    "map_levels": [
+      6,
+      15
+    ],
+    "design_ids": [
+      "ship_main_01",
+      "ship_main_02",
+      "ship_main_03",
+      "ship_main_04",
+      "ship_main_05"
+    ]
+  },
+  "designs": [
+    {
+      "id": "ship_main_01",
+      "display_name": "Main Design 01",
+      "production_status": "P0_PLACEHOLDER_SLOT",
+      "unlock": {
+        "map_level": 6,
+        "contract": "eligible by map level; ownership earned through explicit combat/progression reward",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "balanced",
+      "visual_slot": "ship_main_01",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_02",
+      "display_name": "Main Design 02",
+      "production_status": "P0_PLACEHOLDER_SLOT",
+      "unlock": {
+        "map_level": 8,
+        "contract": "eligible by map level; ownership earned through explicit combat/progression reward",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "speed",
+      "visual_slot": "ship_main_02",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_03",
+      "display_name": "Main Design 03",
+      "production_status": "P0_PLACEHOLDER_SLOT",
+      "unlock": {
+        "map_level": 10,
+        "contract": "eligible by map level; ownership earned through explicit combat/progression reward",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "armor",
+      "visual_slot": "ship_main_03",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_04",
+      "display_name": "Main Design 04",
+      "production_status": "P0_PLACEHOLDER_SLOT",
+      "unlock": {
+        "map_level": 12,
+        "contract": "eligible by map level; ownership earned through explicit combat/progression reward",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "hunter",
+      "visual_slot": "ship_main_04",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_05",
+      "display_name": "Main Design 05",
+      "production_status": "P0_PLACEHOLDER_SLOT",
+      "unlock": {
+        "map_level": 14,
+        "contract": "eligible by map level; ownership earned through explicit combat/progression reward",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "tactical",
+      "visual_slot": "ship_main_05",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_06",
+      "display_name": "Main Design 06",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 16,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "balanced",
+      "visual_slot": "ship_main_06",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_07",
+      "display_name": "Main Design 07",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 18,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "speed",
+      "visual_slot": "ship_main_07",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_08",
+      "display_name": "Main Design 08",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 20,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "armor",
+      "visual_slot": "ship_main_08",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_09",
+      "display_name": "Main Design 09",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 22,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "hunter",
+      "visual_slot": "ship_main_09",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_10",
+      "display_name": "Main Design 10",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 24,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "tactical",
+      "visual_slot": "ship_main_10",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_11",
+      "display_name": "Main Design 11",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 26,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "balanced",
+      "visual_slot": "ship_main_11",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_12",
+      "display_name": "Main Design 12",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 28,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "speed",
+      "visual_slot": "ship_main_12",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_13",
+      "display_name": "Main Design 13",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 30,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "armor",
+      "visual_slot": "ship_main_13",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_14",
+      "display_name": "Main Design 14",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 32,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "hunter",
+      "visual_slot": "ship_main_14",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_15",
+      "display_name": "Main Design 15",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 34,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "tactical",
+      "visual_slot": "ship_main_15",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_16",
+      "display_name": "Main Design 16",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 36,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "balanced",
+      "visual_slot": "ship_main_16",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_17",
+      "display_name": "Main Design 17",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 38,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "speed",
+      "visual_slot": "ship_main_17",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_18",
+      "display_name": "Main Design 18",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 40,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "armor",
+      "visual_slot": "ship_main_18",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_19",
+      "display_name": "Main Design 19",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 42,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "hunter",
+      "visual_slot": "ship_main_19",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_20",
+      "display_name": "Main Design 20",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 44,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "tactical",
+      "visual_slot": "ship_main_20",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_21",
+      "display_name": "Main Design 21",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 46,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "balanced",
+      "visual_slot": "ship_main_21",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_22",
+      "display_name": "Main Design 22",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 48,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "speed",
+      "visual_slot": "ship_main_22",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_23",
+      "display_name": "Main Design 23",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 50,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "armor",
+      "visual_slot": "ship_main_23",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_24",
+      "display_name": "Main Design 24",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 52,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "hunter",
+      "visual_slot": "ship_main_24",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_25",
+      "display_name": "Main Design 25",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 54,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "tactical",
+      "visual_slot": "ship_main_25",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_26",
+      "display_name": "Main Design 26",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 56,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "balanced",
+      "visual_slot": "ship_main_26",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_27",
+      "display_name": "Main Design 27",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 58,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "speed",
+      "visual_slot": "ship_main_27",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_28",
+      "display_name": "Main Design 28",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 60,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "armor",
+      "visual_slot": "ship_main_28",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_29",
+      "display_name": "Main Design 29",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 62,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "hunter",
+      "visual_slot": "ship_main_29",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_30",
+      "display_name": "Main Design 30",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 64,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "tactical",
+      "visual_slot": "ship_main_30",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_31",
+      "display_name": "Main Design 31",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 66,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "balanced",
+      "visual_slot": "ship_main_31",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_32",
+      "display_name": "Main Design 32",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 68,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "speed",
+      "visual_slot": "ship_main_32",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_33",
+      "display_name": "Main Design 33",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 70,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "armor",
+      "visual_slot": "ship_main_33",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_34",
+      "display_name": "Main Design 34",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 72,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "hunter",
+      "visual_slot": "ship_main_34",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_35",
+      "display_name": "Main Design 35",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 74,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "tactical",
+      "visual_slot": "ship_main_35",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_36",
+      "display_name": "Main Design 36",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 76,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "balanced",
+      "visual_slot": "ship_main_36",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_37",
+      "display_name": "Main Design 37",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 78,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "speed",
+      "visual_slot": "ship_main_37",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_38",
+      "display_name": "Main Design 38",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 80,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "armor",
+      "visual_slot": "ship_main_38",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_39",
+      "display_name": "Main Design 39",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 82,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "hunter",
+      "visual_slot": "ship_main_39",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_40",
+      "display_name": "Main Design 40",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 84,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "tactical",
+      "visual_slot": "ship_main_40",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_41",
+      "display_name": "Main Design 41",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 86,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "balanced",
+      "visual_slot": "ship_main_41",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_42",
+      "display_name": "Main Design 42",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 88,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "speed",
+      "visual_slot": "ship_main_42",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_43",
+      "display_name": "Main Design 43",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 90,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "armor",
+      "visual_slot": "ship_main_43",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_44",
+      "display_name": "Main Design 44",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 92,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "hunter",
+      "visual_slot": "ship_main_44",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_45",
+      "display_name": "Main Design 45",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 94,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "tactical",
+      "visual_slot": "ship_main_45",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_46",
+      "display_name": "Main Design 46",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 96,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "balanced",
+      "visual_slot": "ship_main_46",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_47",
+      "display_name": "Main Design 47",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 98,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "speed",
+      "visual_slot": "ship_main_47",
+      "fallback_profile": "barco_low"
+    },
+    {
+      "id": "ship_main_48",
+      "display_name": "Main Design 48",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 100,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "armor",
+      "visual_slot": "ship_main_48",
+      "fallback_profile": "chalupa"
+    },
+    {
+      "id": "ship_main_49",
+      "display_name": "Main Design 49",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 102,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "hunter",
+      "visual_slot": "ship_main_49",
+      "fallback_profile": "clipper"
+    },
+    {
+      "id": "ship_main_50",
+      "display_name": "Main Design 50",
+      "production_status": "PREPARED_FUTURE_SLOT",
+      "unlock": {
+        "map_level": 104,
+        "contract": "active combat/progression activities; exact reward tuning remains data-driven",
+        "meaning": "eligibility_threshold_only"
+      },
+      "ship_mastery_levels": 10,
+      "role": "tactical",
+      "visual_slot": "ship_main_50",
+      "fallback_profile": "barco_low"
+    }
+  ]
+}

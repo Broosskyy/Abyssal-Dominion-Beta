@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "milestone": "M70",
+  "title": "PL1-5 Native Acceptance Harness",
+  "authority": "local QA only; never server authority",
+  "required_sequence": [
+    {
+      "id": "first_sail",
+      "expect": "Tap-to-Sail moves player on sea plane without free Y movement"
+    },
+    {
+      "id": "neutral_contact",
+      "expect": "PL1-5 NPC remains neutral until damaged by player"
+    },
+    {
+      "id": "provocation",
+      "expect": "same NPC becomes hostile after player damage and HUD/nameplate agree"
+    },
+    {
+      "id": "starter_medium",
+      "expect": "medium starter becomes owned through beginner progression, never Gold purchase"
+    },
+    {
+      "id": "harbor_services",
+      "expect": "Haven's Reach exposes repair, shipyard, market, arsenal and quest service presentation without false availability"
+    },
+    {
+      "id": "loot",
+      "expect": "basic loot increments progression/inventory through gameplay-owned logic"
+    },
+    {
+      "id": "shield_hull",
+      "expect": "shield/hull presentation remains readable and damage order remains gameplay-owned"
+    },
+    {
+      "id": "first_monster",
+      "expect": "early monster is visually distinct and targetable without UI obstruction"
+    },
+    {
+      "id": "elite_admiral",
+      "expect": "elite/admiral hierarchy is readable and encounter can complete"
+    },
+    {
+      "id": "starter_large",
+      "expect": "large starter becomes owned by the PL5 beginner milestone"
+    },
+    {
+      "id": "pirate_trial_pl5",
+      "expect": "beginner progression reaches PL5 completion path"
+    },
+    {
+      "id": "mobile_hud",
+      "expect": "core combat touch targets >=56 logical px on touch-density layouts and respect safe area"
+    }
+  ],
+  "pass_rule": "all required checks pass in Godot 4.7.2 runtime and representative Android phone playthrough",
+  "source_state": "READY_TO_RUN_WHEN_NATIVE_ENGINE_AVAILABLE"
+}

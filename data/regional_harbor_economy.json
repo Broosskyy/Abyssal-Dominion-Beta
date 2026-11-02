@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "milestone": "M48",
+  "authority": "local_prototype_balance_not_final",
+  "level_range": [
+    6,
+    15
+  ],
+  "materials": {
+    "stormglass": {
+      "label": "Stormglass",
+      "family": "stormreach",
+      "source": "regional_combat_salvage"
+    },
+    "ember_ore": {
+      "label": "Ember Ore",
+      "family": "ember_shoals",
+      "source": "regional_combat_salvage"
+    },
+    "veil_silk": {
+      "label": "Veil Silk",
+      "family": "veil_sea",
+      "source": "regional_combat_salvage"
+    },
+    "reinforced_timber": {
+      "label": "Reinforced Timber",
+      "family": "common_advanced",
+      "source": "harbor/crafting"
+    },
+    "precision_gears": {
+      "label": "Precision Gears",
+      "family": "common_advanced",
+      "source": "harbor/crafting"
+    }
+  },
+  "harbors": {
+    "stormreach": {
+      "service_label": "Stormreach Foundry",
+      "specialty": "hull_deck_and_hunter",
+      "purchase_offers": {
+        "reinforced_timber": {
+          "amount": 2,
+          "price": 55
+        },
+        "precision_gears": {
+          "amount": 1,
+          "price": 70
+        },
+        "hunter_standard": {
+          "amount": 12,
+          "price": 45
+        },
+        "barbed_chain": {
+          "amount": 6,
+          "price": 75
+        }
+      },
+      "recipes": [
+        "storm_deck_kit",
+        "barbed_payload_batch",
+        "ward_shell_batch"
+      ]
+    },
+    "ember_shoals": {
+      "service_label": "Ember Arsenal",
+      "specialty": "powder_damage_and_armor",
+      "purchase_offers": {
+        "reinforced_timber": {
+          "amount": 1,
+          "price": 60
+        },
+        "precision_gears": {
+          "amount": 2,
+          "price": 95
+        },
+        "powder": {
+          "amount": 8,
+          "price": 60
+        },
+        "plates": {
+          "amount": 8,
+          "price": 65
+        }
+      },
+      "recipes": [
+        "ember_powder_batch",
+        "abyss_piercer_batch",
+        "reinforced_plate_batch"
+      ]
+    },
+    "veil_sea": {
+      "service_label": "Veil Apothecary",
+      "specialty": "support_shield_and_tactical",
+      "purchase_offers": {
+        "precision_gears": {
+          "amount": 1,
+          "price": 75
+        },
+        "restoration_shell": {
+          "amount": 8,
+          "price": 55
+        },
+        "ward_shell": {
+          "amount": 6,
+          "price": 70
+        },
+        "veil": {
+          "amount": 1,
+          "price": 80
+        }
+      },
+      "recipes": [
+        "restoration_shell_batch",
+        "veil_supply_batch",
+        "support_core_kit"
+      ]
+    }
+  },
+  "rules": {
+    "starter_harbors_keep_pl1_5_services": true,
+    "regional_services_require_matching_region": true,
+    "normal_failure_destroys_valuable_equipment": false,
+    "infinite_raw_stat_ladder": false,
+    "missing_final_assets_never_block_services": true
+  }
+}

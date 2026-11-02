@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "milestone": "M101",
+  "environments": {
+    "LOCAL_DEVELOPMENT": {
+      "authority": "local_prototype",
+      "commerce_real_money": false,
+      "persistent_live_ownership": false
+    },
+    "INTERNAL_STAGING": {
+      "authority": "future_server",
+      "commerce_real_money": false,
+      "persistent_live_ownership": false
+    },
+    "TESTSERVER": {
+      "authority": "future_server",
+      "commerce_real_money": false,
+      "persistent_live_ownership": false
+    },
+    "GLOBAL_PRODUCTION": {
+      "authority": "future_server",
+      "commerce_real_money": true,
+      "persistent_live_ownership": true
+    }
+  },
+  "rules": [
+    "Client cannot switch from TEST/LOCAL to GLOBAL by a trusted local option.",
+    "Gameplay/economy/ownership/staff/payment authority is never inferred from client metadata.",
+    "TEST data, entitlements and currencies never promote directly to GLOBAL.",
+    "Secrets and store signing credentials never belong in client data."
+  ]
+}

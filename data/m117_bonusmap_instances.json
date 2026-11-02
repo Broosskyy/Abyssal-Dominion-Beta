@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "milestone": "M154",
+  "instances": {
+    "gold": {
+      "id": "gold_local",
+      "arena_name": "Gilded Tempest",
+      "biome": "cursed",
+      "size": 64,
+      "waves": [
+        {
+          "kind": "ship",
+          "count": 3
+        },
+        {
+          "kind": "ship",
+          "count": 4
+        },
+        {
+          "kind": "elite",
+          "count": 4
+        },
+        {
+          "kind": "elite",
+          "count": 5
+        },
+        {
+          "kind": "admiral",
+          "count": 1
+        }
+      ]
+    },
+    "abyss": {
+      "id": "abyss_local",
+      "arena_name": "The Sunken Hollow",
+      "biome": "abyss",
+      "size": 64,
+      "waves": [
+        {
+          "kind": "ship",
+          "count": 3
+        },
+        {
+          "kind": "ship",
+          "count": 4
+        },
+        {
+          "kind": "monster",
+          "count": 1
+        },
+        {
+          "kind": "elite",
+          "count": 5
+        },
+        {
+          "kind": "elite",
+          "count": 5
+        },
+        {
+          "kind": "guardian",
+          "count": 1
+        }
+      ]
+    },
+    "silver": {
+      "id": "silver_local",
+      "arena_name": "Silver Shoals",
+      "biome": "shattered",
+      "size": 64,
+      "waves": [
+        {
+          "kind": "ship",
+          "count": 3
+        },
+        {
+          "kind": "ship",
+          "count": 4
+        },
+        {
+          "kind": "elite",
+          "count": 4
+        },
+        {
+          "kind": "admiral",
+          "count": 1
+        }
+      ]
+    },
+    "legendary": {
+      "id": "legendary_local",
+      "arena_name": "Legendary Maelstrom",
+      "biome": "void",
+      "size": 72,
+      "waves": [
+        {
+          "kind": "ship",
+          "count": 4
+        },
+        {
+          "kind": "elite",
+          "count": 4
+        },
+        {
+          "kind": "guardian",
+          "count": 1
+        },
+        {
+          "kind": "admiral",
+          "count": 1
+        }
+      ]
+    }
+  },
+  "rules": [
+    "normal world sector frozen while instance active",
+    "only instance-owned sinks progress bonusmap",
+    "exit restores prior sector",
+    "no Pirate Trial bypass"
+  ],
+  "authority": "local prototype; future server instance authority"
+}

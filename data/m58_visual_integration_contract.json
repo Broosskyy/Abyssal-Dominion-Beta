@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "milestone": "M58",
+  "title": "P0 Visual Integration Readiness",
+  "glb_wave_count": 13,
+  "first_asset": "ship_small",
+  "features": {
+    "explicit_import_profiles": true,
+    "npc_p0_slot_mapping": true,
+    "havens_reach_mapping": true,
+    "early_island_mapping": true,
+    "monster_p0_mapping": true,
+    "asset_qa_filter": true,
+    "waterline_marker": true,
+    "fallback_preserved": true,
+    "visual_only_override": true,
+    "mobile_readability_check": true
+  },
+  "native_runtime_qa": "NOT_RUN"
+}

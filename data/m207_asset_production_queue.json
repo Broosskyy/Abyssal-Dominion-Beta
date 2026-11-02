@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "milestone": "M207",
+  "master_concept": "V3.8",
+  "purpose": "First authored 2D/3D asset production queue for direct replacement of current placeholders.",
+  "rules": [
+    "All final world assets share one maritime dark-fantasy 3D/2.5D art language and controlled angled top-down gameplay perspective.",
+    "Final isolated world assets have clean transparent backgrounds, no water scene baked in, no cross-asset glow/fog, and generous padding.",
+    "UI icons must remain readable at quickslot size; silhouette and material identity before micro-detail.",
+    "Do not encode gameplay balance into art filenames; use stable asset slots.",
+    "Godot collision/navigation remains wrapper-owned unless an explicit gameplay task changes it."
+  ],
+  "production_batches": [
+    {
+      "priority": 1,
+      "batch": "UI Combat Essentials",
+      "type": "2D",
+      "assets": [
+        "8 cannon-ammo icons",
+        "4 harpoon/payload icons",
+        "8 action-item icons",
+        "5 cannon family icons",
+        "5 deck/equipment icons"
+      ],
+      "target": "96-192 px source, transparent master, clean silhouette",
+      "replace_slots": [
+        "ui_ammo_*",
+        "ui_harpoon_*",
+        "ui_action_*",
+        "ui_cannon_*",
+        "ui_ship_equipment_*"
+      ]
+    },
+    {
+      "priority": 2,
+      "batch": "Ship Starter + Main Visual Calibration",
+      "type": "2D concept -> 3D GLB",
+      "assets": [
+        "3 starter ships",
+        "first 5 main progression ships"
+      ],
+      "target": "same camera/perspective/material/render language",
+      "replace_slots": [
+        "SHIP-STARTER-*",
+        "SHIP-PROG-001..005"
+      ]
+    },
+    {
+      "priority": 3,
+      "batch": "Island Calibration Set",
+      "type": "2D concept -> 3D GLB",
+      "assets": [
+        "4 small/medium islands",
+        "2 large landmark islands",
+        "2 harbor islands"
+      ],
+      "target": "clean island underbody, no baked water, strong coast silhouette",
+      "replace_slots": [
+        "island production slots / harbor modules"
+      ]
+    },
+    {
+      "priority": 4,
+      "batch": "Loot World Readability",
+      "type": "2D/3D",
+      "assets": [
+        "common salvage",
+        "rare chest",
+        "epic relic crate",
+        "admiral loot",
+        "repair supply",
+        "currency pickup"
+      ],
+      "target": "strongly distinct forms, not recolor-only",
+      "replace_slots": [
+        "loot production slots"
+      ]
+    },
+    {
+      "priority": 5,
+      "batch": "HUD Navigation + Menus",
+      "type": "2D UI",
+      "assets": [
+        "attack",
+        "target cycle",
+        "recenter",
+        "map",
+        "inventory",
+        "shipyard",
+        "market",
+        "crafting",
+        "quests",
+        "settings"
+      ],
+      "target": "navy/gold, high contrast, consistent stroke/volume",
+      "replace_slots": [
+        "M202 interface slots"
+      ]
+    }
+  ],
+  "handoff_checklist": [
+    "transparent/clean source",
+    "canonical naming",
+    "slot id recorded",
+    "preview at small size",
+    "no baked text unless explicitly required",
+    "mobile readability check",
+    "Godot import test",
+    "replacement QA screenshot"
+  ]
+}

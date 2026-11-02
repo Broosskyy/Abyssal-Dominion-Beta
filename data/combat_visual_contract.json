@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "milestone": "M43",
+  "authority": "visual_only_no_gameplay_values",
+  "ammo": {
+    "iron": {
+      "icon_slot": "m42_iron",
+      "impact_vfx": "impact",
+      "color": "#d9d0bc",
+      "trail_profile": "standard",
+      "impact_profile": "impact"
+    },
+    "explosive": {
+      "icon_slot": "m42_explosive",
+      "impact_vfx": "burst",
+      "color": "#ff7043",
+      "trail_profile": "heavy_burst",
+      "impact_profile": "burst"
+    },
+    "chain": {
+      "icon_slot": "m42_chain",
+      "impact_vfx": "slow",
+      "color": "#b9d8ea",
+      "trail_profile": "short_control",
+      "impact_profile": "slow"
+    },
+    "piercing": {
+      "icon_slot": "m42_piercing",
+      "impact_vfx": "pierce",
+      "color": "#f4e3a2",
+      "trail_profile": "needle",
+      "impact_profile": "pierce"
+    },
+    "ember": {
+      "icon_slot": "m42_ember",
+      "impact_vfx": "burn",
+      "color": "#ff8a32",
+      "trail_profile": "flame_dual",
+      "impact_profile": "burn"
+    },
+    "venom": {
+      "icon_slot": "m42_venom",
+      "impact_vfx": "venom",
+      "color": "#70d676",
+      "trail_profile": "toxic_dual",
+      "impact_profile": "venom"
+    },
+    "shatter": {
+      "icon_slot": "m42_shatter",
+      "impact_vfx": "armor_break",
+      "color": "#a9d0ff",
+      "trail_profile": "fracture_dual",
+      "impact_profile": "armor_break"
+    },
+    "spectral": {
+      "icon_slot": "m42_spectral",
+      "impact_vfx": "spectral_mark",
+      "color": "#bb8cff",
+      "trail_profile": "long_spectral_dual",
+      "impact_profile": "spectral_mark"
+    }
+  },
+  "action_items": {
+    "repair": {
+      "icon_slot": "m42_repair",
+      "vfx_profile": "repair",
+      "color": "#7fd7b1"
+    },
+    "boost": {
+      "icon_slot": "m42_boost",
+      "vfx_profile": "boost",
+      "color": "#65b8ff"
+    },
+    "veil": {
+      "icon_slot": "m42_veil",
+      "vfx_profile": "veil",
+      "color": "#9b7cff"
+    },
+    "storm_bolt": {
+      "icon_slot": "m42_storm_bolt",
+      "vfx_profile": "storm_bolt",
+      "color": "#71c8ff"
+    },
+    "infernal_barrel": {
+      "icon_slot": "m42_infernal_barrel",
+      "vfx_profile": "infernal_barrel",
+      "color": "#ff6d43"
+    },
+    "crystal_barrier": {
+      "icon_slot": "m42_crystal_barrier",
+      "vfx_profile": "crystal_barrier",
+      "color": "#75e5e2"
+    },
+    "armor_corrosive": {
+      "icon_slot": "m42_armor_corrosive",
+      "vfx_profile": "armor_corrosive",
+      "color": "#b2d45f"
+    },
+    "repair_blocker": {
+      "icon_slot": "m42_repair_blocker",
+      "vfx_profile": "repair_blocker",
+      "color": "#d87070"
+    },
+    "leviathan_hook": {
+      "icon_slot": "m42_leviathan_hook",
+      "vfx_profile": "leviathan_hook",
+      "color": "#65b9a8"
+    },
+    "recall_compass": {
+      "icon_slot": "m42_recall_compass",
+      "vfx_profile": "recall_compass",
+      "color": "#e2c36d"
+    },
+    "powder": {
+      "icon_slot": "m42_powder",
+      "vfx_profile": "powder",
+      "color": "#c79861"
+    },
+    "plates": {
+      "icon_slot": "m42_plates",
+      "vfx_profile": "plates",
+      "color": "#aab4c0"
+    },
+    "harpoon": {
+      "icon_slot": "m42_harpoon",
+      "vfx_profile": "harpoon",
+      "color": "#d8d3bd"
+    }
+  },
+  "rules": {
+    "stable_icon_slots": true,
+    "stable_vfx_profiles": true,
+    "placeholder_fallback": true,
+    "vfx_never_define_damage": true,
+    "mobile_readability_first": true,
+    "no_third_party_graphics": true,
+    "long_press_detail_card": true,
+    "desktop_right_click_detail": true
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "milestone": "M94",
+  "authority": "local_development_only",
+  "local_default_enabled": true,
+  "visible_indicator": true,
+  "commands": [
+    "toggle_overlay",
+    "teleport_map_level",
+    "spawn_halloween_sloop",
+    "spawn_halloween_monster",
+    "grant_test_kit",
+    "heal_full",
+    "toggle_invulnerability",
+    "toggle_halloween",
+    "cycle_event_phase",
+    "add_event_currency",
+    "guild_relation_cycle",
+    "rebuild_sector"
+  ],
+  "live_forbidden": [
+    "trusted account admin",
+    "live currency authority",
+    "live inventory authority",
+    "guild ownership writes",
+    "war writes",
+    "live event schedule authority",
+    "player moderation"
+  ],
+  "production_gate": "real authenticated server-side admin entitlement required"
+}

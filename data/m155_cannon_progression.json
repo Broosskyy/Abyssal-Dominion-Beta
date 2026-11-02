@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "milestone": "M155",
+  "policy": "Role identity first; upgrades improve a role without turning every cannon into the same weapon.",
+  "upgrade_tiers": [
+    {"tier":1,"label":"Serviceable","power_mult":1.00,"reload_mult":1.00,"range_mult":1.00,"cost_gold":0},
+    {"tier":2,"label":"Reinforced","power_mult":1.06,"reload_mult":0.98,"range_mult":1.01,"cost_gold":900},
+    {"tier":3,"label":"Veteran","power_mult":1.12,"reload_mult":0.96,"range_mult":1.02,"cost_gold":2200},
+    {"tier":4,"label":"Masterwork","power_mult":1.19,"reload_mult":0.93,"range_mult":1.035,"cost_gold":5200},
+    {"tier":5,"label":"Dominion","power_mult":1.27,"reload_mult":0.90,"range_mult":1.05,"cost_gold":10500}
+  ],
+  "role_profiles": {
+    "rapid":{"preferred_ammo":["iron","chain","venom"],"strength":"pressure / utility uptime","tradeoff":"low per-shot burst"},
+    "balanced":{"preferred_ammo":["iron","explosive","piercing"],"strength":"flexible baseline","tradeoff":"no extreme specialty"},
+    "marksman":{"preferred_ammo":["piercing","spectral","iron"],"strength":"range / precision","tradeoff":"slower cycle"},
+    "brawler":{"preferred_ammo":["explosive","ember","shatter"],"strength":"close burst","tradeoff":"short reach"},
+    "siege":{"preferred_ammo":["piercing","shatter","explosive"],"strength":"armor / structure pressure","tradeoff":"slow reload"},
+    "sustained":{"preferred_ammo":["iron","venom","chain"],"strength":"sustained DPS","tradeoff":"moderate burst"},
+    "endgame_siege":{"preferred_ammo":["spectral","piercing","shatter"],"strength":"long-range heavy pressure","tradeoff":"very slow reload"}
+  },
+  "admin": {"content_type":"weapon","editable":true,"versioned":true,"publish_requires":["rbac","validation","review","transport_authority"]}
+}

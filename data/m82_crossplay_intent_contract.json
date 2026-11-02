@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "milestone": "M82",
+  "title": "Crossplay Gameplay Intent Boundary",
+  "status": "ARCHITECTURE_READY_NO_NETWORK_TRANSPORT",
+  "gameplay_intents": [
+    "sail_target",
+    "cancel_sail",
+    "target_next",
+    "fire",
+    "repair",
+    "boost",
+    "interact",
+    "select_weapon_mode",
+    "select_ammunition",
+    "quick_item"
+  ],
+  "presentation_only": [
+    "camera_pan",
+    "camera_zoom",
+    "camera_recenter",
+    "open_menu",
+    "close_menu",
+    "hud_layout",
+    "safe_area",
+    "touch_hitbox_size"
+  ],
+  "rules": [
+    "same gameplay intent vocabulary for Android/iOS/Windows/macOS",
+    "touch/mouse/keyboard/gamepad translate into the same gameplay intents",
+    "camera and HUD presentation are never server-authoritative gameplay",
+    "no platform-specific combat damage, movement speed, cooldown or reward rules",
+    "future multiplayer transport must validate gameplay intents server-side",
+    "M82 does not create accounts, sockets, matchmaking or server authority"
+  ],
+  "future_server_boundary": {
+    "client_sends": "validated gameplay intent + sequence/timestamp/session identity",
+    "server_owns": "movement validation, combat resolution, inventory, rewards, progression, persistence",
+    "client_owns": "input translation, camera, responsive HUD, local accessibility/presentation"
+  }
+}

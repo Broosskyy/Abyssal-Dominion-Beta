@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "milestone": "M229",
+  "master_concept": "V3.8",
+  "status": "ENCOUNTER_FORMATIONS_TERRITORIES_STATIC_VERIFIED",
+  "intent": [
+    "Give existing regional patrol slots readable formation identity without increasing population.",
+    "Differentiate ordinary, elite, monster and admiral world reads at the zoomed-out master camera.",
+    "Prepare event and danger-zone presentation metadata while existing event/content systems remain authoritative."
+  ],
+  "formation_rules": {
+    "existing_spawn_slots_only": true,
+    "no_escort_spawns_added": true,
+    "regional_patterns_include_column_wedge_arc_line_screen": true,
+    "formation_identity_is_visual_semantic_metadata": true,
+    "member_spacing_does_not_change_collision": true
+  },
+  "territory_rules": {
+    "ordinary_patrols_use_regional_patrol_lanes": true,
+    "monsters_use_distinct_territory_read": true,
+    "admirals_use_command_staging_read": true,
+    "event_zone_metadata_ready": true,
+    "event_runtime_authority_unchanged": true,
+    "large_open_sea_gaps_preserved": true
+  },
+  "rank_readability": ["normal", "elite", "monster", "admiral_boss"],
+  "world_rules": {
+    "same_world_mobile_web_desktop": true,
+    "m213_m214_master_camera_unchanged": true,
+    "m228_spawn_cap_unchanged": true,
+    "safe_travel_corridors_preserved": true
+  },
+  "boundaries": {
+    "damage_changed": false, "range_changed": false, "reload_changed": false,
+    "health_changed": false, "rewards_changed": false, "loot_values_changed": false,
+    "collision_changed": false, "tap_to_sail_changed": false, "camera_changed": false,
+    "new_pathfinder_added": false, "spawn_cap_increased": false
+  }
+}

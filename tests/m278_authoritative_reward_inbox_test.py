@@ -1,0 +1,25 @@
+from pathlib import Path
+import json
+ROOT=Path(__file__).resolve().parents[1]
+def read(p): return (ROOT/p).read_text()
+def load(p): return json.loads(read(p))
+
+def test_m278_release_and_contract():
+ d=load('data/release_identity.json'); assert d['milestone'] in {'M278','M279','M280','M281','M282','M283','M284','M285','M286','M287','M288','M289','M290','M291','M292','M293','M294','M295','M296','M297','M298','M299','M300','M301'} and d['client_version'] in {'0.278.0','0.279.0','0.280.0','0.281.0','0.282.0','0.283.0','0.284.0','0.285.0','0.286.0','0.287.0','0.288.0','0.289.0','0.290.0','0.291.0','0.292.0','0.293.0','0.294.0','0.295.0','0.296.0','0.297.0','0.298.0','0.299.0','0.300.0','0.301.0'} and d['version'] in {'0.278.0','0.279.0','0.280.0','0.281.0','0.282.0','0.283.0','0.284.0','0.285.0','0.286.0','0.287.0','0.288.0','0.289.0','0.290.0','0.291.0','0.292.0','0.293.0','0.294.0','0.295.0','0.296.0','0.297.0','0.298.0','0.299.0','0.300.0','0.301.0'} and d['build_number'] in {278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301} and d['content_config_version'] in {'M278','M279','M280','M281','M282','M283','M284','M285','M286','M287','M288','M289','M290','M291','M292','M293','M294','M295','M296','M297','M298','M299','M300','M301'} and d['master_concept']=='V3.8'
+ c=load('data/m278_authoritative_reward_inbox_contract.json'); assert c['contract']=='authoritative_reward_inbox_claim_queue_capacity_overflow_expiry_compensation_recovery'; assert c['genre_ux_references']==['Seafight','Battle of Sea']; assert all(x in c['authority']['server_owns'] for x in ['inbox_entry_identity','queue_order','capacity_verdict','overflow_state','expiry_state','compensation_authorization'])
+
+def test_m278_runtime_fail_closed_inbox_queue_overflow_expiry_compensation():
+ s=read('scripts/online/m278_authoritative_reward_inbox_runtime.gd')
+ for t in ['bind_reward_delivery','ingest_server_inbox_snapshot','ingest_server_inbox_event','inbox_revision','queue_revision','recovery_revision','settlement_sequence','inbox_state','queue_state','overflow_state','expiry_state','compensation_state','REQUIRED_ENTRY_IDENTITY','prepare_claim_queue_intent','prepare_inbox_refresh_intent','invalidate_from_world_resync']: assert t in s
+ for t in ['can_client_create_inbox_entry() -> bool: return false','can_client_reorder_authoritative_queue() -> bool: return false','can_client_override_capacity() -> bool: return false','can_client_extend_reward_expiry() -> bool: return false','can_client_mark_expired_reward_claimable() -> bool: return false','can_client_authorize_compensation() -> bool: return false','can_client_mint_compensation_value() -> bool: return false','can_client_force_mail_overflow() -> bool: return false','can_client_settle_inbox_reward() -> bool: return false','can_client_transfer_test_inbox_to_global() -> bool: return false']: assert t in s
+ assert 'ir <= inbox_revision' in s and '"creates_value":false' in s and '"authorizes_compensation":false' in s and '"settles_reward":false' in s
+
+def test_m278_bootstrap_deck_admin_dependencies():
+ b=read('scripts/core/game_bootstrap.gd'); deck=read('scripts/ui/command_deck.gd'); assert 'M278AuthoritativeRewardInboxRuntime.new()' in b and 'AuthoritativeRewardInboxReadiness' in b; assert 'REWARD INBOX · CLAIM QUEUE · OVERFLOW · EXPIRY' in deck and 'M278AuthoritativeRewardInboxCatalog.compensation()' in deck
+ a=load('data/admin_content_type_registry.json'); assert a['milestone'] in {'M278','M279','M280','M281','M282','M283','M284','M285','M286','M287','M288','M289','M290','M291','M292','M293','M294','M295','M296','M297','M298','M299','M300','M301'} and all(x in a['content_types'] for x in ['reward_inbox_policy_definition','reward_claim_queue_policy_definition','reward_overflow_expiry_policy_definition','reward_compensation_recovery_policy_definition'])
+ c=load('data/m278_authoritative_reward_inbox_contract.json'); assert c['dependencies']['delivery_receipt'].startswith('M277') and c['dependencies']['mail'].startswith('M254') and c['dependencies']['settlement'].startswith('M266')
+
+def test_m278_convergence_and_unset_tuning():
+ m=load('data/m239_master_convergence_matrix.json'); assert m['milestone'] in {'M278','M279','M280','M281','M282','M283','M284','M285','M286','M287','M288','M289','M290','M291','M292','M293','M294','M295','M296','M297','M298','M299','M300','M301'}; row={x['domain']:x for x in m['domains']}['authoritative_reward_inbox_claim_queue_capacity_overflow_expiry_compensation_recovery']; assert row['status']=='PARTIAL' and 'm278_fix' in row and any(x.startswith('production durable reward-inbox') for x in row['remaining'])
+ c=load('data/m278_authoritative_reward_inbox_contract.json'); assert all(x in c['unset_until_measured'] for x in ['inbox_capacity','claim_queue_batch_size','overflow_retention','expiry_duration','compensation_values'])
+ assert c['rules']['each_entry_links_existing_m277_receipt'] is True and c['rules']['compensation_durable_value_requires_m266_commit'] is True

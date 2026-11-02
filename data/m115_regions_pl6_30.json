@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "milestone": "M115",
+  "range": {
+    "map_levels": [
+      6,
+      30
+    ]
+  },
+  "regions": [
+    {
+      "id": "stormreach",
+      "levels": [
+        6,
+        8
+      ],
+      "biome": "storm_coast",
+      "npc_slots": [
+        "npc_storm_raider",
+        "npc_storm_scout",
+        "npc_storm_guard",
+        "npc_storm_hunter"
+      ],
+      "island_slots": [
+        "island_base_01",
+        "island_base_02",
+        "island_base_03"
+      ],
+      "harbor_slot": "harbor_stormreach",
+      "boss_slot": "npc_storm_admiral"
+    },
+    {
+      "id": "ember_shoals",
+      "levels": [
+        9,
+        11
+      ],
+      "biome": "volcanic_shoals",
+      "npc_slots": [
+        "npc_ember_raider",
+        "npc_ember_tank",
+        "npc_ember_hunter"
+      ],
+      "island_slots": [
+        "island_base_04",
+        "island_base_05",
+        "island_base_06"
+      ],
+      "harbor_slot": "harbor_ember",
+      "boss_slot": "npc_ember_admiral"
+    },
+    {
+      "id": "veil_sea",
+      "levels": [
+        12,
+        15
+      ],
+      "biome": "mist_archipelago",
+      "npc_slots": [
+        "npc_veil_scout",
+        "npc_veil_sniper",
+        "npc_veil_guard",
+        "npc_veil_hunter"
+      ],
+      "island_slots": [
+        "island_base_07",
+        "island_base_08",
+        "island_base_09"
+      ],
+      "harbor_slot": "harbor_veil",
+      "boss_slot": "npc_veil_admiral"
+    },
+    {
+      "id": "cursed_dominion",
+      "levels": [
+        16,
+        20
+      ],
+      "biome": "cursed_sea",
+      "npc_slots": [
+        "npc_cursed_raider",
+        "npc_cursed_marksman",
+        "npc_cursed_bulwark",
+        "npc_cursed_hunter",
+        "npc_cursed_elite"
+      ],
+      "island_slots": [
+        "island_cursed_wake_01",
+        "island_black_lantern_01",
+        "island_gilded_grave_01",
+        "island_admiral_scar_01",
+        "island_crown_ash_01"
+      ],
+      "harbor_slot": "harbor_cursed_dominion",
+      "boss_slot": "npc_cursed_admiral",
+      "monster_slots": [
+        "monster_cursed_serpent_01",
+        "monster_ghost_whale_01"
+      ]
+    },
+    {
+      "id": "abyssal_frontier",
+      "levels": [
+        21,
+        25
+      ],
+      "biome": "rift_frontier",
+      "npc_slots": [
+        "npc_frontier_raider",
+        "npc_frontier_status_weaver",
+        "npc_frontier_bulwark",
+        "npc_frontier_hunter",
+        "npc_frontier_elite"
+      ],
+      "island_slots": [
+        "island_riftwater_01",
+        "island_hexed_convoy_01",
+        "island_broken_sigil_01",
+        "island_frontier_maw_01",
+        "island_specialist_trial_01"
+      ],
+      "harbor_slot": "harbor_frontier",
+      "boss_slot": "npc_frontier_admiral",
+      "monster_slots": [
+        "monster_frontier_rift_serpent_01"
+      ]
+    },
+    {
+      "id": "abyssal_depths",
+      "levels": [
+        26,
+        30
+      ],
+      "biome": "abyss_depths",
+      "npc_slots": [
+        "npc_abyss_raider",
+        "npc_abyss_piercer",
+        "npc_abyss_bulwark",
+        "npc_abyss_hunter",
+        "npc_abyss_elite"
+      ],
+      "island_slots": [
+        "island_abyss_threshold_01",
+        "island_drowned_maw_01",
+        "island_coral_grave_01",
+        "island_leviathan_trench_01",
+        "island_corruption_trial_01"
+      ],
+      "harbor_slot": "harbor_abyss_depths",
+      "boss_slot": "npc_abyss_admiral",
+      "monster_slots": [
+        "monster_abyss_serpent_01",
+        "monster_abyss_guardian_01",
+        "monster_drowned_beast_01"
+      ]
+    }
+  ],
+  "rules": {
+    "procedural_fallback_required": true,
+    "neutral_beginner_rule_ends_after_level_5": true,
+    "same_sea_map_controls": true,
+    "guild_islands_from_level_2": true
+  }
+}

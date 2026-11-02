@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "milestone": "M111",
+  "region": "cursed_dominion",
+  "maps": [
+    {
+      "level": 16,
+      "sector_id": "9-1",
+      "name": "Cursed Wake",
+      "port": "Mourning Anchorage",
+      "biome": "cursed"
+    },
+    {
+      "level": 17,
+      "sector_id": "9-2",
+      "name": "Black Lantern Sea",
+      "port": "",
+      "biome": "cursed"
+    },
+    {
+      "level": 18,
+      "sector_id": "10-1",
+      "name": "Gilded Grave",
+      "port": "Gilded Refuge",
+      "biome": "cursed"
+    },
+    {
+      "level": 19,
+      "sector_id": "10-2",
+      "name": "Admiral's Scar",
+      "port": "",
+      "biome": "cursed"
+    },
+    {
+      "level": 20,
+      "sector_id": "11-1",
+      "name": "Crown of Ash",
+      "port": "Ashen Crown Harbor",
+      "biome": "cursed"
+    }
+  ],
+  "runtime_status": "registered progression/world contracts; physical sector-grid expansion pending dedicated world-layout pass",
+  "visual_direction": "pirate cursed-sea, readable oblique top-down silhouettes; not modern navy"
+}

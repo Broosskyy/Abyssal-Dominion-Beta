@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "milestone": "M90",
+  "world_marker": {
+    "slot": "m89_guild_island",
+    "minimap": true,
+    "global_map_from_level": 2
+  },
+  "relations": [
+    {
+      "id": "neutral_preview",
+      "label": "NEUTRALE VORSCHAU",
+      "authoritative": false
+    },
+    {
+      "id": "owned",
+      "label": "EIGENE GILDE",
+      "authoritative": "future_server"
+    },
+    {
+      "id": "ally",
+      "label": "VERBÜNDET",
+      "authoritative": "future_server"
+    },
+    {
+      "id": "enemy",
+      "label": "FEIND",
+      "authoritative": "future_server"
+    },
+    {
+      "id": "war",
+      "label": "KRIEGSZIEL",
+      "authoritative": "future_server"
+    }
+  ],
+  "proximity_actions": [
+    "dock",
+    "inspect_guild",
+    "inspect_defense",
+    "inspect_facilities"
+  ],
+  "tower_panel": [
+    "role",
+    "range",
+    "reload",
+    "damage_definition",
+    "live_damage"
+  ],
+  "facility_panel": [
+    "facility_id",
+    "production_slot",
+    "server_required"
+  ],
+  "mobile": "large full-width-near-bottom interaction rows",
+  "desktop": "same actions; mouse/F interaction supported",
+  "authority": "presentation only until real guild backend"
+}

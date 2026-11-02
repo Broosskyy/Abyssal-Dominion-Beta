@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "milestone": "M72",
+  "priority": "P0",
+  "title": "Early Quest / POI Production Wave",
+  "recommended_next_assets": [
+    "poi_wreck_site_01",
+    "poi_salvage_cache_01",
+    "poi_navigation_marker_01",
+    "poi_shrine_beacon_01",
+    "poi_monster_nest_01",
+    "poi_supply_cache_01",
+    "nature_palm_cluster_01",
+    "nature_rock_cluster_01",
+    "nature_reef_cluster_01",
+    "nature_driftwood_cluster_01"
+  ],
+  "acceptance": [
+    "clear at oblique mobile camera",
+    "no baked text",
+    "visual-only GLB",
+    "stable pivot/scale",
+    "material reuse where sensible",
+    "fallback remains functional",
+    "no water plane inside ordinary GLB"
+  ],
+  "note": "Final art can be created independently and dropped into stable slots."
+}

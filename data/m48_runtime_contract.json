@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "milestone": "M48",
+  "runtime": {
+    "regional_harbor_services": true,
+    "regional_material_salvage": true,
+    "regional_crafting": true,
+    "support_ally_prototype": true,
+    "asset_preview_filters": true,
+    "qa_measurement_guides": true,
+    "qa_mobile_camera_preset": true
+  },
+  "production": {
+    "stable_slots_required": true,
+    "naming_convention_file": true,
+    "glb_export_preset_file": true,
+    "visual_acceptance_checklist_file": true,
+    "missing_final_asset_nonfatal": true
+  },
+  "authority": "local prototype only"
+}

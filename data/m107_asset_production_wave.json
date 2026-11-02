@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "milestone": "M107",
+  "p0_first13": 13,
+  "visible_priority": [
+    "starter silhouettes",
+    "PL1-5 NPC pirate differentiation",
+    "Haven's Reach hero/pirate hierarchy",
+    "cliff/cove irregular island",
+    "first monster silhouette/rig",
+    "guild island shield objective readability"
+  ],
+  "budgets": {
+    "havens_reach_modules": 30,
+    "world_nodes_delta": 0,
+    "marker_delta": 0
+  },
+  "next": [
+    "reward receipt/audit UI for local QA",
+    "first-session teaching-card runtime refinement",
+    "guild objective marker integration",
+    "P0 replacement-path export",
+    "mobile performance audit"
+  ]
+}

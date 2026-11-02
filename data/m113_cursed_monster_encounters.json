@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "milestone": "M113",
+  "encounters": {
+    "17": {
+      "variant": "cursed_serpent",
+      "production_slot": "monster_cursed_serpent_01",
+      "title": "Mirecoil Serpent",
+      "required_fleet_kills": 4
+    },
+    "19": {
+      "variant": "ghost_whale",
+      "production_slot": "monster_ghost_whale_01",
+      "title": "Lantern Ghost Whale",
+      "required_fleet_kills": 5
+    }
+  },
+  "rules": {
+    "hunter_objective": true,
+    "harpoon_recommended": true,
+    "same_targeting_system": true,
+    "no_broadside_angle_damage": true,
+    "visual_fallback_replaceable": true
+  },
+  "truth": "procedural creature-style fallback using existing ShipMotor/health/target contracts; final rigged creature GLBs pending"
+}

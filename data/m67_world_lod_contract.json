@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "milestone": "M67",
+  "title": "Island / Harbor Mobile LOD",
+  "tiers": {
+    "low": {
+      "island_lod_bias": 0.62,
+      "nature_visibility_end": 52,
+      "small_prop_visibility_end": 38,
+      "shore_fx_visibility_end": 58,
+      "shadow_visibility_end": 42,
+      "nature_density_multiplier": 0.55
+    },
+    "balanced": {
+      "island_lod_bias": 0.78,
+      "nature_visibility_end": 70,
+      "small_prop_visibility_end": 52,
+      "shore_fx_visibility_end": 76,
+      "shadow_visibility_end": 58,
+      "nature_density_multiplier": 0.78
+    },
+    "high": {
+      "island_lod_bias": 0.94,
+      "nature_visibility_end": 88,
+      "small_prop_visibility_end": 68,
+      "shore_fx_visibility_end": 94,
+      "shadow_visibility_end": 76,
+      "nature_density_multiplier": 1.0
+    }
+  },
+  "rules": [
+    "base island silhouette persists farther than small nature/props",
+    "shoreline readability persists beyond decorative vegetation",
+    "opaque/alpha-scissor nature preferred over alpha blend",
+    "final gameplay collision independent of visual LOD"
+  ]
+}

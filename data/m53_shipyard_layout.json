@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "milestone": "M53",
+  "breakpoints": {
+    "portrait_max_aspect": 0.82,
+    "narrow_landscape_min_aspect": 0.82,
+    "wide_landscape_min_aspect": 1.35
+  },
+  "mobile": {
+    "minimum_touch_height": 52,
+    "portrait": "single-column; preview first, stats/milestones below",
+    "landscape": "two-column when width permits",
+    "preview_min_height": 220,
+    "details_scrollable": true,
+    "max_persistent_compare_rows": 5
+  },
+  "desktop": {
+    "two_column_default": true
+  },
+  "rules": {
+    "no_horizontal_scroll": true,
+    "role_and_production_diagnostics_collapsible": true,
+    "final_asset_missing_nonfatal": true
+  }
+}

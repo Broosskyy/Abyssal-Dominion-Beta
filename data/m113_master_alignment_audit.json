@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "milestone": "M113",
+  "v3_7_found": false,
+  "source_grounded": [
+    "PL16-25 true midgame",
+    "PL25 Status/Build specialization",
+    "XP alone does not unlock pirate level",
+    "PvP only in appropriate PvP quests",
+    "Cursed Dominion/Abyssal Frontier = curse/rifts/monster hunters",
+    "Silver PL12+, Gold PL18+"
+  ],
+  "implemented": [
+    "PL17 cursed serpent encounter",
+    "PL19 ghost whale encounter",
+    "physical PL21-25 maps",
+    "PL21-25 progression/mastery/objectives",
+    "PL25 trial gate",
+    "Abyssal Frontier slots"
+  ],
+  "not_invented": [
+    "forced PvP requirement for PL25",
+    "final PL21-25 ship reward cadence",
+    "server authority",
+    "final monster GLBs"
+  ],
+  "native_pending": true
+}

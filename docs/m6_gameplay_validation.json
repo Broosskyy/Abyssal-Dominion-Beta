@@ -1,0 +1,24 @@
+{
+  "milestone": "M6",
+  "passed": false,
+  "checks_passed": 15,
+  "checks_total": 16,
+  "checks": {
+    "m6_or_newer_version": true,
+    "user_save_path": true,
+    "backup_save": false,
+    "checksum_guard": true,
+    "autosave": true,
+    "focus_save": true,
+    "sector_restore": true,
+    "checkpoint_restore": true,
+    "progression": true,
+    "three_upgrades": true,
+    "mission_rotation": true,
+    "loot_binding": true,
+    "dock_binding": true,
+    "mobile_shop": true,
+    "module_order": true,
+    "save_round_trip_model": true
+  }
+}

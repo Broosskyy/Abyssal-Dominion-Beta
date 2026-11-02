@@ -1,0 +1,12 @@
+{
+  "schema":1,
+  "milestone":"M155",
+  "status":"SYSTEM_INTEGRATION_POLISH",
+  "bonusmaps":{"silver_gold_abyss_legendary":true,"silver_legendary_save_restore":true,"entry_refund_exploit_guard":true,"menu_overview":true},
+  "cannons":{"roles":7,"upgrade_tiers":5,"role_specific_ammo_guidance":true,"admin_editable":true},
+  "loot":{"physical_clean_room_glbs":5,"tier_chests_share_replaceable_base":true,"visual_only":true},
+  "halloween":{"reward_track_preview":true,"event_runtime_preserved":true,"live_claims":false},
+  "progression":{"live_cap":50,"levels_51_60_staged":true,"balance_fabricated":false},
+  "ui":{"captain_menu_bonusmap_page":true,"mobile_primary_touch_height":52},
+  "admin":{"existing_rbac_publish_pipeline_preserved":true,"new_weapon_event_loot_data_versionable":true}
+}

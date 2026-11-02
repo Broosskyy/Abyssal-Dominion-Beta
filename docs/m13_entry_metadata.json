@@ -1,0 +1,110 @@
+{
+  "source": "docs/il2cpp/Assembly-CSharp.metadata-skeleton.cs",
+  "types": [
+    {
+      "type": "Code.Demo.UI.UILogin",
+      "fields": [
+        "_usernameInput",
+        "_passwordInput",
+        "_errorText",
+        "_joinClientButton",
+        "_menuCanvasGroup",
+        "_loadingText",
+        "_rememberMeToggle",
+        "_uiMediator"
+      ],
+      "methods": [
+        "Configure()",
+        "Start()",
+        "RememberMeToggleValueChanged()",
+        "LoginButtonPressed()",
+        "HideMenu()",
+        "ShowMenu()",
+        "ShowLoadingText()",
+        "ResetForm()",
+        "ShowErrorMessage()",
+        "LoginFailed()",
+        "DisableInteraction()",
+        ".ctor()"
+      ]
+    },
+    {
+      "type": "Code.Demo.UI.UIRegister",
+      "fields": [
+        "_usernameInput",
+        "_passwordInput",
+        "_confirmInput",
+        "_emailInput",
+        "_acceptTermsToggle",
+        "_registerButton",
+        "_backButton",
+        "_errorText",
+        "_okText",
+        "_menuCanvasGroup",
+        "_loadingObject",
+        "_uiMediator"
+      ],
+      "methods": [
+        "Configure()",
+        "Awake()",
+        "RegisterButtonPressed()",
+        "BackButtonPressed()",
+        "RegisterFailed()",
+        "ClearMessages()",
+        "SetOkText()",
+        "ResetForm()",
+        "HideMenu()",
+        "ShowMenu()",
+        "ShowLoading()",
+        "HideLoading()",
+        ".ctor()"
+      ]
+    },
+    {
+      "type": "Code.Demo.UI.UIResetPassword",
+      "fields": [
+        "_emailInputField",
+        "_sendRecoverEmailButton",
+        "_backButton",
+        "_canvasGroup",
+        "_loginCanvasGroup",
+        "_alertText"
+      ],
+      "methods": [
+        "Start()",
+        "BackButtonPressed()",
+        "SendRecoverEmailButtonPressed()",
+        ".ctor()",
+        "<SendRecoverEmailButtonPressed>b__8_0()",
+        "<SendRecoverEmailButtonPressed>b__8_1()"
+      ]
+    }
+  ],
+  "panel_inventory": [
+    {
+      "source": "SeeFight 3D_Data/level2",
+      "type": "GameObject",
+      "path_id": "8750",
+      "name": "Login Panel"
+    },
+    {
+      "source": "SeeFight 3D_Data/level2",
+      "type": "GameObject",
+      "path_id": "9859",
+      "name": "Register Panel"
+    },
+    {
+      "source": "SeeFight 3D_Data/level2",
+      "type": "GameObject",
+      "path_id": "32661",
+      "name": "Login_Register"
+    },
+    {
+      "source": "SeeFight 3D_Data/level2",
+      "type": "GameObject",
+      "path_id": "33962",
+      "name": "Login Window (1)"
+    }
+  ],
+  "boundary": "Metadata only, not original method bodies or authentication backend. Password/email/recovery fields are NOT implemented in the local profile selector."
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "milestone": "M243",
+  "master_basis": ["V3.8 §49 Bounties", "V3.8 §50 Wanted-System", "V3.8 §313-323 PvP/Ehre/Ranked Bible"],
+  "authority": {
+    "player_wanted": "server_authoritative",
+    "pvp_bounty_reward": "server_authoritative",
+    "honor_mutation": "server_authoritative",
+    "anti_farm_verdict": "server_authoritative",
+    "client_role": "read_only_replica"
+  },
+  "wanted": {
+    "triggers": ["high_honor", "kill_streak", "bounty_actions", "risk_sea_dominance", "official_world_bounty"],
+    "resolution": ["qualified_hunter_defeat", "server_decay_or_rule_resolution"],
+    "principle": "risk_reward_not_permanent_punishment"
+  },
+  "bounty_targets": ["npc", "admiral", "monster", "player"],
+  "reward_dimensions": ["gold", "xp", "fame", "honor", "items", "bounty_score", "pvp_token", "cosmetic_prestige", "guild_contribution"],
+  "anti_farm": ["repeat_target_diminishing", "alt_account_feeding", "power_gap", "respawn_camping", "group_dogpile", "logout_exploit", "trade_kill_pattern", "afk_target"],
+  "snapshot_fields": ["revision", "wanted_score", "wanted_state", "wanted_label", "kill_streak", "visibility_state", "risk_state", "active_bounties", "hunter_eligibility", "anti_farm_state", "settlement_state"],
+  "forbidden_client_actions": ["increase_wanted_score", "decrease_wanted_score", "grant_bounty_reward", "mutate_honor", "declare_qualified_kill", "override_anti_farm", "settle_player_bounty"],
+  "balance_lock": "No new reward amounts, thresholds, decay rates or PvP modifiers are invented in M243."
+}

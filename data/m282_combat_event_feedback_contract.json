@@ -1,0 +1,66 @@
+{
+  "milestone": "M282",
+  "contract": "combat_event_feed_damage_heal_number_coalescing_impact_vfx_hit_confirmation_polish",
+  "master_concept": "V3.8",
+  "genre_ux_references": [
+    "Seafight",
+    "Battle of Sea"
+  ],
+  "dependencies": {
+    "combat_outcome": "M269",
+    "combat_state_projectiles": "M270",
+    "combat_hud_convergence": "M281",
+    "target_legality": "M271",
+    "world_replication": "M267"
+  },
+  "authority": {
+    "server_owns": [
+      "resolved_damage",
+      "resolved_heal",
+      "critical_truth",
+      "block_truth",
+      "miss_truth",
+      "projectile_impact_truth",
+      "feedback_ordering"
+    ],
+    "client_may": [
+      "render_confirmed_numbers",
+      "coalesce_presentation_only_entries",
+      "play_impact_vfx_hooks",
+      "dismiss_presented_feedback",
+      "open_combat_detail"
+    ],
+    "client_never": [
+      "create_confirmed_damage_number",
+      "apply_damage_or_heal",
+      "confirm_critical_or_block",
+      "confirm_projectile_impact",
+      "advance_feedback_revision"
+    ]
+  },
+  "visual_rules": {
+    "sea_chart_first": true,
+    "keep_center_readable": true,
+    "target_proximate_feedback": true,
+    "coalesce_repetitive_standard_hits": true,
+    "preserve_crit_block_heal_salience": true,
+    "impact_vfx_presentation_only": true,
+    "primary_attack_bottom_right_unobstructed": true,
+    "camera_joystick_bottom_left_unobstructed": true,
+    "safe_area_aware": true,
+    "mobile_desktop_parity": true,
+    "no_new_combat_main_menu": true,
+    "no_permanent_debug_hud": true
+  },
+  "unset_until_measured": [
+    "damage_number_lifetime",
+    "coalescing_window",
+    "coalescing_distance",
+    "visible_feedback_budget",
+    "critical_emphasis_duration",
+    "impact_vfx_intensity",
+    "hit_stop_or_screen_shake_strength",
+    "mobile_feedback_density",
+    "desktop_feedback_density"
+  ]
+}

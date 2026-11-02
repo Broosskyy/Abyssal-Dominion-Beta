@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "milestone": "M101",
+  "profiles": {
+    "low": {
+      "render_scale": 0.72,
+      "fps_target": 60,
+      "shadows": false,
+      "water_quality": "low",
+      "vfx_scale": 0.55,
+      "world_dressing_scale": 0.6,
+      "marker_cap": 5,
+      "nameplate_distance": 55
+    },
+    "balanced": {
+      "render_scale": 0.86,
+      "fps_target": 60,
+      "shadows": true,
+      "water_quality": "balanced",
+      "vfx_scale": 0.78,
+      "world_dressing_scale": 0.82,
+      "marker_cap": 6,
+      "nameplate_distance": 68
+    },
+    "high": {
+      "render_scale": 1.0,
+      "fps_target": 60,
+      "shadows": true,
+      "water_quality": "high",
+      "vfx_scale": 1.0,
+      "world_dressing_scale": 1.0,
+      "marker_cap": 7,
+      "nameplate_distance": 82
+    }
+  },
+  "rules": [
+    "Profiles alter presentation/performance, never gameplay authority or hit logic.",
+    "Touch targets remain mobile-readable independent of render scale.",
+    "Player may override suitable settings.",
+    "Auto profile may step down on sustained low FPS."
+  ]
+}

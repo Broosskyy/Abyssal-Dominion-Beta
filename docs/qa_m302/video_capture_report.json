@@ -1,0 +1,115 @@
+{
+  "milestone": "M302",
+  "baseline_commit": "dfbfb8f",
+  "captured_at": "2026-09-19T05:30:41.054570+00:00",
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "captures": [
+    {
+      "capture_id": "flow_a_entry_sea",
+      "milestone": "M302",
+      "captured_at": "2026-09-19T05:30:41.054570+00:00",
+      "start_scene": "res://scenes/entry.tscn",
+      "flow": "Entry \u2192 Guest \u2192 Sea",
+      "output_path": "docs/qa_m302/videos/flow_a_entry_sea.webm",
+      "format": "webm",
+      "resolution": "804x581",
+      "fps": 30,
+      "duration_sec": 13.533,
+      "steps": [
+        "splash",
+        "login",
+        "guest",
+        "home",
+        "play",
+        "sea_ready@1",
+        "sea_stable"
+      ],
+      "result": "PASS",
+      "warnings": [],
+      "error": "",
+      "file_size": 350606,
+      "decodable": true,
+      "mostly_black": false
+    },
+    {
+      "capture_id": "flow_b_sea_gameplay",
+      "milestone": "M302",
+      "captured_at": "2026-09-19T05:30:41.054570+00:00",
+      "start_scene": "res://scenes/main.tscn",
+      "flow": "Normal Sea Gameplay",
+      "output_path": "docs/qa_m302/videos/flow_b_sea_gameplay.webm",
+      "format": "webm",
+      "resolution": "804x581",
+      "fps": 30,
+      "duration_sec": 13.5,
+      "steps": [
+        "main_load",
+        "sea_ready@0",
+        "sail_forward",
+        "hold"
+      ],
+      "result": "PASS",
+      "warnings": [],
+      "error": "",
+      "file_size": 399389,
+      "decodable": true,
+      "mostly_black": false
+    },
+    {
+      "capture_id": "flow_c_harbor_poi",
+      "milestone": "M302",
+      "captured_at": "2026-09-19T05:30:41.054570+00:00",
+      "start_scene": "res://scenes/main.tscn",
+      "flow": "Harbor / Island / POI",
+      "output_path": "docs/qa_m302/videos/flow_c_harbor_poi.webm",
+      "format": "webm",
+      "resolution": "804x581",
+      "fps": 30,
+      "duration_sec": 15.0,
+      "steps": [
+        "main_load",
+        "sea_ready@0",
+        "approach_harbor",
+        "harbor_hold"
+      ],
+      "result": "PASS",
+      "warnings": [],
+      "error": "",
+      "file_size": 467171,
+      "decodable": true,
+      "mostly_black": false
+    },
+    {
+      "capture_id": "flow_d_combat",
+      "milestone": "M302",
+      "captured_at": "2026-09-19T05:30:41.054570+00:00",
+      "start_scene": "res://scenes/main.tscn",
+      "flow": "Combat",
+      "output_path": "docs/qa_m302/videos/flow_d_combat.webm",
+      "format": "webm",
+      "resolution": "804x581",
+      "fps": 30,
+      "duration_sec": 17.0,
+      "steps": [
+        "main_load",
+        "sea_ready@0",
+        "enemy_present:4",
+        "target_locked",
+        "auto_fire_on",
+        "combat_end"
+      ],
+      "result": "PASS",
+      "warnings": [],
+      "error": "",
+      "file_size": 506950,
+      "decodable": true,
+      "mostly_black": false
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "pass": 4,
+    "warn": 0,
+    "fail": 0
+  }
+}

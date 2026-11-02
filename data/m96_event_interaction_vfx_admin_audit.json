@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "milestone": "M96",
+  "halloween": {
+    "wreck_proximity_interaction": true,
+    "portal_proximity_interaction": true,
+    "actual_marker_priority": true,
+    "gravefire_runtime_vfx": true,
+    "portal_runtime_vfx": true,
+    "boss_arrival_runtime_vfx": true,
+    "event_fleet_balance": "local PL2-5 map-level scale",
+    "live_reward_authority": false
+  },
+  "admin": {
+    "asset_browser": true,
+    "search_filter": true,
+    "max_visible_results": 12,
+    "combat_and_visual_spawn": true,
+    "safe_area_scaled_to_viewport": true,
+    "production_authority": false
+  },
+  "mobile": {
+    "event_interaction_touch_precedes_sail": true,
+    "marker_budget_unchanged": true,
+    "safe_area_conversion": true
+  },
+  "general_world_prepared": [
+    "nature_island_cliff_bridge_01",
+    "nature_island_sharp_reef_01",
+    "prop_harbor_pirate_sign_01",
+    "prop_harbor_rope_gantry_01",
+    "prop_wreck_half_mast_01",
+    "npc_pirate_sail_patch_01"
+  ],
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS touch",
+    "gamepad",
+    "safe-area screenshots",
+    "GPU profiling"
+  ]
+}

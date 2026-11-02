@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "milestone": "M43",
+  "scope": "combat selection readability",
+  "mobile": {
+    "tap": "select/use",
+    "long_press_ms": 420,
+    "long_press": "open detail card",
+    "picker_blocks_world_input": true,
+    "portrait_columns": 1,
+    "wide_landscape_columns": 2
+  },
+  "desktop": {
+    "left_click": "select/use",
+    "right_click": "open detail card"
+  },
+  "detail_fields": [
+    "name",
+    "category_or_role",
+    "damage_or_effect",
+    "range",
+    "duration",
+    "cooldown",
+    "stock",
+    "source"
+  ],
+  "visual_rules": {
+    "unique_ammo_trails": true,
+    "unique_impact_profiles": true,
+    "gameplay_values_not_derived_from_vfx": true
+  }
+}

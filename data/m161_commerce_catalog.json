@@ -1,0 +1,343 @@
+{
+  "schema": 1,
+  "milestone": "M161",
+  "authority": "SERVER_AUTHORITATIVE_FOR_REAL_MONEY_AND_ENTITLEMENTS",
+  "policy": "All catalog, price, availability, campaign, bundle and entitlement metadata is data-driven. Client may preview only; real-money grants require verified provider receipt and server transaction.",
+  "currencies": [
+    {
+      "id": "gold",
+      "label": "Gold",
+      "kind": "soft",
+      "editable": true
+    },
+    {
+      "id": "pearls",
+      "label": "Perlen",
+      "kind": "premium",
+      "editable": true,
+      "server_authoritative": true
+    },
+    {
+      "id": "guild_marks",
+      "label": "Gildenmarken",
+      "kind": "earned",
+      "editable": true
+    },
+    {
+      "id": "event_tokens",
+      "label": "Eventmarken",
+      "kind": "event",
+      "editable": true
+    }
+  ],
+  "shops": [
+    {
+      "id": "harbor_market",
+      "label": "Hafenmarkt",
+      "surface": "ingame",
+      "availability": {
+        "requires_harbor": true
+      },
+      "offer_ids": [
+        "ammo_iron",
+        "ammo_explosive",
+        "ammo_chain",
+        "ammo_piercing",
+        "ammo_ember",
+        "ammo_venom",
+        "ammo_shatter",
+        "ammo_spectral",
+        "supply_veil",
+        "supply_storm_bolt",
+        "supply_infernal_barrel",
+        "supply_crystal_barrier",
+        "supply_armor_corrosive",
+        "supply_repair_blocker",
+        "supply_leviathan_hook",
+        "supply_recall_compass",
+        "supply_repair",
+        "supply_boost",
+        "harpoon_basic"
+      ]
+    },
+    {
+      "id": "premium_item_shop",
+      "label": "Itemshop",
+      "surface": "ingame_web",
+      "availability": {
+        "account_required": true
+      },
+      "offer_ids": [
+        "starter_captain_pack",
+        "crystal_blessing_pack",
+        "guild_founder_supply"
+      ]
+    }
+  ],
+  "offers": [
+    {
+      "id": "ammo_iron",
+      "label": "60 Eisenkugeln",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "iron",
+      "amount": 60,
+      "price": 30,
+      "currency": "gold"
+    },
+    {
+      "id": "ammo_explosive",
+      "label": "30 Explosivkugeln",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "explosive",
+      "amount": 30,
+      "price": 60,
+      "currency": "gold"
+    },
+    {
+      "id": "ammo_chain",
+      "label": "30 Kettenkugeln",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "chain",
+      "amount": 30,
+      "price": 45,
+      "currency": "gold"
+    },
+    {
+      "id": "ammo_piercing",
+      "label": "20 Durchschlagkugeln",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "piercing",
+      "amount": 20,
+      "price": 55,
+      "currency": "gold"
+    },
+    {
+      "id": "ammo_ember",
+      "label": "20 Glutkugeln",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "ember",
+      "amount": 20,
+      "price": 65,
+      "currency": "gold"
+    },
+    {
+      "id": "ammo_venom",
+      "label": "20 Giftkugeln",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "venom",
+      "amount": 20,
+      "price": 65,
+      "currency": "gold"
+    },
+    {
+      "id": "ammo_shatter",
+      "label": "15 Brecherkugeln",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "shatter",
+      "amount": 15,
+      "price": 70,
+      "currency": "gold"
+    },
+    {
+      "id": "ammo_spectral",
+      "label": "10 Spektralkugeln",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "spectral",
+      "amount": 10,
+      "price": 90,
+      "currency": "gold"
+    },
+    {
+      "id": "supply_veil",
+      "label": "Abyssal Veil",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "veil",
+      "amount": 1,
+      "price": 85,
+      "currency": "gold"
+    },
+    {
+      "id": "supply_storm_bolt",
+      "label": "Storm Bolt",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "storm_bolt",
+      "amount": 1,
+      "price": 70,
+      "currency": "gold"
+    },
+    {
+      "id": "supply_infernal_barrel",
+      "label": "Infernal Barrel",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "infernal_barrel",
+      "amount": 1,
+      "price": 80,
+      "currency": "gold"
+    },
+    {
+      "id": "supply_crystal_barrier",
+      "label": "Crystal Barrier",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "crystal_barrier",
+      "amount": 1,
+      "price": 85,
+      "currency": "gold"
+    },
+    {
+      "id": "supply_armor_corrosive",
+      "label": "Armor Corrosive",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "armor_corrosive",
+      "amount": 1,
+      "price": 75,
+      "currency": "gold"
+    },
+    {
+      "id": "supply_repair_blocker",
+      "label": "Repair Blocker",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "repair_blocker",
+      "amount": 1,
+      "price": 90,
+      "currency": "gold"
+    },
+    {
+      "id": "supply_leviathan_hook",
+      "label": "Leviathan Hook",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "leviathan_hook",
+      "amount": 1,
+      "price": 75,
+      "currency": "gold"
+    },
+    {
+      "id": "supply_recall_compass",
+      "label": "Recall Compass",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "recall_compass",
+      "amount": 1,
+      "price": 110,
+      "currency": "gold"
+    },
+    {
+      "id": "supply_repair",
+      "label": "Reparaturitem",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "repair",
+      "amount": 1,
+      "price": 40,
+      "currency": "gold"
+    },
+    {
+      "id": "supply_boost",
+      "label": "Speed-Boost",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "boost",
+      "amount": 1,
+      "price": 35,
+      "currency": "gold"
+    },
+    {
+      "id": "harpoon_basic",
+      "label": "30 Harpunen",
+      "kind": "soft_currency",
+      "action": "inventory_purchase",
+      "content_id": "harpoon",
+      "amount": 30,
+      "price": 35,
+      "currency": "gold"
+    },
+    {
+      "id": "starter_captain_pack",
+      "label": "Kapitäns-Starterpaket",
+      "kind": "real_money",
+      "action": "payment_product",
+      "provider_product_id": "vaeltide.starter.captain.v1",
+      "entitlement_id": "bundle.starter_captain",
+      "display_price": "provider",
+      "sale_window": null,
+      "purchase_limit": 1
+    },
+    {
+      "id": "crystal_blessing_pack",
+      "label": "Kristallsegen-Paket",
+      "kind": "real_money",
+      "action": "payment_product",
+      "provider_product_id": "vaeltide.blessing.crystal.v1",
+      "entitlement_id": "bundle.crystal_blessing",
+      "display_price": "provider",
+      "purchase_limit": null
+    },
+    {
+      "id": "guild_founder_supply",
+      "label": "Gilden-Gründerbedarf",
+      "kind": "real_money",
+      "action": "payment_product",
+      "provider_product_id": "vaeltide.guild.founder.v1",
+      "entitlement_id": "bundle.guild_founder_supply",
+      "display_price": "provider",
+      "purchase_limit": 1
+    }
+  ],
+  "campaign_rule_fields": [
+    "enabled",
+    "starts_at",
+    "ends_at",
+    "audience",
+    "regions",
+    "platforms",
+    "discount",
+    "bonus_contents",
+    "purchase_limit",
+    "priority",
+    "experiment_key"
+  ],
+  "price_rule_fields": [
+    "currency",
+    "amount",
+    "provider_price_source",
+    "tax_display",
+    "regional_override",
+    "rounding",
+    "minimum_account_age",
+    "eligibility"
+  ],
+  "publishing": {
+    "workflow": [
+      "draft",
+      "validated",
+      "review",
+      "approved",
+      "scheduled",
+      "active",
+      "disabled",
+      "rolled_back"
+    ],
+    "four_eyes": [
+      "real_money_price",
+      "premium_currency_amount",
+      "entitlement_mapping",
+      "refund_policy"
+    ],
+    "audit_required": true,
+    "rollback_required": true
+  }
+}

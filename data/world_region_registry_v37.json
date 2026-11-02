@@ -1,0 +1,408 @@
+{
+  "schema_version": 1,
+  "milestone": "M156",
+  "master": "V3.8",
+  "regions": [
+    {
+      "id": "shattered_shores",
+      "display_name": "Shattered Shores",
+      "levels": [
+        1,
+        5
+      ],
+      "canonical_harbor": "Haven's Reach",
+      "biome": "tropical",
+      "npc_slots": [],
+      "monster_slots": [],
+      "admiral_slot": "",
+      "island_slots": [],
+      "poi_slots": [],
+      "legacy_visual_region_id": "",
+      "legacy_harbor_slot": "",
+      "enabled": true
+    },
+    {
+      "id": "crimson_sea",
+      "display_name": "Crimson Sea",
+      "levels": [
+        6,
+        10
+      ],
+      "canonical_harbor": "Redhaven",
+      "biome": "crimson",
+      "npc_slots": [
+        "npc_storm_raider",
+        "npc_storm_scout",
+        "npc_storm_guard",
+        "npc_storm_hunter"
+      ],
+      "monster_slots": [
+        "monster_krakenling_01",
+        "monster_redfin_01",
+        "monster_ember_ray_01"
+      ],
+      "admiral_slot": "npc_storm_admiral",
+      "island_slots": [
+        "island_base_01",
+        "island_base_02",
+        "island_base_03"
+      ],
+      "poi_slots": [],
+      "legacy_visual_region_id": "stormreach",
+      "legacy_harbor_slot": "harbor_stormreach",
+      "enabled": true
+    },
+    {
+      "id": "drowned_reach",
+      "display_name": "Drowned Reach",
+      "levels": [
+        11,
+        15
+      ],
+      "canonical_harbor": "Mourning Port",
+      "biome": "drowned",
+      "npc_slots": [
+        "npc_ember_raider",
+        "npc_ember_tank",
+        "npc_ember_hunter"
+      ],
+      "monster_slots": [
+        "monster_drowned_beast_01",
+        "monster_ghost_whale_01",
+        "monster_wraith_serpent_01",
+        "monster_young_leviathan_01"
+      ],
+      "admiral_slot": "npc_ember_admiral",
+      "island_slots": [
+        "island_base_04",
+        "island_base_05",
+        "island_base_06"
+      ],
+      "poi_slots": [],
+      "legacy_visual_region_id": "ember_shoals",
+      "legacy_harbor_slot": "harbor_ember",
+      "enabled": true
+    },
+    {
+      "id": "stormbound_expanse",
+      "display_name": "Stormbound Expanse",
+      "levels": [
+        16,
+        20
+      ],
+      "canonical_harbor": "Tempest Anchorage",
+      "biome": "stormbound",
+      "npc_slots": [
+        "npc_cursed_raider",
+        "npc_cursed_marksman",
+        "npc_cursed_bulwark",
+        "npc_cursed_hunter",
+        "npc_cursed_elite"
+      ],
+      "monster_slots": [
+        "monster_cursed_serpent_01",
+        "monster_ghost_whale_01"
+      ],
+      "admiral_slot": "npc_cursed_admiral",
+      "island_slots": [
+        "island_cursed_wake_01",
+        "island_black_lantern_01",
+        "island_gilded_grave_01",
+        "island_admiral_scar_01",
+        "island_crown_ash_01"
+      ],
+      "poi_slots": [],
+      "legacy_visual_region_id": "cursed_dominion",
+      "legacy_harbor_slot": "harbor_cursed_dominion",
+      "enabled": true
+    },
+    {
+      "id": "cursed_dominion",
+      "display_name": "Cursed Dominion",
+      "levels": [
+        21,
+        25
+      ],
+      "canonical_harbor": "Black Lantern Haven",
+      "biome": "cursed",
+      "npc_slots": [
+        "npc_frontier_raider",
+        "npc_frontier_status_weaver",
+        "npc_frontier_bulwark",
+        "npc_frontier_hunter",
+        "npc_frontier_elite"
+      ],
+      "monster_slots": [
+        "monster_frontier_rift_serpent_01"
+      ],
+      "admiral_slot": "npc_frontier_admiral",
+      "island_slots": [
+        "island_riftwater_01",
+        "island_hexed_convoy_01",
+        "island_broken_sigil_01",
+        "island_frontier_maw_01",
+        "island_specialist_trial_01"
+      ],
+      "poi_slots": [],
+      "legacy_visual_region_id": "abyssal_frontier",
+      "legacy_harbor_slot": "harbor_frontier",
+      "enabled": true
+    },
+    {
+      "id": "abyssal_frontier",
+      "display_name": "Abyssal Frontier",
+      "levels": [
+        26,
+        30
+      ],
+      "canonical_harbor": "Riftwatch",
+      "biome": "abyss",
+      "npc_slots": [
+        "npc_abyss_raider",
+        "npc_abyss_piercer",
+        "npc_abyss_bulwark",
+        "npc_abyss_hunter",
+        "npc_abyss_elite"
+      ],
+      "monster_slots": [
+        "monster_abyss_serpent_01",
+        "monster_abyss_guardian_01",
+        "monster_drowned_beast_01"
+      ],
+      "admiral_slot": "npc_abyss_admiral",
+      "island_slots": [
+        "island_abyss_threshold_01",
+        "island_drowned_maw_01",
+        "island_coral_grave_01",
+        "island_leviathan_trench_01",
+        "island_corruption_trial_01"
+      ],
+      "poi_slots": [],
+      "legacy_visual_region_id": "abyssal_depths",
+      "legacy_harbor_slot": "harbor_abyss_depths",
+      "enabled": true
+    },
+    {
+      "id": "sunken_empire",
+      "display_name": "Sunken Empire",
+      "levels": [
+        31,
+        35
+      ],
+      "canonical_harbor": "Crownfall Harbor",
+      "biome": "sunken",
+      "npc_slots": [
+        "npc_ancient_raider",
+        "npc_relic_guard",
+        "npc_titan_piercer",
+        "npc_guardian_hunter",
+        "npc_ancient_elite"
+      ],
+      "monster_slots": [
+        "monster_ancient_guardian_01",
+        "monster_titan_spawn_01"
+      ],
+      "admiral_slot": "npc_ancient_admiral",
+      "island_slots": [
+        "island_ancient_approach_01",
+        "island_guardian_shelf_01",
+        "island_forgotten_vault_01",
+        "island_titan_wake_01",
+        "island_worldboss_muster_01"
+      ],
+      "poi_slots": [],
+      "legacy_visual_region_id": "ancient_guardian_seas",
+      "legacy_harbor_slot": "harbor_relic_haven",
+      "enabled": true
+    },
+    {
+      "id": "void_sea",
+      "display_name": "Void Sea",
+      "levels": [
+        36,
+        40
+      ],
+      "canonical_harbor": "Last Light",
+      "biome": "void",
+      "npc_slots": [
+        "NPC-SHIP-VOID-001",
+        "NPC-SHIP-VOID-002",
+        "NPC-SHIP-VOID-003"
+      ],
+      "monster_slots": [
+        "MON-VOID-001",
+        "MON-VOID-002"
+      ],
+      "admiral_slot": "NPC-ADMIRAL-VOID-001",
+      "island_slots": [
+        "ISLAND-VOID-001",
+        "ISLAND-VOID-002",
+        "ISLAND-VOID-003"
+      ],
+      "poi_slots": [
+        "POI-VOID-RIFT-001",
+        "POI-VOID-WRECK-001"
+      ],
+      "legacy_visual_region_id": "void_sea",
+      "legacy_harbor_slot": "",
+      "enabled": true
+    },
+    {
+      "id": "sovereign_waters",
+      "display_name": "Sovereign Waters",
+      "levels": [
+        41,
+        45
+      ],
+      "canonical_harbor": "Sovereign's Rest",
+      "biome": "sovereign",
+      "npc_slots": [
+        "NPC-SHIP-SOV-001",
+        "NPC-SHIP-SOV-002",
+        "NPC-SHIP-SOV-003",
+        "NPC-SHIP-SOV-004"
+      ],
+      "monster_slots": [
+        "MON-SOV-001"
+      ],
+      "admiral_slot": "NPC-ADMIRAL-SOV-001",
+      "island_slots": [
+        "ISLAND-SOV-001",
+        "ISLAND-SOV-002",
+        "ISLAND-SOV-003"
+      ],
+      "poi_slots": [
+        "POI-SOV-BANNER-001",
+        "POI-SOV-WRECK-001",
+        "POI-SOV-BEACON-001"
+      ],
+      "legacy_visual_region_id": "sovereign_waters",
+      "legacy_harbor_slot": "",
+      "enabled": true
+    },
+    {
+      "id": "abyssal_dominion",
+      "display_name": "Abyssal Dominion",
+      "levels": [
+        46,
+        50
+      ],
+      "canonical_harbor": "Dominion Gate",
+      "biome": "dominion",
+      "npc_slots": [
+        "NPC-SHIP-DOM-001",
+        "NPC-SHIP-DOM-002",
+        "NPC-SHIP-DOM-003"
+      ],
+      "monster_slots": [
+        "MON-DOM-001",
+        "MON-DOM-002"
+      ],
+      "admiral_slot": "NPC-ADMIRAL-DOM-001",
+      "island_slots": [
+        "ISLAND-DOM-001",
+        "ISLAND-DOM-002",
+        "ISLAND-DOM-003"
+      ],
+      "poi_slots": [
+        "POI-DOM-RIFT-001",
+        "POI-DOM-THRONE-001"
+      ],
+      "legacy_visual_region_id": "abyssal_dominion",
+      "legacy_harbor_slot": "HARBOR-DOMINION-001",
+      "enabled": true
+    },
+    {
+      "id": "dreadwater_march",
+      "display_name": "Dreadwater March",
+      "levels": [
+        51,
+        55
+      ],
+      "canonical_harbor": "Blackwake Bastion",
+      "biome": "dominion",
+      "npc_slots": [
+        "SHIP-PROG-051",
+        "SHIP-PROG-052",
+        "SHIP-PROG-053",
+        "SHIP-PROG-054",
+        "SHIP-PROG-055"
+      ],
+      "monster_slots": [
+        "MON-DOM-001",
+        "MON-DOM-002"
+      ],
+      "admiral_slot": "SHIP-PROG-055",
+      "island_slots": [
+        "ISLAND-DOM-001",
+        "ISLAND-SOV-002",
+        "ISLAND-VOID-003"
+      ],
+      "poi_slots": [
+        "POI-DOM-RIFT-001",
+        "POI-SOV-WRECK-001"
+      ],
+      "legacy_visual_region_id": "abyssal_dominion",
+      "legacy_harbor_slot": "HARBOR-DOMINION-001",
+      "enabled": true
+    },
+    {
+      "id": "iron_maw_reach",
+      "display_name": "Iron Maw Reach",
+      "levels": [
+        56,
+        60
+      ],
+      "canonical_harbor": "Iron Maw Anchorage",
+      "biome": "abyss",
+      "npc_slots": [
+        "SHIP-PROG-056",
+        "SHIP-PROG-057",
+        "SHIP-PROG-058",
+        "SHIP-PROG-059",
+        "SHIP-PROG-060"
+      ],
+      "monster_slots": [
+        "MON-VOID-002",
+        "MON-DOM-002"
+      ],
+      "admiral_slot": "SHIP-PROG-060",
+      "island_slots": [
+        "ISLAND-VOID-001",
+        "ISLAND-DOM-002",
+        "ISLAND-SOV-003"
+      ],
+      "poi_slots": [
+        "POI-VOID-RIFT-001",
+        "POI-DOM-THRONE-001"
+      ],
+      "legacy_visual_region_id": "abyssal_dominion",
+      "legacy_harbor_slot": "HARBOR-DOMINION-001",
+      "enabled": true
+    }
+  ],
+  "structural_rules": {
+    "pirate_levels": [
+      1,
+      50
+    ],
+    "trial_levels": [
+      5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50
+    ],
+    "starter_ship_count": 3,
+    "progression_ship_count": 50,
+    "ship_mastery_levels": [
+      1,
+      10
+    ]
+  }
+}

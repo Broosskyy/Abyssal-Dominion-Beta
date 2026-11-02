@@ -1,0 +1,19 @@
+{
+  "milestone": "M294",
+  "master_concept": "V3.8",
+  "name": "first_sortie_tap_to_sail_local_route_observer",
+  "clean_room_references": ["Seafight", "Battle of Sea"],
+  "states": ["IDLE", "INTENT_ONLY", "MOTION_OBSERVED", "ARRIVAL_OBSERVED", "INTERRUPTED"],
+  "observation_rules": {
+    "intent": "Only a water-tap route while undocked in LOCAL_DEVELOPMENT; never an objective or loot click.",
+    "motion": "A locally sampled ShipMotor changes position while moving toward its unchanged water target; this is not M268 authoritative motion.",
+    "arrival": "After observed local motion, PlayerShipInput ends its active route within its existing 1.35 unit stopping radius; no new speed, reload or damage balance value.",
+    "interruption": "Different route, docking, sinking, missing player/input, authority change or stopping without observed arrival.",
+    "truth": "All route stages are QA presentation only; server acceptance and trusted native device evidence are separate."
+  },
+  "initial_ship_model": "ONE_COMPLETE_GLB_PER_SHIP",
+  "placeholder_strategy": "Reuse existing complete ship GLBs and native Tap-to-Sail route marker; no new modular ship mesh or center-chart overlay.",
+  "forbidden": ["change ship movement", "change navigation target", "commit position", "certify server arrival", "mark native QA PASS", "approve release"],
+  "native_status": "NOT_EVALUATED",
+  "release_approved": false
+}

@@ -1,0 +1,2 @@
+# M119
+Ancient Guardian Relic Barrier and Titan Pressure Pulse are active telegraphed mechanics. PL35 now requires explicit WorldBossPrep state: both mechanics observed, Guardian/Titan/Ancient Admiral clears and a Relic Core. Four Ancient equipment roles are craftable/equippable with capped armor/cannon/harpoon/speed consumers. Saved active bonusmaps recover inactive to avoid phantom instances after restart. Native Godot QA pending.

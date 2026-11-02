@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "milestone": "M110",
+  "region": "veil_sea",
+  "ships": {
+    "npc_veil_scout": {
+      "role": "stalker",
+      "identity": "lean pirate silhouette, spectral sail accents",
+      "ammo": "spectral"
+    },
+    "npc_veil_sniper": {
+      "role": "marksman",
+      "identity": "long-hull corsair, tall asymmetric rig",
+      "ammo": "piercing"
+    },
+    "npc_veil_guard": {
+      "role": "warden",
+      "identity": "broad armored pirate hull, reinforced stern",
+      "ammo": "shatter"
+    },
+    "npc_veil_hunter": {
+      "role": "hunter_support",
+      "identity": "harpoon/hunter silhouette, bone/rope ornaments",
+      "ammo": "venom"
+    },
+    "npc_veil_admiral": {
+      "role": "admiral",
+      "identity": "hero pirate silhouette, layered sails and lanterns",
+      "ammo": "spectral"
+    }
+  },
+  "monster_slots": [
+    "monster_veil_stalker_01",
+    "monster_veil_guardian_01"
+  ],
+  "visual_rule": "pirate first; no modern navy silhouette; stable replaceable GLB slots",
+  "authority": "local prototype"
+}

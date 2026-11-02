@@ -1,0 +1,21 @@
+{
+  "milestone": "M8",
+  "passed": true,
+  "checks_passed": 13,
+  "checks_total": 13,
+  "checks": {
+    "m8_or_newer_version": true,
+    "il2cpp_assembly_type_count": true,
+    "runtime_assets_nonempty": true,
+    "ship_adapter_runtime": true,
+    "island_adapter_runtime": true,
+    "port_adapter_runtime": true,
+    "hud_canvas_layer": true,
+    "target_position_sailing": true,
+    "recovered_water_maps": true,
+    "recovered_audio": true,
+    "six_legacy_reference_exclusions": true,
+    "runtime_subset_not_excluded": true,
+    "implementation_map": true
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "milestone": "M195",
+  "master_concept": "V3.8",
+  "status": "REGIONAL_CHART_COMPOSITION_STATIC_VERIFIED",
+  "locks": {
+    "cross_platform_world_parity": true,
+    "named_charts_not_numeric_grid_labels": true,
+    "chart_size_world_units": 360,
+    "tap_to_sail_preserved": true,
+    "land_blocks_units_do_not": true,
+    "gameplay_content_not_device_dependent": true
+  },
+  "composition": {
+    "goal": "Named charts use readable macro routes, broad sailing corridors, regional landmark placement and full-chart POI distribution instead of central prototype clustering.",
+    "island_anchor_pattern": "deterministic normalized anchors with seeded jitter",
+    "poi_distribution": "full chart bands with safe center/port clearance",
+    "route_corridors": ["central crossing", "two diagonal bypasses", "outer exploration arc"],
+    "same_seed_same_world_all_platforms": true
+  }
+}

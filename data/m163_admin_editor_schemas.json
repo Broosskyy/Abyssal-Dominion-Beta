@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "milestone": "M163",
+  "editors": [
+    {
+      "id": "weapon_editor",
+      "types": [
+        "weapon",
+        "cannon_upgrade_track",
+        "cannon_visual_stage"
+      ],
+      "tabs": [
+        "identity",
+        "stats",
+        "upgrade",
+        "assets",
+        "sources",
+        "publish"
+      ]
+    },
+    {
+      "id": "ammo_editor",
+      "types": [
+        "ammo",
+        "ammo_profile",
+        "ammo_effect"
+      ],
+      "tabs": [
+        "identity",
+        "combat",
+        "status",
+        "visual",
+        "economy",
+        "publish"
+      ]
+    },
+    {
+      "id": "harpoon_editor",
+      "types": [
+        "harpoon_profile",
+        "harpoon_family",
+        "harpoon_upgrade_track"
+      ],
+      "tabs": [
+        "identity",
+        "hunter",
+        "status",
+        "visual",
+        "economy",
+        "publish"
+      ]
+    },
+    {
+      "id": "progression_editor",
+      "types": [
+        "special_deck",
+        "talent_tree",
+        "talent_node",
+        "citadel_branch",
+        "upgrade_tree",
+        "upgrade_node"
+      ],
+      "tabs": [
+        "identity",
+        "requirements",
+        "effects",
+        "costs",
+        "visual",
+        "publish"
+      ]
+    },
+    {
+      "id": "guild_editor",
+      "types": [
+        "guild_rank",
+        "guild_permission_set",
+        "guild_building",
+        "guild_building_level",
+        "guild_tower",
+        "guild_tower_level",
+        "guild_siege_rule",
+        "guild_treasury_rule"
+      ],
+      "tabs": [
+        "identity",
+        "levels",
+        "permissions",
+        "economy",
+        "siege",
+        "visual",
+        "publish"
+      ]
+    },
+    {
+      "id": "commerce_editor",
+      "types": [
+        "shop_offer",
+        "bundle",
+        "currency",
+        "price_rule",
+        "commerce_campaign",
+        "entitlement"
+      ],
+      "tabs": [
+        "identity",
+        "contents",
+        "price",
+        "eligibility",
+        "schedule",
+        "publish"
+      ]
+    }
+  ],
+  "workflow": [
+    "draft",
+    "validate",
+    "review",
+    "schedule",
+    "publish",
+    "disable",
+    "rollback"
+  ],
+  "requires_rbac": true,
+  "server_validated": true
+}

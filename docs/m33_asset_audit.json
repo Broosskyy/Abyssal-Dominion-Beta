@@ -1,0 +1,312 @@
+{
+  "engine": "4.5.1-stable (official)",
+  "models": {
+    "buoy": {
+      "bounds_m": [
+        0.870000004768372,
+        1.70000004768372,
+        0.839999973773956
+      ],
+      "bounds_min": [
+        -0.419999986886978,
+        -0.200000002980232,
+        -0.419999986886978
+      ],
+      "consumer": "no buoy gameplay",
+      "normals_present": true,
+      "status": "prepared",
+      "surfaces": 3,
+      "triangles": 128
+    },
+    "cannon": {
+      "bounds_m": [
+        0.699999988079071,
+        0.779999971389771,
+        1.14999997615814
+      ],
+      "bounds_min": [
+        -0.349999994039536,
+        0.0,
+        -0.5
+      ],
+      "consumer": "no mounted cannon replacement",
+      "normals_present": true,
+      "status": "prepared",
+      "surfaces": 2,
+      "triangles": 60
+    },
+    "cannonball": {
+      "bounds_m": [
+        0.300000011920929,
+        0.300000011920929,
+        0.300000011920929
+      ],
+      "bounds_min": [
+        -0.150000005960464,
+        -0.150000005960464,
+        -0.150000005960464
+      ],
+      "consumer": "cannon projectile",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 1,
+      "triangles": 120
+    },
+    "harbor": {
+      "bounds_m": [
+        7.5,
+        5.65000009536743,
+        3.05000019073486
+      ],
+      "bounds_min": [
+        -3.75,
+        -0.800000011920929,
+        -1.95000004768372
+      ],
+      "consumer": "port adapter",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 6,
+      "triangles": 808
+    },
+    "harpoon": {
+      "bounds_m": [
+        0.280000001192093,
+        0.280000001192093,
+        1.45000004768372
+      ],
+      "bounds_min": [
+        -0.140000000596046,
+        -0.140000000596046,
+        -0.600000023841858
+      ],
+      "consumer": "harpoon projectile",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 2,
+      "triangles": 40
+    },
+    "island_rock": {
+      "bounds_m": [
+        2.0,
+        0.937999963760376,
+        1.8400000333786
+      ],
+      "bounds_min": [
+        -1.0,
+        -0.349999994039536,
+        -0.920000016689301
+      ],
+      "consumer": "island adapter / desert",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 2,
+      "triangles": 496
+    },
+    "island_snow": {
+      "bounds_m": [
+        2.0,
+        0.937999963760376,
+        1.8400000333786
+      ],
+      "bounds_min": [
+        -1.0,
+        -0.349999994039536,
+        -0.920000016689301
+      ],
+      "consumer": "island adapter / snow",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 2,
+      "triangles": 496
+    },
+    "island_tropical": {
+      "bounds_m": [
+        2.0,
+        1.15527427196503,
+        1.8400000333786
+      ],
+      "bounds_min": [
+        -1.0,
+        -0.349999994039536,
+        -0.920000016689301
+      ],
+      "consumer": "island adapter / tropical",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 5,
+      "triangles": 671
+    },
+    "loot_chest": {
+      "bounds_m": [
+        1.12000000476837,
+        0.985000014305115,
+        0.845000028610229
+      ],
+      "bounds_min": [
+        -0.560000002384186,
+        -0.104999996721745,
+        -0.409999996423721
+      ],
+      "consumer": "loot visual",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 2,
+      "triangles": 104
+    },
+    "monster_kraken": {
+      "bounds_m": [
+        6.43870830535889,
+        1.82161343097687,
+        3.50974059104919
+      ],
+      "bounds_min": [
+        -3.21935415267944,
+        -0.600000023841858,
+        -1.7548702955246
+      ],
+      "consumer": "monster adapter",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 2,
+      "triangles": 740
+    },
+    "npc_admiral": {
+      "bounds_m": [
+        2.75,
+        5.65000009536743,
+        9.30862808227539
+      ],
+      "bounds_min": [
+        -1.375,
+        -0.649999976158142,
+        -4.023850440979
+      ],
+      "consumer": "admiral visual adapter",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 6,
+      "triangles": 2127
+    },
+    "npc_corsair": {
+      "bounds_m": [
+        2.3125,
+        5.05000019073486,
+        7.57036209106445
+      ],
+      "bounds_min": [
+        -1.15625,
+        -0.649999976158142,
+        -3.27452087402344
+      ],
+      "consumer": "enemy visual adapter",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 6,
+      "triangles": 1655
+    },
+    "npc_shadow": {
+      "bounds_m": [
+        2.75,
+        5.65000009536743,
+        9.30862808227539
+      ],
+      "bounds_min": [
+        -1.375,
+        -0.649999976158142,
+        -4.023850440979
+      ],
+      "consumer": "no dedicated enemy mapping",
+      "normals_present": true,
+      "status": "prepared",
+      "surfaces": 6,
+      "triangles": 2127
+    },
+    "repair_crate": {
+      "bounds_m": [
+        1.12000000476837,
+        0.985000014305115,
+        0.845000028610229
+      ],
+      "bounds_min": [
+        -0.560000002384186,
+        -0.104999996721745,
+        -0.409999996423721
+      ],
+      "consumer": "repair loot visual",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 2,
+      "triangles": 104
+    },
+    "ship_large": {
+      "bounds_m": [
+        2.75,
+        5.65000009536743,
+        9.30862808227539
+      ],
+      "bounds_min": [
+        -1.375,
+        -0.649999976158142,
+        -4.023850440979
+      ],
+      "consumer": "Iron Chalupa / player",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 6,
+      "triangles": 2127
+    },
+    "ship_medium": {
+      "bounds_m": [
+        2.3125,
+        5.05000019073486,
+        7.57036209106445
+      ],
+      "bounds_min": [
+        -1.15625,
+        -0.649999976158142,
+        -3.27452087402344
+      ],
+      "consumer": "Clipper / player",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 6,
+      "triangles": 1655
+    },
+    "ship_small": {
+      "bounds_m": [
+        1.96000003814697,
+        4.09999990463257,
+        6.06401062011719
+      ],
+      "bounds_min": [
+        -0.980000019073486,
+        -0.649999976158142,
+        -2.62478542327881
+      ],
+      "consumer": "Swift Barco / player",
+      "normals_present": true,
+      "status": "active",
+      "surfaces": 6,
+      "triangles": 1399
+    },
+    "wreck": {
+      "bounds_m": [
+        2.30999994277954,
+        2.4980001449585,
+        7.57036209106445
+      ],
+      "bounds_min": [
+        -1.15499997138977,
+        -0.649999976158142,
+        -3.27452087402344
+      ],
+      "consumer": "no wreck gameplay",
+      "normals_present": true,
+      "status": "prepared",
+      "surfaces": 5,
+      "triangles": 1207
+    }
+  },
+  "visual_review": false
+}

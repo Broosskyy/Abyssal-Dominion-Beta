@@ -1,0 +1,12 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "captured_at": "2026-09-18",
+  "steps": [
+    "01_splash.png",
+    "02_login.png",
+    "03_home_guest.png",
+    "04_sea_initial.png",
+    "05_sea_settled.png"
+  ],
+  "notes": "Entry flow via tools/capture_entry_flow.gd. Sea gameplay via tools/capture_sea_direct.gd with guest session metadata."
+}

@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "milestone": "M79",
+  "priority": "P0",
+  "wired_now": [
+    "prop_harbor_net_rack_01",
+    "prop_harbor_lantern_post_01",
+    "prop_monster_bone_rib_01",
+    "nature_reef_marker_01"
+  ],
+  "next_models": [
+    "prop_monster_skull_01",
+    "prop_wreck_anchor_chain_01",
+    "prop_harbor_signpost_01",
+    "prop_harbor_canvas_awning_01",
+    "nature_reef_long_01",
+    "prop_drift_cargo_01"
+  ],
+  "highest_value_final_glbs": [
+    "ship_small",
+    "ship_medium",
+    "ship_large",
+    "npc_friendly_coastal_sloop",
+    "npc_scout_01",
+    "npc_raider_01",
+    "npc_gunship_01",
+    "npc_heavy_01",
+    "harbor_havens_reach",
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "monster_early_01"
+  ],
+  "acceptance": [
+    "mobile oblique silhouette first",
+    "pirate/coastal identity",
+    "no baked UI text",
+    "shared material families where practical",
+    "visual-only GLB",
+    "stable pivot/scale"
+  ]
+}

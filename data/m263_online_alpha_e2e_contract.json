@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "milestone": "M263",
+  "master_concept": "V3.8",
+  "status": "ONLINE_ALPHA_E2E_CONTRACT_FOUNDATION",
+  "principles": {
+    "online_alpha_prioritizes_technical_correctness": true,
+    "server_authority_required": true,
+    "local_preview_is_not_online_alpha": true,
+    "missing_backend_never_fabricates_success": true,
+    "test_global_isolated": true
+  },
+  "flow": [
+    "authenticate",
+    "load_account",
+    "open_session",
+    "join_world",
+    "synchronize_world",
+    "movement_intent",
+    "combat_intent",
+    "persist_authoritative_state",
+    "disconnect_reconnect",
+    "leave_world",
+    "close_session"
+  ],
+  "authority": {
+    "identity": "SERVER",
+    "ownership": "SERVER",
+    "session": "SERVER",
+    "world_state": "SERVER",
+    "movement_resolution": "SERVER",
+    "combat_resolution": "SERVER",
+    "persistence": "SERVER",
+    "rejoin_verdict": "SERVER",
+    "leave_ack": "SERVER"
+  },
+  "client_intents": [
+    "login_request",
+    "world_join_request",
+    "tap_to_sail_intent",
+    "target_intent",
+    "attack_intent",
+    "reconnect_request",
+    "leave_request"
+  ],
+  "safety": {
+    "stale_snapshot_can_settle": false,
+    "client_can_grant_rewards": false,
+    "client_can_confirm_combat": false,
+    "client_can_confirm_persistence": false,
+    "client_can_generate_resume_ticket": false,
+    "client_can_mark_online_alpha_passed": false,
+    "disconnect_must_not_duplicate_state": true
+  },
+  "identity_binding": [
+    "environment",
+    "account_id_or_pseudonymous_ref",
+    "session_id",
+    "world_revision",
+    "build_number",
+    "client_version",
+    "content_config_version"
+  ],
+  "configuration": {
+    "final_timeout_seconds": null,
+    "final_rejoin_window_seconds": null,
+    "final_tick_rate": null,
+    "final_retry_count": null,
+    "final_latency_threshold_ms": null
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "milestone": "M95",
+  "categories": {
+    "halloween_world": [
+      "event_halloween_portal_01",
+      "event_halloween_wreck_01",
+      "event_halloween_island_deco_01"
+    ],
+    "halloween_combat": [
+      "event_halloween_npc_sloop_01",
+      "event_halloween_npc_raider_01",
+      "event_halloween_admiral_01",
+      "event_halloween_monster_01",
+      "event_halloween_boss_01"
+    ],
+    "halloween_guild": [
+      "event_halloween_guild_deco_01"
+    ],
+    "halloween_reward": [
+      "event_design_drowned_corsair_01"
+    ]
+  },
+  "authority": "visual/debug navigation only"
+}

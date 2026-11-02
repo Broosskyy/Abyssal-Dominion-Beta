@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "milestone": "M158",
+  "event_id": "halloween_abyss_01",
+  "authority": "LOCAL_EVENT_PREVIEW",
+  "phase_extensions": [
+    {
+      "id": 1,
+      "label": "The Fog Rises",
+      "objective": "Investigate wrecks and defeat scouts",
+      "recommended_level": 6,
+      "world_intensity": 0.35
+    },
+    {
+      "id": 2,
+      "label": "Drowned Armada",
+      "objective": "Break fleet captains and protect the sea lane",
+      "recommended_level": 15,
+      "world_intensity": 0.6
+    },
+    {
+      "id": 3,
+      "label": "Abyssal Midnight",
+      "objective": "Hunt the monster and open the midnight portal",
+      "recommended_level": 25,
+      "world_intensity": 0.82
+    },
+    {
+      "id": 4,
+      "label": "The Drowned Crown",
+      "objective": "Defeat the event sovereign",
+      "recommended_level": 35,
+      "world_intensity": 1.0
+    }
+  ],
+  "quests": [
+    {
+      "id": "h158_q4",
+      "kind": "event_sink",
+      "target": 12,
+      "label": "Sink 12 Drowned Fleet ships",
+      "reward_currency": 30
+    },
+    {
+      "id": "h158_q5",
+      "kind": "event_monster_hit",
+      "target": 5,
+      "label": "Hit Halloween monsters 5 times with harpoons",
+      "reward_currency": 25
+    },
+    {
+      "id": "h158_q6",
+      "kind": "event_explore",
+      "target": 2,
+      "label": "Investigate haunted event sites",
+      "reward_currency": 20
+    }
+  ],
+  "shop_extensions": [
+    {
+      "id": "gravefire_large_pack",
+      "cost": 24,
+      "currency": "drowned_embers",
+      "label": "120 Gravefire Shot"
+    },
+    {
+      "id": "drowned_salvage_cache",
+      "cost": 55,
+      "currency": "drowned_embers",
+      "label": "Drowned Salvage Cache"
+    },
+    {
+      "id": "event_design_token",
+      "cost": 120,
+      "currency": "drowned_embers",
+      "label": "Drowned Corsair Design Token"
+    }
+  ],
+  "phase4_fleet": [
+    "event_halloween_admiral_01",
+    "event_halloween_monster_01",
+    "event_halloween_boss_01"
+  ],
+  "rules": [
+    "no hard-coded real-world activation date",
+    "server authority required for live rewards/purchases",
+    "event layer must remain removable without affecting base progression"
+  ]
+}

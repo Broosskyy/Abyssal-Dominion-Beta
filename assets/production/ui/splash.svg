@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="75%">
+      <stop offset="0" stop-color="#174e69"/>
+      <stop offset="1" stop-color="#05131f"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c7862c"/>
+      <stop offset=".5" stop-color="#ffe29a"/>
+      <stop offset="1" stop-color="#c7862c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <path d="M0 565c152-44 260-44 412 0s260 44 412 0 260-44 456 0v155H0z" fill="#082b3d"/>
+  <path d="M0 585c152-44 260-44 412 0s260 44 412 0 260-44 456 0" fill="none" stroke="#3faec6" stroke-width="7" opacity=".62"/>
+  <path d="M640 170v278M516 410h248" stroke="url(#gold)" stroke-width="17" stroke-linecap="round"/>
+  <path d="M640 181c-57 63-97 131-116 205h116V181z" fill="#f1e7d0"/>
+  <path d="M658 213c54 49 90 107 106 173H658V213z" fill="#d7c8a7"/>
+  <path d="M494 420h292l-62 70H556z" fill="url(#gold)"/>
+  <text x="640" y="565" fill="#ffffff" font-family="sans-serif" font-weight="700" font-size="48" text-anchor="middle" letter-spacing="7">SEE FIGHT 3D</text>
+  <text x="640" y="611" fill="#8fd6e5" font-family="sans-serif" font-size="20" text-anchor="middle" letter-spacing="4">GODOT RECONSTRUCTION LAB</text>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><!-- M204 abyss_scale: visual-only replacement-ready placeholder -->
+<rect x="5" y="5" width="86" height="86" rx="18" fill="#081827" stroke="#d6a84f" stroke-width="4"/>
+<circle cx="48" cy="48" r="34" fill="#10293b" stroke="#31536a" stroke-width="2"/>
+<polygon points="48.0,27.0 52.0,41.1 66.2,37.5 56.0,48.0 66.2,58.5 52.0,54.9 48.0,69.0 44.0,54.9 29.8,58.5 40.0,48.0 29.8,37.5 44.0,41.1" fill="#e2b85a" fill-opacity=".20" stroke="#d6a84f" stroke-width="3" stroke-linejoin="round"/>
+<g fill="none" stroke="#e2b85a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M32 37 H64 L58 64 H38 Z M38 37 V30 H58 V37"/></g>
+<circle cx="73" cy="23" r="5" fill="#e2b85a" stroke="#f4df9a" stroke-width="2"/></svg>

@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "mode": "visual_socket_contract_only",
+  "ownership_persistence": false,
+  "slots": {
+    "island_base": {
+      "socket": "GuildIsland/IslandBase",
+      "required": true,
+      "role": "terrain/base"
+    },
+    "harbor": {
+      "socket": "GuildIsland/Harbor",
+      "required": true,
+      "role": "anchorage/dock"
+    },
+    "guild_hall": {
+      "socket": "GuildIsland/GuildHall",
+      "required": true,
+      "role": "guild identity/core facility"
+    },
+    "warehouse": {
+      "socket": "GuildIsland/Warehouse",
+      "required": false,
+      "role": "storage visual"
+    },
+    "repair_station": {
+      "socket": "GuildIsland/RepairStation",
+      "required": false,
+      "role": "repair/service visual"
+    },
+    "walls": {
+      "socket": "GuildIsland/Walls",
+      "required": false,
+      "role": "fortification visual"
+    },
+    "tower_cannon": {
+      "socket": "GuildIsland/Towers/Cannon",
+      "required": false,
+      "role": "cannon defense visual"
+    },
+    "tower_mortar": {
+      "socket": "GuildIsland/Towers/Mortar",
+      "required": false,
+      "role": "mortar defense visual"
+    },
+    "tower_chain": {
+      "socket": "GuildIsland/Towers/Chain",
+      "required": false,
+      "role": "chain defense visual"
+    },
+    "tower_guardian": {
+      "socket": "GuildIsland/Towers/Guardian",
+      "required": false,
+      "role": "guardian defense visual"
+    },
+    "decoration_layer": {
+      "socket": "GuildIsland/DecorationLayer",
+      "required": false,
+      "role": "cosmetic/prestige visual"
+    },
+    "event_layer": {
+      "socket": "GuildIsland/EventLayer",
+      "required": false,
+      "role": "seasonal/event visual"
+    },
+    "lighthouse": {
+      "socket": "GuildIsland/Lighthouse",
+      "required": false,
+      "role": "navigation/world/guild utility visual"
+    },
+    "armory": {
+      "socket": "GuildIsland/Armory",
+      "required": false,
+      "role": "war supplies/equipment visual"
+    },
+    "market_pier": {
+      "socket": "GuildIsland/MarketPier",
+      "required": false,
+      "role": "vendor/trade visual"
+    },
+    "hunter_lodge": {
+      "socket": "GuildIsland/HunterLodge",
+      "required": false,
+      "role": "monster objective visual"
+    },
+    "war_room": {
+      "socket": "GuildIsland/WarRoom",
+      "required": false,
+      "role": "war/ranking strategy visual"
+    },
+    "shield_core": {
+      "socket": "GuildIsland/Defense/ShieldCore",
+      "required": false,
+      "role": "defensive objective visual",
+      "active_model_slot": "guild_shield_core_01"
+    },
+    "shield_node": {
+      "socket": "GuildIsland/Defense/ShieldNodes",
+      "required": false,
+      "role": "defensive objective visual",
+      "active_model_slot": "guild_shield_node_01"
+    },
+    "tower_counter_battery": {
+      "socket": "GuildIsland/Towers/CounterBattery",
+      "required": false,
+      "role": "siege counter visual"
+    },
+    "tower_event": {
+      "socket": "GuildIsland/Towers/Event",
+      "required": false,
+      "role": "seasonal tower visual"
+    },
+    "wall_straight": {
+      "socket": "GuildIsland/Walls/Straight",
+      "required": false,
+      "role": "modular fortification visual"
+    },
+    "wall_corner": {
+      "socket": "GuildIsland/Walls/Corner",
+      "required": false,
+      "role": "modular fortification visual"
+    },
+    "wall_gate": {
+      "socket": "GuildIsland/Walls/Gate",
+      "required": false,
+      "role": "harbor gate visual"
+    },
+    "watch_platform": {
+      "socket": "GuildIsland/WatchPlatform",
+      "required": false,
+      "role": "defense/readability visual"
+    }
+  },
+  "milestone": "M100",
+  "minimum_world_map_level": 2,
+  "m100_authority": "Shield/objective layer is visual only; no capture, live defense or persistent state."
+}

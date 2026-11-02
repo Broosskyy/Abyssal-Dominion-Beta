@@ -1,0 +1,57 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "apk": "ABYSSAL_DOMINION_M3051_ARM64_TEST.apk",
+  "package": "com.abyssaldominion.mobile",
+  "version_code": 305101,
+  "version_name": "0.305.1-test.1",
+  "architecture": "arm64-v8a",
+  "size_bytes": 73460286,
+  "sha256": "de9989c44243bd60f90061c696bcb96198a10b6df93bbf33ca5c590c762692e5",
+  "reference_graphics": [
+    {
+      "path": "assets/classic/private_seabattles/ships/elite8.png",
+      "sha256": "2d2463b6dbe4e3e8c99bd3b89e42768ffc58d86a0c3600bbe4c0bb3a950e6d62"
+    },
+    {
+      "path": "assets/classic/private_seabattles/ships/warship.png",
+      "sha256": "296ba591acb84140a79754cd32330ee22e6587cd6d5c7c449ea7982d740f4d3e"
+    },
+    {
+      "path": "assets/classic/private_seabattles/ships/pinnace.png",
+      "sha256": "b6b04d1777f5fa3f2a53a6532b540bb77db64313ccbca8566d19281ef9facd50"
+    },
+    {
+      "path": "assets/classic/private_seabattles/ships/flyingdutchman.png",
+      "sha256": "cdf2d19818ea0656049dc994c38c5dcc55ca0320185a3cb88729040ed784c2fd"
+    },
+    {
+      "path": "assets/classic/private_seabattles/monsters/tiamat.png",
+      "sha256": "a5f78646b313043b8945d7b28649d4b97989fb3f6ac6fda2d7783df86153433d"
+    },
+    {
+      "path": "assets/classic/private_seabattles/ocean/wave_noise.png",
+      "sha256": "245452c5a32d5ab4358533cb2e80a1772c87f01d6449f1b9b9b588824c009c21"
+    },
+    {
+      "path": "assets/classic/private_seabattles/islands/snow.png",
+      "sha256": "c1d62837c658a4b422fd7aa1e205ab904e399a9fffdf9502f9959d0be7f91865"
+    },
+    {
+      "path": "assets/classic/private_seabattles/islands/snow2.png",
+      "sha256": "05955e637983727ab9bf7a9dc8428ed79f3e9198f59ff0371d12d0ab2d1a7624"
+    },
+    {
+      "path": "assets/classic/private_seabattles/islands/rock.png",
+      "sha256": "9a1f8fb937720975b6c91bfb4511e7d9d9ae9e0e0332f9b42861d797d02f4cb5"
+    },
+    {
+      "path": "assets/classic/private_seabattles/islands/tropical.png",
+      "sha256": "06fa539c185d7d4b834cc4f20de05c429a53fb1aa5029b5c66ef5a8fe50b8d0b"
+    }
+  ],
+  "signature": "PASS",
+  "alignment_16k": "PASS",
+  "archive_integrity": "PASS",
+  "device_installation": "NOT_TESTED",
+  "online_service": "NO_PUBLIC_SERVER_CONFIGURED"
+}

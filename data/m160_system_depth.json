@@ -1,0 +1,262 @@
+{
+  "schema": 1,
+  "milestone": "M160",
+  "master_concept": "V3.8",
+  "policy": "Clean-room genre-inspired systems. Data-first; gameplay content is editable without code changes.",
+  "normal_decks": {
+    "levels": 10,
+    "visual_rule": "layered_under_hull",
+    "capacity_per_level": 1,
+    "admin_type": "upgrade_rule"
+  },
+  "special_decks": [
+    {
+      "id": "arcane_tide_deck",
+      "label": "Arkanes Gezeitendeck",
+      "role": "mystic",
+      "unlock": "ritual_and_event_sources",
+      "bonuses": {
+        "cannon_slots": 2,
+        "elite_damage_pct": 3
+      },
+      "vfx": "azure_runes"
+    },
+    {
+      "id": "stormwake_deck",
+      "label": "Sturmwachtdeck",
+      "role": "mobility_control",
+      "unlock": "storm_content",
+      "bonuses": {
+        "reload_pct": 3,
+        "movement_pct": 2
+      },
+      "vfx": "storm_sparks"
+    },
+    {
+      "id": "leviathan_deck",
+      "label": "Leviathandeck",
+      "role": "hunter",
+      "unlock": "monster_hunter",
+      "bonuses": {
+        "harpoon_pct": 8,
+        "monster_damage_pct": 4
+      },
+      "vfx": "deep_teal_marks"
+    },
+    {
+      "id": "iron_bastion_deck",
+      "label": "Bollwerkdeck",
+      "role": "defense",
+      "unlock": "guild_siege",
+      "bonuses": {
+        "hull_pct": 5,
+        "structure_damage_reduction_pct": 3
+      },
+      "vfx": "iron_ward"
+    },
+    {
+      "id": "corsair_oath_deck",
+      "label": "Korsareneid-Deck",
+      "role": "pvp",
+      "unlock": "honor_progression",
+      "bonuses": {
+        "pvp_damage_pct": 3,
+        "pvp_resistance_pct": 2
+      },
+      "vfx": "red_banner_marks"
+    },
+    {
+      "id": "gravewake_deck",
+      "label": "Grabflutdeck",
+      "role": "event",
+      "unlock": "halloween",
+      "bonuses": {
+        "event_damage_pct": 7,
+        "event_loot_pct": 4
+      },
+      "vfx": "gravefire_runes"
+    }
+  ],
+  "cannon_upgrade_tracks": [
+    {
+      "id": "barrel",
+      "label": "Rohr",
+      "levels": 10,
+      "effect": "damage_precision"
+    },
+    {
+      "id": "carriage",
+      "label": "Lafette",
+      "levels": 10,
+      "effect": "reload_stability"
+    },
+    {
+      "id": "chamber",
+      "label": "Kammer",
+      "levels": 10,
+      "effect": "ammo_efficiency"
+    },
+    {
+      "id": "runes",
+      "label": "Runenfassung",
+      "levels": 10,
+      "effect": "role_mastery"
+    }
+  ],
+  "ammo_families": [
+    {
+      "id": "solid",
+      "examples": [
+        "iron",
+        "piercing"
+      ],
+      "identity": "reliable_hull"
+    },
+    {
+      "id": "blast",
+      "examples": [
+        "explosive",
+        "shatter"
+      ],
+      "identity": "burst_structure"
+    },
+    {
+      "id": "control",
+      "examples": [
+        "chain",
+        "venom"
+      ],
+      "identity": "movement_and_pressure"
+    },
+    {
+      "id": "elemental",
+      "examples": [
+        "ember",
+        "gravefire"
+      ],
+      "identity": "damage_over_time"
+    },
+    {
+      "id": "arcane",
+      "examples": [
+        "spectral",
+        "rift_piercer"
+      ],
+      "identity": "elite_and_ward_penetration"
+    }
+  ],
+  "talent_trees": [
+    {
+      "id": "navigator",
+      "label": "Navigator",
+      "nodes": 12,
+      "themes": [
+        "speed",
+        "turning",
+        "map_efficiency"
+      ]
+    },
+    {
+      "id": "artillery",
+      "label": "Artillerist",
+      "nodes": 12,
+      "themes": [
+        "cannons",
+        "ammo",
+        "critical_windows"
+      ]
+    },
+    {
+      "id": "bulwark",
+      "label": "Bollwerk",
+      "nodes": 12,
+      "themes": [
+        "hull",
+        "repair",
+        "resistance"
+      ]
+    },
+    {
+      "id": "hunter",
+      "label": "Jäger",
+      "nodes": 12,
+      "themes": [
+        "harpoon",
+        "monster",
+        "loot"
+      ]
+    },
+    {
+      "id": "corsair",
+      "label": "Korsar",
+      "nodes": 12,
+      "themes": [
+        "pvp",
+        "boarding",
+        "honor"
+      ]
+    }
+  ],
+  "citadel": {
+    "label": "Kastell",
+    "branches": [
+      {
+        "id": "powder_vault",
+        "label": "Pulvermagazin",
+        "levels": 10,
+        "focus": "ammo_capacity_and_reload"
+      },
+      {
+        "id": "master_gunner",
+        "label": "Meisterschütze",
+        "levels": 10,
+        "focus": "cannon_role_mastery"
+      },
+      {
+        "id": "reinforced_hull",
+        "label": "Verstärkter Rumpf",
+        "levels": 10,
+        "focus": "hull_and_resistance"
+      },
+      {
+        "id": "chart_room",
+        "label": "Kartensaal",
+        "levels": 10,
+        "focus": "navigation_and_bonusmaps"
+      },
+      {
+        "id": "hunter_lodge",
+        "label": "Jägerloge",
+        "levels": 10,
+        "focus": "harpoon_and_monsters"
+      },
+      {
+        "id": "guild_quarter",
+        "label": "Gildenquartier",
+        "levels": 10,
+        "focus": "guild_island_and_siege"
+      }
+    ]
+  },
+  "admin": {
+    "editable": true,
+    "create_new": true,
+    "clone": true,
+    "versioned": true,
+    "schedulable": true,
+    "disableable": true,
+    "rollback": true,
+    "asset_slots": [
+      "icon",
+      "model",
+      "vfx",
+      "sfx"
+    ],
+    "publish_requires": [
+      "rbac",
+      "validation",
+      "review",
+      "transport_authority"
+    ]
+  }
+}

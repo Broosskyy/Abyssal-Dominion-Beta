@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "milestone": "M116",
+  "v3_7_found": false,
+  "implemented": [
+    "Corruption risk consumed by ShipHealth",
+    "Corruption reward multiplier consumed by encounter loot",
+    "Abyssal harpoon family runtime payloads",
+    "Abyss six-wave runtime with monster waves 3/6 and Guardian gate",
+    "save payload for Gold/Build/Corruption/Abyss map",
+    "equipment/castle stable hooks"
+  ],
+  "truth_boundary": [
+    "Abyss map has isolated progression state/instance identity but still uses current world encounter director; dedicated scene/world transfer remains pending",
+    "Corruption multiplier is local prototype, future server authority required",
+    "Corruption Gear/Advanced Castle are hooks not full final items"
+  ],
+  "native_pending": true
+}

@@ -1,0 +1,32 @@
+{
+  "milestone": "M287",
+  "status": "PLACEHOLDER_REPLACEABLE",
+  "production_boundary": "assets/production only; reference_only assets are never promoted",
+  "owner": "Godot runtime composition",
+  "ship_model_strategy": "ONE_COMPLETE_3D_MODEL_PER_SHIP; sockets host external presentation overlays only",
+  "required_sockets": ["MOTION_BowFoam", "MOTION_SternWake", "MOTION_TurnWake", "MOTION_Waterline", "MOTION_AnchorRipple", "MOTION_Sails"],
+  "slots": [
+    {"id":"m287_vfx_bow_displacement_placeholder","kind":"VFX","fallback":"paired runtime foam planes","final_replacement":"authored bow displacement scene"},
+    {"id":"m287_vfx_stern_wake_placeholder","kind":"VFX","fallback":"paired runtime wake planes","final_replacement":"authored class-specific stern wake"},
+    {"id":"m287_vfx_turn_curl_placeholder","kind":"VFX","fallback":"runtime torus curls","final_replacement":"authored directional turn-water scene"},
+    {"id":"m287_vfx_hull_waterline_placeholder","kind":"VFX","fallback":"runtime elliptical torus","final_replacement":"authored hull displacement and foam scene"},
+    {"id":"m287_vfx_anchor_ripple_placeholder","kind":"VFX","fallback":"runtime expanding torus","final_replacement":"authored idle and anchor ripple scene"},
+    {"id":"m287_vfx_sail_flow_overlay_placeholder","kind":"VFX_PROXY","fallback":"socketed runtime sail-flow cue without mesh access","final_replacement":"optional authored VFX/animation hook compatible with a complete single GLB"}
+  ],
+  "lod_policy": {
+    "native_desktop": "full bow, stern, turn, waterline and sail presentation",
+    "native_mobile": "primary bow/stern silhouette with conditional turn curl",
+    "web_preview": "primary bow/stern silhouette with conditional turn curl",
+    "world_and_gameplay_truth_identical": true,
+    "final_values": "native QA required"
+  },
+  "legacy_fallback": {
+    "ship_wake_gd": "retained for local-development compatibility",
+    "m287_active": "legacy WakeVFX hidden when the M287 rig is ready"
+  },
+  "authority": {
+    "local_prototype": "may read local ShipMotor only when environment is LOCAL_DEVELOPMENT and server_authority_verified is false",
+    "online": "server-confirmed M287 state and event only",
+    "never": ["set destination", "change speed", "change heading", "rotate ship transform", "require modular ship mesh", "detach or replace ship parts", "decide route", "decide collision", "promote VFX to authority"]
+  }
+}

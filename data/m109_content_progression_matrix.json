@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "milestone": "M109",
+  "maps": [
+    {
+      "level": 6,
+      "existing_sector": "3-2 Dominus Regina",
+      "region": "stormreach",
+      "ship_reward": "ship_main_01"
+    },
+    {
+      "level": 7,
+      "existing_sector": "4-2 Corsair Expanse",
+      "region": "stormreach",
+      "ship_reward": ""
+    },
+    {
+      "level": 8,
+      "existing_sector": "5-1 Frozen Reach",
+      "region": "stormreach",
+      "ship_reward": "ship_main_02"
+    },
+    {
+      "level": 9,
+      "existing_sector": "5-2 Icebreaker Sea",
+      "region": "ember_shoals",
+      "ship_reward": ""
+    },
+    {
+      "level": 10,
+      "existing_sector": "6-1 El Refugio",
+      "region": "ember_shoals",
+      "ship_reward": "ship_main_03",
+      "pirate_trial": true
+    }
+  ],
+  "ship_mastery": {
+    "levels_per_design": 10,
+    "xp_from_pl6_10_npc_sinks": true,
+    "boss_multiplier": 2.5,
+    "elite_multiplier": 1.5
+  },
+  "npc_fleets": [
+    "storm raider",
+    "storm scout",
+    "storm guard",
+    "storm hunter",
+    "storm admiral",
+    "ember raider",
+    "ember tank",
+    "ember hunter",
+    "ember admiral"
+  ],
+  "progression_chain": "NPC sinks -> map XP + selected ship mastery XP -> boss clear -> explicit ship reward milestones -> PL10 Pirate Trial gate",
+  "note": "Map names are existing source sectors; M109 integrates progression rather than replacing the world map."
+}

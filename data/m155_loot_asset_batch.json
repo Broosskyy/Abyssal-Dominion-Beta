@@ -1,0 +1,14 @@
+{
+  "schema":1,
+  "milestone":"M155",
+  "classification":"CLEAN_ROOM_GLB_PLACEHOLDER",
+  "assets":[
+    {"slot":"loot_coin_cache","path":"res://assets/production_placeholders/m155_loot/loot_coin_cache.glb","archetype":"coin_cache"},
+    {"slot":"loot_salvage_bundle","path":"res://assets/production_placeholders/m155_loot/loot_salvage_bundle.glb","archetype":"salvage_bundle"},
+    {"slot":"loot_chest_common","path":"res://assets/production_placeholders/m155_loot/loot_tier_chest.glb","archetype":"tier_chest"},
+    {"slot":"loot_admiral_vault","path":"res://assets/production_placeholders/m155_loot/loot_admiral_vault.glb","archetype":"admiral_vault"},
+    {"slot":"repair_crate","path":"res://assets/production_placeholders/m155_loot/repair_crate_m155.glb","archetype":"repair_crate"}
+  ],
+  "contract":"Visual-only GLBs. Loot table, ownership, pickup, reward authority and collision remain runtime-owned.",
+  "replacement_ready":true
+}

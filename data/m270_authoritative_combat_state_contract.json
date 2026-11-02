@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "milestone": "M270",
+  "master_concept": "V3.8",
+  "contract": "authoritative_combat_state_reload_status_projectile_resolution_foundation",
+  "genre_ux_references": [
+    "Seafight",
+    "Battle of Sea"
+  ],
+  "clean_room_rule": "Use naval-MMO cadence/readability conventions only; do not copy proprietary assets, layouts, values, names or content.",
+  "authority": {
+    "client_may": [
+      "render_reload_progress_from_server_state",
+      "render_status_vfx",
+      "interpolate_projectile_visuals",
+      "show_unconfirmed_fire_feedback"
+    ],
+    "server_owns": [
+      "combat_phase",
+      "reload_start_and_completion",
+      "status_effect_application_refresh_removal",
+      "dot_hot_ticks",
+      "repair_and_shield_application",
+      "projectile_spawn_lifecycle_and_impact",
+      "combat_state_revision",
+      "resource_state_after_combat_events"
+    ],
+    "client_never_commits": [
+      "reload_completion",
+      "status_effect",
+      "dot_or_hot_tick",
+      "repair",
+      "shield_heal",
+      "authoritative_projectile",
+      "projectile_impact",
+      "projectile_damage",
+      "combat_state_revision"
+    ]
+  },
+  "combat_phases": [
+    "IDLE",
+    "ENGAGED",
+    "RELOADING",
+    "DISABLED",
+    "DEFEATED"
+  ],
+  "state_event_families": [
+    "RELOAD",
+    "STATUS_EFFECT",
+    "DOT_HOT",
+    "REPAIR_SHIELD",
+    "PROJECTILE",
+    "COMBAT_PHASE"
+  ],
+  "dependencies": {
+    "combat_resolution": "M269 authoritative target/fire resolution",
+    "world_transport": "M267 snapshot/delta transport",
+    "movement": "M268 authoritative movement",
+    "economy_inventory": "M266 atomic ammo/value settlement",
+    "sustain_support": "M240 sustain/support gameplay contract"
+  },
+  "environment_isolation": [
+    "INTERNAL",
+    "TEST",
+    "GLOBAL"
+  ],
+  "unset_until_measured": [
+    "reload_duration_values",
+    "status_tick_interval",
+    "status_stack_caps",
+    "projectile_speed_and_lifetime",
+    "projectile_interpolation_budget",
+    "impact_tolerance",
+    "repair_shield_tick_values",
+    "combat_exit_delay"
+  ]
+}

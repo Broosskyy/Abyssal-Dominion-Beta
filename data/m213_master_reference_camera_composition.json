@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "milestone": "M213",
+  "status": "MASTER_REFERENCE_CAMERA_COMPOSITION_STATIC_VERIFIED",
+  "master_concept": "V3.8",
+  "reference_basis": [
+    "151866.png",
+    "151878.png",
+    "152093.png",
+    "152969.png",
+    "149437.png"
+  ],
+  "camera": {
+    "projection": "perspective_oblique_top_down",
+    "base_offset": [
+      16.8,
+      29.0,
+      -25.2
+    ],
+    "fov_degrees": 40.0,
+    "default_zoom_factor": 1.0,
+    "zoom_factor_range": [
+      0.82,
+      1.62
+    ],
+    "pan_limit": 32.0,
+    "intent": "higher and wider than M212; several ships, islands and POIs readable simultaneously"
+  },
+  "world_composition": {
+    "sea_chart_dominant": true,
+    "player_ship_readable_not_oversized": true,
+    "multiple_encounters_visible": true,
+    "large_harbor_islands_as_world_anchors": true,
+    "center_play_space_kept_readable": true
+  },
+  "hud_locks": {
+    "top_navigation_supported": true,
+    "minimap_upper_right": true,
+    "combat_cluster_lower_right": true,
+    "primary_attack_lower_right": true,
+    "quickslots_lower_edge": true,
+    "camera_control_lower_left_camera_only": true,
+    "persistent_bottom_menu_bar": false,
+    "center_bottom_primary_attack": false
+  },
+  "gameplay_locks": {
+    "tap_to_sail": true,
+    "camera_control_moves_ship": false,
+    "damage_changed": false,
+    "weapon_range_changed": false,
+    "collision_changed": false,
+    "world_content_platform_specific": false
+  },
+  "platform_parity": "same world/gameplay/presentation; responsive UI scale, spacing, touch targets and safe areas only",
+  "native_visual_qa_required": true
+}

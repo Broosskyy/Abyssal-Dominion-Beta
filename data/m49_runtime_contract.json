@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "milestone": "M49",
+  "runtime": {
+    "persistent_equipment_modules": true,
+    "module_slots": [
+      "weapon",
+      "defense",
+      "support",
+      "mobility"
+    ],
+    "regional_npc_combat_roles": true,
+    "harbor_module_sockets": true,
+    "support_contribution_telemetry": true,
+    "overheal_contribution": 0
+  },
+  "production": {
+    "harbor_module_visual_slots": 4,
+    "regional_module_icon_slots": 6,
+    "asset_preview_priority_filter": true,
+    "missing_override_diagnostics": true,
+    "final_asset_filenames_not_in_gameplay": true
+  },
+  "authority": "local prototype only; no server rewards or live economy authority"
+}

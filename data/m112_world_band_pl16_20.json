@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "milestone": "M112",
+  "region": "cursed_dominion",
+  "maps": [
+    {
+      "level": 16,
+      "sector_id": "9-1",
+      "name": "Cursed Wake",
+      "port": "Mourning Anchorage",
+      "biome": "cursed",
+      "coordinate": [
+        4,
+        3
+      ]
+    },
+    {
+      "level": 17,
+      "sector_id": "9-2",
+      "name": "Black Lantern Sea",
+      "port": "",
+      "biome": "cursed",
+      "coordinate": [
+        4,
+        4
+      ]
+    },
+    {
+      "level": 18,
+      "sector_id": "10-1",
+      "name": "Gilded Grave",
+      "port": "Gilded Refuge",
+      "biome": "cursed",
+      "coordinate": [
+        3,
+        4
+      ]
+    },
+    {
+      "level": 19,
+      "sector_id": "10-2",
+      "name": "Admiral's Scar",
+      "port": "",
+      "biome": "cursed",
+      "coordinate": [
+        2,
+        4
+      ]
+    },
+    {
+      "level": 20,
+      "sector_id": "11-1",
+      "name": "Crown of Ash",
+      "port": "Ashen Crown Harbor",
+      "biome": "cursed",
+      "coordinate": [
+        1,
+        4
+      ]
+    }
+  ],
+  "runtime_status": "M112 physically registered in WorldMapSystem 5x5 grid; native runtime QA pending",
+  "visual_direction": "pirate cursed-sea, readable oblique top-down silhouettes; not modern navy"
+}

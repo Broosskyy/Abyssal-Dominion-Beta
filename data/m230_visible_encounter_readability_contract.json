@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "milestone": "M230",
+  "master_concept": "V3.8",
+  "status": "VISIBLE_ENCOUNTER_READABILITY_STATIC_VERIFIED",
+  "intent": [
+    "Expose M229 encounter rank, territory and formation identity in normal gameplay without filling the sea with labels.",
+    "Use restrained minimap zone rings for elite, monster-territory and admiral reads.",
+    "Keep ordinary patrols quiet so the sea and five-master-reference composition remain dominant."
+  ],
+  "presentation": {
+    "round_gameplay_minimap_preserved": true,
+    "rectangular_full_sea_chart_preserved": true,
+    "ordinary_patrol_zone_ring": false,
+    "elite_zone_ring": true,
+    "monster_territory_ring": true,
+    "admiral_zone_ring": true,
+    "selected_target_can_force_readability": true,
+    "rank_badges_use_existing_nameplates": true,
+    "formation_glyphs_are_compact": true,
+    "world_center_kept_clear": true
+  },
+  "priority": ["selected_target", "admiral_boss", "monster_territory", "elite", "ordinary_patrol"],
+  "world_rules": {
+    "same_world_mobile_web_desktop": true,
+    "m213_m214_master_camera_unchanged": true,
+    "m228_spawn_cap_unchanged": true,
+    "m229_encounter_semantics_reused": true
+  },
+  "boundaries": {
+    "damage_changed": false,
+    "range_changed": false,
+    "reload_changed": false,
+    "health_changed": false,
+    "rewards_changed": false,
+    "loot_values_changed": false,
+    "collision_changed": false,
+    "navigation_changed": false,
+    "aggro_changed": false,
+    "spawn_cap_increased": false,
+    "new_pathfinder_added": false
+  }
+}

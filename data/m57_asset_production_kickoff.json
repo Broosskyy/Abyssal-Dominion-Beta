@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "milestone": "M57",
+  "goal": "First user-created final asset wave; every entry already has or must receive a stable replacement slot.",
+  "first_glb": "ship_small",
+  "wave_a": [
+    {
+      "order": 1,
+      "slot": "ship_small",
+      "asset": "Starter Ship — Small",
+      "method": "Rodin",
+      "status": "CREATE_FIRST"
+    },
+    {
+      "order": 2,
+      "slot": "ship_medium",
+      "asset": "Starter Ship — Medium",
+      "method": "Rodin",
+      "status": "OPEN"
+    },
+    {
+      "order": 3,
+      "slot": "ship_large",
+      "asset": "Starter Ship — Large",
+      "method": "Rodin",
+      "status": "OPEN"
+    },
+    {
+      "order": 4,
+      "slot": "npc_friendly_coastal_sloop",
+      "asset": "NPC Friendly Coastal Sloop",
+      "method": "Rodin",
+      "status": "SLOT_PREPARED_M57"
+    },
+    {
+      "order": 5,
+      "slot": "npc_scout_01",
+      "asset": "NPC Scout I",
+      "method": "Rodin",
+      "status": "SLOT_PREPARED_M57"
+    },
+    {
+      "order": 6,
+      "slot": "npc_raider_01",
+      "asset": "NPC Raider I",
+      "method": "Rodin",
+      "status": "SLOT_PREPARED_M57"
+    },
+    {
+      "order": 7,
+      "slot": "npc_gunship_01",
+      "asset": "NPC Gunship I",
+      "method": "Rodin",
+      "status": "SLOT_PREPARED_M57"
+    },
+    {
+      "order": 8,
+      "slot": "npc_heavy_01",
+      "asset": "NPC Heavy I",
+      "method": "Rodin",
+      "status": "SLOT_PREPARED_M57"
+    },
+    {
+      "order": 9,
+      "slot": "harbor_havens_reach",
+      "asset": "Haven's Reach Harbor",
+      "method": "Rodin/Meshy",
+      "status": "SLOT_PREPARED_M57"
+    },
+    {
+      "order": 10,
+      "slot": "island_tropical_small",
+      "asset": "Tropical Island — Small",
+      "method": "Rodin/Meshy",
+      "status": "SLOT_PREPARED_M57"
+    },
+    {
+      "order": 11,
+      "slot": "island_tropical_medium",
+      "asset": "Tropical Island — Medium",
+      "method": "Rodin/Meshy",
+      "status": "SLOT_PREPARED_M57"
+    },
+    {
+      "order": 12,
+      "slot": "island_cliff_cove",
+      "asset": "Cliff/Cove Island",
+      "method": "Rodin/Meshy",
+      "status": "SLOT_PREPARED_M57"
+    },
+    {
+      "order": 13,
+      "slot": "monster_early_01",
+      "asset": "First Early Sea Monster",
+      "method": "Rodin/Meshy/Blender",
+      "status": "SLOT_PREPARED_M57"
+    }
+  ],
+  "glb_contract": {
+    "up_axis": "+Y",
+    "forward": "+Z",
+    "waterline_pivot": true,
+    "water_in_glb": false,
+    "gameplay_owned_by_wrapper": true
+  },
+  "ui_rule": "Polished replaceable placeholders, mobile readable, no debug-only final surfaces."
+}

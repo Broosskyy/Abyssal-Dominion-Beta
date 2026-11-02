@@ -1,0 +1,160 @@
+{
+  "schema": 1,
+  "milestone": "M201",
+  "classification": "REFERENCE_GRADE_PLACEHOLDERS_NOT_FINAL_ART",
+  "master_basis": "V3.8 visual masters",
+  "rules": [
+    "visual-only replacement assets",
+    "same assets on mobile/web/desktop",
+    "gameplay collision and sockets remain on wrappers",
+    "final production art may replace these files without changing gameplay"
+  ],
+  "models": [
+    {
+      "runtime_id": "ship_small",
+      "path": "res://assets/production_placeholders/m201_reference/models/ship_starter_small_m201.glb",
+      "family": "ship",
+      "final": false
+    },
+    {
+      "runtime_id": "ship_medium",
+      "path": "res://assets/production_placeholders/m201_reference/models/ship_starter_medium_m201.glb",
+      "family": "ship",
+      "final": false
+    },
+    {
+      "runtime_id": "ship_large",
+      "path": "res://assets/production_placeholders/m201_reference/models/ship_starter_large_m201.glb",
+      "family": "ship",
+      "final": false
+    },
+    {
+      "runtime_id": "island_tropical_small",
+      "path": "res://assets/production_placeholders/m201_reference/models/island_tropical_small_m201.glb",
+      "family": "island",
+      "final": false
+    },
+    {
+      "runtime_id": "island_tropical_medium",
+      "path": "res://assets/production_placeholders/m201_reference/models/island_tropical_medium_m201.glb",
+      "family": "island",
+      "final": false
+    },
+    {
+      "runtime_id": "island_cliff_cove",
+      "path": "res://assets/production_placeholders/m201_reference/models/island_cliff_cove_m201.glb",
+      "family": "island",
+      "final": false
+    },
+    {
+      "runtime_id": "island_sandbar_long",
+      "path": "res://assets/production_placeholders/m201_reference/models/island_sandbar_long_m201.glb",
+      "family": "island",
+      "final": false
+    },
+    {
+      "runtime_id": "loot_chest",
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "family": "loot",
+      "final": false
+    },
+    {
+      "runtime_id": "loot_chest_common",
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "family": "loot",
+      "final": false
+    },
+    {
+      "runtime_id": "loot_chest_uncommon",
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "family": "loot",
+      "final": false
+    },
+    {
+      "runtime_id": "loot_chest_rare",
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "family": "loot",
+      "final": false
+    },
+    {
+      "runtime_id": "loot_chest_epic",
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "family": "loot",
+      "final": false
+    },
+    {
+      "runtime_id": "loot_chest_legendary",
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "family": "loot",
+      "final": false
+    },
+    {
+      "runtime_id": "loot_coin_cache",
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_coin_cache_m201.glb",
+      "family": "loot",
+      "final": false
+    },
+    {
+      "runtime_id": "loot_salvage_bundle",
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_salvage_bundle_m201.glb",
+      "family": "loot",
+      "final": false
+    },
+    {
+      "runtime_id": "repair_crate",
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_repair_crate_m201.glb",
+      "family": "loot",
+      "final": false
+    }
+  ],
+  "ui_icons": [
+    {
+      "id": "combat",
+      "path": "res://assets/production_placeholders/m201_reference/ui/icon_combat_m201.svg",
+      "final": false,
+      "style": "navy_gold_high_contrast"
+    },
+    {
+      "id": "ammo",
+      "path": "res://assets/production_placeholders/m201_reference/ui/icon_ammo_m201.svg",
+      "final": false,
+      "style": "navy_gold_high_contrast"
+    },
+    {
+      "id": "harpoon",
+      "path": "res://assets/production_placeholders/m201_reference/ui/icon_harpoon_m201.svg",
+      "final": false,
+      "style": "navy_gold_high_contrast"
+    },
+    {
+      "id": "repair",
+      "path": "res://assets/production_placeholders/m201_reference/ui/icon_repair_m201.svg",
+      "final": false,
+      "style": "navy_gold_high_contrast"
+    },
+    {
+      "id": "shield",
+      "path": "res://assets/production_placeholders/m201_reference/ui/icon_shield_m201.svg",
+      "final": false,
+      "style": "navy_gold_high_contrast"
+    },
+    {
+      "id": "support",
+      "path": "res://assets/production_placeholders/m201_reference/ui/icon_support_m201.svg",
+      "final": false,
+      "style": "navy_gold_high_contrast"
+    },
+    {
+      "id": "quest",
+      "path": "res://assets/production_placeholders/m201_reference/ui/icon_quest_m201.svg",
+      "final": false,
+      "style": "navy_gold_high_contrast"
+    },
+    {
+      "id": "map",
+      "path": "res://assets/production_placeholders/m201_reference/ui/icon_map_m201.svg",
+      "final": false,
+      "style": "navy_gold_high_contrast"
+    }
+  ]
+}

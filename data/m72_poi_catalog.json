@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "milestone": "M78",
+  "title": "PL1-5 POI Visual Content",
+  "rules": {
+    "visual_only": true,
+    "rewards_not_implied": true,
+    "interaction_not_implied": true,
+    "mobile_marker_limit": 8,
+    "distance_fade_start": 42,
+    "distance_fade_end": 64,
+    "missing_asset_uses_fallback": true,
+    "m78_semantic_visual_only": true
+  },
+  "types": {
+    "salvage": {
+      "model_slot": "poi_salvage_cache_01",
+      "marker_slot": "m72_poi_salvage",
+      "label": "SALVAGE"
+    },
+    "wreck": {
+      "model_slot": "poi_wreck_site_01",
+      "marker_slot": "m72_poi_wreck",
+      "label": "WRACK"
+    },
+    "shrine": {
+      "model_slot": "poi_shrine_beacon_01",
+      "marker_slot": "m72_poi_shrine",
+      "label": "SIGNAL"
+    },
+    "monster_nest": {
+      "model_slot": "poi_monster_nest_01",
+      "marker_slot": "m72_poi_nest",
+      "label": "MONSTERGEBIET"
+    },
+    "navigation": {
+      "model_slot": "poi_navigation_marker_01",
+      "marker_slot": "m72_poi_navigation",
+      "label": "SEEWEG"
+    },
+    "supply": {
+      "model_slot": "poi_supply_cache_01",
+      "marker_slot": "m72_poi_supply",
+      "label": "VERSORGUNG"
+    },
+    "wreck_beacon": {
+      "model_slot": "poi_wreck_beacon_01",
+      "marker_slot": "m72_poi_wreck",
+      "label": "WRACKSIGNAL",
+      "semantic_parent": "wreck"
+    },
+    "monster_warning": {
+      "model_slot": "poi_monster_warning_totem_01",
+      "marker_slot": "m76_first_monster",
+      "label": "GEFAHRENZONE",
+      "semantic_parent": "monster_nest"
+    }
+  },
+  "pl1_5_mix": {
+    "1": [
+      "navigation",
+      "salvage",
+      "wreck"
+    ],
+    "2": [
+      "salvage",
+      "navigation",
+      "supply"
+    ],
+    "3": [
+      "wreck_beacon",
+      "salvage",
+      "shrine",
+      "navigation"
+    ],
+    "4": [
+      "monster_warning",
+      "wreck",
+      "navigation",
+      "supply"
+    ],
+    "5": [
+      "monster_warning",
+      "monster_nest",
+      "wreck_beacon",
+      "salvage"
+    ]
+  }
+}

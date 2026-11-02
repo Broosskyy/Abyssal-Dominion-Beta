@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "milestone": "M51",
+  "ship_mastery": {
+    "separate_per_design": true,
+    "levels_per_design": 10,
+    "starter_designs": 3,
+    "main_progression_designs": 50,
+    "dedicated_mobile_panel": true,
+    "xp_display": true,
+    "level_up_feedback": true,
+    "existing_stat_bonus_codified": true
+  },
+  "production": {
+    "ship_card_slots": 53,
+    "mastery_badge_slots": 10,
+    "mastery_level_up_vfx_slot": 1,
+    "generic_nonfatal_fallback": true,
+    "missing_assets_report_updated": true
+  },
+  "authority": "local prototype only"
+}

@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "milestone": "M156",
+  "master": "V3.8",
+  "tuning": "local_prototype",
+  "band": {
+    "levels": [
+      51,
+      60
+    ],
+    "name": "Dreadwater March / Iron Maw Reach",
+    "identity": "post-Dominion W5 seas; faster hunter fleets into armored siege waters"
+  },
+  "levels": {
+    "51": {
+      "map_xp": 2500,
+      "region_objectives": 7,
+      "hunter": 3,
+      "w5_elite_chain": 3,
+      "dominion_shards": 4,
+      "trial": false
+    },
+    "52": {
+      "map_xp": 2720,
+      "region_objectives": 7,
+      "hunter": 3,
+      "w5_elite_chain": 3,
+      "dominion_shards": 5,
+      "trial": false
+    },
+    "53": {
+      "map_xp": 2940,
+      "region_objectives": 8,
+      "hunter": 3,
+      "w5_elite_chain": 4,
+      "dominion_shards": 6,
+      "trial": false
+    },
+    "54": {
+      "map_xp": 3160,
+      "region_objectives": 8,
+      "hunter": 4,
+      "w5_elite_chain": 4,
+      "dominion_shards": 7,
+      "trial": false
+    },
+    "55": {
+      "map_xp": 3380,
+      "region_objectives": 9,
+      "hunter": 4,
+      "w5_elite_chain": 5,
+      "dominion_shards": 8,
+      "trial": true
+    },
+    "56": {
+      "map_xp": 3750,
+      "region_objectives": 9,
+      "hunter": 4,
+      "w5_elite_chain": 5,
+      "dominion_shards": 9,
+      "trial": false
+    },
+    "57": {
+      "map_xp": 3970,
+      "region_objectives": 10,
+      "hunter": 5,
+      "w5_elite_chain": 6,
+      "dominion_shards": 10,
+      "trial": false
+    },
+    "58": {
+      "map_xp": 4190,
+      "region_objectives": 10,
+      "hunter": 5,
+      "w5_elite_chain": 6,
+      "dominion_shards": 11,
+      "trial": false
+    },
+    "59": {
+      "map_xp": 4410,
+      "region_objectives": 11,
+      "hunter": 5,
+      "w5_elite_chain": 7,
+      "dominion_shards": 12,
+      "trial": false
+    },
+    "60": {
+      "map_xp": 4630,
+      "region_objectives": 11,
+      "hunter": 6,
+      "w5_elite_chain": 7,
+      "dominion_shards": 13,
+      "trial": true
+    }
+  },
+  "trials": {
+    "55": {
+      "focus": "Dreadwater Vanguard Prüfung",
+      "requires_runtime": true
+    },
+    "60": {
+      "focus": "Iron Maw Siege Prüfung",
+      "requires_runtime": true
+    }
+  },
+  "cap": {
+    "pirate_level_cap": 60,
+    "next_band": "61-70 remains staged",
+    "prestige_unlock_after": 60
+  },
+  "rules": [
+    "map level is eligibility, never automatic ship ownership",
+    "values are local prototype defaults and remain admin/version controlled",
+    "W5 GLBs are replaceable production placeholders"
+  ]
+}

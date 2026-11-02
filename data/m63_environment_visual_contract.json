@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "milestone": "M63",
+  "title": "Early World Visual Polish + Environment Production",
+  "water": {
+    "base_material_id": "ocean_water_base",
+    "shallow_material_id": "ocean_water_shallow",
+    "rules": {
+      "mobile_first": true,
+      "no_screen_space_dependency_required": true,
+      "reduced_motion_supported": true,
+      "foam_is_visual_only": true,
+      "gameplay_water_plane_unchanged": true
+    }
+  },
+  "coast": {
+    "shoreline_foam_slot": "vfx_shoreline_foam",
+    "shallow_water_slot": "vfx_shallow_water_edge",
+    "rule": "Coast treatment must remain readable from oblique sea-map camera and must not alter island collision."
+  },
+  "ship_water_fx": {
+    "wake_slot": "vfx_ship_wake",
+    "bow_foam_slot": "vfx_bow_foam",
+    "water_impact_slot": "vfx_water_impact",
+    "hull_impact_slot": "vfx_hull_impact"
+  },
+  "harbor": {
+    "safe_zone_ring_slot": "vfx_safe_zone_ring",
+    "safe_zone_beacon_slot": "vfx_safe_zone_beacon"
+  },
+  "authority": "visual/presentation only"
+}

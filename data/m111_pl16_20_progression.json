@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "milestone": "M111",
+  "range": [
+    16,
+    20
+  ],
+  "master_alignment": {
+    "phase": "PL16-25 true midgame; longer goals and multiple content paths",
+    "pl20_trial_focus": "Admiral/Gold Content",
+    "xp_alone_unlocks": false
+  },
+  "levels": {
+    "16": {
+      "title": "Cursed Wake",
+      "region": "cursed_dominion",
+      "map_xp_goal": 4000,
+      "mastery_xp_per_sink": 125,
+      "boss": "npc_cursed_admiral",
+      "hunter_required": 1,
+      "region_objectives": 3,
+      "ship_reward": "ship_main_06",
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "17": {
+      "title": "Black Lantern Sea",
+      "region": "cursed_dominion",
+      "map_xp_goal": 4550,
+      "mastery_xp_per_sink": 135,
+      "boss": "npc_cursed_admiral",
+      "hunter_required": 1,
+      "region_objectives": 3,
+      "ship_reward": "",
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "18": {
+      "title": "Gilded Grave",
+      "region": "cursed_dominion",
+      "map_xp_goal": 5100,
+      "mastery_xp_per_sink": 145,
+      "boss": "npc_cursed_admiral",
+      "hunter_required": 1,
+      "region_objectives": 4,
+      "ship_reward": "ship_main_07",
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "19": {
+      "title": "Admiral's Scar",
+      "region": "cursed_dominion",
+      "map_xp_goal": 5650,
+      "mastery_xp_per_sink": 155,
+      "boss": "npc_cursed_admiral",
+      "hunter_required": 1,
+      "region_objectives": 4,
+      "ship_reward": "",
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "20": {
+      "title": "Crown of Ash",
+      "region": "cursed_dominion",
+      "map_xp_goal": 6200,
+      "mastery_xp_per_sink": 165,
+      "boss": "npc_cursed_admiral",
+      "hunter_required": 2,
+      "region_objectives": 4,
+      "ship_reward": "ship_main_08",
+      "pirate_trial": true,
+      "trial_focus": [
+        "admiral",
+        "gold_content"
+      ]
+    }
+  },
+  "prototype_tuning": [
+    "map_xp_goal",
+    "mastery_xp_per_sink",
+    "objective counts",
+    "reward cadence"
+  ],
+  "authority": "local prototype; future authoritative qualification remains server-side"
+}

@@ -1,0 +1,53 @@
+{
+  "milestone": "M32",
+  "engine": "4.5.1.stable.official.f62fdbde1",
+  "target_engine": "4.7.2.stable",
+  "target_engine_verified": false,
+  "supplementary": true,
+  "source_sha256": "f895259c0b88a9e129c33a0675aa36d19ea2675c6c38709e0f9288b569bbeac9",
+  "asset_count": 18,
+  "visual_verification": false,
+  "native_device_tests": false,
+  "release_approved": false,
+  "stages": [
+    {
+      "name": "import",
+      "passed": true,
+      "exit_code": 0
+    },
+    {
+      "name": "regression",
+      "passed": true,
+      "exit_code": 0
+    },
+    {
+      "name": "m31_regression",
+      "passed": true,
+      "exit_code": 0
+    },
+    {
+      "name": "runtime",
+      "passed": true,
+      "exit_code": 0
+    }
+  ],
+  "passed": true,
+  "regression": {
+    "checks": 1003,
+    "engine": "4.5.1-stable (official)",
+    "failures": [],
+    "suite": "M30"
+  },
+  "m31_regression": {
+    "checks": 88,
+    "engine": "4.5.1-stable (official)",
+    "failures": [],
+    "suite": "M31"
+  },
+  "runtime": {
+    "checks": 186,
+    "engine": "4.5.1-stable (official)",
+    "failures": [],
+    "suite": "M32"
+  }
+}

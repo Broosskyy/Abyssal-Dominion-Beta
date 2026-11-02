@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "milestone": "M49",
+  "authority": "local_prototype_balance_not_final",
+  "rules": {
+    "slots": [
+      "weapon",
+      "defense",
+      "support",
+      "mobility"
+    ],
+    "one_module_per_slot": true,
+    "modules_persist_per_ship": true,
+    "normal_failure_destroys_valuable_equipment": false,
+    "infinite_raw_stat_ladder": false,
+    "visual_asset_does_not_define_stats": true
+  },
+  "modules": {
+    "storm_hunter_rig": {
+      "label": "Storm Hunter Rig",
+      "region": "stormreach",
+      "tier": 1,
+      "slot": "weapon",
+      "effects": {
+        "harpoon_damage_mult": 1.12,
+        "harpoon_reload_mult": 0.94
+      },
+      "cost": {
+        "gold": 130,
+        "materials": {
+          "stormglass": 3,
+          "reinforced_timber": 1,
+          "precision_gears": 1
+        }
+      },
+      "visual_slot": "module_storm_hunter_rig"
+    },
+    "storm_guard_plating": {
+      "label": "Storm Guard Plating",
+      "region": "stormreach",
+      "tier": 1,
+      "slot": "defense",
+      "effects": {
+        "armor_add": 0.045
+      },
+      "cost": {
+        "gold": 145,
+        "materials": {
+          "stormglass": 4,
+          "metal": 2
+        }
+      },
+      "visual_slot": "module_storm_guard_plating"
+    },
+    "ember_blast_chamber": {
+      "label": "Ember Blast Chamber",
+      "region": "ember_shoals",
+      "tier": 2,
+      "slot": "weapon",
+      "effects": {
+        "cannon_damage_mult": 1.1,
+        "cannon_reload_mult": 1.05
+      },
+      "cost": {
+        "gold": 190,
+        "materials": {
+          "ember_ore": 4,
+          "precision_gears": 2,
+          "components": 1
+        }
+      },
+      "visual_slot": "module_ember_blast_chamber"
+    },
+    "ember_armor_lattice": {
+      "label": "Ember Armor Lattice",
+      "region": "ember_shoals",
+      "tier": 2,
+      "slot": "defense",
+      "effects": {
+        "armor_add": 0.065,
+        "speed_mult": 0.97
+      },
+      "cost": {
+        "gold": 205,
+        "materials": {
+          "ember_ore": 5,
+          "metal": 3
+        }
+      },
+      "visual_slot": "module_ember_armor_lattice"
+    },
+    "veil_support_core": {
+      "label": "Veil Support Core",
+      "region": "veil_sea",
+      "tier": 3,
+      "slot": "support",
+      "effects": {
+        "support_heal_mult": 1.16,
+        "support_reload_mult": 0.9
+      },
+      "cost": {
+        "gold": 245,
+        "materials": {
+          "veil_silk": 4,
+          "precision_gears": 3,
+          "components": 2
+        }
+      },
+      "visual_slot": "module_veil_support_core"
+    },
+    "veil_sail_matrix": {
+      "label": "Veil Sail Matrix",
+      "region": "veil_sea",
+      "tier": 3,
+      "slot": "mobility",
+      "effects": {
+        "speed_mult": 1.085
+      },
+      "cost": {
+        "gold": 235,
+        "materials": {
+          "veil_silk": 5,
+          "reinforced_timber": 2,
+          "precision_gears": 1
+        }
+      },
+      "visual_slot": "module_veil_sail_matrix"
+    }
+  }
+}

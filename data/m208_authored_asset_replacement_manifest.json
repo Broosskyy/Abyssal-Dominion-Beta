@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "milestone": "M208",
+  "master_concept": "V3.8",
+  "purpose": "Production handoff contract for replacing optimized placeholders with authored 2D/3D assets without changing gameplay authority.",
+  "replacement_rules": {
+    "keep_slot_ids_stable": true,
+    "world_collision_wrapper_owned": true,
+    "navigation_wrapper_owned": true,
+    "damage_balance_not_encoded_in_art": true,
+    "same_world_assets_all_platforms": true,
+    "responsive_ui_only": ["hud_scale", "font_scale", "touch_targets", "spacing", "safe_areas"]
+  },
+  "first_authored_2d_batch": [
+    {"family":"cannon_ammo", "count":8, "source_px":"512-1024", "delivery":"transparent PNG + layered/source master", "preview_px":[96,64,48]},
+    {"family":"harpoon_payloads", "count":4, "source_px":"512-1024", "delivery":"transparent PNG + layered/source master", "preview_px":[96,64,48]},
+    {"family":"action_items", "count":8, "source_px":"512-1024", "delivery":"transparent PNG + layered/source master", "preview_px":[96,64,48]},
+    {"family":"cannon_families", "count":7, "source_px":"512-1024", "delivery":"transparent PNG + layered/source master", "preview_px":[96,64,48]},
+    {"family":"deck_and_ship_equipment", "count":12, "source_px":"512-1024", "delivery":"transparent PNG + layered/source master", "preview_px":[96,64,48]},
+    {"family":"hud_navigation", "count":10, "source_px":"512-1024", "delivery":"transparent PNG + layered/source master", "preview_px":[96,64,48]}
+  ],
+  "first_authored_world_batch": {
+    "ships": ["3 starter ships", "5 first main-progression ships"],
+    "islands": ["4 small/medium", "2 large landmarks", "2 harbor islands"],
+    "loot": ["common salvage", "rare chest", "epic relic", "admiral loot", "repair supply", "currency pickup"]
+  },
+  "acceptance": [
+    "silhouette readable at intended gameplay size",
+    "no baked water/fog/world glow in isolated world asset",
+    "transparent clean padding",
+    "consistent angled top-down/isometric presentation",
+    "same material/render language across asset families",
+    "slot mapping recorded before import",
+    "Godot import and native screenshot QA still required"
+  ]
+}

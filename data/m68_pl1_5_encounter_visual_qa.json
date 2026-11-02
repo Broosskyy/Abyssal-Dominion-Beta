@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "milestone": "M68",
+  "title": "PL1-5 Encounter Visual Hierarchy",
+  "priority_order": [
+    "player",
+    "current_target",
+    "monster_or_admiral",
+    "elite",
+    "hostile_npc",
+    "neutral_npc",
+    "world_decoration"
+  ],
+  "checks": [
+    "neutral NPC is visually non-hostile until provoked",
+    "hostile state uses same EncounterRelation truth as nameplate/target frame",
+    "monster silhouette differs unmistakably from ships",
+    "monster VFX never obscure target hull/shield/status UI",
+    "player remains easiest moving unit to reacquire on phone",
+    "no gameplay outcome depends on visual LOD or animation state"
+  ],
+  "note": "Presentation QA contract; no new combat balance values."
+}

@@ -1,0 +1,18 @@
+{
+  "milestone": "M191",
+  "status": "M191_COAST_WAKE_WORLD_READABILITY_STATIC_VERIFIED",
+  "focus": [
+    "island silhouette separation",
+    "subtle shallow-water coast shelf",
+    "ship wake continuity",
+    "world readability without collision changes"
+  ],
+  "locks": {
+    "visual_only_coast_dressing": true,
+    "collision_navigation_unchanged": true,
+    "tap_to_sail_preserved": true,
+    "camera_wheel_camera_only": true,
+    "combat_ranges_unchanged": true,
+    "master_hud_hierarchy_preserved": true
+  }
+}

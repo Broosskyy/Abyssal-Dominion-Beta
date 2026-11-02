@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "milestone": "M261",
+  "master": "V3.8",
+  "status": "CRASH_DIAGNOSTICS_CLIENT_HEALTH_QA_MATRIX_FOUNDATION",
+  "crash_diagnostics": {
+    "capture_dimensions": [
+      "build",
+      "platform",
+      "permitted_device_context",
+      "error_stack_context",
+      "session_correlation"
+    ],
+    "player_support_diagnostics_opt_in": true,
+    "sensitive_content_filtered": true,
+    "raw_secrets_tokens_receipts_forbidden": true,
+    "crash_report_is_not_gameplay_authority": true,
+    "provider_delivery_requires_real_integration": true
+  },
+  "client_health": {
+    "dimensions": [
+      "fps",
+      "frame_time",
+      "memory_ram_vram",
+      "thermal",
+      "battery",
+      "asset_streaming",
+      "long_session_stability",
+      "resume_health"
+    ],
+    "30_60_fps_compatible": true,
+    "gameplay_tick_independent_from_client_fps": true,
+    "real_mobile_device_qa_required": true,
+    "quality_profiles_may_scale_rendering_not_gameplay_world": true
+  },
+  "network_qa": {
+    "profiles": [
+      "limited_mobile_bandwidth",
+      "jitter",
+      "packet_loss",
+      "variable_latency",
+      "disconnect_reconnect",
+      "background_resume"
+    ],
+    "telemetry_dimensions": [
+      "ping",
+      "packet_loss",
+      "reconnects",
+      "disconnect_causes"
+    ],
+    "resume_requires_session_revalidation": true,
+    "stale_world_resume_forbidden": true,
+    "client_may_fake_network_pass": false
+  },
+  "qa_matrix": {
+    "dimensions": [
+      "android_device_classes",
+      "ios_devices",
+      "web_browsers",
+      "desktop_targets",
+      "network_profiles",
+      "account_progression_states"
+    ],
+    "critical_release_requires_defined_minimum_coverage": true,
+    "single_developer_device_is_not_release_evidence": true,
+    "results_require_environment_build_config_identity": true,
+    "final_device_list_invented": false,
+    "final_coverage_thresholds_invented": false
+  },
+  "operations_snapshot": {
+    "monotonic_revision_required": true,
+    "environments": [
+      "INTERNAL",
+      "TEST",
+      "GLOBAL"
+    ],
+    "local_preview_never_production_health_truth": true,
+    "fields": [
+      "revision",
+      "environment",
+      "crash_health",
+      "client_health",
+      "network_health",
+      "qa_runs",
+      "coverage",
+      "known_issues"
+    ]
+  },
+  "client_boundary": {
+    "may_prepare_sanitized_diagnostic_intent": true,
+    "may_present_verified_health": true,
+    "may_present_verified_qa_results": true,
+    "may_mark_crash_uploaded": false,
+    "may_mark_qa_gate_passed": false,
+    "may_fabricate_device_result": false,
+    "may_close_crash_incident": false,
+    "may_override_session_revalidation": false,
+    "may_attach_secret_to_diagnostics": false,
+    "may_merge_test_global_results": false
+  },
+  "configuration": {
+    "final_crash_rate_thresholds_invented": false,
+    "final_memory_budgets_invented": false,
+    "final_thermal_budgets_invented": false,
+    "final_device_matrix_invented": false,
+    "final_network_thresholds_invented": false,
+    "final_qa_coverage_thresholds_invented": false
+  }
+}

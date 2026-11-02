@@ -1,0 +1,22 @@
+{
+  "milestone": "M287",
+  "status": "FOUNDATION_UNTUNED",
+  "ship_model_strategy": "each profile is presentation metadata for one complete individual ship model",
+  "profiles": [
+    {"id":"LIGHT","applies_to":["STARTER_SMALL", "SCOUT", "LIGHT_NPC"],"identity":"quick narrow wake and responsive sails","asset_family":"motion_light","final_assets_required":true},
+    {"id":"BALANCED","applies_to":["STARTER_MEDIUM", "PLAYER_STANDARD", "NPC_STANDARD"],"identity":"balanced bow displacement and stern trail","asset_family":"motion_balanced","final_assets_required":true},
+    {"id":"HEAVY","applies_to":["STARTER_LARGE", "HEAVY", "TANK", "SIEGE_NPC"],"identity":"broad displacement and weighty wake","asset_family":"motion_heavy","final_assets_required":true},
+    {"id":"ADMIRAL","applies_to":["ELITE", "ADMIRAL", "BOSS_SHIP"],"identity":"dominant silhouette-scale displacement","asset_family":"motion_admiral","final_assets_required":true},
+    {"id":"ABYSSAL","applies_to":["ABYSSAL", "CURSED", "EVENT_SHIP"],"identity":"restrained supernatural water signature","asset_family":"motion_abyssal","final_assets_required":true}
+  ],
+  "rules": {
+    "profile_assignment": "SERVER_OR_VERSIONED_CONTENT",
+    "profile_does_not_change_speed": true,
+    "profile_does_not_change_turning_or_route": true,
+    "profile_does_not_change_collision": true,
+    "profile_does_not_require_modular_ship_parts": true,
+    "same_profile_on_mobile_web_desktop": true,
+    "platforms_may_reduce_secondary_vfx_only": true,
+    "authored_assets_replace_same_slot_ids": true
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "milestone": "M82",
+  "title": "Mobile Presentation Budget",
+  "profiles": {
+    "compact_phone": {
+      "world_nameplates": 5,
+      "world_poi": 4,
+      "minimap_poi": 4,
+      "transient_feedback": 5,
+      "dressing_visibility_end": 28.0,
+      "hud_text_scale": 1.08,
+      "world_marker_size": 30,
+      "first_dock_seconds": 4.0
+    },
+    "phone": {
+      "world_nameplates": 7,
+      "world_poi": 6,
+      "minimap_poi": 5,
+      "transient_feedback": 7,
+      "dressing_visibility_end": 38.0,
+      "hud_text_scale": 1.04,
+      "world_marker_size": 32,
+      "first_dock_seconds": 4.5
+    },
+    "tablet_desktop": {
+      "world_nameplates": 10,
+      "world_poi": 8,
+      "minimap_poi": 6,
+      "transient_feedback": 10,
+      "dressing_visibility_end": 52.0,
+      "hud_text_scale": 1.0,
+      "world_marker_size": 30,
+      "first_dock_seconds": 5.0
+    }
+  },
+  "priority": [
+    "player",
+    "selected_target",
+    "monster_admiral",
+    "elite",
+    "hostile",
+    "neutral",
+    "poi",
+    "decoration"
+  ],
+  "rules": [
+    "selected target is never removed by density budget",
+    "combat nameplates outrank POI markers",
+    "POI markers fade before combat UI",
+    "decorative geometry may use visibility range and LOD",
+    "gameplay state never depends on visual visibility",
+    "mobile touch hit targets remain at least 56 logical units after density scaling",
+    "desktop keeps denser information but never smaller than readable 1080p baseline",
+    "crossplay gameplay state is independent of HUD profile/input modality"
+  ]
+}

@@ -1,0 +1,241 @@
+{
+  "schema": 2,
+  "milestone": "M158",
+  "authority": "local_prototype_only",
+  "active_event": "halloween_abyss_01",
+  "events": {
+    "halloween_abyss_01": {
+      "title": "Night of the Drowned",
+      "subtitle": "Halloween 2026 \u00b7 original Abyssal Dominion seasonal event",
+      "theme": "haunted_pirate_sea",
+      "phase": 1,
+      "phases": [
+        {
+          "id": 1,
+          "label": "The Fog Rises",
+          "world_slots": [
+            "event_halloween_portal_01",
+            "event_halloween_wreck_01"
+          ],
+          "fleet": [
+            "event_halloween_npc_sloop_01"
+          ]
+        },
+        {
+          "id": 2,
+          "label": "Drowned Armada",
+          "world_slots": [
+            "event_halloween_portal_01",
+            "event_halloween_wreck_01"
+          ],
+          "fleet": [
+            "event_halloween_npc_sloop_01",
+            "event_halloween_npc_raider_01",
+            "event_halloween_admiral_01"
+          ]
+        },
+        {
+          "id": 3,
+          "label": "Abyssal Midnight",
+          "world_slots": [
+            "event_halloween_portal_01",
+            "event_halloween_wreck_01",
+            "event_halloween_island_deco_01"
+          ],
+          "fleet": [
+            "event_halloween_admiral_01",
+            "event_halloween_monster_01",
+            "event_halloween_boss_01"
+          ]
+        },
+        {
+          "id": 4,
+          "label": "The Drowned Crown",
+          "world_slots": [
+            "event_halloween_portal_01",
+            "event_halloween_wreck_01",
+            "event_halloween_island_deco_01"
+          ],
+          "fleet": [
+            "event_halloween_admiral_01",
+            "event_halloween_monster_01",
+            "event_halloween_boss_01"
+          ]
+        }
+      ],
+      "currency": {
+        "id": "drowned_embers",
+        "label": "Ertrunkene Glut",
+        "icon": "m94_halloween_currency"
+      },
+      "world_meter": {
+        "label": "Midnight Tide",
+        "target": 100
+      },
+      "quests": [
+        {
+          "id": "h94_q1",
+          "label": "Versenke 5 Schiffe der Ertrunkenen Flotte",
+          "kind": "event_sink",
+          "target": 5,
+          "reward_currency": 15
+        },
+        {
+          "id": "h94_q2",
+          "label": "Triff ein Halloween-Monster mit Harpunen",
+          "kind": "event_monster_hit",
+          "target": 1,
+          "reward_currency": 20
+        },
+        {
+          "id": "h94_q3",
+          "label": "Untersuche das Geisterwrack",
+          "kind": "event_explore",
+          "target": 1,
+          "reward_currency": 10
+        },
+        {
+          "id": "h158_q4",
+          "kind": "event_sink",
+          "target": 12,
+          "label": "Sink 12 Drowned Fleet ships",
+          "reward_currency": 30
+        },
+        {
+          "id": "h158_q5",
+          "kind": "event_monster_hit",
+          "target": 5,
+          "label": "Hit Halloween monsters 5 times with harpoons",
+          "reward_currency": 25
+        },
+        {
+          "id": "h158_q6",
+          "kind": "event_explore",
+          "target": 2,
+          "label": "Investigate haunted event sites",
+          "reward_currency": 20
+        }
+      ],
+      "combat_hooks": {
+        "ammo": [
+          {
+            "id": "gravefire",
+            "label": "Grabfeuer-Kugel",
+            "target": "ship",
+            "tags": [
+              "event",
+              "cannon"
+            ],
+            "inventory_bound": true
+          }
+        ],
+        "items": [
+          {
+            "id": "gravewake_lantern",
+            "label": "Grabwacht-Laterne",
+            "target": "hostile",
+            "tags": [
+              "event",
+              "tactical"
+            ],
+            "inventory_bound": true
+          }
+        ],
+        "support_ammo": [
+          {
+            "id": "event_restoration_shell",
+            "label": "Nachtflut-Heilgeschoss",
+            "target": "friendly_event_participant",
+            "routing": "hybrid",
+            "inventory_bound": true
+          }
+        ]
+      },
+      "milestones": [
+        {
+          "id": "h94_m1",
+          "score": 15,
+          "reward_label": "40 Grabfeuer-Kugeln"
+        },
+        {
+          "id": "h94_m2",
+          "score": 35,
+          "reward_label": "2 Grabwacht-Laternen"
+        },
+        {
+          "id": "h94_m3",
+          "score": 60,
+          "reward_label": "Halloween-Truhe"
+        },
+        {
+          "id": "h94_m4",
+          "score": 100,
+          "reward_label": "Design-Token \u00b7 Drowned Corsair"
+        }
+      ],
+      "shop": [
+        {
+          "id": "gravefire_pack",
+          "cost": 12,
+          "currency": "drowned_embers",
+          "label": "50 Grabfeuer-Kugeln"
+        },
+        {
+          "id": "gravewake_pack",
+          "cost": 22,
+          "currency": "drowned_embers",
+          "label": "2 Grabwacht-Laternen"
+        },
+        {
+          "id": "halloween_chest",
+          "cost": 40,
+          "currency": "drowned_embers",
+          "label": "Halloween-Truhe"
+        },
+        {
+          "id": "gravefire_large_pack",
+          "cost": 24,
+          "currency": "drowned_embers",
+          "label": "120 Gravefire Shot"
+        },
+        {
+          "id": "drowned_salvage_cache",
+          "cost": 55,
+          "currency": "drowned_embers",
+          "label": "Drowned Salvage Cache"
+        },
+        {
+          "id": "event_design_token",
+          "cost": 120,
+          "currency": "drowned_embers",
+          "label": "Drowned Corsair Design Token"
+        }
+      ],
+      "reward_designs": [
+        {
+          "id": "event_design_drowned_corsair_01",
+          "label": "Drowned Corsair",
+          "source": "milestone_or_event_shop",
+          "visual_slot": "event_design_drowned_corsair_01"
+        }
+      ],
+      "guild_island_layer": {
+        "slot": "event_halloween_guild_deco_01",
+        "authority": "visual_only"
+      },
+      "rules": {
+        "no_full_loot": true,
+        "no_angle_damage": true,
+        "normal_progression_preserved": true
+      }
+    }
+  },
+  "rules": {
+    "sea_map_remains_primary": true,
+    "event_ui_must_not_block_sailing": true,
+    "event_rewards_require_server_authority_live": true,
+    "local_claims_are_preview_only": true,
+    "admin_event_override_local_only": true,
+    "no_angle_damage": true
+  }
+}

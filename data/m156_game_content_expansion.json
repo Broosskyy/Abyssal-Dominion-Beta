@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "milestone": "M156",
+  "status": "PLAYABLE_PL51_60_AND_LEGACY_REPAIR",
+  "progression": {
+    "live_map_cap": 60,
+    "new_levels": [
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60
+    ],
+    "trials": [
+      55,
+      60
+    ],
+    "prestige_after": 60
+  },
+  "world": {
+    "regions": [
+      "dreadwater_march",
+      "iron_maw_reach"
+    ],
+    "new_sectors": 10,
+    "continuity": "SECTOR-051 -> SECTOR-052..061",
+    "w5_visual_slots": "SHIP-PROG-051..060"
+  },
+  "prior_content_repairs": [
+    "region validator no longer hard-stops at PL50",
+    "admin sector validator follows live cap 60",
+    "dynamic quest default max follows cap 60",
+    "POI spawning extended to PL60",
+    "special hunter slot uses resolved spawn slot count",
+    "trial runtime validates from data instead of hard-coded [40,45,50]"
+  ],
+  "combat": {
+    "pl51_60_mastery_xp": true,
+    "post_beginner_objectives": true,
+    "W5_elite_chain": true,
+    "dominion_shard_objective": true
+  },
+  "authority": "Local prototype tuning only; admin/content service remains source of publishable live values."
+}

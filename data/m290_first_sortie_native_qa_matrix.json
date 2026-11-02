@@ -1,0 +1,25 @@
+{
+  "milestone": "M290",
+  "status": "NOT_EVALUATED",
+  "target_engine": "Godot 4.7.2",
+  "release_approved": false,
+  "gates": [
+    {"id":"EVENT_BINDING_PARSE", "state":"NOT_EVALUATED", "evidence_required":"native parser and scene-load log"},
+    {"id":"HARBOR_START_AND_UNDOCK", "state":"NOT_EVALUATED", "evidence_required":"native Haven's Reach start/undock capture"},
+    {"id":"TAP_TO_SAIL_GUIDANCE", "state":"NOT_EVALUATED", "evidence_required":"native touch and desktop navigation-intent capture"},
+    {"id":"TARGET_CANNON_HARPOON", "state":"NOT_EVALUATED", "evidence_required":"native ship and monster combat observation capture"},
+    {"id":"REPAIR_SHIELD_LOOT_QUEST", "state":"NOT_EVALUATED", "evidence_required":"native sustain/recovery/objective capture"},
+    {"id":"SINK_RESPAWN_HARBOR_RETURN", "state":"NOT_EVALUATED", "evidence_required":"native defeat-to-harbor loop capture"},
+    {"id":"MOBILE_SAFE_AREA", "state":"NOT_EVALUATED", "evidence_required":"compact/portrait HUD and beacon screenshots"},
+    {"id":"DESKTOP_LAYOUT", "state":"NOT_EVALUATED", "evidence_required":"wide HUD and beacon screenshots"},
+    {"id":"PERFORMANCE", "state":"NOT_EVALUATED", "evidence_required":"GPU/frame-time/memory measurements"},
+    {"id":"AUDIO_HAPTICS", "state":"NOT_EVALUATED", "evidence_required":"supported native device review"}
+  ],
+  "rules": {
+    "static_tests_cannot_set_pass": true,
+    "local_observations_are_not_server_truth": true,
+    "presentation_fire_is_not_hit_confirmation": true,
+    "blocked_gate_prevents_release_approval": true
+  }
+}
+

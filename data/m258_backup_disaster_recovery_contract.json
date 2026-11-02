@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "milestone": "M258",
+  "master": "V3.8",
+  "status": "BACKUP_DISASTER_RECOVERY_FOUNDATION",
+  "critical_data_classes": ["account", "ownership", "economy", "guild", "bazaar", "payment_entitlement", "configuration"],
+  "backup": {
+    "automated_by_criticality": true,
+    "encrypted": true,
+    "access_restricted": true,
+    "health_fields": ["backup_id", "data_class", "environment", "state", "completed_at", "age_state", "verification_state"],
+    "client_cannot_create_or_verify_production_backup": true
+  },
+  "pitr_restore": {
+    "prepared_for_suitable_datastores": true,
+    "restore_tests_use_isolated_environment": true,
+    "rpo_rto_documented_per_data_class": true,
+    "existing_backup_file_is_not_proof_of_recoverability": true,
+    "client_cannot_select_restore_point": true,
+    "client_cannot_execute_restore": true
+  },
+  "disaster_recovery": {
+    "priority_order": ["auth", "account", "ownership_economy", "world_server", "payment", "website_status", "support"],
+    "documents_dependencies_secrets_dns_endpoints_restore_and_restart_order": true,
+    "drills_required": true,
+    "test_and_global_isolated": true
+  },
+  "account_economy_recovery": {
+    "validated_tools_only": true,
+    "ledger_compensation_and_audit_required": true,
+    "uncontrolled_direct_database_editor": false,
+    "client_cannot_compensate_or_repair_value_state": true
+  },
+  "incident_recovery": {
+    "runbook_driven": true,
+    "safe_dashboard_actions_over_direct_database_manipulation": true,
+    "restore_requires_authorized_operations_role": true,
+    "restore_requires_audit": true
+  },
+  "client_boundary": {
+    "may_present_server_recovery_state": true,
+    "may_present_degraded_read_only_status": true,
+    "may_mutate_backup_policy": false,
+    "may_execute_restore": false,
+    "may_execute_pitr": false,
+    "may_change_rpo_rto": false,
+    "may_mark_drill_successful": false,
+    "may_repair_account_economy": false
+  },
+  "balance": {
+    "final_backup_intervals_invented": false,
+    "final_retention_periods_invented": false,
+    "final_rpo_rto_values_invented": false
+  }
+}

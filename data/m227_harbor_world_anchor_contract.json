@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "milestone": "M227",
+  "master_concept": "V3.8",
+  "purpose": "Make harbor services readable as real world anchors in the high/wide master camera without creating new gameplay authorities.",
+  "master_reference_rules": {
+    "harbor_is_world_anchor": true,
+    "sea_chart_remains_visible": true,
+    "screen_center_remains_clear": true,
+    "service_identity_uses_distinct_silhouettes_before_color": true,
+    "mobile_desktop_web_world_visual_logic_identical": true
+  },
+  "service_anchors": {
+    "shipyard": {"socket": "WorkshopSocket", "shape": "gantry/crane", "stable_slot": "harbor_service_shipyard_anchor"},
+    "repair": {"socket": "RepairYardSocket", "shape": "repair frame", "stable_slot": "harbor_service_repair_anchor"},
+    "market": {"socket": "MerchantSocket", "shape": "awning", "stable_slot": "harbor_service_market_anchor"},
+    "arsenal": {"socket": "SupportPierSocket", "shape": "battery", "stable_slot": "harbor_service_arsenal_anchor"}
+  },
+  "authored_asset_intake": {
+    "placeholder_replacement_ready": true,
+    "stable_service_slots": true,
+    "final_assets_must_not_bake_water_fog_or_gameplay_vfx": true,
+    "collision_navigation_remain_godot_authority": true
+  },
+  "boundaries": {
+    "navigation_changed": false,
+    "collision_changed": false,
+    "economy_values_changed": false,
+    "combat_values_changed": false,
+    "service_authority_changed": false,
+    "dock_flow_changed": false,
+    "m226_service_strip_remains_authoritative": true
+  }
+}

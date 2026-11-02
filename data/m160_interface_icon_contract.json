@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "milestone": "M160",
+  "interface_panels": [
+    "equipment",
+    "special_decks",
+    "cannon_upgrade",
+    "ammunition",
+    "talents",
+    "citadel",
+    "guild_island",
+    "buffs"
+  ],
+  "icon_contract": {
+    "sizes": [
+      32,
+      48,
+      64,
+      96,
+      128
+    ],
+    "fallback": "procedural_symbol",
+    "replaceable_asset_slot": true,
+    "rarity_frame_separate": true
+  },
+  "mobile": {
+    "min_touch_target": 48,
+    "bottom_sheet_for_dense_editors": true,
+    "no_hover_only_actions": true
+  },
+  "vfx_statuses": [
+    "crystal_blessing",
+    "special_deck",
+    "guild_buff",
+    "event_buff",
+    "ward",
+    "debuff"
+  ],
+  "admin_preview": true
+}

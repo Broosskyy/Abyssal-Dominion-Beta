@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dymkj1pobbokt"
+
+[deps]
+
+files=["res://docs/unity_asset_catalog.path.translation", "res://docs/unity_asset_catalog.type.translation", "res://docs/unity_asset_catalog.name.translation", "res://docs/unity_asset_catalog.width.translation", "res://docs/unity_asset_catalog.height.translation", "res://docs/unity_asset_catalog.format.translation", "res://docs/unity_asset_catalog.vertex.translation", "res://docs/unity_asset_catalog.duration.translation"]
+
+source_file="res://docs/unity_asset_catalog.csv"
+dest_files=["res://docs/unity_asset_catalog.path.translation", "res://docs/unity_asset_catalog.type.translation", "res://docs/unity_asset_catalog.name.translation", "res://docs/unity_asset_catalog.width.translation", "res://docs/unity_asset_catalog.height.translation", "res://docs/unity_asset_catalog.format.translation", "res://docs/unity_asset_catalog.vertex.translation", "res://docs/unity_asset_catalog.duration.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

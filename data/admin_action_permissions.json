@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "content": {
+    "read": "content.read",
+    "create": "content.create",
+    "edit": "content.edit",
+    "validate": "content.validate",
+    "schedule": "content.schedule",
+    "publish": "content.publish",
+    "disable": "content.disable",
+    "rollback": "content.rollback"
+  },
+  "balance": {
+    "read": "balance.read",
+    "edit": "balance.edit",
+    "publish": "balance.publish"
+  },
+  "economy": {
+    "read": "economy.read",
+    "edit": "economy.edit",
+    "publish": "economy.publish"
+  },
+  "liveops": {
+    "read": "liveops.read",
+    "edit": "liveops.edit",
+    "schedule": "liveops.schedule",
+    "publish": "liveops.publish"
+  },
+  "assets": {
+    "read": "asset.read",
+    "upload": "asset.upload",
+    "replace": "asset.replace",
+    "publish": "asset.publish"
+  },
+  "monetization": {
+    "read": "monetization.read",
+    "edit": "monetization.edit",
+    "publish": "monetization.publish"
+  },
+  "payment": {
+    "read": "payment.read",
+    "configure": "payment.configure",
+    "publish": "payment.publish",
+    "refund": "payment.refund"
+  },
+  "staff": {
+    "read": "staff.read",
+    "roles": "staff.manage_roles",
+    "permissions": "staff.manage_permissions"
+  },
+  "cms": {
+    "read": "cms.read",
+    "edit": "cms.edit",
+    "publish": "cms.publish"
+  },
+  "analytics": {
+    "read": "analytics.read"
+  },
+  "settings": {
+    "read": "settings.read",
+    "edit": "settings.edit",
+    "publish": "settings.publish"
+  },
+  "commerce": {
+    "read": "commerce.read",
+    "edit": "commerce.edit",
+    "publish": "commerce.publish"
+  },
+  "shop": {
+    "read": "shop.read",
+    "edit": "shop.edit",
+    "publish": "shop.publish"
+  },
+  "commands": {
+    "read": "command.read",
+    "execute": "command.execute",
+    "manage": "command.manage"
+  }
+}

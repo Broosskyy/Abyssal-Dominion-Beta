@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "milestone": "M112",
+  "id": "bonusmap_silver",
+  "eligibility_level": 12,
+  "sources": [
+    "npc",
+    "elite",
+    "compass"
+  ],
+  "progression_effect": [
+    "ship_progress",
+    "world_progress",
+    "design_progress"
+  ],
+  "rule": "optional accelerator; never automatically replaces Pirate Trial requirements",
+  "runtime_scope": "PL12+ credited NPC/elite/admiral sinks grant local prototype chart fragments; full bonus-map scene loop pending",
+  "prototype_drop_rule": "normal=1, elite=2, boss=3 per credited sink; tuning only"
+}

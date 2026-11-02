@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "milestone": "M68",
+  "profiles": {
+    "monster_early_01": {
+      "silhouette": "broad sea-creature body + readable head + asymmetric appendage fan",
+      "fallback_scale": [
+        1.1,
+        1.0,
+        1.16
+      ],
+      "rotation_y_deg": 0,
+      "palette": {
+        "body": "#285D68",
+        "deep": "#173B46",
+        "crest": "#4C8A8B",
+        "accent": "#D0A95C"
+      },
+      "mobile": {
+        "lod_bias": {
+          "low": 0.6,
+          "balanced": 0.78,
+          "high": 0.94
+        },
+        "vfx_scale": {
+          "low": 0.65,
+          "balanced": 0.82,
+          "high": 1.0
+        }
+      },
+      "readability": [
+        "head remains identifiable",
+        "appendages do not merge into one circular blob",
+        "selection/target UI stays above VFX",
+        "water effects never hide hull/head silhouette"
+      ]
+    }
+  }
+}

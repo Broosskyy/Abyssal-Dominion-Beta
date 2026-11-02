@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "milestone": "M68",
+  "tiers": {
+    "low": {
+      "monster_lod_bias": 0.6,
+      "max_monster_transient_vfx": 6,
+      "impact_particles": 10,
+      "phase_particles": 14,
+      "wake_particles": 8
+    },
+    "balanced": {
+      "monster_lod_bias": 0.78,
+      "max_monster_transient_vfx": 10,
+      "impact_particles": 16,
+      "phase_particles": 22,
+      "wake_particles": 12
+    },
+    "high": {
+      "monster_lod_bias": 0.94,
+      "max_monster_transient_vfx": 16,
+      "impact_particles": 24,
+      "phase_particles": 32,
+      "wake_particles": 18
+    }
+  },
+  "rule": "Visual budgets only. Combat timing, hit registration, AI and rewards never change by tier."
+}

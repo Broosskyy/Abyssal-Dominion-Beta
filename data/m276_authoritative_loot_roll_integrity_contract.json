@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "milestone": "M276",
+  "master_concept": "V3.8",
+  "contract": "authoritative_loot_roll_ledger_rng_integrity_duplicate_protection_guaranteed_pity_foundation",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "Use readable naval-MMO reward anticipation and clear confirmed-drop feedback only; do not copy proprietary RNG formulas, pity thresholds, drop tables, currencies, probabilities, reward values, names, layouts, assets or mechanics.",
+  "authority": {
+    "client_may": ["render_confirmed_roll_state", "render_confirmed_guaranteed_or_pity_progress", "render_confirmed_reward_pending_or_settled_state"],
+    "server_owns": ["roll_id", "request_id", "idempotency_key", "loot_table_version", "resolver_version", "rng_resolution", "duplicate_guard", "result_digest", "guaranteed_state", "pity_state", "roll_ledger_revision", "pity_revision"],
+    "client_never_commits": ["rng_seed", "roll_result", "reroll", "duplicate_override", "guaranteed_drop", "pity_progress", "result_digest", "settlement"]
+  },
+  "roll_states": ["UNKNOWN", "AUTHORIZED", "RESOLVING", "RESOLVED", "DISTRIBUTED", "SETTLEMENT_PENDING", "SETTLED", "REVOKED"],
+  "roll_identity": ["roll_id", "request_id", "idempotency_key", "loot_table_id", "loot_table_version", "resolver_version"],
+  "integrity_evidence": ["entropy_commitment", "result_digest", "resolver_version", "roll_ledger_revision", "server_tick"],
+  "replay_rules": [
+    "same idempotency identity converges to the existing authoritative roll",
+    "retry or reconnect never authorizes an independent second roll",
+    "client secret entropy or seed input is not accepted",
+    "stale roll-ledger or pity revisions are rejected"
+  ],
+  "dependencies": {
+    "distribution": "M275 supplies authoritative loot-table/drop-pool/distribution context and consumes only confirmed roll outcomes",
+    "eligibility": "M274 remains authoritative participant/reward eligibility gate",
+    "encounter": "M273 remains authoritative encounter completion identity",
+    "settlement": "M266 alone atomically creates durable inventory/wallet/ownership mutations and receipts"
+  },
+  "environment_isolation": ["INTERNAL", "TEST", "GLOBAL"],
+  "unset_until_measured": ["rng_algorithm", "entropy_source_implementation", "drop_probabilities", "rarity_weights", "guaranteed_drop_thresholds", "pity_thresholds", "pity_increment_rules", "pity_reset_rules", "duplicate_item_protection_rules", "bad_luck_protection_scope", "daily_or_weekly_caps", "reward_values"]
+}

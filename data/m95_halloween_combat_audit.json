@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "milestone": "M95",
+  "combat": {
+    "canonical_health": true,
+    "canonical_weapons": true,
+    "canonical_enemy_ai": true,
+    "targetable_group_enemy": true,
+    "sloop": true,
+    "raider": true,
+    "admiral": true,
+    "monster": true,
+    "boss": true,
+    "no_angle_damage": true
+  },
+  "event_progress": {
+    "sink_hook": true,
+    "harpoon_monster_hit_hook": true,
+    "explore_contract": true,
+    "local_currency_rewards": true,
+    "live_authority": false
+  },
+  "admin": {
+    "all_event_spawn_roles": true,
+    "event_score": true,
+    "safe_area_layout": true,
+    "asset_browser_contract": true,
+    "production_authority": false
+  },
+  "performance": {
+    "event_combat_cap": 3,
+    "world_landmarks": 2,
+    "guild_deco_cap": 1
+  },
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS touch",
+    "desktop/gamepad",
+    "event AI balance",
+    "safe-area screenshots",
+    "GPU profile"
+  ]
+}

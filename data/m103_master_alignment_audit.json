@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "milestone": "M103",
+  "implemented": [
+    "versioned Account/Profile/Provider/Session DTO contracts",
+    "transaction envelopes for inventory/wallet/reward/entitlement/progression",
+    "idempotency and optimistic revision contracts",
+    "guest upgrade/provider-linking conflict preview policy",
+    "P0 first-13 generated import-readiness report",
+    "Command Deck identity/transaction truth labels"
+  ],
+  "authority_truth": {
+    "live_auth": false,
+    "server_database": false,
+    "global_transactions": false,
+    "provider_linking": false,
+    "payment_entitlements": false,
+    "local_test_contracts": true
+  },
+  "master_alignment": [
+    "Account/Captain immutable IDs",
+    "Guest upgrade without silent overwrite",
+    "Email/Google/Apple provider linking architecture",
+    "server-authoritative inventory/wallet/rewards/entitlements",
+    "Global/Test separation",
+    "stable data-driven P0 replacement slots"
+  ],
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS/Desktop/Web",
+    "real backend transport",
+    "database migrations",
+    "final P0 GLB imports",
+    "mobile screenshots",
+    "monster final rig/animation"
+  ]
+}

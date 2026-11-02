@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "milestone": "M301",
+  "authority": "SERVER_DOMAIN_ONLY",
+  "event_id": "halloween_abyss_01",
+  "pumpkin_ammo_id": "pumpkin",
+  "pumpkin_event_damage_multiplier": 1.35,
+  "base_cannon_damage": 35,
+  "base_harpoon_damage": 16,
+  "player_range": 24,
+  "player_reload_ms": 1800,
+  "tower_profiles": {
+    "cannon": {"hp": 300, "range": 21, "damage": 32, "reload_ms": 4000},
+    "chain": {"hp": 260, "range": 18, "damage": 23, "reload_ms": 5200},
+    "mortar": {"hp": 350, "range": 26, "damage": 40, "reload_ms": 6400},
+    "ward": {"hp": 420, "range": 19, "damage": 19, "reload_ms": 5400},
+    "hunter": {"hp": 270, "range": 23, "damage": 27, "reload_ms": 4500}
+  },
+  "npc_profiles": {
+    "event_halloween_npc_sloop_01": 520,
+    "event_halloween_npc_raider_01": 760,
+    "event_halloween_admiral_01": 2300,
+    "event_halloween_monster_01": 1800,
+    "event_halloween_boss_01": 3900
+  },
+  "pumpkin_wreck_hp": 3,
+  "boss_ship_design_award_policy": "TOP_DAMAGE",
+  "allowed_boss_design_policies": ["TOP_DAMAGE", "LAST_HIT"],
+  "reward_intents": {
+    "collect_pumpkin_ammo": 2,
+    "collect_pumpkin_tokens": 10,
+    "pumpkin_wreck_tokens": 50,
+    "event_npc_tokens": 30,
+    "boss_top_damage_tokens": 500,
+    "boss_final_blow_tokens": 150,
+    "boss_top_damage_ship_design": "event_halloween_ship_design_01"
+  },
+  "settlement": "PENDING_M266; no durable inventory or player ownership before authenticated economy commit",
+  "balance": "DRAFT_UNTIL_NATIVE_AND_SERVER_QA"
+}

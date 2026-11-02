@@ -1,0 +1,37 @@
+{
+  "milestone": "M289",
+  "status": "PLACEHOLDER_INTAKE_READY_FINAL_ART_PENDING",
+  "map": {"id":"slice_havens_reach_01", "kind":"SMALL_SEA_MAP", "final_world_composition_required":true},
+  "harbor": {"id":"harbor_havens_reach", "slot":"harbor_havens_reach", "placeholder":"res://assets/production_placeholders/p0/harbor_havens_reach.glb", "final_asset_required":true},
+  "starter_ships": [
+    {"id":"starter_small", "slot":"ship_small", "model_strategy":"ONE_COMPLETE_GLB", "placeholder":"res://assets/production_placeholders/p0/ship_small.glb", "final_asset_required":true},
+    {"id":"starter_medium", "slot":"ship_medium", "model_strategy":"ONE_COMPLETE_GLB", "placeholder":"res://assets/production_placeholders/p0/ship_medium.glb", "final_asset_required":true},
+    {"id":"starter_large", "slot":"ship_large", "model_strategy":"ONE_COMPLETE_GLB", "placeholder":"res://assets/production_placeholders/p0/ship_large.glb", "final_asset_required":true}
+  ],
+  "normal_npcs": [
+    {"id":"npc_scout", "placeholder":"res://assets/production_placeholders/m297/npc_scout_01.glb", "final_asset_required":true},
+    {"id":"npc_raider", "placeholder":"res://assets/production_placeholders/m295/npc_raider_01.glb", "final_asset_required":true},
+    {"id":"npc_heavy", "placeholder":"res://assets/production_placeholders/m297/npc_heavy_01.glb", "final_asset_required":true}
+  ],
+  "priority_encounters": [
+    {"id":"elite_crimson_hunter", "kind":"ELITE", "placeholder":"res://assets/production_placeholders/p1/regional/ships/npc_crimson_hunter.glb", "final_asset_required":true},
+    {"id":"admiral_crimson", "kind":"ADMIRAL", "placeholder":"res://assets/production_placeholders/p1/regional/ships/npc_crimson_admiral.glb", "final_asset_required":true},
+    {"id":"monster_early_01", "kind":"MONSTER", "weapon_rule":"HARPOON_PRIMARY", "placeholder":"res://assets/production_placeholders/p0/monster_early_01.glb", "final_asset_required":true}
+  ],
+  "combat_loadout": {
+    "cannon_families": ["LIGHT", "STANDARD", "HEAVY"],
+    "ammo_families": ["IRON", "CHAIN", "EXPLOSIVE"],
+    "harpoon_required": true,
+    "repair_required": true,
+    "shield_required": true,
+    "values": "VERSIONED_CONTENT_AND_SERVER_AUTHORITY"
+  },
+  "completion": {"loot":"loot_tier_chest", "quest_chain":"first_sea_sortie", "reward_authority":"SERVER_ONLY"},
+  "rules": {
+    "all_initial_ships_are_complete_individual_models": true,
+    "modular_ship_parts_required": false,
+    "wake_water_smoke_fire_impacts_and_target_markers_not_baked_into_glb": true,
+    "placeholder_assets_do_not_count_as_final_art": true,
+    "authored_assets_replace_stable_slots_without_gameplay_rewrite": true
+  }
+}

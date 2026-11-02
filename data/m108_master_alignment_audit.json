@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "milestone": "M108",
+  "implemented": [
+    "same-session local reward receipt dedupe/history",
+    "single-primary PL1-5 teaching runtime",
+    "guild objective reuse of existing world marker budget",
+    "P0 replacement batch export",
+    "mobile nameplate source consolidation"
+  ],
+  "truth": {
+    "persistent_reward_ledger": false,
+    "server_reward_dedupe": false,
+    "real_backend": false,
+    "guild_objective_authority": false,
+    "native_mobile_qa": false
+  },
+  "v3_7": {
+    "available_in_library_search": false,
+    "invented_rules": false
+  },
+  "preserved": [
+    "Tap-to-Sail",
+    "selected target readability",
+    "PL1-5 protection/neutrality",
+    "HUD customization",
+    "Haven's Reach budget",
+    "guild island map level 2",
+    "P0 first-13 priority"
+  ],
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS/Desktop/Web",
+    "reward double-claim playthrough",
+    "marker overlap screenshots",
+    "P0 final GLBs"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "milestone": "M50",
+  "consolidation": {
+    "dedicated_harbor_equipment_screen": true,
+    "mobile_stat_delta_text": true,
+    "regional_npc_role_cues": true,
+    "harbor_module_replacement_adapter": true,
+    "generated_missing_asset_report": true,
+    "production_priority_shared_runtime": true
+  },
+  "production": {
+    "stable_slots_preserved": true,
+    "fallback_nonfatal": true,
+    "gameplay_stats_outside_final_models": true
+  },
+  "authority": "local prototype only"
+}

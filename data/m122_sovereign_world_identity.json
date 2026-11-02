@@ -1,0 +1,25 @@
+{
+  "region": "sovereign_waters",
+  "theme": "prestige naval frontier with pirate-readable silhouettes",
+  "islands": [
+    "ISLAND-SOV-001",
+    "ISLAND-SOV-002",
+    "ISLAND-SOV-003"
+  ],
+  "harbor": "HARBOR-CROWNWATCH-001",
+  "pois": [
+    "POI-SOV-BANNER-001",
+    "POI-SOV-WRECK-001",
+    "POI-SOV-BEACON-001"
+  ],
+  "mobile": {
+    "max_major_vfx": 2,
+    "max_world_poi_markers": 5,
+    "hero_escort_aura_update_seconds": 5.0
+  },
+  "guild_war": {
+    "presentation_hook_ready": true,
+    "server_authority_required": true,
+    "local_ownership_changes": false
+  }
+}

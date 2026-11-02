@@ -1,0 +1,14 @@
+{
+  "schema_version":1,"milestone":"M152","authority":"SERVER_REQUIRED_FOR_PRODUCTION","local_preview":true,
+  "caps":{"default_seconds":28800,"minimum_seconds":3600,"maximum_configurable_seconds":43200,"catch_up_multiplier_cap":1.5},
+  "profiles":[
+    {"id":"AFK-PROFILE-HARBOR-OPS","name":"Harbor Operations","gold_per_hour":90,"items_per_hour":[{"id":"standard_ammo","quantity":12},{"id":"repair_crate","quantity":1}],"world_xp_per_hour":6,"companion_xp_per_hour":4,"weight":1.0},
+    {"id":"AFK-PROFILE-SALVAGE","name":"Salvage Detail","gold_per_hour":55,"items_per_hour":[{"id":"wood","quantity":4},{"id":"iron","quantity":2}],"world_xp_per_hour":4,"companion_xp_per_hour":5,"weight":0.8},
+    {"id":"AFK-PROFILE-HUNTER","name":"Hunter Supplies","gold_per_hour":45,"items_per_hour":[{"id":"harpoon_basic","quantity":5},{"id":"monster_scrap","quantity":1}],"world_xp_per_hour":5,"companion_xp_per_hour":6,"weight":0.65},
+    {"id":"AFK-PROFILE-SUPPLY","name":"Quartermaster Supply","gold_per_hour":70,"items_per_hour":[{"id":"powder","quantity":2},{"id":"armor_plate","quantity":1}],"world_xp_per_hour":3,"companion_xp_per_hour":3,"weight":0.75}
+  ],
+  "forbidden_rewards":["premium_currency","ranked_rating","honor","guild_war_score","event_ranking_score","admiral_loot","world_boss_loot","legendary_bonusmap_completion","rare_endgame_drop"],
+  "claim":{"active_claim_required":true,"idempotent":true,"reward_id_required":true,"transaction_id_required_online":true,"client_clock_forbidden_online":true},
+  "telemetry":["afk_preview_opened","afk_claim_attempted","afk_claim_confirmed","afk_claim_duplicate","afk_reward_value","return_after_offline","active_to_afk_value_ratio"],
+  "rules":["Exact values are LOCAL prototype balancing data and remain versioned/configurable.","Active play must remain materially more valuable.","No real background sea-map combat is simulated.","Rested Captain Bonus is a separate active-play catch-up system."]
+}

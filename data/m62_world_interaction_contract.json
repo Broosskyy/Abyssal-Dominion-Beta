@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "milestone": "M62",
+  "title": "PL1-5 World Interaction + Port/Quest UI Production",
+  "features": {
+    "interaction_prompt": true,
+    "safe_harbor": true,
+    "quest_objective_markers": true,
+    "loot_repair_monster_elite_admiral_markers": true,
+    "havens_reach_services": 5,
+    "minimap_player_port": true,
+    "mobile_density_contract": true,
+    "visual_polish_audit": true
+  },
+  "authority": "presentation only; gameplay/quest/economy/backend truth remains outside graphics"
+}

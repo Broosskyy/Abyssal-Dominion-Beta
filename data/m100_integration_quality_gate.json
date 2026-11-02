@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "milestone": "M100",
+  "type": "major_integration_quality_gate",
+  "regressions_corrected": {
+    "npc_hull_hidden_at_shadow_distance": true,
+    "shadow_distance_is_now_hint_only": true,
+    "nameplate_quality_distance_wired": true,
+    "selected_target_exception": true,
+    "boss_exception": true,
+    "player_exception": true
+  },
+  "permanent_world": {
+    "island_profile_replacements": {
+      "cliff_cove": "nature_island_small_cliff_01",
+      "thin_spit": "nature_island_long_hook_01",
+      "long_shoal": "nature_island_split_rock_01"
+    },
+    "island_hero_cap": 1,
+    "harbor_replacements": [
+      [
+        "prop_harbor_wayfinder_01",
+        "prop_harbor_skull_sign_01"
+      ],
+      [
+        "prop_harbor_lantern_post_01",
+        "prop_harbor_pirate_lantern_02"
+      ],
+      [
+        "prop_harbor_lantern_post_01",
+        "prop_harbor_pirate_lantern_02"
+      ]
+    ],
+    "harbor_module_count": 30,
+    "harbor_module_count_increased": false
+  },
+  "guild": {
+    "map_level_2": true,
+    "shield_core": 1,
+    "shield_nodes": 2,
+    "objective_visual_only": true,
+    "capture_authority": false,
+    "persistent_state": false,
+    "wall_gate_visual_only": true
+  },
+  "hud": {
+    "guild_detail_safe_area_fallback": true,
+    "touch_mouse_gamepad_focus_preserved": true,
+    "custom_hud_preserved": true
+  },
+  "event_admin": {
+    "halloween_preserved": true,
+    "admin_preserved": true,
+    "live_economy_authority": false,
+    "server_entitlement_claimed": false
+  },
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS safe-area/orientation",
+    "desktop/gamepad",
+    "selected-target/nameplate playtest",
+    "shadow/GPU profiling",
+    "Halloween/Admin overlap screenshots"
+  ]
+}

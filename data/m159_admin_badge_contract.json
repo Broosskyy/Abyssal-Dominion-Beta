@@ -1,0 +1,1 @@
+{"schema":1,"milestone":"M159","badge":{"label":"ADMIN","visible_only_when_verified":true,"local_preview_label":"DEV ADMIN","world_nameplate":true,"hud":true,"color_semantics":"staff_only"},"security":{"never_infer_from_local_toggle":true,"requires_server_verified_staff_identity":true}}

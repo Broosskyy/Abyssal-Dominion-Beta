@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "authority": "contract_only_local_prototype",
+  "live_authority_required": true,
+  "definitions": [
+    "GuildDefinition",
+    "GuildMemberDefinition",
+    "GuildRoleDefinition",
+    "GuildTreasuryDefinition",
+    "GuildVaultDefinition",
+    "GuildQuestDefinition",
+    "DiplomacyDefinition",
+    "AllianceDefinition",
+    "GuildWarDefinition",
+    "GuildIslandDefinition",
+    "FacilityDefinition",
+    "GuildTowerDefinition",
+    "GuildRatingDefinition"
+  ],
+  "permissions": [
+    "member_management",
+    "guild_profile",
+    "treasury_deposit",
+    "treasury_spend",
+    "vault_deposit",
+    "vault_withdraw",
+    "war",
+    "diplomacy",
+    "island_build",
+    "defense",
+    "events",
+    "audit_view"
+  ],
+  "roles": {
+    "guild_master": ["member_management", "guild_profile", "treasury_deposit", "treasury_spend", "vault_deposit", "vault_withdraw", "war", "diplomacy", "island_build", "defense", "events", "audit_view"],
+    "admiral": ["member_management", "war", "island_build", "defense", "events", "audit_view"],
+    "quartermaster": ["treasury_deposit", "treasury_spend", "vault_deposit", "vault_withdraw", "audit_view"],
+    "fleet_leader": ["war", "events"],
+    "diplomat": ["diplomacy", "war"],
+    "veteran": ["treasury_deposit", "vault_deposit"],
+    "member": ["treasury_deposit", "vault_deposit"],
+    "recruit": []
+  },
+  "critical_actions_require_audit": [
+    "treasury_spend",
+    "vault_withdraw",
+    "war",
+    "diplomacy",
+    "island_build",
+    "member_management"
+  ]
+}

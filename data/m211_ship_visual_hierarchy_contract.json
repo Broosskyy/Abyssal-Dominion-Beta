@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "milestone": "M211",
+  "master_concept": "V3.8",
+  "ship_visual_stack": [
+    "ship_hull_and_design",
+    "representative_cannon_battery",
+    "sails_and_rigging",
+    "hull_armor_and_ram",
+    "harpoon_mount",
+    "normal_deck_stack_below_ship",
+    "special_deck_layer_below_normal_decks"
+  ],
+  "under_ship_rules": {
+    "normal_decks_visible": true,
+    "normal_deck_levels": 10,
+    "special_deck_visible": true,
+    "special_deck_below_normal_stack": true,
+    "visual_only": true,
+    "collision_unchanged": true,
+    "navigation_unchanged": true
+  },
+  "ui": {
+    "shipyard_explains_under_ship_stack": true,
+    "equipment_cards_use_same_runtime_slots": true,
+    "responsive_only_differences": ["scale", "spacing", "touch_targets", "safe_area"]
+  }
+}

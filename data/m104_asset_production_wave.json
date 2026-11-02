@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "milestone": "M104",
+  "p0_first13": 13,
+  "visual_focus": [
+    "distinct pirate starter/NPC silhouettes",
+    "irregular island silhouettes",
+    "Haven's Reach pirate harbor readability",
+    "monster semantic rig/animation",
+    "stable waterline/forward/anchors"
+  ],
+  "optimization": [
+    "quality-aware marker cap",
+    "no gameplay logic tied to graphics quality",
+    "existing world dressing budgets retained"
+  ],
+  "next": [
+    "P0 final-art swap dashboard",
+    "GLB bounds/waterline diagnostics",
+    "mobile preset runtime application audit",
+    "guild objective UI polish",
+    "first-session PL1-5 visual pass"
+  ]
+}

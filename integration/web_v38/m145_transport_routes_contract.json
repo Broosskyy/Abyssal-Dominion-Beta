@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "milestone": "M145",
+  "target": "VAELTIDE_WEB_PLATFORM_V38",
+  "backend_connected": false,
+  "base_path": "/api/admin/v1",
+  "client_adapters": {"godot_native_mobile":"HTTPS JSON", "web_preview":"same-origin HTTPS proxy"},
+  "middleware_order": ["TLS", "staff authentication", "critical-action MFA", "server RBAC", "idempotency ledger", "optimistic revision", "database transaction", "immutable audit", "signed response"],
+  "idempotency": {"header":"Idempotency-Key", "table":"admin_request_ledger", "same_key_same_hash":"return stored response", "same_key_other_hash":"409 conflict"},
+  "snapshot_response": {"format":"abyssal-content-snapshot-v1", "signature_required":true, "content_hash_required":true},
+  "global_activation_gates": ["signed deployment", "real HTTPS backend", "MFA", "server RBAC", "approval policy", "idempotency", "immutable audit"],
+  "rule": "The artifacts define a contract only. No GLOBAL endpoint or production authority is enabled by M145."
+}

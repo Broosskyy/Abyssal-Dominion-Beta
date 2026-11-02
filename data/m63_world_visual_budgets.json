@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "milestone": "M63",
+  "title": "Mobile World Visual Budgets",
+  "tiers": {
+    "low": {
+      "water_subdivisions": 64,
+      "shoreline_segments": 36,
+      "max_transient_combat_vfx": 44,
+      "max_simultaneous_water_impacts": 12,
+      "max_wake_emitters": 16,
+      "max_shoreline_foam_islands": 12,
+      "particle_quality": "canonical"
+    },
+    "balanced": {
+      "water_subdivisions": 64,
+      "shoreline_segments": 36,
+      "max_transient_combat_vfx": 44,
+      "max_simultaneous_water_impacts": 12,
+      "max_wake_emitters": 16,
+      "max_shoreline_foam_islands": 12,
+      "particle_quality": "canonical"
+    },
+    "high": {
+      "water_subdivisions": 64,
+      "shoreline_segments": 36,
+      "max_transient_combat_vfx": 44,
+      "max_simultaneous_water_impacts": 12,
+      "max_wake_emitters": 16,
+      "max_shoreline_foam_islands": 12,
+      "particle_quality": "canonical"
+    }
+  },
+  "rule": "M199 parity lock: quality/platform selection may not change canonical world composition or combat presentation; only interface scale/spacing/safe-area presentation may differ. Performance fallback must preserve the same visible world hierarchy."
+}

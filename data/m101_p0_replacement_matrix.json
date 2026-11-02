@@ -1,0 +1,532 @@
+{
+  "schema": 1,
+  "milestone": "M102",
+  "title": "P0 First-13 Visual Acceptance Matrix",
+  "source_order": "Asset-Erstellungsreihenfolge / Master P0 wave",
+  "assets": [
+    {
+      "order": 1,
+      "id": "ship_small",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/ship_small.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "ship",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "pirate_identity": "wood/sail/ornament silhouette; avoid modern navy language",
+        "waterline": "Y=0 visual calibration required"
+      }
+    },
+    {
+      "order": 2,
+      "id": "ship_medium",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/ship_medium.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "ship",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "pirate_identity": "wood/sail/ornament silhouette; avoid modern navy language",
+        "waterline": "Y=0 visual calibration required"
+      }
+    },
+    {
+      "order": 3,
+      "id": "ship_large",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/ship_large.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "ship",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "pirate_identity": "wood/sail/ornament silhouette; avoid modern navy language",
+        "waterline": "Y=0 visual calibration required"
+      }
+    },
+    {
+      "order": 4,
+      "id": "npc_friendly_coastal_sloop",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/npc_corsair.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "ship",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "pirate_identity": "wood/sail/ornament silhouette; avoid modern navy language",
+        "waterline": "Y=0 visual calibration required"
+      }
+    },
+    {
+      "order": 5,
+      "id": "npc_scout_01",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/npc_corsair.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "ship",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "pirate_identity": "wood/sail/ornament silhouette; avoid modern navy language",
+        "waterline": "Y=0 visual calibration required"
+      }
+    },
+    {
+      "order": 6,
+      "id": "npc_raider_01",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/npc_corsair.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "ship",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "pirate_identity": "wood/sail/ornament silhouette; avoid modern navy language",
+        "waterline": "Y=0 visual calibration required"
+      }
+    },
+    {
+      "order": 7,
+      "id": "npc_gunship_01",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/npc_corsair.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "ship",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "pirate_identity": "wood/sail/ornament silhouette; avoid modern navy language",
+        "waterline": "Y=0 visual calibration required"
+      }
+    },
+    {
+      "order": 8,
+      "id": "npc_heavy_01",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/npc_admiral.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "ship",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "pirate_identity": "wood/sail/ornament silhouette; avoid modern navy language",
+        "waterline": "Y=0 visual calibration required"
+      }
+    },
+    {
+      "order": 9,
+      "id": "harbor_havens_reach",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/harbor.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "harbor",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA"
+      }
+    },
+    {
+      "order": 10,
+      "id": "island_tropical_small",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/island_tropical.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "island",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "shape": "irregular/cove/cliff/long silhouette; avoid generic round island"
+      }
+    },
+    {
+      "order": 11,
+      "id": "island_tropical_medium",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/island_tropical.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "island",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "shape": "irregular/cove/cliff/long silhouette; avoid generic round island"
+      }
+    },
+    {
+      "order": 12,
+      "id": "island_cliff_cove",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/island_rock.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "m104_visual_targets": {
+        "asset_class": "island",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "shape": "irregular/cove/cliff/long silhouette; avoid generic round island"
+      }
+    },
+    {
+      "order": 13,
+      "id": "monster_early_01",
+      "priority": "P0",
+      "slot_exists": true,
+      "fallback_path": "res://assets/placeholder_pack/models/monster_kraken.glb",
+      "override_path": "",
+      "status": "active",
+      "required_checks": [
+        "import",
+        "bounds",
+        "pivot",
+        "waterline",
+        "forward",
+        "silhouette",
+        "materials",
+        "mobile_readability",
+        "fallback",
+        "anchors"
+      ],
+      "visual_acceptance": {
+        "waterline": "required",
+        "forward_axis": "+Z",
+        "pivot": "stable wrapper-relative",
+        "mobile_silhouette": "required",
+        "gameplay_collision": "wrapper_owned",
+        "final_asset_state": "fallback_until_override"
+      },
+      "rig_acceptance": {
+        "rig_optional_for_static_fallback": true,
+        "final_hero_requires_animation_bridge": true,
+        "required_semantic_aliases": [
+          "idle",
+          "attack",
+          "hit",
+          "death"
+        ],
+        "gameplay_must_not_wait_for_animation": true
+      },
+      "m104_visual_targets": {
+        "asset_class": "monster",
+        "top_down_readability": "mandatory",
+        "target_bounds_policy": "normalize via visual wrapper; do not rescale gameplay collision from GLB",
+        "silhouette_policy": "distinct at gameplay zoom",
+        "anchor_policy": "stable wrapper anchors for nameplate/wake/VFX",
+        "mobile_acceptance": "required native screenshot/device QA",
+        "animation_semantics": [
+          "idle",
+          "attack",
+          "hit",
+          "death"
+        ],
+        "gameplay_independent_of_animation": true
+      }
+    }
+  ],
+  "rules": [
+    "Missing final art never breaks gameplay.",
+    "Final GLB is visual-only; gameplay wrapper owns collision/stats/input.",
+    "Water/wake/foam/VFX are not baked into canonical ship GLBs.",
+    "P0 final-art replacement remains ahead of broad P1/P2 hero production."
+  ]
+}

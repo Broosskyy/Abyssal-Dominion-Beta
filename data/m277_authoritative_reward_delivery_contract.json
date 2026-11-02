@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "milestone": "M277",
+  "master_concept": "V3.8",
+  "contract": "authoritative_reward_receipt_claim_delivery_mail_fallback_post_settlement_recovery_audit",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "References inform only readable naval-MMO reward feedback and claim UX. No proprietary values, names, layouts, drop tables, assets or mechanics are copied.",
+  "authority": {
+    "server_owns": [
+      "reward_receipt_id",
+      "transaction_id",
+      "idempotency_key",
+      "beneficiary_id",
+      "reward_bundle_digest",
+      "claim_state",
+      "delivery_channel",
+      "delivery_result",
+      "mail_fallback_authorization",
+      "recovery_state",
+      "audit_evidence",
+      "settlement_receipt_link"
+    ],
+    "client_may": [
+      "render_confirmed_receipt_state",
+      "render_confirmed_delivery_state",
+      "submit_claim_intent",
+      "request_refresh_or_recovery"
+    ],
+    "client_must_never": [
+      "create_reward_receipt",
+      "attach_reward_value",
+      "change_beneficiary",
+      "mark_delivery_success",
+      "force_mail_fallback",
+      "reopen_settled_receipt",
+      "mint_recovery_reward",
+      "append_authoritative_audit",
+      "settle_reward"
+    ]
+  },
+  "receipt_states": ["UNKNOWN", "ISSUED", "CLAIMABLE", "CLAIMING", "DELIVERED", "MAIL_FALLBACK", "RECOVERY_PENDING", "SETTLED", "REVOKED"],
+  "delivery_channels": ["NONE", "INVENTORY", "WALLET", "OWNERSHIP", "MAIL", "CLAIM_INBOX", "MIXED"],
+  "delivery_rules": {
+    "durable_value_requires_m266_commit": true,
+    "failed_delivery_must_not_create_local_value": true,
+    "retry_reconnect_must_converge_to_same_receipt": true,
+    "mail_fallback_is_server_authorized_only": true,
+    "mail_fallback_uses_m254_server_channel": true,
+    "delivery_receipt_must_link_to_atomic_transaction": true
+  },
+  "recovery_audit": {
+    "receipt_revision_guard": true,
+    "delivery_revision_guard": true,
+    "audit_revision_guard": true,
+    "settlement_sequence_guard": true,
+    "server_tick_guard": true,
+    "post_settlement_recovery_is_idempotent": true,
+    "disconnect_or_crash_must_not_duplicate_reward": true,
+    "test_global_isolation": true
+  },
+  "dependencies": {
+    "roll_integrity": "M276 authoritative roll ledger/RNG integrity",
+    "distribution": "M275 authoritative loot distribution",
+    "eligibility": "M274 authoritative reward eligibility",
+    "mail": "M254 server-authoritative mail/notification/claim channel",
+    "settlement": "M266 atomic economy/inventory transaction boundary"
+  },
+  "unset_until_measured": [
+    "claim_expiry",
+    "delivery_retry_count",
+    "delivery_retry_backoff",
+    "mail_fallback_delay",
+    "recovery_timeout",
+    "recovery_retention_window",
+    "audit_retention_window",
+    "inventory_capacity_values",
+    "reward_values"
+  ],
+  "production_status": "PARTIAL"
+}

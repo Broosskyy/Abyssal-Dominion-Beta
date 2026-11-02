@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "milestone": "M104",
+  "implemented": [
+    "transport-independent API envelopes",
+    "offline adapter with live-environment block",
+    "relational persistence schema draft",
+    "authority migration routing map",
+    "P0 visual target metadata",
+    "quality-aware HUD marker cap"
+  ],
+  "truth": {
+    "http_api": false,
+    "websocket": false,
+    "database_running": false,
+    "sql_executed": false,
+    "live_auth": false,
+    "server_combat": false,
+    "global_release": false
+  },
+  "security": [
+    "no plaintext password/token schema",
+    "provider subject server-derived future",
+    "transaction ledger idempotency",
+    "TEST/GLOBAL isolation contract",
+    "admin direct DB edits prohibited"
+  ],
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS/Desktop/Web",
+    "mobile HUD screenshots",
+    "P0 final GLBs",
+    "first monster rig",
+    "server implementation/migrations"
+  ]
+}

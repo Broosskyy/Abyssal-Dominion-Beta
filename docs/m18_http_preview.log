@@ -1,0 +1,5 @@
+PREVIEW READY: http://localhost:18077/
+Only builds/web is served. Ctrl+C stops the server.
+127.0.0.1 - - [30/Aug/2026 14:45:43] "GET /__preview__/status HTTP/1.1" 200 -
+127.0.0.1 - - [30/Aug/2026 14:45:43] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [30/Aug/2026 14:45:43] "HEAD /index.wasm HTTP/1.1" 200 -

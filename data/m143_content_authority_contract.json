@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "milestone": "M143",
+  "service": "UnifiedContentAdminService",
+  "environments": ["LOCAL", "TEST", "STAGING", "GLOBAL"],
+  "canonical_registry": "res://data/admin_content_type_registry.json",
+  "asset_registry": "res://data/m136_production_placeholder_registry.json",
+  "workflow": ["draft", "validated", "review", "approved", "scheduled", "active", "archived", "rolled_back"],
+  "approval_policy": {
+    "ordinary_content": 1,
+    "balance": 1,
+    "world": 1,
+    "liveops": 1,
+    "economy": 2,
+    "monetization": 2,
+    "payment": 2,
+    "entitlement": 2,
+    "staff_permissions": 2,
+    "server_operations": 2,
+    "different_staff_required": true,
+    "requester_cannot_self_approve_critical": true
+  },
+  "snapshot": {
+    "format": "abyssal-content-snapshot-v1",
+    "required": ["environment", "content_version", "generated_at", "records", "asset_slots", "content_hash", "signature"],
+    "client_accepts_only_server_verified": true,
+    "rollback_is_new_version": true,
+    "cache_last_verified": true,
+    "local_fallback_cannot_become_global": true
+  },
+  "audit_required": ["actor_staff_id", "roles", "permission", "action", "target_type", "target_id", "before_revision", "after_revision", "request_id", "timestamp", "surface", "environment", "result"],
+  "prohibited": ["client_grants_currency", "client_changes_entitlement", "client_sets_payment_success", "arbitrary_script_upload", "unlogged_database_edit", "production_publish_from_local_admin"],
+  "web_v38_migration": {
+    "replace_parallel_staff_models": true,
+    "canonical_permission_source": "staff_roles + staff_permissions + staff_role_permissions + staff_user_roles",
+    "legacy_domains_are_adapters": true,
+    "missing_m142_domains_must_be_added": ["weapon", "payment_product", "support", "ship_reward", "equipment_module", "upgrade_rule", "sector", "region", "spawn_table", "formation", "poi", "island_visual", "harbor_visual"]
+  }
+}

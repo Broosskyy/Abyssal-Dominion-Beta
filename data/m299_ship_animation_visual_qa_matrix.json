@@ -1,0 +1,16 @@
+{
+  "milestone": "M299",
+  "status": "NOT_EVALUATED",
+  "requires_native_godot": true,
+  "scene": "res://scenes/qa/m299_ship_animation_visual_qa.tscn",
+  "manual_checks": [
+    {"id": "IMPORT", "test": "Godot 4 parser and scene load with all 8 distinct ship GLBs; no missing model, controller or material", "status": "NOT_EVALUATED"},
+    {"id": "OBLIQUE_READABILITY", "test": "At mobile and desktop camera framing all 8 ship silhouettes, waterlines and labels remain readable", "status": "NOT_EVALUATED"},
+    {"id": "MOTION", "test": "Idle/cruise/port/starboard: model-only heave/heel; ship world positions and physics shapes do not move", "status": "NOT_EVALUATED"},
+    {"id": "IMPACT", "test": "Shield and hull demo flashes are visually distinct and expire; BROKEN state alone never fabricates a hit", "status": "NOT_EVALUATED"},
+    {"id": "DEFEAT", "test": "Stagger/flood/breakup/submerged/cleanup progression reads as staged defeat; Reset restores only presentation", "status": "NOT_EVALUATED"},
+    {"id": "ACCESSIBILITY", "test": "Reduced Motion disables ambient bob and damps hits; defeat remains legible", "status": "NOT_EVALUATED"},
+    {"id": "MOBILE_BUDGET", "test": "Android/portrait touch selection, GPU cost with eight ships and no menu/chart/gameplay HUD interference", "status": "NOT_EVALUATED"},
+    {"id": "AUTHORITY", "test": "Local QA preview rejected outside this scene, on verified online session and after server presentation; no rewards, combat truth or QA PASS synthesized", "status": "NOT_EVALUATED"}
+  ]
+}

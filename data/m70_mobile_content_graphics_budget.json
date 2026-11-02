@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "milestone": "M70",
+  "profile": "mobile-first PL1-5",
+  "touch": {
+    "minimum_core_target_px": 56,
+    "safe_area_required": true,
+    "hide_legacy_quick_ammo_on_touch": true
+  },
+  "world": {
+    "max_high_priority_nameplates": 10,
+    "max_near_player_markers": 12,
+    "prefer_instancing_for_nature": true,
+    "hero_glb_material_guidance": "keep material groups readable; atlas/reuse where sensible"
+  },
+  "graphics": {
+    "water": "retain M63 quality tiers",
+    "textures": "M64 1K repeated / 2K hero guidance",
+    "fallbacks": "polished and readable, but cheaper than final Hero assets"
+  },
+  "content": {
+    "decorative_props_never_own_gameplay": true,
+    "missing_asset_never_breaks_vertical_slice": true
+  },
+  "status": "STATIC_READY_NATIVE_PROFILE_PENDING"
+}

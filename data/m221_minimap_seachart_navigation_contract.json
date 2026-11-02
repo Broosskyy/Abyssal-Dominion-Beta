@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "milestone": "M221",
+  "master_concept": "V3.8",
+  "purpose": "Converge minimap, sea-chart navigation and world guidance into one readable composition for the five gameplay master references.",
+  "locks": {
+    "camera": "M213/M214 high/wide oblique gameplay camera remains authoritative",
+    "world_truth": "minimap and navigation render only objects/targets that actually exist in the current world",
+    "movement": "mobile Tap-to-Sail and desktop Click-to-Sail remain authoritative",
+    "route_authority": "M192 island avoidance and M220 final-destination preservation remain unchanged",
+    "world_parity": "same map, actors, POIs, route authority and gameplay on mobile/web/desktop; only responsive UI sizing differs",
+    "hud": "circular upper-right minimap; no persistent bottom command/map-selection bar; primary attack remains lower-right"
+  },
+  "minimap": {
+    "shape": "circular nautical radar/sea-chart read",
+    "orientation": "north-up with explicit player heading vector",
+    "course": "active final Tap-to-Sail destination and local steering bend can be shown without becoming route authority",
+    "priority": [
+      "tracked mission objective",
+      "selected combat target",
+      "boss/admiral",
+      "active course destination",
+      "harbor",
+      "high-value loot",
+      "secondary POI",
+      "ordinary enemy"
+    ],
+    "density": "ordinary markers stay compact; selected/tracked/high-priority markers receive rings rather than excessive labels"
+  },
+  "non_goals": [
+    "no invented destination",
+    "no teleportation",
+    "no platform-specific map content",
+    "no combat/range/reward changes",
+    "no second navigation simulation"
+  ]
+}

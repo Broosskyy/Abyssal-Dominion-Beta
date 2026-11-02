@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "milestone": "M102",
+  "identity": {
+    "immutable": [
+      "account_id",
+      "captain_id"
+    ],
+    "mutable": [
+      "captain_name"
+    ],
+    "never_primary_reference": [
+      "captain_name"
+    ]
+  },
+  "providers": [
+    "guest",
+    "email",
+    "google",
+    "apple"
+  ],
+  "states": [
+    "signed_out",
+    "guest_local_preview",
+    "authenticated_future_server",
+    "reauth_required",
+    "restricted"
+  ],
+  "linking_rules": [
+    "One account may link multiple providers.",
+    "Provider linking must be server verified before profiles are merged.",
+    "Guest upgrade must never silently overwrite either ownership set.",
+    "Android/iOS/Web/Desktop share one future account/captain progression."
+  ],
+  "security_future_server": [
+    "password hashing",
+    "rate limiting",
+    "brute-force protection",
+    "session/token rotation",
+    "device/session management",
+    "recovery verification",
+    "privileged re-auth",
+    "admin 2FA"
+  ],
+  "local_rule": "M102 LocalAccountAdapter is a development/offline compatibility adapter only; it never authenticates a live account."
+}

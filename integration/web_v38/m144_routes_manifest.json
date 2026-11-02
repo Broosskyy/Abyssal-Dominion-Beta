@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "milestone": "M144",
+  "target": "VAELTIDE_WEB_PLATFORM_V38",
+  "backend_connected": false,
+  "base_path": "/api/admin/v1",
+  "required_routes": [
+    "content/types", "content/records", "content/drafts", "content/drafts/{id}",
+    "content/drafts/{id}/validate", "content/drafts/{id}/review", "content/drafts/{id}/publish",
+    "content/drafts/{id}/schedule", "content/records/{id}/rollback", "approvals/{id}",
+    "assets", "assets/{slot}/versions", "snapshots/current", "audit"
+  ],
+  "required_web_changes": [
+    "Use the shared M144 request envelope",
+    "Resolve permissions on the server for every request",
+    "Require MFA and separate approval for configured critical actions",
+    "Persist idempotency keys and optimistic revisions",
+    "Append immutable audit evidence inside the write transaction"
+  ],
+  "client_rule": "Neither the web dashboard nor Godot ingame admin can directly write production state."
+}

@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "milestone": "M103",
+  "p0_first13_preserved": true,
+  "work_this_milestone": [
+    "all 13 P0 slots receive generated source-readiness status",
+    "final override vs fallback is explicitly separated",
+    "monster_early_01 remains the only P0 asset requiring final rig/animation acceptance",
+    "mobile silhouette acceptance remains mandatory",
+    "gameplay collision remains wrapper-owned"
+  ],
+  "next_art_batch": [
+    "ship_small",
+    "ship_medium",
+    "ship_large",
+    "npc_friendly_coastal_sloop",
+    "npc_scout_01",
+    "npc_raider_01",
+    "npc_gunship_01",
+    "npc_heavy_01",
+    "harbor_havens_reach",
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "monster_early_01"
+  ],
+  "rule": "Do not broaden Hero production ahead of replacing/accepting the P0 first-13 unless required for a gameplay blocker."
+}

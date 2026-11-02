@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "milestone": "M92",
+  "harbor": {
+    "hierarchy": [
+      "landmark",
+      "secondary",
+      "dressing"
+    ],
+    "mobile_dressing_budget": "m88 budget + graphics quality",
+    "service_truth_from_visibility": false
+  },
+  "wreck": {
+    "context_object_cap": 3,
+    "hero_readability": [
+      "stern_gallery",
+      "spar_cluster",
+      "torn_flag"
+    ]
+  },
+  "monster_warning": {
+    "context_object_cap": 2,
+    "teaching": [
+      "hunter_buoy",
+      "hunter_banner"
+    ],
+    "reward_authority": false
+  },
+  "p0_npc": {
+    "quad_mesh_cache": true,
+    "pirate_role_silhouette_pass": true
+  },
+  "guild": {
+    "focus_visual": "presentation ring",
+    "tower_range": "selected only",
+    "local_authority": false
+  },
+  "markers": {
+    "total_budget_unchanged": true,
+    "guild_priority_metadata": true
+  },
+  "native_required": [
+    "Godot 4.7.2 parser",
+    "Android compact landscape",
+    "safe area/notch",
+    "desktop mouse/gamepad",
+    "GPU object/material profile"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "milestone": "M108",
+  "nameplate_distance_source": "m101_mobile_graphics_profiles first; legacy ship visual quality only fallback",
+  "marker_cap_source": "m101_mobile_graphics_profiles",
+  "whole_hull_visibility_from_shadow_distance": false,
+  "shadow_distance_hint": "advisory metadata only; not a visibility range and not authority",
+  "guild_objectives": "reuse world_poi_markers and existing marker budget; no second marker system",
+  "selected_target_exception": true,
+  "boss_exception": true,
+  "rules": [
+    "Graphics quality never changes gameplay hit/range/target authority.",
+    "Low quality may reduce ambient presentation but not selected targets or required teaching objectives.",
+    "Guild objective presentation shares the existing marker cap."
+  ]
+}

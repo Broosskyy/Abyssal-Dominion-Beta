@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource path="res://scripts/visual/production_qa_scene.gd" type="Script" id="1"]
+
+[node name="gameplay_camera_asset_test" type="Node3D"]
+script = ExtResource("1")
+mode = "gameplay_camera_asset"
+metadata/purpose = "oblique sea-map silhouette/occlusion"
+metadata/milestone = "M47"

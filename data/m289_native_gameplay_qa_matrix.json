@@ -1,0 +1,28 @@
+{
+  "milestone": "M289",
+  "status": "NOT_EVALUATED",
+  "target_engine": "Godot 4.7.2",
+  "release_approved": false,
+  "gates": [
+    {"id":"GODOT_4_7_2_BOOT", "state":"NOT_EVALUATED", "evidence_required":"native editor/runtime boot log"},
+    {"id":"PARSER_AND_SCENE_LOAD", "state":"NOT_EVALUATED", "evidence_required":"zero parser/resource/scene-load errors"},
+    {"id":"DESKTOP_GAMEPLAY_LOOP", "state":"NOT_EVALUATED", "evidence_required":"complete 12-stage desktop run"},
+    {"id":"ANDROID_GAMEPLAY_LOOP", "state":"NOT_EVALUATED", "evidence_required":"complete 12-stage Android run"},
+    {"id":"MOBILE_TOUCH_AND_SAFE_AREA", "state":"NOT_EVALUATED", "evidence_required":"tap/pinch/recenter/target/fire plus safe-area capture"},
+    {"id":"HUD_OVERLAP", "state":"NOT_EVALUATED", "evidence_required":"compact and wide viewport screenshots"},
+    {"id":"GPU_FRAME_TIME", "state":"NOT_EVALUATED", "evidence_required":"measured representative-device frame profile"},
+    {"id":"MEMORY_AND_VFX_BUDGET", "state":"NOT_EVALUATED", "evidence_required":"measured memory and simultaneous-effect profile"},
+    {"id":"AUDIO_MIX", "state":"NOT_EVALUATED", "evidence_required":"native cannon/harpoon/impact/ambient mix review"},
+    {"id":"HAPTICS", "state":"NOT_EVALUATED", "evidence_required":"supported-device haptic review"},
+    {"id":"SINK_RESPAWN_LOOP", "state":"NOT_EVALUATED", "evidence_required":"player/NPC/admiral defeat and cleanup evidence"},
+    {"id":"HARBOR_RETURN_LOOP", "state":"NOT_EVALUATED", "evidence_required":"dock/undock/return/service continuity evidence"}
+  ],
+  "platform_profiles": ["DESKTOP_NATIVE", "ANDROID_NATIVE", "MOBILE_WEB", "DESKTOP_WEB"],
+  "rules": {
+    "static_tests_cannot_set_pass": true,
+    "manual_claim_without_evidence_rejected": true,
+    "blocked_gate_prevents_release_approval": true,
+    "missing_gate_remains_not_evaluated": true,
+    "test_and_global_evidence_are_isolated": true
+  }
+}

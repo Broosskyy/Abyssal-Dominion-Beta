@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "milestone": "M232",
+  "master_concept": "V3.8",
+  "status": "WORLD_EVENT_AWARENESS_STATIC_VERIFIED",
+  "intent": [
+    "Bind active world-event presence to restrained gameplay feedback without creating a second event authority.",
+    "Expose event entry/exit, active phase and event boss/admiral presence while keeping the sea chart readable.",
+    "Reuse EventRuntime plus existing event-owned world nodes only."
+  ],
+  "presentation": {
+    "active_event_entry_exit": true,
+    "active_phase_change_feedback": true,
+    "event_boss_admiral_presence": true,
+    "compact_event_state_read": true,
+    "permanent_center_banner": false,
+    "ordinary_non_event_encounter_unchanged": true,
+    "event_enter_radius": 31.0,
+    "event_exit_hysteresis": 6.0,
+    "boss_announce_radius": 42.0
+  },
+  "authority": {
+    "event_runtime_remains_authority": true,
+    "existing_event_nodes_only": true,
+    "no_event_phase_mutation_from_hud": true,
+    "no_reward_mutation_from_hud": true,
+    "no_second_event_runtime": true
+  },
+  "world_rules": {
+    "round_gameplay_minimap_preserved": true,
+    "rectangular_full_sea_chart_preserved": true,
+    "m213_m214_master_camera_unchanged": true,
+    "m231_encounter_feedback_preserved": true,
+    "same_world_mobile_web_desktop": true
+  },
+  "boundaries": {
+    "damage_changed": false,
+    "range_changed": false,
+    "reload_changed": false,
+    "health_changed": false,
+    "rewards_changed": false,
+    "loot_values_changed": false,
+    "collision_changed": false,
+    "navigation_changed": false,
+    "aggro_changed": false,
+    "spawn_cap_increased": false,
+    "new_pathfinder_added": false,
+    "event_schedule_changed": false
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "milestone": "M37",
+  "authority": "local_prototype_contract",
+  "live_authority_required": true,
+  "scope": [
+    "powder",
+    "armor_plates",
+    "shield_foundation",
+    "support_weapon_foundation"
+  ],
+  "supplies": {
+    "powder": {
+      "type": "offense_supply",
+      "consume_rule": "valid_cannon_salvo_only",
+      "orientation_independent": true,
+      "local_damage_multiplier": 1.12
+    },
+    "plates": {
+      "type": "defense_supply",
+      "consume_rule": "valid_incoming_damage_only",
+      "orientation_independent": true,
+      "local_damage_reduction": 0.12
+    }
+  },
+  "shield": {
+    "enabled_for_player_prototype": true,
+    "base_capacity": 180.0,
+    "damage_order": [
+      "shield",
+      "armor",
+      "hull"
+    ],
+    "hull_repair_affects_shield": false,
+    "restore_is_separate": true
+  },
+  "support_weapon": {
+    "family": "healing_cannon",
+    "foundation_only": true,
+    "requires_friendly_target": true,
+    "requires_range": true,
+    "requires_reload": true,
+    "overheal_contribution": 0,
+    "compatible_ammo": [
+      "hull",
+      "shield",
+      "hybrid"
+    ]
+  },
+  "definitions": [
+    "ShieldMasterDefinition",
+    "ShipSupplyDefinition",
+    "HealingWeaponDefinition",
+    "HealingAmmoDefinition",
+    "RepairItemDefinition",
+    "ShieldItemDefinition",
+    "SupportContributionDefinition",
+    "DefenseStackConfig",
+    "SupplyLoadoutDefinition"
+  ],
+  "asset_hooks": [
+    "repair_vfx",
+    "shield_vfx",
+    "powder_vfx",
+    "armor_plate_vfx",
+    "healing_cannon",
+    "healing_projectile",
+    "healing_impact",
+    "support_hud_icons"
+  ]
+}

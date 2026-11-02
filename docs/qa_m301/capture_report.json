@@ -1,0 +1,32 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "renderer": "OpenGL 3.3 Compatibility / NVIDIA RTX 5060",
+  "captured_at": "2026-09-18",
+  "notes": "Runtime ruleset lookup fixed (GameplayRuleset.rule_value). Sea and entry captures verified with visible HUD, ship, and menu content.",
+  "records": [
+    {
+      "file": "entry_menu.png",
+      "scene": "res://scenes/entry.tscn",
+      "status": "ok",
+      "kind": "native Godot desktop capture via tools/capture_screenshot.gd"
+    },
+    {
+      "file": "entry_boot.png",
+      "scene": "res://scenes/entry.tscn",
+      "status": "ok",
+      "kind": "native Godot desktop capture via tools/capture_screenshot.gd (15 frames)"
+    },
+    {
+      "file": "m299_ships_fixed.png",
+      "scene": "res://scenes/qa/m299_ship_animation_visual_qa.tscn",
+      "status": "ok",
+      "kind": "native Godot desktop capture via tools/capture_screenshot.gd"
+    },
+    {
+      "file": "m289_vertical_slice.png",
+      "scene": "res://scenes/main.tscn",
+      "status": "ok",
+      "kind": "native Godot desktop capture via tools/capture_screenshot.gd"
+    }
+  ]
+}

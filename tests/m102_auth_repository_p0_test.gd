@@ -1,0 +1,18 @@
+extends Node
+func _ready()->void:
+	var auth:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m102_account_auth_contract.json"))
+	assert(auth.providers==["guest","email","google","apple"])
+	var repo:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m102_repository_contract.json"))
+	assert(repo.repositories.has("wallet"))
+	assert(repo.repositories.has("entitlement"))
+	var compat:=CompatibilityGate.local_check()
+	assert(bool(compat.ok))
+	assert(not bool(compat.server_check_performed))
+	var p0:=P0ReplacementQa.data()
+	assert(p0.assets.size()==13)
+	var monster:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m102_monster_animation_acceptance.json"))
+	assert(monster.semantic_aliases.has("death"))
+	var local:=LocalAccountAdapter.new()
+	assert(not local.is_server_verified())
+	assert(local.sign_in("email").error=="live_auth_not_connected")
+	print("M102_AUTH_REPOSITORY_P0_PASS")

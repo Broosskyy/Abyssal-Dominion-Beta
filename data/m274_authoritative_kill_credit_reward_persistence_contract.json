@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "milestone": "M274",
+  "master_concept": "V3.8",
+  "contract": "authoritative_kill_credit_loot_reward_eligibility_encounter_persistence_foundation",
+  "genre_ux_references": [
+    "Seafight",
+    "Battle of Sea"
+  ],
+  "clean_room_rule": "Use readable naval-MMO participation, kill/loot feedback and boss/admiral reward clarity only; do not copy proprietary drop tables, contribution formulas, reward values, names, layouts, assets or mechanics.",
+  "authority": {
+    "client_may": [
+      "render_confirmed_contribution",
+      "render_confirmed_eligibility",
+      "render_reward_pending_or_settled_state",
+      "request_reconnect_recovery"
+    ],
+    "server_owns": [
+      "contribution_ledger",
+      "kill_credit",
+      "group_participation_resolution",
+      "reward_eligibility",
+      "loot_drop_authorization",
+      "reward_authorization",
+      "encounter_persistence",
+      "reconnect_recovery",
+      "eligibility_revision",
+      "settlement_handoff"
+    ],
+    "client_never_commits": [
+      "kill_credit",
+      "contribution",
+      "eligibility",
+      "loot_roll",
+      "loot_drop",
+      "reward_grant",
+      "encounter_credit_restore",
+      "settlement"
+    ]
+  },
+  "eligibility_states": [
+    "UNKNOWN",
+    "TRACKING",
+    "ELIGIBLE",
+    "INELIGIBLE",
+    "LOCKED",
+    "SETTLED",
+    "REVOKED"
+  ],
+  "contribution_dimensions": [
+    "damage",
+    "effective_support",
+    "objective_participation",
+    "encounter_presence",
+    "group_participation"
+  ],
+  "dependencies": {
+    "encounter": "M273 confirms authoritative encounter lifecycle/defeat/completion",
+    "ai": "M272 remains AI intent authority",
+    "target_legality": "M271 remains target/relationship legality boundary",
+    "combat": "M269/M270 produce authoritative combat outcomes used as contribution evidence",
+    "world_transport": "M267 supplies confirmed entity/session continuity",
+    "settlement": "M266 atomically settles authorized loot/rewards/value and receipts"
+  },
+  "environment_isolation": [
+    "INTERNAL",
+    "TEST",
+    "GLOBAL"
+  ],
+  "unset_until_measured": [
+    "minimum_contribution_thresholds",
+    "contribution_weights",
+    "group_share_rules",
+    "kill_credit_tiebreakers",
+    "drop_probabilities",
+    "loot_quantities",
+    "reward_values",
+    "eligibility_grace_window",
+    "disconnect_grace",
+    "persistence_checkpoint_cadence",
+    "recovery_timeout",
+    "anti_farm_windows"
+  ]
+}

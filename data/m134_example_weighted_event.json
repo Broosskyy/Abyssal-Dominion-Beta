@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "config_version": "m134-example-weighted-event",
+  "content": {
+    "records": [
+      {
+        "type": "formation",
+        "id": "FORMATION-STORM-V",
+        "name": "Storm V",
+        "offsets": [
+          [
+            -5,
+            2
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            -2,
+            -2
+          ],
+          [
+            2,
+            -2
+          ]
+        ],
+        "rotation_mode": "face_player",
+        "enabled": false
+      },
+      {
+        "type": "spawn_table",
+        "id": "SPAWN-STORM-001",
+        "name": "Stormtide Weighted Fleet",
+        "entries": [
+          {
+            "content_id": "NPC-EVENT-STORM-001",
+            "kind": "npc",
+            "weight": 5.0,
+            "tags": [
+              "stormtide",
+              "raider"
+            ]
+          },
+          {
+            "content_id": "NPC-EVENT-STORM-ELITE",
+            "kind": "npc",
+            "weight": 1.0,
+            "elite": true,
+            "tags": [
+              "stormtide",
+              "elite"
+            ]
+          },
+          {
+            "content_id": "NPC-ADMIRAL-STORM-001",
+            "kind": "admiral",
+            "weight": 1.0,
+            "tags": [
+              "stormtide",
+              "admiral"
+            ]
+          }
+        ],
+        "slot_count": 4,
+        "respawn_seconds": 3.0,
+        "admiral_kills_required": 8,
+        "admiral_cooldown_seconds": 30.0,
+        "formation_id": "FORMATION-STORM-V",
+        "region_ids": [
+          "crimson_sea"
+        ],
+        "enabled": false
+      },
+      {
+        "type": "quest",
+        "id": "QUEST-STORM-HUNTER",
+        "name": "Storm Hunter",
+        "requirements": {
+          "min_level": 6,
+          "max_level": 10
+        },
+        "objectives": [
+          {
+            "kind": "sink",
+            "target": 5,
+            "content_tags": [
+              "stormtide"
+            ]
+          }
+        ],
+        "rewards": {
+          "gold": 500,
+          "xp": 180
+        },
+        "enabled": false
+      },
+      {
+        "type": "event",
+        "id": "EVENT-STORM-WEIGHTED",
+        "name": "Stormtide Fleet Rotation",
+        "schedule": {},
+        "regions": [
+          "crimson_sea"
+        ],
+        "spawn_table_ids": [
+          "SPAWN-STORM-001"
+        ],
+        "quests": [
+          "QUEST-STORM-HUNTER"
+        ],
+        "multipliers": {
+          "xp": 1.15,
+          "gold": 1.1,
+          "loot": 1.0
+        },
+        "enabled": false
+      }
+    ]
+  }
+}

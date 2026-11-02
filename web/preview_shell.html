@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#071b29">
+  <title>Abyssal Dominion — Preview</title>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#071b29;color:#e4eff4;font:16px system-ui}
+    #canvas{display:block;width:100%;height:100%;outline:0;touch-action:none}
+    body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+    #cover{position:fixed;inset:0;z-index:5;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#071723,#12354a)}
+    .card{max-width:480px;width:100%;padding:28px;border:1px solid #46738a;border-radius:16px;background:#0a2134}
+    h1{font-size:27px;margin:8px 0 14px}p{line-height:1.5;color:#bfd3df}button{font:inherit;min-height:48px;padding:12px 24px;border:0;border-radius:8px;background:#75d4db;color:#071723;font-weight:700;cursor:pointer}button:disabled{opacity:.5}
+    #status{white-space:pre-wrap;overflow-wrap:anywhere}progress{width:100%;margin:16px 0;accent-color:#75d4db}
+    #web-controls{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 4px);left:calc(env(safe-area-inset-left) + 8px);z-index:3}
+    #web-controls button{min-height:32px;font-size:11px;padding:5px 8px;background:#0b263dc9;color:#d1e5ef}
+    #build-label{font-size:11px;opacity:.7} #rotate{position:fixed;bottom:42px;left:10px;z-index:3;font-size:12px;pointer-events:none;display:none}
+    @media(orientation:portrait) and (pointer:coarse){#rotate{display:block}}
+  </style>
+  $GODOT_HEAD_INCLUDE
+</head>
+<body>
+  <canvas id="canvas" tabindex="0" aria-label="Abyssal Dominion Spiel"></canvas>
+  <div id="cover"><section class="card"><small>RECONSTRUCTION LAB · M18</small><h1>Abyssal Dominion</h1><p>Offline-Teststand mit rekonstruierten Unity-Assets. Lokale Profile, noch keine Onlinekonten.</p><p id="status">Tippen oder klicken, um Spiel und Audio zu starten.</p><progress id="progress" value="0" max="1" hidden></progress><button id="start">Spiel starten</button><p id="build-label"></p></section></div>
+  <div id="web-controls"><button id="fullscreen" aria-label="Vollbild umschalten">⛶ Vollbild</button></div>
+  <div id="rotate">Für die Spielansicht bitte ins Querformat drehen.</div>
+  <script src="$GODOT_URL"></script>
+  <script>
+    'use strict';
+    const config = $GODOT_CONFIG;
+    const canvas = document.getElementById('canvas');
+    const status = document.getElementById('status');
+    const start = document.getElementById('start');
+    const progress = document.getElementById('progress');
+    window.__sfPreview = {ready:false, error:null};
+    const engine = new Engine(config);
+    start.addEventListener('click', async () => {
+      start.disabled=true; progress.hidden=false; status.textContent='Spiel wird geladen …';
+      try {
+        await engine.startGame({canvas, onProgress:(current,total)=>{if(total){progress.value=current/total;}},
+          onPrintError:(...args)=>{console.error(...args);}});
+        window.__sfPreview.ready=true;
+        document.getElementById('cover').style.display='none'; canvas.focus();
+      } catch(error) {
+        window.__sfPreview.error=String(error); status.textContent='Start fehlgeschlagen: '+error+'\nWebGL 2 prüfen; auf dem Handy ggf. HTTPS verwenden.';
+        start.textContent='Seite neu laden'; start.disabled=false; start.onclick=()=>location.reload();
+      }
+    }, {once:true});
+    document.getElementById('fullscreen').onclick=async()=>{
+      try {if(document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen();}
+      catch(error){console.warn('Fullscreen unavailable',error);} canvas.focus();
+    };
+    // Preview builds deliberately have no service worker: changes must not be cached.
+    let currentBuild=null;
+    async function pollBuild(){
+      try{
+        const response=await fetch('preview-build.json',{cache:'no-store'});
+        if(!response.ok)return;
+        const build=await response.json();
+        document.getElementById('build-label').textContent=build.milestone+' · Godot '+build.engine+' · '+build.source_sha256.slice(0,12);
+        if(currentBuild && currentBuild!==build.source_sha256)location.reload();
+        currentBuild=build.source_sha256;
+      }catch{}
+    }
+    pollBuild();setInterval(pollBuild,3000);
+  </script>
+</body>
+</html>

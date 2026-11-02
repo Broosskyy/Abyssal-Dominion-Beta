@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "milestone": "M70",
+  "priority": "P0",
+  "title": "PL1-5 World Content Placeholder Wave",
+  "models": [
+    {
+      "slot": "prop_lighthouse_01",
+      "recommended_tool": "Rodin/Meshy or manual GLB",
+      "purpose": "P0 Haven's Reach / coast landmark",
+      "acceptance": [
+        "mobile oblique readability",
+        "meters/+Y",
+        "no gameplay scripts",
+        "no embedded camera",
+        "stable pivot",
+        "reasonable mobile material count"
+      ]
+    },
+    {
+      "slot": "prop_dock_wood_01",
+      "recommended_tool": "Rodin/Meshy or manual GLB",
+      "purpose": "P0 harbor modular dock",
+      "acceptance": [
+        "mobile oblique readability",
+        "meters/+Y",
+        "no gameplay scripts",
+        "no embedded camera",
+        "stable pivot",
+        "reasonable mobile material count"
+      ]
+    },
+    {
+      "slot": "prop_warehouse_01",
+      "recommended_tool": "Rodin/Meshy or manual GLB",
+      "purpose": "P0 harbor architecture",
+      "acceptance": [
+        "mobile oblique readability",
+        "meters/+Y",
+        "no gameplay scripts",
+        "no embedded camera",
+        "stable pivot",
+        "reasonable mobile material count"
+      ]
+    },
+    {
+      "slot": "prop_market_stall_01",
+      "recommended_tool": "Rodin/Meshy or manual GLB",
+      "purpose": "P0 harbor service dressing",
+      "acceptance": [
+        "mobile oblique readability",
+        "meters/+Y",
+        "no gameplay scripts",
+        "no embedded camera",
+        "stable pivot",
+        "reasonable mobile material count"
+      ]
+    },
+    {
+      "slot": "prop_quest_board_01",
+      "recommended_tool": "Rodin/Meshy or manual GLB",
+      "purpose": "P0 quest interaction dressing",
+      "acceptance": [
+        "mobile oblique readability",
+        "meters/+Y",
+        "no gameplay scripts",
+        "no embedded camera",
+        "stable pivot",
+        "reasonable mobile material count"
+      ]
+    },
+    {
+      "slot": "nature_palm_cluster_01",
+      "recommended_tool": "Rodin/Meshy or manual GLB",
+      "purpose": "P0 tropical island nature",
+      "acceptance": [
+        "mobile oblique readability",
+        "meters/+Y",
+        "no gameplay scripts",
+        "no embedded camera",
+        "stable pivot",
+        "reasonable mobile material count"
+      ]
+    },
+    {
+      "slot": "nature_rock_cluster_01",
+      "recommended_tool": "Rodin/Meshy or manual GLB",
+      "purpose": "P0 island/coast nature",
+      "acceptance": [
+        "mobile oblique readability",
+        "meters/+Y",
+        "no gameplay scripts",
+        "no embedded camera",
+        "stable pivot",
+        "reasonable mobile material count"
+      ]
+    },
+    {
+      "slot": "prop_wreck_small_01",
+      "recommended_tool": "Rodin/Meshy or manual GLB",
+      "purpose": "P0 sea-map exploration dressing",
+      "acceptance": [
+        "mobile oblique readability",
+        "meters/+Y",
+        "no gameplay scripts",
+        "no embedded camera",
+        "stable pivot",
+        "reasonable mobile material count"
+      ]
+    },
+    {
+      "slot": "prop_buoy_navigation_01",
+      "recommended_tool": "Rodin/Meshy or manual GLB",
+      "purpose": "P0 navigation dressing",
+      "acceptance": [
+        "mobile oblique readability",
+        "meters/+Y",
+        "no gameplay scripts",
+        "no embedded camera",
+        "stable pivot",
+        "reasonable mobile material count"
+      ]
+    },
+    {
+      "slot": "prop_crate_stack_01",
+      "recommended_tool": "Rodin/Meshy or manual GLB",
+      "purpose": "P0 harbor/loot dressing",
+      "acceptance": [
+        "mobile oblique readability",
+        "meters/+Y",
+        "no gameplay scripts",
+        "no embedded camera",
+        "stable pivot",
+        "reasonable mobile material count"
+      ]
+    }
+  ],
+  "rule": "These are replaceable content slots, not ten mandatory unique gameplay systems. Reuse/instancing is preferred."
+}

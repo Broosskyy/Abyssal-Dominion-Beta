@@ -1,0 +1,251 @@
+[
+  {
+    "game_object": "Cannons_Left_Side_lod3",
+    "mesh_path_id": 1170,
+    "mesh": "Cannons_Left_Side_lod3",
+    "materials": [
+      {
+        "source": "sharedassets1.assets",
+        "path_id": 344,
+        "name": "Clipper_details",
+        "textures": [
+          {
+            "property": "_BumpMap",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 620
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 524
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "Sails_off_Level2_Lod3",
+    "mesh_path_id": 1174,
+    "mesh": "Sails_off_Level2_Lod3",
+    "materials": [
+      {
+        "source": "sharedassets1.assets",
+        "path_id": 447,
+        "name": "Clipper_sails",
+        "textures": [
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 847
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "Sails_Level2_Lod2-4",
+    "mesh_path_id": 956,
+    "mesh": "Sails_Level2_Lod2-4",
+    "materials": [
+      {
+        "source": "sharedassets1.assets",
+        "path_id": 347,
+        "name": "Clipper_sails_purple",
+        "textures": [
+          {
+            "property": "_BumpMap",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 697
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 847
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "Flags_Level2_Lod2-4",
+    "mesh_path_id": 1181,
+    "mesh": "Flags_Level2_Lod2-4",
+    "materials": [
+      {
+        "source": "sharedassets1.assets",
+        "path_id": 347,
+        "name": "Clipper_sails_purple",
+        "textures": [
+          {
+            "property": "_BumpMap",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 697
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 847
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "barquito",
+    "mesh_path_id": 945,
+    "mesh": "Clipper_Leve2_Lod3",
+    "materials": [
+      {
+        "source": "sharedassets1.assets",
+        "path_id": 345,
+        "name": "Clipper_main",
+        "textures": [
+          {
+            "property": "_BumpMap",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 464
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 653
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "game_object": "Deteils_Level2_Lod3",
+    "mesh_path_id": 944,
+    "mesh": "Deteils_Level2_Lod3",
+    "materials": [
+      {
+        "source": "sharedassets1.assets",
+        "path_id": 344,
+        "name": "Clipper_details",
+        "textures": [
+          {
+            "property": "_BumpMap",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 620
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "property": "_MainTex",
+            "texture": {
+              "m_FileID": 0,
+              "m_PathID": 524
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "offset": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "milestone": "M65",
+  "title": "Ship Material / Texture Memory Heuristic",
+  "estimation": {
+    "rgba8_uncompressed_bytes": "width*height*4",
+    "mip_chain_multiplier": 1.333,
+    "warning": "Runtime VRAM depends on import compression/platform; estimates are diagnostics, not profiler measurements."
+  },
+  "budgets": {
+    "starter_ship_recommended_unique_2k_equivalents": 2,
+    "npc_ship_recommended_unique_2k_equivalents": 1,
+    "prefer_shared_materials": true,
+    "prefer_1k_for_small_secondary_maps": true
+  },
+  "mobile_note": "Godot VRAM compression/mipmaps should be verified after real import and on-device profiling."
+}

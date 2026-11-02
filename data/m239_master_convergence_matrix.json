@@ -1,0 +1,1194 @@
+{
+  "schema": 1,
+  "milestone": "M301",
+  "master_concept": "V3.8",
+  "audit_type": "MASTER_CONVERGENCE_RUNTIME_HARDENING",
+  "status_scale": [
+    "IMPLEMENTED",
+    "PARTIAL",
+    "FOUNDATION",
+    "MISSING"
+  ],
+  "scope_note": "Game-source/client audit. Server, payment, production backend and native-device behavior are never counted as implemented unless executable source/runtime evidence exists in this package.",
+  "priority_rule": "Close canonical gameplay/runtime gaps before adding more depth to already-strong Events/Seasons.",
+  "domains": [
+    {
+      "domain": "camera_world_navigation",
+      "status": "IMPLEMENTED",
+      "evidence": [
+        "scripts/gameplay/player_input.gd",
+        "scripts/world/world_map_system.gd",
+        "scripts/ui/game_hud.gd"
+      ],
+      "remaining": [
+        "native visual/device QA",
+        "final authored world art"
+      ]
+    },
+    {
+      "domain": "combat_targeting_core",
+      "status": "IMPLEMENTED",
+      "evidence": [
+        "scripts/gameplay/ship_weapons.gd",
+        "scripts/combat/targeting_system.gd",
+        "scripts/gameplay/cannon_projectile.gd"
+      ],
+      "remaining": [
+        "server authority",
+        "native combat-feel QA"
+      ],
+      "m239_fix": "Enemy firing is no longer gated by broadside/facing alignment; facing remains presentation/steering only."
+    },
+    {
+      "domain": "cannons_harpoons_ammunition",
+      "status": "PARTIAL",
+      "evidence": [
+        "scripts/combat/m158_cannon_runtime.gd",
+        "scripts/gameplay/ship_weapons.gd",
+        "scripts/progression/player_inventory.gd"
+      ],
+      "remaining": [
+        "full canonical family/balance validation",
+        "final authored weapon art",
+        "server validation"
+      ]
+    },
+    {
+      "domain": "sustain_support",
+      "status": "PARTIAL",
+      "evidence": [
+        "scripts/gameplay/combat_support_contracts.gd",
+        "scripts/gameplay/support_payload_catalog.gd",
+        "scripts/gameplay/ship_health.gd",
+        "scripts/gameplay/support_contribution_telemetry.gd"
+      ],
+      "remaining": [
+        "repair-master progression closure",
+        "shield-master progression closure",
+        "healing-cannon full loop",
+        "PvP support modifiers"
+      ]
+    },
+    {
+      "domain": "ship_progression_decks_equipment",
+      "status": "PARTIAL",
+      "evidence": [
+        "scripts/progression/player_ship_roster.gd",
+        "scripts/progression/player_progression.gd",
+        "scripts/ui/shipyard_panel.gd",
+        "scripts/ui/m206_deck_equipment_presentation_catalog.gd"
+      ],
+      "remaining": [
+        "final authored ship/deck equipment assets",
+        "full progression/economy QA"
+      ]
+    },
+    {
+      "domain": "talents_builds",
+      "status": "PARTIAL",
+      "evidence": [
+        "scripts/progression/player_progression.gd",
+        "scripts/ui/m160_progression_hub.gd",
+        "scripts/meta/m162_system_catalog.gd"
+      ],
+      "remaining": [
+        "complete V3.8 specialization coverage",
+        "respec/economy/server authority QA"
+      ]
+    },
+    {
+      "domain": "crew_officers",
+      "status": "PARTIAL",
+      "evidence": [
+        "scripts/progression/m241_crew_officer_runtime.gd",
+        "data/m241_crew_officer_contract.json",
+        "scripts/ui/command_deck.gd",
+        "scripts/gameplay/m240_sustain_support_runtime.gd",
+        "scripts/progression/m242_officer_progression_runtime.gd",
+        "data/m242_officer_progression_contract.json"
+      ],
+      "remaining": [
+        "final balanced Officer XP thresholds/costs/modifier values",
+        "authored officer portraits/icons",
+        "connected server ownership/progression/acquisition service"
+      ],
+      "m241_fix": "Repair Master and Shield Master are now actual assigned officer contracts instead of isolated sustain tier values; roster/slots persist and migrate legacy M240 saves."
+    },
+    {
+      "domain": "wanted_bounty",
+      "status": "FOUNDATION",
+      "evidence": [
+        "data/m243_wanted_bounty_contract.json",
+        "scripts/progression/m243_wanted_bounty_runtime.gd",
+        "scripts/ui/m243_wanted_bounty_catalog.gd"
+      ],
+      "remaining": [
+        "connected PvP/honor service",
+        "qualified kill settlement",
+        "server anti-farm telemetry/verdicts",
+        "balanced thresholds/rewards",
+        "world target integration for live player hunts"
+      ],
+      "m243_fix": "Wanted/Bounty now has an authority-safe read-only runtime/UI foundation; client cannot mutate Wanted, Honor, anti-farm verdicts or rewards."
+    },
+    {
+      "domain": "crafting_salvage",
+      "status": "PARTIAL",
+      "evidence": [
+        "data/m165_runtime_effects_crafting_guild.json",
+        "data/m244_crafting_salvage_contract.json",
+        "scripts/progression/player_inventory.gd",
+        "scripts/progression/m244_crafting_salvage_catalog.gd",
+        "scripts/ui/m160_progression_hub.gd"
+      ],
+      "remaining": [
+        "connected server-authoritative idempotent transaction service",
+        "final recipe/access/balance pass",
+        "bound/special item-specific salvage definitions",
+        "economy and native interaction QA"
+      ],
+      "m244_fix": "Craft actions now use local atomic preflight/rollback; owned unequipped regional modules have a data-driven partial-material salvage loop with capacity checks and no gold refund/dupe path."
+    },
+    {
+      "domain": "bazaar_player_trading",
+      "status": "PARTIAL",
+      "evidence": [
+        "data/m247_bazaar_trading_contract.json",
+        "scripts/progression/m247_bazaar_trading_runtime.gd",
+        "scripts/ui/m247_bazaar_trading_catalog.gd",
+        "scripts/ui/command_deck.gd"
+      ],
+      "remaining": [
+        "connected server-authoritative listing/escrow/transaction service",
+        "live price history and search backend",
+        "final listing limits/fees after economy telemetry",
+        "native marketplace UX and abuse QA"
+      ],
+      "m247_fix": "Player Bazaar now has a V3.8 binding/listing/fee/anti-manipulation contract, monotonic server replica, cached presentation state and dedicated read-only Command Deck surface; client cannot create/cancel/buy live listings or move value."
+    },
+    {
+      "domain": "compass_cauldron_special_pve",
+      "status": "PARTIAL",
+      "evidence": [
+        "scripts/world/bonusmap_wave_director.gd",
+        "scripts/world/bonusmap_instance_router.gd",
+        "data/m245_special_pve_oracle_contract.json",
+        "scripts/progression/m245_special_pve_oracle_runtime.gd",
+        "scripts/ui/m245_special_pve_oracle_catalog.gd"
+      ],
+      "remaining": [
+        "connected server-side Tide Essence ledger/reward resolver",
+        "final lore name and authored Oracle UI/assets",
+        "final pity thresholds/reward quantities/probability disclosures",
+        "Abyss Rift/Secret Route depth and native Special-PvE QA"
+      ],
+      "m245_fix": "Existing Bonusmap runtime is now joined by a read-only server-authoritative Oracle/Compass-successor replica, transparent reward-pool category presentation, pity/resource authority boundaries and persistence-safe cached snapshot."
+    },
+    {
+      "domain": "achievements_collections",
+      "status": "PARTIAL",
+      "evidence": [
+        "data/m246_achievements_collections_contract.json",
+        "scripts/progression/m246_achievement_collection_runtime.gd",
+        "scripts/ui/m246_achievement_collection_catalog.gd",
+        "scripts/ui/command_deck.gd"
+      ],
+      "remaining": [
+        "connected server progression/claim service",
+        "full authored achievement/collection definitions",
+        "Captain profile showcase integration",
+        "final reward thresholds/quantities and native UX QA"
+      ],
+      "m246_fix": "Achievements/Collections now have a monotonic server-authoritative read-only replica, persistent cached state, dedicated Command Deck surface, canonical categories/collections and explicit claim/receipt boundary."
+    },
+    {
+      "domain": "pvp_honor_ranked",
+      "status": "PARTIAL",
+      "evidence": [
+        "data/m249_pvp_honor_ranked_contract.json",
+        "scripts/progression/m249_pvp_honor_ranked_runtime.gd",
+        "scripts/ui/m249_pvp_honor_ranked_catalog.gd",
+        "scripts/ui/command_deck.gd",
+        "scripts/ui/nautical_hud.gd",
+        "data/m243_wanted_bounty_contract.json"
+      ],
+      "remaining": [
+        "connected realtime PvP zone/flag service",
+        "server combat-timer and protection enforcement",
+        "live Honor settlement and anti-farm telemetry",
+        "ranked matchmaking/MMR/match-result service",
+        "final competitive modifiers/divisions/rewards after telemetry",
+        "native PvP/Ranked interaction and network QA"
+      ],
+      "m249_fix": "PvP/Honor/Ranked now has a V3.8 authority-safe monotonic server replica, explicit zone/protection/combat-timer visibility, Honor/Ranked read-only Command Deck presentation and server-only HUD danger chips; no client competitive settlement authority."
+    },
+    {
+      "domain": "guilds_guild_islands",
+      "status": "PARTIAL",
+      "evidence": [
+        "server/halloween_guild_domain.py",
+        "data/m301_halloween_guild_server_config.json",
+        "scripts/guild/guild_contracts.gd",
+        "scripts/guild/guild_island_composer.gd",
+        "scripts/guild/guild_island_interaction.gd",
+        "data/m250_guild_governance_contract.json",
+        "scripts/progression/m250_guild_governance_runtime.gd",
+        "scripts/ui/m250_guild_governance_catalog.gd",
+        "scripts/ui/command_deck.gd"
+      ],
+      "remaining": [
+        "connected authoritative guild membership/permission service",
+        "atomic treasury/vault ledger service",
+        "live war/siege/diplomacy/alliance service",
+        "guild progression/rating settlement",
+        "native guild-island/social QA"
+      ],
+      "m250_fix": "V3.8 guild governance now has a monotonic read-only server replica for membership/roles, treasury/vault, diplomacy/alliance and war state; Command Deck no longer relies only on generic locked placeholders.",
+      "m300_fix": "Five separate guild tower preview roles gain enemy/war warning beacons with no firing or damage authority; repeated local relation changes and sector rebuilds no longer leave duplicate visual layers or silently drop the selected admin preview. Live siege remains server-dependent.",
+      "m301_fix": "Independent SQLite server domain now resolves war-gated target selection, tower HP/attacks/reload and player tower hits; Godot preview is not a replica of this server until authenticated gateway/M267/M269 integration."
+    },
+    {
+      "domain": "social_groups_chat_mail",
+      "status": "PARTIAL",
+      "evidence": [
+        "data/m248_social_friends_groups_chat_contract.json",
+        "scripts/progression/m248_social_runtime.gd",
+        "scripts/ui/m248_social_catalog.gd",
+        "scripts/ui/command_deck.gd",
+        "data/m254_mail_notifications_contract.json",
+        "scripts/online/m254_mail_notification_runtime.gd",
+        "scripts/ui/m254_mail_notification_catalog.gd"
+      ],
+      "remaining": [
+        "connected server-authoritative friends/presence service",
+        "live group/fleet membership and realtime target-ping transport",
+        "live chat delivery/rate-limit/moderation service",
+        "native social/privacy/moderation QA",
+        "connected server mail/notification delivery service",
+        "idempotent live claim/compensation settlement",
+        "native inbox/push/rejoin communication QA"
+      ],
+      "m248_fix": "V3.8 Friends, small Fleet Groups, Chat channels, public Profile/Inspect and Block/Mute/Report safety now have an authority-safe monotonic server replica and dedicated read-only Command Deck surface; live mutations/delivery/contribution remain server-owned.",
+      "m254_fix": "Mail/Notifications/Claims now have a monotonic server-only replica, idempotent claim contract and read-only Command Deck presentation; local mode fabricates no inbox, claimable rewards or system notices."
+    },
+    {
+      "domain": "events_world_events",
+      "status": "IMPLEMENTED",
+      "evidence": [
+        "server/halloween_guild_domain.py",
+        "data/m301_halloween_guild_server_config.json",
+        "scripts/events/event_runtime.gd",
+        "scripts/events/halloween_event_world.gd",
+        "data/m300_guild_halloween_closure_contract.json",
+        "scripts/ui/m232_world_event_awareness_catalog.gd",
+        "scripts/ui/m238_season_progression_catalog.gd"
+      ],
+      "remaining": [
+        "real backend transport",
+        "live event content",
+        "native UX QA"
+      ],
+      "m300_fix": "Halloween decorations are removed synchronously before rebuilding or deactivation and only current-sector Guild Islands receive them; event combat and rewards remain a local prototype, not a live scheduled server event.",
+      "m301_fix": "SQLite server domain supplies time-windowed Halloween combat, collectible/wreck validation, pumpkin event-NPC bonus, contribution leaderboard and pending design/last-hit reward intents. Godot has visible separate preview slots; no connected auth/transport, live event, durable settlement or native acceptance yet."
+    },
+    {
+      "domain": "seasons_event_history",
+      "status": "PARTIAL",
+      "evidence": [
+        "scripts/events/event_runtime.gd",
+        "scripts/ui/m238_season_progression_catalog.gd"
+      ],
+      "remaining": [
+        "real server snapshots",
+        "season history/settlement production services",
+        "ranked-season integration"
+      ]
+    },
+    {
+      "domain": "companions",
+      "status": "PARTIAL",
+      "evidence": [
+        "scripts/meta/companion_runtime.gd",
+        "scripts/meta/companion_catalog.gd",
+        "scripts/progression/m251_meta_progression_runtime.gd",
+        "scripts/ui/m251_meta_progression_catalog.gd"
+      ],
+      "remaining": [
+        "connected ownership/XP/acquisition service",
+        "authored progression/acquisition definitions",
+        "final model/portrait/animation/audio assets",
+        "native UX QA"
+      ],
+      "m251_fix": "Added monotonic server replica for ownership/progression/loadout while preserving M152 visual preview as non-authoritative presentation only."
+    },
+    {
+      "domain": "artifacts",
+      "status": "PARTIAL",
+      "evidence": [
+        "scripts/meta/artifact_catalog.gd",
+        "scripts/meta/artifact_loadout.gd",
+        "scripts/progression/m251_meta_progression_runtime.gd",
+        "scripts/ui/m251_meta_progression_catalog.gd"
+      ],
+      "remaining": [
+        "connected inventory/progression service",
+        "authored progression/set/acquisition content",
+        "final artifact hero/world assets",
+        "balance/native QA"
+      ],
+      "m251_fix": "Added server-replica boundary for ownership/mastery/resonance/loadout plus V3.8 effect/set/progression admin schema without new final balance."
+    },
+    {
+      "domain": "afk_rewards",
+      "status": "PARTIAL",
+      "evidence": [
+        "scripts/meta/afk_reward_service.gd",
+        "scripts/meta/afk_reward_catalog.gd",
+        "scripts/progression/m251_meta_progression_runtime.gd",
+        "scripts/ui/m251_meta_progression_catalog.gd"
+      ],
+      "remaining": [
+        "trusted server session timestamps",
+        "production reward resolver/ledger",
+        "idempotent connected claim receipts",
+        "telemetry-calibrated final caps/rates",
+        "native return-flow QA"
+      ],
+      "m251_fix": "Client-facing M251 flow no longer exposes a normal local reward claim; authoritative offline time/reward/receipt state is server-replica only."
+    },
+    {
+      "domain": "online_auth_persistence_transport",
+      "status": "FOUNDATION",
+      "evidence": [
+        "data/m252_online_readiness_contract.json",
+        "scripts/online/m252_online_readiness_runtime.gd",
+        "scripts/online/service_locator.gd",
+        "scripts/online/auth_gateway.gd",
+        "scripts/online/repository_gateway.gd",
+        "scripts/online/transport_gateway.gd",
+        "scripts/ui/m252_online_readiness_catalog.gd",
+        "scripts/ui/command_deck.gd",
+        "data/m253_world_session_reconnect_contract.json",
+        "scripts/online/m253_world_session_runtime.gd",
+        "scripts/ui/m253_world_session_catalog.gd",
+        "scripts/ui/nautical_hud.gd",
+        "data/m267_authoritative_world_transport_contract.json",
+        "scripts/online/m267_authoritative_world_transport_runtime.gd",
+        "scripts/ui/m267_authoritative_world_transport_catalog.gd"
+      ],
+      "remaining": [
+        "real auth provider",
+        "persistent remote repository",
+        "verified remote network transport",
+        "authoritative world/zone server",
+        "live presence and map join/transfer service",
+        "server-issued reconnect/resume flow",
+        "native multiplayer/network QA and latency/load testing"
+      ],
+      "m239_hardening": "Gateways now expose explicit unavailable/foundation capability reports so UI/dev tooling cannot mistake stubs for production services.",
+      "m252_fix": "Online readiness is now explicitly fail-closed across auth, repository, transport, trusted time and environment isolation; ServiceLocator exposes capability matrices and Command Deck presents production gaps without fabricating a connected backend.",
+      "m253_fix": "Realtime world/session readiness now adds a monotonic server replica for session/map-instance-channel identity, published presence and reconnect/resume continuity; transient HUD reconnect feedback is server-snapshot-only and stale client state cannot settle authority.",
+      "m267_fix": "World transport now defines server-owned baseline/delta replication with stable entity identity, monotonic tick/revision/sequence guards and fail-closed join/transfer/resync continuity; client remains replica-only."
+    },
+    {
+      "domain": "admin_liveops_no_code",
+      "status": "PARTIAL",
+      "evidence": [
+        "scripts/admin/admin_mode_runtime.gd",
+        "data/admin_content_type_registry.json",
+        "data/m161_no_code_authoring_matrix.json"
+      ],
+      "remaining": [
+        "production backend",
+        "granular remote RBAC enforcement",
+        "publish/review/rollback service",
+        "audit persistence"
+      ]
+    },
+    {
+      "domain": "payments_commerce",
+      "status": "PARTIAL",
+      "evidence": [
+        "M255 Payment/Commerce contract",
+        "M255 PaymentCommerce runtime",
+        "Command Deck Shop payment/entitlement cards",
+        "server catalog/receipt/entitlement boundary",
+        "admin commerce content types"
+      ],
+      "remaining": [
+        "real Google Play/App Store/Web payment provider adapters",
+        "production receipt verification service",
+        "persistent purchase/entitlement ledger",
+        "premium-wallet integration",
+        "refund/chargeback/dispute processing",
+        "native store/device QA and legal/platform review"
+      ],
+      "m255_fix": [
+        "client purchase intent only",
+        "server/provider price authority",
+        "idempotent receipt/transaction boundary",
+        "GLOBAL/TEST commerce isolation",
+        "no client entitlement or premium-wallet authority"
+      ]
+    },
+    {
+      "domain": "telemetry_observability",
+      "status": "PARTIAL",
+      "evidence": [
+        "M256 telemetry/observability contract",
+        "M256 privacy-safe diagnostics/server replica",
+        "Command Deck system-status telemetry cards",
+        "versioned event/privacy/environment boundaries",
+        "existing support contribution telemetry",
+        "M260 capacity/performance result integration boundary",
+        "M261 privacy-scrubbed crash/client-health diagnostic intent and QA replica"
+      ],
+      "remaining": [
+        "production event ingestion pipeline",
+        "analytics warehouse/aggregation jobs",
+        "real operations dashboards and alert routing",
+        "server retention/consent enforcement",
+        "load/soak/chaos telemetry and native device QA",
+        "production crash-reporting provider delivery/aggregation"
+      ],
+      "m256_fix": [
+        "stable versioned event contract",
+        "sensitive telemetry payload filtering",
+        "LOCAL diagnostics explicitly non-authoritative",
+        "GLOBAL/TEST analytics isolation",
+        "server-only KPI/alert state",
+        "no analytics-driven client reward/balance/payment/moderation authority"
+      ]
+    },
+    {
+      "domain": "release_operations",
+      "status": "PARTIAL",
+      "evidence": [
+        "existing release_identity/config/channel foundations",
+        "M257 release operations contract",
+        "M257 read-only release/incident/feature-flag runtime",
+        "Command Deck release/system-status cards",
+        "fail-closed minimum-version and deployment authority boundary"
+      ],
+      "remaining": [
+        "real CI/CD promotion pipeline",
+        "signed remote feature-config service",
+        "production minimum-version service",
+        "status/incident backend integration",
+        "automated canary and rollback orchestration",
+        "native platform update-flow QA",
+        "integration with production backup/restore readiness service"
+      ],
+      "m257_fix": [
+        "explicit LOCAL/INTERNAL/TEST/GLOBAL release-state boundary",
+        "server-controlled minimum-version/update-required state",
+        "environment-scoped feature flags with safe defaults",
+        "server-published maintenance/incident state",
+        "client cannot deploy/promote/rollback/resolve incidents",
+        "launch-readiness dependencies remain visibly incomplete"
+      ]
+    },
+    {
+      "domain": "final_authored_visuals",
+      "status": "FOUNDATION",
+      "evidence": [
+        "assets/production/README.md",
+        "data/m210_authored_asset_intake_manifest.json"
+      ],
+      "remaining": [
+        "replace production placeholders",
+        "native import/LOD/material QA",
+        "final UI/world art pass"
+      ]
+    },
+    {
+      "domain": "backup_restore_disaster_recovery",
+      "status": "PARTIAL",
+      "evidence": [
+        "M258 backup/disaster-recovery contract",
+        "M258 read-only Operations recovery runtime",
+        "Command Deck backup/PITR/DR readiness cards",
+        "explicit account/economy recovery authority boundary"
+      ],
+      "remaining": [
+        "production automated backup jobs",
+        "encrypted backup storage and access-control integration",
+        "real PITR datastore integration",
+        "scheduled isolated restore drills",
+        "measured RPO/RTO validation",
+        "disaster-recovery failover/restart drills",
+        "validated account/economy compensation tooling"
+      ],
+      "m258_fix": [
+        "critical data classes explicitly covered",
+        "backup existence is not treated as restore proof",
+        "PITR/restore stays Operations-only",
+        "TEST/GLOBAL recovery state remains isolated",
+        "account/economy recovery requires validated tooling, ledger/compensation and audit"
+      ]
+    },
+    {
+      "domain": "security_secrets_anti_abuse",
+      "status": "PARTIAL",
+      "evidence": [
+        "M259 security/secrets/anti-abuse contract",
+        "M259 read-only Security Operations runtime",
+        "Command Deck security posture cards",
+        "environment-scoped secret and RBAC boundary"
+      ],
+      "remaining": [
+        "production secret-management provider",
+        "real auth rate-limit/brute-force enforcement",
+        "production RBAC/permission service",
+        "privileged-admin MFA enforcement",
+        "central anti-abuse/risk correlation service",
+        "security alert/case workflow and evidence review",
+        "penetration/security review and native end-to-end QA"
+      ],
+      "m259_fix": [
+        "LOCAL/TEST/GLOBAL secret material is explicitly separated",
+        "client never receives/rotates/revokes production secret material",
+        "least-privilege RBAC and sensitive-action audit boundaries are explicit",
+        "anti-abuse decisions remain server-authoritative and client signals are not proof",
+        "TEST may relax rules without opening GLOBAL authority",
+        "no final rate-limit, lockout or risk thresholds invented"
+      ]
+    },
+    {
+      "domain": "capacity_load_performance_operations",
+      "status": "PARTIAL",
+      "evidence": [
+        "M260 capacity/performance contract",
+        "M260 read-only capacity/performance runtime",
+        "M260 Command Deck capacity/load/soak/chaos cards",
+        "M260 admin capacity/test/performance definitions"
+      ],
+      "remaining": [
+        "production distributed load-test harness",
+        "measured CCU/map-instance/combat/database capacity limits",
+        "long-duration soak campaigns",
+        "controlled dependency-failure/chaos orchestration",
+        "native Android/iOS/Web/Desktop performance and thermal/memory profiling",
+        "autoscaling validation and large GLOBAL event capacity drills"
+      ],
+      "m260_fix": "Capacity planning and resilience testing now have explicit measured dimensions, versioned environment-bound test results, fail-closed client presentation and Operations/QA-only scale/chaos authority without inventing final limits or platform-divergent gameplay."
+    },
+    {
+      "domain": "crash_client_health_device_network_qa",
+      "status": "PARTIAL",
+      "evidence": [
+        "M261 crash/client-health/QA contract",
+        "M261 read-only QA/Operations runtime",
+        "M261 Command Deck crash/device/network/test-matrix cards",
+        "privacy-scrubbed diagnostic intent boundary"
+      ],
+      "remaining": [
+        "production crash-reporting provider integration",
+        "real Android/iOS/Web/Desktop device-lab coverage",
+        "measured FPS/frame-time/RAM/VRAM/thermal/battery budgets",
+        "long-session and asset-streaming campaigns",
+        "real mobile bandwidth/jitter/packet-loss/latency matrix",
+        "background/resume/reconnect native QA",
+        "defined critical-release minimum coverage and automated QA evidence ingestion"
+      ],
+      "m261_fix": "Crash diagnostics, client health, network profiles and release test-matrix evidence now have a privacy-filtered, environment/build-bound, Operations/QA-authoritative boundary; LOCAL cannot fabricate provider delivery, device passes or release coverage."
+    },
+    {
+      "domain": "launch_readiness_release_candidate_verification",
+      "status": "PARTIAL",
+      "evidence": [
+        "M262 launch-readiness gate contract",
+        "M262 read-only Release Operations runtime",
+        "M262 Command Deck RC/gate/blocker cards",
+        "cross-domain evidence and promotion-authority boundary"
+      ],
+      "remaining": [
+        "production CI/CD evidence ingestion",
+        "real cross-domain automated release gates",
+        "defined critical-release acceptance thresholds",
+        "privileged audited waiver workflow",
+        "native device/network/store/backend RC verification",
+        "signed GLOBAL promotion decision and rollback drill evidence"
+      ],
+      "m262_fix": "Launch readiness now aggregates evidence-bound cross-domain gate state without treating missing evidence as PASS; LOCAL cannot claim production readiness, TEST/GLOBAL evidence stays isolated, and build promotion/blocker override/waivers remain Operations/pipeline-authoritative."
+    },
+    {
+      "domain": "online_alpha_end_to_end_server_contract",
+      "status": "PARTIAL",
+      "evidence": [
+        "M263 Online Alpha E2E contract",
+        "M263 read-only Online Alpha runtime",
+        "M263 Command Deck end-to-end flow cards",
+        "server-only auth/session/world/movement/combat/persistence/reconnect/leave boundary"
+      ],
+      "remaining": [
+        "production authentication/account backend",
+        "persistent repository/database integration",
+        "realtime transport and authoritative world server",
+        "server-resolved movement/combat pipeline",
+        "durable ownership/progression persistence",
+        "real reconnect/resume reservation and world resync",
+        "native end-to-end Online Alpha tests with limited users"
+      ],
+      "m263_fix": "Online Alpha now has one fail-closed end-to-end contract from login through clean leave; LOCAL emits intents only and cannot fabricate authentication, session, movement/combat resolution, persistence, rejoin or Alpha-pass evidence."
+    },
+    {
+      "domain": "auth_account_persistent_repository_integration",
+      "status": "PARTIAL",
+      "evidence": [
+        "M264 Auth/Account/Repository contract",
+        "M264 verified identity/repository runtime",
+        "M264 Command Deck identity/repository/conflict cards",
+        "immutable identity and revision/idempotency authority boundary"
+      ],
+      "remaining": [
+        "production auth provider adapters",
+        "account identity and linking backend",
+        "persistent database/repository implementation",
+        "session token issuance/refresh service",
+        "server transaction/idempotency implementation",
+        "profile schema migration service",
+        "native provider/account recovery/persistence QA"
+      ],
+      "m264_fix": "Auth, verified Account identity and persistent Repository now share one fail-closed integration boundary: LOCAL cannot promote itself to a live identity, server IDs remain immutable, repository requests are revision-bound/idempotency-ready, and TEST/GLOBAL stay isolated."
+    },
+    {
+      "domain": "authoritative_player_profile_ownership_persistence",
+      "status": "PARTIAL",
+      "evidence": [
+        "M265 player-profile/ownership contract",
+        "M265 server-authoritative profile/ownership runtime",
+        "M265 Command Deck profile/ownership/loadout/progression cards",
+        "immutable identity + owned-instance/loadout integrity boundary"
+      ],
+      "remaining": [
+        "production player-profile repository",
+        "durable ownership ledger and instance storage",
+        "wallet/economy transaction backend",
+        "inventory/equipment persistence implementation",
+        "progression/quest/unlock persistence implementation",
+        "profile schema migration/repair service",
+        "native multi-device/crossplay persistence QA"
+      ],
+      "m265_fix": "Account/Captain identity, durable ownership, loadout references, wallet and progression now converge behind one revision-bound server snapshot; LOCAL cannot mint ownership, set wallet/progression, equip unowned instances or transfer TEST ownership to GLOBAL."
+    },
+    {
+      "domain": "economy_inventory_atomic_transactions",
+      "status": "PARTIAL",
+      "evidence": [
+        "M266 economy/inventory transaction contract",
+        "M266 atomic/idempotent server transaction runtime",
+        "M266 Command Deck wallet/inventory/transaction cards",
+        "shared revision/idempotency/lock/receipt boundary across loot/shop/crafting/salvage/bazaar"
+      ],
+      "remaining": [
+        "production atomic transaction service",
+        "durable wallet/economy ledger",
+        "durable inventory/ownership mutation repository",
+        "server-side loot/shop/crafting/salvage settlement",
+        "bazaar escrow and transfer backend",
+        "distributed transaction/lock conflict handling",
+        "native concurrency/double-spend/dupe QA"
+      ],
+      "m266_fix": "Wallet, Inventory, Loot, Shop, Crafting, Salvage, Bazaar and equipment mutations now converge behind one atomic/idempotent server transaction boundary with revision guards, server-owned locks and receipts; LOCAL cannot mint, destroy, transfer or settle durable value."
+    },
+    {
+      "domain": "authoritative_world_transport_snapshot_protocol",
+      "status": "PARTIAL",
+      "evidence": [
+        "M267 authoritative world transport contract",
+        "M267 full baseline + ordered delta replica runtime",
+        "M267 Command Deck transport/entity/resync cards",
+        "stable network entity ID + spawn-generation lifecycle guards"
+      ],
+      "remaining": [
+        "production realtime transport backend",
+        "authoritative world/zone server",
+        "production interest/relevancy management",
+        "server join/rejoin/zone-transfer orchestration",
+        "server movement/combat reconciliation pipeline",
+        "native multiplayer latency/jitter/packet-loss/load/concurrency QA"
+      ],
+      "m267_fix": "World replication now converges behind a server-authoritative baseline/delta protocol with stable entity identity, monotonic tick/revision/sequence ordering, stale/duplicate rejection and mandatory resync on sequence gaps or baseline mismatch; LOCAL cannot fabricate world authority."
+    },
+    {
+      "domain": "authoritative_movement_prediction_reconciliation",
+      "status": "PARTIAL",
+      "evidence": [
+        "M268 authoritative movement contract",
+        "M268 Tap-to-Sail intent + prediction/reconciliation runtime",
+        "M268 Command Deck movement/prediction/integrity cards",
+        "M267 world transport dependency with movement authority kept separate"
+      ],
+      "remaining": [
+        "production authoritative movement simulation",
+        "server pathfinding/navigation/collision legality pipeline",
+        "realtime movement command processing backend",
+        "measured prediction/correction/snap tuning",
+        "native latency/jitter/loss prediction-reconciliation QA",
+        "adversarial speed/teleport/route manipulation QA"
+      ],
+      "m268_fix": "Tap-to-Sail now crosses an explicit server-authoritative movement boundary: LOCAL may issue intents and predict for presentation, but accepted position/velocity/heading, command acknowledgements, movement revisions and integrity verdicts remain server-owned; reconciliation can never promote prediction to world truth."
+    },
+    {
+      "domain": "authoritative_combat_resolution_fire_command_pipeline",
+      "status": "PARTIAL",
+      "evidence": [
+        "M269 authoritative combat contract",
+        "M269 target/fire intent + server verdict runtime",
+        "M269 Command Deck combat/target/settlement cards",
+        "M267 transport + M268 movement + M266 atomic settlement dependency chain"
+      ],
+      "remaining": [
+        "production authoritative combat simulation",
+        "server weapon/ammo ownership and cooldown/status repository",
+        "production range/line-of-fire/projectile resolution",
+        "atomic server ammo consumption and kill/reward settlement",
+        "PvP relationship/safe-zone/anti-farm validation",
+        "measured latency compensation and fire-rate tuning",
+        "native latency/jitter/loss/concurrency/adversarial combat QA"
+      ],
+      "m269_fix": "Target selection and fire now cross an explicit server-authoritative combat boundary: LOCAL may select/cycle targets, issue fire intents and show unconfirmed feedback, but legality, ammo/cooldown, hit/miss/block/crit, damage/heal/death, combat revisions and reward linkage remain server-owned."
+    },
+    {
+      "domain": "authoritative_combat_state_reload_status_projectile_resolution",
+      "status": "PARTIAL",
+      "evidence": [
+        "M270 combat-state/reload/status/projectile contract",
+        "M270 server-replica temporal combat runtime",
+        "M270 Command Deck combat-state/effects/sustain/projectile cards",
+        "M269 combat resolution + M267 transport + M266 settlement dependency chain"
+      ],
+      "remaining": [
+        "production authoritative combat-state service",
+        "server weapon reload/cooldown scheduler",
+        "production status-effect and DoT/HoT scheduler",
+        "server repair/shield sustain resolution",
+        "production projectile simulation/collision/impact service",
+        "measured projectile/reload/status tuning",
+        "native latency/jitter/loss/load/adversarial projectile-combat QA"
+      ],
+      "m270_fix": "Temporal combat truth now converges behind one server-authoritative state boundary: reload completion, status effects, DoT/HoT, repair/shield resource changes and projectile impact remain server-owned while local timers/VFX/interpolation are presentation only."
+    },
+    {
+      "domain": "authoritative_targeting_aggro_pvp_relationship_safe_zone",
+      "status": "PARTIAL",
+      "evidence": [
+        "M271 targeting/relationship/aggro/safe-zone authority contract",
+        "M271 server-replica target legality and relationship runtime",
+        "M271 Command Deck targeting/relationship/zone/aggro/legality cards",
+        "M269 combat + M270 combat-state + M267 world transport dependency chain"
+      ],
+      "remaining": [
+        "production relationship/zone/aggro service",
+        "server target-cycle and target-loss orchestration",
+        "production PvP/safe-zone/protection rules repository",
+        "server NPC/monster threat and leash simulation",
+        "anti-farm/kill-legality integration with bounty/honor/rewards",
+        "measured target-cycle/aggro/leash/protection tuning",
+        "native latency/jitter/loss/load/adversarial targeting QA"
+      ],
+      "m271_fix": "Attack legality now converges behind a server-authoritative pre-fire boundary: local target selection/cycling and threat/relationship hints remain presentation/intent only, while relationships, safe zones, PvP protection, aggro/threat, target loss and kill legality remain server-owned before M269 may resolve fire."
+    },
+    {
+      "domain": "authoritative_npc_monster_ai_combat_brain_threat_resolution",
+      "status": "PARTIAL",
+      "evidence": [
+        "M272 NPC/monster AI combat-brain authority contract",
+        "M272 server-replica AI state/threat/decision runtime",
+        "M272 Command Deck AI/threat/archetype/integration cards",
+        "M271 target legality + M268 movement + M269/M270 combat dependency chain"
+      ],
+      "remaining": [
+        "production authoritative AI simulation service",
+        "server navigation/pathfinding and collision-aware AI movement",
+        "production threat table and target-switch orchestration",
+        "encounter/home-anchor/leash/reset orchestration",
+        "admiral/boss phase scheduler and authored behavior profiles",
+        "measured AI cadence/threat/leash/reposition tuning",
+        "native multiplayer latency/load/soak/adversarial AI QA"
+      ],
+      "m272_fix": "NPC, monster, admiral and boss combat intent now converges behind one server-authoritative AI brain boundary: local clients only render confirmed state/telegraphs, while state transitions, threat resolution, target choice, pursuit/attack/reposition, leash/return and phase decisions remain server-owned."
+    },
+    {
+      "domain": "authoritative_encounter_spawn_respawn_admiral_boss_phase_orchestration",
+      "status": "PARTIAL",
+      "evidence": [
+        "M273 authoritative encounter orchestration contract",
+        "M273 server-replica encounter lifecycle/spawn/wave/phase runtime",
+        "M273 Command Deck encounter/spawn/phase/integration cards",
+        "M272 AI + M267 world + M269/M270 combat + M266 settlement dependency chain"
+      ],
+      "remaining": [
+        "production authoritative encounter scheduler/spawner",
+        "persistent encounter/instance state repository",
+        "server spawn/despawn/respawn/reset orchestration",
+        "authored admiral/boss phase and wave/add profiles",
+        "world-transport entity generation integration",
+        "atomic completion/loot/reward handoff into M266",
+        "measured spawn/respawn/wave/phase/population tuning",
+        "native multiplayer latency/load/soak/adversarial encounter QA"
+      ],
+      "m273_fix": "Encounter lifecycle now converges behind one server-authoritative orchestration boundary: clients only render confirmed encounter/world replicas and telegraphs, while spawn/despawn, respawn/reset, waves/adds, admiral/boss phases, completion, cleanup and reward-handoff authorization remain server-owned."
+    },
+    {
+      "domain": "authoritative_kill_credit_loot_reward_eligibility_encounter_persistence",
+      "status": "PARTIAL",
+      "evidence": [
+        "M274 kill-credit/reward/persistence authority contract",
+        "M274 server-replica contribution/eligibility/persistence runtime",
+        "M274 Command Deck contribution/eligibility/settlement cards",
+        "M273 encounter + M269/M270 combat + M266 atomic settlement dependency chain"
+      ],
+      "remaining": [
+        "production authoritative contribution ledger and kill-credit service",
+        "durable encounter participation/eligibility repository",
+        "server loot/drop authorization service and authored drop pools",
+        "group/fleet contribution and anti-farm production rules",
+        "reconnect/recovery checkpoint orchestration",
+        "atomic M266 settlement integration with durable receipts",
+        "measured contribution/eligibility/drop/recovery tuning",
+        "native multiplayer disconnect/concurrency/dupe/adversarial QA"
+      ],
+      "m274_fix": "Kill credit, contribution, reward eligibility, loot authorization and encounter recovery now converge behind one fail-closed server boundary. Clients only render confirmed participation/reward state; durable loot/value still requires M266 atomic settlement."
+    },
+    {
+      "domain": "authoritative_loot_table_drop_pool_group_fleet_reward_distribution",
+      "status": "PARTIAL",
+      "evidence": [
+        "M275 loot-table/drop-pool/distribution authority contract",
+        "M275 server-replica loot/distribution runtime",
+        "M275 Command Deck pool/personal/group/fleet/settlement cards",
+        "M274 eligibility + M273 encounter + M266 atomic settlement dependency chain"
+      ],
+      "remaining": [
+        "production authoritative loot-table/drop-pool resolver service",
+        "durable authored pool/version repository and validation",
+        "secure RNG/roll ledger with idempotent resolution receipts",
+        "production group/fleet membership snapshot and distribution service",
+        "atomic M266 settlement integration for every assigned reward",
+        "measured rarity/drop/share/pity/duplicate-protection tuning",
+        "native multiplayer disconnect/concurrency/double-resolution/dupe/adversarial QA"
+      ],
+      "m275_fix": "Loot selection and reward distribution now converge behind one fail-closed server boundary. M274 gates eligibility, M275 resolves authored pools and personal/group/fleet assignments, and only M266 may create durable inventory/wallet/ownership value."
+    },
+    {
+      "domain": "authoritative_loot_roll_ledger_rng_integrity_duplicate_protection_guaranteed_pity",
+      "status": "PARTIAL",
+      "evidence": [
+        "M276 loot-roll/RNG-integrity authority contract",
+        "M276 fail-closed roll-ledger server-replica runtime",
+        "M276 Command Deck ledger/RNG/duplicate/pity/settlement cards",
+        "M275 distribution dependency and M266 durable settlement boundary"
+      ],
+      "remaining": [
+        "production authoritative loot-roll ledger and durable idempotency repository",
+        "production server RNG/entropy implementation with auditable evidence",
+        "concurrency/retry/reconnect/double-roll/dupe QA",
+        "measured guaranteed/pity/duplicate-item rules and live balance validation"
+      ],
+      "m276_fix": "Loot RNG now converges behind a fail-closed server roll ledger. Stable roll/request/idempotency identity prevents retry/reconnect from minting a second roll; guaranteed/pity state is server-owned and versioned; M275 distributes only confirmed outcomes and only M266 creates durable value."
+    },
+    {
+      "domain": "authoritative_reward_receipt_claim_delivery_mail_fallback_post_settlement_recovery_audit",
+      "status": "PARTIAL",
+      "evidence": [
+        "M277 reward-receipt/claim-delivery/recovery authority contract",
+        "M277 fail-closed reward delivery server-replica runtime",
+        "M277 Command Deck receipt/delivery/mail/recovery/settlement cards",
+        "M276 roll integrity + M254 mail channel + M266 atomic settlement dependency chain"
+      ],
+      "remaining": [
+        "production durable reward-receipt and claim-delivery repository/service",
+        "atomic M266 transaction-receipt linkage for every delivered reward",
+        "production M254 mail/claim-inbox fallback delivery integration",
+        "post-settlement reconnect/crash recovery orchestrator",
+        "durable append-only reward delivery audit evidence",
+        "capacity/failure/retry/recovery policy validation against production storage",
+        "native disconnect/reconnect/crash/concurrency/double-claim/dupe/load QA"
+      ],
+      "m277_fix": "Reward delivery now converges behind a fail-closed server receipt boundary. Stable receipt/transaction/idempotency identity links confirmed rewards to M266 settlement; failed direct delivery may only use server-authorized M254 mail/claim fallback; reconnect/crash recovery and audit revisions cannot mint or redeliver value from the client."
+    },
+    {
+      "domain": "authoritative_reward_inbox_claim_queue_capacity_overflow_expiry_compensation_recovery",
+      "status": "PARTIAL",
+      "evidence": [
+        "M278 reward-inbox/claim-queue/overflow/expiry authority contract",
+        "M278 fail-closed reward inbox server-replica runtime",
+        "M278 Command Deck inbox/queue/overflow/expiry/compensation cards",
+        "M277 receipt delivery + M254 mail + M266 settlement dependency chain"
+      ],
+      "remaining": [
+        "production durable reward-inbox/claim-queue repository and service",
+        "server queue worker with concurrency/idempotency guarantees",
+        "production capacity/overflow/mail-fallback integration",
+        "server expiry/retention scheduler and policy validation",
+        "audited compensation/recovery workflow linked to M266 settlement",
+        "measured capacity/expiry/retry/compensation tuning",
+        "native disconnect/reconnect/full-capacity/double-claim/expiry/concurrency/load QA"
+      ],
+      "m278_fix": "Multiple pending rewards now converge behind one fail-closed server inbox/queue boundary. Capacity overflow, expiry and compensation remain server policy decisions; clients can only submit queue/refresh intents, and all durable value still requires existing M277/M266 settlement identity."
+    },
+    {
+      "domain": "authoritative_reward_notification_loot_presentation_claim_ux_state_foundation",
+      "status": "PARTIAL",
+      "evidence": [
+        "M279 reward notification/presentation authority contract",
+        "M279 fail-closed presentation server-replica runtime",
+        "M279 Command Deck sea-chart/boss-admiral/badge/claim UX cards",
+        "M278 inbox + M277 delivery + M266 settlement dependency chain"
+      ],
+      "remaining": [
+        "production authored reward-presentation UI binding and final assets",
+        "live M278/M277 backend event integration",
+        "native mobile/desktop safe-area and interaction QA",
+        "accessibility/localization and animation/VFX polish",
+        "disconnect/reconnect notification coalescing and replay QA",
+        "measured banner/reveal/badge/queue presentation tuning"
+      ],
+      "m279_fix": "Reward presentation now converges behind a presentation-only server-confirmed boundary. Sea-chart reward feedback is primary and brief, inbox/claim is secondary, and no visual notification, badge or local animation can create value, confirm a claim or settle ownership."
+    },
+    {
+      "domain": "reward_presentation_visual_integration_combat_hud_loot_feedback_boss_reward_reveal_polish",
+      "status": "PARTIAL",
+      "m280_fix": [
+        "M279 server-confirmed presentation mapped into sea-chart HUD view model",
+        "safe-area-aware mobile/desktop reward card foundation",
+        "boss/admiral emphasis and stable icon_asset_id hooks",
+        "presentation-only VFX/motion boundary with client reward authority denied"
+      ],
+      "remaining": [
+        "production authored reward-presentation assets and icon coverage",
+        "native mobile/desktop safe-area and overlap QA",
+        "measured reveal timing/stacking/VFX intensity",
+        "live M279 backend event binding and accessibility/localization QA"
+      ]
+    },
+    {
+      "domain": "combat_hud_target_reload_ammo_status_visual_convergence_naval_battle_feedback_polish",
+      "status": "PARTIAL",
+      "evidence": [
+        "M281 combat-HUD visual convergence contract",
+        "M281 fail-closed presentation runtime over M269/M270/M271",
+        "GameHud/NauticalHud server-confirmed combat view binding",
+        "M281 Command Deck combat visual convergence cards"
+      ],
+      "remaining": [
+        "live production M269/M270/M271 event binding into final HUD",
+        "authored final target/ammo/status/telegraph asset coverage",
+        "native mobile/desktop safe-area and combat-overlap QA",
+        "measured combat feedback timing/density and accessibility/localization",
+        "real multiplayer latency/jitter combat-feedback convergence QA"
+      ],
+      "m281_fix": [
+        "target/reload/ammo/status information converges into one sea-chart-first combat visual model",
+        "M271 target legality and M269/M270 combat truth remain server-authoritative",
+        "bottom-right attack and bottom-left camera controls remain unobstructed",
+        "Seafight/Battle of Sea retained only as clean-room genre/UX references"
+      ]
+    },
+    {
+      "domain": "combat_event_feed_damage_heal_number_coalescing_impact_vfx_hit_confirmation_polish",
+      "status": "PARTIAL",
+      "evidence": [
+        "M282 combat-event feedback contract",
+        "M282 fail-closed combat-event/coalescing runtime over M269/M270/M281",
+        "GameHud/NauticalHud confirmed combat-event presentation binding",
+        "M282 Command Deck feedback convergence cards"
+      ],
+      "remaining": [
+        "live production combat-event stream binding and server-side event ids/sequences",
+        "authored final impact VFX/audio/haptics coverage",
+        "native mobile/desktop density/overlap/accessibility QA",
+        "measured coalescing windows/lifetimes/feedback budgets",
+        "multiplayer latency/jitter/order/replay visual convergence QA"
+      ],
+      "m282_fix": [
+        "repetitive confirmed damage/heal events coalesce by target/type for readability",
+        "critical/block/miss/heal salience stays distinct and server-confirmed",
+        "impact VFX hooks remain presentation-only and cannot author combat results",
+        "sea-chart center and locked bottom control zones remain unobstructed"
+      ]
+    },
+    {
+      "domain": "projectile_travel_cannon_salvo_harpoon_impact_audio_haptics_presentation",
+      "status": "PARTIAL",
+      "m283_fix": "Server-confirmed projectile/salvo/harpoon impact presentation boundary with optional local audio/haptics and sea-chart-first density guards.",
+      "evidence": [
+        "scripts/ui/m283_projectile_salvo_presentation_runtime.gd",
+        "scripts/ui/nautical_hud.gd",
+        "data/m283_projectile_salvo_presentation_contract.json"
+      ],
+      "remaining": [
+        "authored projectile/VFX/audio assets",
+        "native Godot rendering",
+        "device haptics integration",
+        "measured multiplayer visual QA"
+      ]
+    },
+    {
+      "domain": "naval_combat_audio_cannon_family_harpoon_identity_impact_material_salvo_rhythm",
+      "status": "PARTIAL",
+      "evidence": [
+        "M284NavalCombatIdentityRuntime",
+        "M284 contract",
+        "GameHud/NauticalHud presentation integration",
+        "Command Deck readiness"
+      ],
+      "remaining": [
+        "authored family audio/VFX profiles",
+        "native Godot render/audio QA",
+        "measured salvo rhythm and impact tuning",
+        "device haptics QA"
+      ]
+    },
+    {
+      "domain": "ship_hit_reactions_hull_shield_damage_states_sinking_defeat_presentation",
+      "status": "PARTIAL",
+      "m285_fix": "Server-confirmed, reconnect-safe ship reactions and persistent damage-state presentation with replaceable ship-mounted placeholder VFX and confirmed cleanup boundaries.",
+      "evidence": [
+        "scripts/ui/m285_ship_damage_defeat_presentation_runtime.gd",
+        "scripts/visual/m285_ship_damage_visual_rig.gd",
+        "data/m285_ship_damage_defeat_presentation_contract.json",
+        "data/m285_ship_damage_placeholder_asset_manifest.json",
+        "GameHud/NauticalHud/Command Deck integration"
+      ],
+      "remaining": [
+        "final authored hull/shield/fire/smoke/sinking assets",
+        "native Godot render/audio/haptic QA",
+        "measured hit-motion and damaged-ship LOD budgets",
+        "native multiplayer latency/jitter/reconnect/load QA"
+      ]
+    },
+    {
+      "domain": "single_model_ship_damage_overlay_staged_sinking_wreck_presentation",
+      "status": "PARTIAL",
+      "m286_fix": "Server-confirmed segment escalation and staged defeat presentation through overlays around one complete ship model; no modular ship mesh dependency.",
+      "evidence": [
+        "scripts/ui/m286_ship_damage_escalation_runtime.gd",
+        "scripts/visual/m286_ship_damage_overlay_rig.gd",
+        "data/m286_ship_damage_overlay_contract.json",
+        "data/m286_ship_destruction_placeholder_manifest.json",
+        "GameHud/NauticalHud/Command Deck integration"
+      ],
+      "remaining": [
+        "final authored class-specific damage and wreck kits",
+        "native Godot segment/sinking render and audio QA",
+        "measured mobile/desktop LOD and simultaneous-destruction budgets",
+        "live multiplayer ordering/reconnect/load validation"
+      ]
+    },
+    {
+      "domain": "ship_motion_identity_wake_water_sail_presentation",
+      "status": "PARTIAL",
+      "m287_fix": "Server-confirmed motion-state identity with replaceable bow displacement, stern wake, turn-water, waterline, anchor-ripple and sail-response placeholder layers over M268 truth.",
+      "evidence": [
+        "scripts/ui/m287_ship_motion_identity_runtime.gd",
+        "scripts/visual/m287_ship_motion_visual_rig.gd",
+        "data/m287_ship_motion_identity_contract.json",
+        "data/m287_ship_motion_placeholder_manifest.json",
+        "GameHud/NauticalHud/Command Deck integration"
+      ],
+      "remaining": [
+        "final authored class-specific water and sail motion assets",
+        "native Godot water-surface blending and sail-rig QA",
+        "measured wake opacity/length and simultaneous-ship budgets",
+        "live multiplayer movement snapshot/reconciliation visual QA"
+      ]
+    },
+    {
+      "domain": "naval_contact_target_threat_range_offscreen_readability",
+      "status": "PARTIAL",
+      "m288_fix": "Server-confirmed selected-target, relationship, threat, range, priority and offscreen presentation with replaceable world/HUD placeholders over M271/M272 truth.",
+      "evidence": [
+        "scripts/ui/m288_naval_contact_readability_runtime.gd",
+        "scripts/visual/m288_naval_contact_visual_rig.gd",
+        "data/m288_naval_contact_readability_contract.json",
+        "data/m288_naval_contact_placeholder_manifest.json",
+        "GameHud/NauticalHud/Command Deck integration"
+      ],
+      "remaining": [
+        "final authored relation/threat/range/offscreen marker assets",
+        "native Godot gameplay-scale readability and accessibility QA",
+        "measured simultaneous-contact and mobile edge-marker budgets",
+        "live multiplayer targeting/threat/range snapshot validation"
+      ]
+    },
+    {
+      "domain": "native_playable_vertical_slice_readiness",
+      "status": "PARTIAL",
+      "m289_fix": "Coherent first-session source/content manifest, 12-stage observation flow, native QA matrix and fail-closed readiness reporting without fabricated native PASS or release approval.",
+      "evidence": [
+        "scripts/ui/m289_playable_vertical_slice_runtime.gd",
+        "scripts/qa/m289_playable_vertical_slice_qa.gd",
+        "scenes/qa/m289_playable_vertical_slice_qa.tscn",
+        "data/m289_playable_vertical_slice_contract.json",
+        "data/m289_playable_vertical_slice_content_manifest.json",
+        "data/m289_native_gameplay_qa_matrix.json",
+        "GameHud/Command Deck integration"
+      ],
+      "remaining": [
+        "native Godot 4.7.2 parser and scene-load evidence",
+        "complete desktop and Android 12-stage gameplay runs",
+        "final authored complete starter/NPC/admiral/monster/harbor assets",
+        "measured HUD, GPU, memory, VFX, audio and haptic evidence",
+        "production online-server end-to-end slice validation"
+      ]
+    },
+    {
+      "domain": "first_sea_sortie_runtime_integration_guidance",
+      "status": "PARTIAL",
+      "m290_fix": "M289's 12-stage vertical slice now receives passive local-development gameplay-event observations, trusted server receipts, compact HUD progress and one replaceable world beacon without gameplay authority.",
+      "m291_fix": "The first-sortie observer distinguishes actual harbor departure from a navigation intent, supports normal harbor return without forced defeat, tracks defeat/respawn as optional native-QA cases and never records rejected local observations.",
+      "m292_fix": "The single existing mission panel displays first-sortie guidance only when no quest is tracked; a tracked quest retains priority with a width-safe small counter. Local vs server observations and optional QA remain explicit in Command Deck.",
+      "m293_fix": "Home start/return resolve Haven's Reach only; port proximity is player-ship-only. The single passive world beacon yields to tracked quests, selected combat targets, open menus/charts and sinking; dead/stale guidance candidates are excluded.",
+      "m294_fix": "A local-development read-only Tap-to-Sail observer distinguishes intent, actual locally observed motion, arrival within the existing local stop radius and interruption; the 12-stage slice still treats tap as intent and never upgrades local observations to server or native truth.",
+      "m295_fix": "Active Scout/Raider duplicate placeholder bytes are resolved by a distinct one-node/one-mesh complete Raider GLB and stable-slot replacement; old runtime structural Raider fallback decoration is suppressed for this model.",
+      "m296_fix": "Active coastal sloop and gunship now have distinct one-node/one-mesh GLB placeholders, with their structural details baked into the respective ship model; exact-path runtime structural decorators are bypassed, leaving user replacements and older fallbacks alone.",
+      "m297_fix": "Active Scout and Heavy use distinct complete GLB placeholders with baked silhouette details; all five early NPC slots now resolve to unique complete models and bypass runtime structural fallback decorators on their exact new paths.",
+      "m298_fix": "Eight starter/early-NPC world placeholder GLBs gain bounded whole-model-local motion and confirmed hit-response animation; M285 shield BROKEN state alone no longer fabricates a shield hit flash. No ship/collision transform is animated and reduced motion/mobile budgets remain explicit.",
+      "m299_fix": "Added isolated 4×2/2×4 oblique visual QA for eight complete ships, strictly local scene-tagged preview inputs, motion-server-event handoff and M285 local preview precedence hardening; all native QA gates remain NOT_EVALUATED.",
+      "m300_fix": "Local Guild Island tower relation previews and Halloween sector decoration lifecycle are closed without modular ships or client combat/event reward authority; see the M300 closure contract. Native QA is still NOT_EVALUATED.",
+      "m301_fix": "Added transaction-safe server-domain prototype for guild towers and Halloween, client-only world placeholders and fail-closed online local event guards. Production integration and native QA remain open.",
+      "evidence": [
+        "scripts/ui/m290_first_sortie_integration_runtime.gd",
+        "scripts/visual/m290_first_sortie_visual_rig.gd",
+        "scripts/qa/m290_first_sortie_integration_qa.gd",
+        "scenes/qa/m290_first_sortie_integration_qa.tscn",
+        "data/m290_first_sortie_integration_contract.json",
+        "data/m290_first_sortie_placeholder_manifest.json",
+        "data/m290_first_sortie_presentation_profiles.json",
+        "data/m290_first_sortie_native_qa_matrix.json",
+        "data/m291_sortie_causality_contract.json",
+        "data/m292_sortie_hud_guidance_contract.json",
+        "data/m293_world_guidance_priority_contract.json",
+        "data/m294_sailing_observation_contract.json",
+        "data/m295_raider_single_model_placeholder_contract.json",
+        "data/m296_complete_npc_models_contract.json",
+        "data/m297_early_npc_complete_model_contract.json",
+        "data/m298_ship_visual_animation_contract.json",
+        "data/m298_ship_visual_animation_profiles.json",
+        "data/m299_ship_animation_visual_qa_contract.json",
+        "data/m299_ship_animation_visual_qa_matrix.json",
+        "Gameplay signal hooks / GameHud / NauticalHud / Command Deck integration"
+      ],
+      "remaining": [
+        "native Godot 4.7.2 parser and full 12-stage gameplay run",
+        "final authored complete ship/NPC/monster/harbor assets",
+        "native mobile safe-area and world-beacon readability tuning",
+        "measured GPU/audio/haptic evidence",
+        "production server receipt integration and end-to-end validation"
+      ]
+    }
+  ],
+  "next_priority_order": [
+    "runtime_hardening",
+    "sustain_support",
+    "crew_officers",
+    "wanted_bounty",
+    "compass_cauldron_special_pve",
+    "bazaar_player_trading",
+    "social_groups_chat_mail",
+    "online_backend"
+  ]
+}

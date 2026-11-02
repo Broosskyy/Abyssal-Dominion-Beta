@@ -1,0 +1,26 @@
+{
+  "mobile": {
+    "islands_per_sector": 8,
+    "decorators_per_island": 8,
+    "standard_ship_lod": "LOD1",
+    "hero_lod": "LOD0",
+    "vfx": "canonical",
+    "small_detail_geometry": "material_first"
+  },
+  "desktop": {
+    "islands_per_sector": 8,
+    "decorators_per_island": 8,
+    "standard_ship_lod": "LOD1",
+    "hero_lod": "LOD0",
+    "vfx": "canonical",
+    "small_detail_geometry": "material_first"
+  },
+  "web": {
+    "islands_per_sector": 8,
+    "decorators_per_island": 8,
+    "standard_ship_lod": "LOD1",
+    "hero_lod": "LOD0",
+    "vfx": "canonical",
+    "small_detail_geometry": "material_first"
+  }
+}

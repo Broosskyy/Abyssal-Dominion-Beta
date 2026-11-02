@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+M3042_TOUCH_RECT @Button@44 (8.0, 335.0) (70.0, 47.0)
+M3042_TOUCH_RECT @Button@47 (164.0, 335.0) (36.0, 47.0)
+M3042_TOUCH_RECT @Button@48 (204.0, 335.0) (36.0, 47.0)
+M3042_TOUCH_RECT AmmoQuick_KANONEN (334.0, 335.0) (56.0, 47.0)
+M3042_TOUCH_RECT AmmoQuick_HARPUNEN (394.0, 335.0) (56.0, 47.0)
+M3042_TOUCH_RECT AmmoQuick_KETTE (454.0, 335.0) (56.0, 47.0)
+M3042_TOUCH_RECT @Button@49 (644.0, 335.0) (82.0, 47.0)
+M3042_TOUCH_RECT @Button@51 (730.0, 335.0) (106.0, 47.0)
+{"failed":[],"scope":"scene, chain ammo, atlas-frame stability, non-overlapping buttons, shipyard, helm","status":"PASS","version":"M304.2"}

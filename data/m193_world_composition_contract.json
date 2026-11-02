@@ -1,0 +1,24 @@
+{
+  "milestone": "M193",
+  "status": "WORLD_COMPOSITION_AND_MASTER_AUDIT_STATIC_VERIFIED",
+  "chart": {
+    "world_units": 360,
+    "player_facing_identity": "named_region_and_chart",
+    "technical_sector_ids_hidden": true,
+    "target_island_budget": {
+      "mobile": 8,
+      "web": 8,
+      "desktop": 8
+    },
+    "composition": "macro_landmarks_plus_navigation_punctuation",
+    "preserve_open_sailing_corridors": true
+  },
+  "movement_locks": {
+    "land_blocks_and_routes_around": true,
+    "ships_npcs_monsters_bosses_overlap": true,
+    "loot_non_blocking": true
+  },
+  "audit": "M193_MASTER_REFERENCE_AUDIT.md",
+  "native_runtime_visual_qa_pending": true,
+  "superseded_by": "M194_CROSS_PLATFORM_WORLD_PARITY"
+}

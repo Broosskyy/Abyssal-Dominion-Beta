@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "milestone": "M86",
+  "title": "HUD Device Preview Profiles",
+  "profiles": [
+    {
+      "id": "compact_phone",
+      "label": "Compact Phone",
+      "size": [
+        960,
+        540
+      ],
+      "safe": [
+        24,
+        12,
+        912,
+        516
+      ],
+      "input": "touch"
+    },
+    {
+      "id": "phone_wide",
+      "label": "Phone Wide",
+      "size": [
+        1560,
+        720
+      ],
+      "safe": [
+        32,
+        18,
+        1496,
+        684
+      ],
+      "input": "touch"
+    },
+    {
+      "id": "phone_notch",
+      "label": "Phone Notch",
+      "size": [
+        2556,
+        1179
+      ],
+      "safe": [
+        126,
+        44,
+        2304,
+        1091
+      ],
+      "input": "touch"
+    },
+    {
+      "id": "desktop_1080p",
+      "label": "Desktop 1080p",
+      "size": [
+        1920,
+        1080
+      ],
+      "safe": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "input": "mouse_keyboard"
+    },
+    {
+      "id": "desktop_1440p",
+      "label": "Desktop 1440p",
+      "size": [
+        2560,
+        1440
+      ],
+      "safe": [
+        0,
+        0,
+        2560,
+        1440
+      ],
+      "input": "mouse_keyboard"
+    },
+    {
+      "id": "desktop_gamepad",
+      "label": "Desktop Gamepad",
+      "size": [
+        1920,
+        1080
+      ],
+      "safe": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "input": "gamepad"
+    }
+  ],
+  "rules": [
+    "preview never changes live gameplay state",
+    "preview shows safe area/notch and critical-group overlap",
+    "mobile preview preserves touch-floor intent",
+    "desktop preview preserves denser information layout"
+  ]
+}

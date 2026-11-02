@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "milestone": "M61",
+  "title": "PL1–5 HUD Completion + World Readability",
+  "families": {
+    "cannon_ammo": [
+      "iron",
+      "explosive",
+      "chain",
+      "piercing",
+      "ember",
+      "venom",
+      "shatter",
+      "spectral"
+    ],
+    "harpoon_payload": [
+      "hunter_standard",
+      "barbed_chain",
+      "abyss_piercer"
+    ],
+    "support_payload": [
+      "restoration_shell",
+      "ward_shell",
+      "event_restoration_shell"
+    ],
+    "action_supply": [
+      "repair",
+      "boost",
+      "veil",
+      "storm_bolt",
+      "infernal_barrel",
+      "crystal_barrier",
+      "armor_corrosive",
+      "repair_blocker",
+      "leviathan_hook",
+      "recall_compass",
+      "powder",
+      "plates"
+    ],
+    "world_nameplates": [
+      "friendly",
+      "neutral",
+      "hostile",
+      "elite",
+      "admiral",
+      "monster"
+    ]
+  },
+  "rules": {
+    "text_baked_into_assets": false,
+    "counts_baked_into_assets": false,
+    "cooldowns_baked_into_assets": false,
+    "relation_owned_by_graphic": false,
+    "mobile_readability_primary": true,
+    "stable_slots_replaceable": true,
+    "fallbacks_preserved": true
+  },
+  "authority": "presentation only; online/backend authority not claimed"
+}

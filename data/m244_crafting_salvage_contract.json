@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "milestone": "M244",
+  "master_concept": "V3.8",
+  "domain": "CRAFTING_SALVAGE",
+  "authority": {
+    "local_prototype": "client_runtime_with_transaction_preflight_and_rollback",
+    "online_target": "server_authoritative_atomic_inventory_economy_transaction",
+    "recipe_definition": "data_driven_admin_authorable",
+    "salvage_definition": "data_driven_admin_authorable"
+  },
+  "crafting_categories": [
+    "weapons",
+    "deck_modules",
+    "supplies",
+    "hunter",
+    "siege",
+    "abyss",
+    "event",
+    "cosmetic"
+  ],
+  "master_rules": [
+    "CraftRecipeDefinition carries inputs, outputs, station and requirements.",
+    "Upgrades consume Gold and materials; normal failure must not destroy valuable core equipment.",
+    "Higher tiers may require rarer components and content progression.",
+    "Unused equipment may be salvaged into only a portion of its material class.",
+    "Bound or special items follow explicit salvage rules.",
+    "Salvage must never create a duplication loop.",
+    "Online craft, salvage, transfer and reward mutations require atomic idempotent server transactions."
+  ],
+  "prototype_salvage": {
+    "scope": "regional_equipment_modules_only",
+    "return_fraction": 0.5,
+    "gold_refund": false,
+    "minimum_return_per_present_material": 0,
+    "balance_status": "LOCAL_PROTOTYPE_NOT_FINAL",
+    "restrictions": [
+      "must_be_in_harbor",
+      "must_be_owned",
+      "must_not_be_equipped_on_any_ship",
+      "salvage_allowed_must_not_be_false",
+      "bound_or_special_requires_explicit_override",
+      "output_capacity_preflight_required"
+    ]
+  },
+  "recipe_category_overrides": {
+    "recipe_storm_shot": "supplies",
+    "recipe_wardbreaker": "supplies",
+    "recipe_frostwake": "supplies",
+    "recipe_siege_core": "siege",
+    "recipe_harpoon_reefspike": "hunter",
+    "recipe_harpoon_dreadfang": "hunter"
+  },
+  "salvage_overrides": {},
+  "forbidden_client_online_actions": [
+    "authoritative_craft_commit",
+    "authoritative_salvage_commit",
+    "authoritative_gold_ledger_mutation",
+    "authoritative_inventory_ownership_mutation",
+    "authoritative_binding_override"
+  ],
+  "ui": {
+    "surface": "Command Deck > Ausrüstung & Ausbau > Werkstatt",
+    "normal_gameplay_hud_clutter": false,
+    "show_recipe_requirements": true,
+    "show_station_requirement": true,
+    "show_salvage_returns_before_commit": true,
+    "show_salvage_block_reason": true,
+    "mobile_desktop_information_architecture_same": true
+  }
+}

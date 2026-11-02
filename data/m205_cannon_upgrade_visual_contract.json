@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "milestone": "M205",
+  "status": "CANNON_FAMILY_AND_UPGRADE_VISUALS_STATIC_VERIFIED",
+  "master_concept": "V3.8",
+  "visual_master": "user visual master references",
+  "scope": {
+    "cannon_family_icons": 7,
+    "quality_tier_badges": 5,
+    "mastery_track_stage_icons": 20,
+    "visible_mastery_stages": [
+      1,
+      3,
+      5,
+      7,
+      10
+    ]
+  },
+  "locks": [
+    "Cannon icons are distinct silhouettes, not recolors only.",
+    "Tier/mastery visuals are presentation-only; existing M155/M162/M163/M165 stats and costs remain authoritative.",
+    "Same cannon/item visuals and gameplay on mobile/web/desktop; only responsive UI sizing/spacing/safe areas differ.",
+    "Icons are stable replaceable SVG slots for later final production art."
+  ]
+}

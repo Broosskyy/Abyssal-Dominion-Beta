@@ -1,0 +1,21 @@
+{
+  "milestone": "M285",
+  "contract": "ship_hit_reactions_hull_shield_damage_states_sinking_defeat_presentation",
+  "master_concept": "V3.8",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "Genre, combat feel and readability reference only; no proprietary sounds, VFX, models, formulas or timings.",
+  "dependencies": {"combat_outcome":"M269", "combat_state":"M270", "combat_feedback":"M282", "projectile_presentation":"M283", "combat_identity":"M284", "world_replica":"M267"},
+  "damage_states": ["INTACT", "LIGHT", "MODERATE", "HEAVY", "CRITICAL", "DEFEATED"],
+  "shield_states": ["NONE", "STABLE", "HIT", "LOW", "BROKEN"],
+  "reaction_events": ["SHIELD_HIT", "HULL_HIT", "ARMOR_HIT", "CRITICAL_ENTER", "DEFEAT_CONFIRMED", "SINK_START", "SINK_COMPLETE", "CLEANUP_CONFIRMED"],
+  "persistent_visual_hooks": ["hull_damage_hook", "shield_hook", "fire_hook", "smoke_hook", "critical_hook", "sinking_hook"],
+  "authority": {
+    "server_owns": ["damage", "hull_shield_state", "damage_state", "critical_state", "defeat", "despawn", "kill_credit", "rewards", "drops", "event_ordering", "presentation_seed"],
+    "client_may": ["interpolate_confirmed_reaction", "render_replicated_damage_state", "play_seeded_sinking_sequence", "reduce_local_motion_vfx", "render explicitly labelled local prototype fallback"],
+    "client_never": ["derive_damage_from_reaction", "derive authoritative state from health bar", "confirm_defeat_from_animation", "despawn_from_sinking_vfx", "grant_reward_or_drop"]
+  },
+  "replication": {"idempotent_event_ids":true, "monotonic_revisions":true, "monotonic_event_sequence":true, "server_tick_guard":true, "deterministic_presentation_seed":true, "resync_invalidates_transient_state":true, "cleanup_requires_confirmation":true},
+  "visual_rules": {"sea_chart_first":true, "mid_zoom_master":true, "angled_top_down":true, "segment_readability":true, "persistent_damage_until_repair_or_defeat":true, "critical_unmistakable_not_overdone":true, "controls_unobstructed":true, "landscape_mobile_only":true, "mobile_desktop_parity":true, "master_asset_hooks_reused":true, "no_new_main_menu":true, "no_permanent_debug_hud":true},
+  "placeholder_rules": {"runtime_composed":true, "required_sockets":["VFX_Damage_01", "VFX_Damage_02", "VFX_Shield", "VFX_Sink"], "ship_glb_excludes_baked_vfx":true, "stable_replacement_slots":true, "production_and_reference_only_separated":true},
+  "unset_until_measured": ["hit_stop_duration", "hit_flash_duration", "tilt_angle", "knockback_distance", "fire_density", "smoke_density", "critical_pulse_rate", "sinking_duration", "sinking_depth_curve", "debris_density", "screen_shake_strength", "haptic_strength", "simultaneous_damaged_ship_budget"]
+}

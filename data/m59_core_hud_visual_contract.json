@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "milestone": "M59",
+  "title": "Core HUD Visual Production Pass",
+  "visual_language": "dark navy / weathered gold / abyssal cyan accents",
+  "mobile_first": true,
+  "minimum_touch_target_dp": 52,
+  "safe_area_required": true,
+  "slots": {
+    "combat_ring": [
+      "hud_combat_ring",
+      "hud_combat_ring_active"
+    ],
+    "quickslot": "hud_quickslot_frame",
+    "target": "hud_target_frame",
+    "bars": [
+      "hud_bar_hull",
+      "hud_bar_shield"
+    ],
+    "picker": [
+      "hud_ammo_selector_frame",
+      "hud_picker_row",
+      "hud_picker_row_selected"
+    ]
+  },
+  "replaceability_rule": "All images may be replaced through VisualAssetCatalog without changing hitboxes, cooldown logic, counts or combat rules.",
+  "acceptance": [
+    "readable on phone landscape",
+    "attack/ammo/repair/harpoon hierarchy obvious",
+    "touch targets >= 52dp",
+    "no text baked into graphics",
+    "cooldown/count overlays remain code rendered",
+    "safe-area compatible",
+    "fallback survives missing override"
+  ]
+}

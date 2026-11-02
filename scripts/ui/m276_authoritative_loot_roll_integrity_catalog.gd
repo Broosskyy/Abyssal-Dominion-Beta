@@ -1,0 +1,11 @@
+class_name M276AuthoritativeLootRollIntegrityCatalog
+extends RefCounted
+static func overview(runtime:M276AuthoritativeLootRollIntegrityRuntime)->Dictionary:
+	if runtime==null:return {"title":"Loot Roll Ledger · RNG Integrity","state":"SERVER REQUIRED","detail":"Keine autoritative Roll-Ledger-Replica gebunden."}
+	var s:=runtime.snapshot(); return {"title":"Loot Roll Ledger · RNG Integrity","state":"SERVER REPLICA" if int(s.get("roll_ledger_revision",-1))>=0 else "WAITING","detail":"Encounter %s · roll rev %d · pity rev %d"%[str(s.get("encounter_id","UNBOUND")),int(s.get("roll_ledger_revision",-1)),int(s.get("pity_revision",-1))]}
+static func ledger()->Dictionary: return {"title":"Roll ID · Idempotency · Replay Safety","state":"FAIL-CLOSED FOUNDATION","detail":"Roll-ID, Request-ID, Idempotency-Key, Loot-Table-Version und Resolver-Version gehören dem Server. Retry/Reconnect darf denselben Roll wiederfinden, keinen zweiten erzeugen."}
+static func rng()->Dictionary: return {"title":"RNG Integrity · Result Evidence","state":"SERVER AUTHORITATIVE","detail":"Der Client wählt keinen Seed und würfelt nicht lokal. Commitments/Result-Digests sind opaque Server-Evidence; geheimes Entropie-/Seed-Material bleibt serverseitig."}
+static func duplicate()->Dictionary: return {"title":"Duplicate · Double-Roll Protection","state":"LEDGER GUARDED","detail":"Replay, doppelter Claim, reconnect-bedingter Retry und parallele Requests müssen über Ledger-/Idempotency-Grenzen auf einen autoritativen Roll konvergieren."}
+static func pity()->Dictionary: return {"title":"Guaranteed · Pity Foundation","state":"DATA-DRIVEN · SERVER OWNED","detail":"Guaranteed-/Pity-State ist versioniert und serverautoritative Eingabe der Loot-Auflösung. Finale Schwellen, Zähler, Rarity-Regeln und Resetbedingungen bleiben ungesetzt."}
+static func settlement()->Dictionary: return {"title":"Resolved Roll · Atomic Ownership","state":"M275 → M266","detail":"M276 sichert Roll-Integrität; M275 verteilt das bestätigte Ergebnis; nur M266 darf daraus dauerhaften Besitz/Wallet/Receipts erzeugen."}
+static func authority()->Dictionary: return {"title":"Roll Authority","state":"FAIL-CLOSED","detail":"Clients können weder Roll-ID/Seed/Resultat noch Pity/Guaranteed, Duplicate-Guard oder Settlement autorisieren. TEST/GLOBAL bleiben strikt isoliert."}

@@ -1,0 +1,8 @@
+{
+  "passed": false,
+  "status": "blocked_not_run_after_workspace_recovery",
+  "reason": "The prior browser and temporary M13 screenshots were removed by workspace maintenance. Browser reinstall timed out; the final download attempt ended with a cancelled network approval. No permission workaround attempted.",
+  "current_build_rendered": false,
+  "screenshots": [],
+  "next_step": "Run tools/capture_entry_web.cjs with an authorized locally installed Chromium and Playwright. Existing docs/qa_m12 screenshots are historical M12, not current M13."
+}

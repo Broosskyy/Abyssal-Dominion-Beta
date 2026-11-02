@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "milestone": "M104",
+  "current_local_to_future_server": [
+    {
+      "domain": "profile/save",
+      "current": [
+        "GameState.save_now",
+        "LocalProfileStore"
+      ],
+      "future": "ProfileRepository/server",
+      "phase": "backend"
+    },
+    {
+      "domain": "inventory",
+      "current": [
+        "PlayerInventory",
+        "GameState payload"
+      ],
+      "future": "InventoryRepository + transaction ledger",
+      "phase": "backend"
+    },
+    {
+      "domain": "currency/wallet",
+      "current": [
+        "GameState currency mutations",
+        "local rewards"
+      ],
+      "future": "WalletRepository + atomic ledger",
+      "phase": "backend"
+    },
+    {
+      "domain": "progression",
+      "current": [
+        "PlayerProgression",
+        "local quest/event rewards"
+      ],
+      "future": "ProgressionRepository + reward transaction",
+      "phase": "backend"
+    },
+    {
+      "domain": "combat",
+      "current": [
+        "ShipWeapons",
+        "ShipHealth",
+        "local NPC state"
+      ],
+      "future": "authoritative simulation/validation",
+      "phase": "multiplayer"
+    },
+    {
+      "domain": "guild",
+      "current": [
+        "guild island presentation/local interactions"
+      ],
+      "future": "GuildRepository + ownership/war/treasury services",
+      "phase": "multiplayer_backend"
+    },
+    {
+      "domain": "admin",
+      "current": [
+        "AdminModeRuntime local QA"
+      ],
+      "future": "server-verified Staff service + audit log",
+      "phase": "operations"
+    },
+    {
+      "domain": "payment",
+      "current": [
+        "none"
+      ],
+      "future": "provider verification -> entitlement transaction",
+      "phase": "monetization"
+    }
+  ],
+  "client_remains_local": [
+    "HUD layout",
+    "graphics",
+    "input bindings",
+    "accessibility",
+    "device QA preferences"
+  ],
+  "rule": "Migration happens behind gateways/repositories; working gameplay systems are not reset merely to introduce backend."
+}

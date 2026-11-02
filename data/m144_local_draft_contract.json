@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "milestone": "M144",
+  "path": "user://admin/content_drafts_v1.json",
+  "format": "abyssal-local-admin-drafts-v1",
+  "authority": "LOCAL_PREVIEW_ONLY",
+  "atomic_write": true,
+  "allowed_status": ["draft", "validated", "review", "archived"],
+  "forbidden_status": ["approved", "scheduled", "active", "rolled_back"],
+  "production_import_requires_server_validation": true
+}

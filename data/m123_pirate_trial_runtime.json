@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "milestone": "M156",
+  "trials": {
+    "40": {
+      "id": "trial_void_high_risk",
+      "stages": [
+        {
+          "id": "survive_void_fleet",
+          "kind": "qualified_sinks",
+          "target": 3
+        },
+        {
+          "id": "break_elite_chain",
+          "kind": "elite_sinks",
+          "target": 2
+        },
+        {
+          "id": "defeat_void_hunter",
+          "kind": "guardian_sink",
+          "target": 1
+        },
+        {
+          "id": "defeat_void_admiral",
+          "kind": "boss_sink",
+          "target": 1
+        }
+      ]
+    },
+    "45": {
+      "id": "trial_sovereign_mastery",
+      "stages": [
+        {
+          "id": "break_hero_escort",
+          "kind": "elite_sinks",
+          "target": 2
+        },
+        {
+          "id": "prestige_action",
+          "kind": "prestige",
+          "target": 2
+        },
+        {
+          "id": "defeat_sovereign_hunter",
+          "kind": "guardian_sink",
+          "target": 1
+        },
+        {
+          "id": "defeat_sovereign_admiral",
+          "kind": "boss_sink",
+          "target": 1
+        }
+      ]
+    },
+    "50": {
+      "id": "trial_abyssal_dominion_final",
+      "stages": [
+        {
+          "id": "break_legendary_vanguard",
+          "kind": "elite_sinks",
+          "target": 3
+        },
+        {
+          "id": "complete_legendary_chain",
+          "kind": "legendary_chain",
+          "target": 3
+        },
+        {
+          "id": "defeat_dominion_guardian",
+          "kind": "guardian_sink",
+          "target": 1
+        },
+        {
+          "id": "defeat_legendary_dominion_admiral",
+          "kind": "boss_sink",
+          "target": 1
+        }
+      ]
+    },
+    "55": {
+      "id": "trial_dreadwater_vanguard",
+      "stages": [
+        {
+          "id": "break_dread_cutter_chain",
+          "kind": "w5_elite_chain",
+          "target": 4
+        },
+        {
+          "id": "hunt_dreadwater_guardian",
+          "kind": "guardian_sink",
+          "target": 1
+        },
+        {
+          "id": "defeat_blackwake_admiral",
+          "kind": "boss_sink",
+          "target": 1
+        }
+      ]
+    },
+    "60": {
+      "id": "trial_iron_maw_siege",
+      "stages": [
+        {
+          "id": "break_iron_galleass_chain",
+          "kind": "w5_elite_chain",
+          "target": 5
+        },
+        {
+          "id": "secure_dominion_shards",
+          "kind": "dominion_shards",
+          "target": 6
+        },
+        {
+          "id": "hunt_iron_maw_leviathan",
+          "kind": "guardian_sink",
+          "target": 1
+        },
+        {
+          "id": "defeat_iron_maw_admiral",
+          "kind": "boss_sink",
+          "target": 1
+        }
+      ]
+    }
+  },
+  "rules": {
+    "must_start_at_port": true,
+    "xp_alone_never_completes": true,
+    "local_prototype": true
+  }
+}

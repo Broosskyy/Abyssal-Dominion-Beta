@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "milestone": "M89",
+  "mode": "compatibility_contract_only",
+  "persistence": false,
+  "server_authority_required": true,
+  "identity": {
+    "guild_id": "nullable_string",
+    "member_id": "nullable_string",
+    "alliance_id": "nullable_string"
+  },
+  "contribution_events": [
+    "npc_sink",
+    "admiral_or_world_boss",
+    "guild_quest_objective",
+    "guild_war_objective",
+    "guild_island_defense",
+    "exploration_world_objective",
+    "seasonal_event_objective",
+    "effective_support"
+  ],
+  "world_hooks": [
+    "ship_guild_id",
+    "encounter_contribution_context",
+    "world_objective_guild_context",
+    "island_owner_guild_id",
+    "war_context_id",
+    "guild_island_interaction_context",
+    "guild_tower_target_context",
+    "guild_facility_interaction_context"
+  ],
+  "rules": {
+    "early_progression_guild_optional": true,
+    "overheal_contribution": 0,
+    "late_join_war_exploit_allowed": false,
+    "client_authoritative_rewards": false,
+    "guild_island_world_discovery_from_map_level": 2
+  }
+}

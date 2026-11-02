@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "milestone": "M99",
+  "guild_mobile_ux": {
+    "dedicated_icons": 6,
+    "touch_focus": true,
+    "mouse_focus": true,
+    "gamepad_focus": true,
+    "tap_to_sail_protected": true,
+    "map_level_2": true
+  },
+  "guild_world": {
+    "walls": 2,
+    "corners": 2,
+    "gate": 1,
+    "watch_platform": 1,
+    "visual_only": true,
+    "collision_authority": false,
+    "siege_authority": false,
+    "permanent_destruction": false
+  },
+  "admin": {
+    "tower_state_controls_visible": true,
+    "range_preview_control_visible": true,
+    "production_authority": false
+  },
+  "performance": {
+    "marker_budget_increase": false,
+    "range_ring_shadow": false,
+    "fortification_shadow": false,
+    "new_world_slots_prepared_not_spawned": 5
+  },
+  "backend_boundary": {
+    "ownership": false,
+    "treasury": false,
+    "vault": false,
+    "war": false,
+    "conquest": false,
+    "persistent_damage": false
+  },
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS touch",
+    "desktop/gamepad",
+    "safe-area/orientation",
+    "GPU profile"
+  ]
+}

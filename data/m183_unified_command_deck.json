@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "milestone": "M183",
+  "master_concept": "V3.8",
+  "goal": "UNIFIED_COMMAND_DECK_AND_MENU_INFORMATION_ARCHITECTURE",
+  "principles": [
+    "seekarte_is_primary_gameplay_surface",
+    "one_dominant_modal_at_a_time",
+    "consistent_back_then_close",
+    "safe_area_and_large_touch_targets",
+    "vertical_scroll_without_horizontal_overflow",
+    "sensitive_actions_remain_server_authoritative"
+  ],
+  "shell": {
+    "touch_target_min": 56,
+    "desktop_touch_target_min": 50,
+    "touch_edge_margin": 8,
+    "desktop_max_width": 980,
+    "navigation": "destination_picker_plus_history_back",
+    "escape_behavior": "back_then_close",
+    "active_page": "explicit_title_and_context",
+    "admin_visibility": "authorized_runtime_only"
+  },
+  "sections": [
+    {
+      "id": "sea",
+      "label": "AUF SEE",
+      "destinations": [
+        {
+          "id": "progress",
+          "context": "Gebiete, Freischaltungen und Prüfungen"
+        },
+        {
+          "id": "quests",
+          "context": "Aktive und wiederkehrende Aufträge"
+        },
+        {
+          "id": "bonusmaps",
+          "context": "Instanzen, Zugänge und Belohnungen"
+        },
+        {
+          "id": "events",
+          "context": "Live Objectives und saisonale Inhalte"
+        }
+      ]
+    },
+    {
+      "id": "ship",
+      "label": "SCHIFF & AUSRÜSTUNG",
+      "destinations": [
+        {
+          "id": "equipment",
+          "context": "Waffen, Loadouts und Ausbau"
+        },
+        {
+          "id": "shop",
+          "context": "Hafenmarkt und Versorgung"
+        }
+      ]
+    },
+    {
+      "id": "captain",
+      "label": "KAPITÄN & GEMEINSCHAFT",
+      "destinations": [
+        {
+          "id": "guild",
+          "context": "Gilde und Insel"
+        },
+        {
+          "id": "rankings",
+          "context": "Ruhm, Ehre und Wettbewerb"
+        },
+        {
+          "id": "achievements",
+          "context": "Erfolge, Sammlungen und Codex"
+        },
+        {
+          "id": "log",
+          "context": "Letzte Ereignisse"
+        },
+        {
+          "id": "meta",
+          "context": "Begleiter, Artefakte und begrenzte AFK-Rückkehrboni"
+        }
+      ]
+    },
+    {
+      "id": "system",
+      "label": "SYSTEM",
+      "destinations": [
+        {
+          "id": "systems",
+          "context": "Account, Persistenz und Netzwerkstatus"
+        },
+        {
+          "id": "help",
+          "context": "Steuerung und Einstellungen"
+        },
+        {
+          "id": "admin",
+          "context": "Autorisierte Werkzeuge",
+          "conditional": "admin_runtime_enabled"
+        }
+      ]
+    }
+  ],
+  "progression_rules": {
+    "quest_map_surface": "show_only_prioritized_tracked_objectives",
+    "quest_log": [
+      "story",
+      "region",
+      "daily_weekly",
+      "hunter",
+      "guild",
+      "event"
+    ],
+    "harbor_services": [
+      "shipyard",
+      "loadouts",
+      "repair",
+      "supply",
+      "quests",
+      "regional_services"
+    ],
+    "progression_layers": [
+      "pirate_level",
+      "world_level",
+      "ship_level",
+      "fame",
+      "honor",
+      "battle_rank"
+    ]
+  },
+  "authority": {
+    "payment": "server_receipt_only",
+    "guild_critical": "server_authoritative",
+    "admin": "authenticated_server_action",
+    "local_prototype": "presentation_and_non_live_preview_only"
+  },
+  "no_code_types": [
+    "command_deck_destination_profile",
+    "command_deck_section_profile",
+    "modal_navigation_policy",
+    "mobile_menu_shell_profile"
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "milestone": "M238",
+  "master_concept": "V3.8",
+  "feature": "server_authoritative_season_identity_period_progression_division_event_results_settlement",
+  "surface": {
+    "primary": "Command Deck > Events > Season",
+    "secondary": "Command Deck > Rankings > Season",
+    "gameplay_hud": "no persistent season panel"
+  },
+  "season_fields": [
+    "season_id",
+    "title",
+    "state",
+    "starts_at",
+    "ends_at",
+    "remaining_seconds",
+    "season_score",
+    "division",
+    "division_rank",
+    "global_rank",
+    "next_division",
+    "next_threshold",
+    "qualified_state"
+  ],
+  "event_result_fields": [
+    "event_id",
+    "title",
+    "personal_rank",
+    "contribution",
+    "season_points",
+    "qualified_tier"
+  ],
+  "settlement_fields": [
+    "reward_publication_state",
+    "reward_summary",
+    "settlement_id",
+    "receipt_id"
+  ],
+  "states": [
+    "scheduled",
+    "live",
+    "finale",
+    "ended",
+    "settled"
+  ],
+  "authority": {
+    "server_owns_season_timing": true,
+    "server_owns_season_score": true,
+    "server_owns_division_and_rank": true,
+    "server_owns_event_to_season_points": true,
+    "server_owns_season_settlement": true,
+    "client_may_advance_season": false,
+    "client_may_compute_authoritative_rank": false,
+    "client_may_grant_or_claim_season_reward": false,
+    "replica_revision_is_monotonic": true,
+    "no_fake_season_when_snapshot_missing": true
+  },
+  "continuity": {
+    "M235_M236_active_event_replica_unchanged": true,
+    "M237_event_history_receipts_unchanged": true,
+    "season_aggregates_confirmed_event_results": true,
+    "past_seasons_can_be_carried_by_future_history_snapshots": true
+  },
+  "unchanged": [
+    "damage",
+    "range",
+    "reload",
+    "navigation",
+    "collision",
+    "spawns",
+    "loot",
+    "reward values",
+    "M213/M214 camera",
+    "round gameplay minimap",
+    "rectangular full sea chart"
+  ]
+}

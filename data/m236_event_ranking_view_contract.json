@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "milestone": "M236",
+  "master_concept": "V3.8",
+  "feature": "read_only_event_ranking_contribution_qualification_reward_view",
+  "surface": {
+    "primary": "Command Deck > Events",
+    "secondary": "Command Deck > Rankings",
+    "gameplay_hud": "transition feedback only",
+    "normal_hud_must_not_become_leaderboard": true
+  },
+  "sections": [
+    "personal_contribution",
+    "group_contribution",
+    "contribution_breakdown",
+    "personal_rank",
+    "group_rank",
+    "next_threshold",
+    "qualification_status",
+    "reward_publication_summary",
+    "optional_top10_personal",
+    "optional_top10_group"
+  ],
+  "authority": {
+    "source": "M235 authoritative contribution replica",
+    "client_may_sort_for_presentation": true,
+    "client_sort_is_authoritative": false,
+    "client_may_compute_rank": false,
+    "client_may_set_qualification": false,
+    "client_may_claim_or_grant_reward": false,
+    "claim_requires_server_receipt": true
+  },
+  "responsive": {
+    "same_information_architecture_all_platforms": true,
+    "mobile_changes_only_size_spacing_columns": true,
+    "scrollable": true,
+    "minimum_touch_target_policy": "M202"
+  },
+  "empty_states": {
+    "no_snapshot": "local preview / server rank pending",
+    "no_leaderboard_rows": "do not invent players or ranks",
+    "unpublished_reward": "show publication state only"
+  },
+  "unchanged": [
+    "damage",
+    "range",
+    "reload",
+    "navigation",
+    "collision",
+    "spawn authority",
+    "event phase authority",
+    "reward values",
+    "M213/M214 camera",
+    "round gameplay minimap",
+    "rectangular full sea chart"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "milestone": "M48",
+  "checks": [
+    "correct stable slot",
+    "scale against canonical scene",
+    "silhouette at gameplay camera",
+    "mobile readability",
+    "waterline/pivot",
+    "material calibration",
+    "LOD/performance budget",
+    "no unexpected collision",
+    "fallback still works if override removed"
+  ]
+}

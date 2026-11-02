@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "milestone": "M118",
+  "unlock_level": 31,
+  "encounters": [
+    {
+      "slot": "monster_ancient_guardian_01",
+      "role": "guardian",
+      "health_mult": 2.4,
+      "armor": 0.34,
+      "range": 16,
+      "mechanic": "relic_barrier",
+      "harpoon_weakness": "rift_piercer"
+    },
+    {
+      "slot": "monster_titan_spawn_01",
+      "role": "titan",
+      "health_mult": 3.0,
+      "armor": 0.28,
+      "range": 12,
+      "mechanic": "pressure_pulse",
+      "harpoon_weakness": "leviathan_chain"
+    },
+    {
+      "slot": "npc_ancient_admiral",
+      "role": "admiral",
+      "health_mult": 2.2,
+      "armor": 0.38,
+      "range": 22,
+      "mechanic": "escort_phase",
+      "harpoon_weakness": "abyssal_spike"
+    }
+  ],
+  "world_boss_prep": {
+    "level": 35,
+    "requirements": [
+      "guardian_fragments",
+      "hunter_clears",
+      "regional_objectives",
+      "admiral_clear"
+    ],
+    "not_world_boss_itself": true
+  },
+  "tuning": "prototype"
+}

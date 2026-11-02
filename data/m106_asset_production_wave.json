@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "milestone": "M106",
+  "p0_first13": 13,
+  "runtime_visual_replacements": [
+    "prop_harbor_pirate_lantern_02",
+    "prop_harbor_pirate_rope_post_01",
+    "nature_island_cove_rock_spur_01"
+  ],
+  "budgets": {
+    "harbor_modules_delta": 0,
+    "island_secondary_detail_delta": 0,
+    "marker_delta": 0
+  },
+  "next": [
+    "P0 final GLB batch replacement",
+    "starter/NPC silhouette native QA",
+    "first monster final rig",
+    "PL1-5 first-session visual hierarchy",
+    "guild island shield/objective mobile polish"
+  ]
+}

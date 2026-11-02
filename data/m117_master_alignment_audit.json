@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "milestone": "M117",
+  "v3_7_found": false,
+  "implemented": [
+    "dedicated bonusmap router/world root",
+    "normal-sea kills blocked from Gold/Abyss progression",
+    "return-sector routing",
+    "PL31-35 physical world",
+    "Ancient Guardian fragment objectives",
+    "PL35 World Boss preparation trial",
+    "stable Ancient NPC/monster/island/harbor slots"
+  ],
+  "truth_boundary": [
+    "bonusmap arena is a dedicated runtime root but reuses EncounterDirector profiles; deterministic per-wave spawn controller remains next refinement",
+    "no server instance authority",
+    "PL31-35 exact numeric tuning is prototype"
+  ],
+  "native_pending": true
+}

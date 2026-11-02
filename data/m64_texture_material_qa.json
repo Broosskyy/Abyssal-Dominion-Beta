@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "milestone": "M64",
+  "title": "Texture / Material QA Audit",
+  "checks": [
+    "all P0 texture slots have packaged fallback",
+    "override path remains under res://assets",
+    "phone sea-map readability beats micro-detail",
+    "no PL1–5 world placeholder requires 4K texture",
+    "material family reuse preferred over unique materials",
+    "water normal/foam remain replaceable independently",
+    "texture absence never breaks gameplay",
+    "final GLB materials may be remapped without changing gameplay wrapper"
+  ],
+  "status": "STATIC_READY_NATIVE_MEMORY_PROFILE_PENDING"
+}

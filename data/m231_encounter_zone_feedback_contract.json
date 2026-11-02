@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "milestone": "M231",
+  "master_concept": "V3.8",
+  "status": "ENCOUNTER_ZONE_FEEDBACK_STATIC_VERIFIED",
+  "intent": [
+    "Give restrained enter/leave feedback when the player crosses presentation-awareness boundaries around existing elite, monster-territory and admiral encounters.",
+    "Expose regional encounter identity without adding permanent world labels or filling the sea with circles.",
+    "Keep M229/M230 encounter semantics and all gameplay authorities unchanged."
+  ],
+  "feedback": {
+    "monster_territory_enter_leave": true,
+    "elite_danger_enter_leave": true,
+    "admiral_presence_enter_leave": true,
+    "regional_hint_compact": true,
+    "hysteresis_prevents_boundary_spam": true,
+    "change_cooldown_seconds": 1.0,
+    "message_seconds": 2.4,
+    "permanent_center_banner": false,
+    "ordinary_patrol_feedback": false
+  },
+  "presentation_boundary": {
+    "awareness_radii_are_gameplay_ranges": false,
+    "awareness_changes_aggro": false,
+    "awareness_changes_navigation": false,
+    "awareness_changes_collision": false,
+    "awareness_changes_damage": false
+  },
+  "world_rules": {
+    "round_gameplay_minimap_preserved": true,
+    "rectangular_full_sea_chart_preserved": true,
+    "m213_m214_master_camera_unchanged": true,
+    "same_world_mobile_web_desktop": true,
+    "m228_spawn_cap_unchanged": true,
+    "m229_encounter_semantics_reused": true,
+    "m230_minimap_nameplate_reads_reused": true
+  },
+  "boundaries": {
+    "damage_changed": false,
+    "range_changed": false,
+    "reload_changed": false,
+    "health_changed": false,
+    "rewards_changed": false,
+    "loot_values_changed": false,
+    "collision_changed": false,
+    "navigation_changed": false,
+    "aggro_changed": false,
+    "spawn_cap_increased": false,
+    "new_pathfinder_added": false
+  }
+}

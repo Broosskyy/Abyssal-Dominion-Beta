@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "milestone": "M109",
+  "range": [
+    6,
+    10
+  ],
+  "source_alignment": {
+    "regions": "extends existing pl6_15_regions M46",
+    "ship_rewards": "preserves existing pl6_15_ship_rewards M56 at PL6/8/10",
+    "ship_mastery": "uses existing per-design level 1-10 system",
+    "numbers": "local prototype tuning; not claimed as recovered final balance"
+  },
+  "levels": {
+    "6": {
+      "region": "stormreach",
+      "title": "Stormreach Approach",
+      "required_boss": true,
+      "trial": false,
+      "npc_slots": [
+        "npc_storm_raider",
+        "npc_storm_scout",
+        "npc_storm_guard"
+      ],
+      "boss": "npc_storm_admiral",
+      "ship_reward": "ship_main_01",
+      "mastery_xp_per_sink": 55,
+      "map_xp_goal": 900
+    },
+    "7": {
+      "region": "stormreach",
+      "title": "Stormreach Expanse",
+      "required_boss": true,
+      "trial": false,
+      "npc_slots": [
+        "npc_storm_scout",
+        "npc_storm_guard",
+        "npc_storm_raider"
+      ],
+      "boss": "npc_storm_admiral",
+      "ship_reward": "",
+      "mastery_xp_per_sink": 60,
+      "map_xp_goal": 1100
+    },
+    "8": {
+      "region": "stormreach",
+      "title": "Stormreach Deep Hunt",
+      "required_boss": true,
+      "trial": false,
+      "npc_slots": [
+        "npc_storm_guard",
+        "npc_storm_hunter",
+        "npc_storm_raider"
+      ],
+      "boss": "npc_storm_admiral",
+      "ship_reward": "ship_main_02",
+      "mastery_xp_per_sink": 65,
+      "map_xp_goal": 1300
+    },
+    "9": {
+      "region": "ember_shoals",
+      "title": "Ember Shoals",
+      "required_boss": true,
+      "trial": false,
+      "npc_slots": [
+        "npc_ember_raider",
+        "npc_ember_tank",
+        "npc_ember_hunter"
+      ],
+      "boss": "npc_ember_admiral",
+      "ship_reward": "",
+      "mastery_xp_per_sink": 70,
+      "map_xp_goal": 1550
+    },
+    "10": {
+      "region": "ember_shoals",
+      "title": "Ember Trial",
+      "required_boss": true,
+      "trial": true,
+      "npc_slots": [
+        "npc_ember_raider",
+        "npc_ember_tank",
+        "npc_ember_hunter"
+      ],
+      "boss": "npc_ember_admiral",
+      "ship_reward": "ship_main_03",
+      "mastery_xp_per_sink": 80,
+      "map_xp_goal": 1850
+    }
+  },
+  "progression_rules": {
+    "map_xp_is_eligibility_progress": true,
+    "boss_clear_required": true,
+    "pirate_trial_levels": [
+      10
+    ],
+    "map_level_does_not_auto_grant_ship": true,
+    "ship_reward_requires_explicit_boss_milestone": true,
+    "ship_mastery_xp_is_per_selected_design": true,
+    "npc_hostility_after_beginner_seas": true,
+    "guild_islands_remain_visible_from_level_2": true
+  }
+}

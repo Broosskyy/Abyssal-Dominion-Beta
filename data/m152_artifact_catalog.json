@@ -1,0 +1,12 @@
+{
+  "schema_version":1,"milestone":"M152","initial_active_slots":2,"mastery_cap_local_preview":10,
+  "artifacts":[
+    {"id":"ARTIFACT-WAR-CAPSTAN","name":"War Capstan","family":"war","rarity":"rare","effect":{"kind":"reload_after_valid_hit","value":0.03,"cap":0.06,"tradeoff":"repair_rate_-0.02"},"icon":"res://assets/production/ui/m152/artifact_war_capstan.svg","world_prop_slot":"ART-PROP-WAR-CAPSTAN"},
+    {"id":"ARTIFACT-TIDE-BULWARK","name":"Tide Bulwark","family":"defense","rarity":"epic","effect":{"kind":"shield_recovery_below_threshold","value":0.04,"cap":0.08,"cooldown":45},"icon":"res://assets/production/ui/m152/artifact_tide_bulwark.svg","world_prop_slot":"ART-PROP-TIDE-BULWARK"},
+    {"id":"ARTIFACT-STAR-COMPASS","name":"Star Compass","family":"navigation","rarity":"rare","effect":{"kind":"exploration_interaction","value":1.0,"cap":1.0},"icon":"res://assets/production/ui/m152/artifact_star_compass.svg","world_prop_slot":"ART-PROP-STAR-COMPASS"},
+    {"id":"ARTIFACT-LEVIATHAN-TOOTH","name":"Leviathan Tooth","family":"hunter","rarity":"legendary","effect":{"kind":"harpoon_specialization","value":0.05,"cap":0.10,"target":"monster"},"icon":"res://assets/production/ui/m152/artifact_leviathan_tooth.svg","world_prop_slot":"ART-PROP-LEVIATHAN-TOOTH"},
+    {"id":"ARTIFACT-FORTUNE-IDOL","name":"Fortune Idol","family":"fortune","rarity":"epic","effect":{"kind":"treasure_choice_quality","value":0.04,"cap":0.08},"icon":"res://assets/production/ui/m152/artifact_fortune_idol.svg","world_prop_slot":"ART-PROP-FORTUNE-IDOL"},
+    {"id":"ARTIFACT-ABYSS-HEART","name":"Abyss Heart","family":"abyssal","rarity":"abyssal","effect":{"kind":"corruption_risk_reward","value":0.06,"cap":0.12,"tradeoff":"incoming_abyss_damage_+0.04"},"icon":"res://assets/production/ui/m152/artifact_abyss_heart.svg","world_prop_slot":"ART-PROP-ABYSS-HEART"}
+  ],
+  "rules":["Artifacts specialize or alter mechanics instead of forming another generic stat ladder.","Strong effects require triggers, limits, cooldowns or trade-offs.","Competitive artifact power remains earnable.","No exclusive cash artifact may provide dominant combat power.","Pity, drop sources, sets, caps and PvP modifiers are versioned Admin content."]
+}

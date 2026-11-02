@@ -1,0 +1,306 @@
+{
+  "schema": 1,
+  "milestone": "M207",
+  "status": "MASTER_CONCEPT_SOURCE_AUDIT_STATIC_VERIFIED",
+  "master_concept": "V3.8",
+  "scope_note": "Game source/client audit only. Web/backend/admin requirements are recorded as architecture/future scope, not claimed implemented.",
+  "domains": [
+    {
+      "domain": "seekarte_world",
+      "master_points": [
+        "2",
+        "62",
+        "64"
+      ],
+      "status": "PARTIAL_STRONG_FOUNDATION",
+      "evidence": [
+        "scripts/world/world_map_system.gd",
+        "scripts/world/chart_composition_catalog.gd",
+        "scripts/visual/water_surface.gd"
+      ],
+      "remaining": [
+        "final authored island/harbor assets",
+        "native visual QA",
+        "regional final art"
+      ]
+    },
+    {
+      "domain": "mobile_desktop_controls",
+      "master_points": [
+        "3",
+        "4"
+      ],
+      "status": "IMPLEMENTED_FOUNDATION",
+      "evidence": [
+        "scripts/gameplay/player_input.gd",
+        "scripts/ui/nautical_layout.gd"
+      ],
+      "remaining": [
+        "native device QA",
+        "final touch tuning"
+      ]
+    },
+    {
+      "domain": "combat_targeting",
+      "master_points": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "status": "IMPLEMENTED_FOUNDATION",
+      "evidence": [
+        "scripts/gameplay/ship_weapons.gd",
+        "scripts/combat/targeting_system.gd",
+        "scripts/gameplay/cannon_projectile.gd"
+      ],
+      "remaining": [
+        "server authority",
+        "native combat-feel tuning"
+      ]
+    },
+    {
+      "domain": "cannons_harpoons_ammo",
+      "master_points": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "status": "PARTIAL_DEEP",
+      "evidence": [
+        "scripts/combat/m158_cannon_runtime.gd",
+        "scripts/progression/player_inventory.gd",
+        "scripts/ui/m205_cannon_presentation_catalog.gd",
+        "scripts/ui/m206_deck_equipment_presentation_catalog.gd"
+      ],
+      "remaining": [
+        "final 2D icons",
+        "final 3D weapon modules",
+        "server validation"
+      ]
+    },
+    {
+      "domain": "quickbar_action_items",
+      "master_points": [
+        "13",
+        "14",
+        "15"
+      ],
+      "status": "IMPLEMENTED_FOUNDATION",
+      "evidence": [
+        "scripts/ui/game_hud.gd",
+        "scripts/progression/player_inventory.gd",
+        "scripts/ui/item_ui_icon_catalog.gd"
+      ],
+      "remaining": [
+        "final icon art",
+        "native usability QA"
+      ]
+    },
+    {
+      "domain": "ships_fleet_mastery",
+      "master_points": [
+        "27",
+        "29",
+        "30",
+        "31",
+        "32"
+      ],
+      "status": "PARTIAL_DEEP",
+      "evidence": [
+        "scripts/progression/player_ship_roster.gd",
+        "scripts/progression/ship_catalog.gd",
+        "scripts/ui/shipyard_panel.gd"
+      ],
+      "remaining": [
+        "final ship GLBs",
+        "final ship cards",
+        "fleet UX polish"
+      ]
+    },
+    {
+      "domain": "decks_equipment",
+      "master_points": [
+        "33"
+      ],
+      "status": "PARTIAL_DEEP",
+      "evidence": [
+        "scripts/visual/m159_ship_extension_visuals.gd",
+        "scripts/ui/m206_deck_equipment_presentation_catalog.gd",
+        "scripts/ui/m207_ship_equipment_stage_catalog.gd"
+      ],
+      "remaining": [
+        "final deck/equipment 2D assets",
+        "final 3D modular visuals"
+      ]
+    },
+    {
+      "domain": "asset_registry_and_replacement_pipeline",
+      "master_points": [
+        "112-130",
+        "800",
+        "V3.7 Asset Replacement Slots"
+      ],
+      "status": "PARTIAL_STRONG_FOUNDATION",
+      "evidence": [
+        "data/visual_slots.json",
+        "scripts/visual/p0_import_readiness.gd",
+        "scripts/visual/p0_replacement_qa.gd",
+        "scripts/visual/ship_asset_acceptance.gd"
+      ],
+      "remaining": [
+        "author final assets",
+        "native Godot import QA",
+        "final hardpoint/socket contracts per hero model",
+        "production LOD/material optimization"
+      ]
+    },
+    {
+      "domain": "loot_inventory_crafting",
+      "master_points": [
+        "37",
+        "38",
+        "41"
+      ],
+      "status": "PARTIAL_DEEP",
+      "evidence": [
+        "scripts/visual/loot_visual.gd",
+        "scripts/ui/arsenal_panel.gd",
+        "scripts/progression/equipment_economy_contracts.gd"
+      ],
+      "remaining": [
+        "full category UX",
+        "final item art",
+        "server-authoritative transactions"
+      ]
+    },
+    {
+      "domain": "npcs_admirals_monsters",
+      "master_points": [
+        "42",
+        "43",
+        "44",
+        "45"
+      ],
+      "status": "PARTIAL_FOUNDATION",
+      "evidence": [
+        "scripts/world/encounter_director.gd",
+        "scripts/gameplay/enemy_ship_ai.gd",
+        "scripts/world/regional_encounter_zone_catalog.gd"
+      ],
+      "remaining": [
+        "final NPC ship models",
+        "final monster models",
+        "encounter native QA"
+      ]
+    },
+    {
+      "domain": "events_bonusmaps_exploration",
+      "master_points": [
+        "51",
+        "54",
+        "58",
+        "60"
+      ],
+      "status": "PARTIAL_FOUNDATION",
+      "evidence": [
+        "scripts/world/bonusmap_wave_director.gd",
+        "scripts/world/world_poi_composer.gd"
+      ],
+      "remaining": [
+        "full live event content",
+        "final world assets",
+        "server/liveops authority"
+      ]
+    },
+    {
+      "domain": "harbors_market_economy",
+      "master_points": [
+        "39",
+        "74",
+        "75"
+      ],
+      "status": "PARTIAL_FOUNDATION",
+      "evidence": [
+        "scripts/world/m187_harbor_service_catalog.gd",
+        "scripts/progression/regional_harbor_economy.gd",
+        "scripts/visual/harbor_content_composer.gd"
+      ],
+      "remaining": [
+        "full bazaar",
+        "final harbor art",
+        "server economy"
+      ]
+    },
+    {
+      "domain": "hud_interface",
+      "master_points": [
+        "2",
+        "3",
+        "4",
+        "15"
+      ],
+      "status": "PARTIAL_STRONG_FOUNDATION",
+      "evidence": [
+        "scripts/ui/game_hud.gd",
+        "scripts/ui/nautical_hud.gd",
+        "scripts/ui/command_deck.gd"
+      ],
+      "remaining": [
+        "visual-master native QA",
+        "menu consolidation",
+        "final 2D UI art"
+      ]
+    },
+    {
+      "domain": "companions_artifacts_afk",
+      "master_points": [
+        "848-862"
+      ],
+      "status": "PARTIAL_ARCHITECTURE",
+      "evidence": [
+        "scripts/meta/companion_catalog.gd",
+        "scripts/meta/companion_runtime.gd",
+        "scripts/meta/artifact_catalog.gd",
+        "scripts/meta/artifact_loadout.gd"
+      ],
+      "remaining": [
+        "complete production UX/content",
+        "final assets",
+        "server authority"
+      ]
+    },
+    {
+      "domain": "backend_admin_web",
+      "master_points": [
+        "V3.4-V3.8 technical operations"
+      ],
+      "status": "OUTSIDE_CURRENT_GAME_SOURCE_IMPLEMENTATION",
+      "evidence": [
+        "integration",
+        "server_schema"
+      ],
+      "remaining": [
+        "real backend",
+        "database",
+        "admin/CMS",
+        "web/support platform",
+        "production security/ops"
+      ]
+    }
+  ],
+  "priority_next": [
+    "final asset production pipeline",
+    "ship/island/harbor/loot authored assets",
+    "HUD/menu visual convergence",
+    "native mobile+desktop QA",
+    "replace placeholders through stable visual slots"
+  ],
+  "claims": {
+    "native_godot_visual_pass": false,
+    "android_device_pass": false,
+    "desktop_device_pass": false,
+    "gameplay_balance_changed": false
+  }
+}

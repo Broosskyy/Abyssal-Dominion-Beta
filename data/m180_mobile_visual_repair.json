@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "milestone": "M180",
+  "master_concept": "V3.8",
+  "evidence": {
+    "android_recording": "156780.mp4 · 2340x1080 · M177 test",
+    "screenshot": "156778.jpg",
+    "master_gameplay_reference": "Masterkonzept embedded gameplay image",
+    "verified_failures": [
+      "raw high-DPI width selected desktop navigation",
+      "admin toggle overlapped top-right menu",
+      "repair overlapped ammunition selector",
+      "quickslots overlapped combat selectors",
+      "event quest strip competed with event/minimap rail",
+      "admin panel used unscaled desktop dimensions",
+      "water specular response obscured world readability"
+    ]
+  },
+  "mobile_hud": {
+    "wide_reference_navigation": ["KARTE", "WERFT", "LOG", "ARSENAL", "MENÜ"],
+    "narrow_navigation": ["WERFT", "ARSENAL", "MENÜ"],
+    "secondary_destinations_live_in_menu": true,
+    "combat_cluster_runtime_overlap_guard": true,
+    "event_summary_count_on_touch": 1,
+    "camera_joystick": "bottom_left_camera_only",
+    "ship_movement": "tap_to_sail",
+    "primary_attack": "bottom_right"
+  },
+  "menus": {
+    "admin_touch_entry": "MENU_ADMIN",
+    "meta_touch_entry": "MENU_HOME",
+    "standalone_touch_toggles": false,
+    "modal_shade": true,
+    "background_sailing_blocked": true,
+    "density_scaled_controls": true
+  },
+  "water": {
+    "target": "dark restrained readable naval sea",
+    "default_surface_roughness": 0.60,
+    "default_specular_strength": 0.22,
+    "metallic": 0.0,
+    "normal_depth": 0.22,
+    "default_sun_energy": 0.92,
+    "large_white_glare_is_acceptable": false
+  },
+  "authority": {
+    "presentation_only": true,
+    "gameplay_or_economy_values_changed": false,
+    "server_authority_preserved": true
+  }
+}

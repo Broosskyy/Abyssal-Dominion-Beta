@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "milestone": "M235",
+  "master_concept": "V3.8",
+  "feature": "server_authoritative_world_event_contribution_ranking_and_reward_eligibility_replica",
+  "authority": {
+    "contribution_totals": "server/admin authoritative when connected",
+    "ranking": "server authoritative",
+    "eligibility": "server authoritative",
+    "reward_grant": "server authoritative",
+    "hud": "read_only presentation",
+    "client_may_rank": false,
+    "client_may_mark_eligible": false,
+    "client_may_grant_rewards": false
+  },
+  "contribution": {
+    "dimensions": [
+      "personal",
+      "group"
+    ],
+    "supported_breakdown": [
+      "damage",
+      "sinks",
+      "objectives",
+      "support",
+      "exploration"
+    ],
+    "local_runtime_score_is_preview_only": true,
+    "anti_cheat_note": "client-originated actions are requests/telemetry only; authoritative totals require server validation"
+  },
+  "ranking": {
+    "fields": [
+      "personal_rank",
+      "group_rank",
+      "participants",
+      "group_participants",
+      "tier",
+      "next_threshold"
+    ],
+    "leaderboard_rows_optional": true,
+    "client_sort_is_not_authoritative": true
+  },
+  "reward_eligibility": {
+    "states": [
+      "unknown",
+      "participating",
+      "eligible",
+      "qualified",
+      "settled"
+    ],
+    "fields": [
+      "eligible",
+      "eligibility_state",
+      "qualified_tier",
+      "reward_publication_state",
+      "reward_summary"
+    ],
+    "reward_values_unchanged": true,
+    "claim_requires_server_receipt": true
+  },
+  "online_ready": {
+    "snapshot_fields": [
+      "event_id",
+      "revision",
+      "personal_contribution",
+      "group_contribution",
+      "contribution_breakdown",
+      "personal_rank",
+      "group_rank",
+      "participants",
+      "group_participants",
+      "tier",
+      "next_threshold",
+      "eligible",
+      "eligibility_state",
+      "qualified_tier",
+      "reward_publication_state",
+      "reward_summary"
+    ],
+    "monotonic_revision_expected": true,
+    "client_replica_only": true
+  },
+  "unchanged": [
+    "damage",
+    "range",
+    "reload",
+    "collision",
+    "navigation",
+    "spawn authority",
+    "reward values",
+    "loot values",
+    "event phase authority",
+    "M213/M214 camera",
+    "round gameplay minimap",
+    "rectangular full sea chart"
+  ]
+}

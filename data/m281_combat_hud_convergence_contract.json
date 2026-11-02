@@ -1,0 +1,66 @@
+{
+  "milestone": "M281",
+  "contract": "combat_hud_target_reload_ammo_status_visual_convergence_naval_battle_feedback_polish",
+  "master_concept": "V3.8",
+  "genre_ux_references": [
+    "Seafight",
+    "Battle of Sea"
+  ],
+  "dependencies": {
+    "target_legality": "M271",
+    "fire_outcome": "M269",
+    "combat_state": "M270",
+    "movement": "M268",
+    "world_replication": "M267"
+  },
+  "authority": {
+    "server_owns": [
+      "target_legality",
+      "relationship_truth",
+      "reload_completion",
+      "ammo_consumption",
+      "combat_outcome",
+      "status_effect_truth",
+      "boss_phase_truth"
+    ],
+    "client_may": [
+      "render_confirmed_combat_state",
+      "animate_unconfirmed_fire_press",
+      "cycle_target_intent",
+      "open_ammo_or_status_ui"
+    ],
+    "client_never": [
+      "authorize_target",
+      "complete_reload",
+      "consume_ammo",
+      "confirm_hit_or_damage",
+      "apply_status_effect",
+      "advance_boss_phase"
+    ]
+  },
+  "visual_rules": {
+    "sea_chart_first": true,
+    "keep_center_readable": true,
+    "primary_attack_bottom_right": true,
+    "camera_joystick_bottom_left": true,
+    "target_header_compact": true,
+    "reload_salvo_feedback_immediate": true,
+    "active_ammo_visible_near_combat_cluster": true,
+    "prioritized_status_effects": true,
+    "boss_admiral_telegraphs_readable": true,
+    "safe_area_aware": true,
+    "mobile_desktop_parity": true,
+    "reuse_master_ammo_item_icons": true,
+    "no_new_combat_main_menu": true,
+    "no_permanent_debug_hud": true
+  },
+  "unset_until_measured": [
+    "reload_ring_animation_timing",
+    "combat_feedback_lifetime",
+    "status_chip_limit",
+    "boss_telegraph_duration",
+    "damage_number_density",
+    "mobile_spacing_scale",
+    "desktop_spacing_scale"
+  ]
+}

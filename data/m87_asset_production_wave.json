@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "milestone": "M87",
+  "priority": "P0",
+  "master_first_13": [
+    "ship_small",
+    "ship_medium",
+    "ship_large",
+    "npc_friendly_coastal_sloop",
+    "npc_scout_01",
+    "npc_raider_01",
+    "npc_gunship_01",
+    "npc_heavy_01",
+    "harbor_havens_reach",
+    "island_tropical_small",
+    "island_tropical_medium",
+    "island_cliff_cove",
+    "monster_early_01"
+  ],
+  "wired_this_milestone": [
+    "prop_harbor_sailcloth_bundle_01",
+    "prop_harbor_cart_01",
+    "prop_monster_bone_spine_01",
+    "prop_monster_harpoon_rack_01",
+    "nature_coast_cliff_spur_01",
+    "nature_coast_tidepool_01"
+  ],
+  "prepared_next": [
+    "prop_harbor_dock_stairs_01",
+    "prop_harbor_fish_drying_rack_01",
+    "prop_wreck_bow_ornament_01",
+    "prop_wreck_spar_cluster_01",
+    "nature_island_cliff_face_01",
+    "nature_island_cove_rocks_01",
+    "nature_island_sand_spit_01",
+    "prop_monster_hunter_buoy_01"
+  ],
+  "rule": "Master P0 first-13 final GLBs remain the highest production priority; secondary world slots are swap-ready only."
+}

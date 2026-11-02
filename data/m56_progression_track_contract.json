@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "milestone": "M56",
+  "progression_track": {
+    "mobile_panel": true,
+    "map_level_visible": true,
+    "eligibility_separate": true,
+    "ownership_separate": true,
+    "boss_milestones_visible": true,
+    "future_unbound_rewards_labeled": true,
+    "local_reward_history": true
+  },
+  "reward_history": {
+    "persisted_in_ship_roster": true,
+    "one_time_per_awarded_design": true,
+    "server_audit_claimed": false
+  },
+  "main_designs": 50,
+  "starter_designs": 3,
+  "authority": "local prototype only"
+}

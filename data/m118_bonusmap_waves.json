@@ -1,0 +1,219 @@
+{
+  "schema": 1,
+  "milestone": "M157",
+  "gold": [
+    {
+      "wave": 1,
+      "kind": "ship",
+      "count": 3,
+      "slot": "npc_gold_raider",
+      "archetype": "brawler",
+      "level_offset": 0
+    },
+    {
+      "wave": 2,
+      "kind": "ship",
+      "count": 4,
+      "slot": "npc_gold_marksman",
+      "archetype": "artillery",
+      "level_offset": 1
+    },
+    {
+      "wave": 3,
+      "kind": "elite",
+      "count": 4,
+      "slot": "npc_gold_elite",
+      "archetype": "skirmisher",
+      "level_offset": 2
+    },
+    {
+      "wave": 4,
+      "kind": "elite",
+      "count": 5,
+      "slot": "npc_gold_guard",
+      "archetype": "tank",
+      "level_offset": 3
+    },
+    {
+      "wave": 5,
+      "kind": "admiral",
+      "count": 1,
+      "slot": "npc_gold_admiral",
+      "archetype": "tank",
+      "level_offset": 4
+    },
+    {
+      "wave": 6,
+      "kind": "admiral",
+      "count": 1,
+      "slot": "npc_gold_sovereign",
+      "archetype": "artillery",
+      "level_offset": 6
+    }
+  ],
+  "abyss": [
+    {
+      "wave": 1,
+      "kind": "ship",
+      "count": 3,
+      "slot": "npc_abyss_raider",
+      "archetype": "brawler",
+      "level_offset": 0
+    },
+    {
+      "wave": 2,
+      "kind": "ship",
+      "count": 4,
+      "slot": "npc_abyss_piercer",
+      "archetype": "artillery",
+      "level_offset": 1
+    },
+    {
+      "wave": 3,
+      "kind": "monster",
+      "count": 1,
+      "slot": "monster_abyss_serpent_01",
+      "archetype": "skirmisher",
+      "level_offset": 2
+    },
+    {
+      "wave": 4,
+      "kind": "elite",
+      "count": 5,
+      "slot": "npc_abyss_elite",
+      "archetype": "tank",
+      "level_offset": 3
+    },
+    {
+      "wave": 5,
+      "kind": "elite",
+      "count": 5,
+      "slot": "npc_abyss_hunter",
+      "archetype": "skirmisher",
+      "level_offset": 4
+    },
+    {
+      "wave": 6,
+      "kind": "guardian",
+      "count": 1,
+      "slot": "monster_abyss_guardian_01",
+      "archetype": "tank",
+      "level_offset": 6
+    },
+    {
+      "wave": 7,
+      "kind": "guardian",
+      "count": 1,
+      "slot": "monster_abyss_crown_guardian",
+      "archetype": "tank",
+      "level_offset": 8
+    }
+  ],
+  "rules": [
+    "spawn next wave only after current wave cleared",
+    "stable production slots",
+    "instance ownership required",
+    "no normal-sea progression"
+  ],
+  "tuning": "prototype",
+  "silver": [
+    {
+      "wave": 1,
+      "kind": "ship",
+      "count": 3,
+      "slot": "npc_silver_raider",
+      "archetype": "brawler",
+      "level_offset": 0
+    },
+    {
+      "wave": 2,
+      "kind": "ship",
+      "count": 4,
+      "slot": "npc_silver_skirmisher",
+      "archetype": "skirmisher",
+      "level_offset": 1
+    },
+    {
+      "wave": 3,
+      "kind": "elite",
+      "count": 4,
+      "slot": "npc_silver_elite",
+      "archetype": "artillery",
+      "level_offset": 2
+    },
+    {
+      "wave": 4,
+      "kind": "admiral",
+      "count": 1,
+      "slot": "npc_silver_admiral",
+      "archetype": "tank",
+      "level_offset": 3
+    },
+    {
+      "wave": 5,
+      "kind": "admiral",
+      "count": 1,
+      "slot": "npc_silver_flagship",
+      "archetype": "artillery",
+      "level_offset": 5
+    }
+  ],
+  "legendary": [
+    {
+      "wave": 1,
+      "kind": "ship",
+      "count": 4,
+      "slot": "npc_legendary_void_fleet",
+      "archetype": "brawler",
+      "level_offset": 0
+    },
+    {
+      "wave": 2,
+      "kind": "elite",
+      "count": 4,
+      "slot": "npc_legendary_elite",
+      "archetype": "skirmisher",
+      "level_offset": 2
+    },
+    {
+      "wave": 3,
+      "kind": "guardian",
+      "count": 1,
+      "slot": "monster_legendary_void",
+      "archetype": "tank",
+      "level_offset": 4
+    },
+    {
+      "wave": 4,
+      "kind": "admiral",
+      "count": 1,
+      "slot": "npc_legendary_admiral",
+      "archetype": "artillery",
+      "level_offset": 6
+    },
+    {
+      "wave": 5,
+      "kind": "elite",
+      "count": 5,
+      "slot": "npc_legendary_command_guard",
+      "archetype": "tank",
+      "level_offset": 7
+    },
+    {
+      "wave": 6,
+      "kind": "monster",
+      "count": 1,
+      "slot": "monster_legendary_leviathan",
+      "archetype": "leviathan",
+      "level_offset": 8
+    },
+    {
+      "wave": 7,
+      "kind": "admiral",
+      "count": 1,
+      "slot": "npc_legendary_sovereign",
+      "archetype": "artillery",
+      "level_offset": 10
+    }
+  ]
+}

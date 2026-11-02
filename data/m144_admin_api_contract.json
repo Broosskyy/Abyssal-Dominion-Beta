@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "milestone": "M161",
+  "service": "UnifiedContentAdminService",
+  "transport": "HTTPS_JSON",
+  "base_path": "/api/admin/v1",
+  "environments": [
+    "TEST",
+    "STAGING",
+    "GLOBAL"
+  ],
+  "authentication": {
+    "staff_session": "http_only_secure_cookie_or_short_lived_bearer",
+    "mfa_for_critical": true,
+    "client_role_claims_trusted": false
+  },
+  "operations": {
+    "types.list": {
+      "method": "GET",
+      "path": "/content/types",
+      "permission": "content.read"
+    },
+    "records.list": {
+      "method": "GET",
+      "path": "/content/records",
+      "permission": "content.read"
+    },
+    "draft.create": {
+      "method": "POST",
+      "path": "/content/drafts",
+      "permission": "content.create"
+    },
+    "draft.update": {
+      "method": "PATCH",
+      "path": "/content/drafts/{id}",
+      "permission": "content.edit",
+      "revision_guard": true
+    },
+    "draft.validate": {
+      "method": "POST",
+      "path": "/content/drafts/{id}/validate",
+      "permission": "content.validate"
+    },
+    "review.request": {
+      "method": "POST",
+      "path": "/content/drafts/{id}/review",
+      "permission": "content.validate"
+    },
+    "approval.submit": {
+      "method": "POST",
+      "path": "/approvals/{id}",
+      "permission": "content.publish",
+      "server_only": true
+    },
+    "publish": {
+      "method": "POST",
+      "path": "/content/drafts/{id}/publish",
+      "permission": "content.publish",
+      "server_only": true
+    },
+    "schedule": {
+      "method": "POST",
+      "path": "/content/drafts/{id}/schedule",
+      "permission": "content.schedule",
+      "server_only": true
+    },
+    "rollback": {
+      "method": "POST",
+      "path": "/content/records/{id}/rollback",
+      "permission": "content.rollback",
+      "server_only": true
+    },
+    "assets.upload": {
+      "method": "POST",
+      "path": "/assets",
+      "permission": "asset.upload",
+      "server_only": true
+    },
+    "assets.replace": {
+      "method": "POST",
+      "path": "/assets/{slot}/versions",
+      "permission": "asset.replace",
+      "server_only": true
+    },
+    "snapshots.current": {
+      "method": "GET",
+      "path": "/snapshots/current",
+      "permission": "content.read"
+    },
+    "audit.list": {
+      "method": "GET",
+      "path": "/audit",
+      "permission": "audit.read"
+    },
+    "commands.execute": {
+      "method": "POST",
+      "path": "/v1/admin/commands/execute",
+      "permission": "command.execute",
+      "server_only": true
+    },
+    "commerce.publish": {
+      "method": "POST",
+      "path": "/v1/admin/commerce/publish",
+      "permission": "commerce.publish",
+      "server_only": true
+    },
+    "commerce.rollback": {
+      "method": "POST",
+      "path": "/v1/admin/commerce/rollback",
+      "permission": "commerce.publish",
+      "server_only": true
+    },
+    "payment.refund": {
+      "method": "POST",
+      "path": "/v1/admin/payments/refund",
+      "permission": "payment.refund",
+      "server_only": true
+    },
+    "entitlement.adjust": {
+      "method": "POST",
+      "path": "/v1/admin/entitlements/adjust",
+      "permission": "entitlement.adjust",
+      "server_only": true
+    }
+  },
+  "request_required": [
+    "request_id",
+    "operation",
+    "environment",
+    "surface",
+    "client_version",
+    "permission",
+    "payload"
+  ],
+  "response_required": [
+    "request_id",
+    "status",
+    "server_time",
+    "revision",
+    "payload",
+    "audit_event_id",
+    "server_verified"
+  ],
+  "idempotency": {
+    "required_for_writes": true,
+    "header": "Idempotency-Key"
+  },
+  "concurrency": {
+    "strategy": "optimistic_revision",
+    "conflict_status": 409
+  },
+  "rule": "The Godot and web admin surfaces emit the same request envelope. Only the authenticated server executes writes and persists audit history."
+}

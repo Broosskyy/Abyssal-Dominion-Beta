@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "milestone": "M95",
+  "markers": [
+    {
+      "kind": "event_portal",
+      "slot": "event_halloween_portal_01",
+      "icon": "m94_halloween_event",
+      "priority": 82,
+      "label": "Halloween Portal"
+    },
+    {
+      "kind": "event_wreck",
+      "slot": "event_halloween_wreck_01",
+      "icon": "m94_halloween_quest",
+      "priority": 72,
+      "label": "Geisterwrack"
+    },
+    {
+      "kind": "event_boss",
+      "slot": "event_halloween_boss_01",
+      "icon": "m94_halloween_event",
+      "priority": 96,
+      "label": "Drowned Sovereign"
+    }
+  ],
+  "rule": "presentation priority only; targeting/reward authority remains canonical gameplay/server path"
+}

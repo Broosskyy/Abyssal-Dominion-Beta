@@ -1,0 +1,24 @@
+{
+  "milestone": "M217",
+  "title": "Combat Pursuit, Respawn Safety & Hostile Salvo Readability",
+  "master_concept": "V3.8",
+  "camera_lock": "five gameplay master references; M213/M214 high-wide oblique composition unchanged",
+  "rules": {
+    "defeat_breaks_previous_aggro_chain": true,
+    "enemy_forced_return_after_player_sink": true,
+    "post_respawn_enemy_reacquire_buffer_ms": 3500,
+    "passive_until_attacked_resets_provocation_after_player_defeat": true,
+    "existing_player_respawn_protection_duration_unchanged": true,
+    "damage_range_reload_movement_collision_loot_balance_unchanged": true,
+    "hostile_broadside_window_exposed_as_presentation_metadata": true,
+    "target_hud_salvo_cue": true,
+    "cross_platform_world_logic_identical": true
+  },
+  "acceptance": [
+    "sunk/protected player is not attackable",
+    "previous enemy target is cleared",
+    "enemy enters RETURN state",
+    "enemy cannot instantly reacquire after protection",
+    "SALVE cue remains presentation-only"
+  ]
+}

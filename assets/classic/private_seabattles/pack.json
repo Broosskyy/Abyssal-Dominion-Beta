@@ -1,0 +1,157 @@
+{
+  "source_label": "SeaBattles 1.24.0 user-provided reference assets",
+  "actors": {
+    "PlayerShip": {
+      "path": "ships/elite8.png",
+      "columns": 4,
+      "rows": 2,
+      "world_width": 12.0,
+      "heading_offset": 45.0,
+      "verified_healthy_row": 1,
+      "source_layout": "4 directions x 2 sail states; full sails row1"
+    },
+    "NPC_0": {
+      "path": "ships/warship.png",
+      "columns": 4,
+      "rows": 2,
+      "world_width": 12.0,
+      "heading_offset": 45.0,
+      "verified_healthy_row": 1,
+      "source_layout": "4 directions x 2 sail states; full sails row1"
+    },
+    "NPC_1": {
+      "path": "ships/pinnace.png",
+      "columns": 4,
+      "rows": 2,
+      "world_width": 12.0,
+      "heading_offset": 45.0,
+      "verified_healthy_row": 1,
+      "source_layout": "4 directions x 2 sail states; full sails row1"
+    },
+    "NPC_2": {
+      "path": "ships/flyingdutchman.png",
+      "columns": 4,
+      "rows": 2,
+      "world_width": 12.0,
+      "heading_offset": 45.0,
+      "verified_healthy_row": 1,
+      "source_layout": "4 directions x 2 sail states; full sails row1"
+    },
+    "NPC_3": {
+      "path": "ships/elite8.png",
+      "columns": 4,
+      "rows": 2,
+      "world_width": 12.0,
+      "heading_offset": 45.0,
+      "verified_healthy_row": 1,
+      "source_layout": "4 directions x 2 sail states; full sails row1"
+    },
+    "NPC_4": {
+      "path": "ships/warship.png",
+      "columns": 4,
+      "rows": 2,
+      "world_width": 12.0,
+      "heading_offset": 45.0,
+      "verified_healthy_row": 1,
+      "source_layout": "4 directions x 2 sail states; full sails row1"
+    },
+    "SeaMonster": {
+      "path": "monsters/tiamat.png",
+      "columns": 4,
+      "rows": 8,
+      "world_width": 17,
+      "heading_offset": 45,
+      "animation_rows": 8,
+      "animation_fps": 7
+    },
+    "Island_0": {
+      "path": "islands/snow.png"
+    },
+    "Island_1": {
+      "path": "islands/snow2.png"
+    },
+    "Island_2": {
+      "path": "islands/rock.png"
+    },
+    "Island_3": {
+      "path": "islands/tropical.png"
+    }
+  },
+  "ocean": {
+    "path": "ocean/wave_noise.png",
+    "usage": "noise"
+  },
+  "selected": [
+    {
+      "slot": "ships/elite8.png",
+      "name": "elite8",
+      "source": "01cfeb25dc28e0340a3e1309896dbbce",
+      "path_id": 1,
+      "sha256": "2d2463b6dbe4e3e8c99bd3b89e42768ffc58d86a0c3600bbe4c0bb3a950e6d62"
+    },
+    {
+      "slot": "ships/warship.png",
+      "name": "Warship",
+      "source": "acf30e60df3b7474e8216b6a8730ee75",
+      "path_id": 1,
+      "sha256": "296ba591acb84140a79754cd32330ee22e6587cd6d5c7c449ea7982d740f4d3e"
+    },
+    {
+      "slot": "ships/pinnace.png",
+      "name": "Pinnace",
+      "source": "3602f33411dee0c46be4e5ec9c682241",
+      "path_id": 1,
+      "sha256": "b6b04d1777f5fa3f2a53a6532b540bb77db64313ccbca8566d19281ef9facd50"
+    },
+    {
+      "slot": "ships/flyingdutchman.png",
+      "name": "FlyingDutchman",
+      "source": "3540fe60383ea264faf390faf471835c",
+      "path_id": 1,
+      "sha256": "cdf2d19818ea0656049dc994c38c5dcc55ca0320185a3cb88729040ed784c2fd"
+    },
+    {
+      "slot": "monsters/tiamat.png",
+      "name": "Tiamat",
+      "source": "efec81a9b8502e449a63c27457026def",
+      "path_id": 1,
+      "sha256": "a5f78646b313043b8945d7b28649d4b97989fb3f6ac6fda2d7783df86153433d"
+    },
+    {
+      "slot": "ocean/wave_noise.png",
+      "name": "WaveNoise",
+      "source": "sharedassets1.assets",
+      "path_id": 34,
+      "sha256": "245452c5a32d5ab4358533cb2e80a1772c87f01d6449f1b9b9b588824c009c21"
+    },
+    {
+      "slot": "islands/snow.png",
+      "name": "8",
+      "source": "17b90585340354e37b4c231e2b07b451",
+      "path_id": 1,
+      "sha256": "c1d62837c658a4b422fd7aa1e205ab904e399a9fffdf9502f9959d0be7f91865"
+    },
+    {
+      "slot": "islands/snow2.png",
+      "name": "7",
+      "source": "e5a7937dfb2ab4a36979b7c17fd0e953",
+      "path_id": 1,
+      "sha256": "05955e637983727ab9bf7a9dc8428ed79f3e9198f59ff0371d12d0ab2d1a7624"
+    },
+    {
+      "slot": "islands/rock.png",
+      "name": "5",
+      "source": "57e9e303722d74b189316842c16c6458",
+      "path_id": 1,
+      "sha256": "9a1f8fb937720975b6c91bfb4511e7d9d9ae9e0e0332f9b42861d797d02f4cb5"
+    },
+    {
+      "slot": "islands/tropical.png",
+      "name": "9",
+      "source": "10804415ce2f9449783e705a6a0d2991",
+      "path_id": 1,
+      "sha256": "06fa539c185d7d4b834cc4f20de05c429a53fb1aa5029b5c66ef5a8fe50b8d0b"
+    }
+  ],
+  "license": "Not established for redistribution; local reference prototype"
+}

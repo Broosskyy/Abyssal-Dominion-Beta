@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "milestone": "M186",
+  "master_concept": "V3.8",
+  "goal": "ONE_TRACKED_OBJECTIVE_WITH_HONEST_WORLD_TARGET_ROUTING",
+  "sources": ["core", "dynamic", "event"],
+  "selection": {
+    "maximum_tracked": 1,
+    "saved_locally": true,
+    "progress_authority_unchanged": true,
+    "track_without_map_target": true
+  },
+  "navigation": {
+    "requires_existing_world_node": true,
+    "nearest_matching_target": true,
+    "tap_to_sail_reused": true,
+    "teleport": false,
+    "spawn_missing_target": false,
+    "fake_route": false,
+    "honest_empty_state": "KEIN KARTENZIEL IN DIESEM SEKTOR"
+  },
+  "target_mapping": {
+    "sink": "enemies",
+    "loot": "loot",
+    "dock": "ports",
+    "event_sink": "event_participant_enemies",
+    "event_monster_hit": "event_participant_monsters",
+    "event_explore": "event_interactables",
+    "dynamic": "content_ids_content_tags_or_explicit_target_groups"
+  },
+  "hud": {
+    "mission_lane": "tracked_objective_only",
+    "world_marker": "single_priority_marker_and_edge_cue",
+    "minimap": "single_tracked_ring",
+    "clear_center": true,
+    "menu_detail_location": "MENU > AUFTRÄGE"
+  },
+  "touch": {
+    "track_untrack_minimum": 56,
+    "navigate_minimum": 56,
+    "safe_area_layout": true
+  },
+  "no_code_types": [
+    "quest_tracking_profile",
+    "objective_navigation_profile",
+    "tracked_objective_priority",
+    "quest_map_target_policy"
+  ]
+}

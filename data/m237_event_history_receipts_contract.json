@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "milestone": "M237",
+  "master_concept": "V3.8",
+  "feature": "server_authoritative_event_history_placements_tiers_reward_receipts",
+  "surface": {
+    "primary": "Command Deck > Events > Event-Historie",
+    "secondary": "Command Deck > Rankings > historical summary",
+    "gameplay_hud": "none except existing transient event feedback"
+  },
+  "history_fields": [
+    "event_id", "title", "season_label", "completed_at", "personal_rank", "group_rank",
+    "personal_contribution", "qualified_tier", "reward_state", "settlement_id"
+  ],
+  "receipt_fields": [
+    "receipt_id", "event_id", "settlement_id", "status", "reward_summary", "issued_at", "server_signature_present"
+  ],
+  "authority": {
+    "server_owns_event_completion": true,
+    "server_owns_rank_and_tier": true,
+    "server_owns_reward_settlement": true,
+    "client_may_create_receipt": false,
+    "client_may_mark_reward_delivered": false,
+    "client_history_is_read_only": true,
+    "replica_revision_is_monotonic": true,
+    "no_fake_history_when_snapshot_missing": true
+  },
+  "continuity": {
+    "events_do_not_reset_to_zero_as_history": true,
+    "season_and_recurring_event_history_supported": true,
+    "active_event_state_remains_M235_M236": true,
+    "history_does_not_modify_active_event_progress": true
+  },
+  "unchanged": [
+    "damage", "range", "reload", "navigation", "collision", "spawns", "loot", "reward values",
+    "M213/M214 camera", "round gameplay minimap", "rectangular full sea chart"
+  ]
+}

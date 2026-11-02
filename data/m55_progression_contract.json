@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "milestone": "M55",
+  "progression": {
+    "map_level_auto_ownership_removed": true,
+    "eligibility_separate_from_ownership": true,
+    "pl6_15_boss_reward_hooks": 5,
+    "old_save_owned_designs_preserved": true,
+    "future_design_rewards_data_driven": true
+  },
+  "ship_browser": {
+    "starter_only_preview_removed": true,
+    "starter_owned_eligible_ids_combined": true,
+    "harbor_equip_owned_only": true
+  },
+  "authority": "local prototype only"
+}

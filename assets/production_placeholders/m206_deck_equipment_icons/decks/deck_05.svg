@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Deck level 5">
+<rect x="5" y="5" width="86" height="86" rx="18" fill="#07131d" stroke="#3c5363" stroke-width="3"/>
+<path d="M15 72 Q48 86 81 72" fill="none" stroke="#244656" stroke-width="5" stroke-linecap="round"/>
+<path d="M24 54 L31 46 H65 L72 54 L65 59 H31 Z" fill="#6a4a2f" stroke="#d2aa69" stroke-width="2"/><path d="M24 50 L31 42 H65 L72 50 L65 55 H31 Z" fill="#6a4a2f" stroke="#d2aa69" stroke-width="2"/><path d="M24 46 L31 38 H65 L72 46 L65 51 H31 Z" fill="#6a4a2f" stroke="#d2aa69" stroke-width="2"/><path d="M24 42 L31 34 H65 L72 42 L65 47 H31 Z" fill="#6a4a2f" stroke="#d2aa69" stroke-width="2"/><path d="M24 38 L31 30 H65 L72 38 L65 43 H31 Z" fill="#6a4a2f" stroke="#d2aa69" stroke-width="2"/><circle cx="32" cy="69" r="2" fill="#f0c97a"/><circle cx="42" cy="69" r="2" fill="#f0c97a"/><circle cx="52" cy="69" r="2" fill="#f0c97a"/><circle cx="62" cy="69" r="2" fill="#f0c97a"/><circle cx="32" cy="63" r="2" fill="#f0c97a"/>
+<circle cx="48" cy="48" r="35" fill="none" stroke="#d1a25b" stroke-opacity=".28" stroke-width="2"/>
+</svg>

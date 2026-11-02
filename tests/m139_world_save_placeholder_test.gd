@@ -1,0 +1,16 @@
+extends Node
+func _ready()->void:
+	assert(WorldSectorRegistry.validate().is_empty())
+	var migrated:=WorldSaveMigration.resolve_sector_id({"sector":[0,0]})
+	assert(bool(migrated.get("ok",false)))
+	assert(str(migrated.get("sector_id",""))=="SECTOR-001")
+	assert(bool(migrated.get("migrated",false)))
+	var direct:=WorldSaveMigration.resolve_sector_id({"sector_id":"SECTOR-001"})
+	assert(not bool(direct.get("migrated",true)))
+	assert(VisualQualityResolver.decorator_budget()>0)
+	var a:=ProductionPlaceholderContract.ship_silhouette("SHIP-PROG-001")
+	var b:=ProductionPlaceholderContract.ship_silhouette("SHIP-PROG-005")
+	assert(a.get("silhouette")!=b.get("silhouette"))
+	var islands:=JSON.parse_string(FileAccess.get_file_as_string("res://data/m139_island_silhouette_profiles.json"))
+	assert((islands.get("profiles",[]) as Array).size()==20)
+	print("M139_WORLD_SAVE_PLACEHOLDER_PASS")

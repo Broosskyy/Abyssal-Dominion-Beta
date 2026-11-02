@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "milestone": "M197",
+  "master_concept": "V3.8",
+  "status": "REGIONAL_ENCOUNTER_ZONES_STATIC_VERIFIED",
+  "locks": {
+    "cross_platform_world_parity": true,
+    "chart_size_world_units": 360,
+    "named_charts_preserved": true,
+    "tap_to_sail_preserved": true,
+    "land_blocks_units_do_not": true,
+    "combat_math_unchanged": true,
+    "spawn_count_authority_unchanged": true,
+    "regional_spawn_zones": true,
+    "safe_travel_corridor_reserved": true,
+    "monster_territories_distinct_from_patrol_lanes": true,
+    "admiral_staging_area_distinct": true
+  },
+  "intent": [
+    "Give each named region a recognizable combat geography rather than uniform random spawns.",
+    "Keep at least one readable travel corridor through normal patrol pressure.",
+    "Place ordinary monsters in regional monster territories and admirals in deliberate staging areas.",
+    "Keep all gameplay spawn geometry identical across Mobile, Web and Desktop."
+  ]
+}

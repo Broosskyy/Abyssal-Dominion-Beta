@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "milestone": "M64",
+  "profiles": {
+    "tropical": {
+      "water_tint": "#1382a1",
+      "shallow_tint": "#47b7bd",
+      "fog_tint": "#b7d9d6",
+      "sun_energy": 1.0,
+      "contrast": "clear"
+    },
+    "storm": {
+      "water_tint": "#355d70",
+      "shallow_tint": "#5f8690",
+      "fog_tint": "#9aaeb5",
+      "sun_energy": 0.72,
+      "contrast": "muted"
+    },
+    "ember": {
+      "water_tint": "#36576a",
+      "shallow_tint": "#766b5c",
+      "fog_tint": "#b7a28b",
+      "sun_energy": 0.86,
+      "contrast": "warm_haze"
+    },
+    "veil": {
+      "water_tint": "#344b6e",
+      "shallow_tint": "#6d6684",
+      "fog_tint": "#a9a3b8",
+      "sun_energy": 0.68,
+      "contrast": "mystic"
+    }
+  },
+  "rule": "Profiles are presentation-only and cannot alter navigation, range, stealth or combat."
+}

@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "milestone": "M117",
+  "range": [
+    31,
+    35
+  ],
+  "master_alignment": {
+    "phase": "Ancient Guardian / Legendary Fragment preparation",
+    "pl35_trial": "World Boss preparation",
+    "xp_alone_unlocks": false
+  },
+  "levels": {
+    "31": {
+      "title": "Ancient Approach",
+      "region": "ancient_guardian_seas",
+      "map_xp_goal": 15500,
+      "mastery_xp_per_sink": 310,
+      "boss": "npc_ancient_admiral",
+      "hunter_required": 3,
+      "region_objectives": 6,
+      "guardian_fragments_required": 2,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "32": {
+      "title": "Guardian Shelf",
+      "region": "ancient_guardian_seas",
+      "map_xp_goal": 16800,
+      "mastery_xp_per_sink": 325,
+      "boss": "npc_ancient_admiral",
+      "hunter_required": 3,
+      "region_objectives": 6,
+      "guardian_fragments_required": 2,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "33": {
+      "title": "Forgotten Vault Sea",
+      "region": "ancient_guardian_seas",
+      "map_xp_goal": 18100,
+      "mastery_xp_per_sink": 340,
+      "boss": "npc_ancient_admiral",
+      "hunter_required": 3,
+      "region_objectives": 7,
+      "guardian_fragments_required": 3,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "34": {
+      "title": "Titan Wake",
+      "region": "ancient_guardian_seas",
+      "map_xp_goal": 19400,
+      "mastery_xp_per_sink": 355,
+      "boss": "npc_ancient_admiral",
+      "hunter_required": 3,
+      "region_objectives": 7,
+      "guardian_fragments_required": 3,
+      "pirate_trial": false,
+      "trial_focus": []
+    },
+    "35": {
+      "title": "World Boss Muster",
+      "region": "ancient_guardian_seas",
+      "map_xp_goal": 20700,
+      "mastery_xp_per_sink": 370,
+      "boss": "npc_ancient_admiral",
+      "hunter_required": 3,
+      "region_objectives": 8,
+      "guardian_fragments_required": 4,
+      "pirate_trial": true,
+      "trial_focus": [
+        "world_boss_preparation",
+        "guardian_mechanics",
+        "legendary_fragments"
+      ]
+    }
+  },
+  "tuning": "prototype"
+}

@@ -1,0 +1,383 @@
+{
+  "schema": 1,
+  "provenance": "Original M30 stylized placeholders, not recovered Unity art M155 adds clean-room visual-only loot GLBs; no recovered commercial asset bytes.",
+  "contract": {
+    "units": "meters",
+    "up": "+Y",
+    "forward": "+Z",
+    "pivot": "waterline",
+    "collision": "Godot wrapper only",
+    "material_policy": "embedded PBR, shared resources"
+  },
+  "assets": {
+    "ship_small": {
+      "path": "res://assets/production_placeholders/m201_reference/models/ship_starter_small_m201.glb",
+      "triangles": 1399,
+      "surfaces": 6,
+      "sha256": "c414e4c6b077a2296944d569e4933761270d162c8332a03a1f0e0428127929da",
+      "bytes": 12460,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "ship_medium": {
+      "path": "res://assets/production_placeholders/m201_reference/models/ship_starter_medium_m201.glb",
+      "triangles": 1655,
+      "surfaces": 6,
+      "sha256": "5a374d90d6962fee387fbaa379ea083053eee42434ee583189490b403ab2358d",
+      "bytes": 12252,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "ship_large": {
+      "path": "res://assets/production_placeholders/m201_reference/models/ship_starter_large_m201.glb",
+      "triangles": 2127,
+      "surfaces": 6,
+      "sha256": "a6dcd6beb4bb724c4eaa7e4fb207322d85f26667802027fd3c7fd4bdc0777a7b",
+      "bytes": 13560,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "npc_corsair": {
+      "path": "res://assets/placeholder_pack/models/npc_corsair.glb",
+      "triangles": 1655,
+      "surfaces": 6,
+      "sha256": "736cfebb4ac521f3ae00c75e44f3930d2b2a48eab07f3724d388e8d92a1e8c00",
+      "bytes": 123132
+    },
+    "npc_admiral": {
+      "path": "res://assets/placeholder_pack/models/npc_admiral.glb",
+      "triangles": 2127,
+      "surfaces": 6,
+      "sha256": "c46ff6c449cbd117b3f1c9f2cc8aa0c5a4de6df3cdfc92d3e44bf6c54d6d055d",
+      "bytes": 157068
+    },
+    "npc_shadow": {
+      "path": "res://assets/placeholder_pack/models/npc_shadow.glb",
+      "triangles": 2127,
+      "surfaces": 6,
+      "sha256": "95e7c34d8b5031024c7e480346885e469dbf3a29d0c3d435b462b3038510e861",
+      "bytes": 157068
+    },
+    "island_tropical": {
+      "path": "res://assets/placeholder_pack/models/island_tropical.glb",
+      "triangles": 671,
+      "surfaces": 5,
+      "sha256": "5052668bad9870b84b2f7e75e2881872531e538ab3e1daf512b8ca0539019771",
+      "bytes": 52048
+    },
+    "island_rock": {
+      "path": "res://assets/placeholder_pack/models/island_rock.glb",
+      "triangles": 496,
+      "surfaces": 2,
+      "sha256": "b9d180a69fdcddc988886513f4db924261ed61162a398eb7de638779f8308a27",
+      "bytes": 37336
+    },
+    "island_snow": {
+      "path": "res://assets/placeholder_pack/models/island_snow.glb",
+      "triangles": 496,
+      "surfaces": 2,
+      "sha256": "d31fc9beb37a92be2dcdc1132962101e71ecadbea5c18dad1258bbd766863aa5",
+      "bytes": 37336
+    },
+    "harbor": {
+      "path": "res://assets/placeholder_pack/models/harbor.glb",
+      "triangles": 808,
+      "surfaces": 6,
+      "sha256": "2cce76b62f11a06a9cbb01eba4f60ca382c7803dc5cb290efb12cacfb9563e3d",
+      "bytes": 62148
+    },
+    "loot_chest": {
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "sha256": "7749e44803cc23e3e2c312d63d98961ae7cc39d9c15fba143ecf6cc29b06d958",
+      "bytes": 3764,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "repair_crate": {
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_repair_crate_m201.glb",
+      "sha256": "cd0740176df4a129a6aa8fbb25381d5418d3685855de38d47fb5171f83e5e36f",
+      "bytes": 3484,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "monster_kraken": {
+      "path": "res://assets/placeholder_pack/models/monster_kraken.glb",
+      "triangles": 740,
+      "surfaces": 2,
+      "sha256": "ca7673010758a4ddc79c5de52a14e14a2e08b8298422a452f3a03e8f19b7b8ce",
+      "bytes": 54976
+    },
+    "wreck": {
+      "path": "res://assets/placeholder_pack/models/wreck.glb",
+      "triangles": 1207,
+      "surfaces": 5,
+      "sha256": "4af34facf6159d8143c34f67e5ee4d500b5b552b961db6c155cbbaf1ad039343",
+      "bytes": 90248
+    },
+    "cannon": {
+      "path": "res://assets/placeholder_pack/models/cannon.glb",
+      "triangles": 60,
+      "surfaces": 2,
+      "sha256": "980e4295534aa839f72b02a059153c98922d7ab091273045a9ceeaad426eba22",
+      "bytes": 5768
+    },
+    "cannonball": {
+      "path": "res://assets/placeholder_pack/models/cannonball.glb",
+      "triangles": 120,
+      "surfaces": 1,
+      "sha256": "97e8d714ca33f9cf19f10a2c1e6286b780423cc9cc1e53c465c6770b9594faa7",
+      "bytes": 9568
+    },
+    "harpoon": {
+      "path": "res://assets/placeholder_pack/models/harpoon.glb",
+      "triangles": 40,
+      "surfaces": 2,
+      "sha256": "dbdce5c5f323bf115e30e509fb1fd0e32244197a40d8e0ddaa1c4eb2f40a9903",
+      "bytes": 4392
+    },
+    "buoy": {
+      "path": "res://assets/placeholder_pack/models/buoy.glb",
+      "triangles": 128,
+      "surfaces": 3,
+      "sha256": "fc016f29e3484909879d3f33929c318e46670a31666be5335db1d0060eea1e4d",
+      "bytes": 11364
+    },
+    "npc_friendly_coastal_sloop": {
+      "path": "res://assets/production_placeholders/m296/npc_friendly_coastal_sloop.glb",
+      "triangles": 1667,
+      "surfaces": 7,
+      "sha256": "cc337d917ecdd9d4204997dc9fd89be7e0d1d8c39bf6017739e192bfc387324e",
+      "bytes": 124572,
+      "classification": "M296_COMPLETE_COASTAL_GLB_PLACEHOLDER"
+    },
+    "npc_scout_01": {
+      "path": "res://assets/production_placeholders/m297/npc_scout_01.glb",
+      "triangles": 1703,
+      "surfaces": 8,
+      "sha256": "043c2dfc89a13d47bd6114f70ef8731aa3efa9b99757675e871b7deb3671957a",
+      "bytes": 126960,
+      "classification": "M297_COMPLETE_SCOUT_GLB_PLACEHOLDER"
+    },
+    "npc_raider_01": {
+      "path": "res://assets/production_placeholders/m295/npc_raider_01.glb",
+      "triangles": 1655,
+      "surfaces": 6,
+      "sha256": "ce638fe7c8819a9417ae3b1ffe62274c8305b57321c65dd94e82fd50c2e85157",
+      "bytes": 123428,
+      "classification": "M295_COMPLETE_RAIDER_GLB_PLACEHOLDER"
+    },
+    "event_halloween_npc_sloop_01": {
+      "path": "res://assets/production_placeholders/m301/event_halloween_npc_sloop_01.glb",
+      "triangles": 1655,
+      "surfaces": 6,
+      "sha256": "8b7a59419bbb22c3c989290fadbc090885db887d8a77143d0894e50b02a93c8c",
+      "bytes": 123488,
+      "classification": "M301_COMPLETE_HALLOWEEN_SLOOP_GLB_PLACEHOLDER"
+    },
+    "event_halloween_npc_raider_01": {
+      "path": "res://assets/production_placeholders/m301/event_halloween_npc_raider_01.glb",
+      "triangles": 1655,
+      "surfaces": 6,
+      "sha256": "65cff31532ab7e1392d8ca181d4403024987e6e10154263a89c22ce69485bc42",
+      "bytes": 123496,
+      "classification": "M301_COMPLETE_HALLOWEEN_RAIDER_GLB_PLACEHOLDER"
+    },
+    "event_halloween_ship_design_01": {
+      "path": "res://assets/production_placeholders/m301/event_halloween_ship_design_01.glb",
+      "triangles": 1655,
+      "surfaces": 6,
+      "sha256": "eae86dd1a33e4437a6964454c61e7c389e83ebcc466b94f53a4f94763def35a7",
+      "bytes": 123496,
+      "classification": "M301_COMPLETE_EVENT_PRIZE_GLB_PLACEHOLDER"
+    },
+    "npc_gunship_01": {
+      "path": "res://assets/production_placeholders/m296/npc_gunship_01.glb",
+      "triangles": 1775,
+      "surfaces": 8,
+      "sha256": "fe7485b23bb99aafdb5a19e2d06d05f446212778c677b9576b322bc27b6c7489",
+      "bytes": 130860,
+      "classification": "M296_COMPLETE_GUNSHIP_GLB_PLACEHOLDER"
+    },
+    "npc_heavy_01": {
+      "path": "res://assets/production_placeholders/m297/npc_heavy_01.glb",
+      "triangles": 2211,
+      "surfaces": 9,
+      "sha256": "e0efa5bbe44147b83fa2ed01f14dec35fb5cb5905d38c2b87002b071be1beaba",
+      "bytes": 163336,
+      "classification": "M297_COMPLETE_HEAVY_GLB_PLACEHOLDER"
+    },
+    "harbor_havens_reach": {
+      "path": "res://assets/production_placeholders/p0/harbor_havens_reach.glb",
+      "triangles": 808,
+      "surfaces": 6,
+      "sha256": "2cce76b62f11a06a9cbb01eba4f60ca382c7803dc5cb290efb12cacfb9563e3d",
+      "bytes": 62148,
+      "classification": "M58_SPECIALIZED_FALLBACK"
+    },
+    "island_tropical_small": {
+      "path": "res://assets/production_placeholders/m201_reference/models/island_tropical_small_m201.glb",
+      "triangles": 671,
+      "surfaces": 5,
+      "sha256": "5edcca0a6920279a1630a7c615e287b6b4b5f458c34638888f1325621a22b536",
+      "bytes": 15400,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "island_tropical_medium": {
+      "path": "res://assets/production_placeholders/m201_reference/models/island_tropical_medium_m201.glb",
+      "triangles": 671,
+      "surfaces": 5,
+      "sha256": "dd643d444dbe762e188fd178566422ce0e5d0def946d1762b75cab0f27ac4754",
+      "bytes": 16392,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "island_cliff_cove": {
+      "path": "res://assets/production_placeholders/m201_reference/models/island_cliff_cove_m201.glb",
+      "triangles": 496,
+      "surfaces": 2,
+      "sha256": "54d8efc1f491138deb732ef3b05719e8b9c1a9c87f26eecc8698dbc138a552aa",
+      "bytes": 16668,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "island_sandbar_long": {
+      "path": "res://assets/production_placeholders/m201_reference/models/island_sandbar_long_m201.glb",
+      "triangles": 671,
+      "surfaces": 5,
+      "sha256": "5ce74c992dba94c98ddd6ef943d4409aec05f94c6edbc77c4c3985e10007155e",
+      "bytes": 13464,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "monster_early_01": {
+      "path": "res://assets/production_placeholders/p0/monster_early_01.glb",
+      "triangles": 740,
+      "surfaces": 2,
+      "sha256": "ca7673010758a4ddc79c5de52a14e14a2e08b8298422a452f3a03e8f19b7b8ce",
+      "bytes": 54976,
+      "classification": "M58_SPECIALIZED_FALLBACK"
+    },
+    "poi_salvage_cache_01": {
+      "path": "res://assets/placeholder_pack/models/loot_chest.glb",
+      "triangles": 104,
+      "surfaces": 2,
+      "sha256": "9e09ca5cc85592953559486db438654cf6aaf34d89adaf91c99029ab58889962",
+      "bytes": 8948,
+      "classification": "M72_SEMANTIC_FALLBACK"
+    },
+    "poi_wreck_site_01": {
+      "path": "res://assets/placeholder_pack/models/wreck.glb",
+      "triangles": 1207,
+      "surfaces": 5,
+      "sha256": "4af34facf6159d8143c34f67e5ee4d500b5b552b961db6c155cbbaf1ad039343",
+      "bytes": 90248,
+      "classification": "M72_SEMANTIC_FALLBACK"
+    },
+    "poi_navigation_marker_01": {
+      "path": "res://assets/placeholder_pack/models/buoy.glb",
+      "triangles": 128,
+      "surfaces": 3,
+      "sha256": "fc016f29e3484909879d3f33929c318e46670a31666be5335db1d0060eea1e4d",
+      "bytes": 11364,
+      "classification": "M72_SEMANTIC_FALLBACK"
+    },
+    "poi_supply_cache_01": {
+      "path": "res://assets/placeholder_pack/models/repair_crate.glb",
+      "triangles": 104,
+      "surfaces": 2,
+      "sha256": "0be9007cab78b29809e567fad8961153c90a124b47fe8ceb92da5f7e9cab4df5",
+      "bytes": 8952,
+      "classification": "M72_SEMANTIC_FALLBACK"
+    },
+    "loot_coin_cache": {
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_coin_cache_m201.glb",
+      "sha256": "b22df0340401a9d1b30ab154840eae95aa1afeac86c3b7918d28a529bef77be2",
+      "bytes": 4204,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "loot_salvage_bundle": {
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_salvage_bundle_m201.glb",
+      "sha256": "2d14eed817258a5d08e8267810d757c0d53a0b604f986c72aaf6c1f5c16f0233",
+      "bytes": 2860,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "loot_chest_common": {
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "sha256": "7749e44803cc23e3e2c312d63d98961ae7cc39d9c15fba143ecf6cc29b06d958",
+      "bytes": 3764,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "loot_chest_uncommon": {
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "sha256": "7749e44803cc23e3e2c312d63d98961ae7cc39d9c15fba143ecf6cc29b06d958",
+      "bytes": 3764,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "loot_chest_rare": {
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "sha256": "7749e44803cc23e3e2c312d63d98961ae7cc39d9c15fba143ecf6cc29b06d958",
+      "bytes": 3764,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "loot_chest_epic": {
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "sha256": "7749e44803cc23e3e2c312d63d98961ae7cc39d9c15fba143ecf6cc29b06d958",
+      "bytes": 3764,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "loot_chest_legendary": {
+      "path": "res://assets/production_placeholders/m201_reference/models/loot_chest_m201.glb",
+      "sha256": "7749e44803cc23e3e2c312d63d98961ae7cc39d9c15fba143ecf6cc29b06d958",
+      "bytes": 3764,
+      "classification": "M201_REFERENCE_GRADE_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true,
+      "counts_as_final": false
+    },
+    "loot_admiral_vault": {
+      "path": "res://assets/production_placeholders/m155_loot/loot_admiral_vault.glb",
+      "sha256": "a90cf983587654dc72205a6cb18b6201ba78517e785d0346b9efcd6b4a7119ac",
+      "bytes": 9108,
+      "classification": "M155_CLEAN_ROOM_GLB_PLACEHOLDER",
+      "visual_only": true,
+      "replacement_ready": true
+    }
+  }
+}

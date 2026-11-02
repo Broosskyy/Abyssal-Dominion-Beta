@@ -1,0 +1,151 @@
+{
+  "schema": 1,
+  "milestone": "M104",
+  "database": "future PostgreSQL-compatible relational model",
+  "tables": {
+    "accounts": {
+      "pk": "account_id",
+      "columns": [
+        "account_id UUID",
+        "status TEXT",
+        "revision BIGINT",
+        "created_at TIMESTAMPTZ",
+        "updated_at TIMESTAMPTZ"
+      ]
+    },
+    "captains": {
+      "pk": "captain_id",
+      "fk": [
+        "account_id -> accounts"
+      ],
+      "columns": [
+        "captain_id UUID",
+        "account_id UUID",
+        "captain_name TEXT",
+        "revision BIGINT",
+        "locale TEXT"
+      ]
+    },
+    "account_providers": {
+      "pk": "provider_link_id",
+      "fk": [
+        "account_id -> accounts"
+      ],
+      "unique": [
+        "provider, provider_subject"
+      ],
+      "columns": [
+        "provider_link_id UUID",
+        "account_id UUID",
+        "provider TEXT",
+        "provider_subject TEXT",
+        "verified_at TIMESTAMPTZ"
+      ]
+    },
+    "sessions": {
+      "pk": "session_id",
+      "fk": [
+        "account_id -> accounts"
+      ],
+      "columns": [
+        "session_id UUID",
+        "account_id UUID",
+        "environment TEXT",
+        "token_hash TEXT",
+        "issued_at TIMESTAMPTZ",
+        "expires_at TIMESTAMPTZ",
+        "revoked_at TIMESTAMPTZ"
+      ]
+    },
+    "inventory_items": {
+      "pk": "inventory_item_id",
+      "fk": [
+        "account_id -> accounts"
+      ],
+      "unique": [
+        "account_id, definition_id"
+      ],
+      "columns": [
+        "inventory_item_id UUID",
+        "account_id UUID",
+        "definition_id TEXT",
+        "quantity BIGINT",
+        "revision BIGINT"
+      ]
+    },
+    "wallet_balances": {
+      "pk": "wallet_balance_id",
+      "fk": [
+        "account_id -> accounts"
+      ],
+      "unique": [
+        "account_id, currency_id"
+      ],
+      "columns": [
+        "wallet_balance_id UUID",
+        "account_id UUID",
+        "currency_id TEXT",
+        "balance BIGINT",
+        "revision BIGINT"
+      ]
+    },
+    "entitlements": {
+      "pk": "entitlement_id",
+      "fk": [
+        "account_id -> accounts"
+      ],
+      "unique": [
+        "account_id, entitlement_key"
+      ],
+      "columns": [
+        "entitlement_id UUID",
+        "account_id UUID",
+        "entitlement_key TEXT",
+        "source TEXT",
+        "granted_at TIMESTAMPTZ",
+        "revoked_at TIMESTAMPTZ"
+      ]
+    },
+    "transaction_ledger": {
+      "pk": "transaction_id",
+      "fk": [
+        "account_id -> accounts"
+      ],
+      "unique": [
+        "client_request_id"
+      ],
+      "columns": [
+        "transaction_id UUID",
+        "client_request_id TEXT",
+        "account_id UUID",
+        "environment TEXT",
+        "domain TEXT",
+        "operation TEXT",
+        "definition_id TEXT",
+        "quantity BIGINT",
+        "expected_revision BIGINT",
+        "result TEXT",
+        "created_at TIMESTAMPTZ"
+      ]
+    },
+    "progression": {
+      "pk": "captain_id",
+      "fk": [
+        "captain_id -> captains"
+      ],
+      "columns": [
+        "captain_id UUID",
+        "pirate_level INT",
+        "xp BIGINT",
+        "map_level INT",
+        "revision BIGINT"
+      ]
+    }
+  },
+  "rules": [
+    "No plaintext password/session token storage.",
+    "Wallet/inventory/entitlement writes and ledger entry share one server transaction.",
+    "TEST and GLOBAL databases are isolated.",
+    "Support/Admin tooling uses audited service operations, not direct manual row edits."
+  ]
+}

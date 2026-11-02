@@ -1,0 +1,84 @@
+{
+  "base": "http://127.0.0.1:8077/",
+  "renderer": "Chromium WebGL2 / SwiftShader",
+  "records": [
+    {
+      "file": "desktop_wide.png",
+      "fixture": "wide",
+      "mobile_emulation": false,
+      "viewport": {
+        "width": 1600,
+        "height": 900
+      },
+      "kind": "actual Godot WebGL runtime; debug fixture; software renderer"
+    },
+    {
+      "file": "desktop_ship_detail.png",
+      "fixture": "ship_detail",
+      "mobile_emulation": false,
+      "viewport": {
+        "width": 1600,
+        "height": 900
+      },
+      "kind": "actual Godot WebGL runtime; debug fixture; software renderer"
+    },
+    {
+      "file": "desktop_harbor.png",
+      "fixture": "harbor",
+      "mobile_emulation": false,
+      "viewport": {
+        "width": 1600,
+        "height": 900
+      },
+      "kind": "actual Godot WebGL runtime; debug fixture; software renderer"
+    },
+    {
+      "file": "desktop_snow.png",
+      "fixture": "snow",
+      "mobile_emulation": false,
+      "viewport": {
+        "width": 1600,
+        "height": 900
+      },
+      "kind": "actual Godot WebGL runtime; debug fixture; software renderer"
+    },
+    {
+      "file": "desktop_arsenal.png",
+      "fixture": "arsenal",
+      "mobile_emulation": false,
+      "viewport": {
+        "width": 1600,
+        "height": 900
+      },
+      "kind": "actual Godot WebGL runtime; debug fixture; software renderer"
+    },
+    {
+      "mobile_emulation": false,
+      "errors": []
+    },
+    {
+      "file": "mobile_wide.png",
+      "fixture": "wide",
+      "mobile_emulation": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "kind": "actual Godot WebGL runtime; debug fixture; software renderer"
+    },
+    {
+      "file": "mobile_arsenal.png",
+      "fixture": "arsenal",
+      "mobile_emulation": true,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "kind": "actual Godot WebGL runtime; debug fixture; software renderer"
+    },
+    {
+      "mobile_emulation": true,
+      "errors": []
+    }
+  ]
+}

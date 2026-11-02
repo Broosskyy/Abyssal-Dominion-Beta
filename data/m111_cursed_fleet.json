@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "milestone": "M111",
+  "region": "cursed_dominion",
+  "npc_slots": {
+    "npc_cursed_raider": {
+      "role": "raider",
+      "ammo": "ember",
+      "silhouette": "fast pirate brig, torn asymmetric sails"
+    },
+    "npc_cursed_marksman": {
+      "role": "artillery",
+      "ammo": "piercing",
+      "silhouette": "long corsair hull, raised stern cannon deck"
+    },
+    "npc_cursed_bulwark": {
+      "role": "tank",
+      "ammo": "shatter",
+      "silhouette": "heavy pirate galleon, broad battered hull"
+    },
+    "npc_cursed_hunter": {
+      "role": "hunter",
+      "ammo": "venom",
+      "silhouette": "harpoon spars, rope/bone trophies"
+    },
+    "npc_cursed_elite": {
+      "role": "elite",
+      "ammo": "spectral",
+      "silhouette": "black-sail veteran corsair with lantern rig"
+    },
+    "npc_cursed_admiral": {
+      "role": "admiral",
+      "ammo": "spectral",
+      "silhouette": "hero pirate flagship, layered sails, crown lanterns"
+    }
+  },
+  "monster_slots": {
+    "monster_cursed_serpent_01": {
+      "role": "hunter_target",
+      "attack": "lunge/status"
+    },
+    "monster_ghost_whale_01": {
+      "role": "heavy_hunter_target",
+      "attack": "wake/impact"
+    }
+  },
+  "stable_asset_slots": true,
+  "fallbacks_required": true
+}

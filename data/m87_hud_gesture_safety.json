@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "milestone": "M87",
+  "title": "HUD Gesture Edge Safety",
+  "touch_edge_guard": 18,
+  "notch_guard": 12,
+  "critical_groups": [
+    "movement",
+    "combat"
+  ],
+  "rules": [
+    "critical touch groups remain inside safe rect plus gesture inset",
+    "editor warns when critical groups approach gesture edge",
+    "desktop profiles do not receive touch gesture padding",
+    "presentation/input safety only; no gameplay value changes"
+  ]
+}

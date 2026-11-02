@@ -1,0 +1,224 @@
+{
+  "schema": 1,
+  "milestone": "M175",
+  "master_concept": "V3.8",
+  "production_lock": "ABYSSAL_DOMINION_2026_PRODUKTIONS_DESIGN_LOCK_V1.0",
+  "goal": "DATA_DRIVEN_COMBAT_REWARD_AND_MOBILE_FEEDBACK_FOUNDATION",
+  "immutable_hud_contract": {
+    "bottom_left": "camera_joystick_only",
+    "ship_movement": "tap_to_sail",
+    "bottom_right": "large_primary_attack_with_combat_actions",
+    "center": "world_gameplay_readability_first",
+    "camera_joystick_may_steer_ship": false
+  },
+  "damage_number_profiles": {
+    "compact_phone": {
+      "max_entries": 24,
+      "merge_window": 0.13,
+      "crowd_merge_window": 0.28,
+      "crowd_threshold": 10,
+      "life": 1.2,
+      "base_scale": 0.94
+    },
+    "phone": {
+      "max_entries": 24,
+      "merge_window": 0.13,
+      "crowd_merge_window": 0.28,
+      "crowd_threshold": 10,
+      "life": 1.2,
+      "base_scale": 1.0
+    },
+    "tablet_desktop": {
+      "max_entries": 24,
+      "merge_window": 0.13,
+      "crowd_merge_window": 0.28,
+      "crowd_threshold": 10,
+      "life": 1.2,
+      "base_scale": 1.0
+    }
+  },
+  "value_kinds": {
+    "damage": {
+      "prefix": "−",
+      "suffix": "",
+      "priority": 2,
+      "scale": 1.0
+    },
+    "critical": {
+      "prefix": "−",
+      "suffix": " KRIT",
+      "priority": 5,
+      "scale": 1.22
+    },
+    "dot": {
+      "prefix": "−",
+      "suffix": " DOT",
+      "priority": 1,
+      "scale": 0.9
+    },
+    "heal": {
+      "prefix": "+",
+      "suffix": " HEILUNG",
+      "priority": 4,
+      "scale": 1.08
+    },
+    "repair": {
+      "prefix": "+",
+      "suffix": " REPARATUR",
+      "priority": 4,
+      "scale": 1.08
+    },
+    "shield": {
+      "prefix": "+",
+      "suffix": " SCHILD",
+      "priority": 4,
+      "scale": 1.04
+    },
+    "block": {
+      "prefix": "",
+      "suffix": " BLOCK",
+      "priority": 3,
+      "scale": 1.0
+    },
+    "armor": {
+      "prefix": "",
+      "suffix": " RÜSTUNG",
+      "priority": 3,
+      "scale": 1.0
+    }
+  },
+  "reward_presentations": {
+    "common": {
+      "label": "BEUTE",
+      "vfx_action": "loot_common",
+      "notice_ms": 2200,
+      "presentation": "compact"
+    },
+    "uncommon": {
+      "label": "UNGEWÖHNLICHE BEUTE",
+      "vfx_action": "loot_uncommon",
+      "notice_ms": 2400,
+      "presentation": "compact_accent"
+    },
+    "rare": {
+      "label": "SELTENE BEUTE",
+      "vfx_action": "loot_rare",
+      "notice_ms": 2900,
+      "presentation": "banner"
+    },
+    "epic": {
+      "label": "EPISCHE BEUTE",
+      "vfx_action": "loot_epic",
+      "notice_ms": 3400,
+      "presentation": "banner_burst"
+    },
+    "legendary": {
+      "label": "LEGENDÄRE BEUTE",
+      "vfx_action": "loot_legendary",
+      "notice_ms": 4200,
+      "presentation": "hero_reveal"
+    },
+    "abyssal": {
+      "label": "ABYSSALE BEUTE",
+      "vfx_action": "loot_abyssal",
+      "notice_ms": 4800,
+      "presentation": "hero_reveal"
+    },
+    "repair": {
+      "label": "BERGUNG",
+      "vfx_action": "loot_repair",
+      "notice_ms": 2200,
+      "presentation": "compact"
+    }
+  },
+  "vfx_profiles": {
+    "loot_rare": {
+      "color": "#58B8FF",
+      "strength": 1.25
+    },
+    "loot_epic": {
+      "color": "#B46CFF",
+      "strength": 1.45
+    },
+    "loot_legendary": {
+      "color": "#FFD35D",
+      "strength": 1.7
+    },
+    "loot_abyssal": {
+      "color": "#41E0D0",
+      "strength": 1.85
+    },
+    "boss_phase": {
+      "color": "#FF665D",
+      "strength": 1.6
+    },
+    "boss_enrage": {
+      "color": "#FF3D2E",
+      "strength": 1.9
+    },
+    "heal_impact": {
+      "color": "#65E6A6",
+      "strength": 1.1
+    },
+    "shield_heal_impact": {
+      "color": "#62CFFF",
+      "strength": 1.2
+    }
+  },
+  "layerable_status_vfx": [
+    "burning",
+    "poison",
+    "curse",
+    "slow",
+    "armor_break",
+    "reload_slow",
+    "repair_block",
+    "range_reduction",
+    "storm_shock",
+    "corruption",
+    "shield",
+    "healing"
+  ],
+  "performance": {
+    "effect_intensity_default": 1.0,
+    "effect_intensity_min": 0.0,
+    "reduced_motion_duration_multiplier": 0.55,
+    "reduced_motion_scale_multiplier": 0.72,
+    "reduced_flash_burst_multiplier": 0.35,
+    "important_feedback_never_suppressed": [
+      "critical",
+      "boss_phase",
+      "boss_enrage",
+      "legendary",
+      "abyssal"
+    ]
+  },
+  "notification_families": [
+    "loot",
+    "currency",
+    "xp",
+    "world_xp",
+    "elite",
+    "material",
+    "quest",
+    "achievement",
+    "level_up",
+    "pirate_trial",
+    "region_unlock",
+    "ship_unlock",
+    "ship_level",
+    "talent",
+    "citadel",
+    "bonusmap",
+    "event",
+    "ranking",
+    "prestige",
+    "boss_phase"
+  ],
+  "authority": {
+    "presentation_profiles": "draft_review_publish_rollback",
+    "damage_loot_currency_inventory": "server_authoritative_online",
+    "client_presentation_may_grant_rewards": false
+  },
+  "cross_platform_presentation_lock": "M199: identical feedback density/lifetime/merge behavior; only interface-size scaling may differ."
+}

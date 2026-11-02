@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "milestone": "M76",
+  "title": "First Session Guidance",
+  "steps": {
+    "sink": {
+      "title": "GEFECHT",
+      "hint": "Wähle ein Ziel und greife an.",
+      "icon": "m76_guide_combat",
+      "guide": "combat"
+    },
+    "loot": {
+      "title": "BERGUNG",
+      "hint": "Sammle Beute oder Salvage ein.",
+      "icon": "m76_guide_salvage",
+      "guide": "loot"
+    },
+    "dock": {
+      "title": "RÜCKKEHR",
+      "hint": "Kehre zum nächsten verfügbaren Hafen zurück.",
+      "icon": "m76_guide_harbor",
+      "guide": "harbor"
+    }
+  },
+  "rules": [
+    "one primary guidance cue at a time",
+    "no auto-navigation",
+    "no forced camera movement",
+    "guidance never changes trial counters",
+    "harbor cue uses existing port nodes",
+    "combat cue never selects or attacks a target automatically"
+  ]
+}

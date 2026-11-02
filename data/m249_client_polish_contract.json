@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "milestone": "M249",
+  "master_concept": "V3.8",
+  "goal": "CONTINUOUS_CLIENT_POLISH_WITHOUT_GAMEPLAY_DRIFT",
+  "areas": [
+    "graphics_readability",
+    "hud_hierarchy",
+    "responsive_layout",
+    "menu_density",
+    "micro_animation",
+    "combat_feedback",
+    "interaction_feedback",
+    "asset_placeholder_consistency",
+    "mobile_touch_readability"
+  ],
+  "immutable_locks": {
+    "mobile_ship_movement": "tap_to_sail_only",
+    "camera_joystick": "camera_only",
+    "primary_attack": "lower_right",
+    "gameplay_minimap": "round",
+    "large_sea_chart": "rectangular",
+    "platform_world_parity": true,
+    "angle_damage": false,
+    "world_center_readability_first": true
+  },
+  "motion": {
+    "command_deck_open_seconds": 0.18,
+    "command_deck_scale_from": 0.985,
+    "status_card_reveal_seconds": 0.14,
+    "status_card_stagger_seconds": 0.018,
+    "status_card_stagger_cap_seconds": 0.12,
+    "combat_ready_pulse": "subtle_presentation_only",
+    "avoid_large_continuous_menu_motion": true,
+    "no_gameplay_values_from_animation": true
+  },
+  "layout": {
+    "touch_targets_minimum": "existing M202 policy",
+    "status_cards": "responsive typography and reduced compact padding",
+    "quick_navigation": "existing responsive columns",
+    "safe_area_required": true,
+    "center_world_occlusion": "avoid_new_persistent_panels"
+  },
+  "feedback": {
+    "selected_target_remains_strongest_combat_cue": true,
+    "pvp_zone_chip_only_from_server_state": true,
+    "pvp_combat_timer_only_from_server_state": true,
+    "no_fake_live_status": true
+  },
+  "asset_policy": {
+    "reuse_existing_authored_slots_first": true,
+    "no_new_asset_just_to_fill_ui": true,
+    "placeholder_must_be_replaceable": true,
+    "final_asset_catalog_m209_still_binding": true
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "milestone": "M185",
+  "master_concept": "V3.8",
+  "goal": "HONEST_RUNTIME_STATUS_CARDS_AND_REQUIREMENT_CLARITY",
+  "principles": [
+    "seekarte_remains_primary",
+    "show_state_and_requirement_before_action",
+    "use_runtime_source_of_truth",
+    "no_fake_online_progress",
+    "compact_cards_replace_unstructured_text_walls",
+    "mobile_vertical_scroll_and_56_touch_targets"
+  ],
+  "state_vocabulary": [
+    "ready",
+    "active",
+    "warning",
+    "locked",
+    "danger",
+    "info"
+  ],
+  "context_cards": [
+    "location_harbor_or_sea",
+    "next_objective",
+    "progression_layers",
+    "active_loadout",
+    "event_phase_and_meter"
+  ],
+  "quest_groups": [
+    "core_story",
+    "region",
+    "daily_weekly",
+    "hunter",
+    "guild",
+    "event"
+  ],
+  "bonusmap_fields": [
+    "eligibility_level",
+    "entry_item",
+    "owned_and_required_fragments",
+    "harbor_requirement",
+    "active_wave",
+    "total_waves",
+    "completions",
+    "pity_where_supported"
+  ],
+  "competitive_layers": [
+    {"id":"fame", "label":"Ruhm", "authority":"server_persistent"},
+    {"id":"honor", "label":"Ehre", "authority":"server_persistent"},
+    {"id":"battle_rank", "label":"Battle Rank", "authority":"ranked_server"}
+  ],
+  "authority": {
+    "cards": "client_presentation",
+    "claims_and_purchases": "existing_runtime_or_server_validation",
+    "guild_rankings_payment_admin": "server_authoritative",
+    "live_event": "server_schedule_required_for_production"
+  },
+  "no_code_types": [
+    "menu_status_card_profile",
+    "menu_state_vocabulary",
+    "quest_group_profile",
+    "bonusmap_requirement_card_profile"
+  ]
+}
+

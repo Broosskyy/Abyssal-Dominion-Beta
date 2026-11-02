@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "purpose": "content-authoring examples; not authoritative map replacement",
+  "examples": [
+    {
+      "name": "Palm Key",
+      "profile": "tropical_small",
+      "radius": 5.2,
+      "role": "small navigation landmark"
+    },
+    {
+      "name": "Twinleaf",
+      "profile": "tropical_medium",
+      "radius": 8.0,
+      "role": "medium encounter island"
+    },
+    {
+      "name": "Needle Shoal",
+      "profile": "thin_spit",
+      "radius": 7.2,
+      "role": "long thin navigation obstacle"
+    },
+    {
+      "name": "Corsair Reach",
+      "profile": "long_shoal",
+      "radius": 8.8,
+      "role": "elongated combat silhouette"
+    },
+    {
+      "name": "Broken Cove",
+      "profile": "cliff_cove",
+      "radius": 7.5,
+      "role": "cove/cliff landmark"
+    },
+    {
+      "name": "Watch Rock",
+      "profile": "rocky_islet",
+      "radius": 4.2,
+      "role": "small rocky landmark"
+    }
+  ],
+  "rule": "Use mixed sizes and silhouettes; do not fill maps with uniformly round large islands."
+}

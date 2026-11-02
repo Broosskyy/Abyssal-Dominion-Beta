@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "milestone": "M94",
+  "admin": {
+    "runtime": true,
+    "overlay": true,
+    "local_default_enabled": true,
+    "map_teleport": true,
+    "spawn_preview": true,
+    "grant_test_kit": true,
+    "heal": true,
+    "invulnerability": true,
+    "event_override": true,
+    "guild_relation_preview": true,
+    "production_authority": false
+  },
+  "halloween": {
+    "event_id": "halloween_abyss_01",
+    "active_local": true,
+    "phases": 3,
+    "world_layer": true,
+    "guild_layer": true,
+    "fleet_visuals": true,
+    "real_event_ammo": "gravefire",
+    "real_tactical_item": "gravewake_lantern",
+    "quests_contract": true,
+    "currency": "drowned_embers",
+    "shop_preview": true,
+    "design_reward_slot": "event_design_drowned_corsair_01",
+    "live_rewards_authority": false
+  },
+  "preserved": [
+    "Tap-to-Sail",
+    "PL1-5 normal progression",
+    "guild island from map level 2",
+    "no broadside angle damage",
+    "mobile/desktop HUD",
+    "stable asset slots"
+  ],
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android touch admin overlay",
+    "desktop/gamepad focus",
+    "event world performance",
+    "orientation/safe area"
+  ]
+}

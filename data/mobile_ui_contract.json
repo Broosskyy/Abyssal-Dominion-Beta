@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "milestone": "M39",
+  "targets": [
+    "android",
+    "ios",
+    "windows",
+    "macos"
+  ],
+  "web_role": "preview",
+  "density": {
+    "touch_dpi_threshold": 180,
+    "touch_scale_min": 1.15,
+    "touch_scale_max": 1.7,
+    "desktop_scale_max": 1.55
+  },
+  "comfort": {
+    "minimum_touch_target_dp": 48,
+    "primary_fire_is_largest_action": true,
+    "picker_taps_block_world_navigation": true,
+    "safe_area_required": true,
+    "legacy_small_ammo_quick_buttons_hidden_on_high_density_touch": true,
+    "event_chip_non_modal": true,
+    "event_details_live_in_event_hub": true
+  },
+  "pickers": {
+    "ammo": [
+      "iron",
+      "explosive",
+      "chain",
+      "harpoon"
+    ],
+    "items": [
+      "repair",
+      "boost",
+      "powder",
+      "plates",
+      "harpoon"
+    ],
+    "landscape_columns": 2,
+    "portrait_columns": 1,
+    "landscape_card_layout": true
+  }
+}

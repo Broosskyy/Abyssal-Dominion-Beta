@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "milestone": "M98",
+  "mode": "early_world_contract_local_preview",
+  "minimum_map_level": 2,
+  "guild_optional": true,
+  "ownership_persistence": false,
+  "server_authority_required": true,
+  "presentation": {
+    "perspective": "oblique_sea_map",
+    "free_walk": false,
+    "interaction_range": 10.0,
+    "world_marker": "guild_island"
+  },
+  "early_island": {
+    "tier": "I_anchorage_preview",
+    "facilities": [
+      "harbor",
+      "guild_hall",
+      "warehouse",
+      "repair_station"
+    ],
+    "defense": [
+      "tower_cannon",
+      "tower_chain"
+    ],
+    "interactions": [
+      {
+        "id": "dock",
+        "label": "ANLEGEN",
+        "authority": "existing_local_port_contract"
+      },
+      {
+        "id": "inspect_guild",
+        "label": "GILDE",
+        "authority": "presentation_only"
+      },
+      {
+        "id": "inspect_defense",
+        "label": "VERTEIDIGUNG",
+        "authority": "presentation_only"
+      },
+      {
+        "id": "inspect_facilities",
+        "label": "ANLAGEN",
+        "authority": "presentation_only"
+      },
+      {
+        "id": "inspect_harbor",
+        "label": "HAFEN",
+        "authority": "presentation_only"
+      },
+      {
+        "id": "range_preview",
+        "label": "TURMREICHWEITE",
+        "authority": "presentation_only"
+      }
+    ]
+  },
+  "tower_contract": {
+    "fields": [
+      "target",
+      "range",
+      "reload",
+      "damage_definition"
+    ],
+    "broadside_angle_damage": false,
+    "visible_guns_are_damage_count": false,
+    "m89_live_damage": false,
+    "roles": [
+      "cannon",
+      "mortar",
+      "chain",
+      "guardian",
+      "siege_counter_battery",
+      "event"
+    ],
+    "visual_damage_states": [
+      "intact",
+      "damaged",
+      "disabled"
+    ],
+    "damage_states_authoritative": false,
+    "range_preview_presentation_only": true
+  },
+  "future_authority": [
+    "membership",
+    "roles",
+    "treasury",
+    "vault",
+    "diplomacy",
+    "wars",
+    "island_ownership",
+    "facility_upgrades",
+    "tower_configuration",
+    "siege_state"
+  ],
+  "loss_rule": "A siege loss never deletes the guild or permanently destroys all invested facilities; damaged/disabled visuals are reversible presentation states until server authority exists."
+}

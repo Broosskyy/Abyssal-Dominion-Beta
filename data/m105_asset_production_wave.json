@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "milestone": "M105",
+  "priority": [
+    "3 starter ships",
+    "5 PL1-5 NPC ships",
+    "Haven's Reach",
+    "3 P0 islands",
+    "first monster"
+  ],
+  "status": {
+    "source_ready": 13,
+    "final_overrides": 0,
+    "native_mobile_accepted": 0
+  },
+  "new_prepared_slots": [
+    "prop_harbor_pirate_rope_post_01",
+    "nature_island_cove_rock_spur_01"
+  ],
+  "rule": "Final user-created GLBs can replace stable slots without changing gameplay wrappers or service architecture."
+}

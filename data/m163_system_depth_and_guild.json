@@ -1,0 +1,902 @@
+{
+  "schema": 1,
+  "milestone": "M163",
+  "master_concept": "V3.8",
+  "goal": "SYSTEM_DEPTH_VISIBLE_AND_NO_CODE_AUTHORABLE",
+  "special_deck_depth": [
+    {
+      "id": "arcane_tide_deck",
+      "identity": "mystic_precision",
+      "signature": "Tidal Focus",
+      "tradeoff": "lower_structure_damage",
+      "unlock_sources": [
+        "bonusmap",
+        "artifact",
+        "season"
+      ],
+      "visual_stage": "rune_orbit"
+    },
+    {
+      "id": "stormwake_deck",
+      "identity": "mobility_control",
+      "signature": "Wake Surge",
+      "tradeoff": "lower_hull_resistance",
+      "unlock_sources": [
+        "exploration",
+        "event"
+      ],
+      "visual_stage": "storm_wake"
+    },
+    {
+      "id": "leviathan_hunter_deck",
+      "identity": "monster_hunter",
+      "signature": "Marked Prey",
+      "tradeoff": "lower_pvp_output",
+      "unlock_sources": [
+        "monster",
+        "hunter"
+      ],
+      "visual_stage": "hunter_glyph"
+    },
+    {
+      "id": "bastion_deck",
+      "identity": "defense_siege",
+      "signature": "Ward Bastion",
+      "tradeoff": "lower_speed",
+      "unlock_sources": [
+        "guild",
+        "siege"
+      ],
+      "visual_stage": "ward_plate"
+    },
+    {
+      "id": "corsair_deck",
+      "identity": "pvp_honor",
+      "signature": "Duelist Momentum",
+      "tradeoff": "lower_monster_damage",
+      "unlock_sources": [
+        "pvp",
+        "honor"
+      ],
+      "visual_stage": "red_pennants"
+    },
+    {
+      "id": "festival_relic_deck",
+      "identity": "event_adaptive",
+      "signature": "Relic Resonance",
+      "tradeoff": "season_bound_synergy",
+      "unlock_sources": [
+        "event",
+        "season"
+      ],
+      "visual_stage": "relic_lanterns"
+    }
+  ],
+  "ammo_profiles": [
+    {
+      "id": "iron",
+      "label": "Eisenkugel",
+      "family": "standard",
+      "role": "baseline",
+      "damage_mult": 1.0,
+      "armor_pierce": 0.1,
+      "status": "none",
+      "rarity": "common"
+    },
+    {
+      "id": "explosive",
+      "label": "Sprengkugel",
+      "family": "burst",
+      "role": "structure_burst",
+      "damage_mult": 1.22,
+      "armor_pierce": 0.02,
+      "status": "blast",
+      "rarity": "uncommon"
+    },
+    {
+      "id": "chain",
+      "label": "Kettenkugel",
+      "family": "control",
+      "role": "sail_control",
+      "damage_mult": 0.66,
+      "armor_pierce": 0,
+      "status": "slow",
+      "rarity": "common"
+    },
+    {
+      "id": "piercing",
+      "label": "Durchschlagkugel",
+      "family": "anti_armor",
+      "role": "armor_pierce",
+      "damage_mult": 0.92,
+      "armor_pierce": 0.42,
+      "status": "none",
+      "rarity": "uncommon"
+    },
+    {
+      "id": "ember",
+      "label": "Glutgeschoss",
+      "family": "elemental",
+      "role": "fire_dot",
+      "damage_mult": 0.88,
+      "armor_pierce": 0.04,
+      "status": "burn",
+      "rarity": "rare"
+    },
+    {
+      "id": "venom",
+      "label": "Giftgeschoss",
+      "family": "elemental",
+      "role": "poison_dot",
+      "damage_mult": 0.78,
+      "armor_pierce": 0.08,
+      "status": "venom",
+      "rarity": "rare"
+    },
+    {
+      "id": "shatter",
+      "label": "Splittergeschoss",
+      "family": "debuff",
+      "role": "armor_break",
+      "damage_mult": 0.82,
+      "armor_pierce": 0.16,
+      "status": "armor_break",
+      "rarity": "rare"
+    },
+    {
+      "id": "spectral",
+      "label": "Spektralgeschoss",
+      "family": "arcane",
+      "role": "mark",
+      "damage_mult": 1.08,
+      "armor_pierce": 0.2,
+      "status": "spectral_mark",
+      "rarity": "epic"
+    },
+    {
+      "id": "gravefire",
+      "label": "Grabfeuer",
+      "family": "event",
+      "role": "halloween_burn",
+      "damage_mult": 0.96,
+      "armor_pierce": 0.1,
+      "status": "burn",
+      "rarity": "event"
+    },
+    {
+      "id": "storm_shot",
+      "label": "Sturmgeschoss",
+      "family": "control",
+      "role": "reload_disrupt",
+      "damage_mult": 0.84,
+      "armor_pierce": 0.08,
+      "status": "reload_disrupt",
+      "rarity": "epic"
+    },
+    {
+      "id": "wardbreaker",
+      "label": "Wardbrecher",
+      "family": "siege",
+      "role": "anti_ward",
+      "damage_mult": 1.02,
+      "armor_pierce": 0.24,
+      "status": "ward_break",
+      "rarity": "epic"
+    },
+    {
+      "id": "hunter_shell",
+      "label": "Jägergeschoss",
+      "family": "hunter",
+      "role": "anti_monster",
+      "damage_mult": 0.94,
+      "armor_pierce": 0.12,
+      "status": "prey_mark",
+      "rarity": "rare"
+    }
+  ],
+  "harpoon_profiles": [
+    {
+      "id": "harpoon",
+      "label": "Standardharpune",
+      "family": "standard",
+      "damage_mult": 1.0,
+      "range_mult": 1.0,
+      "effect": "none",
+      "rarity": "common"
+    },
+    {
+      "id": "harpoon_tempered",
+      "label": "Gehärtete Harpune",
+      "family": "heavy",
+      "damage_mult": 1.18,
+      "range_mult": 0.96,
+      "effect": "wound",
+      "rarity": "uncommon"
+    },
+    {
+      "id": "harpoon_stormhook",
+      "label": "Sturmhaken",
+      "family": "control",
+      "damage_mult": 0.92,
+      "range_mult": 1.06,
+      "effect": "slow",
+      "rarity": "rare"
+    },
+    {
+      "id": "harpoon_relic",
+      "label": "Reliktharpune",
+      "family": "guardian",
+      "damage_mult": 1.28,
+      "range_mult": 1.04,
+      "effect": "guardian_break",
+      "rarity": "epic"
+    },
+    {
+      "id": "harpoon_abyssal",
+      "label": "Abgrundlanze",
+      "family": "abyss",
+      "damage_mult": 1.34,
+      "range_mult": 0.92,
+      "effect": "corruption",
+      "rarity": "epic"
+    },
+    {
+      "id": "harpoon_chainbite",
+      "label": "Kettenbiss",
+      "family": "control",
+      "damage_mult": 1.02,
+      "range_mult": 0.95,
+      "effect": "snare",
+      "rarity": "rare"
+    },
+    {
+      "id": "harpoon_sunsteel",
+      "label": "Sonnenstahl-Harpune",
+      "family": "boss",
+      "damage_mult": 1.42,
+      "range_mult": 1.0,
+      "effect": "boss_break",
+      "rarity": "legendary"
+    },
+    {
+      "id": "harpoon_ghostline",
+      "label": "Geisterleine",
+      "family": "event",
+      "damage_mult": 1.12,
+      "range_mult": 1.12,
+      "effect": "spectral_mark",
+      "rarity": "event"
+    }
+  ],
+  "consumables_and_materials": [
+    {
+      "id": "ward_tonic",
+      "label": "Wardsud",
+      "category": "combat_buff",
+      "effect": "resistance_pct",
+      "value": 8,
+      "duration": 45
+    },
+    {
+      "id": "powder_charge",
+      "label": "Pulverladung",
+      "category": "combat_buff",
+      "effect": "reload_pct",
+      "value": 10,
+      "duration": 35
+    },
+    {
+      "id": "hunter_flare",
+      "label": "Jägerleuchtfeuer",
+      "category": "hunter",
+      "effect": "monster_tracking",
+      "value": 1,
+      "duration": 120
+    },
+    {
+      "id": "sea_chart",
+      "label": "Seekartenrolle",
+      "category": "navigation",
+      "effect": "poi_reveal",
+      "value": 1,
+      "duration": 180
+    },
+    {
+      "id": "repair_crew",
+      "label": "Reparaturmannschaft",
+      "category": "repair",
+      "effect": "repair_over_time",
+      "value": 12,
+      "duration": 20
+    },
+    {
+      "id": "smoke_screen",
+      "label": "Nebelwerfer",
+      "category": "escape",
+      "effect": "target_break",
+      "value": 1,
+      "duration": 8
+    },
+    {
+      "id": "war_banner",
+      "label": "Kriegsbanner",
+      "category": "guild",
+      "effect": "guild_combat_aura",
+      "value": 5,
+      "duration": 90
+    },
+    {
+      "id": "monster_bait",
+      "label": "Monsterköder",
+      "category": "hunter",
+      "effect": "encounter_attract",
+      "value": 1,
+      "duration": 60
+    },
+    {
+      "id": "admiral_seal",
+      "label": "Admiralssiegel",
+      "category": "encounter",
+      "effect": "admiral_trigger",
+      "value": 1,
+      "duration": 0
+    },
+    {
+      "id": "crystal_blessing",
+      "label": "Kristallsegen",
+      "category": "blessing",
+      "effect": "crystal_aura",
+      "value": 1,
+      "duration": 120
+    },
+    {
+      "id": "siege_repair_kit",
+      "label": "Belagerungs-Reparaturkit",
+      "category": "guild_supply",
+      "effect": "structure_repair",
+      "value": 10,
+      "duration": 0
+    },
+    {
+      "id": "arcane_shard",
+      "label": "Arkaner Splitter",
+      "category": "material",
+      "effect": "special_deck_material",
+      "value": 1,
+      "duration": 0
+    },
+    {
+      "id": "cannon_oil",
+      "label": "Kanonenöl",
+      "category": "material",
+      "effect": "cannon_upgrade_material",
+      "value": 1,
+      "duration": 0
+    },
+    {
+      "id": "tower_parts",
+      "label": "Turmbauteile",
+      "category": "guild_material",
+      "effect": "tower_upgrade_material",
+      "value": 1,
+      "duration": 0
+    },
+    {
+      "id": "guild_timber",
+      "label": "Gildenholz",
+      "category": "guild_material",
+      "effect": "building_upgrade_material",
+      "value": 1,
+      "duration": 0
+    },
+    {
+      "id": "guild_steel",
+      "label": "Gildenstahl",
+      "category": "guild_material",
+      "effect": "building_upgrade_material",
+      "value": 1,
+      "duration": 0
+    },
+    {
+      "id": "enchanted_rope",
+      "label": "Verzaubertes Tauwerk",
+      "category": "crafting",
+      "effect": "harpoon_upgrade_material",
+      "value": 1,
+      "duration": 0
+    },
+    {
+      "id": "ward_crystal",
+      "label": "Wardkristall",
+      "category": "guild_material",
+      "effect": "ward_tower_material",
+      "value": 1,
+      "duration": 0
+    },
+    {
+      "id": "siege_powder",
+      "label": "Belagerungspulver",
+      "category": "guild_material",
+      "effect": "siege_ammo_material",
+      "value": 1,
+      "duration": 0
+    },
+    {
+      "id": "talent_compass",
+      "label": "Kompassfragment",
+      "category": "progression",
+      "effect": "talent_respec_material",
+      "value": 1,
+      "duration": 0
+    }
+  ],
+  "cannon_visual_stages": [
+    {
+      "track": "barrel",
+      "level": 1,
+      "slot": "cannon_barrel_lv1",
+      "icon": "icon_cannon_barrel_1",
+      "vfx": "none"
+    },
+    {
+      "track": "barrel",
+      "level": 3,
+      "slot": "cannon_barrel_lv3",
+      "icon": "icon_cannon_barrel_3",
+      "vfx": "none"
+    },
+    {
+      "track": "barrel",
+      "level": 5,
+      "slot": "cannon_barrel_lv5",
+      "icon": "icon_cannon_barrel_5",
+      "vfx": "subtle_glow"
+    },
+    {
+      "track": "barrel",
+      "level": 7,
+      "slot": "cannon_barrel_lv7",
+      "icon": "icon_cannon_barrel_7",
+      "vfx": "subtle_glow"
+    },
+    {
+      "track": "barrel",
+      "level": 10,
+      "slot": "cannon_barrel_lv10",
+      "icon": "icon_cannon_barrel_10",
+      "vfx": "mastery_glow"
+    },
+    {
+      "track": "carriage",
+      "level": 1,
+      "slot": "cannon_carriage_lv1",
+      "icon": "icon_cannon_carriage_1",
+      "vfx": "none"
+    },
+    {
+      "track": "carriage",
+      "level": 3,
+      "slot": "cannon_carriage_lv3",
+      "icon": "icon_cannon_carriage_3",
+      "vfx": "none"
+    },
+    {
+      "track": "carriage",
+      "level": 5,
+      "slot": "cannon_carriage_lv5",
+      "icon": "icon_cannon_carriage_5",
+      "vfx": "subtle_glow"
+    },
+    {
+      "track": "carriage",
+      "level": 7,
+      "slot": "cannon_carriage_lv7",
+      "icon": "icon_cannon_carriage_7",
+      "vfx": "subtle_glow"
+    },
+    {
+      "track": "carriage",
+      "level": 10,
+      "slot": "cannon_carriage_lv10",
+      "icon": "icon_cannon_carriage_10",
+      "vfx": "mastery_glow"
+    },
+    {
+      "track": "chamber",
+      "level": 1,
+      "slot": "cannon_chamber_lv1",
+      "icon": "icon_cannon_chamber_1",
+      "vfx": "none"
+    },
+    {
+      "track": "chamber",
+      "level": 3,
+      "slot": "cannon_chamber_lv3",
+      "icon": "icon_cannon_chamber_3",
+      "vfx": "none"
+    },
+    {
+      "track": "chamber",
+      "level": 5,
+      "slot": "cannon_chamber_lv5",
+      "icon": "icon_cannon_chamber_5",
+      "vfx": "subtle_glow"
+    },
+    {
+      "track": "chamber",
+      "level": 7,
+      "slot": "cannon_chamber_lv7",
+      "icon": "icon_cannon_chamber_7",
+      "vfx": "subtle_glow"
+    },
+    {
+      "track": "chamber",
+      "level": 10,
+      "slot": "cannon_chamber_lv10",
+      "icon": "icon_cannon_chamber_10",
+      "vfx": "mastery_glow"
+    },
+    {
+      "track": "runes",
+      "level": 1,
+      "slot": "cannon_runes_lv1",
+      "icon": "icon_cannon_runes_1",
+      "vfx": "none"
+    },
+    {
+      "track": "runes",
+      "level": 3,
+      "slot": "cannon_runes_lv3",
+      "icon": "icon_cannon_runes_3",
+      "vfx": "none"
+    },
+    {
+      "track": "runes",
+      "level": 5,
+      "slot": "cannon_runes_lv5",
+      "icon": "icon_cannon_runes_5",
+      "vfx": "subtle_glow"
+    },
+    {
+      "track": "runes",
+      "level": 7,
+      "slot": "cannon_runes_lv7",
+      "icon": "icon_cannon_runes_7",
+      "vfx": "subtle_glow"
+    },
+    {
+      "track": "runes",
+      "level": 10,
+      "slot": "cannon_runes_lv10",
+      "icon": "icon_cannon_runes_10",
+      "vfx": "mastery_glow"
+    }
+  ],
+  "guild": {
+    "ranks": [
+      {
+        "id": "recruit",
+        "label": "Rekrut",
+        "priority": 10,
+        "permissions": [
+          "guild.chat",
+          "guild.deposit"
+        ]
+      },
+      {
+        "id": "member",
+        "label": "Mitglied",
+        "priority": 20,
+        "permissions": [
+          "guild.chat",
+          "guild.deposit",
+          "guild.island_use"
+        ]
+      },
+      {
+        "id": "veteran",
+        "label": "Veteran",
+        "priority": 30,
+        "permissions": [
+          "guild.chat",
+          "guild.deposit",
+          "guild.island_use",
+          "guild.siege_join"
+        ]
+      },
+      {
+        "id": "officer",
+        "label": "Offizier",
+        "priority": 40,
+        "permissions": [
+          "guild.invite",
+          "guild.kick_member",
+          "guild.siege_schedule",
+          "guild.build_request"
+        ]
+      },
+      {
+        "id": "quartermaster",
+        "label": "Quartiermeister",
+        "priority": 45,
+        "permissions": [
+          "guild.treasury_view",
+          "guild.treasury_spend_request",
+          "guild.build_request"
+        ]
+      },
+      {
+        "id": "war_master",
+        "label": "Kriegsmeister",
+        "priority": 50,
+        "permissions": [
+          "guild.siege_schedule",
+          "guild.tower_config",
+          "guild.war_manage"
+        ]
+      },
+      {
+        "id": "leader",
+        "label": "Gildenmeister",
+        "priority": 100,
+        "permissions": [
+          "guild.manage",
+          "guild.roles",
+          "guild.treasury_approve",
+          "guild.ownership"
+        ]
+      }
+    ],
+    "buildings": [
+      {
+        "id": "guild_hall",
+        "label": "Gildenhalle",
+        "max_level": 10,
+        "role": "capacity_roles",
+        "visual_stages": [
+          1,
+          3,
+          5,
+          7,
+          10
+        ]
+      },
+      {
+        "id": "warehouse",
+        "label": "Lager",
+        "max_level": 10,
+        "role": "resource_capacity",
+        "visual_stages": [
+          1,
+          4,
+          7,
+          10
+        ]
+      },
+      {
+        "id": "shipyard",
+        "label": "Gildenwerft",
+        "max_level": 10,
+        "role": "repair_refit",
+        "visual_stages": [
+          1,
+          3,
+          6,
+          10
+        ]
+      },
+      {
+        "id": "treasury",
+        "label": "Schatzkammer",
+        "max_level": 10,
+        "role": "treasury_limits",
+        "visual_stages": [
+          1,
+          5,
+          10
+        ]
+      },
+      {
+        "id": "siege_workshop",
+        "label": "Belagerungswerkstatt",
+        "max_level": 10,
+        "role": "siege_supply",
+        "visual_stages": [
+          1,
+          3,
+          5,
+          8,
+          10
+        ]
+      },
+      {
+        "id": "ward_foundry",
+        "label": "Wardgießerei",
+        "max_level": 10,
+        "role": "ward_defense",
+        "visual_stages": [
+          1,
+          4,
+          7,
+          10
+        ]
+      }
+    ],
+    "towers": [
+      {
+        "id": "cannon",
+        "label": "Kanonenturm",
+        "max_level": 10,
+        "role": "direct_damage",
+        "targeting": "nearest_hostile"
+      },
+      {
+        "id": "chain",
+        "label": "Kettenturm",
+        "max_level": 10,
+        "role": "control",
+        "targeting": "fastest_hostile"
+      },
+      {
+        "id": "mortar",
+        "label": "Mörserturm",
+        "max_level": 10,
+        "role": "area_damage",
+        "targeting": "cluster"
+      },
+      {
+        "id": "ward",
+        "label": "Wardturm",
+        "max_level": 10,
+        "role": "shield_support",
+        "targeting": "friendly_structure"
+      },
+      {
+        "id": "hunter",
+        "label": "Jägerturm",
+        "max_level": 10,
+        "role": "anti_monster",
+        "targeting": "monster_priority"
+      }
+    ],
+    "treasury": {
+      "server_authoritative": true,
+      "approval_thresholds_data_driven": true,
+      "audit_log": true
+    },
+    "siege": {
+      "server_authoritative": true,
+      "schedule_data_driven": true,
+      "ownership_transfer_audited": true
+    }
+  },
+  "admin_editors": [
+    {
+      "id": "weapon_editor",
+      "types": [
+        "weapon",
+        "cannon_upgrade_track",
+        "cannon_visual_stage"
+      ],
+      "tabs": [
+        "identity",
+        "stats",
+        "upgrade",
+        "assets",
+        "sources",
+        "publish"
+      ]
+    },
+    {
+      "id": "ammo_editor",
+      "types": [
+        "ammo",
+        "ammo_profile",
+        "ammo_effect"
+      ],
+      "tabs": [
+        "identity",
+        "combat",
+        "status",
+        "visual",
+        "economy",
+        "publish"
+      ]
+    },
+    {
+      "id": "harpoon_editor",
+      "types": [
+        "harpoon_profile",
+        "harpoon_family",
+        "harpoon_upgrade_track"
+      ],
+      "tabs": [
+        "identity",
+        "hunter",
+        "status",
+        "visual",
+        "economy",
+        "publish"
+      ]
+    },
+    {
+      "id": "progression_editor",
+      "types": [
+        "special_deck",
+        "talent_tree",
+        "talent_node",
+        "citadel_branch",
+        "upgrade_tree",
+        "upgrade_node"
+      ],
+      "tabs": [
+        "identity",
+        "requirements",
+        "effects",
+        "costs",
+        "visual",
+        "publish"
+      ]
+    },
+    {
+      "id": "guild_editor",
+      "types": [
+        "guild_rank",
+        "guild_permission_set",
+        "guild_building",
+        "guild_building_level",
+        "guild_tower",
+        "guild_tower_level",
+        "guild_siege_rule",
+        "guild_treasury_rule"
+      ],
+      "tabs": [
+        "identity",
+        "levels",
+        "permissions",
+        "economy",
+        "siege",
+        "visual",
+        "publish"
+      ]
+    },
+    {
+      "id": "commerce_editor",
+      "types": [
+        "shop_offer",
+        "bundle",
+        "currency",
+        "price_rule",
+        "commerce_campaign",
+        "entitlement"
+      ],
+      "tabs": [
+        "identity",
+        "contents",
+        "price",
+        "eligibility",
+        "schedule",
+        "publish"
+      ]
+    }
+  ],
+  "presentation": {
+    "mobile_first": true,
+    "tooltips": true,
+    "rarity_frames": true,
+    "upgrade_stage_badges": true,
+    "ship_cannon_mastery_visual": true,
+    "guild_island_level_visuals": true
+  },
+  "authority": {
+    "gameplay_preview": "LOCAL_ALLOWED",
+    "economy_guild_payment": "SERVER_REQUIRED",
+    "production_publish": "SERVER_RBAC_REQUIRED"
+  },
+  "legacy_audit": {
+    "m1_50_content": "keep_and_refine",
+    "generic_special_decks": "replaced_by_distinct_families",
+    "hardcoded_single_item_buttons": "continue_migration_to_content_actions",
+    "old_milestone_labels": "refresh_to_M163"
+  }
+}

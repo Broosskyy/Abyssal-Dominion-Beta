@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "milestone": "M98",
+  "map2_guild_island": {
+    "minimum_map_level": 2,
+    "spawn_path_verified": true,
+    "interaction_range": 10.0,
+    "actions": [
+      "dock",
+      "inspect_guild",
+      "inspect_defense",
+      "inspect_facilities",
+      "inspect_harbor",
+      "range_preview"
+    ],
+    "tower_roles": [
+      "cannon",
+      "chain"
+    ],
+    "tower_contract": [
+      "target",
+      "range",
+      "reload",
+      "damage_definition"
+    ],
+    "broadside_angle_damage": false,
+    "auto_chase": false,
+    "live_damage": false
+  },
+  "visual_states": {
+    "tower": [
+      "intact",
+      "damaged",
+      "disabled"
+    ],
+    "authoritative": false,
+    "permanent_destruction": false,
+    "range_preview": "presentation_only"
+  },
+  "admin": {
+    "cycle_tower_state": true,
+    "toggle_range_preview": true,
+    "production_authority": false
+  },
+  "mobile": {
+    "oblique_sea_map": true,
+    "free_walk": false,
+    "interaction_panel_reuses_responsive_hud": true,
+    "range_ring_shadow": false
+  },
+  "backend_boundary": {
+    "ownership": false,
+    "treasury": false,
+    "war": false,
+    "persistent_damage": false,
+    "conquest": false
+  },
+  "native_pending": [
+    "Godot 4.7.2 parser/runtime",
+    "Android/iOS touch",
+    "desktop/gamepad",
+    "range-ring scale/readability",
+    "GPU profiling"
+  ]
+}

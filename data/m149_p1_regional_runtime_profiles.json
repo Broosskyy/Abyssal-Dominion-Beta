@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "milestone": "M149",
+  "master": "V3.7",
+  "state": "REGIONAL_RUNTIME_CONNECTED_LOCAL_PROTOTYPE",
+  "regions": {
+    "crimson_sea": {
+      "levels": [6, 10],
+      "material": {"hull":"713a2d","sail":"d5b69a","trim":"c79a52","emissive":"ef5b38","water_accent":"43b8c6","roughness":0.68,"metallic":0.08},
+      "vfx": {"ship":"crimson_wake","admiral":"bloodsail_command","monster":"ember_hunter","harbor":"redhaven_beacon","density":0.82},
+      "spawn": {"population_target":4,"respawn_seconds":3.0,"admiral_kills_required":8,"admiral_cooldown_seconds":45.0,"monster_weight":0.16},
+      "nature_slots": ["flora_coral_cluster_01","flora_coastal_flowers_01"],
+      "island_visual_slots": ["island_module_crimson_coast_01"],
+      "harbor_slot": "harbor_stormreach"
+    },
+    "drowned_reach": {
+      "levels": [11, 15],
+      "material": {"hull":"40504d","sail":"aaa99d","trim":"7f9b88","emissive":"6bc6b4","water_accent":"3f8f9c","roughness":0.82,"metallic":0.04},
+      "vfx": {"ship":"drowned_wake","admiral":"sovereign_wraith","monster":"drowned_hunter","harbor":"mourning_mist","density":0.76},
+      "spawn": {"population_target":4,"respawn_seconds":3.5,"admiral_kills_required":10,"admiral_cooldown_seconds":55.0,"monster_weight":0.20},
+      "nature_slots": ["flora_coral_cluster_01","flora_mangrove_01","flora_reeds_01"],
+      "island_visual_slots": ["island_module_drowned_coast_01"],
+      "harbor_slot": "harbor_ember"
+    }
+  },
+  "platforms": {
+    "desktop": {"standard_lod":"LOD1","hero_lod":"LOD0","shadow_mode":"ON","vfx_density_multiplier":1.0,"visibility_end":0.0},
+    "mobile": {"standard_lod":"LOD2","hero_lod":"LOD1","shadow_mode":"ON","vfx_density_multiplier":0.70,"visibility_end":115.0},
+    "web": {"standard_lod":"LOD2","hero_lod":"LOD1","shadow_mode":"OFF","vfx_density_multiplier":0.52,"visibility_end":95.0}
+  },
+  "authority": {
+    "local_defaults": "Prototype fallback only; server/admin snapshots override spawn and presentation configuration.",
+    "visual_only": ["materials","LOD","shadows","VFX density","decorator density","harbor accents"],
+    "never_visual_authority": ["collision","damage","AI","rewards","quest credit","progression","spawn qualification","economy"]
+  },
+  "rules": [
+    "Naval movement remains X/Z with fixed WATER_Y and full 360-degree Y rotation.",
+    "Mobile navigation remains Tap-to-Sail; camera control never steers the ship.",
+    "Web is preview-only; desktop, macOS, Android and iOS are quality targets.",
+    "Admirals use counter/condition, announcement and cooldown; monsters do not become permanently resident bosses.",
+    "GLOBAL remains server-authoritative and locked in local builds."
+  ]
+}

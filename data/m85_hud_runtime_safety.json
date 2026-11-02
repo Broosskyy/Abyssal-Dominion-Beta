@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "milestone": "M85",
+  "title": "Custom HUD Runtime Safety",
+  "features": [
+    "group_lock",
+    "reset_current_profile",
+    "reset_all_local_profiles",
+    "schema2_to_schema3_migration",
+    "compact critical-overlap fallback",
+    "critical 56+ touch floor",
+    "hidden-panel draw guards"
+  ],
+  "critical_groups": [
+    "profile_status",
+    "movement",
+    "combat"
+  ],
+  "hideable": [
+    "mission",
+    "objective",
+    "minimap",
+    "quickbar",
+    "target",
+    "currency"
+  ],
+  "rules": [
+    "locked groups cannot drag/scale/hide until unlocked",
+    "compact touch layouts restore safe defaults if movement and combat overlap",
+    "hidden zero-area panels must not execute panel drawing code",
+    "custom layout remains device-local presentation only"
+  ]
+}

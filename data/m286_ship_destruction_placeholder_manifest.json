@@ -1,0 +1,29 @@
+{
+  "milestone": "M286",
+  "status": "PLACEHOLDER_REPLACEABLE",
+  "production_boundary": "assets/production only; reference_only assets are never promoted",
+  "owner": "Godot runtime composition",
+  "ship_model_strategy": "ONE_COMPLETE_3D_MODEL_PER_SHIP; all listed items are optional overlay proxies, not swappable ship modules",
+  "required_sockets": ["VFX_Bow", "VFX_PortHull", "VFX_StarboardHull", "VFX_Deck", "VFX_Mast", "VFX_Sails", "VFX_Stern", "VFX_Waterline", "VFX_Wreck"],
+  "slots": [
+    {"id":"m286_model_deck_breach_placeholder","kind":"VFX_PROXY","fallback":"runtime torus breach rim over complete model","final_replacement":"authored deck damage overlay scene"},
+    {"id":"m286_vfx_mast_damage_overlay_placeholder","kind":"VFX_PROXY","fallback":"runtime mast-damage silhouette beside complete model","final_replacement":"authored mast damage overlay or optional animation hook"},
+    {"id":"m286_vfx_sail_damage_overlay_placeholder","kind":"VFX_PROXY","fallback":"runtime sail-damage strips over complete model","final_replacement":"authored sail damage overlay or optional animation hook"},
+    {"id":"m286_model_bow_breach_placeholder","kind":"VFX_PROXY","fallback":"runtime breach plate and splinters over complete model","final_replacement":"authored bow damage overlay"},
+    {"id":"m286_model_stern_damage_placeholder","kind":"VFX_PROXY","fallback":"runtime stern plate and splinters over complete model","final_replacement":"authored stern damage overlay"},
+    {"id":"m286_vfx_waterline_flooding_placeholder","kind":"VFX","fallback":"runtime waterline torus","final_replacement":"authored flooding and foam scene"},
+    {"id":"m286_vfx_sinking_bubbles_placeholder","kind":"VFX","fallback":"runtime bubble spheres","final_replacement":"authored underwater bubble effect"},
+    {"id":"m286_model_wreck_silhouette_placeholder","kind":"VFX_PROXY","fallback":"runtime dark wreck silhouette after confirmed defeat","final_replacement":"authored class-specific wreck presentation"}
+  ],
+  "lod_policy": {
+    "native_desktop": "all confirmed segment and sinking layers",
+    "native_mobile": "primary silhouette segments plus reduced bubble nodes",
+    "web_preview": "primary silhouette segments plus reduced bubble nodes",
+    "gameplay_truth_parity": true,
+    "final_values": "native QA required"
+  },
+  "authority": {
+    "online": "server-confirmed M286 state and event only",
+    "never": ["apply damage", "break equipment", "change movement", "change ship transform", "require modular ship meshes", "hide detach or replace ship parts", "confirm defeat", "despawn", "spawn wreck entity", "grant reward or create drop"]
+  }
+}

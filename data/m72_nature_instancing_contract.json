@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "milestone": "M72",
+  "title": "Repeated Nature / Prop Instancing Contract",
+  "families": [
+    {
+      "slot": "nature_palm_cluster_01",
+      "use": "tropical islands",
+      "batch_candidate": true
+    },
+    {
+      "slot": "nature_rock_cluster_01",
+      "use": "islands/coast",
+      "batch_candidate": true
+    },
+    {
+      "slot": "nature_reef_cluster_01",
+      "use": "shallow/coast",
+      "batch_candidate": true
+    },
+    {
+      "slot": "nature_driftwood_cluster_01",
+      "use": "coast/harbor",
+      "batch_candidate": true
+    },
+    {
+      "slot": "prop_buoy_navigation_01",
+      "use": "navigation",
+      "batch_candidate": true
+    }
+  ],
+  "rules": [
+    "prefer MultiMesh/instancing when repeated instances share mesh/material",
+    "do not batch interactive gameplay objects with decorative instances",
+    "low quality may reduce decorative count but not navigation/gameplay truth",
+    "visual LOD/density never changes collision/rewards/quest completion"
+  ],
+  "status": "architecture_ready; native profiler required before aggressive batching"
+}

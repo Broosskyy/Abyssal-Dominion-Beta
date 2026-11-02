@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "milestone": "M102",
+  "asset_id": "monster_early_01",
+  "semantic_aliases": {
+    "idle": [
+      "idle",
+      "Idle",
+      "swim",
+      "Swim",
+      "loop"
+    ],
+    "attack": [
+      "attack",
+      "Attack",
+      "bite",
+      "Bite",
+      "strike"
+    ],
+    "hit": [
+      "hit",
+      "Hit",
+      "damage",
+      "Damage",
+      "hurt"
+    ],
+    "death": [
+      "death",
+      "Death",
+      "die",
+      "Die",
+      "sink"
+    ]
+  },
+  "required_for_final_hero": [
+    "idle",
+    "attack",
+    "hit",
+    "death"
+  ],
+  "rules": [
+    "Animation names are adapted semantically; gameplay never depends on exact clip names.",
+    "Missing animation falls back visually and never blocks combat.",
+    "Rig/AnimationTree is visual presentation, not combat authority."
+  ]
+}

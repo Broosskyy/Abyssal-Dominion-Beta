@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "milestone": "M171",
+  "master_concept": "V3.8",
+  "goal": "RUNTIME_PRESENTATION_STATUS_AND_ARSENAL_INTERACTION_PASS",
+  "principles": [
+    "seekarte/gameplay camera remains unchanged",
+    "existing HUD/arsenal surfaces consume runtime catalogs instead of milestone-fixed lists",
+    "new action items with supported behavior components can appear in selector without UI code edits",
+    "all active runtime combat status effects are visible as HUD chips",
+    "arsenal uses effective live-config offers and runtime labels",
+    "mobile safe areas, scrolling and >=52px scaled touch targets remain mandatory"
+  ],
+  "runtime_presentation_bindings": [
+    {
+      "surface": "items_selector",
+      "source": "ActionItemCatalog.item_ids",
+      "status": "dynamic"
+    },
+    {
+      "surface": "ammo_selector_labels",
+      "source": "CombatCatalog.ammo_rows",
+      "status": "dynamic"
+    },
+    {
+      "surface": "payload_selector_labels",
+      "source": "SupportPayloadCatalog",
+      "status": "dynamic"
+    },
+    {
+      "surface": "arsenal_offer_rows",
+      "source": "PlayerInventory.effective_offers",
+      "status": "dynamic"
+    },
+    {
+      "surface": "status_chips",
+      "source": "ShipHealth.ammo_effect_until",
+      "status": "dynamic"
+    }
+  ],
+  "interaction_audit": [
+    {
+      "screen": "combat_items",
+      "back": "depth_first",
+      "scroll_strategy": "adaptive_rows",
+      "touch_target_min": 52
+    },
+    {
+      "screen": "arsenal",
+      "back": "ui_cancel",
+      "vertical_scroll": true,
+      "safe_area": true,
+      "touch_target_min": 52
+    },
+    {
+      "screen": "quickslots",
+      "binding": "runtime_kind_validation",
+      "slots": 4
+    },
+    {
+      "screen": "status_feedback",
+      "max_visible_chips": 5,
+      "source": "active_runtime_effects"
+    }
+  ],
+  "content_authoring_guards": [
+    {
+      "id": "action_item_supported_behavior",
+      "rule": "new item must use supported behavior_components/legacy behavior primitive"
+    },
+    {
+      "id": "offer_server_boundary",
+      "rule": "effective offer presentation never grants real-money or server entitlements client-side"
+    },
+    {
+      "id": "status_visibility",
+      "rule": "runtime status IDs require readable generated fallback label even without bespoke UI text"
+    }
+  ],
+  "no_code_types": [
+    "runtime_presentation_binding",
+    "status_chip_profile",
+    "arsenal_offer_presentation",
+    "action_item_selector_profile"
+  ]
+}

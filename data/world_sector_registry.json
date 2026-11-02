@@ -1,0 +1,1429 @@
+{
+  "schema_version": 1,
+  "milestone": "M192",
+  "master": "V3.7",
+  "stable_id_rule": "SECTOR-### is persistent internal authority; player-facing maps use named charts, never 1-1/2-1 numbering",
+  "sectors": [
+    {
+      "id": "SECTOR-001",
+      "legacy_coord": [
+        0,
+        0
+      ],
+      "display_name": "Novice Tide",
+      "biome": "tropical",
+      "port": "Haven's Reach",
+      "pirate_level": 1,
+      "map_type": "core_sea",
+      "neighbors": {
+        "right": "SECTOR-002",
+        "down": "SECTOR-005"
+      },
+      "region_id": "shattered_shores",
+      "map_position": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SECTOR-002",
+      "legacy_coord": [
+        1,
+        0
+      ],
+      "display_name": "Green Frontier",
+      "biome": "tropical",
+      "port": "",
+      "pirate_level": 2,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-001",
+        "right": "SECTOR-003",
+        "down": "SECTOR-006"
+      },
+      "region_id": "shattered_shores",
+      "map_position": [
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SECTOR-003",
+      "legacy_coord": [
+        2,
+        0
+      ],
+      "display_name": "Port Royale",
+      "biome": "tropical",
+      "port": "Port Royale",
+      "pirate_level": 3,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-002",
+        "right": "SECTOR-004",
+        "down": "SECTOR-007"
+      },
+      "region_id": "shattered_shores",
+      "map_position": [
+        2.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SECTOR-004",
+      "legacy_coord": [
+        3,
+        0
+      ],
+      "display_name": "Drake Passage",
+      "biome": "desert",
+      "port": "",
+      "pirate_level": 4,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-003",
+        "down": "SECTOR-008"
+      },
+      "region_id": "shattered_shores",
+      "map_position": [
+        3.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SECTOR-005",
+      "legacy_coord": [
+        0,
+        1
+      ],
+      "display_name": "Ember Coast",
+      "biome": "desert",
+      "port": "Ember Anchorage",
+      "pirate_level": 4,
+      "map_type": "core_sea",
+      "neighbors": {
+        "right": "SECTOR-006",
+        "up": "SECTOR-001",
+        "down": "SECTOR-009"
+      },
+      "region_id": "shattered_shores",
+      "map_position": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "SECTOR-006",
+      "legacy_coord": [
+        1,
+        1
+      ],
+      "display_name": "Amazigh Sahil",
+      "biome": "desert",
+      "port": "",
+      "pirate_level": 5,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-005",
+        "right": "SECTOR-007",
+        "up": "SECTOR-002",
+        "down": "SECTOR-010"
+      },
+      "region_id": "shattered_shores",
+      "map_position": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "id": "SECTOR-007",
+      "legacy_coord": [
+        2,
+        1
+      ],
+      "display_name": "Dominus Regina",
+      "biome": "tropical",
+      "port": "Regina Harbor",
+      "pirate_level": 6,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-006",
+        "right": "SECTOR-008",
+        "up": "SECTOR-003",
+        "down": "SECTOR-011"
+      },
+      "region_id": "crimson_sea",
+      "map_position": [
+        2.0,
+        1.0
+      ]
+    },
+    {
+      "id": "SECTOR-008",
+      "legacy_coord": [
+        3,
+        1
+      ],
+      "display_name": "Corsair Expanse",
+      "biome": "tropical",
+      "port": "",
+      "pirate_level": 7,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-007",
+        "up": "SECTOR-004",
+        "down": "SECTOR-012"
+      },
+      "region_id": "crimson_sea",
+      "map_position": [
+        3.0,
+        1.0
+      ]
+    },
+    {
+      "id": "SECTOR-009",
+      "legacy_coord": [
+        0,
+        2
+      ],
+      "display_name": "Frozen Reach",
+      "biome": "snow",
+      "port": "Frosthaven",
+      "pirate_level": 8,
+      "map_type": "core_sea",
+      "neighbors": {
+        "right": "SECTOR-010",
+        "up": "SECTOR-005",
+        "down": "SECTOR-013"
+      },
+      "region_id": "crimson_sea",
+      "map_position": [
+        0.0,
+        2.0
+      ]
+    },
+    {
+      "id": "SECTOR-010",
+      "legacy_coord": [
+        1,
+        2
+      ],
+      "display_name": "Icebreaker Sea",
+      "biome": "snow",
+      "port": "",
+      "pirate_level": 9,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-009",
+        "right": "SECTOR-011",
+        "up": "SECTOR-006",
+        "down": "SECTOR-014"
+      },
+      "region_id": "crimson_sea",
+      "map_position": [
+        1.0,
+        2.0
+      ]
+    },
+    {
+      "id": "SECTOR-011",
+      "legacy_coord": [
+        2,
+        2
+      ],
+      "display_name": "El Refugio",
+      "biome": "snow",
+      "port": "Refugio",
+      "pirate_level": 10,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-010",
+        "right": "SECTOR-012",
+        "up": "SECTOR-007",
+        "down": "SECTOR-015"
+      },
+      "region_id": "crimson_sea",
+      "map_position": [
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "id": "SECTOR-012",
+      "legacy_coord": [
+        3,
+        2
+      ],
+      "display_name": "Leviathan Gate",
+      "biome": "snow",
+      "port": "",
+      "pirate_level": 11,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-011",
+        "up": "SECTOR-008",
+        "down": "SECTOR-016"
+      },
+      "region_id": "drowned_reach",
+      "map_position": [
+        3.0,
+        2.0
+      ]
+    },
+    {
+      "id": "SECTOR-013",
+      "legacy_coord": [
+        0,
+        3
+      ],
+      "display_name": "Veil Crossing",
+      "biome": "tropical",
+      "port": "Veil Anchorage",
+      "pirate_level": 12,
+      "map_type": "core_sea",
+      "neighbors": {
+        "right": "SECTOR-014",
+        "up": "SECTOR-009"
+      },
+      "region_id": "drowned_reach",
+      "map_position": [
+        0.0,
+        3.0
+      ]
+    },
+    {
+      "id": "SECTOR-014",
+      "legacy_coord": [
+        1,
+        3
+      ],
+      "display_name": "Mist Reaches",
+      "biome": "tropical",
+      "port": "",
+      "pirate_level": 13,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-013",
+        "right": "SECTOR-015",
+        "up": "SECTOR-010",
+        "down": "SECTOR-021"
+      },
+      "region_id": "drowned_reach",
+      "map_position": [
+        1.0,
+        3.0
+      ]
+    },
+    {
+      "id": "SECTOR-015",
+      "legacy_coord": [
+        2,
+        3
+      ],
+      "display_name": "Abyssal Crown",
+      "biome": "desert",
+      "port": "Crown Harbor",
+      "pirate_level": 14,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-014",
+        "right": "SECTOR-016",
+        "up": "SECTOR-011",
+        "down": "SECTOR-020"
+      },
+      "region_id": "drowned_reach",
+      "map_position": [
+        2.0,
+        3.0
+      ]
+    },
+    {
+      "id": "SECTOR-016",
+      "legacy_coord": [
+        3,
+        3
+      ],
+      "display_name": "Hunter's Verge",
+      "biome": "snow",
+      "port": "",
+      "pirate_level": 15,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-015",
+        "right": "SECTOR-017",
+        "up": "SECTOR-012",
+        "down": "SECTOR-019"
+      },
+      "region_id": "drowned_reach",
+      "map_position": [
+        3.0,
+        3.0
+      ]
+    },
+    {
+      "id": "SECTOR-017",
+      "legacy_coord": [
+        4,
+        3
+      ],
+      "display_name": "Cursed Wake",
+      "biome": "cursed",
+      "port": "Mourning Anchorage",
+      "pirate_level": 16,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-016",
+        "right": "SECTOR-028",
+        "down": "SECTOR-018"
+      },
+      "region_id": "stormbound_expanse",
+      "map_position": [
+        4.0,
+        3.0
+      ]
+    },
+    {
+      "id": "SECTOR-018",
+      "legacy_coord": [
+        4,
+        4
+      ],
+      "display_name": "Black Lantern Sea",
+      "biome": "cursed",
+      "port": "",
+      "pirate_level": 17,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-019",
+        "right": "SECTOR-027",
+        "up": "SECTOR-017",
+        "down": "SECTOR-025"
+      },
+      "region_id": "stormbound_expanse",
+      "map_position": [
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SECTOR-019",
+      "legacy_coord": [
+        3,
+        4
+      ],
+      "display_name": "Gilded Grave",
+      "biome": "cursed",
+      "port": "Gilded Refuge",
+      "pirate_level": 18,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-020",
+        "right": "SECTOR-018",
+        "up": "SECTOR-016",
+        "down": "SECTOR-024"
+      },
+      "region_id": "stormbound_expanse",
+      "map_position": [
+        3.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SECTOR-020",
+      "legacy_coord": [
+        2,
+        4
+      ],
+      "display_name": "Admiral's Scar",
+      "biome": "cursed",
+      "port": "",
+      "pirate_level": 19,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-021",
+        "right": "SECTOR-019",
+        "up": "SECTOR-015",
+        "down": "SECTOR-023"
+      },
+      "region_id": "stormbound_expanse",
+      "map_position": [
+        2.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SECTOR-021",
+      "legacy_coord": [
+        1,
+        4
+      ],
+      "display_name": "Crown of Ash",
+      "biome": "cursed",
+      "port": "Ashen Crown Harbor",
+      "pirate_level": 20,
+      "map_type": "core_sea",
+      "neighbors": {
+        "right": "SECTOR-020",
+        "up": "SECTOR-014",
+        "down": "SECTOR-022"
+      },
+      "region_id": "stormbound_expanse",
+      "map_position": [
+        1.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SECTOR-022",
+      "legacy_coord": [
+        1,
+        5
+      ],
+      "display_name": "Riftwater",
+      "biome": "cursed",
+      "port": "",
+      "pirate_level": 21,
+      "map_type": "core_sea",
+      "neighbors": {
+        "right": "SECTOR-023",
+        "up": "SECTOR-021"
+      },
+      "region_id": "cursed_dominion",
+      "map_position": [
+        1.0,
+        5.0
+      ]
+    },
+    {
+      "id": "SECTOR-023",
+      "legacy_coord": [
+        2,
+        5
+      ],
+      "display_name": "Hexed Convoy Sea",
+      "biome": "cursed",
+      "port": "Riftwatch",
+      "pirate_level": 22,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-022",
+        "right": "SECTOR-024",
+        "up": "SECTOR-020"
+      },
+      "region_id": "cursed_dominion",
+      "map_position": [
+        2.0,
+        5.0
+      ]
+    },
+    {
+      "id": "SECTOR-024",
+      "legacy_coord": [
+        3,
+        5
+      ],
+      "display_name": "Broken Sigil",
+      "biome": "cursed",
+      "port": "",
+      "pirate_level": 23,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-023",
+        "right": "SECTOR-025",
+        "up": "SECTOR-019"
+      },
+      "region_id": "cursed_dominion",
+      "map_position": [
+        3.0,
+        5.0
+      ]
+    },
+    {
+      "id": "SECTOR-025",
+      "legacy_coord": [
+        4,
+        5
+      ],
+      "display_name": "Frontier Maw",
+      "biome": "cursed",
+      "port": "Frontier Refuge",
+      "pirate_level": 24,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-024",
+        "right": "SECTOR-026",
+        "up": "SECTOR-018"
+      },
+      "region_id": "cursed_dominion",
+      "map_position": [
+        4.0,
+        5.0
+      ]
+    },
+    {
+      "id": "SECTOR-026",
+      "legacy_coord": [
+        5,
+        5
+      ],
+      "display_name": "Specialist's Trial",
+      "biome": "cursed",
+      "port": "Specialist Anchorage",
+      "pirate_level": 25,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-025",
+        "up": "SECTOR-027"
+      },
+      "region_id": "cursed_dominion",
+      "map_position": [
+        5.0,
+        5.0
+      ]
+    },
+    {
+      "id": "SECTOR-027",
+      "legacy_coord": [
+        5,
+        4
+      ],
+      "display_name": "Abyssal Threshold",
+      "biome": "abyss",
+      "port": "Threshold Refuge",
+      "pirate_level": 26,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-018",
+        "right": "SECTOR-036",
+        "up": "SECTOR-028",
+        "down": "SECTOR-026"
+      },
+      "region_id": "abyssal_frontier",
+      "map_position": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SECTOR-028",
+      "legacy_coord": [
+        5,
+        3
+      ],
+      "display_name": "Drowned Maw",
+      "biome": "abyss",
+      "port": "",
+      "pirate_level": 27,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-017",
+        "right": "SECTOR-035",
+        "up": "SECTOR-029",
+        "down": "SECTOR-027"
+      },
+      "region_id": "abyssal_frontier",
+      "map_position": [
+        5.0,
+        3.0
+      ]
+    },
+    {
+      "id": "SECTOR-029",
+      "legacy_coord": [
+        5,
+        2
+      ],
+      "display_name": "Coral Grave",
+      "biome": "abyss",
+      "port": "Deepwatch",
+      "pirate_level": 28,
+      "map_type": "core_sea",
+      "neighbors": {
+        "right": "SECTOR-034",
+        "up": "SECTOR-030",
+        "down": "SECTOR-028"
+      },
+      "region_id": "abyssal_frontier",
+      "map_position": [
+        5.0,
+        2.0
+      ]
+    },
+    {
+      "id": "SECTOR-030",
+      "legacy_coord": [
+        5,
+        1
+      ],
+      "display_name": "Leviathan Trench",
+      "biome": "abyss",
+      "port": "",
+      "pirate_level": 29,
+      "map_type": "core_sea",
+      "neighbors": {
+        "right": "SECTOR-033",
+        "up": "SECTOR-031",
+        "down": "SECTOR-029"
+      },
+      "region_id": "abyssal_frontier",
+      "map_position": [
+        5.0,
+        1.0
+      ]
+    },
+    {
+      "id": "SECTOR-031",
+      "legacy_coord": [
+        5,
+        0
+      ],
+      "display_name": "Corruption Trial",
+      "biome": "abyss",
+      "port": "Abyssal Anchorage",
+      "pirate_level": 30,
+      "map_type": "core_sea",
+      "neighbors": {
+        "right": "SECTOR-032",
+        "down": "SECTOR-030"
+      },
+      "region_id": "abyssal_frontier",
+      "map_position": [
+        5.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SECTOR-032",
+      "legacy_coord": [
+        6,
+        0
+      ],
+      "display_name": "Ancient Approach",
+      "biome": "abyss",
+      "port": "",
+      "pirate_level": 31,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-031",
+        "right": "SECTOR-041",
+        "down": "SECTOR-033"
+      },
+      "region_id": "sunken_empire",
+      "map_position": [
+        6.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SECTOR-033",
+      "legacy_coord": [
+        6,
+        1
+      ],
+      "display_name": "Guardian Shelf",
+      "biome": "abyss",
+      "port": "Relic Haven",
+      "pirate_level": 32,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-030",
+        "right": "SECTOR-040",
+        "up": "SECTOR-032",
+        "down": "SECTOR-034"
+      },
+      "region_id": "sunken_empire",
+      "map_position": [
+        6.0,
+        1.0
+      ]
+    },
+    {
+      "id": "SECTOR-034",
+      "legacy_coord": [
+        6,
+        2
+      ],
+      "display_name": "Forgotten Vault Sea",
+      "biome": "abyss",
+      "port": "",
+      "pirate_level": 33,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-029",
+        "right": "SECTOR-039",
+        "up": "SECTOR-033",
+        "down": "SECTOR-035"
+      },
+      "region_id": "sunken_empire",
+      "map_position": [
+        6.0,
+        2.0
+      ]
+    },
+    {
+      "id": "SECTOR-035",
+      "legacy_coord": [
+        6,
+        3
+      ],
+      "display_name": "Titan Wake",
+      "biome": "abyss",
+      "port": "Titan Refuge",
+      "pirate_level": 34,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-028",
+        "right": "SECTOR-038",
+        "up": "SECTOR-034",
+        "down": "SECTOR-036"
+      },
+      "region_id": "sunken_empire",
+      "map_position": [
+        6.0,
+        3.0
+      ]
+    },
+    {
+      "id": "SECTOR-036",
+      "legacy_coord": [
+        6,
+        4
+      ],
+      "display_name": "World Boss Muster",
+      "biome": "abyss",
+      "port": "Muster Anchorage",
+      "pirate_level": 35,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-027",
+        "right": "SECTOR-037",
+        "up": "SECTOR-035"
+      },
+      "region_id": "sunken_empire",
+      "map_position": [
+        6.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SECTOR-037",
+      "legacy_coord": [
+        7,
+        4
+      ],
+      "display_name": "Void Threshold",
+      "biome": "abyss",
+      "port": "Last Light",
+      "pirate_level": 36,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-036",
+        "right": "SECTOR-046",
+        "up": "SECTOR-038"
+      },
+      "region_id": "void_sea",
+      "map_position": [
+        7.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SECTOR-038",
+      "legacy_coord": [
+        7,
+        3
+      ],
+      "display_name": "Blackglass Current",
+      "biome": "abyss",
+      "port": "",
+      "pirate_level": 37,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-035",
+        "right": "SECTOR-045",
+        "up": "SECTOR-039",
+        "down": "SECTOR-037"
+      },
+      "region_id": "void_sea",
+      "map_position": [
+        7.0,
+        3.0
+      ]
+    },
+    {
+      "id": "SECTOR-039",
+      "legacy_coord": [
+        7,
+        2
+      ],
+      "display_name": "Hollow Stars",
+      "biome": "abyss",
+      "port": "Last Light",
+      "pirate_level": 38,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-034",
+        "right": "SECTOR-044",
+        "up": "SECTOR-040",
+        "down": "SECTOR-038"
+      },
+      "region_id": "void_sea",
+      "map_position": [
+        7.0,
+        2.0
+      ]
+    },
+    {
+      "id": "SECTOR-040",
+      "legacy_coord": [
+        7,
+        1
+      ],
+      "display_name": "Admiral's Eclipse",
+      "biome": "abyss",
+      "port": "",
+      "pirate_level": 39,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-033",
+        "right": "SECTOR-043",
+        "up": "SECTOR-041",
+        "down": "SECTOR-039"
+      },
+      "region_id": "void_sea",
+      "map_position": [
+        7.0,
+        1.0
+      ]
+    },
+    {
+      "id": "SECTOR-041",
+      "legacy_coord": [
+        7,
+        0
+      ],
+      "display_name": "Last Light Trial",
+      "biome": "abyss",
+      "port": "Last Light",
+      "pirate_level": 40,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-032",
+        "right": "SECTOR-042",
+        "down": "SECTOR-040"
+      },
+      "region_id": "void_sea",
+      "map_position": [
+        7.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SECTOR-042",
+      "legacy_coord": [
+        8,
+        0
+      ],
+      "display_name": "Sovereign Gate",
+      "biome": "cursed",
+      "port": "Sovereign's Rest",
+      "pirate_level": 41,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-041",
+        "right": "SECTOR-051",
+        "down": "SECTOR-043"
+      },
+      "region_id": "sovereign_waters",
+      "legacy_port_alias": "Sovereign's Rest",
+      "map_position": [
+        8.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SECTOR-043",
+      "legacy_coord": [
+        8,
+        1
+      ],
+      "display_name": "Crownwake Reach",
+      "biome": "cursed",
+      "port": "",
+      "pirate_level": 42,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-040",
+        "right": "SECTOR-050",
+        "up": "SECTOR-042",
+        "down": "SECTOR-044"
+      },
+      "region_id": "sovereign_waters",
+      "map_position": [
+        8.0,
+        1.0
+      ]
+    },
+    {
+      "id": "SECTOR-044",
+      "legacy_coord": [
+        8,
+        2
+      ],
+      "display_name": "Bannerfall Sea",
+      "biome": "cursed",
+      "port": "Sovereign's Rest",
+      "pirate_level": 43,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-039",
+        "right": "SECTOR-049",
+        "up": "SECTOR-043",
+        "down": "SECTOR-045"
+      },
+      "region_id": "sovereign_waters",
+      "legacy_port_alias": "Banner Anchorage",
+      "map_position": [
+        8.0,
+        2.0
+      ]
+    },
+    {
+      "id": "SECTOR-045",
+      "legacy_coord": [
+        8,
+        3
+      ],
+      "display_name": "High Admiral Sound",
+      "biome": "cursed",
+      "port": "",
+      "pirate_level": 44,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-038",
+        "right": "SECTOR-048",
+        "up": "SECTOR-044",
+        "down": "SECTOR-046"
+      },
+      "region_id": "sovereign_waters",
+      "map_position": [
+        8.0,
+        3.0
+      ]
+    },
+    {
+      "id": "SECTOR-046",
+      "legacy_coord": [
+        8,
+        4
+      ],
+      "display_name": "Sovereign Muster",
+      "biome": "cursed",
+      "port": "Sovereign's Rest",
+      "pirate_level": 45,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-037",
+        "right": "SECTOR-047",
+        "up": "SECTOR-045"
+      },
+      "region_id": "sovereign_waters",
+      "legacy_port_alias": "Sovereign's Rest",
+      "map_position": [
+        8.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SECTOR-047",
+      "legacy_coord": [
+        9,
+        4
+      ],
+      "display_name": "Dominion Threshold",
+      "biome": "dominion",
+      "port": "Dominion Gate",
+      "pirate_level": 46,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-046",
+        "up": "SECTOR-048"
+      },
+      "region_id": "abyssal_dominion",
+      "legacy_port_alias": "Dominion Gate",
+      "map_position": [
+        9.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SECTOR-048",
+      "legacy_coord": [
+        9,
+        3
+      ],
+      "display_name": "Legendary Wake",
+      "biome": "dominion",
+      "port": "",
+      "pirate_level": 47,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-045",
+        "up": "SECTOR-049",
+        "down": "SECTOR-047"
+      },
+      "region_id": "abyssal_dominion",
+      "map_position": [
+        9.0,
+        3.0
+      ]
+    },
+    {
+      "id": "SECTOR-049",
+      "legacy_coord": [
+        9,
+        2
+      ],
+      "display_name": "Rift Throne Sea",
+      "biome": "dominion",
+      "port": "Dominion Gate",
+      "pirate_level": 48,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-044",
+        "up": "SECTOR-050",
+        "down": "SECTOR-048"
+      },
+      "region_id": "abyssal_dominion",
+      "legacy_port_alias": "Dominion Gate",
+      "map_position": [
+        9.0,
+        2.0
+      ]
+    },
+    {
+      "id": "SECTOR-050",
+      "legacy_coord": [
+        9,
+        1
+      ],
+      "display_name": "High Admiral Dominion",
+      "biome": "dominion",
+      "port": "",
+      "pirate_level": 49,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-043",
+        "up": "SECTOR-051",
+        "down": "SECTOR-049"
+      },
+      "region_id": "abyssal_dominion",
+      "map_position": [
+        9.0,
+        1.0
+      ]
+    },
+    {
+      "id": "SECTOR-051",
+      "legacy_coord": [
+        9,
+        0
+      ],
+      "display_name": "Abyssal Dominion",
+      "biome": "dominion",
+      "port": "Dominion Gate",
+      "pirate_level": 50,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-042",
+        "down": "SECTOR-050",
+        "right": "SECTOR-052"
+      },
+      "region_id": "abyssal_dominion",
+      "legacy_port_alias": "Dominion Gate",
+      "map_position": [
+        9.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SECTOR-052",
+      "legacy_coord": [
+        10,
+        0
+      ],
+      "display_name": "Blackwake Gate",
+      "biome": "dominion",
+      "port": "Blackwake Bastion",
+      "pirate_level": 51,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-051",
+        "down": "SECTOR-053"
+      },
+      "region_id": "dreadwater_march",
+      "map_position": [
+        10.0,
+        0.0
+      ],
+      "npc_ids": [
+        "SHIP-PROG-051",
+        "SHIP-PROG-052",
+        "SHIP-PROG-053",
+        "SHIP-PROG-054",
+        "SHIP-PROG-055"
+      ]
+    },
+    {
+      "id": "SECTOR-053",
+      "legacy_coord": [
+        10,
+        1
+      ],
+      "display_name": "Razor Current",
+      "biome": "dominion",
+      "port": "",
+      "pirate_level": 52,
+      "map_type": "core_sea",
+      "neighbors": {
+        "up": "SECTOR-052",
+        "down": "SECTOR-054"
+      },
+      "region_id": "dreadwater_march",
+      "map_position": [
+        10.0,
+        1.0
+      ],
+      "npc_ids": [
+        "SHIP-PROG-051",
+        "SHIP-PROG-052",
+        "SHIP-PROG-053",
+        "SHIP-PROG-054",
+        "SHIP-PROG-055"
+      ]
+    },
+    {
+      "id": "SECTOR-054",
+      "legacy_coord": [
+        10,
+        2
+      ],
+      "display_name": "Dreadwake Crossing",
+      "biome": "dominion",
+      "port": "",
+      "pirate_level": 53,
+      "map_type": "core_sea",
+      "neighbors": {
+        "up": "SECTOR-053",
+        "down": "SECTOR-055"
+      },
+      "region_id": "dreadwater_march",
+      "map_position": [
+        10.0,
+        2.0
+      ],
+      "npc_ids": [
+        "SHIP-PROG-051",
+        "SHIP-PROG-052",
+        "SHIP-PROG-053",
+        "SHIP-PROG-054",
+        "SHIP-PROG-055"
+      ]
+    },
+    {
+      "id": "SECTOR-055",
+      "legacy_coord": [
+        10,
+        3
+      ],
+      "display_name": "Hunter Graves",
+      "biome": "dominion",
+      "port": "",
+      "pirate_level": 54,
+      "map_type": "core_sea",
+      "neighbors": {
+        "up": "SECTOR-054",
+        "down": "SECTOR-056"
+      },
+      "region_id": "dreadwater_march",
+      "map_position": [
+        10.0,
+        3.0
+      ],
+      "npc_ids": [
+        "SHIP-PROG-051",
+        "SHIP-PROG-052",
+        "SHIP-PROG-053",
+        "SHIP-PROG-054",
+        "SHIP-PROG-055"
+      ]
+    },
+    {
+      "id": "SECTOR-056",
+      "legacy_coord": [
+        10,
+        4
+      ],
+      "display_name": "Blackwake Bastion",
+      "biome": "dominion",
+      "port": "Blackwake Bastion",
+      "pirate_level": 55,
+      "map_type": "core_sea",
+      "neighbors": {
+        "up": "SECTOR-055",
+        "right": "SECTOR-057"
+      },
+      "region_id": "dreadwater_march",
+      "map_position": [
+        10.0,
+        4.0
+      ],
+      "npc_ids": [
+        "SHIP-PROG-051",
+        "SHIP-PROG-052",
+        "SHIP-PROG-053",
+        "SHIP-PROG-054",
+        "SHIP-PROG-055"
+      ]
+    },
+    {
+      "id": "SECTOR-057",
+      "legacy_coord": [
+        11,
+        4
+      ],
+      "display_name": "Iron Maw Threshold",
+      "biome": "abyss",
+      "port": "Iron Maw Anchorage",
+      "pirate_level": 56,
+      "map_type": "core_sea",
+      "neighbors": {
+        "left": "SECTOR-056",
+        "up": "SECTOR-058"
+      },
+      "region_id": "iron_maw_reach",
+      "map_position": [
+        11.0,
+        4.0
+      ],
+      "npc_ids": [
+        "SHIP-PROG-056",
+        "SHIP-PROG-057",
+        "SHIP-PROG-058",
+        "SHIP-PROG-059",
+        "SHIP-PROG-060"
+      ]
+    },
+    {
+      "id": "SECTOR-058",
+      "legacy_coord": [
+        11,
+        3
+      ],
+      "display_name": "Chainbreaker Sound",
+      "biome": "abyss",
+      "port": "",
+      "pirate_level": 57,
+      "map_type": "core_sea",
+      "neighbors": {
+        "down": "SECTOR-057",
+        "up": "SECTOR-059"
+      },
+      "region_id": "iron_maw_reach",
+      "map_position": [
+        11.0,
+        3.0
+      ],
+      "npc_ids": [
+        "SHIP-PROG-056",
+        "SHIP-PROG-057",
+        "SHIP-PROG-058",
+        "SHIP-PROG-059",
+        "SHIP-PROG-060"
+      ]
+    },
+    {
+      "id": "SECTOR-059",
+      "legacy_coord": [
+        11,
+        2
+      ],
+      "display_name": "Galleass Furnace",
+      "biome": "abyss",
+      "port": "",
+      "pirate_level": 58,
+      "map_type": "core_sea",
+      "neighbors": {
+        "down": "SECTOR-058",
+        "up": "SECTOR-060"
+      },
+      "region_id": "iron_maw_reach",
+      "map_position": [
+        11.0,
+        2.0
+      ],
+      "npc_ids": [
+        "SHIP-PROG-056",
+        "SHIP-PROG-057",
+        "SHIP-PROG-058",
+        "SHIP-PROG-059",
+        "SHIP-PROG-060"
+      ]
+    },
+    {
+      "id": "SECTOR-060",
+      "legacy_coord": [
+        11,
+        1
+      ],
+      "display_name": "Siegewater Crown",
+      "biome": "abyss",
+      "port": "",
+      "pirate_level": 59,
+      "map_type": "core_sea",
+      "neighbors": {
+        "down": "SECTOR-059",
+        "up": "SECTOR-061"
+      },
+      "region_id": "iron_maw_reach",
+      "map_position": [
+        11.0,
+        1.0
+      ],
+      "npc_ids": [
+        "SHIP-PROG-056",
+        "SHIP-PROG-057",
+        "SHIP-PROG-058",
+        "SHIP-PROG-059",
+        "SHIP-PROG-060"
+      ]
+    },
+    {
+      "id": "SECTOR-061",
+      "legacy_coord": [
+        11,
+        0
+      ],
+      "display_name": "Iron Maw Trial",
+      "biome": "abyss",
+      "port": "Iron Maw Anchorage",
+      "pirate_level": 60,
+      "map_type": "core_sea",
+      "neighbors": {
+        "down": "SECTOR-060"
+      },
+      "region_id": "iron_maw_reach",
+      "map_position": [
+        11.0,
+        0.0
+      ],
+      "npc_ids": [
+        "SHIP-PROG-056",
+        "SHIP-PROG-057",
+        "SHIP-PROG-058",
+        "SHIP-PROG-059",
+        "SHIP-PROG-060"
+      ]
+    }
+  ]
+}

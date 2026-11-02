@@ -1,0 +1,2 @@
+# M124 — PL46–50 Abyssal Dominion
+Implements the master-defined final PL1–50 band: Legendary fleets, complex encounters, endgame materials/design/meta; PL46–49 Abyssal High Admiral/Legendary Chain direction; PL50 final trial and repeatable prestige prototype. Numeric tuning is explicitly local/provisional. Stable replacement slots and mobile LOD/readability contracts remain binding. Audit fix: Voyage import still capped advanced_map_level at 35 in M123; now corrected to 50. No server authority is claimed.

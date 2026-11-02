@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "milestone": "M109",
+  "implemented": [
+    "PL6-10 map progression runtime",
+    "map XP gates",
+    "boss-clear gates",
+    "PL10 Pirate Trial gate",
+    "selected-ship mastery XP from PL6-10 combat",
+    "Stormreach/Ember NPC fleet definitions",
+    "PL6/8/10 existing main-design reward cadence",
+    "PL6-10 HUD progression strip"
+  ],
+  "source_truth": {
+    "v3_7_found": false,
+    "existing_m46_regions_preserved": true,
+    "existing_m56_ship_rewards_preserved": true,
+    "existing_ship_mastery_1_10_preserved": true
+  },
+  "prototype_tuning": [
+    "map XP goals",
+    "mastery XP per sink/multipliers",
+    "NPC semantic ammo/role tuning"
+  ],
+  "authority": {
+    "server_progression": false,
+    "local_save": true,
+    "real_backend": false
+  },
+  "next": "PL11-15 expansion after native/static M109 audit; then continue toward wider 1-50 progression."
+}

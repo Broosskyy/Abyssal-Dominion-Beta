@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "milestone": "M188",
+  "master_concept": "V3.8",
+  "goal": "GLOBAL_META_ACCESS_AND_CONTEXTUAL_HARBOR_ENTRY",
+  "global_routes": [
+    "ships",
+    "shipyard",
+    "equipment",
+    "loadouts",
+    "quests",
+    "events",
+    "guild",
+    "rankings",
+    "itemshop",
+    "progression"
+  ],
+  "harbor_local": [
+    "repair_service",
+    "local_supply_market",
+    "regional_vendor",
+    "regional_crafting",
+    "harbor_npc",
+    "harbor_quest",
+    "harbor_event_hook"
+  ],
+  "routing": {
+    "shipyard_opens_global_shipyard_panel": true,
+    "shipyard_never_aliases_harbor_page": true,
+    "target_action_becomes_harbor_action_only_in_real_port_range": true,
+    "harbor_action_activates_real_port_before_opening_local_page": true,
+    "normal_target_cycle_preserved_at_sea": true
+  },
+  "presentation": {
+    "legacy_harbor_shipyard_label_removed": true,
+    "equipment_page_explains_global_vs_local_boundary": true,
+    "harbor_center_overlay_not_persistent": true,
+    "seekarte_center_remains_clear": true
+  },
+  "quests": {
+    "normal_global": true,
+    "harbor_special_opt_in_only": true
+  },
+  "authority": {
+    "no_fake_offers": true,
+    "no_client_entitlement_grants": true
+  }
+}

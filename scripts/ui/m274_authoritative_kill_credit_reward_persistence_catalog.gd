@@ -1,0 +1,10 @@
+class_name M274AuthoritativeKillCreditRewardPersistenceCatalog
+extends RefCounted
+static func overview(runtime:M274AuthoritativeKillCreditRewardPersistenceRuntime)->Dictionary:
+	if runtime==null:return {"title":"Kill Credit · Rewards","state":"SERVER REQUIRED","detail":"Keine autoritative Eligibility-Replica gebunden."}
+	var s:=runtime.snapshot(); return {"title":"Kill Credit · Eligibility · Persistence","state":"SERVER REPLICA" if int(s.get("eligibility_revision",-1))>=0 else "WAITING","detail":"Encounter %s · eligibility rev %d · persistence rev %d"%[str(s.get("encounter_id","UNBOUND")),int(s.get("eligibility_revision",-1)),int(s.get("persistence_revision",-1))]}
+static func contribution()->Dictionary: return {"title":"Contribution · Group · Participation","state":"SERVER AUTHORITATIVE","detail":"Teilnahme, Damage/Support/Objective-Contribution, Gruppenbezug und Kill-Credit werden serverseitig bewertet; lokale HUD-Werte erzeugen keine Berechtigung."}
+static func eligibility()->Dictionary: return {"title":"Loot · Reward Eligibility","state":"FAIL-CLOSED","detail":"Drop-/Reward-Berechtigung wird aus bestätigtem Encounter-, Kill- und Contribution-State abgeleitet. Finale Schwellen, Gewichte und Dropchancen bleiben ungesetzt."}
+static func persistence()->Dictionary: return {"title":"Reconnect · Recovery · Persistence","state":"SERVER PERSISTED FOUNDATION","detail":"Laufende Encounter-, Contribution- und Eligibility-Revisionen sind für Reconnect/Recovery vorbereitet; Clients können verlorenen Credit nicht lokal wiederherstellen."}
+static func settlement()->Dictionary: return {"title":"Loot Handoff · Atomic Settlement","state":"M266 REQUIRED","detail":"M274 autorisiert nur Eligibility/Drop-/Reward-Handoffs. Eigentum, Wallet, Inventar, Loot und Receipts werden ausschließlich atomar über M266 dauerhaft verbucht."}
+static func authority()->Dictionary: return {"title":"Reward Authority","state":"SERVER AUTHORITATIVE","detail":"Clients können weder Kill-Credit, Contribution, Eligibility, Loot-Rolls, Drops, Rewards noch Settlement bestätigen. TEST/GLOBAL bleiben strikt isoliert."}

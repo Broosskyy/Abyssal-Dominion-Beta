@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "milestone": "M45",
+  "rules": {
+    "max_world_icons": 4,
+    "world_icon_size_px": 18,
+    "show_remaining_seconds": true,
+    "mobile_clamp": true,
+    "visual_only": true,
+    "stable_asset_slots": true
+  },
+  "statuses": {
+    "burn": {
+      "label": "BURN",
+      "icon_slot": "status_burn",
+      "priority": 80,
+      "source": "ammo_effect_until"
+    },
+    "venom": {
+      "label": "VENOM",
+      "icon_slot": "status_venom",
+      "priority": 75,
+      "source": "ammo_effect_until"
+    },
+    "armor_break": {
+      "label": "ARMOR",
+      "icon_slot": "status_armor_break",
+      "priority": 90,
+      "source": "ammo_effect_until"
+    },
+    "spectral_mark": {
+      "label": "MARK",
+      "icon_slot": "status_spectral_mark",
+      "priority": 85,
+      "source": "ammo_effect_until"
+    },
+    "repair_block": {
+      "label": "NO REPAIR",
+      "icon_slot": "status_repair_block",
+      "priority": 95,
+      "source": "repair_block_until"
+    },
+    "barrier": {
+      "label": "BARRIER",
+      "icon_slot": "status_barrier",
+      "priority": 70,
+      "source": "temporary_barrier_until"
+    },
+    "veil": {
+      "label": "VEIL",
+      "icon_slot": "status_veil",
+      "priority": 65,
+      "source": "ship_meta_veil_until"
+    },
+    "powder": {
+      "label": "POWDER",
+      "icon_slot": "status_powder",
+      "priority": 55,
+      "source": "inventory_toggle"
+    },
+    "plates": {
+      "label": "PLATES",
+      "icon_slot": "status_plates",
+      "priority": 55,
+      "source": "inventory_toggle"
+    }
+  }
+}

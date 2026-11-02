@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "milestone": "M81",
+  "status": "SOURCE_INTEGRITY_CLOSED_NATIVE_PENDING",
+  "beginner_progression": {
+    "fresh_v2": {
+      "medium_stage": 2,
+      "large_stage": 3
+    },
+    "explicit_v1": {
+      "stage1_clipper_grandfathered": true,
+      "stage5_chalupa_grandfathered": true
+    },
+    "pre_version_m31": {
+      "trial_passed_maps_to_completed_trials": 1,
+      "legacy_clipper_fabricated": false
+    },
+    "owned_ship_removal": false
+  },
+  "shipyard": {
+    "unowned_beginner_purchase": false,
+    "unowned_main_design_purchase": false,
+    "eligibility_equals_ownership": false,
+    "preview_status_uses_acquisition_message": true
+  },
+  "visual_budget": {
+    "source": "m75_mobile_presentation_budget.json",
+    "compact_phone_visibility_end": 28.0,
+    "phone_visibility_end": 38.0,
+    "tablet_desktop_visibility_end": 52.0,
+    "world_dressing_uses_shared_budget": true,
+    "wreck_and_monster_context_use_shared_budget": true
+  },
+  "native_required": true
+}

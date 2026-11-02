@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "milestone": "M176",
+  "master_concept": "V3.8",
+  "goal": "RUNTIME_COMBAT_BOSS_BONUSMAP_AND_NOTIFICATION_FEEDBACK",
+  "notification_profiles": {
+    "default": {"priority": 1, "duration_ms": 2600, "text": "{message}"},
+    "boss_arrival": {"priority": 6, "duration_ms": 3600, "text": "BOSS ERSCHEINT · {boss}"},
+    "boss_phase": {"priority": 7, "duration_ms": 3200, "text": "{boss} · PHASE {phase}"},
+    "boss_enrage": {"priority": 8, "duration_ms": 3900, "text": "{boss} · ENRAGE · PHASE {phase}"},
+    "bonus_wave_start": {"priority": 4, "duration_ms": 2600, "text": "{map} · WELLE {wave} STARTET · {count}× {kind}"},
+    "bonus_wave_clear": {"priority": 5, "duration_ms": 2800, "text": "{map} · WELLE {wave} ABGESCHLOSSEN"},
+    "bonus_complete": {"priority": 8, "duration_ms": 4600, "text": "{map} · BONUSMAP ABGESCHLOSSEN"},
+    "bonus_boss": {"priority": 7, "duration_ms": 3800, "text": "{map} · ENDBOSS · {boss}"},
+    "boss_mechanic": {"priority": 7, "duration_ms": 2500, "text": "{boss} · {mechanic}"},
+    "boss_dodged": {"priority": 7, "duration_ms": 1700, "text": "AUSGEWICHEN · {mechanic}"},
+    "boss_hit": {"priority": 5, "duration_ms": 1400, "text": "TREFFER · {mechanic}"},
+    "bonus_no_death": {"priority": 8, "duration_ms": 4200, "text": "{map} · NO-DEATH-BONUS ERREICHT · SERVER-REWARD AUSSTEHEND"},
+    "repair": {"priority": 3, "duration_ms": 1800, "text": "+{amount} REPARATUR"},
+    "shield_restore": {"priority": 3, "duration_ms": 1800, "text": "+{amount} SCHILD"}
+  },
+  "combat_value_routing": {
+    "repair_kind": "repair",
+    "support_heal_kind": "heal",
+    "shield_kind": "shield",
+    "barrier_absorb_kind": "block",
+    "mitigation_kind": "armor",
+    "minimum_defense_value": 5.0,
+    "minimum_defense_ratio": 0.08,
+    "positive_values_ignore_only_own_damage_filter_for_player_target": true
+  },
+  "bonusmap_rules": {
+    "final_boss_resolution": "last_authored_runtime_wave",
+    "legacy_fixed_boss_wave_is_advisory": true,
+    "wave_start_feedback": true,
+    "wave_clear_feedback": true,
+    "completion_feedback": true,
+    "reward_mutation_authority": "existing_progress_runtime_local_preview"
+  },
+  "boss_phase_rules": {
+    "phase_2": "boss_phase",
+    "phase_3": "boss_enrage",
+    "presentation_only": true,
+    "combat_stats_source": "existing_m158_phase_profile"
+  },
+  "hud_lock": {
+    "camera_joystick": "bottom_left_camera_only",
+    "ship_movement": "tap_to_sail",
+    "primary_attack": "bottom_right",
+    "notification_lane": "center_top_below_fixed_hud",
+    "world_center_priority": true
+  },
+  "authority": {
+    "presentation_may_change_combat_values": false,
+    "presentation_may_grant_rewards": false,
+    "damage_loot_currency_inventory": "server_authoritative_online",
+    "profiles": "draft_review_publish_rollback"
+  }
+}

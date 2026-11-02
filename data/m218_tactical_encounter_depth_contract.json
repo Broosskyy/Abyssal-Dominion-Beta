@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "milestone": "M218",
+  "title": "Tactical Encounter Depth & Loot Collectability",
+  "master_reference_lock": "V3.8 + five gameplay master references + M213/M214 camera/world composition",
+  "combat": {
+    "tactical_states": [
+      "PATROL",
+      "PURSUE",
+      "ALIGN",
+      "BROADSIDE",
+      "RECOVER",
+      "KITE",
+      "RETURN"
+    ],
+    "rules": [
+      "Aggro transitions must be readable rather than binary chase loops.",
+      "Broadside firing keeps existing damage/range/reload authority.",
+      "Post-shot recover is movement/presentation state only and does not accelerate reload.",
+      "Boss phase changes expose a short readable phase-shift state."
+    ]
+  },
+  "sink_read": {
+    "classes": [
+      "normal",
+      "elite",
+      "admiral",
+      "monster"
+    ],
+    "rule": "Presentation scale differs by encounter class; health/rewards remain authoritative and unchanged."
+  },
+  "loot": {
+    "boss_cluster_spacing_m": 2.6,
+    "rules": [
+      "Boss salvage and repair cache must not visually overlap.",
+      "Pickup radius and reward values remain unchanged.",
+      "Loot remains in navigable water near the defeated target."
+    ]
+  },
+  "parity": "Identical gameplay/world logic on mobile, web and desktop; only responsive UI sizing may differ.",
+  "balance_changes": false
+}

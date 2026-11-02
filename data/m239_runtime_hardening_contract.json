@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "milestone": "M240",
+  "master_concept": "V3.8",
+  "purpose": "Prevent false-complete source claims and enforce canonical interaction/combat authority while convergence work proceeds.",
+  "canonical_combat": {
+    "required": "valid target + correct weapon + range + reload => full calculated hit",
+    "facing_damage_multiplier": false,
+    "broadside_damage_multiplier": false,
+    "facing_attack_gate": false,
+    "visual_firing_side_is_cosmetic": true,
+    "enemy_ai_fix": "M239 removes broadside/facing alignment as a firing gate. AI may still steer toward a broadside-looking presentation."
+  },
+  "interaction_authority": {
+    "navigation": "PlayerShipInput / existing Tap-to-Sail routing",
+    "targeting": "TargetingSystem",
+    "combat": "ShipWeapons + projectile/health contracts",
+    "quests": "TrackedQuestRuntime/MissionSystem",
+    "events": "EventRuntime",
+    "harbor": "PortInteraction + existing service routes",
+    "server_rank_rewards": "server replica only; client read-only"
+  },
+  "production_boundaries": {
+    "auth_gateway": "foundation/unavailable",
+    "repository_gateway": "foundation/unavailable",
+    "transport_gateway": "foundation/unavailable",
+    "payments": "missing",
+    "native_device_qa": "not performed in this environment"
+  },
+  "regression_guards": [
+    "Do not add a second pathfinder.",
+    "Do not make ships/NPCs/monsters movement blockers.",
+    "Do not let HUD become gameplay authority.",
+    "Do not infer server readiness from replica contracts.",
+    "Do not gate canonical attacks by facing/broadside angle.",
+    "Do not alter M213/M214 master camera/world composition without explicit visual-master change."
+  ],
+  "balance_changes": false
+}

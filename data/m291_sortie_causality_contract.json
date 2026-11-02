@@ -1,0 +1,22 @@
+{
+  "milestone": "M291",
+  "master_concept": "V3.8",
+  "name": "first_sea_sortie_evidence_causality",
+  "clean_room_references": ["Seafight", "Battle of Sea"],
+  "core_stages": ["HARBOR_START", "UNDOCK", "TAP_TO_SAIL", "TARGET_CONTACT", "CANNON_COMBAT", "HARPOON_MONSTER", "REPAIR_OR_SHIELD", "LOOT_RECOVERY", "QUEST_COMPLETION", "HARBOR_RETURN"],
+  "optional_native_qa_stages": ["SHIP_DEFEAT", "RESPAWN"],
+  "evidence_rules": {
+    "undock": "Explicit Haven's Reach undock or actual departure from Haven's Reach proximity after a water-tap intent; navigation intent alone is insufficient.",
+    "tap_to_sail": "Water-tap navigation intent while not docked; does not certify that movement or arrival occurred.",
+    "harbor_return": "Actual Haven's Reach docking after observed departure and water-tap intent; player defeat or respawn are not prerequisites.",
+    "cannon": "Presentation salvo against a ship, not a monster; does not certify hit, damage or kill.",
+    "harpoon": "Presentation salvo against a monster; does not certify hit, damage or kill.",
+    "repair": "Input intent only; does not certify effective healing or shield recovery.",
+    "local_observation": "Record only when M289 accepts the local-development observation; never promote it into server truth.",
+    "native_qa": "Core completion is an observation milestone, not a native pass or release approval. Defeat/respawn remain separately testable without encouraging deliberate sinking in the regular journey."
+  },
+  "ship_model_strategy": "ONE_COMPLETE_GLB_PER_SHIP",
+  "placeholder_strategy": "Reuse stable individually replaceable complete ship GLBs and external M290 presentation beacon; no modular ship construction.",
+  "native_status": "NOT_EVALUATED",
+  "release_approved": false
+}

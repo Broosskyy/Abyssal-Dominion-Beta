@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://0po15vbciwbp"
+path="res://.godot/imported/clipper_sails_lod3.obj-f2934de2c1d7d7686ebc6ef0b7c10fbc.mesh"
+
+[deps]
+
+files=["res://.godot/imported/clipper_sails_lod3.obj-f2934de2c1d7d7686ebc6ef0b7c10fbc.mesh"]
+
+source_file="res://assets/recovered_test/m8/ships/clipper_sails_lod3.obj"
+dest_files=["res://.godot/imported/clipper_sails_lod3.obj-f2934de2c1d7d7686ebc6ef0b7c10fbc.mesh", "res://.godot/imported/clipper_sails_lod3.obj-f2934de2c1d7d7686ebc6ef0b7c10fbc.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

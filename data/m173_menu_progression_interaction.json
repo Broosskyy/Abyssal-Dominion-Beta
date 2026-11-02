@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "milestone": "M173",
+  "master_concept": "V3.8",
+  "focus": [
+    "progression_menu_selection",
+    "upgrade_requirement_feedback",
+    "guild_panel_navigation",
+    "mobile_panel_clarity",
+    "no_code_authoring"
+  ],
+  "progression_menu": {
+    "rule": "Existing progression systems remain canonical; panel selection, current state and blocked requirements must be visible before mutation.",
+    "tabs": [
+      "decks",
+      "special",
+      "cannons",
+      "ammo",
+      "crafting",
+      "talents",
+      "citadel",
+      "guild",
+      "buffs"
+    ],
+    "selection": [
+      "active tab is visibly marked",
+      "buttons remain at least mobile touch target",
+      "vertical scrolling remains canonical on compact screens"
+    ]
+  },
+  "requirement_feedback": {
+    "systems": [
+      "special_deck",
+      "talent",
+      "citadel",
+      "cannon_mastery"
+    ],
+    "states": [
+      "ready",
+      "not_in_port",
+      "locked",
+      "max_level",
+      "insufficient_gold",
+      "missing_material",
+      "missing_points",
+      "missing_prerequisite",
+      "unknown_definition"
+    ],
+    "rule": "UI queries the same runtime status helper used by the mutation path."
+  },
+  "guild_panel_navigation": {
+    "visible_window_rows": 4,
+    "rule": "Focused guild tower/facility row must stay inside the visible detail window instead of always rendering only the first rows.",
+    "authority": "presentation_only_client; treasury/build/war/ownership remain server authoritative"
+  },
+  "authoring_guards": [
+    {
+      "type": "progression_panel_profile",
+      "server_sensitive": false,
+      "fields": [
+        "tab_id",
+        "label",
+        "short_label",
+        "display_order",
+        "enabled",
+        "icon_slot"
+      ]
+    },
+    {
+      "type": "upgrade_requirement_feedback_profile",
+      "server_sensitive": false,
+      "fields": [
+        "system",
+        "state",
+        "label",
+        "severity",
+        "mobile_label"
+      ]
+    },
+    {
+      "type": "guild_detail_navigation_profile",
+      "server_sensitive": false,
+      "fields": [
+        "visible_rows",
+        "focus_behavior",
+        "row_height",
+        "compact_row_height"
+      ]
+    },
+    {
+      "type": "progression_selection_profile",
+      "server_sensitive": false,
+      "fields": [
+        "selected_marker",
+        "disabled_state",
+        "max_state",
+        "ready_state"
+      ]
+    }
+  ]
+}

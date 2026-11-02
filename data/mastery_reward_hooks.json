@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "milestone": "M53",
+  "authority": "presentation_hooks_only",
+  "binding_rule": "Do not invent Gold, currencies, items, stats or server rewards here. Hooks expose milestone state only until source-of-truth reward data exists.",
+  "hooks": [
+    {
+      "id": "mastery_level_reached",
+      "payload": [
+        "ship_id",
+        "level"
+      ],
+      "reward_binding": "none"
+    },
+    {
+      "id": "mastery_capstone_reached",
+      "payload": [
+        "ship_id",
+        "level"
+      ],
+      "reward_binding": "none"
+    },
+    {
+      "id": "ship_design_unlocked",
+      "payload": [
+        "ship_id",
+        "map_level"
+      ],
+      "reward_binding": "existing progression ownership only"
+    }
+  ],
+  "presentation": {
+    "badge_slot_pattern": "mastery_badge_##",
+    "level_up_vfx_slot": "mastery_level_up",
+    "locked_reward_label": "Reward hook prepared · concrete reward not bound"
+  }
+}

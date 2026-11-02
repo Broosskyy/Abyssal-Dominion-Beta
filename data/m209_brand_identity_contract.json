@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "milestone": "M209",
+  "master_concept": "V3.8",
+  "status": "WORKING_TITLE_LOCKED_FOR_CURRENT_SOURCE",
+  "canonical_player_facing_name": "Abyssal Dominion",
+  "reserved_alternative": "VAELTIDE",
+  "legacy_reconstruction_name": "SeeFight 3D",
+  "rules": [
+    "Abyssal Dominion is the current player-facing working title in the source and preview.",
+    "VAELTIDE remains a reserved alternative until the final brand decision; do not mix both names in one player-facing build.",
+    "SeeFight 3D may remain only in historical reconstruction reports, compatibility identifiers, recovered-file notes and old milestone evidence.",
+    "Do not mass-rename technical legacy identifiers when that could break saves, tests, recovered evidence or tooling."
+  ]
+}

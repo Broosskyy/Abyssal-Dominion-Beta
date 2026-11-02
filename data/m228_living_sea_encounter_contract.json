@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "milestone": "M228",
+  "master_concept": "V3.8",
+  "status": "LIVING_SEA_ENCOUNTER_DISTRIBUTION_STATIC_VERIFIED",
+  "intent": [
+    "Make named sea charts feel inhabited through readable patrol motion and regional encounter identity.",
+    "Keep ordinary patrols, monster territories and admiral staging areas visually distinct at the M213/M214 zoomed-out master camera.",
+    "Expose neutral-versus-hostile relation reads without inventing a second faction or combat authority.",
+    "Keep event zones governed by the existing event/content systems while making regional encounter metadata ready for their presentation."
+  ],
+  "world_rules": {
+    "canonical_chart_size": 360,
+    "same_world_mobile_web_desktop": true,
+    "spawn_count_authority_unchanged": true,
+    "dynamic_spawn_table_authority_preserved": true,
+    "regional_encounter_zone_authority_preserved": true,
+    "safe_travel_corridor_preserved": true,
+    "ordinary_patrols_use_local_orbit_routes": true,
+    "monsters_remain_in_distinct_territories": true,
+    "admirals_remain_in_staging_areas": true,
+    "beginner_neutral_until_attacked_rule_preserved": true,
+    "event_runtime_authority_unchanged": true
+  },
+  "density_rules": {
+    "do_not_increase_runtime_enemy_cap": true,
+    "do_not_fill_every_open_water_area": true,
+    "preserve_large_readable_sea_gaps": true,
+    "multiple_world_roles_can_be_visible_at_master_camera_zoom": true,
+    "semantic_identity_before_decorative_clutter": true
+  },
+  "boundaries": {
+    "damage_changed": false,
+    "range_changed": false,
+    "reload_changed": false,
+    "health_changed": false,
+    "rewards_changed": false,
+    "loot_values_changed": false,
+    "collision_changed": false,
+    "tap_to_sail_changed": false,
+    "camera_changed": false,
+    "new_pathfinder_added": false
+  }
+}

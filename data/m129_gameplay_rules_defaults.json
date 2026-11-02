@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "config_version": "m130-ruleset-defaults",
+  "authority": "LOCAL_FALLBACK",
+  "missions": {
+    "rotation": [
+      {
+        "id": "sink_hostiles",
+        "title": "Corsair Hunt",
+        "kind": "sink",
+        "target": 3,
+        "coins": 180,
+        "xp": 90
+      },
+      {
+        "id": "collect_salvage",
+        "title": "Sea Salvage",
+        "kind": "loot",
+        "target": 4,
+        "coins": 220,
+        "xp": 110
+      },
+      {
+        "id": "harbor_route",
+        "title": "Harbor Route",
+        "kind": "dock",
+        "target": 2,
+        "coins": 160,
+        "xp": 80
+      }
+    ],
+    "daily_goals": {
+      "sink": 5,
+      "loot": 6,
+      "dock": 3
+    },
+    "weekly_goals": {
+      "sink": 24,
+      "loot": 20,
+      "dock": 10
+    },
+    "daily_reward": {
+      "coins": 450,
+      "xp": 180
+    },
+    "weekly_reward": {
+      "coins": 1800,
+      "xp": 700
+    },
+    "event_milestones": [
+      100,
+      250,
+      500
+    ],
+    "event_rewards": [
+      {
+        "coins": 250,
+        "xp": 100,
+        "label": "Corsair Cache"
+      },
+      {
+        "coins": 650,
+        "xp": 260,
+        "label": "Admiral Cache"
+      },
+      {
+        "coins": 1400,
+        "xp": 550,
+        "label": "Legendary Fleet Cache"
+      }
+    ],
+    "chain_stages": [
+      {
+        "title": "First Blood",
+        "goal": 60,
+        "text": "Sink corsairs and prove your broadside."
+      },
+      {
+        "title": "Reaver Trail",
+        "goal": 180,
+        "text": "Hunt elite raiders across the sector."
+      },
+      {
+        "title": "Admiral's Wake",
+        "goal": 360,
+        "text": "Break the fleet and force out its admiral."
+      },
+      {
+        "title": "Sea Legend",
+        "goal": 500,
+        "text": "Complete the legendary fleet campaign."
+      }
+    ]
+  },
+  "loot": {
+    "pickup_lifetime": 45.0,
+    "pickup_radius": 0.85,
+    "proximity_collect_radius": 4.25,
+    "salvage_materials": [
+      "wood",
+      "metal",
+      "components"
+    ],
+    "salvage_material_amount": 1,
+    "admiral_material_amount": 2
+  },
+  "respawn": {
+    "protection_seconds": 6.0
+  },
+  "corruption": {
+    "source": "m115_corruption.json",
+    "admin_override_enabled": true
+  },
+  "ship_progression": {
+    "main_fleet_admin_extendable": true,
+    "boss_reward_admin_extendable": true,
+    "mastery_admin_override_enabled": true
+  },
+  "bonusmaps": {
+    "gold": {
+      "source": "m114_bonusmap_gold.json",
+      "runtime_override_path": "rules.bonusmaps.gold"
+    },
+    "abyss": {
+      "eligibility_level": 26,
+      "entry_item": "abyss_chart_fragment",
+      "entry_cost": 15,
+      "kills_per_wave": [
+        3,
+        4,
+        1,
+        5,
+        5,
+        1
+      ],
+      "wave_rewards": {
+        "gold_formula": {
+          "base": 160,
+          "per_wave": 55
+        },
+        "mastery_formula": {
+          "base": 90,
+          "per_wave": 25
+        }
+      },
+      "completion": {
+        "gold": 1250,
+        "items": {
+          "abyss_scale": 8,
+          "corrupted_pearl": 2
+        }
+      },
+      "guardian_waves": [
+        3,
+        6
+      ]
+    }
+  },
+  "events": {
+    "missions_admin": true,
+    "rewards_admin": true,
+    "multipliers_admin": true,
+    "shops_admin": true,
+    "spawns_admin": true
+  },
+  "player_progression": {
+    "start_level": 1,
+    "start_xp": 0,
+    "start_gold": 250,
+    "xp_curve": {
+      "base": 100.0,
+      "exponent": 1.35
+    },
+    "level_up_gold": {
+      "base": 75,
+      "per_level": 15
+    },
+    "upgrade": {
+      "max_level": 10,
+      "cost_base": 110,
+      "cost_step": 135,
+      "hull_per_level": 0.12,
+      "cannon_per_level": 0.1,
+      "sails_per_level": 0.045
+    }
+  },
+  "inventory": {
+    "max_stock_default": 9999,
+    "owned_cannons_start": 3,
+    "owned_cannons_max": 6,
+    "cannon_purchase_price": 150,
+    "max_deck": 10,
+    "deck_price_base": 180,
+    "deck_price_step": 120,
+    "harbor_bundle": {
+      "price": 120,
+      "targets": {
+        "iron": 240,
+        "explosive": 60,
+        "chain": 60,
+        "repair": 5,
+        "boost": 5
+      }
+    },
+    "dynamic_items_allowed": true
+  },
+  "beginner_trial": {
+    "goals": {
+      "sink": 3,
+      "loot": 2,
+      "dock": 1
+    },
+    "reward": {
+      "gold": 250,
+      "xp": 120
+    },
+    "event_token_rewards": {
+      "sink": 10,
+      "loot": 5,
+      "dock": 0
+    }
+  }
+}

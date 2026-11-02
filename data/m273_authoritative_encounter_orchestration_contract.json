@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "milestone": "M273",
+  "master_concept": "V3.8",
+  "contract": "authoritative_encounter_spawn_respawn_admiral_boss_phase_orchestration_foundation",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room_rule": "Use readable naval-MMO encounter cadence, phase telegraphs, wave clarity and boss/admiral presence only; do not copy proprietary spawn tables, boss mechanics, names, layouts, values, assets or content.",
+  "authority": {
+    "client_may": ["render_confirmed_encounter_state", "render_spawn_and_phase_telegraphs", "render_confirmed_world_entities", "preview_non_authoritative_encounter_ui"],
+    "server_owns": ["encounter_lifecycle", "spawn_and_despawn", "respawn_and_reset", "wave_and_add_orchestration", "admiral_and_boss_phases", "completion_and_cleanup", "reward_handoff_authorization", "encounter_revision"],
+    "client_never_commits": ["spawn", "despawn", "respawn", "reset", "wave_start", "boss_phase", "encounter_completion", "encounter_reward"]
+  },
+  "encounter_kinds": ["PATROL_GROUP", "MONSTER_PACK", "ADMIRAL", "BOSS", "EVENT", "BONUSMAP", "QUEST"],
+  "lifecycle_states": ["INACTIVE", "ARMED", "SPAWNING", "ACTIVE", "PHASE_TRANSITION", "WAVE_TRANSITION", "RESETTING", "RESPAWNING", "COMPLETING", "COMPLETED", "CLEANUP", "DISABLED"],
+  "dependencies": {
+    "ai_brain": "M272 provides server-authoritative per-entity combat intent inside an encounter",
+    "target_legality": "M271 remains target/relationship/safe-zone legality boundary",
+    "movement": "M268 remains authoritative movement boundary for spawned actors",
+    "combat": "M269/M270 resolve combat outcomes and temporal combat state",
+    "world_transport": "M267 replicates confirmed spawn/despawn/entity generation and encounter state",
+    "settlement": "M266 atomically settles authorized loot/reward/value after M273 completion handoff"
+  },
+  "environment_isolation": ["INTERNAL", "TEST", "GLOBAL"],
+  "unset_until_measured": ["spawn_population_caps", "spawn_intervals", "respawn_delays", "reset_delays", "wave_intervals", "add_counts", "boss_phase_thresholds", "phase_transition_delays", "encounter_timeout", "cleanup_delay", "reentry_grace", "concurrent_encounter_budget"]
+}

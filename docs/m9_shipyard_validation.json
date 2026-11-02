@@ -1,0 +1,21 @@
+{
+  "milestone": "M9",
+  "passed": true,
+  "checks_passed": 13,
+  "checks_total": 13,
+  "checks": {
+    "m9_or_newer_version": true,
+    "three_ship_profiles": true,
+    "distinct_ship_stats": true,
+    "owned_and_selected_state": true,
+    "coin_purchase": true,
+    "live_visual_swap": true,
+    "live_stats": true,
+    "save_binding": true,
+    "desktop_controls": true,
+    "touch_controls": true,
+    "il2cpp_selector_evidence": true,
+    "il2cpp_ship_data_evidence": true,
+    "mapping_document": true
+  }
+}

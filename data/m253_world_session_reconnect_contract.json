@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "milestone": "M253",
+  "master_concept": "V3.8",
+  "system": "REALTIME_WORLD_SESSION_PRESENCE_RECONNECT",
+  "master_contract": {
+    "shared_world_target": true,
+    "server_authoritative_world_session": true,
+    "stable_world_identity": true,
+    "map_instance_channel_server_owned": true,
+    "presence_server_published": true,
+    "movement_combat_prediction_is_presentation_only": true,
+    "map_transfer_server_authoritative": true,
+    "reconnect_resume_required": true,
+    "disconnect_abuse_protection_required": true,
+    "duplicate_reward_claim_protection_required": true
+  },
+  "snapshot": {
+    "revision_rule": "monotonic_non_decreasing_server_revision",
+    "world_revision_rule": "monotonic_non_decreasing_within_session",
+    "fields": [
+      "revision",
+      "session_id",
+      "environment",
+      "connection",
+      "world",
+      "presence",
+      "resume",
+      "last_error"
+    ],
+    "world_fields": [
+      "world_revision",
+      "region_id",
+      "map_id",
+      "instance_id",
+      "channel_id",
+      "population",
+      "server_tick"
+    ],
+    "presence_fields": [
+      "captain_id",
+      "display_name",
+      "state",
+      "map_id",
+      "group_id",
+      "guild_id",
+      "public_ship_id"
+    ],
+    "client_may_cache_last_confirmed_snapshot": true,
+    "cached_snapshot_is_never_authority": true
+  },
+  "reconnect": {
+    "states": ["connected", "degraded", "reconnecting", "resume_pending", "resumed", "closed"],
+    "resume_ticket": "server_issued_opaque_reference",
+    "resume_verdict": "server_authoritative",
+    "client_may_not_generate_resume_ticket": true,
+    "client_may_not_finalize_resume": true,
+    "stale_world_state_must_be_marked": true,
+    "stale_world_state_may_not_settle_rewards_or_transactions": true
+  },
+  "authority": {
+    "session_id": "server",
+    "presence": "server",
+    "world_revision": "server",
+    "map_instance_channel": "server",
+    "population": "server",
+    "server_tick": "server",
+    "resume_ticket": "server",
+    "resume_verdict": "server",
+    "ownership_rewards_economy": "existing_server_authority_boundaries_unchanged"
+  },
+  "polish": {
+    "command_deck_world_session_cards": true,
+    "transient_reconnect_hud_chip": true,
+    "hud_chip_only_from_server_snapshot": true,
+    "compact_mobile_safe_area": true,
+    "desktop_mobile_same_information_architecture": true,
+    "presentation_only_micro_animation": true,
+    "no_permanent_network_debug_panel_on_gameplay_hud": true
+  },
+  "production_gap": [
+    "real_world_zone_server",
+    "verified_remote_transport",
+    "live_presence_service",
+    "end_to_end_map_join_and_transfer",
+    "server_issued_resume_ticket_flow",
+    "reconnect_resume_native_device_qa",
+    "latency_packet_loss_and_load_testing"
+  ],
+  "balance": {"new_final_gameplay_values_invented": false}
+}

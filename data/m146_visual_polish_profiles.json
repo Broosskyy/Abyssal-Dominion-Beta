@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "milestone": "M146",
+  "desktop": {"lod_bias_cap":1.0,"cast_shadows":true,"visibility_end":0,"material_filter":"linear_mipmap_anisotropic","vfx_density":1.0},
+  "mobile": {"lod_bias_cap":0.78,"cast_shadows":true,"visibility_end":115,"material_filter":"linear_mipmap","vfx_density":0.72},
+  "web_preview": {"lod_bias_cap":0.68,"cast_shadows":false,"visibility_end":95,"material_filter":"linear_mipmap","vfx_density":0.55},
+  "readability": {"minimum_screen_silhouette_px":34,"minimum_touch_target_px":48,"nameplate_contrast":0.9,"selection_ring_contrast":0.92,"wake_minimum_alpha":0.42},
+  "rules": ["Never change gameplay bounds or collision.","Never mutate final GLB transforms for role differentiation.","Prefer silhouette and contrast over tiny ornament at gameplay zoom."]
+}

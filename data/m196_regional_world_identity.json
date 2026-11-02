@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "milestone": "M196",
+  "master_concept": "V3.8",
+  "status": "REGIONAL_WORLD_IDENTITY_STATIC_VERIFIED",
+  "locks": {
+    "cross_platform_world_parity": true,
+    "chart_size_world_units": 360,
+    "island_count_all_platforms": 8,
+    "named_charts_not_numeric_grid_labels": true,
+    "tap_to_sail_preserved": true,
+    "land_blocks_units_do_not": true,
+    "region_changes_layout_not_device": true
+  },
+  "regional_identity": {
+    "shattered_shores": "open coastal crossings and beginner-readable sailing space",
+    "crimson_sea": "diagonal raider lanes",
+    "drowned_reach": "wreck arc and fog-bypass composition",
+    "stormbound_expanse": "stronger chokepoint rhythm with outer bypass",
+    "cursed_dominion": "broken-sigil zig-zag",
+    "abyssal_frontier": "rift-ring and monster corridor",
+    "sunken_empire": "ruin archipelago",
+    "void_sea": "wide void crossing",
+    "sovereign_waters": "fortified trade lanes",
+    "abyssal_dominion": "dominion gate corridors",
+    "dreadwater_march": "blackwake gauntlet",
+    "iron_maw_reach": "iron-maw channels"
+  },
+  "rules": [
+    "Regional layout is deterministic from stable sector/content seed and region id.",
+    "Performance quality may alter decorative rendering only, never gameplay island/POI/spawn authority.",
+    "All eight island composition slots remain present independent of device class.",
+    "Regional POI semantics use existing POI contracts and do not grant rewards by themselves."
+  ]
+}

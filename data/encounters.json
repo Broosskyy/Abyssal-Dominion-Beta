@@ -1,0 +1,162 @@
+{
+  "provenance": "Offline reconstruction tuning; not recovered production balance or original NPC names.",
+  "population": 4,
+  "biomes": {
+    "tropical": {
+      "slots": [
+        "raider",
+        "scout",
+        "raider",
+        "tank"
+      ],
+      "required_kills": 4,
+      "respawn_seconds": 10.0,
+      "admiral": "Tide Admiral",
+      "boss_kind": "monster",
+      "boss_archetype": "leviathan",
+      "boss_title": "Tide Leviathan"
+    },
+    "desert": {
+      "slots": [
+        "sniper",
+        "raider",
+        "tank",
+        "sniper"
+      ],
+      "required_kills": 5,
+      "respawn_seconds": 12.0,
+      "admiral": "Dune Admiral",
+      "boss_kind": "admiral",
+      "boss_archetype": "tank",
+      "boss_title": "Dune Admiral"
+    },
+    "snow": {
+      "slots": [
+        "tank",
+        "sniper",
+        "scout",
+        "tank"
+      ],
+      "required_kills": 6,
+      "respawn_seconds": 14.0,
+      "admiral": "Frost Admiral",
+      "boss_kind": "admiral",
+      "boss_archetype": "tank",
+      "boss_title": "Frost Admiral"
+    },
+    "cursed": {
+      "slots": [
+        "raider",
+        "sniper",
+        "tank",
+        "raider"
+      ],
+      "admiral": "Ash-Crown Admiral",
+      "required_kills": 5,
+      "respawn_seconds": 10.0,
+      "boss_kind": "admiral",
+      "boss_archetype": "tank",
+      "boss_title": "Ash-Crown Admiral"
+    }
+  },
+  "archetypes": {
+    "raider": {
+      "visual": "barco_low",
+      "hull": 360.0,
+      "damage": 48.0,
+      "speed": 4.1,
+      "armor": 0.08,
+      "range": 10.0,
+      "cannon": 1,
+      "ammo": 0,
+      "xp": 38,
+      "coins": 45
+    },
+    "scout": {
+      "visual": "barco_low",
+      "hull": 290.0,
+      "damage": 36.0,
+      "speed": 6.8,
+      "armor": 0.02,
+      "range": 9.0,
+      "cannon": 0,
+      "ammo": 2,
+      "xp": 30,
+      "coins": 35
+    },
+    "tank": {
+      "visual": "chalupa",
+      "hull": 650.0,
+      "damage": 58.0,
+      "speed": 3.4,
+      "armor": 0.28,
+      "range": 10.0,
+      "cannon": 2,
+      "ammo": 0,
+      "xp": 65,
+      "coins": 70
+    },
+    "sniper": {
+      "visual": "clipper",
+      "hull": 420.0,
+      "damage": 64.0,
+      "speed": 4.2,
+      "armor": 0.05,
+      "range": 15.0,
+      "cannon": 1,
+      "ammo": 1,
+      "xp": 50,
+      "coins": 60
+    },
+    "leviathan": {
+      "visual": "procedural_monster",
+      "hull": 920.0,
+      "damage": 72.0,
+      "speed": 5.2,
+      "armor": 0.18,
+      "range": 11.0,
+      "cannon": 2,
+      "ammo": 1,
+      "xp": 110,
+      "coins": 120
+    }
+  },
+  "scaling": {
+    "hull_per_level": 0.1,
+    "damage_per_level": 0.04,
+    "reward_per_level": 0.12
+  },
+  "admiral": {
+    "hull_multiplier": 2.5,
+    "damage_multiplier": 1.2,
+    "reward_multiplier": 4.0,
+    "cooldown_seconds": 45.0
+  },
+  "elite": {
+    "hull_multiplier": 1.22,
+    "damage_multiplier": 1.1,
+    "reward_multiplier": 1.35
+  },
+  "loot_tiers": {
+    "common": {
+      "multiplier": 1.0,
+      "label": "SALVAGE"
+    },
+    "uncommon": {
+      "multiplier": 1.18,
+      "label": "FINE SALVAGE"
+    },
+    "rare": {
+      "multiplier": 1.45,
+      "label": "RARE CHEST"
+    },
+    "epic": {
+      "multiplier": 1.85,
+      "label": "EPIC CHEST"
+    },
+    "legendary": {
+      "multiplier": 2.5,
+      "label": "ADMIRAL HOARD"
+    }
+  }
+}

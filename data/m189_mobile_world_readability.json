@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "milestone": "M189",
+  "title": "Mobile world readability and combat hierarchy",
+  "master_reference": "Masterkonzept V3.8 gameplay HUD references",
+  "locks": {
+    "world_center_gameplay_first": true,
+    "tap_to_sail_preserved": true,
+    "camera_wheel_camera_only": true,
+    "primary_attack_bottom_right": true,
+    "global_meta_access_preserved": true,
+    "harbor_is_local_world_poi": true
+  },
+  "repairs": [
+    "Tracked objective edge marker avoids reserved HUD geometry instead of covering controls.",
+    "Contextual target button communicates HAFEN only when a real nearby port exists; otherwise it remains ZIEL.",
+    "Safe-zone copy no longer implies that global Shipyard requires docking.",
+    "Touch HUD keeps the circular combat cluster as the primary action surface and does not introduce a second permanent rectangular action rail.",
+    "Tracked target remains emphasized on the minimap with a dedicated ring while generic POI density stays budgeted."
+  ],
+  "authority": "presentation_only"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "milestone": "M245",
+  "master_concept": "V3.8",
+  "system_identity": {
+    "working_name": "Compass/Cauldron successor",
+    "final_name_locked": false,
+    "ui_label": "ORAKEL / KOMPASS-SYSTEM · ARBEITSNAME",
+    "resource_working_name": "Tide Essence"
+  },
+  "special_pve_pillars": [
+    "bonusmaps",
+    "admiral_hunts",
+    "world_bosses",
+    "monster_hunts",
+    "treasure_expeditions",
+    "oracle_compass",
+    "secret_routes",
+    "abyss_rifts",
+    "seasonal_pve"
+  ],
+  "resource_sources": [
+    "npc_pve",
+    "treasure",
+    "bonusmaps",
+    "quests",
+    "exploration",
+    "admirals",
+    "events",
+    "daily_weekly"
+  ],
+  "draw_contract": [
+    "select_single_or_defined_multi",
+    "spend_gameplay_earned_resource",
+    "resolve_server_reward_table",
+    "show_reward_clearly",
+    "advance_visible_pity_or_grand_reward_meter",
+    "apply_defined_duplicate_rule",
+    "claim_atomically_and_idempotently_online"
+  ],
+  "reward_pool_categories": [
+    "supplies",
+    "currency",
+    "materials",
+    "map_parts",
+    "equipment",
+    "progress",
+    "cosmetics",
+    "rare"
+  ],
+  "transparency": {
+    "show_categories": true,
+    "show_rarity": true,
+    "show_pity_progress": true,
+    "cash_spins_core_model": false,
+    "gameplay_earned_first": true,
+    "probabilities": "server_content_and_legal_review_before_live"
+  },
+  "authority": {
+    "tide_essence": "server_authoritative_online",
+    "reward_roll": "server_authoritative_online",
+    "pity_meter": "server_authoritative_online",
+    "duplicate_conversion": "server_authoritative_online",
+    "claim": "server_authoritative_online",
+    "client": "read_only_replica_plus_local_non_reward_preview"
+  },
+  "special_pve_rules": [
+    "bonusmap checkpoint resume must not duplicate rewards",
+    "boss loot requires qualified contribution",
+    "effective healing and shield restore count; overheal does not",
+    "monster profiles remain harpoon-centered",
+    "combat damage remains orientation-independent",
+    "fragment assembly produces a map exactly once",
+    "disconnect/retry must not duplicate completion claims",
+    "special PvE complements rather than replaces the normal sea map"
+  ],
+  "prototype_balance": {
+    "pity_threshold": null,
+    "draw_cost": null,
+    "reward_quantities": null,
+    "status": "UNSET_BY_MASTER_DO_NOT_INVENT"
+  }
+}

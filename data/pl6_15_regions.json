@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "milestone": "M110",
+  "range": {
+    "map_levels": [
+      6,
+      15
+    ]
+  },
+  "regions": [
+    {
+      "id": "stormreach",
+      "levels": [
+        6,
+        8
+      ],
+      "biome": "storm_coast",
+      "npc_slots": [
+        "npc_storm_raider",
+        "npc_storm_scout",
+        "npc_storm_guard",
+        "npc_storm_hunter"
+      ],
+      "island_slots": [
+        "island_base_01",
+        "island_base_02",
+        "island_base_03"
+      ],
+      "harbor_slot": "harbor_stormreach",
+      "boss_slot": "npc_storm_admiral"
+    },
+    {
+      "id": "ember_shoals",
+      "levels": [
+        9,
+        11
+      ],
+      "biome": "volcanic_shoals",
+      "npc_slots": [
+        "npc_ember_raider",
+        "npc_ember_tank",
+        "npc_ember_hunter"
+      ],
+      "island_slots": [
+        "island_base_04",
+        "island_base_05",
+        "island_base_06"
+      ],
+      "harbor_slot": "harbor_ember",
+      "boss_slot": "npc_ember_admiral"
+    },
+    {
+      "id": "veil_sea",
+      "levels": [
+        12,
+        15
+      ],
+      "biome": "mist_archipelago",
+      "npc_slots": [
+        "npc_veil_scout",
+        "npc_veil_sniper",
+        "npc_veil_guard",
+        "npc_veil_hunter"
+      ],
+      "island_slots": [
+        "island_base_07",
+        "island_base_08",
+        "island_base_09"
+      ],
+      "harbor_slot": "harbor_veil",
+      "boss_slot": "npc_veil_admiral"
+    }
+  ],
+  "rules": {
+    "procedural_fallback_required": true,
+    "neutral_beginner_rule_ends_after_level_5": true,
+    "no_final_asset_claim": true,
+    "same_sea_map_controls": true
+  }
+}

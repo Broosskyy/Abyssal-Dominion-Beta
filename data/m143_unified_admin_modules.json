@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "milestone": "M161",
+  "master": "ABYSSAL_DOMINION_V3.7",
+  "authority": "SERVER_AUTHORITATIVE",
+  "surfaces": [
+    "web_admin",
+    "ingame_admin"
+  ],
+  "modules": [
+    {
+      "id": "overview",
+      "label": "Übersicht",
+      "icon": "UI-ADMIN-OVERVIEW",
+      "permission": "admin.access",
+      "capabilities": [
+        "health",
+        "pending_approvals",
+        "scheduled_changes",
+        "alerts"
+      ]
+    },
+    {
+      "id": "content",
+      "label": "Spielinhalte",
+      "icon": "UI-ADMIN-CONTENT",
+      "permission": "content.read",
+      "capabilities": [
+        "create",
+        "edit",
+        "clone",
+        "validate",
+        "preview",
+        "schedule",
+        "publish",
+        "disable",
+        "rollback"
+      ]
+    },
+    {
+      "id": "world",
+      "label": "Welt & Karten",
+      "icon": "UI-ADMIN-WORLD",
+      "permission": "world.read",
+      "capabilities": [
+        "regions",
+        "sectors",
+        "poi",
+        "harbors",
+        "islands",
+        "spawns",
+        "formations"
+      ]
+    },
+    {
+      "id": "balance",
+      "label": "Balance & Progression",
+      "icon": "UI-ADMIN-BALANCE",
+      "permission": "balance.read",
+      "capabilities": [
+        "ships",
+        "weapons",
+        "ammo",
+        "npcs",
+        "monsters",
+        "levels",
+        "rewards"
+      ]
+    },
+    {
+      "id": "economy",
+      "label": "Ökonomie",
+      "icon": "UI-ADMIN-ECONOMY",
+      "permission": "economy.read",
+      "capabilities": [
+        "currencies",
+        "prices",
+        "loot",
+        "shops",
+        "limits",
+        "multipliers"
+      ]
+    },
+    {
+      "id": "liveops",
+      "label": "Events & LiveOps",
+      "icon": "UI-ADMIN-LIVEOPS",
+      "permission": "liveops.read",
+      "capabilities": [
+        "events",
+        "seasons",
+        "schedules",
+        "overrides",
+        "server_time"
+      ]
+    },
+    {
+      "id": "assets",
+      "label": "Assets",
+      "icon": "UI-ADMIN-ASSETS",
+      "permission": "asset.read",
+      "capabilities": [
+        "stable_slots",
+        "glb",
+        "lod",
+        "icons",
+        "ui",
+        "vfx",
+        "audio",
+        "fallbacks",
+        "replacement_qa"
+      ]
+    },
+    {
+      "id": "players",
+      "label": "Spieler & Accounts",
+      "icon": "UI-ADMIN-PLAYERS",
+      "permission": "player.read",
+      "capabilities": [
+        "profiles",
+        "inventory",
+        "wallet_ledger",
+        "sanctions",
+        "compensation"
+      ]
+    },
+    {
+      "id": "guilds",
+      "label": "Gilden & Basar",
+      "icon": "UI-ADMIN-GUILDS",
+      "permission": "guild.read",
+      "capabilities": [
+        "guilds",
+        "islands",
+        "towers",
+        "market",
+        "moderation"
+      ]
+    },
+    {
+      "id": "support",
+      "label": "Support",
+      "icon": "UI-ADMIN-SUPPORT",
+      "permission": "support.read",
+      "capabilities": [
+        "tickets",
+        "assignment",
+        "escalation",
+        "internal_notes",
+        "templates",
+        "incidents"
+      ]
+    },
+    {
+      "id": "cms",
+      "label": "Website & CMS",
+      "icon": "UI-ADMIN-CMS",
+      "permission": "cms.read",
+      "capabilities": [
+        "pages",
+        "news",
+        "patchnotes",
+        "help_center",
+        "server_status",
+        "localization",
+        "media"
+      ]
+    },
+    {
+      "id": "monetization",
+      "label": "Shop & Payment",
+      "icon": "UI-ADMIN-PAYMENT",
+      "permission": "monetization.read",
+      "capabilities": [
+        "products",
+        "offers",
+        "provider_mapping",
+        "entitlements",
+        "sales_windows"
+      ]
+    },
+    {
+      "id": "moderation",
+      "label": "Moderation",
+      "icon": "UI-ADMIN-MODERATION",
+      "permission": "player.moderate",
+      "capabilities": [
+        "reports",
+        "chat",
+        "sanctions",
+        "appeals"
+      ]
+    },
+    {
+      "id": "staff",
+      "label": "Team & Rechte",
+      "icon": "UI-ADMIN-STAFF",
+      "permission": "staff.read",
+      "capabilities": [
+        "staff",
+        "roles",
+        "permissions",
+        "sessions",
+        "approvals"
+      ]
+    },
+    {
+      "id": "server",
+      "label": "Server & Betrieb",
+      "icon": "UI-ADMIN-SERVER",
+      "permission": "server.read",
+      "capabilities": [
+        "environments",
+        "feature_flags",
+        "maintenance",
+        "deployments",
+        "jobs",
+        "backups"
+      ]
+    },
+    {
+      "id": "analytics",
+      "label": "Analytics",
+      "icon": "UI-ADMIN-ANALYTICS",
+      "permission": "analytics.read",
+      "capabilities": [
+        "gameplay",
+        "economy",
+        "liveops",
+        "commerce",
+        "retention",
+        "performance"
+      ]
+    },
+    {
+      "id": "audit",
+      "label": "Audit-Logs",
+      "icon": "UI-ADMIN-AUDIT",
+      "permission": "audit.read",
+      "capabilities": [
+        "changes",
+        "approvals",
+        "security",
+        "exports"
+      ]
+    },
+    {
+      "id": "settings",
+      "label": "Systemeinstellungen",
+      "icon": "UI-ADMIN-SETTINGS",
+      "permission": "settings.read",
+      "capabilities": [
+        "platform_profiles",
+        "graphics",
+        "mobile_ui",
+        "localization",
+        "notifications"
+      ]
+    },
+    {
+      "id": "commerce",
+      "label": "Commerce Studio",
+      "permission": "commerce.read",
+      "surface": [
+        "web_admin",
+        "ingame_admin"
+      ]
+    },
+    {
+      "id": "payment_ops",
+      "label": "Payment Operations",
+      "permission": "payment.read",
+      "surface": [
+        "web_admin",
+        "ingame_admin"
+      ]
+    },
+    {
+      "id": "command_console",
+      "label": "GM / Command Console",
+      "permission": "command.read",
+      "surface": [
+        "web_admin",
+        "ingame_admin"
+      ]
+    },
+    {
+      "id": "roles_permissions",
+      "label": "Rollen & Berechtigungen",
+      "permission": "staff.read",
+      "surface": [
+        "web_admin",
+        "ingame_admin"
+      ]
+    }
+  ],
+  "rule": "Module visibility is permission filtered. The server rechecks every mutation. UI visibility never grants authority."
+}

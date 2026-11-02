@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "milestone": "M187",
+  "master_concept": "V3.8",
+  "goal": "HARBOR_AS_LOCAL_WORLD_POI_NOT_GLOBAL_SYSTEM_GATE",
+  "principles": [
+    "global_meta_systems_remain_global",
+    "harbor_is_physical_world_poi",
+    "only_explicit_harbor_content_requires_harbor",
+    "no_duplicate_global_navigation",
+    "no_fake_offers_or_entitlements"
+  ],
+  "global_anywhere": [
+    "ships",
+    "shipyard",
+    "equipment",
+    "loadouts",
+    "itemshop",
+    "quests",
+    "events",
+    "guild",
+    "rankings",
+    "achievements",
+    "logbook",
+    "progression"
+  ],
+  "local_harbor": [
+    "dock_visit",
+    "repair_service",
+    "local_supply_market",
+    "regional_vendor",
+    "regional_crafting",
+    "harbor_npc",
+    "harbor_quest",
+    "harbor_event_hook"
+  ],
+  "quests": {
+    "normal_quests_require_harbor": false,
+    "harbor_quests_require_harbor": true,
+    "harbor_quest_definition_must_opt_in": true,
+    "automatic_conversion_of_normal_quests": false
+  },
+  "shipyard": {
+    "browse_anywhere": true,
+    "equip_owned_ship_anywhere": true,
+    "global_upgrade_access": true,
+    "local_special_crafting_may_require_harbor": true
+  },
+  "world": {
+    "navigate_only_to_existing_port": true,
+    "proximity_unlocks_local_harbor_page": true,
+    "auto_open_global_shop_on_dock": false,
+    "clear_center": true
+  },
+  "authority": {
+    "payment_entitlements": "server_receipt_only",
+    "harbor_special_offers": "published_data_only",
+    "no_invented_prices_or_ownership": true
+  },
+  "no_code_types": [
+    "harbor_service_profile",
+    "harbor_quest_profile",
+    "harbor_vendor_profile",
+    "harbor_event_profile"
+  ]
+}

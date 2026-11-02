@@ -1,0 +1,18 @@
+{
+  "milestone": "M293",
+  "master_concept": "V3.8",
+  "genre_ux_references": ["Seafight", "Battle of Sea"],
+  "clean_room": "Only genre-level sea-chart priority/readability inspiration; no copied layouts, assets, timings or rules.",
+  "world_guidance_priority": ["active_player_selected_quest", "active_player_selected_combat_target", "passive_first_sortie_beacon"],
+  "suppression": ["tracked_quest", "selected_hostile_during_ship_or_monster_stage", "open_menu", "open_full_sea_chart", "player_sunk"],
+  "home_port": "Haven's Reach only; another port does not prove home start and never becomes the return beacon.",
+  "candidates": "Only live in-tree enemies; exclude sunk, invalid and queued-for-deletion targets and pickups.",
+  "port_proximity": "Only a ShipMotor in the player group can set port metadata or emit entry/exit observations.",
+  "max_world_beacons": 1,
+  "changes_navigation_or_target_selection": false,
+  "changes_combat_damage_loot_or_quest_truth": false,
+  "ship_model_strategy": "ONE_COMPLETE_GLB_PER_SHIP",
+  "placeholder_strategy": "Reuse the external M290 replaceable beacon and stable complete individual GLB models; no modular ship assembly.",
+  "native_status": "NOT_EVALUATED",
+  "release_approved": false
+}

@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "milestone": "M52",
+  "max_level": 10,
+  "applies_to": "each playable ship design separately",
+  "xp_curve_to_next_level": {
+    "1": 150,
+    "2": 300,
+    "3": 450,
+    "4": 600,
+    "5": 750,
+    "6": 900,
+    "7": 1050,
+    "8": 1200,
+    "9": 1350
+  },
+  "existing_runtime_bonus": {
+    "hull_and_damage_per_level_after_1": 0.02,
+    "note": "Codifies the existing PlayerShipRoster runtime scaling; no new hidden stat layer."
+  },
+  "milestones": {
+    "2": {
+      "label": "Mastery II",
+      "presentation_reward": "mastery_badge_02"
+    },
+    "3": {
+      "label": "Mastery III",
+      "presentation_reward": "mastery_badge_03"
+    },
+    "4": {
+      "label": "Mastery IV",
+      "presentation_reward": "mastery_badge_04"
+    },
+    "5": {
+      "label": "Mastery V",
+      "presentation_reward": "mastery_badge_05"
+    },
+    "6": {
+      "label": "Mastery VI",
+      "presentation_reward": "mastery_badge_06"
+    },
+    "7": {
+      "label": "Mastery VII",
+      "presentation_reward": "mastery_badge_07"
+    },
+    "8": {
+      "label": "Mastery VIII",
+      "presentation_reward": "mastery_badge_08"
+    },
+    "9": {
+      "label": "Mastery IX",
+      "presentation_reward": "mastery_badge_09"
+    },
+    "10": {
+      "label": "Mastery X",
+      "presentation_reward": "mastery_badge_10",
+      "capstone": true
+    }
+  },
+  "rules": {
+    "xp_is_per_design": true,
+    "switching_ship_does_not_transfer_ship_xp": true,
+    "level_cap_is_per_design": true,
+    "starter_ships_also_keep_separate_mastery_records": true,
+    "main_progression_designs": 50,
+    "visual_rewards_are_placeholder_slots": true,
+    "no_live_reward_authority": true
+  },
+  "milestone_reward_policy": {
+    "M52_scope": "presentation/status hooks only",
+    "currency_or_item_rewards": "not assigned because no binding source value is defined here",
+    "future_rule": "Any economy/item reward must come from binding Master Bible/data tuning, not be invented by UI."
+  }
+}

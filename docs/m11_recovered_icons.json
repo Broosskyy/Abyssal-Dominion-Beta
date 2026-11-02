@@ -1,0 +1,95 @@
+{
+  "decoder": "UnityPy 1.25.3",
+  "assets": [
+    {
+      "source": "sharedassets2.assets",
+      "path_id": 237,
+      "type": "Texture2D",
+      "original_name": "IronBalls",
+      "path": "assets/recovered_test/m11/ui/iron.png",
+      "width": 98,
+      "height": 72,
+      "sha256": "a34d75df3d4d56d24e928f6282142fb689569524bbb41d6c5e0183cf001c134f"
+    },
+    {
+      "source": "sharedassets2.assets",
+      "path_id": 261,
+      "type": "Texture2D",
+      "original_name": "Explosive_Ammunition",
+      "path": "assets/recovered_test/m11/ui/explosive.png",
+      "width": 230,
+      "height": 180,
+      "sha256": "dbb403cf3608d7af37ede14c11dc39fc00b1c51da19c0be429c2f120e7187341"
+    },
+    {
+      "source": "sharedassets2.assets",
+      "path_id": 346,
+      "type": "Texture2D",
+      "original_name": "woodDeck",
+      "path": "assets/recovered_test/m11/ui/deck.png",
+      "width": 1536,
+      "height": 1536,
+      "sha256": "200c8ecf66294391ccc76ab897824b35bc5ae045d6c3006511d78c058ebf6c4d"
+    },
+    {
+      "source": "sharedassets2.assets",
+      "path_id": 392,
+      "type": "Texture2D",
+      "original_name": "Swiftstone",
+      "path": "assets/recovered_test/m11/ui/boost.png",
+      "width": 230,
+      "height": 180,
+      "sha256": "3fbb2f07fbe85f54354aeb15b15a76bbe2f15b182eb5127dfcb3af2ede0c5624"
+    },
+    {
+      "source": "sharedassets2.assets",
+      "path_id": 660,
+      "type": "Texture2D",
+      "original_name": "Shield2",
+      "path": "assets/recovered_test/m11/ui/shield.png",
+      "width": 35,
+      "height": 45,
+      "sha256": "ce728e7928fa68b768ecb4c6b9ff567584570643dcd85c8c23de81bf73458aba"
+    },
+    {
+      "source": "sharedassets2.assets",
+      "path_id": 723,
+      "type": "Texture2D",
+      "original_name": "Emergency_Repairs",
+      "path": "assets/recovered_test/m11/ui/repair.png",
+      "width": 230,
+      "height": 180,
+      "sha256": "1601cd247092e1228d0690718ba6373fdeff3a87364b9cc88be3ee23b6b671ec"
+    },
+    {
+      "source": "sharedassets2.assets",
+      "path_id": 732,
+      "type": "Texture2D",
+      "original_name": "smallPremumCannon",
+      "path": "assets/recovered_test/m11/ui/cannon.png",
+      "width": 1024,
+      "height": 1024,
+      "sha256": "31b04fae618f5cfc071c378d75205e7aed33d3440474a8b515669c8496f760f8"
+    },
+    {
+      "source": "resources.assets",
+      "path_id": 399,
+      "type": "Texture2D",
+      "original_name": "Gunpowder",
+      "path": "assets/recovered_test/m11/ui/gunpowder.png",
+      "width": 230,
+      "height": 180,
+      "sha256": "79a1f1a4adc999fb6e6dcef9b2af0d71c8e8afb10a647c67018c7c2cc781494b"
+    }
+  ],
+  "errors": [],
+  "unavailable": [
+    {
+      "source": "sharedassets2.assets",
+      "path_id": 841,
+      "original_name": "Black_Gunpowder",
+      "reason": "Texture2D has no image data"
+    }
+  ],
+  "note": "Original pixels decoded to PNG; no gameplay values recovered from these images."
+}

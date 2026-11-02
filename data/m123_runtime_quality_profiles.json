@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "milestone": "M123",
+  "master": "V3.7",
+  "profiles": {
+    "mobile_low": {
+      "max_npcs": 22,
+      "max_monsters": 4,
+      "max_major_vfx": 5,
+      "max_poi_markers": 9,
+      "lod0_distance": 34,
+      "lod1_distance": 75,
+      "simulation_distance": 110,
+      "wake_quality": 1.0
+    },
+    "mobile_high": {
+      "max_npcs": 22,
+      "max_monsters": 4,
+      "max_major_vfx": 5,
+      "max_poi_markers": 9,
+      "lod0_distance": 34,
+      "lod1_distance": 75,
+      "simulation_distance": 110,
+      "wake_quality": 1.0
+    },
+    "desktop": {
+      "max_npcs": 22,
+      "max_monsters": 4,
+      "max_major_vfx": 5,
+      "max_poi_markers": 9,
+      "lod0_distance": 34,
+      "lod1_distance": 75,
+      "simulation_distance": 110,
+      "wake_quality": 1.0
+    }
+  },
+  "rules": [
+    "cross_platform_gameplay_world_parity",
+    "same_spawn_caps_and_simulation_distance_all_platforms",
+    "same_world_object_and_poi_budget_all_platforms",
+    "responsive_ui_may_change_size_spacing_and_layout_only",
+    "no_platform_specific_gameplay_content"
+  ]
+}
