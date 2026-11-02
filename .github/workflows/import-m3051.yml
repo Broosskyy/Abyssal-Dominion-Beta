@@ -1,0 +1,64 @@
+name: Import verified M3051 snapshot
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download and verify the prepared source snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release download m3051-test --repo "$GITHUB_REPOSITORY" --pattern ABYSSAL_DOMINION_M3051_SOURCE.bundle --dir /tmp/m3051
+          echo 'ea51fe3c4fb0a64c0e0439a214b8ed6fe70a6165c06342d40a1454ef29303523  /tmp/m3051/ABYSSAL_DOMINION_M3051_SOURCE.bundle' | sha256sum -c -
+          git bundle verify /tmp/m3051/ABYSSAL_DOMINION_M3051_SOURCE.bundle
+          git fetch /tmp/m3051/ABYSSAL_DOMINION_M3051_SOURCE.bundle main:refs/heads/m3051-source
+          test "$(git rev-parse m3051-source)" = aa966590057c8df812bc771d44291ed96b14cb45
+      - name: Import code, source graphics and verified Android APK
+        run: |
+          set -euo pipefail
+          git config user.name 'Abyssal Dominion Backup'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git merge --allow-unrelated-histories --no-commit -s ours m3051-source
+          git restore --source=m3051-source --staged --worktree -- . ':!.github'
+          test -z "$(git diff --cached --name-only -- .github)"
+          test -f project.godot
+          test -f assets/classic/private_seabattles/ships/elite8.png
+          echo 'de9989c44243bd60f90061c696bcb96198a10b6df93bbf33ca5c590c762692e5  releases/M3051/ABYSSAL_DOMINION_M3051_ARM64_TEST.apk' | sha256sum -c -
+          python3 - <<'PY'
+          import hashlib, json, subprocess
+          from pathlib import Path
+          inventory = json.loads(Path('docs/m3051/graphics_inventory.json').read_text())
+          for item in inventory:
+              p = Path(item['path'])
+              assert p.is_file(), str(p)
+              assert hashlib.sha256(p.read_bytes()).hexdigest() == item['sha256'], str(p)
+          files = subprocess.check_output(['git','ls-files','-z']).decode().split('\0')
+          assert not any(x.endswith(('.keystore','.jks','.p12')) or Path(x).name == '.env' for x in files if x)
+          Path('docs/m3051/GITHUB_SYNC.md').write_text(
+              '# GitHub synchronization\n\n'
+              'Imported the original source commit aa966590057c8df812bc771d44291ed96b14cb45, including its Git history.\n'
+              'All 659 source graphics/inventory entries verified by SHA-256; Android APK verified by SHA-256.\n'
+              'Repository: Broosskyy/Abyssal-Dominion-Beta (private).\n'
+              'The earlier BUILD_REPORT records the state before this successful remote import.\n'
+              'No signing keys or environment files are included.\n')
+          print('SOURCE_GRAPHICS_VERIFIED', len(inventory))
+          PY
+          git add docs/m3051/GITHUB_SYNC.md
+          git commit -m 'Import M3051 code, graphics and verified Android APK'
+          git push origin HEAD:main
+          echo "Imported commit: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Save a complete portable Git backup
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git bundle create /tmp/ABYSSAL_DOMINION_M3051_GITHUB.bundle main
+          gh release upload m3051-test /tmp/ABYSSAL_DOMINION_M3051_GITHUB.bundle --repo "$GITHUB_REPOSITORY"
