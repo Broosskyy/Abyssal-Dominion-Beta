@@ -106,6 +106,20 @@ func _run() -> void:
 	check(game.sim.map_id==1 and game.camera.position==game.sim.player.pos,"map UI switches simulation, recenters camera and saves")
 	game._load_progress()
 	check(game.sim.map_id==1 and game.sim.upgrades.cannon==1,"new map and equipment survive UI save reload")
+	game._open_modal("Werft")
+	await process_frame;await process_frame
+	game.modal_scroll.scroll_vertical=300
+	await process_frame
+	game._open_modal("Werft")
+	await process_frame;await process_frame
+	check(game.modal_scroll.scroll_vertical>=299,"refreshing visible shipyard preserves the current scroll position")
+	game.modal.hide();game._open_modal("Werft")
+	await process_frame;await process_frame
+	check(game.modal_scroll.scroll_vertical==0,"reopening a closed menu starts at its beginning")
+	game.modal_scroll.scroll_vertical=300
+	game._open_modal("Logbuch")
+	await process_frame;await process_frame
+	check(game.modal_scroll.scroll_vertical==0,"changing menus resets scroll instead of opening half-way down")
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)

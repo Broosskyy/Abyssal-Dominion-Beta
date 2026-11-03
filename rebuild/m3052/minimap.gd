@@ -27,7 +27,10 @@ func _draw() -> void:
 	for npc in simulation.npcs:
 		if int(npc.hp)>0:
 			var p: Vector2=r.position+npc.pos/simulation.WORLD*r.size
-			draw_circle(p,2.2,Color("ed7867") if npc.kind=="ship" else Color("d29cdb"))
+			var hostile=bool(npc.aggressive) or bool(region.npc_hostile)
+			var color=Color("ed7867") if hostile else (Color("baa165") if npc.kind=="ship" else Color("c4a0d7"))
+			draw_circle(p,2.2,color)
+			if int(npc.id)==int(simulation.target):draw_circle(p,4,Color("f4d992"),false,1.0,true)
 	for portal in simulation.portals:
 		var p: Vector2 = r.position+portal.pos/simulation.WORLD*r.size
 		draw_rect(Rect2(p-Vector2(2,3),Vector2(4,6)),Color("9b93ff"))

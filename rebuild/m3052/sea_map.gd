@@ -83,6 +83,7 @@ var player_portrait: TextureRect
 var target_portrait: TextureRect
 var portrait_skin := -1
 var portrait_target := -1
+var target_health_skin: StyleBoxFlat
 
 func _ready() -> void:
 	_load_assets()
@@ -333,7 +334,8 @@ func _draw_actor(actor: Dictionary) -> void:
 	_label(baseline,("✦ "+name) if is_player else name,14 if is_player else 13,color)
 	var bar = Rect2(point+Vector2(-43,name_offset+8),Vector2(86,4))
 	draw_rect(bar,Color("071820"))
-	draw_rect(Rect2(bar.position,Vector2(bar.size.x*float(actor.hp)/float(actor.max_hp),4)),Color("60b682") if is_player else Color("b36452"))
+	var health_color=Color("60b682") if is_player else (Color("b36452") if bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) else Color("baa165"))
+	draw_rect(Rect2(bar.position,Vector2(bar.size.x*float(actor.hp)/float(actor.max_hp),4)),health_color)
 	if float(actor.slow)>0: _label(point+Vector2(0,name_offset+33),"VERLANGSAMT",10,Color("9fdbf4"))
 
 func _draw_atlas(tex: Texture2D,point: Vector2,width: float,col: int,row: int,columns: int,rows: int) -> void:
@@ -504,6 +506,8 @@ func _build_ui() -> void:
 	target_name=_text(target_panel,"",14)
 	target_name.clip_text=true
 	target_hp=_bar(target_panel)
+	target_health_skin=target_hp.get_theme_stylebox("fill").duplicate()
+	target_hp.add_theme_stylebox_override("fill",target_health_skin)
 	target_numbers=_text(target_panel,"",11)
 	chart_mini=MINI.new()
 	chart_mini.simulation=sim
@@ -513,9 +517,7 @@ func _build_ui() -> void:
 	combat_dock.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	combat_readout=_text(combat_dock,"",10,Color("a6b8b8"))
 	loadout_button=_button(ui,"WAFFEN",func():_open_modal("Bewaffnung"))
-	loadout_button.icon=extra_icons.cannon_0
-	loadout_button.expand_icon=true
-	loadout_button.add_theme_constant_override("icon_max_width",22)
+	loadout_button.tooltip_text="Bewaffnung: Kanonen, Harpunen und Munitionsvorrat"
 	loadout_button.add_theme_font_size_override("font_size",10)
 	attack=_button(ui,"FEUER",_toggle_fire)
 	attack.name="FireButton"
@@ -674,6 +676,7 @@ func _refresh_ui() -> void:
 		target_hp.max_value=selected.max_hp
 		target_hp.value=selected.hp
 		var disposition="IM KAMPF" if sim.npc_engages(selected) else ("FEINDLICH" if CONTENT.MAPS[sim.map_id].npc_hostile else "NEUTRAL")
+		target_health_skin.bg_color=Color("b36452") if bool(selected.aggressive) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) else Color("baa165")
 		target_numbers.text="%d / %d HP\n%s · %d m"%[int(selected.hp),int(selected.max_hp),disposition,roundi(sim.player.pos.distance_to(selected.pos))]
 	attack.text="FEUER STOPP" if sim.firing else "FEUER"
 	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0 or sim.docked
@@ -683,9 +686,9 @@ func _refresh_ui() -> void:
 		ammo_buttons[i].text=["Vollkugeln","Kettenkugeln","Harpunen"][i]+"\n"+("✓ " if sim.ammo_mode==i else "")+str(sim.player.ammo[i])
 		ammo_buttons[i].set_pressed_no_signal(sim.ammo_mode==i)
 		ammo_buttons[i].tooltip_text=["Vollkugeln: gegen Schiffe","Kettenkugeln: verlangsamen Schiffe","Harpunen: gegen Monster"][i]
-	var reload_text="BEREIT" if float(sim.player.reload)<=0 else "LÄDT %.1f s" % float(sim.player.reload)
+	var reload_text="IM HAFEN" if sim.docked else ("BEREIT" if float(sim.player.reload)<=0 else "LÄDT %.1f s" % float(sim.player.reload))
 	combat_readout.text="%s · ST. %d     %d SCHADEN × %d     %s" % ["HARPUNEN" if sim.ammo_mode==2 else "KANONEN",int(sim.upgrades.harpoon if sim.ammo_mode==2 else sim.upgrades.cannon),sim.weapon_damage(sim.ammo_mode),1 if sim.ammo_mode==2 else 3,reload_text]
-	status.text=sim.message
+	status.text="IM HAFEN · ABLEGEN zum Weiterfahren" if sim.docked else sim.message
 	var quest = sim.current_quest()
 	quest_claim.disabled=quest.is_empty() or sim.quest_progress()<int(quest.goal)
 	quest_text.text="ALLE AUFTRÄGE ERLEDIGT" if quest.is_empty() else "%s · %d/%d\n%d Gold · %d EP" % [str(quest.name).to_upper(),mini(sim.quest_progress(),int(quest.goal)),quest.goal,quest.gold,quest.xp]
@@ -706,6 +709,7 @@ func _toggle_fire() -> void:
 	_refresh_ui()
 
 func _open_modal(kind: String) -> void:
+	var scroll_position=modal_scroll.scroll_vertical if modal.visible and modal_kind==kind else 0
 	modal_kind=kind
 	modal_title.text=kind
 	for child in modal_body.get_children():
@@ -742,7 +746,7 @@ func _open_modal(kind: String) -> void:
 	elif kind=="Hafen":
 		_info("PORT AZUR · AUSRÜSTUNG & VERSORGUNG" if sim.map_id==0 else "HAFEN · AUSRÜSTUNG & VERSORGUNG",CYAN)
 		if not sim.docked:
-			_info("Fahre zum goldenen Hafensymbol und docke an. Im Hafen pausiert die lokale Seekarte. Distanz: %d m." % roundi(sim.player.pos.distance_to(sim.harbor)))
+			_info("Fahre zum goldenen Hafensymbol und docke an. Dein Schiff liegt dort geschützt; die Patrouillen fahren weiter. Distanz: %d m." % roundi(sim.player.pos.distance_to(sim.harbor)))
 			_action("KURS ZUM HAFEN",func():sim.course(sim.harbor);modal.hide())
 			var dock_button = _action("ANDOCKEN",func():
 				if sim.dock():_save_progress();_open_modal("Hafen")
@@ -806,6 +810,7 @@ func _open_modal(kind: String) -> void:
 		info.custom_minimum_size=Vector2(modal_scroll.size.x-20,300)
 	modal.show()
 	modal_backdrop.show()
+	modal_scroll.set_deferred("scroll_vertical",scroll_position)
 
 func _info(text: String,color: Color=GOLD) -> Label:
 	var label = _text(modal_body,text,14,color)

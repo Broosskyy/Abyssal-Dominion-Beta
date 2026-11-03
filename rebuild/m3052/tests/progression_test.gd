@@ -12,8 +12,12 @@ func _initialize() -> void:
 	check(sim.dock(),"ship docks at reachable water marker")
 	var before: Vector2=sim.npcs[0].pos
 	var clock: float=sim.clock
+	var dock_hp: float=sim.player.hp
+	var dock_position: Vector2=sim.player.pos
+	sim.npcs[0].aggressive=true
 	sim.step(10)
-	check(sim.clock==clock and sim.npcs[0].pos==before,"harbor freezes guest combat without advancing enemies")
+	check(sim.clock>clock and sim.npcs[0].pos.distance_to(before)>30,"harbor keeps the sea clock and NPC patrols running")
+	check(sim.player.hp==dock_hp and sim.player.pos==dock_position and sim.shots.is_empty(),"docked ship stays protected and moored while NPCs keep moving")
 	check(not sim.course(sim.START),"docked vessel cannot sail until departure")
 	var wallet=int(sim.player.gold)
 	check(sim.buy_upgrade("cannon") and int(sim.player.gold)==wallet-150,"upgrade debits exact cost once")

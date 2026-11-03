@@ -50,6 +50,14 @@ func _initialize() -> void:
 		check(not sim.shots.is_empty(),"provoked NPC can retaliate on map "+str(map_index))
 		sim.player.pos=Vector2(2500,500);sim._step_npc(body,0.1)
 		check(not body.aggressive and body.state=="patrol","escaping combat clears retaliation instead of permanent pursuit: "+str(map_index))
+		sim.shots.clear();sim.docked=true;body.aggressive=true;body.reload=0.0
+		sim.player.pos=Vector2(500,500)
+		var dock_hp: float=sim.player.hp
+		var patrol_start: Vector2=body.pos
+		for _i in 120:sim.step(1.0/30.0)
+		check(body.pos.distance_to(patrol_start)>50,"patrol continues while captain is docked on region "+str(map_index))
+		check(sim.player.hp==dock_hp and sim.shots.is_empty() and not body.aggressive,"docking suppresses hostile and retaliatory fire on region "+str(map_index))
+		sim.docked=false
 	sim=SIM.new()
 	body=sim.npcs[0];body.pos=Vector2(500,500);body.home=body.pos;body.patrol=0
 	var patrol=sim._patrol_path(body)

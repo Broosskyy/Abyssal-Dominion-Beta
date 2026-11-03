@@ -43,7 +43,7 @@ See [`docs/m3054/SHIP_RENDER_AUDIT.md`](../../docs/m3054/SHIP_RENDER_AUDIT.md) f
 ## Existing playable content
 
 - Three connected regions: Caribbean Sea (level 1), North Sea (level 2), Shadow Waters (level 4). Regional island art, mirrored layouts, ocean tint and increasingly strong enemies. East/west portals require physical sailing and six seconds without damage. Returning during a session preserves previous enemy and loot state.
-- Physical harbor marker, docking, departure, paid drydock repair and four functional equipment categories with three purchased tiers: cannon/chain damage, harpoon damage, maximum hull HP and sailing speed. Docking pauses local combat.
+- Physical harbor marker, docking, departure, paid drydock repair and four functional equipment categories with three purchased tiers: cannon/chain damage, harpoon damage, maximum hull HP and sailing speed. Docking protects the moored captain while NPC patrols keep moving.
 - Captain XP and levels 1–20, with seven sequential quests for combat, salvage, monsters, exploration and elite ships. Rewards are claimed once; previous achievements count toward subsequent tasks.
 - Four visual loot categories and equipment/quest/map icons extracted from the supplied 110-PNG reference collection. Seventeen additional cropped runtime images, including a panel frame; all 62 PNGs have provenance and SHA-256 checksums. Full reference boards are not copied into runtime as backgrounds.
 - Guest save schema 2 persists level, XP, equipment, quest counters, visited regions, current region, position and hull. Schema-1 M3052 saves retain wallet, ammunition, design and claimed first quest. Existing app package, signing cache and save filename are retained.

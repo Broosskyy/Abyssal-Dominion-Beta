@@ -48,5 +48,26 @@ func _run() -> void:
 		await process_frame;await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png(output+"/weapons-%dx%d.png" % [dimensions.x,dimensions.y])
 		game.modal.hide();game.modal_backdrop.hide()
-	print(JSON.stringify({"status":"CAPTURED","scenario":"real four-view movement","frames":140,"telemetry":true}))
+	root.size=Vector2i(1280,720)
+	await process_frame
+	game._layout()
+	game.sim.player.pos=game.sim.harbor;game.sim.player.last_hit=-100
+	game.sim.player.hp=1200
+	npc.pos=game.sim.harbor+Vector2(200,0);npc.home=npc.pos;npc.path=[];npc.repath=0.0;npc.aggressive=true;npc.state="attack"
+	game.sim.dock()
+	var captain_start: Vector2=game.sim.player.pos
+	var patrol_start: Vector2=npc.pos
+	for _i in 180:game.sim.step(1.0/30.0)
+	game.camera.position=game.sim.player.pos;game._refresh_ui();game.queue_redraw()
+	game.ocean.set_shader_parameter("camera_world",game.camera.position)
+	game.ocean.set_shader_parameter("viewport_size",game.get_viewport_rect().size)
+	game.chart_mini.camera_world=game.camera.position;game.chart_mini.view_world=game.get_viewport_rect().size/game.camera.zoom;game.chart_mini.queue_redraw()
+	await process_frame;await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(output+"/harbor-patrol.png")
+	var receipt=FileAccess.open(output+"/harbor-patrol.json",FileAccess.WRITE)
+	receipt.store_string(JSON.stringify({"docked":game.sim.docked,"captain_held":game.sim.player.pos==captain_start,"captain_hp":game.sim.player.hp,"npc_distance":npc.pos.distance_to(patrol_start),"shots":game.sim.shots.size()}));receipt.close()
+	game._open_modal("Hafen")
+	await process_frame;await process_frame;await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(output+"/harbor-menu-top.png")
+	print(JSON.stringify({"status":"CAPTURED","scenario":"real four-view movement and live harbor","frames":140,"telemetry":true}))
 	quit()

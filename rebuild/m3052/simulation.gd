@@ -229,10 +229,12 @@ func toggle_repair() -> void:
 	message = "Reparatur läuft" if repairing else "Reparatur gestoppt"
 
 func step(delta: float) -> void:
-	if docked: return
 	clock += delta
 	player.reload = maxf(0, float(player.reload) - delta)
 	player.slow = maxf(0, float(player.slow) - delta)
+	if docked:
+		for npc in npcs:_step_npc(npc,delta)
+		return
 	if int(player.hp) <= 0:
 		player.respawn -= delta
 		if float(player.respawn) <= 0:
@@ -281,7 +283,7 @@ func _move(body: Dictionary, delta: float) -> void:
 
 func npc_engages(npc: Dictionary) -> bool:
 	# Entry regions are neutral: proximity and selecting a target never provoke fire.
-	return int(player.hp)>0 and npc.pos.distance_to(npc.home)<900 and npc.pos.distance_to(player.pos)<1000 and (bool(npc.aggressive) or (bool(CONTENT.MAPS[map_id].npc_hostile) and npc.pos.distance_to(player.pos)<380))
+	return not docked and int(player.hp)>0 and npc.pos.distance_to(npc.home)<900 and npc.pos.distance_to(player.pos)<1000 and (bool(npc.aggressive) or (bool(CONTENT.MAPS[map_id].npc_hostile) and npc.pos.distance_to(player.pos)<380))
 
 func _patrol_path(npc: Dictionary) -> Array[Vector2]:
 	# Long diamond circuits match the authored diagonal views instead of tiny loops.
