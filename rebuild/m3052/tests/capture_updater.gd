@@ -12,7 +12,7 @@ func _run() -> void:
 	for state in ["checking","downloading","permission"]:
 		scene.updater.progress=0.42
 		var text="Neue Version wird gesucht …" if state=="checking" else ("Update lädt · 42 %" if state=="downloading" else "Updates für diese App in Android erlauben, dann hier fortsetzen.")
-		scene.updater._set(state,text)
+		scene.updater.set_status(state,text)
 		for i in 3:await process_frame
 		await RenderingServer.frame_post_draw
 		var error=root.get_texture().get_image().save_png(output+"/"+state+".png")

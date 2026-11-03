@@ -24,30 +24,30 @@ func _ready() -> void:
 	request.request_completed.connect(_manifest_complete)
 	set_process(true)
 
-func _set(next: String,text: String) -> void:
+func set_status(next: String,text: String) -> void:
 	state=next;message=text;changed.emit()
 
 func check() -> void:
 	if state in ["checking","downloading","paused","verifying","installing"]:return
 	if native==null:
-		_set("unsupported","App-Updates werden auf Android installiert.")
+		set_status("unsupported","App-Updates werden auf Android installiert.")
 		return
 	if _resume():return
 	var config=JSON.parse_string(FileAccess.get_file_as_string("res://updater/config.json"))
 	auto_download=bool(config.get("auto_download",true))
-	_set("checking","Neue Version wird gesucht …")
+	set_status("checking","Neue Version wird gesucht …")
 	var error=request.request(str(config.manifest_url),["Cache-Control: no-cache"])
-	if error!=OK:_set("offline","Update-Prüfung momentan nicht erreichbar. Du kannst spielen.")
+	if error!=OK:set_status("offline","Update-Prüfung momentan nicht erreichbar. Du kannst spielen.")
 
 func _manifest_complete(result: int,code: int,_headers: PackedStringArray,body: PackedByteArray) -> void:
 	if result!=HTTPRequest.RESULT_SUCCESS or code!=200:
-		_set("offline","Update-Prüfung momentan nicht erreichbar. Du kannst spielen.")
+		set_status("offline","Update-Prüfung momentan nicht erreichbar. Du kannst spielen.")
 		return
 	var parsed=MODEL.manifest(JSON.parse_string(body.get_string_from_utf8()))
-	if parsed.status=="invalid":_set("error","Update-Informationen konnten nicht bestätigt werden.");return
-	if parsed.status=="current":_set("current","Dein Spiel ist aktuell.");return
+	if parsed.status=="invalid":set_status("error","Update-Informationen konnten nicht bestätigt werden.");return
+	if parsed.status=="current":set_status("current","Dein Spiel ist aktuell.");return
 	spec=parsed.spec.duplicate(true)
-	_set("available","Neue Version verfügbar · %.1f MB"%(float(spec.bytes)/1000000.0))
+	set_status("available","Neue Version verfügbar · %.1f MB"%(float(spec.bytes)/1000000.0))
 	if auto_download:download()
 
 func _resume() -> bool:
@@ -69,11 +69,11 @@ func download() -> void:
 	if state in ["downloading","paused","verifying","installing"]:return
 	# Persist metadata before enqueue. The native request itself is persisted by Android.
 	var file=FileAccess.open(PENDING,FileAccess.WRITE)
-	if file==null:_set("error","Update konnte nicht vorbereitet werden.");return
+	if file==null:set_status("error","Update konnte nicht vorbereitet werden.");return
 	file.store_string(JSON.stringify(spec));file.close()
 	var result=str(native.call("enqueueBackgroundApk",str(spec.url),int(spec.version_code),str(spec.sha256),int(spec.bytes)))
-	if result not in ["queued","active"]:_set("error","Download konnte nicht gestartet werden. Bitte erneut versuchen.");return
-	_set("downloading","Update wird im Hintergrund heruntergeladen …")
+	if result not in ["queued","active"]:set_status("error","Download konnte nicht gestartet werden. Bitte erneut versuchen.");return
+	set_status("downloading","Update wird im Hintergrund heruntergeladen …")
 	poll_elapsed=1.0
 
 func _process(delta: float) -> void:
@@ -82,40 +82,40 @@ func _process(delta: float) -> void:
 		worker=null
 		if not valid:
 			native.call("discardBackgroundApk")
-			_set("error","Update-Datei ist unvollständig oder beschädigt. Bitte erneut laden.")
+			set_status("error","Update-Datei ist unvollständig oder beschädigt. Bitte erneut laden.")
 		else:
 			progress=1.0
-			_set("ready","Update geprüft. Android-Installation wird geöffnet …")
+			set_status("ready","Update geprüft. Android-Installation wird geöffnet …")
 			install()
 	if state not in ["downloading","paused"] or native==null:return
 	poll_elapsed+=delta
 	if poll_elapsed<0.5:return
 	poll_elapsed=0
 	var data=JSON.parse_string(str(native.call("queryBackgroundApk")))
-	if not data is Dictionary:_set("error","Downloadstatus konnte nicht gelesen werden.");return
+	if not data is Dictionary:set_status("error","Downloadstatus konnte nicht gelesen werden.");return
 	_apply_native_state(data)
 
 func _apply_native_state(data: Dictionary) -> void:
-	if int(data.get("version",-1))!=int(spec.get("version_code",-2)):_set("error","Update-Auftrag passt nicht zur Version.");return
+	if int(data.get("version",-1))!=int(spec.get("version_code",-2)):set_status("error","Update-Auftrag passt nicht zur Version.");return
 	progress=clampf(float(data.get("received",0))/maxf(1,float(spec.bytes)),0,1)
 	match str(data.get("status","")):
-		"pending","running":_set("downloading","Update lädt · %d %%"%roundi(progress*100))
-		"paused":_set("paused","Download pausiert. Android setzt ihn bei Verbindung fort.")
+		"pending","running":set_status("downloading","Update lädt · %d %%"%roundi(progress*100))
+		"paused":set_status("paused","Download pausiert. Android setzt ihn bei Verbindung fort.")
 		"complete":
 			verified_path=str(data.get("path",""))
-			_set("verifying","Heruntergeladenes Update wird geprüft …")
+			set_status("verifying","Heruntergeladenes Update wird geprüft …")
 			worker=Thread.new()
 			var error=worker.start(MODEL.verify_file.bind(spec.duplicate(true),verified_path))
-			if error!=OK:worker=null;_set("error","Update-Prüfung konnte nicht gestartet werden.")
-		_:_set("error","Download unterbrochen. Du kannst ihn erneut starten.")
+			if error!=OK:worker=null;set_status("error","Update-Prüfung konnte nicht gestartet werden.")
+		_:set_status("error","Download unterbrochen. Du kannst ihn erneut starten.")
 
 func install() -> void:
 	if native==null or state not in ["ready","permission"]:return
 	var result=str(native.call("installValidatedApk",verified_path,int(spec.version_code)))
 	match result:
-		"installer_opened":_set("installing","Bitte die Installation im Android-Fenster bestätigen.")
-		"permission_required":_set("permission","Updates für diese App in Android erlauben, dann hier fortsetzen.")
-		_:_set("error","Android konnte dieses Update nicht installieren. Du kannst weiterspielen.")
+		"installer_opened":set_status("installing","Bitte die Installation im Android-Fenster bestätigen.")
+		"permission_required":set_status("permission","Updates für diese App in Android erlauben, dann hier fortsetzen.")
+		_:set_status("error","Android konnte dieses Update nicht installieren. Du kannst weiterspielen.")
 
 func _exit_tree() -> void:
 	# Leaving the launcher never removes the Android DownloadManager request.
@@ -123,4 +123,4 @@ func _exit_tree() -> void:
 
 func _notification(what: int) -> void:
 	if what==MainLoop.NOTIFICATION_APPLICATION_RESUMED and state=="installing":
-		_set("ready","Installation noch offen. Du kannst sie fortsetzen oder spielen.")
+		set_status("ready","Installation noch offen. Du kannst sie fortsetzen oder spielen.")
