@@ -40,7 +40,7 @@ public final class AbyssalApkInstaller extends GodotPlugin {
     // reconnect to the system request id from app-private preferences.
     private static final String DOWNLOAD_PREFS = "abyssal_background_apk_v1";
     private static final String RELEASE_ROOT =
-        "https://github.com/Broosskyy/Abyssal-Dominion-Updates/releases/download/";
+        "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/";
     private static final String UPDATE_DIRECTORY = "abyssal_apk_updater";
 
     private static boolean trustedDownload(String url, int version, String digest, int length) {

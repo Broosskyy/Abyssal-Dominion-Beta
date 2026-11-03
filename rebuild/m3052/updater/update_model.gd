@@ -2,7 +2,7 @@ extends RefCounted
 const VERSION_CODE := 305701
 const PACKAGE := "com.abyssaldominion.rebuild"
 const CERT := "278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b"
-const RELEASE_ROOT := "https://github.com/Broosskyy/Abyssal-Dominion-Updates/releases/download/"
+const RELEASE_ROOT := "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/"
 const MAX_BYTES := 350000000
 
 static func whole(value: Variant) -> bool:

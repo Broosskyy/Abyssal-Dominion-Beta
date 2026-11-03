@@ -59,7 +59,7 @@ def main():
         text = pattern.sub(lambda _: line, text) if pattern.search(text) else text+'\n'+line+'\n'
     settings.write_text(text)
     for script in ['content.gd', 'simulation.gd', 'ship_visuals.gd', 'updater/update_model.gd', 'updater/update_controller.gd', 'updater/launcher.gd']:
-        checked([engine, '--headless', '--path', str(ROOT), '--check-only', '--script', script], output.with_suffix('.'+script+'.check.log'))
+        checked([engine, '--headless', '--path', str(ROOT), '--check-only', '--script', script], output.with_suffix('.'+script.replace('/', '_')+'.check.log'))
     checked([engine, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.import.log'))
     results = []
     for name in ['simulation_test', 'progression_test', 'ship_visual_test', 'ui_test', 'updater_test']:
@@ -108,7 +108,7 @@ def main():
         raise RuntimeError('Unexpected Android identity')
     report = {'engine': version, 'apk': output.name, 'sha256': hashlib.sha256(output.read_bytes()).hexdigest(),
               'bytes': output.stat().st_size, 'tests': results, 'audited_pngs': len(assets),
-              'signature': 'PASS', 'certificate_sha256': certificate, 'version_code': 305701, 'package': 'com.abyssaldominion.rebuild', 'updater_native': True, 'update_distribution': 'PENDING_PUBLIC_CHANNEL_APPROVAL', 'alignment_16k': 'PASS', 'physical_android_test': 'NOT_PERFORMED',
+              'signature': 'PASS', 'certificate_sha256': certificate, 'version_code': 305701, 'package': 'com.abyssaldominion.rebuild', 'updater_native': True, 'update_distribution': 'GITHUB_RELEASES_MANIFEST_PUBLISHED_LAST', 'alignment_16k': 'PASS', 'physical_android_test': 'NOT_PERFORMED',
               'mode': 'LOCAL_GUEST_SEA_CHART', 'public_server': False, 'milestone': 'M3057',
               'regions': 3, 'quest_chain': 7, 'equipment_categories': 4, 'equipment_tiers': 3,
               'source_commit': os.environ.get('GITHUB_SHA', 'local'),

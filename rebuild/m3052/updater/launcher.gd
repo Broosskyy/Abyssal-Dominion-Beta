@@ -46,7 +46,7 @@ func _refresh() -> void:
 	bar.indeterminate=state in ["checking","verifying"]
 	action.visible=state not in ["checking","downloading","paused","verifying"]
 	action.disabled=state=="installing"
-	action.text="Installation fortsetzen" if state in ["ready","permission"] else ("Erneut herunterladen" if state=="error" and not updater.spec.is_empty() else "Updates prüfen")
+	action.text="Installation fortsetzen" if state in ["ready","permission"] else ("Update herunterladen" if state=="available" else ("Erneut herunterladen" if state=="error" and not updater.spec.is_empty() else "Updates prüfen"))
 	play.text="Spielen · Download läuft weiter" if state in ["downloading","paused"] else "Spielen"
 	if autostart and state in ["current","offline"] and not countdown:
 		countdown=true
@@ -55,7 +55,7 @@ func _refresh() -> void:
 
 func _action() -> void:
 	if updater.state in ["ready","permission"]:updater.install()
-	elif updater.state=="error" and not updater.spec.is_empty():updater.download()
+	elif updater.state=="available" or (updater.state=="error" and not updater.spec.is_empty()):updater.download()
 	else:updater.check()
 
 func _play() -> void:

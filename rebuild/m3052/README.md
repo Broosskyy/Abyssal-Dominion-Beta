@@ -4,7 +4,7 @@ The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the exist
 
 ## M3057 updater
 
-Android launcher and HAFEN → UPDATES PRÜFEN now use a native DownloadManager bridge based on Realm 733. Files are verified before Android installation; gameplay and guest storage stay available. One manual bootstrap install is required. Public APK/manifest hosting is pending approval, so this private build does not yet provide a live automatic distribution channel. See [updater flow and limits](../../docs/m3057/UPDATER.md).
+Android launcher and HAFEN → UPDATES PRÜFEN now use a native DownloadManager bridge based on Realm 733. Files are verified before Android installation; gameplay and guest storage stay available. One manual bootstrap install is required. The existing repository is now public; verified APKs are published as GitHub releases before the latest-version manifest is updated. See [updater flow and limits](../../docs/m3057/UPDATER.md).
 
 ## Aktuelle Vorgabe: 2D zuerst
 
@@ -50,6 +50,6 @@ Tap water to sail and an enemy to select it. FEUER toggles cannon fire. Harpoons
 
 ## Scope
 
-Local guest gameplay. This scene is not connected to M3051's separate development server. Public networking, accounts, multiplayer/PvP, guilds, cross-device acceptance, production signing and updater distribution remain open. Three regional layouts share a base geometry transformed per region; this is not a claim of three entirely independent authored worlds. NPC state on other maps is retained during the current session, not serialized across app restarts. Captain level and equipment are functional; cosmetics are still free test designs.
+Local guest gameplay. This scene is not connected to M3051's separate development server. Public networking, accounts, multiplayer/PvP, guilds, cross-device acceptance, production signing and physical updater acceptance remain open. Three regional layouts share a base geometry transformed per region; this is not a claim of three entirely independent authored worlds. NPC state on other maps is retained during the current session, not serialized across app restarts. Captain level and equipment are functional; cosmetics are still free test designs.
 
 Supplied/reference art is used in the private development repository; public redistribution rights have not been established. Automated checks and rendered captures do not constitute a physical Android device playtest.

@@ -49,7 +49,7 @@ jobs:
           chmod +x rebuild/m3052/android/build/gradlew
       - name: Test and verify APK
         run: python3 rebuild/m3052/tools/build_android.py --godot /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --keystore "$HOME/.cache/abyssal-test-signing/debug.keystore" --output "$GITHUB_WORKSPACE/releases/M3057/ABYSSAL_DOMINION_M3057_REBUILD_ARM64.apk"
-      - name: Prepare reviewed update manifest
+      - name: Prepare verified update manifest
         run: python3 rebuild/m3052/tools/prepare_update_manifest.py releases/M3057/ABYSSAL_DOMINION_M3057_REBUILD_ARM64.apk
       - name: Capture desktop and mobile gameplay
         shell: bash
@@ -87,6 +87,31 @@ jobs:
           path: releases/M3057/
           if-no-files-found: error
           retention-days: 90
+      - name: Publish verified Android release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if [ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]; then
+            echo 'Newer source exists; skipping outdated release.'
+            exit 0
+          fi
+          cp releases/M3057/ABYSSAL_DOMINION_M3057_REBUILD_ARM64.apk "$RUNNER_TEMP/ABYSSAL_DOMINION_305701.apk"
+          cat > "$RUNNER_TEMP/release-notes.md" <<'NOTES'
+          M3057: Native Android background updater, start launcher and HAFEN → UPDATES PRÜFEN.
+          Install this bootstrap APK once over M3056; keep the existing app and saved progress.
+          Future APKs download through Android DownloadManager and require Android installation confirmation.
+          Automated checks and runtime captures passed; physical Android upgrade/background acceptance remains pending.
+          NOTES
+          if gh release view abyssal-305701-android >/dev/null 2>&1; then
+            echo 'Release already exists; refusing to overwrite immutable APK.'
+            exit 1
+          fi
+          gh release create abyssal-305701-android "$RUNNER_TEMP/ABYSSAL_DOMINION_305701.apk" releases/M3057/latest.json --target "$GITHUB_SHA" --title 'Abyssal Dominion M3057 Android' --notes-file "$RUNNER_TEMP/release-notes.md" --prerelease
+          mkdir -p updates
+          cp releases/M3057/latest.json updates/latest.json
       - name: Preserve verified APK in repository
         shell: bash
         run: |
@@ -98,6 +123,7 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f releases/M3057/*.apk releases/M3057/*.build.json releases/M3057/*.signature.txt releases/M3057/*.manifest.txt releases/M3057/*.android-xml.txt releases/M3057/latest.json releases/M3057/captures/
+          test -f updates/latest.json
+          git add -f updates/latest.json releases/M3057/*.apk releases/M3057/*.build.json releases/M3057/*.signature.txt releases/M3057/*.manifest.txt releases/M3057/*.android-xml.txt releases/M3057/latest.json releases/M3057/captures/
           git commit -m 'Preserve verified M3057 APK, native updater and UI captures [skip ci]'
           git push origin HEAD:main
