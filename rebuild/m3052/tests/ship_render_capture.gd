@@ -8,7 +8,7 @@ func _run() -> void:
 		if arg.begins_with("--out="):output=arg.trim_prefix("--out=")
 		if arg.begins_with("--page="):page=int(arg.trim_prefix("--page="))
 	root.content_scale_size=Vector2i.ZERO
-	root.size=Vector2i(1280,1460 if page==0 else 1196)
+	root.size=Vector2i(1280,2120 if page==0 else 1720)
 	var game=load("res://sea_map.tscn").instantiate()
 	game.gallery_page=page
 	root.add_child(game)
@@ -24,5 +24,6 @@ func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(output)
 	var error=root.get_texture().get_image().save_png(output+"/ships_page_%d.png"%page)
 	if error!=OK:push_error("Ship gallery capture failed");quit(1);return
+	root.get_texture().get_image().save_jpg(output+"/ships_page_%d.jpg"%page,0.92)
 	print(JSON.stringify({"status":"CAPTURED","page":page,"renderer":"sea_map._draw_actor","waterline_markers":true}))
 	quit()

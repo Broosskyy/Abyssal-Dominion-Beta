@@ -315,7 +315,7 @@ func _draw_ship_gallery() -> void:
 	_label(Vector2(640,26),"M3054 · ORIGINAL RUNTIME RENDERER · WATERLINE ANCHORS",20,GOLD)
 	for c in 4:_label(Vector2(320+c*240,59),["NORDOST","NORDWEST","SÜDWEST","SÜDOST"][c],14,CYAN)
 	for skin in range(first,last):
-		var y=120.0+float(skin-first)*132.0
+		var y=216.0+float(skin-first)*200.0
 		_label(Vector2(100,y-18),str(skins[skin].name),13,GOLD)
 		_label(Vector2(100,y+5),"Einzelbild / Spiegelung" if skin<10 else "4 echte Atlasansichten",10,CYAN)
 		draw_line(Vector2(14,y+78),Vector2(1266,y+78),Color(0.3,0.5,0.6,0.2))

@@ -63,7 +63,7 @@ jobs:
             fi
           done
           for page in 0 1 2; do
-            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/ship_render_capture.gd -- --out="$GITHUB_WORKSPACE/releases/M3054/captures/ship-audit" "--page=$page" > "releases/M3054/captures/ship-audit-$page.log" 2>&1 || { cat "releases/M3054/captures/ship-audit-$page.log"; exit 1; }
+            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a --server-args='-screen 0 1600x2304x24' /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/ship_render_capture.gd -- --out="$GITHUB_WORKSPACE/releases/M3054/captures/ship-audit" "--page=$page" > "releases/M3054/captures/ship-audit-$page.log" 2>&1 || { cat "releases/M3054/captures/ship-audit-$page.log"; exit 1; }
             cat "releases/M3054/captures/ship-audit-$page.log"
             if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3054/captures/ship-audit-$page.log"; then exit 1; fi
           done
