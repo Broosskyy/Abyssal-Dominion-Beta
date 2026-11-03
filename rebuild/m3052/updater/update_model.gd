@@ -1,5 +1,5 @@
 extends RefCounted
-const VERSION_CODE := 305701
+const VERSION_CODE := 305702
 const PACKAGE := "com.abyssaldominion.rebuild"
 const CERT := "278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b"
 const RELEASE_ROOT := "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/"

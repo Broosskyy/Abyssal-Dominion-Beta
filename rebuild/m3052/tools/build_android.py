@@ -104,11 +104,11 @@ def main():
     subprocess.run([str(bt/'zipalign'), '-c', '-P', '16', '4', str(output)], check=True)
     manifest = subprocess.check_output([str(bt/'aapt'), 'dump', 'badging', str(output)], text=True)
     output.with_suffix('.manifest.txt').write_text(manifest)
-    if "name='com.abyssaldominion.rebuild' versionCode='305701' versionName='0.305.7-test.1'" not in manifest:
+    if "name='com.abyssaldominion.rebuild' versionCode='305702' versionName='0.305.7-test.2'" not in manifest:
         raise RuntimeError('Unexpected Android identity')
     report = {'engine': version, 'apk': output.name, 'sha256': hashlib.sha256(output.read_bytes()).hexdigest(),
               'bytes': output.stat().st_size, 'tests': results, 'audited_pngs': len(assets),
-              'signature': 'PASS', 'certificate_sha256': certificate, 'version_code': 305701, 'package': 'com.abyssaldominion.rebuild', 'updater_native': True, 'update_distribution': 'GITHUB_RELEASES_MANIFEST_PUBLISHED_LAST', 'alignment_16k': 'PASS', 'physical_android_test': 'NOT_PERFORMED',
+              'signature': 'PASS', 'certificate_sha256': certificate, 'version_code': 305702, 'package': 'com.abyssaldominion.rebuild', 'updater_native': True, 'update_distribution': 'GITHUB_RELEASES_MANIFEST_PUBLISHED_LAST', 'alignment_16k': 'PASS', 'physical_android_test': 'NOT_PERFORMED',
               'mode': 'LOCAL_GUEST_SEA_CHART', 'public_server': False, 'milestone': 'M3057',
               'regions': 3, 'quest_chain': 7, 'equipment_categories': 4, 'equipment_tiers': 3,
               'source_commit': os.environ.get('GITHUB_SHA', 'local'),

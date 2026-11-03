@@ -1,6 +1,6 @@
 # Abyssal Dominion M3057 — Android background updater
 
-The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.7-test.1` / Android code `305701`. M3052 is retained in Git history and `releases/M3052/`.
+The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.7-test.2` / Android code `305702`. M3052 is retained in Git history and `releases/M3052/`.
 
 ## M3057 updater
 

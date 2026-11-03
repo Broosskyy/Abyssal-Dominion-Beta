@@ -15,6 +15,12 @@ func _run() -> void:
 		scene.updater.set_status(state,text)
 		for i in 3:await process_frame
 		await RenderingServer.frame_post_draw
+		for control: Control in [scene.action,scene.play]:
+			if not control.visible:continue
+			var rect=control.get_global_rect()
+			if rect.size.x<100 or rect.size.y<44 or rect.position.x<0 or rect.position.y<0 or rect.end.x>844 or rect.end.y>390:
+				push_error("Updater action outside capture: "+str(rect));quit(1);return
+		print(JSON.stringify({"fixture":state,"panel":str(scene.panel.get_global_rect()),"play":str(scene.play.get_global_rect())}))
 		var error=root.get_texture().get_image().save_png(output+"/"+state+".png")
 		if error!=OK:quit(1);return
 	print(JSON.stringify({"status":"CAPTURED","scene":"updater/launcher.tscn","fixture_states":true,"network":"simulated"}))

@@ -6,19 +6,20 @@ var status: Label
 var bar: ProgressBar
 var action: Button
 var play: Button
-var panel: PanelContainer
+var panel: Panel
+var box: VBoxContainer
 var countdown=false
 
 func _ready() -> void:
 	var manual=bool(get_tree().get_meta("abyssal_manual_update",false))
 	if manual:get_tree().remove_meta("abyssal_manual_update");autostart=false
 	var bg=ColorRect.new();bg.color=Color("061b28");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
-	panel=PanelContainer.new();add_child(panel)
+	panel=Panel.new();add_child(panel)
 	var skin=StyleBoxFlat.new();skin.bg_color=Color("0b2736");skin.border_color=Color("b89755")
 	skin.set_border_width_all(1);skin.set_corner_radius_all(16)
 	skin.content_margin_left=28;skin.content_margin_right=28;skin.content_margin_top=24;skin.content_margin_bottom=24
 	panel.add_theme_stylebox_override("panel",skin)
-	var box=VBoxContainer.new();box.add_theme_constant_override("separation",14);panel.add_child(box)
+	box=VBoxContainer.new();box.add_theme_constant_override("separation",12);box.alignment=BoxContainer.ALIGNMENT_CENTER;panel.add_child(box)
 	var title=Label.new();title.text="ABYSSAL DOMINION";title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size",25);title.add_theme_color_override("font_color",Color("e1c68b"));box.add_child(title)
 	var version=Label.new();version.text="Version "+str(ProjectSettings.get_setting("application/config/version",""));version.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;box.add_child(version)
@@ -39,6 +40,8 @@ func _layout() -> void:
 	var width=minf(540,s.x-32)
 	panel.size=Vector2(width,minf(410,s.y-24))
 	panel.position=(s-panel.size)*0.5
+	box.position=Vector2(24,16)
+	box.size=panel.size-Vector2(48,32)
 
 func _refresh() -> void:
 	status.text=updater.message;bar.value=updater.progress

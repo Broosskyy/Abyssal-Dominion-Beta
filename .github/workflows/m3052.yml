@@ -98,18 +98,18 @@ jobs:
             echo 'Newer source exists; skipping outdated release.'
             exit 0
           fi
-          cp releases/M3057/ABYSSAL_DOMINION_M3057_REBUILD_ARM64.apk "$RUNNER_TEMP/ABYSSAL_DOMINION_305701.apk"
+          cp releases/M3057/ABYSSAL_DOMINION_M3057_REBUILD_ARM64.apk "$RUNNER_TEMP/ABYSSAL_DOMINION_305702.apk"
           cat > "$RUNNER_TEMP/release-notes.md" <<'NOTES'
           M3057: Native Android background updater, start launcher and HAFEN → UPDATES PRÜFEN.
           Install this bootstrap APK once over M3056; keep the existing app and saved progress.
           Future APKs download through Android DownloadManager and require Android installation confirmation.
           Automated checks and runtime captures passed; physical Android upgrade/background acceptance remains pending.
           NOTES
-          if gh release view abyssal-305701-android >/dev/null 2>&1; then
+          if gh release view abyssal-305702-android >/dev/null 2>&1; then
             echo 'Release already exists; refusing to overwrite immutable APK.'
             exit 1
           fi
-          gh release create abyssal-305701-android "$RUNNER_TEMP/ABYSSAL_DOMINION_305701.apk" releases/M3057/latest.json --target "$GITHUB_SHA" --title 'Abyssal Dominion M3057 Android' --notes-file "$RUNNER_TEMP/release-notes.md" --prerelease
+          gh release create abyssal-305702-android "$RUNNER_TEMP/ABYSSAL_DOMINION_305702.apk" releases/M3057/latest.json --target "$GITHUB_SHA" --title 'Abyssal Dominion M3057 Android' --notes-file "$RUNNER_TEMP/release-notes.md" --prerelease
           mkdir -p updates
           cp releases/M3057/latest.json updates/latest.json
       - name: Preserve verified APK in repository

@@ -72,7 +72,7 @@ func _run() -> void:
 		root.size=dimensions;await process_frame;scene._layout();await process_frame
 		for control: Control in [scene.action,scene.play]:
 			var rect=control.get_global_rect()
-			check(rect.position.x>=0 and rect.position.y>=0 and rect.end.x<=dimensions.x+1 and rect.end.y<=dimensions.y+1,"updater action visible at "+str(dimensions))
+			check(rect.size.x>100 and rect.size.y>=44 and rect.position.x>=0 and rect.position.y>=0 and rect.end.x<=dimensions.x+1 and rect.end.y<=dimensions.y+1,"updater action visible at "+str(dimensions))
 		check(not scene.action.get_global_rect().intersects(scene.play.get_global_rect()),"updater actions do not overlap at "+str(dimensions))
 	scene.queue_free();await process_frame
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures,"native_download_simulation":true,"physical_android_test":false}))
