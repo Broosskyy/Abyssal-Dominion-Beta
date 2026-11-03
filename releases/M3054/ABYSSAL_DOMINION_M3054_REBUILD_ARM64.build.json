@@ -1,7 +1,7 @@
 {
   "engine": "4.7.2.stable.official.ed1daf0bf",
   "apk": "ABYSSAL_DOMINION_M3054_REBUILD_ARM64.apk",
-  "sha256": "d69f4bea71f1731436653c86a31c9bf0c83ff514df7ad452fbb7aa56775c11d6",
+  "sha256": "a30a6feaa7a51d1e972b6fafff857dd63fe681756371380d98a7c4ef15c9a85e",
   "bytes": 37832740,
   "tests": [
     {
@@ -40,7 +40,7 @@
   "quest_chain": 7,
   "equipment_categories": 4,
   "equipment_tiers": 3,
-  "source_commit": "04ab0f0af6fdb9285e4e6acc8787824a47289d0f",
+  "source_commit": "9866ec41886111d846b423ac2fe8b0562bf50add",
   "measured_ship_sources": 26,
   "measured_ship_frames": 74
 }
