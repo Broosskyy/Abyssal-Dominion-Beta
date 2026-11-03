@@ -23,7 +23,7 @@ func _draw() -> void:
 		draw_rect(Rect2(Vector2(1,1),size-Vector2(2,2)),gold,false,1.0)
 		draw_circle(Vector2(size.x*.5,19),17,Color("201f18"));draw_circle(Vector2(size.x*.5,19),16,Color("7e673d"),false,1,true)
 		if art!=null:draw_texture_rect(art,Rect2(Vector2(size.x*.5-14,5),Vector2(28,28)),false,Color.WHITE if not disabled else Color(.5,.5,.5))
-		var title_size=10 if size.x>=66 else 9
+		var title_size=12 if size.x>=66 else 10
 		var w=font.get_string_size(caption,HORIZONTAL_ALIGNMENT_LEFT,-1,title_size).x
 		draw_string(font,Vector2((size.x-w)*.5,size.y-6),caption,HORIZONTAL_ALIGNMENT_LEFT,-1,title_size,Color("f2dfb1"))
 		return
@@ -36,6 +36,11 @@ func _draw() -> void:
 		draw_circle(center,radius-t*radius*.22,Color("4c3820").lerp(Color("0b1c26"),t))
 	draw_circle(center,radius,gold,false,2.0,true)
 	draw_circle(center,radius-4,Color("80623a"),false,1.0,true)
+	# Small brass fasteners and a glass sheen keep each control readable at phone scale.
+	for angle in [PI*.25,PI*.75,PI*1.25,PI*1.75]:
+		var rivet=center+Vector2(cos(angle),sin(angle))*(radius-2)
+		draw_circle(rivet,1.5,Color("edcf89"))
+	draw_arc(center,radius-6,PI*1.05,PI*1.75,20,Color(1,.9,.6,.16),3,true)
 	draw_arc(center,radius-1,PI*1.05,PI*1.8,28,Color("fae1a0"),1.3,true)
 	if art!=null:
 		var dimensions=art.get_size()*diameter*.68/maxf(art.get_width(),art.get_height())
@@ -43,11 +48,11 @@ func _draw() -> void:
 	if hot:draw_circle(center,radius-6,Color("dfb15c"),false,1.2,true)
 	if cooldown>0:draw_arc(center,radius-7,-PI*.5,-PI*.5+TAU*(1-clampf(cooldown,0,1)),36,Color("e3bf76"),2,true)
 	if not caption.is_empty():
-		var fs=11 if diameter>70 else 9
+		var fs=14 if diameter>70 else 10
 		var w=font.get_string_size(caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
 		draw_string_outline(font,Vector2(center.x-w*.5,diameter-9),caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,3,Color("071018"))
 		draw_string(font,Vector2(center.x-w*.5,diameter-9),caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("f3e0b6"))
 	if not quantity.is_empty():
-		var w=font.get_string_size(quantity,HORIZONTAL_ALIGNMENT_LEFT,-1,12).x
-		draw_string_outline(font,Vector2(center.x-w*.5,size.y-2),quantity,HORIZONTAL_ALIGNMENT_LEFT,-1,12,3,Color("071018"))
-		draw_string(font,Vector2(center.x-w*.5,size.y-2),quantity,HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("f3e0b6"))
+		var w=font.get_string_size(quantity,HORIZONTAL_ALIGNMENT_LEFT,-1,14).x
+		draw_string_outline(font,Vector2(center.x-w*.5,size.y-2),quantity,HORIZONTAL_ALIGNMENT_LEFT,-1,14,3,Color("071018"))
+		draw_string(font,Vector2(center.x-w*.5,size.y-2),quantity,HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("f3e0b6"))

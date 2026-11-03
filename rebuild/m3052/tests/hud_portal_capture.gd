@@ -17,6 +17,7 @@ func _run() -> void:
 	var game=load("res://sea_map.tscn").instantiate();root.add_child(game);current_scene=game
 	await process_frame
 	game.set_process(false);game.elapsed=2.0
+	game.hud_size=1;game.journal_visible=true
 	game.sim.player.pos=Vector2(1800,1320);game.sim.player.hp=1850;game.sim.level=4
 	game.camera.position=Vector2(1720,1180);game.camera.zoom=Vector2.ONE*.96
 	var npc=game.sim.npcs[0];npc.pos=game.sim.player.pos+Vector2(260,70);npc.home=npc.pos
@@ -29,6 +30,12 @@ func _run() -> void:
 		game._open_modal("Munition")
 		await _shot(game,output,"ammo-%dx%d" % [dimensions.x,dimensions.y])
 		game.modal.hide();game.modal_backdrop.hide()
+	root.size=Vector2i(1560,720)
+	game._set_display(2,false);game.modal.hide();game.modal_backdrop.hide()
+	await _shot(game,output,"hud-large-1560x720")
+	game._open_modal("Anzeige")
+	await _shot(game,output,"display-1560x720")
+	game._set_display(1,true);game.modal.hide();game.modal_backdrop.hide()
 	root.size=Vector2i(1280,720)
 	game.sim.npcs.clear();game.sim.drops.clear();game.sim.player.pos=game.sim.portals[0].pos-Vector2(220,0)
 	game.camera.position=game.sim.portals[0].pos;game.camera.force_update_scroll()

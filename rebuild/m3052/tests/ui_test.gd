@@ -187,6 +187,33 @@ func _run() -> void:
 	check(game.sim.map_id==1 and game.camera.position==game.sim.player.pos and game.previous_region==1,"touch-to-arrival crossing switches region, recenters camera and synchronizes scene")
 	game._load_progress()
 	check(game.sim.map_id==1,"automatic portal arrival is saved to the captain file")
+	# Exercise preferences through the actual settings callbacks at every supported size.
+	var captain_before: Dictionary=game.sim.export_save()
+	for dimensions in [Vector2i(1280,720),Vector2i(1560,720),Vector2i(844,390),Vector2i(720,405)]:
+		root.size=dimensions
+		await process_frame
+		for preset in 3:
+			game._set_display(preset,true)
+			await process_frame;await process_frame
+			check(game.modal_kind=="Anzeige" and game.modal.visible,"display settings remain usable after changing scale")
+			check(game.modal.get_global_rect().position.x>=0 and game.modal.get_global_rect().end.x<=dimensions.x+1 and game.modal.get_global_rect().end.y<=dimensions.y+1,"scaled settings panel fits %s preset %d" % [dimensions,preset])
+			game.modal.hide()
+			var touch: Array=[game.attack,game.repair,game.ammo_selector,game.center_button,game.zoom_in,game.zoom_out,game.loadout_button]
+			touch.append_array(game.ammo_buttons)
+			for control: Control in touch:
+				var bounds=control.get_global_rect()
+				check(bounds.position.x>=0 and bounds.position.y>=0 and bounds.end.x<=dimensions.x+1 and bounds.end.y<=dimensions.y+1,"scaled touch target remains inside viewport")
+			for i in touch.size():
+				for j in range(i+1,touch.size()):check(not touch[i].get_global_rect().intersects(touch[j].get_global_rect()),"scaled touch targets remain independent")
+			check(game.water.size==Vector2(dimensions),"HUD scaling does not resize ocean or world coordinates")
+			check(game._hud_contains(game.player_hp.get_global_rect().get_center()),"scaled HP hit testing uses viewport coordinates")
+	game._set_display(2,false)
+	game.hud_size=0;game.journal_visible=true;game._load_display();game._layout()
+	check(game.hud_size==2 and not game.quest_panel.visible,"HUD size and journal visibility survive reload")
+	check(game.sim.export_save()==captain_before,"display choices preserve all captain progress")
+	game._set_display(1,true);game.modal.hide()
+	root.size=Vector2i(1560,720);await process_frame;game._layout()
+	check(game.attack.get_global_rect().size.x>=140,"comfortable wide-phone layout has a larger primary attack button")
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)

@@ -6,6 +6,7 @@ const CONTENT = preload("res://content.gd")
 const VISUALS = preload("res://ship_visuals.gd")
 const USER_ROOT := "res://assets/user/"
 const SAVE := "user://captain_m3052.json"
+const HUD_SAVE := "user://display_m3052.json"
 const GOLD := Color("dcc18a")
 const CYAN := Color("80e3dc")
 var sim := SIM.new()
@@ -97,10 +98,14 @@ var system_label: Label
 var system_view=false
 var message_history: Array[String]=[]
 var previous_region := -1
+var hud_size := 1 # 0 compact, 1 comfortable, 2 large
+var journal_visible := true
+var hud_scale := 1.0
 
 func _ready() -> void:
 	_load_assets()
 	_load_progress()
+	_load_display()
 	previous_region=sim.map_id
 	camera = Camera2D.new()
 	camera.position = sim.player.pos
@@ -524,12 +529,12 @@ func _build_ui() -> void:
 	var layer =CanvasLayer.new()
 	add_child(layer)
 	ui=Control.new()
-	ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	ui.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	ui.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	layer.add_child(ui)
 	chrome=_panel(ui)
 	title=_text(chrome,"ABYSSAL DOMINION",12)
-	resources=_text(chrome,"",11,GOLD)
+	resources=_text(chrome,"",12,GOLD)
 	var nav_items=[["Schiff","ship","Schiff"],["Werft","anchor","Hafen"],["Aufträge","book","Logbuch"],["Karten","compass","Seekarten"],["Vorräte","chest","Munition"],["Menü","gear","Spielinfo"]]
 	for item in nav_items:
 		var kind: String=item[2]
@@ -537,7 +542,7 @@ func _build_ui() -> void:
 		button.set_meta("modal",kind);nav_buttons.append(button)
 	player_panel=_panel(ui)
 	player_portrait=_portrait(player_panel)
-	player_name=_text(player_panel,"",12,GOLD)
+	player_name=_text(player_panel,"",13,GOLD)
 	player_hp=_bar(player_panel)
 	player_numbers=_text(player_panel,"",11)
 	player_name.clip_text=true
@@ -545,7 +550,7 @@ func _build_ui() -> void:
 	var xp_style: StyleBoxFlat=player_xp.get_theme_stylebox("fill").duplicate();xp_style.bg_color=Color("348cb6");player_xp.add_theme_stylebox_override("fill",xp_style)
 	target_panel=_panel(ui)
 	target_portrait=_portrait(target_panel)
-	target_name=_text(target_panel,"",12);target_name.clip_text=true
+	target_name=_text(target_panel,"",13);target_name.clip_text=true
 	target_hp=_bar(target_panel)
 	target_health_skin=target_hp.get_theme_stylebox("fill").duplicate();target_hp.add_theme_stylebox_override("fill",target_health_skin)
 	target_numbers=_text(target_panel,"",11)
@@ -612,12 +617,19 @@ func _place(c: Control,x: float,y: float,w: float,h: float) -> void:
 
 func _layout() -> void:
 	if ui==null:return
-	var s =get_viewport_rect().size
-	var compact =s.y<560 or s.x<1000
+	var viewport_size=get_viewport_rect().size
+	# Scale only the HUD. Ocean, camera, world input and simulation keep viewport coordinates.
+	var base=clampf(viewport_size.y/600.0,1.0,1.35)
+	var requested=base*[0.86,1.0,1.14][hud_size]
+	hud_scale=clampf(requested,0.86,minf(viewport_size.x/720.0,viewport_size.y/390.0))
+	ui.scale=Vector2.ONE*hud_scale
+	var s=viewport_size/hud_scale
+	ui.size=s
+	var compact=viewport_size.y<560 or viewport_size.x<1000
 	if compact and elapsed<0.1:
 		desired_zoom=0.78
 		camera.zoom=Vector2.ONE*desired_zoom
-	water.size=s
+	water.size=viewport_size
 	var header=54.0 if compact else 62.0
 	_place(chrome,0,0,s.x,header)
 	title.visible=not compact;_place(title,12,4,210,18)
@@ -625,6 +637,7 @@ func _layout() -> void:
 	resources.visible=true
 	var nw=62.0 if compact else 80.0
 	var nav_x=(s.x-nw*nav_buttons.size())*.5
+	resources.size.x=maxf(90,nav_x-24)
 	for i in nav_buttons.size():_place(nav_buttons[i],nav_x+i*nw,2,nw-3,header-4)
 	var top=header+8
 	_place(player_panel,12,top,208 if compact else 236,66)
@@ -660,7 +673,7 @@ func _layout() -> void:
 	_place(status,status_x,dy-26,minf(440,side_x-status_x-12),20)
 	_place(interact,12,top+152,player_panel.size.x,36)
 	_place(quest_panel,12,s.y-(116 if compact else 150)-10,208 if compact else 270,116 if compact else 150)
-	quest_panel.visible=true
+	quest_panel.visible=journal_visible
 	_place(quest_tab,5,4,quest_panel.size.x*.5-7,23);_place(system_tab,quest_panel.size.x*.5+2,4,quest_panel.size.x*.5-7,23)
 	_place(quest_text,10,33,quest_panel.size.x-20,quest_panel.size.y-72)
 	_place(system_label,10,33,quest_panel.size.x-20,quest_panel.size.y-42)
@@ -871,8 +884,19 @@ func _open_modal(kind: String) -> void:
 			travel_button.disabled=i==sim.map_id or locked or sim.docked
 		_info("Tippe auf ein Portal oder auf KURS ZUM PORTAL. Dein Schiff fährt hin und wechselt beim Erreichen automatisch. Levelgrenzen bleiben gültig; nach einem Treffer wartet das Portal 6 Sekunden. Im Hafen zuerst ablegen.")
 		_action("STEUERUNG & SPIELINFO",func():_open_modal("Spielinfo"))
+	elif kind=="Anzeige":
+		_info("DEINE SEEKARTE · DEINE OBERFLÄCHE",CYAN)
+		_info("Wähle die Größe für Anzeigen, Karte und Kampfbuttons. Die Spielwelt behält ihre eigene Zoomstufe. Deine Auswahl bleibt auf diesem Gerät gespeichert.")
+		for i in 3:
+			var index=i
+			var choice=_action((["KOMPAKT · mehr freie Seekarte","KOMFORT · größere Anzeigen","GROSS · beste Lesbarkeit"][i])+("   ✓" if hud_size==i else ""),func():_set_display(index,journal_visible))
+			choice.disabled=hud_size==i
+		_action("AUFTRAGSFENSTER: "+("EIN" if journal_visible else "AUS"),func():_set_display(hud_size,not journal_visible))
+		_info("Aufträge bleiben jederzeit oben über Aufträge erreichbar. Zwei Finger zum Zoomen; das Fadenkreuz holt die Kamera zum Schiff zurück.")
+		_action("STANDARD WIEDERHERSTELLEN",func():_set_display(1,true))
 	else:
 		_action("UPDATES PRÜFEN",func():_save_progress();get_tree().set_meta("abyssal_manual_update",true);get_tree().change_scene_to_file("res://updater/launcher.tscn"))
+		_action("ANZEIGE & HUD ANPASSEN",func():_open_modal("Anzeige"))
 		var info =_text(modal_body,"ABYSSAL DOMINION · STEUERUNG\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nHAFEN: Andocken, Rumpf reparieren und Kanonen, Harpunen, Rumpf oder Segel verbessern.\nLOGBUCH: Sieben aufeinanderfolgende Aufträge.\nKARTEN: Portale zur Karibischen See, zum Nordmeer und zu den Schattengewässern.\n\nZwei Finger / Mausrad: Zoom. Ziehen / rechte Maustaste: Kamera.\nDas Fadenkreuz zentriert die Kamera. Portale antippen: hinfahren und automatisch wechseln.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",15)
 		info.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		info.custom_minimum_size.y=300
@@ -1042,3 +1066,21 @@ func _load_progress() -> void:
 func _notification(what: int) -> void:
 	if what==NOTIFICATION_APPLICATION_PAUSED or what==NOTIFICATION_WM_CLOSE_REQUEST:
 		_save_progress()
+
+func _load_display() -> void:
+	if not FileAccess.file_exists(HUD_SAVE):return
+	var data: Variant=JSON.parse_string(FileAccess.get_file_as_string(HUD_SAVE))
+	if not data is Dictionary:return
+	hud_size=clampi(int(data.get("hud_size",1)),0,2)
+	journal_visible=bool(data.get("journal_visible",true))
+
+func _set_display(size_index: int,show_journal: bool) -> void:
+	hud_size=clampi(size_index,0,2)
+	journal_visible=show_journal
+	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
+	if file!=null:
+		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible}))
+		file.close()
+	_layout()
+	_open_modal("Anzeige")
+	_refresh_ui()

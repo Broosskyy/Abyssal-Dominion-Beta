@@ -67,3 +67,9 @@ Supplied/reference art is used in the private development repository; public red
 Tap a portal or choose its course from the map panel to sail there and cross automatically. Level gates explain their requirement; recent damage delays the queued crossing until six seconds without damage. A new water course, docking, repair or sinking cancels the order. Map arrival updates the camera and guest save.
 
 The HUD uses six functional illustrated navigation cells, a framed coordinate minimap, round fire/repair/ammunition controls, a contextual ammunition list, HP/XP quick-slot deck and live System/Quest tabs. The ten source SVG icons are recorded under `vector_ui` in the asset provenance file. The layout follows the supplied Seafight/Battle of Sea and Abyssal mockup references; it does not introduce fictional online chat, guild currency or unimplemented consumable powers.
+
+## Responsive HUD polish
+
+The HUD now scales independently from the sea camera and canvas. At 720 logical pixels high, the default comfortable profile enlarges the complete HUD by 20%; short phone layouts are capped to retain nonoverlapping touch targets. Menu → Anzeige & HUD anpassen offers compact, comfortable and large profiles and an optional quest/system window. Preferences live in a separate local display file; captain saves, sailing positions and world camera coordinates are unchanged. The primary fire caption, navigation labels, quantities and ship cards have larger text, and circular controls use brass fasteners and a glass highlight.
+
+Acceptance includes all three profiles at 1280×720, 1560×720, 844×390 and 720×405: control bounds, touch separation, scaled hit testing, menu containment, full-size ocean, display preference reload and unchanged captain progress. Actual renderer captures add a large-HUD view and the display settings panel. This update changes compatible game scripts only and uses the signed data channel; it does not require a replacement APK.
