@@ -606,7 +606,7 @@ func _build_ui() -> void:
 	modal_title=_text(modal,"",22)
 	modal_close=_button(modal,"SCHLIESSEN",func():modal.hide();_save_progress())
 	modal_scroll=ScrollContainer.new()
-	modal_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+	modal_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	modal.add_child(modal_scroll)
 	modal_body=VBoxContainer.new()
 	modal_body.size_flags_horizontal=Control.SIZE_EXPAND_FILL

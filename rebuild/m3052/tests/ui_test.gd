@@ -197,6 +197,7 @@ func _run() -> void:
 			await process_frame;await process_frame
 			check(game.modal_kind=="Anzeige" and game.modal.visible,"display settings remain usable after changing scale")
 			check(game.modal.get_global_rect().position.x>=0 and game.modal.get_global_rect().end.x<=dimensions.x+1 and game.modal.get_global_rect().end.y<=dimensions.y+1,"scaled settings panel fits %s preset %d" % [dimensions,preset])
+			check(game.modal_scroll.get_global_rect().end.x<=game.modal.get_global_rect().end.x-10,"scaled scroll container stays inside the menu frame")
 			for button: Button in game.modal_body.find_children("*","Button",true,false):
 				check(button.get_global_rect().end.x<=game.modal_scroll.get_global_rect().end.x+1,"display option stays inside the scaled scroll viewport")
 			game.modal.hide()

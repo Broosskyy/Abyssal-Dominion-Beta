@@ -10,6 +10,10 @@ func _shot(game: Node,output: String,name: String) -> void:
 	for _frame in 8:await process_frame
 	if game.modal.visible:
 		var bounds: Rect2=game.modal_scroll.get_global_rect()
+		var frame: Rect2=game.modal.get_global_rect()
+		print(JSON.stringify({"capture":name,"frame":str(frame),"scroll":str(bounds),"body":str(game.modal_body.get_global_rect())}))
+		if bounds.end.x>frame.end.x-10:
+			push_error("Scroll container expands beyond modal frame: "+name);quit(1);return
 		for button: Button in game.modal_body.find_children("*","Button",true,false):
 			if button.get_global_rect().end.x>bounds.end.x+1:
 				push_error("Rendered modal content exceeds scroll viewport: "+name);quit(1);return
