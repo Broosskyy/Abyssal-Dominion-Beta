@@ -34,7 +34,7 @@ func _run() -> void:
 		game.sim.select(2)
 		game._refresh_ui()
 		for nav: Button in game.nav_buttons:check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
-		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.interact,game.loadout_button]
+		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.interact,game.loadout_button,game.ammo_selector]
 		controls.append_array(game.ammo_buttons)
 		for control: Control in controls:
 			var rect=control.get_global_rect()
@@ -44,7 +44,7 @@ func _run() -> void:
 				check(not controls[i].get_global_rect().intersects(controls[j].get_global_rect()),"independent touch targets %s / %s at %s"%[controls[i].name,controls[j].name,dimensions])
 		check(not game.player_panel.get_global_rect().intersects(game.target_panel.get_global_rect()),"player and target cards do not overlap")
 		check(game.player_portrait.texture!=null and game.target_portrait.texture!=null,"player and selected NPC show actual ship portraits")
-		check(game.combat_dock.get_global_rect().encloses(game.attack.get_global_rect()),"combat actions are contained in the unified lower dock")
+		check(game.attack.get_global_rect().position.x>dimensions.x*.7 and game.combat_dock.get_global_rect().encloses(game.ammo_buttons[0].get_global_rect()),"round fire control stays on the right and quick ammunition stays in the lower deck")
 		game.loadout_button.pressed.emit()
 		check(game.modal_kind=="Bewaffnung" and game.modal.visible,"quick weapons control opens real ammunition and cannon information")
 		game.modal.hide()
@@ -55,7 +55,7 @@ func _run() -> void:
 	root.size=Vector2i(1280,720)
 	await process_frame
 	game._layout();game._open_modal("Hafen")
-	check(game.modal_scroll.position.x>=76 and game.modal_scroll.get_rect().end.y<=game.modal.size.y-78,"decorative frame has an inset safe scroll area")
+	check(game.modal_scroll.position.x>=18 and game.modal_scroll.get_rect().end.y<=game.modal.size.y-18,"menu has an inset safe scroll area")
 	game.sim.player.pos=game.sim.portals[0].pos
 	check(not game._landmark_label_visible(game.sim.player.pos),"actual portal suppresses overlapping caption beneath captain name")
 	game.sim.player.pos=game.sim.START
@@ -144,11 +144,44 @@ func _run() -> void:
 	await process_frame
 	game._layout();game._open_modal("Hafen")
 	await process_frame;await process_frame
-	check(game.modal_scroll.get_rect().end.x<=game.modal.size.x-54,"compact-to-wide menu transition keeps content inside the decorative frame")
+	check(game.modal_scroll.get_rect().end.x<=game.modal.size.x-18,"compact-to-wide menu transition keeps content inside the frame")
 	var menu_bounds=true
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
 		menu_bounds=menu_bounds and button.get_global_rect().end.x<=game.modal_scroll.get_global_rect().end.x+1
 	check(menu_bounds,"actual harbor buttons stay inside the scroll viewport after resize")
+	game.modal.hide();game.ammo_selector.pressed.emit()
+	await process_frame;await process_frame
+	check(game.modal_kind=="Munition" and game.modal.visible,"round ammo selector opens the live contextual ammunition list")
+	game.sim.set_ammo(0);game._open_modal("Munition")
+	var loaded=false
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text=="LADEN" and not button.disabled:button.pressed.emit();loaded=true;break
+	check(loaded and game.sim.ammo_mode==1 and not game.modal.visible,"ammunition popup loads actual chain stock and closes")
+	game.system_tab.pressed.emit()
+	check(game.system_label.visible and not game.quest_text.visible,"system tab displays actual game messages")
+	game.quest_tab.pressed.emit()
+	check(game.quest_text.visible and not game.system_label.visible,"quest tab restores the live quest tracker")
+	game.sim.configure_map(0);game.previous_region=0;game.sim.level=4;game.sim.player.hp=game.sim.player.max_hp;game.sim.player.last_hit=-100;game.sim.docked=false
+	game.sim.npcs.clear();game.sim.player.pos=game.sim.portals[0].pos-Vector2(220,0)
+	game.sim.player.path=[]
+	var hud_down=InputEventScreenTouch.new();hud_down.index=7;hud_down.position=game.player_hp.get_global_rect().get_center();hud_down.pressed=true
+	var hud_up=InputEventScreenTouch.new();hud_up.index=7;hud_up.position=hud_down.position;hud_up.pressed=false
+	game._unhandled_input(hud_down);game._unhandled_input(hud_up)
+	check(game.sim.player.path.is_empty() and game.sim.pending_portal==-1,"touching HUD health does not leak a movement or portal command into the sea")
+	game.suppress_tap_until=0
+	game.camera.position=game.sim.portals[0].pos;game.camera.force_update_scroll()
+	var screen: Vector2=game.get_canvas_transform()*game.sim.portals[0].pos
+	var down=InputEventScreenTouch.new();down.index=0;down.position=screen;down.pressed=true
+	var up=InputEventScreenTouch.new();up.index=0;up.position=screen;up.pressed=false
+	game._unhandled_input(down);game._unhandled_input(up)
+	check(game.sim.pending_portal==1 and not game.sim.player.path.is_empty(),"touching the rendered portal queues a real crossing")
+	for _i in 120:
+		game.sim.step(1.0/30.0)
+		if game.sim.map_id!=0:break
+	game._process(0)
+	check(game.sim.map_id==1 and game.camera.position==game.sim.player.pos and game.previous_region==1,"touch-to-arrival crossing switches region, recenters camera and synchronizes scene")
+	game._load_progress()
+	check(game.sim.map_id==1,"automatic portal arrival is saved to the captain file")
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)

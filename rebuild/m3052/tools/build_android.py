@@ -66,8 +66,9 @@ def main():
         z.writestr('fixture.bin',b'Z'*1000000)
     fixture_spec=data_spec(fixture/'content.zip',fixture_info,args.signing_key)
     (fixture/'content_spec.json').write_text(json.dumps(fixture_spec))
-    assets = json.loads((ROOT/'assets/provenance.json').read_text())['files']
-    for row in assets:
+    catalog = json.loads((ROOT/'assets/provenance.json').read_text())
+    assets = catalog['files']
+    for row in assets + catalog.get('vector_ui', []):
         if hashlib.sha256((ROOT/row['path']).read_bytes()).hexdigest() != row['sha256']:
             raise RuntimeError('Artwork changed: '+row['path'])
     settings = Path(os.environ.get('XDG_CONFIG_HOME', str(Path.home()/'.config')))/'godot/editor_settings-4.7.tres'

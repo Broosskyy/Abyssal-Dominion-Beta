@@ -21,6 +21,7 @@ var grid := AStarGrid2D.new()
 var firing := false
 var repairing := false
 var target := -1
+var pending_portal := -1
 var ammo_mode := 0
 var kills := 0
 var claimed := false
@@ -184,6 +185,7 @@ func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
 	return result
 
 func course(point: Vector2) -> bool:
+	pending_portal=-1
 	if docked: return false
 	if int(player.hp) <= 0: return false
 	var route = plan_path(player.pos, point)
@@ -225,6 +227,7 @@ func toggle_repair() -> void:
 	repairing = not repairing
 	if repairing:
 		firing = false
+		pending_portal=-1
 		player.path = []
 	message = "Reparatur läuft" if repairing else "Reparatur gestoppt"
 
@@ -244,6 +247,10 @@ func step(delta: float) -> void:
 			message = "Wieder auf See · Rumpf repariert"
 	else:
 		_move(player, delta)
+		if pending_portal>=0 and near_portal()==pending_portal:
+			if clock-float(player.last_hit)<6.0:
+				message="Portal wartet · noch %d Sekunden ohne Treffer" % ceili(6.0-clock+float(player.last_hit))
+			elif travel(pending_portal):return
 		if repairing:
 			player.hp = minf(float(player.max_hp), float(player.hp) + 90.0 * delta)
 			if float(player.hp) >= float(player.max_hp): repairing = false
@@ -406,6 +413,7 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 		victim.respawn = 8.0 if int(victim.id) == 0 else 48.0
 		_event("sunk", victim.pos, 0, victim.id)
 		if int(victim.id) == 0:
+			pending_portal=-1
 			firing = false
 			repairing = false
 			message = "Versenkt · Rückkehr in 8 Sekunden"
@@ -500,6 +508,7 @@ func dock() -> bool:
 		message = "Zum Hafen fahren · Andocken erst 6 Sekunden ohne Treffer"
 		return false
 	docked = true
+	pending_portal=-1
 	firing = false
 	repairing = false
 	player.path = []
@@ -527,6 +536,28 @@ func near_portal() -> int:
 		if player.pos.distance_to(portal.pos) <= 135: return int(portal.destination)
 	return -1
 
+func request_portal(destination: int) -> bool:
+	pending_portal=-1
+	if docked:message="Vor der Überfahrt zuerst im Hafen ablegen";return false
+	if int(player.hp)<=0:return false
+	if destination<0 or destination>=CONTENT.MAPS.size() or destination==map_id:return false
+	if level<int(CONTENT.MAPS[destination].level):
+		message="%s: Kapitänsstufe %d benötigt" % [CONTENT.MAPS[destination].name,CONTENT.MAPS[destination].level]
+		return false
+	for portal in portals:
+		if int(portal.destination)!=destination:continue
+		if player.pos.distance_to(portal.pos)<=135:
+			if clock-float(player.last_hit)>=6.0:return travel(destination)
+			player.path=[];pending_portal=destination
+			message="Portal wartet · erst 6 Sekunden ohne Treffer"
+			return true
+		if not course(portal.pos):return false
+		pending_portal=destination
+		firing=false
+		message="Kurs zum Portal · %s" % CONTENT.MAPS[destination].name
+		return true
+	return false
+
 func travel(destination: int) -> bool:
 	if destination < 0 or destination >= CONTENT.MAPS.size() or destination == map_id or docked or int(player.hp) <= 0: return false
 	if near_portal() != destination:
@@ -540,6 +571,7 @@ func travel(destination: int) -> bool:
 		return false
 	map_states[map_id] = {"npcs":npcs.duplicate(true),"drops":drops.duplicate(true)}
 	configure_map(destination)
+	pending_portal=-1
 	player.pos = START
 	player.path = []
 	firing = false

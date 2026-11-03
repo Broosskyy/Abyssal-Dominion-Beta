@@ -84,6 +84,32 @@ func _initialize() -> void:
 				if sim.blocked(body.pos,15):invariant=false
 		check(invariant,"regional NPC navigation avoids coastlines %d"%region)
 
+	for start_region in 3:
+		sim=SIM.new();sim.level=20;sim.configure_map(start_region);sim.npcs.clear();sim.drops.clear()
+		var original_gold: int=sim.player.gold
+		var destination: int=sim.portals[0].destination
+		check(sim.request_portal(destination) and sim.pending_portal==destination,"portal request queues route from region "+str(start_region))
+		for _i in 1800:
+			sim.step(1.0/30.0)
+			if sim.map_id!=start_region:break
+		check(sim.map_id==destination and sim.pending_portal==-1 and sim.near_portal()==-1,"real sailing reaches portal and changes region exactly once: "+str(start_region))
+		check(sim.visited[destination] and sim.player.gold==original_gold,"automatic crossing preserves wallet and records destination")
+		sim.npcs.clear()
+		check(sim.request_portal(start_region),"return portal accepts route")
+		for _i in 1800:
+			sim.step(1.0/30.0)
+			if sim.map_id==start_region:break
+		check(sim.map_id==start_region,"return crossing completes through actual sailing")
+	sim=SIM.new();sim.npcs.clear()
+	check(not sim.request_portal(1) and "stufe 2" in sim.message.to_lower() and sim.pending_portal==-1,"locked portal explains the actual level requirement")
+	sim.level=4;sim.player.pos=sim.portals[0].pos;sim.player.last_hit=sim.clock
+	check(sim.request_portal(1) and sim.map_id==0,"combat cooldown queues crossing without escaping immediately")
+	sim.step(3)
+	check(sim.map_id==0 and "Portal wartet" in sim.message,"portal waits while combat cooldown remains")
+	sim.step(3.1)
+	check(sim.map_id==1,"waiting portal completes after six seconds without damage")
+	sim=SIM.new();sim.level=4
+	check(sim.request_portal(1) and sim.course(sim.START+Vector2(150,0)) and sim.pending_portal==-1,"a new water course cancels pending portal intent")
 	sim=SIM.new()
 	sim.player.gold=4000
 	sim.player.pos=sim.harbor

@@ -1,6 +1,7 @@
 extends Node2D
 const SIM = preload("res://simulation.gd")
 const MINI = preload("res://minimap.gd")
+const HUD=preload("res://nautical_button.gd")
 const CONTENT = preload("res://content.gd")
 const VISUALS = preload("res://ship_visuals.gd")
 const USER_ROOT := "res://assets/user/"
@@ -60,6 +61,7 @@ var drag_start := Vector2.ZERO
 var dragging := false
 var last_mouse := Vector2.ZERO
 var touch_points: Dictionary = {}
+var hud_touches: Dictionary = {}
 var pinch_distance := 0.0
 var suppress_tap_until := 0
 var drawn_shots := 0
@@ -84,10 +86,22 @@ var target_portrait: TextureRect
 var portrait_skin := -1
 var portrait_target := -1
 var target_health_skin: StyleBoxFlat
+var hud_icons: Dictionary={}
+var ammo_selector: Button
+var deck_hp: ProgressBar
+var deck_xp: ProgressBar
+var deck_numbers: Label
+var system_tab: Button
+var quest_tab: Button
+var system_label: Label
+var system_view=false
+var message_history: Array[String]=[]
+var previous_region := -1
 
 func _ready() -> void:
 	_load_assets()
 	_load_progress()
+	previous_region=sim.map_id
 	camera = Camera2D.new()
 	camera.position = sim.player.pos
 	camera.zoom = Vector2.ONE*desired_zoom
@@ -110,6 +124,7 @@ func _ready() -> void:
 	if data_boot!=null:data_boot.mark_healthy()
 
 func _load_assets() -> void:
+	for name in ["anchor","ship","book","compass","chest","gear","plus","minus","focus","arrow"]:hud_icons[name]=load("res://assets/ui/icons/"+name+".svg")
 	extra_icons.port_watchtower=load("res://assets/reference/landmarks/port_watchtower.png")
 	ship_frames=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/ship_frames.json")).entries
 	var pack: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(USER_ROOT+"pack.json"))
@@ -147,6 +162,7 @@ func _process(delta: float) -> void:
 	while accumulator >= 1.0/30.0:
 		sim.step(1.0/30.0)
 		accumulator -= 1.0/30.0
+	if previous_region!=sim.map_id:_sync_region()
 	var goal: Vector2 = sim.player.pos+pan
 	camera.position = camera.position.lerp(goal,1.0-exp(-delta*5.0))
 	camera.zoom = camera.zoom.lerp(Vector2.ONE*desired_zoom,1.0-exp(-delta*8.0))
@@ -202,7 +218,10 @@ func _draw() -> void:
 		var pp: Vector2 = portal.pos
 		var region: Dictionary = CONTENT.MAPS[int(portal.destination)]
 		_draw_portal_marker(pp,int(region.level)>sim.level)
-		if _landmark_label_visible(pp):_label(pp+Vector2(0,100),"%s · AB LV. %d" % [region.name,region.level],14,CYAN)
+		if _landmark_label_visible(pp):
+			var locked=int(region.level)>sim.level
+			_label(pp+Vector2(0,100),"%s · AB LV. %d" % [region.name,region.level] if locked else str(region.name)+" · PORTAL",14,GOLD if locked else CYAN)
+			if not locked:_label(pp+Vector2(0,119),"Antippen: automatische Überfahrt",11,CYAN)
 	if not sim.player.path.is_empty():
 		var before: Vector2 = sim.player.pos
 		for point: Vector2 in sim.player.path:
@@ -491,6 +510,16 @@ func _bar(parent: Node) -> ProgressBar:
 	parent.add_child(b)
 	return b
 
+func _orb(parent: Node,semantic: String,texture: Texture2D,callback: Callable,caption: String="",nav: bool=false) -> Button:
+	var button=HUD.new()
+	button.text=semantic;button.art=texture;button.caption=caption;button.nav_mode=nav
+	button.tooltip_text=semantic
+	button.pressed.connect(callback);parent.add_child(button)
+	return button
+
+func _set_orb(button: Button,texture: Texture2D,amount: String="",active: bool=false,caption: String="") -> void:
+	button.set("art",texture);button.set("quantity",amount);button.set("latched",active);button.set("caption",caption);button.queue_redraw()
+
 func _build_ui() -> void:
 	var layer =CanvasLayer.new()
 	add_child(layer)
@@ -499,65 +528,54 @@ func _build_ui() -> void:
 	ui.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	layer.add_child(ui)
 	chrome=_panel(ui)
-	title=_text(chrome,"ABYSSAL DOMINION",17)
-	resources=_text(chrome,"",13,CYAN)
-	nav_buttons.append(_button(chrome,"HAFEN",func():_open_modal("Hafen")))
-	nav_buttons.append(_button(chrome,"LOGBUCH",func():_open_modal("Logbuch")))
-	nav_buttons.append(_button(chrome,"KARTEN",func():_open_modal("Seekarten")))
-	for nav: Button in nav_buttons:nav.add_theme_font_size_override("font_size",13)
+	title=_text(chrome,"ABYSSAL DOMINION",12)
+	resources=_text(chrome,"",11,GOLD)
+	var nav_items=[["Schiff","ship","Schiff"],["Werft","anchor","Hafen"],["Aufträge","book","Logbuch"],["Karten","compass","Seekarten"],["Vorräte","chest","Munition"],["Menü","gear","Spielinfo"]]
+	for item in nav_items:
+		var kind: String=item[2]
+		var button=_orb(chrome,str(item[0]),hud_icons[item[1]],func():_open_modal(kind),str(item[0]),true)
+		button.set_meta("modal",kind);nav_buttons.append(button)
 	player_panel=_panel(ui)
 	player_portrait=_portrait(player_panel)
-	player_name=_text(player_panel,"",15,CYAN)
+	player_name=_text(player_panel,"",12,GOLD)
 	player_hp=_bar(player_panel)
 	player_numbers=_text(player_panel,"",11)
 	player_name.clip_text=true
 	player_xp=_bar(player_panel)
+	var xp_style: StyleBoxFlat=player_xp.get_theme_stylebox("fill").duplicate();xp_style.bg_color=Color("348cb6");player_xp.add_theme_stylebox_override("fill",xp_style)
 	target_panel=_panel(ui)
 	target_portrait=_portrait(target_panel)
-	target_name=_text(target_panel,"",14)
-	target_name.clip_text=true
+	target_name=_text(target_panel,"",12);target_name.clip_text=true
 	target_hp=_bar(target_panel)
-	target_health_skin=target_hp.get_theme_stylebox("fill").duplicate()
-	target_hp.add_theme_stylebox_override("fill",target_health_skin)
+	target_health_skin=target_hp.get_theme_stylebox("fill").duplicate();target_hp.add_theme_stylebox_override("fill",target_health_skin)
 	target_numbers=_text(target_panel,"",11)
-	chart_mini=MINI.new()
-	chart_mini.simulation=sim
-	chart_mini.course_requested.connect(func(point):sim.course(point))
+	chart_mini=MINI.new();chart_mini.simulation=sim
+	chart_mini.course_requested.connect(func(point):_chart_course(point))
 	ui.add_child(chart_mini)
-	combat_dock=_panel(ui)
-	combat_dock.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	combat_readout=_text(combat_dock,"",10,Color("a6b8b8"))
-	loadout_button=_button(ui,"WAFFEN",func():_open_modal("Bewaffnung"))
-	loadout_button.tooltip_text="Bewaffnung: Kanonen, Harpunen und Munitionsvorrat"
-	loadout_button.add_theme_font_size_override("font_size",10)
-	attack=_button(ui,"FEUER",_toggle_fire)
-	attack.name="FireButton"
-	attack.add_theme_font_size_override("font_size",18)
-	repair=_button(ui,"REPARATUR",func():sim.toggle_repair())
-	repair.name="RepairButton"
+	combat_dock=_panel(ui);combat_dock.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	combat_readout=_text(combat_dock,"",10,GOLD);combat_readout.clip_text=true
+	deck_hp=_bar(combat_dock);deck_xp=_bar(combat_dock);deck_xp.add_theme_stylebox_override("fill",xp_style)
+	deck_numbers=_text(combat_dock,"",9,Color.WHITE);deck_numbers.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	loadout_button=_orb(ui,"Bewaffnung",extra_icons.cannon_0,func():_open_modal("Bewaffnung"),"WAFFEN")
+	attack=_orb(ui,"Feuer ein/aus",extra_icons.cannon_2,_toggle_fire,"FEUER");attack.name="FireButton"
+	repair=_orb(ui,"Schiff reparieren",extra_icons.upgrade_hull,func():sim.toggle_repair();_refresh_ui(),"REP");repair.name="RepairButton"
+	ammo_selector=_orb(ui,"Munitionsauswahl",icons.cannonball,func():_open_modal("Munition"),"KUGELN")
 	for i in 3:
-		var index =i
-		var b =_button(ui,"",func():sim.set_ammo(index))
-		b.name="Ammo%d"%i
-		b.toggle_mode=true
-		b.icon=icons[["cannonball","chain","harpoon"][i]]
-		b.expand_icon=true
-		b.add_theme_constant_override("icon_max_width",20)
-		b.add_theme_font_size_override("font_size",12)
-		ammo_buttons.append(b)
-	center_button=_button(ui,"ZIEL",func():pan=Vector2.ZERO;camera_locked=true)
-	center_button.tooltip_text="Kamera zum Schiff"
-	zoom_in=_button(ui,"+",func():_zoom(1.15))
-	zoom_out=_button(ui,"−",func():_zoom(1.0/1.15))
-	interact=_button(ui,"HAFEN",_interact)
-	interact.name="InteractButton"
-	status=_text(ui,"",12,Color("b3ccd0"))
-	status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-	status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		var index=i
+		var button=_orb(ui,"",icons[["cannonball","chain","harpoon"][i]],func():sim.set_ammo(index);_refresh_ui())
+		button.name="Ammo%d" % i;button.toggle_mode=true;ammo_buttons.append(button)
+	center_button=_orb(ui,"Kamera zum Schiff",hud_icons.focus,func():pan=Vector2.ZERO;camera_locked=true)
+	zoom_in=_orb(ui,"Näher zoomen",hud_icons.plus,func():_zoom(1.15))
+	zoom_out=_orb(ui,"Weiter zoomen",hud_icons.minus,func():_zoom(1.0/1.15))
+	interact=_button(ui,"",_interact);interact.name="InteractButton"
+	status=_text(ui,"",11,Color("b3ccd0"));status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	quest_panel=_panel(ui)
-	quest_text=_text(quest_panel,"",12)
-	quest_text.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	quest_claim=_button(quest_panel,"BELOHNUNG ABHOLEN",func():sim.claim_quest();_save_progress();_refresh_ui())
+	quest_tab=_button(quest_panel,"AUFTRAG",func():system_view=false;_refresh_ui())
+	system_tab=_button(quest_panel,"SYSTEM",func():system_view=true;_refresh_ui())
+	for tab in [quest_tab,system_tab]:tab.add_theme_font_size_override("font_size",10)
+	quest_text=_text(quest_panel,"",11);quest_text.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	system_label=_text(quest_panel,"",11,Color("bac7c7"));system_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;system_label.clip_text=true
+	quest_claim=_button(quest_panel,"BELOHNUNG ABHOLEN",func():sim.claim_quest();_save_progress();_refresh_ui());quest_claim.add_theme_font_size_override("font_size",10)
 	modal_backdrop=ColorRect.new()
 	modal_backdrop.color=Color(0.002,0.009,0.018,0.77)
 	modal_backdrop.z_index=19
@@ -600,68 +618,68 @@ func _layout() -> void:
 		desired_zoom=0.78
 		camera.zoom=Vector2.ONE*desired_zoom
 	water.size=s
-	_place(chrome,0,0,s.x,36)
-	title.add_theme_font_size_override("font_size",13 if compact else 15)
-	_place(title,14,3,220,28)
-	_place(resources,240 if compact else 300,5,250,25)
-	resources.visible=s.x>=800
-	for i in nav_buttons.size(): _place(nav_buttons[i],s.x-252+i*82,3,77,30)
-	_place(player_panel,12,46,208 if s.x<800 else 236,66)
-	_place(player_portrait,7,6,48,49)
-	player_name.add_theme_font_size_override("font_size",12)
-	_place(player_name,62,3,player_panel.size.x-70,22)
-	_place(player_hp,62,27,player_panel.size.x-72,9)
-	_place(player_numbers,62,38,player_panel.size.x-70,20)
+	var header=54.0 if compact else 62.0
+	_place(chrome,0,0,s.x,header)
+	title.visible=not compact;_place(title,12,4,210,18)
+	_place(resources,12,5 if compact else 24,154 if compact else 250,44 if compact else 32)
+	resources.visible=true
+	var nw=62.0 if compact else 80.0
+	var nav_x=(s.x-nw*nav_buttons.size())*.5
+	for i in nav_buttons.size():_place(nav_buttons[i],nav_x+i*nw,2,nw-3,header-4)
+	var top=header+8
+	_place(player_panel,12,top,208 if compact else 236,66)
+	_place(player_portrait,7,6,48,49);_place(player_name,62,3,player_panel.size.x-70,22)
+	_place(player_hp,62,27,player_panel.size.x-72,9);_place(player_numbers,62,38,player_panel.size.x-70,20)
 	_place(player_xp,8,60,player_panel.size.x-16,3)
-	var tw = 204.0 if s.x<800 else 240.0
-	_place(target_panel,s.x*0.5-tw*0.5,46,tw,72)
-	_place(target_portrait,7,5,48,51)
-	target_name.add_theme_font_size_override("font_size",12)
-	_place(target_name,62,3,tw-70,22)
-	_place(target_hp,62,27,tw-72,8)
-	_place(target_numbers,62,36,tw-70,32)
-	var mw =155.0 if compact else 185.0
-	_place(chart_mini,s.x-mw-12,46,mw,126 if compact else 155)
-	_place(zoom_out,s.x-108,chart_mini.position.y+chart_mini.size.y+6,44,36)
-	_place(zoom_in,s.x-59,chart_mini.position.y+chart_mini.size.y+6,44,36)
-	_place(center_button,s.x-59,chart_mini.position.y+chart_mini.size.y+47,44,36)
-	_place(interact,12,118,208 if s.x<800 else 236,36)
-	var bottom =s.y-88
-	var bw =100.0 if compact else 114.0
-	var dock_width=bw*3+290
-	var dock_x=(s.x-dock_width)*0.5
-	_place(combat_dock,dock_x,bottom,dock_width,80)
-	_place(combat_readout,12,4,dock_width-24,17)
-	_place(loadout_button,dock_x+8,bottom+25,60,46)
-	for i in 3:
-		ammo_buttons[i].add_theme_font_size_override("font_size",11 if compact else 12)
-		_place(ammo_buttons[i],dock_x+74+i*(bw+6),bottom+25,bw,46)
-	repair.add_theme_font_size_override("font_size",11)
-	attack.add_theme_font_size_override("font_size",14)
-	_place(repair,dock_x+74+3*(bw+6),bottom+25,80,46)
-	_place(attack,dock_x+160+3*(bw+6),bottom+25,104,46)
-	_place(status,maxf(12,s.x*0.5-260),s.y-115,minf(520,s.x-24),22)
-	_place(quest_panel,12,s.y-188,228,92)
-	quest_panel.visible=not compact
-	_place(quest_text,12,6,204,45)
-	_place(quest_claim,10,55,208,29)
-	var width =minf(640,s.x-32)
-	var height =minf(560,s.y-24)
+	var tw=204.0 if compact else 240.0
+	_place(target_panel,s.x*.5-tw*.5,top,tw,72)
+	_place(target_portrait,7,5,48,51);_place(target_name,62,3,tw-70,22);_place(target_hp,62,27,tw-72,8);_place(target_numbers,62,36,tw-70,32)
+	var mw=128.0 if compact else 180.0
+	var mh=108.0 if compact else 154.0
+	_place(chart_mini,s.x-mw-12,top,mw,mh)
+	var z=36.0 if compact else 38.0
+	_place(zoom_out,s.x-2*z-18,top+mh+6,z,z);_place(zoom_in,s.x-z-12,top+mh+6,z,z)
+	_place(center_button,s.x-z-12,top+mh+z+10,z,z)
+	var q=44.0 if compact else 52.0
+	var group=4*q+24
+	var left=(s.x-group)*.5
+	var dh=104.0 if compact else 116.0
+	var dy=s.y-dh-6
+	_place(combat_dock,left-8,dy,group+16,dh)
+	_place(combat_readout,8,3,group,14)
+	_place(deck_hp,8,19,group,10);_place(deck_xp,8,31,group,7);_place(deck_numbers,8,18,group,12)
+	for i in 3:_place(ammo_buttons[i],left+i*(q+8),dy+42,q,q+12)
+	_place(loadout_button,left+3*(q+8),dy+42,q,q)
+	var fire=92.0 if compact else 118.0
+	_place(attack,s.x-fire-12,s.y-fire-12,fire,fire)
+	var small=52.0 if compact else 60.0
+	var side_x=s.x-fire-small-28
+	_place(repair,side_x,s.y-small-12,small,small)
+	_place(ammo_selector,side_x-2,s.y-small*2-42,small+4,small+16)
+	var status_x=maxf(236 if compact else 294,s.x*.5-220)
+	_place(status,status_x,dy-26,minf(440,side_x-status_x-12),20)
+	_place(interact,s.x*.5-110,dy-64,220,36)
+	_place(quest_panel,12,s.y-(116 if compact else 150)-10,208 if compact else 270,116 if compact else 150)
+	quest_panel.visible=true
+	_place(quest_tab,5,4,quest_panel.size.x*.5-7,23);_place(system_tab,quest_panel.size.x*.5+2,4,quest_panel.size.x*.5-7,23)
+	_place(quest_text,10,33,quest_panel.size.x-20,quest_panel.size.y-72)
+	_place(system_label,10,33,quest_panel.size.x-20,quest_panel.size.y-42)
+	_place(quest_claim,8,quest_panel.size.y-32,quest_panel.size.x-16,25)
+	var width=minf(640,s.x-32)
+	var height=minf(560,s.y-24)
 	_place(modal_backdrop,0,0,s.x,s.y)
-	_place(modal,(s.x-width)*0.5,(s.y-height)*0.5,width,height)
-	if compact:
-		modal.add_theme_stylebox_override("panel",modal_compact_skin)
-		_place(modal_title,20,14,width-170,32)
-		_place(modal_close,width-138,14,118,36)
-		_place(modal_scroll,20,63,width-40,height-84)
-	else:
-		modal.add_theme_stylebox_override("panel",modal_skin)
-		_place(modal_title,76,110,width-238,32)
-		_place(modal_close,width-170,104,112,36)
-		_place(modal_scroll,76,160,width-130,height-238)
+	if modal_kind=="Munition":
+		width=minf(430,s.x-32);height=minf(380,s.y-108)
+		_place(modal,s.x-width-16,maxf(12,s.y-height-104),width,height)
+	else:_place(modal,(s.x-width)*.5,(s.y-height)*.5,width,height)
+	modal.add_theme_stylebox_override("panel",modal_compact_skin)
+	_place(modal_title,18,12,width-160,30);_place(modal_close,width-136,12,118,32)
+	_place(modal_scroll,18,56,width-36,height-74)
 
 func _refresh_ui() -> void:
 	if player_name==null:return
+	for nav: Button in nav_buttons:
+		nav.set("latched",modal.visible and modal_kind==str(nav.get_meta("modal")));nav.queue_redraw()
 	player_name.text="Lv. %d · %s" % [sim.level,skins[int(sim.player.skin)].name]
 	if portrait_skin!=int(sim.player.skin):
 		portrait_skin=int(sim.player.skin)
@@ -672,7 +690,7 @@ func _refresh_ui() -> void:
 	player_xp.tooltip_text="Erfahrung %d / %d" % [sim.xp,sim.xp_required()]
 	player_xp.max_value=sim.xp_required()
 	player_xp.value=sim.xp
-	resources.text="GOLD  %s     VERSENKT  %d"%[str(sim.player.gold),sim.kills]
+	resources.text="GOLD  %s\nLV. %d · %d VERSENKT" % [str(sim.player.gold),sim.level,sim.kills]
 	var selected =sim.actor(sim.target)
 	target_panel.visible=not selected.is_empty() and sim.target>0 and int(selected.hp)>0
 	if target_panel.visible:
@@ -691,27 +709,45 @@ func _refresh_ui() -> void:
 		target_numbers.text="%d / %d HP\n%s · %d m"%[int(selected.hp),int(selected.max_hp),disposition,roundi(sim.player.pos.distance_to(selected.pos))]
 	attack.text="STOPP" if sim.firing else "FEUER"
 	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0 or sim.docked
+	_set_orb(attack,extra_icons["cannon_%d" % mini(2,int(sim.upgrades.cannon))],"",sim.firing,attack.text)
+	attack.set("cooldown",float(sim.player.reload)/1.65)
 	repair.disabled=sim.docked
 	repair.text="STOPP" if sim.repairing else "REPARATUR"
+	_set_orb(repair,extra_icons.upgrade_hull,"",sim.repairing,"STOPP" if sim.repairing else "REP")
 	for i in 3:
 		ammo_buttons[i].text=["Vollkugeln","Kettenkugeln","Harpunen"][i]+"\n"+("✓ " if sim.ammo_mode==i else "")+str(sim.player.ammo[i])
 		ammo_buttons[i].set_pressed_no_signal(sim.ammo_mode==i)
+		_set_orb(ammo_buttons[i],icons[["cannonball","chain","harpoon"][i]],str(sim.player.ammo[i]),sim.ammo_mode==i)
 		ammo_buttons[i].tooltip_text=["Vollkugeln: gegen Schiffe","Kettenkugeln: verlangsamen Schiffe","Harpunen: gegen Monster"][i]
+	_set_orb(ammo_selector,icons[["cannonball","chain","harpoon"][sim.ammo_mode]],str(sim.player.ammo[sim.ammo_mode]),false,["KUGELN","KETTE","HARP."][sim.ammo_mode])
+	deck_hp.max_value=sim.player.max_hp;deck_hp.value=sim.player.hp;deck_xp.max_value=sim.xp_required();deck_xp.value=sim.xp
+	deck_numbers.text="%d / %d HP" % [sim.player.hp,sim.player.max_hp]
 	var reload_text="IM HAFEN" if sim.docked else ("BEREIT" if float(sim.player.reload)<=0 else "LÄDT %.1f s" % float(sim.player.reload))
-	combat_readout.text="%s · ST. %d     %d SCHADEN × %d     %s" % ["HARPUNEN" if sim.ammo_mode==2 else "KANONEN",int(sim.upgrades.harpoon if sim.ammo_mode==2 else sim.upgrades.cannon),sim.weapon_damage(sim.ammo_mode),1 if sim.ammo_mode==2 else 3,reload_text]
+	combat_readout.text="%s · %d×%d · %s" % [["Vollkugeln","Kettenkugeln","Harpunen"][sim.ammo_mode],sim.weapon_damage(sim.ammo_mode),1 if sim.ammo_mode==2 else 3,reload_text]
+	if message_history.is_empty() or message_history.back()!=sim.message:
+		message_history.append(sim.message)
+		if message_history.size()>3:message_history.pop_front()
+	var recent=message_history.duplicate();recent.reverse()
+	system_label.text="\n".join(recent)
+	system_label.visible=system_view;quest_text.visible=not system_view;quest_claim.visible=not system_view
 	status.text="IM HAFEN · ABLEGEN zum Weiterfahren" if sim.docked else sim.message
 	var quest = sim.current_quest()
 	quest_claim.disabled=quest.is_empty() or sim.quest_progress()<int(quest.goal)
 	quest_text.text="ALLE AUFTRÄGE ERLEDIGT" if quest.is_empty() else "%s · %d/%d\n%d Gold · %d EP" % [str(quest.name).to_upper(),mini(sim.quest_progress(),int(quest.goal)),quest.goal,quest.gold,quest.xp]
 	quest_claim.text="ABGESCHLOSSEN" if quest.is_empty() else "BELOHNUNG ABHOLEN"
+	interact.visible=sim.docked or sim.near_portal()>=0 or sim.can_dock() or sim.pending_portal>=0
+	interact.disabled=false
 	if sim.docked:
 		interact.text="ABLEGEN"
 	elif sim.near_portal()>=0:
-		interact.text="PORTAL BETRETEN"
+		var region: Dictionary=CONTENT.MAPS[sim.near_portal()]
+		interact.text=("AB LV. %d · %s" % [region.level,region.name]) if sim.level<int(region.level) else "PORTAL · "+str(region.name)
+	elif sim.pending_portal>=0:
+		interact.text="PORTALKURS ABBRECHEN"
 	elif sim.can_dock():
 		interact.text="IM HAFEN ANDOCKEN"
 	else:
-		interact.text="KURS ZUM HAFEN"
+		interact.text="KURS ZUM PORTAL" if sim.pending_portal>=0 else "KURS ZUM HAFEN"
 
 func _toggle_fire() -> void:
 	if sim.target<1:return
@@ -723,10 +759,30 @@ func _open_modal(kind: String) -> void:
 	var scroll_position=modal_scroll.scroll_vertical if modal.visible and modal_kind==kind else 0
 	modal_kind=kind
 	modal_title.text=kind
+	modal_body.add_theme_constant_override("separation",6 if kind=="Munition" else 10)
 	for child in modal_body.get_children():
 		modal_body.remove_child(child)
 		child.queue_free()
-	if kind=="Werft":
+	_layout()
+	if kind=="Schiff":
+		_info(str(skins[int(sim.player.skin)].name).to_upper(),CYAN)
+		_picture(modal_body,skin_previews[int(sim.player.skin)],120)
+		_info("Kapitän Lv. %d · Erfahrung %d / %d\nRumpf %d / %d · Fahrt %d\nKanonen St. %d · Harpunen St. %d" % [sim.level,sim.xp,sim.xp_required(),sim.player.hp,sim.player.max_hp,sim.player.speed,sim.upgrades.cannon,sim.upgrades.harpoon])
+		_action("SCHIFFSDESIGN WÄHLEN",func():_open_modal("Werft"))
+		_action("BEWAFFNUNG",func():_open_modal("Bewaffnung"))
+	elif kind=="Munition":
+		modal_title.text="Munitionsauswahl"
+		for i in 3:
+			var index=i
+			var row=HBoxContainer.new();row.add_theme_constant_override("separation",12);modal_body.add_child(row)
+			_picture(row,icons[["cannonball","chain","harpoon"][i]],58)
+			var column=VBoxContainer.new();column.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(column)
+			column.add_theme_constant_override("separation",2)
+			var label=_text(column,"%s · %d\n%d Schaden · %s" % [["Vollkugeln","Kettenkugeln","Harpunen"][i],sim.player.ammo[i],sim.weapon_damage(i),["Gegen Schiffe","Verlangsamt Schiffe","Gegen Seeungeheuer"][i]],12,CYAN)
+			label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+			var choose=_button(column,"GELADEN" if sim.ammo_mode==i else "LADEN",func():sim.set_ammo(index);modal.hide();_refresh_ui())
+			choose.custom_minimum_size.y=28;choose.add_theme_font_size_override("font_size",11);choose.disabled=sim.ammo_mode==i or int(sim.player.ammo[i])<=0
+	elif kind=="Werft":
 		_info("SCHIFFSDESIGNS · Wähle deinen Look für die nächste Ausfahrt.",CYAN)
 		for i in skins.size():
 			var index =i
@@ -813,10 +869,11 @@ func _open_modal(kind: String) -> void:
 			var travel_button = _button(column,text,func():_navigate_region(index))
 			travel_button.custom_minimum_size.y=44
 			travel_button.disabled=i==sim.map_id or locked or sim.docked
-		_info("Portale liegen am östlichen und westlichen Kartenrand. Ein Wechsel ist erst 6 Sekunden nach dem letzten Treffer möglich. Im Hafen zuerst ablegen.")
+		_info("Tippe auf ein Portal oder auf KURS ZUM PORTAL. Dein Schiff fährt hin und wechselt beim Erreichen automatisch. Levelgrenzen bleiben gültig; nach einem Treffer wartet das Portal 6 Sekunden. Im Hafen zuerst ablegen.")
 		_action("STEUERUNG & SPIELINFO",func():_open_modal("Spielinfo"))
 	else:
-		var info =_text(modal_body,"M3053 · HAFEN & SEEGEBIETE\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nHAFEN: Andocken, Rumpf reparieren und Kanonen, Harpunen, Rumpf oder Segel verbessern.\nLOGBUCH: Sieben aufeinanderfolgende Aufträge.\nKARTEN: Portale zur Karibischen See, zum Nordmeer und zu den Schattengewässern.\n\nZwei Finger / Mausrad: Zoom. Ziehen / rechte Maustaste: Kamera.\nZIEL zentriert die Kamera.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",15)
+		_action("UPDATES PRÜFEN",func():_save_progress();get_tree().set_meta("abyssal_manual_update",true);get_tree().change_scene_to_file("res://updater/launcher.tscn"))
+		var info =_text(modal_body,"ABYSSAL DOMINION · STEUERUNG\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nHAFEN: Andocken, Rumpf reparieren und Kanonen, Harpunen, Rumpf oder Segel verbessern.\nLOGBUCH: Sieben aufeinanderfolgende Aufträge.\nKARTEN: Portale zur Karibischen See, zum Nordmeer und zu den Schattengewässern.\n\nZwei Finger / Mausrad: Zoom. Ziehen / rechte Maustaste: Kamera.\nDas Fadenkreuz zentriert die Kamera. Portale antippen: hinfahren und automatisch wechseln.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",15)
 		info.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		info.custom_minimum_size.y=300
 	modal.show()
@@ -860,17 +917,22 @@ func _upgrade_row(key: String) -> void:
 	button.custom_minimum_size.y=44
 	button.disabled=cost<0 or int(sim.player.gold)<cost
 
-func _navigate_region(destination: int) -> void:
-	if sim.near_portal()==destination:
-		if sim.travel(destination):
-			pan=Vector2.ZERO
-			camera.position=sim.player.pos
-			_save_progress()
-	else:
-		for portal in sim.portals:
-			if int(portal.destination)==destination:sim.course(portal.pos)
+func _sync_region() -> void:
+	previous_region=sim.map_id
 	modal.hide()
-	_refresh_ui()
+	pan=Vector2.ZERO;camera.position=sim.player.pos
+	_save_progress();_refresh_ui()
+
+func _navigate_region(destination: int) -> void:
+	sim.request_portal(destination)
+	if previous_region!=sim.map_id:_sync_region()
+	modal.hide();_refresh_ui()
+
+func _chart_course(point: Vector2) -> void:
+	for portal in sim.portals:
+		if point.distance_to(portal.pos)<120:
+			_navigate_region(int(portal.destination));return
+	sim.course(point);_refresh_ui()
 
 func _interact() -> void:
 	if sim.docked:
@@ -878,6 +940,8 @@ func _interact() -> void:
 		modal.hide()
 	elif sim.near_portal()>=0:
 		_navigate_region(sim.near_portal())
+	elif sim.pending_portal>=0:
+		sim.pending_portal=-1;sim.player.path=[];sim.message="Portalkurs abgebrochen"
 	elif sim.can_dock():
 		if sim.dock():_open_modal("Hafen")
 	else:
@@ -899,17 +963,20 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		last_touch_ms=Time.get_ticks_msec()
 		if event.pressed:
+			if _hud_contains(event.position):hud_touches[event.index]=true;return
 			touch_points[event.index]=event.position
 			if touch_points.size()==1:drag_start=event.position;dragging=false
 			if touch_points.size()>1:suppress_tap_until=Time.get_ticks_msec()+400
 		else:
-			if touch_points.size()==1 and not dragging and Time.get_ticks_msec()>suppress_tap_until:
+			if hud_touches.has(event.index):hud_touches.erase(event.index);return
+			if touch_points.size()==1 and not dragging and Time.get_ticks_msec()>suppress_tap_until and not _hud_contains(event.position):
 				_tap(event.position)
 			touch_points.erase(event.index)
 			pinch_distance=0
 			suppress_tap_until=Time.get_ticks_msec()+180
 		get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
+		if hud_touches.has(event.index):return
 		touch_points[event.index]=event.position
 		if touch_points.size()>=2:
 			var values =touch_points.values()
@@ -938,9 +1005,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode==KEY_2:sim.set_ammo(1)
 		if event.keycode==KEY_3:sim.set_ammo(2)
 
+func _hud_contains(screen: Vector2) -> bool:
+	if modal.visible:return true
+	for control: Control in [chrome,player_panel,target_panel,chart_mini,quest_panel,combat_dock,attack,repair,ammo_selector,center_button,zoom_in,zoom_out,interact]:
+		if control.is_visible_in_tree() and control.get_global_rect().has_point(screen):return true
+	return false
+
 func _tap(screen: Vector2) -> void:
 	if modal.visible:return
 	var point: Vector2=get_canvas_transform().affine_inverse()*screen
+	for portal in sim.portals:
+		if point.distance_to(portal.pos)<=maxf(85,45/camera.zoom.x):
+			_navigate_region(int(portal.destination));return
 	var nearest =-1
 	var distance =82.0/camera.zoom.x
 	for npc in sim.npcs:

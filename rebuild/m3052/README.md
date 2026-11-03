@@ -61,3 +61,9 @@ Tap water to sail and an enemy to select it. FEUER toggles cannon fire. Harpoons
 Local guest gameplay. This scene is not connected to M3051's separate development server. Public networking, accounts, multiplayer/PvP, guilds, cross-device acceptance, production signing and physical updater acceptance remain open. Three regional layouts share a base geometry transformed per region; this is not a claim of three entirely independent authored worlds. NPC state on other maps is retained during the current session, not serialized across app restarts. Captain level and equipment are functional; cosmetics are still free test designs.
 
 Supplied/reference art is used in the private development repository; public redistribution rights have not been established. Automated checks and rendered captures do not constitute a physical Android device playtest.
+
+## Portal travel and nautical HUD
+
+Tap a portal or choose its course from the map panel to sail there and cross automatically. Level gates explain their requirement; recent damage delays the queued crossing until six seconds without damage. A new water course, docking, repair or sinking cancels the order. Map arrival updates the camera and guest save.
+
+The HUD uses six functional illustrated navigation cells, a framed coordinate minimap, round fire/repair/ammunition controls, a contextual ammunition list, HP/XP quick-slot deck and live System/Quest tabs. The ten source SVG icons are recorded under `vector_ui` in the asset provenance file. The layout follows the supplied Seafight/Battle of Sea and Abyssal mockup references; it does not introduce fictional online chat, guild currency or unimplemented consumable powers.

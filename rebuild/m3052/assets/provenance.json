@@ -592,5 +592,67 @@
       "source_name": "RoyaleTowerIcon3",
       "source_path_id": 682
     }
+  ],
+  "vector_ui": [
+    {
+      "path": "assets/ui/icons/anchor.svg",
+      "bytes": 488,
+      "sha256": "cd20dd3b113c0b7796f31bf8b9f0ffd231cf4943d66b3718d44803c7a65b7212",
+      "source": "Handwritten nautical SVG icon for Abyssal Dominion HUD"
+    },
+    {
+      "path": "assets/ui/icons/arrow.svg",
+      "bytes": 417,
+      "sha256": "8d5f0e4f973115be7ec854b5a1d8ccaaaed7a51f6490308c8af716698bb2a94f",
+      "source": "Handwritten nautical SVG icon for Abyssal Dominion HUD"
+    },
+    {
+      "path": "assets/ui/icons/book.svg",
+      "bytes": 445,
+      "sha256": "058180d2e5541c73896f87f7622043deabb78c8c23ed8cd5189306bd345051e0",
+      "source": "Handwritten nautical SVG icon for Abyssal Dominion HUD"
+    },
+    {
+      "path": "assets/ui/icons/chest.svg",
+      "bytes": 457,
+      "sha256": "b2b61b01c9ce6b8868f3c91a0317a942f84ed0c789936274a630843ed210eeb7",
+      "source": "Handwritten nautical SVG icon for Abyssal Dominion HUD"
+    },
+    {
+      "path": "assets/ui/icons/compass.svg",
+      "bytes": 498,
+      "sha256": "e05f60578b9c4b6b2fe7707c8760299f6e3a52c86aadfaa4f47fcf34ee987073",
+      "source": "Handwritten nautical SVG icon for Abyssal Dominion HUD"
+    },
+    {
+      "path": "assets/ui/icons/focus.svg",
+      "bytes": 445,
+      "sha256": "91b7e278ee817239fd837fe4166beafe9812782583ce989812f5b0c6bc852867",
+      "source": "Handwritten nautical SVG icon for Abyssal Dominion HUD"
+    },
+    {
+      "path": "assets/ui/icons/gear.svg",
+      "bytes": 510,
+      "sha256": "b68478f8e47429e2c3cd1d80075de073451ed7565d37f7acad9ce7fcb887ca64",
+      "source": "Handwritten nautical SVG icon for Abyssal Dominion HUD"
+    },
+    {
+      "path": "assets/ui/icons/minus.svg",
+      "bytes": 390,
+      "sha256": "1c6d3d88d4f1a8ebf19cf139665e24d19656fdc822e1b2a0c9f94eeeca3da820",
+      "source": "Handwritten nautical SVG icon for Abyssal Dominion HUD"
+    },
+    {
+      "path": "assets/ui/icons/plus.svg",
+      "bytes": 399,
+      "sha256": "f48a7e195ea7057357087f6364b168192409ec98abe8f86b2c2e7110890abac8",
+      "source": "Handwritten nautical SVG icon for Abyssal Dominion HUD"
+    },
+    {
+      "path": "assets/ui/icons/ship.svg",
+      "bytes": 439,
+      "sha256": "dc492e90e541b5a94c4b600d4abcb302bea6967a37d5fe51f4698cd964d48076",
+      "source": "Handwritten nautical SVG icon for Abyssal Dominion HUD"
+    }
   ]
 }
