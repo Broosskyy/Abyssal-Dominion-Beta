@@ -40,3 +40,11 @@ Acht intakte plus acht beschädigte Ansichten pro Schiff sind als reines 2D-Ziel
 - Ein dokumentierter Android-Durchlauf bestätigt den Kernablauf zusätzlich zu CI-Tests und Renderaufnahmen.
 
 Diese Änderung dokumentiert Vorgabe und Vergleich. Sie enthält keine neuen Laufzeitkorrekturen und keinen neuen APK-Build. Die Kriterien gelten nicht als vollständig auf einem Gerät bestanden.
+
+## Nachgereichte Masterdokumente
+
+Die fünf Original-DOCX und die Referenzanalyse konkretisieren die Grundlage. Der [Masterplan-Abgleich](MASTERPLAN_ABGLEICH.md) hält Quellen, Abweichungen und die nächste Produktion fest.
+
+Das erste Referenzschiff ist SHIP-STARTER-001 / Small Starter: kompakt, ein Hauptmast, gealtertes Holz, neutrale Segel und klare Silhouette. Die verworfene Schattenklaue und der ungeprüfte Dreimast-Fregattenentwurf sind keine geeigneten Startervorlagen. Acht 2D-Fahrtrichtungen verwenden dieselbe Spielkamera; die vier Modellierungsansichten aus den GLB-Dokumenten sind etwas anderes. Die aktuelle Nutzerentscheidung verschiebt 3D auf später.
+
+Zusätzlich offen sind die manuelle Standardsalve gemäß Masterkonzept, der Kamera-Joystick und die kanonische Starterprogression. 50 Hauptdesigns und 100 Klassen/P1–P5 aus unterschiedlichen Dokumenten werden vor dem großen Flottenausbau konsolidiert; die Small-Starter-Produktion ist davon unabhängig.
