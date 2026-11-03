@@ -23,3 +23,15 @@ The measurement tool is `tools/audit_ship_art.py` (Pillow required for developer
 ## Limits
 
 The ten concept images still lack true side, bow and stern views. Their corrected reflection is not advertised as a complete perspective set. The sixteen supplied reference hulls have four authored direction images, not 8/16/32 distinct baked views. Runtime sprite fixes cannot recover geometry that is absent from the input artwork. The source atlases also retain their original resolution/compression defects. This remains local guest gameplay; a physical Android playtest is separate from CI rendering and APK verification.
+
+## Verified M3054 result
+
+Source commit: `9866ec41886111d846b423ac2fe8b0562bf50add`. 881 automated checks passed, including 617 ship geometry checks. APK signature, ARM64 engine, 16 KB alignment, embedded artwork and exact sprite metadata passed. APK SHA-256: `a30a6feaa7a51d1e972b6fafff857dd63fe681756371380d98a7c4ef15c9a85e`. No physical Android playtest was performed.
+
+All 26 designs were inspected in the runtime galleries after rendering. The 3-second, 960×540 east/west maneuver clip shows the supplied Schattenklaue design staying on its waterline anchor through reflection. The comparison below uses a frame from the user's video on the left and a controlled runtime test on the right; these are different captures of the same design, not a synchronized recording.
+
+![Source video versus corrected runtime](Ship_Anchor_Comparison_M3054.png)
+
+- [Controlled maneuver video](../../releases/M3054/captures/maneuver/course_change.mp4)
+- [All ship view galleries](../../releases/M3054/captures/ship-audit/)
+- [Machine-readable build report](../../releases/M3054/ABYSSAL_DOMINION_M3054_REBUILD_ARM64.build.json)
