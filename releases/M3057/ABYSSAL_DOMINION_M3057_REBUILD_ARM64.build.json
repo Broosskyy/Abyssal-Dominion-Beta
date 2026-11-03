@@ -1,8 +1,8 @@
 {
   "engine": "4.7.2.stable.official.ed1daf0bf",
   "apk": "ABYSSAL_DOMINION_M3057_REBUILD_ARM64.apk",
-  "sha256": "345b5c221faad50106c2fa69334f9e490a9d5b7e8a779364ccd5579c5233ba36",
-  "bytes": 91286690,
+  "sha256": "d03a6f4508558cbb10b665675f6283c3ae994da59fecc2d0a2f89c6acf30cabd",
+  "bytes": 91286954,
   "tests": [
     {
       "test": "simulation_test",
@@ -40,7 +40,7 @@
   "audited_pngs": 62,
   "signature": "PASS",
   "certificate_sha256": "278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b",
-  "version_code": 305701,
+  "version_code": 305702,
   "package": "com.abyssaldominion.rebuild",
   "updater_native": true,
   "update_distribution": "GITHUB_RELEASES_MANIFEST_PUBLISHED_LAST",
@@ -53,7 +53,7 @@
   "quest_chain": 7,
   "equipment_categories": 4,
   "equipment_tiers": 3,
-  "source_commit": "4fbdd9162072263e6c86fa16ca91ad39c3792db7",
+  "source_commit": "7be25249ca76571e4d8fd9219fc20914bbac4e52",
   "measured_ship_sources": 28,
   "measured_ship_frames": 90,
   "eight_direction_designs": 1,
