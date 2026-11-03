@@ -21,8 +21,9 @@ func _draw() -> void:
 	draw_string(ThemeDB.fallback_font,Vector2(10,17),"%s · %s" % [region.code,region.name],HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("d7c092"))
 	draw_rect(r,Color("123b4b"))
 	for island in simulation.islands:
-		var p: Vector2=r.position+island.pos/simulation.WORLD*r.size
-		draw_circle(p,4.0,Color("7e9976"))
+		var shape=PackedVector2Array()
+		for vertex: Vector2 in island.outline:shape.append(r.position+vertex/simulation.WORLD*r.size)
+		draw_colored_polygon(shape,Color("7e9976"))
 	for npc in simulation.npcs:
 		if int(npc.hp)>0:
 			var p: Vector2=r.position+npc.pos/simulation.WORLD*r.size
@@ -33,6 +34,6 @@ func _draw() -> void:
 	var port: Vector2 = r.position+simulation.harbor/simulation.WORLD*r.size
 	draw_circle(port,3.0,Color("f4c56c"))
 	var box = Rect2(r.position+(camera_world-view_world*0.5)/simulation.WORLD*r.size,view_world/simulation.WORLD*r.size)
-	draw_rect(box,Color(0.65,0.88,0.85,0.6),false,1.0)
+	draw_rect(box.intersection(r),Color(0.65,0.88,0.85,0.6),false,1.0)
 	var player: Vector2=r.position+simulation.player.pos/simulation.WORLD*r.size
 	draw_circle(player,3.5,Color("6cf1e0"))

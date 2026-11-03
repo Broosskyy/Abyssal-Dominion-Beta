@@ -54,6 +54,8 @@ func _run() -> void:
 	check(game.sim.firing,"fire control changes actual simulation state")
 	game.ammo_buttons[1].pressed.emit()
 	check(game.sim.ammo_mode==1,"ammo UI selects actual chain ammunition")
+	game._refresh_ui()
+	check("Kettenkugeln" in game.ammo_buttons[1].text and "✓" in game.ammo_buttons[1].text,"selected ammunition has a visible type label and selection marker")
 	game.sim.player.gold=543
 	game._save_progress()
 	game.sim.player.gold=0

@@ -98,6 +98,8 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 	_refresh_ui()
+	var data_boot=get_tree().root.get_node_or_null("DataBoot")
+	if data_boot!=null:data_boot.mark_healthy()
 
 func _load_assets() -> void:
 	ship_frames=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/ship_frames.json")).entries
@@ -169,16 +171,16 @@ func _draw() -> void:
 		var width: float = island.width
 		var dimensions = tex.get_size()*width/tex.get_width()
 		var point: Vector2 = island.pos
-		_ellipse(point+Vector2(0,20),Vector2(width*0.46,width*0.19),Color(0.09,0.49,0.48,0.15))
-		var foam = Color(0.6,0.87,0.8,0.08+0.025*sin(elapsed*1.5))
-		_ellipse_line(point+Vector2(0,20),Vector2(width*0.43,width*0.17),foam,2.0)
 		draw_texture_rect(tex,Rect2(point-dimensions*Vector2(0.5,0.65),dimensions),false)
 		_label(point+Vector2(0,dimensions.y*0.31+20),island.name,16,GOLD)
 	# Planned route and tap marker remain visible without obscuring the sea.
 	# Docks and portals occupy water cells and are also marked on the minimap.
-	_ellipse_line(sim.harbor,Vector2(86,36),Color(0.85,0.72,0.4,0.5),2.0)
-	var harbor_icon: Texture2D = extra_icons.upgrade_sails
-	draw_texture_rect(harbor_icon,Rect2(sim.harbor-Vector2(40,70),Vector2(80,80)),false)
+	# Compact anchor replaces the oversized dock circle and upgrade-arrow placeholder.
+	var anchor=sim.harbor
+	draw_circle(anchor-Vector2(0,23),6,GOLD,false,2.0,true)
+	draw_line(anchor-Vector2(0,17),anchor+Vector2(0,17),GOLD,2.5,true)
+	draw_line(anchor-Vector2(13,7),anchor+Vector2(13,-7),GOLD,2.0,true)
+	draw_arc(anchor+Vector2(0,1),23,0,PI,24,GOLD,2.5,true)
 	if _landmark_label_visible(sim.harbor):_label(sim.harbor+Vector2(0,100),"HAFEN · ANDOCKEN",13,GOLD)
 	for portal in sim.portals:
 		if not view.has_point(portal.pos): continue
@@ -493,7 +495,8 @@ func _build_ui() -> void:
 		b.name="Ammo%d"%i
 		b.icon=icons[["cannonball","chain","harpoon"][i]]
 		b.expand_icon=true
-		b.add_theme_constant_override("icon_max_width",26)
+		b.add_theme_constant_override("icon_max_width",20)
+		b.add_theme_font_size_override("font_size",12)
 		ammo_buttons.append(b)
 	center_button=_button(ui,"ZIEL",func():pan=Vector2.ZERO;camera_locked=true)
 	center_button.tooltip_text="Kamera zum Schiff"
@@ -618,7 +621,8 @@ func _refresh_ui() -> void:
 	repair.disabled=sim.docked
 	repair.text="REPAR. STOPP" if sim.repairing else "REPARATUR"
 	for i in 3:
-		ammo_buttons[i].text=("● " if sim.ammo_mode==i else "")+str(sim.player.ammo[i])
+		ammo_buttons[i].text=["Vollkugeln","Kettenkugeln","Harpunen"][i]+"\n"+("✓ " if sim.ammo_mode==i else "")+str(sim.player.ammo[i])
+		ammo_buttons[i].modulate=Color("91f3ec") if sim.ammo_mode==i else Color("a3b2b8")
 		ammo_buttons[i].tooltip_text=["Vollkugeln: gegen Schiffe","Kettenkugeln: verlangsamen Schiffe","Harpunen: gegen Monster"][i]
 	status.text=sim.message
 	var quest = sim.current_quest()

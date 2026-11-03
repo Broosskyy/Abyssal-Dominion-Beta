@@ -1,4 +1,4 @@
-name: M3058 video visual regressions - Android
+name: M3059 signed content updates and sea movement
 on:
   workflow_dispatch:
   push:
@@ -14,6 +14,9 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+      - name: Plan native versus content release
+        id: plan
+        run: python3 rebuild/m3052/tools/release_plan.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -27,9 +30,10 @@ jobs:
         with:
           path: ~/.cache/abyssal-test-signing
           key: m3052-private-debug-signing-v1
-      - name: Install Godot and development signing key
+      - name: Install engine and prepare pinned content signing
         env:
           ABYSSAL_ANDROID_KEYSTORE_BASE64: ${{ secrets.ABYSSAL_ANDROID_KEYSTORE_BASE64 }}
+          SHELL_NEEDED: ${{ steps.plan.outputs.shell_needed }}
         shell: bash
         run: |
           set -euo pipefail
@@ -37,26 +41,43 @@ jobs:
           unzip -q /tmp/godot.zip -d /tmp/godot
           chmod +x /tmp/godot/Godot_v4.7.2-stable_linux.x86_64
           curl -fL --retry 3 -o /tmp/templates.tpz https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz
-          mkdir -p "$HOME/.local/share/godot/export_templates/4.7.2.stable" "$HOME/.cache/abyssal-test-signing"
-          unzip -p /tmp/templates.tpz templates/android_debug.apk > "$HOME/.local/share/godot/export_templates/4.7.2.stable/android_debug.apk"
+          tpl="$HOME/.local/share/godot/export_templates/4.7.2.stable"
+          mkdir -p "$tpl" "$HOME/.cache/abyssal-test-signing"
+          unzip -p /tmp/templates.tpz templates/android_debug.apk > "$tpl/android_debug.apk"
           if [ -n "$ABYSSAL_ANDROID_KEYSTORE_BASE64" ]; then
             python3 -c 'import os,base64,pathlib; pathlib.Path.home().joinpath(".cache/abyssal-test-signing/debug.keystore").write_bytes(base64.b64decode(os.environ["ABYSSAL_ANDROID_KEYSTORE_BASE64"],validate=True))'
           fi
-          test -f "$HOME/.cache/abyssal-test-signing/debug.keystore" || { echo 'Original signing key unavailable: refusing to generate an incompatible replacement.'; exit 1; }
-          tpl="$HOME/.local/share/godot/export_templates/4.7.2.stable"
-          unzip -p /tmp/templates.tpz templates/android_source.zip > "$tpl/android_source.zip"
-          unzip -p /tmp/templates.tpz templates/version.txt > "$tpl/version.txt"
-          mkdir -p rebuild/m3052/android/build
-          unzip -q "$tpl/android_source.zip" -d rebuild/m3052/android/build
-          touch rebuild/m3052/android/build/.gdignore
-          echo '4.7.2.stable' > rebuild/m3052/android/.build_version
-          python3 rebuild/m3052/tools/android_updater/inject_bridge.py rebuild/m3052/android/build
-          chmod +x rebuild/m3052/android/build/gradlew
-      - name: Test and verify APK
-        run: python3 rebuild/m3052/tools/build_android.py --godot /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --keystore "$HOME/.cache/abyssal-test-signing/debug.keystore" --output "$GITHUB_WORKSPACE/releases/M3058/ABYSSAL_DOMINION_M3058_REBUILD_ARM64.apk"
-      - name: Prepare verified update manifest
-        run: python3 rebuild/m3052/tools/prepare_update_manifest.py releases/M3058/ABYSSAL_DOMINION_M3058_REBUILD_ARM64.apk
-      - name: Capture desktop and mobile gameplay
+          signing="$HOME/.cache/abyssal-test-signing/debug.keystore"
+          test -f "$signing" || { echo 'Original signing key unavailable; refusing replacement.'; exit 1; }
+          keytool -exportcert -alias androiddebugkey -keystore "$signing" -storepass android -file /tmp/certificate.der
+          test "$(sha256sum /tmp/certificate.der | cut -d' ' -f1)" = 278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b
+          keytool -importkeystore -srckeystore "$signing" -srcstorepass android -srcalias androiddebugkey -destkeystore /tmp/content-signing.p12 -deststoretype PKCS12 -deststorepass android -noprompt
+          openssl pkcs12 -in /tmp/content-signing.p12 -nocerts -nodes -passin pass:android -out /tmp/content-private.pem
+          chmod 600 /tmp/content-private.pem
+          openssl pkey -in /tmp/content-private.pem -pubout -out rebuild/m3052/updater/data_public.pem
+          if [ "$SHELL_NEEDED" = true ]; then
+            unzip -p /tmp/templates.tpz templates/android_source.zip > "$tpl/android_source.zip"
+            unzip -p /tmp/templates.tpz templates/version.txt > "$tpl/version.txt"
+            mkdir -p rebuild/m3052/android/build
+            unzip -q "$tpl/android_source.zip" -d rebuild/m3052/android/build
+            touch rebuild/m3052/android/build/.gdignore
+            echo '4.7.2.stable' > rebuild/m3052/android/.build_version
+            python3 rebuild/m3052/tools/android_updater/inject_bridge.py rebuild/m3052/android/build
+            chmod +x rebuild/m3052/android/build/gradlew
+          fi
+      - name: Test game, signed data pack and optional native APK
+        env:
+          SHELL_NEEDED: ${{ steps.plan.outputs.shell_needed }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          extra=()
+          if [ "$SHELL_NEEDED" = false ]; then extra+=(--content-only); fi
+          python3 rebuild/m3052/tools/build_android.py --godot /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --keystore "$HOME/.cache/abyssal-test-signing/debug.keystore" --output "$GITHUB_WORKSPACE/releases/M3059/ABYSSAL_DOMINION_M3059_REBUILD_ARM64.apk" --data-output "$GITHUB_WORKSPACE/releases/M3059/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip" --revision "$GITHUB_RUN_NUMBER" --signing-key /tmp/content-private.pem "${extra[@]}"
+          if [ "$SHELL_NEEDED" = true ]; then
+            python3 rebuild/m3052/tools/prepare_update_manifest.py releases/M3059/ABYSSAL_DOMINION_M3059_REBUILD_ARM64.apk
+          fi
+      - name: Capture actual renderer and movement
         shell: bash
         run: |
           set -euo pipefail
@@ -64,76 +85,57 @@ jobs:
             sudo apt-get update -qq
             sudo apt-get install -y -qq ffmpeg
           fi
-          mkdir -p releases/M3058/captures
-          XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/capture_updater.gd -- --out="$GITHUB_WORKSPACE/releases/M3058/captures/updater" > releases/M3058/captures/updater.log 2>&1 || { cat releases/M3058/captures/updater.log; exit 1; }
-          cat releases/M3058/captures/updater.log
-          if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' releases/M3058/captures/updater.log; then exit 1; fi
-          XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a --server-args='-screen 0 2340x1080x24' /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/video_regression_capture.gd -- --out="$GITHUB_WORKSPACE/releases/M3058/captures/video-regressions" > releases/M3058/captures/video-regressions.log 2>&1 || { cat releases/M3058/captures/video-regressions.log; exit 1; }
-          cat releases/M3058/captures/video-regressions.log
-          if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' releases/M3058/captures/video-regressions.log; then exit 1; fi
-          for scene in combat harbor maps north maneuver damage; do
-            extra=""
-            if [ "$scene" = harbor ] || [ "$scene" = maps ]; then extra="--mobile"; fi
-            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --fixed-fps 60 --script tests/capture_scene.gd -- --out="$GITHUB_WORKSPACE/releases/M3058/captures/$scene" "--$scene" $extra > "releases/M3058/captures/$scene.log" 2>&1 || { cat "releases/M3058/captures/$scene.log"; exit 1; }
-            cat "releases/M3058/captures/$scene.log"
-            if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3058/captures/$scene.log"; then exit 1; fi
-            if [ "$scene" = maneuver ] || [ "$scene" = damage ]; then
-              clip_name=course_change
-              if [ "$scene" = damage ]; then clip_name=health_state_change; fi
-              ffmpeg -y -hide_banner -loglevel error -framerate 20 -i releases/M3058/captures/$scene/motion_%03d.png -vf 'scale=960:-2' -c:v libx264 -crf 28 -pix_fmt yuv420p -movflags +faststart releases/M3058/captures/$scene/$clip_name.mp4
-              rm releases/M3058/captures/$scene/motion_*.png
-            fi
+          mkdir -p releases/M3059/captures
+          for script in capture_updater sea_foundation_capture; do
+            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a --server-args='-screen 0 2340x1080x24' /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script "tests/$script.gd" -- --out="$GITHUB_WORKSPACE/releases/M3059/captures/$script" > "releases/M3059/captures/$script.log" 2>&1 || { cat "releases/M3059/captures/$script.log"; exit 1; }
+            cat "releases/M3059/captures/$script.log"
+            if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3059/captures/$script.log"; then exit 1; fi
           done
-          for page in 0 1 2 3 4; do
-            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a --server-args='-screen 0 1600x2304x24' /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/ship_render_capture.gd -- --out="$GITHUB_WORKSPACE/releases/M3058/captures/ship-audit" "--page=$page" > "releases/M3058/captures/ship-audit-$page.log" 2>&1 || { cat "releases/M3058/captures/ship-audit-$page.log"; exit 1; }
-            cat "releases/M3058/captures/ship-audit-$page.log"
-            if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3058/captures/ship-audit-$page.log"; then exit 1; fi
+          ffmpeg -y -hide_banner -loglevel error -framerate 10 -i releases/M3059/captures/sea_foundation_capture/motion_%03d.png -c:v libx264 -crf 25 -pix_fmt yuv420p -movflags +faststart releases/M3059/captures/sea_foundation_capture/legacy_zigzag.mp4
+          rm releases/M3059/captures/sea_foundation_capture/motion_*.png
+          for scene in combat harbor damage; do
+            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --fixed-fps 60 --script tests/capture_scene.gd -- --out="$GITHUB_WORKSPACE/releases/M3059/captures/$scene" "--$scene" > "releases/M3059/captures/$scene.log" 2>&1 || { cat "releases/M3059/captures/$scene.log"; exit 1; }
+            if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3059/captures/$scene.log"; then exit 1; fi
           done
+          ffmpeg -y -hide_banner -loglevel error -framerate 20 -i releases/M3059/captures/damage/motion_%03d.png -c:v libx264 -crf 28 -pix_fmt yuv420p releases/M3059/captures/damage/health_state_change.mp4
+          rm releases/M3059/captures/damage/motion_*.png
       - uses: actions/upload-artifact@v4
         with:
-          name: Abyssal-Dominion-M3058-Android
-          path: releases/M3058/
+          name: Abyssal-Dominion-M3059-${{ github.run_number }}
+          path: releases/M3059/
           if-no-files-found: error
           retention-days: 90
-      - name: Publish verified Android release
+      - name: Publish immutable verified release files
         env:
           GH_TOKEN: ${{ github.token }}
+          SHELL_NEEDED: ${{ steps.plan.outputs.shell_needed }}
+          SHELL_CODE: ${{ steps.plan.outputs.code }}
         shell: bash
         run: |
           set -euo pipefail
           git fetch origin main
-          if [ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]; then
-            echo 'Newer source exists; skipping outdated release.'
-            exit 0
+          if [ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]; then echo 'Newer source exists; preserving artifact without publishing stale update.'; exit 0; fi
+          if [ "$SHELL_NEEDED" = true ]; then
+            cp releases/M3059/ABYSSAL_DOMINION_M3059_REBUILD_ARM64.apk "$RUNNER_TEMP/ABYSSAL_DOMINION_${SHELL_CODE}.apk"
+            gh release create "abyssal-${SHELL_CODE}-android" "$RUNNER_TEMP/ABYSSAL_DOMINION_${SHELL_CODE}.apk" releases/M3059/latest.json --target "$GITHUB_SHA" --title 'M3059 content-update bootstrap' --notes 'One-time bootstrap for signed game-data updates. Legacy diagonal NPC navigation, coastline collisions, animated water and readable ammo selection. Future compatible game changes use data packages instead of APK installation.' --prerelease
+            curl -fL --retry 3 -o "$RUNNER_TEMP/served.apk" "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/abyssal-${SHELL_CODE}-android/ABYSSAL_DOMINION_${SHELL_CODE}.apk"
+            python3 -c 'import json,hashlib,pathlib,os; s=json.loads(pathlib.Path("releases/M3059/latest.json").read_text())["latest"]; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"served.apk"; assert p.stat().st_size==s["bytes"] and hashlib.sha256(p.read_bytes()).hexdigest()==s["sha256"]'
           fi
-          cp releases/M3058/ABYSSAL_DOMINION_M3058_REBUILD_ARM64.apk "$RUNNER_TEMP/ABYSSAL_DOMINION_305801.apk"
-          cat > "$RUNNER_TEMP/release-notes.md" <<'NOTES'
-          M3058: Transparent map gates, readable damage totals and inset harbor panel content.
-          Video regressions from 206805, 206806 and 206807. Existing ship assets, combat values and save data remain.
-          Available through the M3057 updater; Android requires installation confirmation.
-          Automated checks and runtime captures passed; physical Android acceptance remains pending.
-          NOTES
-          if gh release view abyssal-305801-android >/dev/null 2>&1; then
-            echo 'Release already exists; refusing to overwrite immutable APK.'
-            exit 1
-          fi
-          gh release create abyssal-305801-android "$RUNNER_TEMP/ABYSSAL_DOMINION_305801.apk" releases/M3058/latest.json --target "$GITHUB_SHA" --title 'Abyssal Dominion M3058 Android' --notes-file "$RUNNER_TEMP/release-notes.md" --prerelease
-          curl -fL --retry 3 -o "$RUNNER_TEMP/served.apk" https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/abyssal-305801-android/ABYSSAL_DOMINION_305801.apk
-          python3 -c 'import hashlib,json,os,pathlib; manifest=json.loads(pathlib.Path("releases/M3058/latest.json").read_text())["latest"]; apk=pathlib.Path(os.environ["RUNNER_TEMP"])/"served.apk"; assert apk.stat().st_size==manifest["bytes"] and hashlib.sha256(apk.read_bytes()).hexdigest()==manifest["sha256"]; print("ANONYMOUS_APK_DOWNLOAD_VERIFIED")'
+          gh release create "data-${GITHUB_RUN_NUMBER}" "releases/M3059/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip" releases/M3059/data.json --target "$GITHUB_SHA" --title "Abyssal game data ${GITHUB_RUN_NUMBER}" --notes 'Signed game scripts and assets for the M3059 bootstrap. No Android installation for compatible data updates.' --prerelease
+          curl -fL --retry 3 -o "$RUNNER_TEMP/served.zip" "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-${GITHUB_RUN_NUMBER}/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip"
+          python3 -c 'import json,hashlib,pathlib,os; s=json.loads(pathlib.Path("releases/M3059/data.json").read_text())["latest"]; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"served.zip"; assert p.stat().st_size==s["bytes"] and hashlib.sha256(p.read_bytes()).hexdigest()==s["sha256"]; print("ANONYMOUS_DATA_DOWNLOAD_VERIFIED")'
           mkdir -p updates
-          cp releases/M3058/latest.json updates/latest.json
-      - name: Preserve verified APK in repository
+          if [ "$SHELL_NEEDED" = true ]; then cp releases/M3059/latest.json updates/latest.json; fi
+          cp releases/M3059/data.json updates/data.json
+      - name: Preserve manifests, reports and renderer evidence
         shell: bash
         run: |
           set -euo pipefail
           git fetch origin main
-          if [ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]; then
-            echo 'Newer source exists; artifact retained, skipping outdated APK commit.'
-            exit 0
-          fi
+          if [ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]; then echo 'Newer source exists; leaving artifact available.'; exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          test -f updates/latest.json
-          git add -f updates/latest.json releases/M3058/*.apk releases/M3058/*.build.json releases/M3058/*.signature.txt releases/M3058/*.manifest.txt releases/M3058/*.android-xml.txt releases/M3058/latest.json releases/M3058/captures/
-          git commit -m 'Preserve verified M3058 APK, native updater and UI captures [skip ci]'
-          git push origin HEAD:main
+          git add -f updates/*.json releases/M3059/*.build.json releases/M3059/data.json releases/M3059/captures/ rebuild/m3052/updater/data_public.pem rebuild/m3052/assets/content_version.json
+          if [ -f releases/M3059/latest.json ]; then git add -f releases/M3059/latest.json releases/M3059/*.signature.txt releases/M3059/*.manifest.txt releases/M3059/*.android-xml.txt; fi
+          git commit -m 'Preserve signed data release, optional bootstrap and renderer checks [skip ci]'
+          git -c pack.window=0 push origin HEAD:main

@@ -1,5 +1,7 @@
 extends RefCounted
 const CONTENT = preload("res://content.gd")
+const NAV=preload("res://navigation.gd")
+var island_shapes: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/island_collision.json")).entries
 ## Independent fixed-step sea simulation. No dependency on legacy map scripts.
 const WORLD := Vector2(4400, 3200)
 const CELL := 48
@@ -68,7 +70,7 @@ func _init() -> void:
 			"max_hp": 760 if elite else 420, "speed": 66.0 + float(i % 3) * 8.0,
 			"reload": float(i % 4) * 0.6, "repath": 0.0, "state": "patrol", "patrol": i % 4,
 			"aggressive": false, "slow": 0.0, "respawn": 0.0, "reward": 110 if elite else 55,
-			"art": i, "elite": elite})
+			"art": i, "elite": elite, "view_count":4, "renderer":"sprite", "navigation":"four_diagonal"})
 	npcs.append({"id": 100, "name": "Tiamat · Tiefenwächter", "kind": "monster", "pos": Vector2(2590, 1750),
 		"home": Vector2(2590, 1750), "heading": Vector2.LEFT, "path": [], "hp": 1650,
 		"max_hp": 1650, "speed": 48.0, "reload": 1.0, "repath": 0.0, "state": "patrol",
@@ -82,6 +84,15 @@ func _init() -> void:
 	configure_map(0)
 
 func _build_grid() -> void:
+	for island: Dictionary in islands:
+		var shape: Dictionary=island_shapes[str(island.art)]
+		var dimensions=Vector2(float(island.width),float(island.width)*float(shape.size[1])/float(shape.size[0]))
+		var polygon=PackedVector2Array()
+		for vertex: Array in shape.points:polygon.append(island.pos+(Vector2(vertex[0],vertex[1])-Vector2(0.5,0.65))*dimensions)
+		island.outline=polygon
+		var bounds=Rect2(polygon[0],Vector2.ZERO)
+		for vertex: Vector2 in polygon:bounds=bounds.expand(vertex)
+		island.bounds=bounds
 	grid.region = Rect2i(0, 0, ceili(WORLD.x / CELL), ceili(WORLD.y / CELL))
 	grid.cell_size = Vector2.ONE * CELL
 	grid.offset = Vector2.ONE * CELL * 0.5
@@ -90,14 +101,17 @@ func _build_grid() -> void:
 	for y in grid.region.size.y:
 		for x in grid.region.size.x:
 			var cell = Vector2i(x, y)
-			grid.set_point_solid(cell, blocked(grid.get_point_position(cell), 38.0))
+			grid.set_point_solid(cell, blocked(grid.get_point_position(cell), 48.0))
 
-func blocked(point: Vector2, margin: float = 22.0) -> bool:
+func blocked(point: Vector2, margin: float = 36.0) -> bool:
 	if point.x < margin or point.y < margin or point.x > WORLD.x - margin or point.y > WORLD.y - margin:
 		return true
 	for island in islands:
-		if point.distance_to(island.pos) < float(island.radius) + margin:
-			return true
+		if not island.bounds.grow(margin).has_point(point):continue
+		var polygon: PackedVector2Array=island.outline
+		if Geometry2D.is_point_in_polygon(point,polygon):return true
+		for i in polygon.size():
+			if Geometry2D.get_closest_point_to_segment(point,polygon[i],polygon[(i+1)%polygon.size()]).distance_to(point)<margin:return true
 	return false
 
 func segment_free(a: Vector2, b: Vector2) -> bool:
@@ -143,6 +157,28 @@ func plan_path(start: Vector2, goal: Vector2) -> Array[Vector2]:
 		current = raw[furthest]
 		index = furthest + 1
 	if segment_free(current, goal): result.append(goal)
+	return result
+
+func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
+	var base=plan_path(body.pos,goal)
+	if int(body.get("view_count",8))!=4 or str(body.get("renderer","sprite"))!="sprite":return base
+	var result: Array[Vector2]=[]
+	var before: Vector2=body.pos
+	for waypoint: Vector2 in base:
+		var accepted=false
+		for size in [96.0,48.0,24.0,12.0]:
+			for side in [1,-1]:
+				var legs=NAV.diagonal_leg(before,waypoint,size,side if int(body.id)%2==0 else -side)
+				var cursor=before
+				var safe=true
+				for leg: Vector2 in legs:
+					if not segment_free(cursor,leg):safe=false;break
+					cursor=leg
+				if safe:
+					result.append_array(legs);accepted=true;break
+			if accepted:break
+		if not accepted:return []
+		before=waypoint
 	return result
 
 func course(point: Vector2) -> bool:
@@ -257,7 +293,7 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 	if pursue:
 		npc.state = "attack" if distance < 390 else "approach"
 		if distance > 305 and float(npc.repath) <= 0:
-			npc.path = plan_path(npc.pos, player.pos)
+			npc.path = plan_actor_path(npc,player.pos)
 			npc.repath = 1.5
 		elif distance <= 305:
 			npc.path = []
@@ -271,7 +307,7 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 			npc.patrol = (int(npc.patrol) + 1) % 4
 			var offsets = [Vector2(140, 0), Vector2(0, 135), Vector2(-145, 0), Vector2(0, -135)]
 			var destination: Vector2 = npc.home + offsets[int(npc.patrol)]
-			npc.path = plan_path(npc.pos, destination)
+			npc.path = plan_actor_path(npc,destination)
 	_move(npc, delta)
 
 func _fire_player() -> void:

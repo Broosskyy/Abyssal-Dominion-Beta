@@ -1,6 +1,10 @@
-# Abyssal Dominion M3058 — video regressions
+# Abyssal Dominion M3059 — signed data updates and 2D sea foundations
 
-The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.8-test.1` / Android code `305801`. M3052 is retained in Git history and `releases/M3052/`.
+The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.9-test.1` / Android code `305901`. M3052 is retained in Git history and `releases/M3052/`.
+
+## M3059 foundations
+
+One final bootstrap APK adds RSA-authenticated game-data ZIP updates: compatible game code/graphics can update without Android installation. Native/updater changes still require an APK. Legacy four-view NPCs sail actual alternating diagonals, while eight-view and future 3D metadata retain free courses. Measured island silhouettes replace displaced circular collisions, large island overlays are removed, water waves animate directionally and ammunition buttons show type/stock/selection. See [behavior and acceptance limits](../../docs/m3059/FOUNDATION.md).
 
 ## M3058 video regressions
 
@@ -50,7 +54,7 @@ Tap water to sail and an enemy to select it. FEUER toggles cannon fire. Harpoons
 
 ## Build and verification
 
-`.github/workflows/m3052.yml` builds `releases/M3058/ABYSSAL_DOMINION_M3058_REBUILD_ARM64.apk`. The builder audits every PNG, imports and tests the project, verifies embedded textures, ARM64 engine, signature, 16 KB alignment and application/version identity. CI also captures actual gameplay at desktop and mobile landscape sizes; no generated mockups serve as QA evidence. Build reports record the source commit. Simulation, progression and UI tests use fresh isolated guest storage.
+`.github/workflows/m3052.yml` builds `the versioned APK in GitHub releases`. The builder audits every PNG, imports and tests the project, verifies embedded textures, ARM64 engine, signature, 16 KB alignment and application/version identity. CI also captures actual gameplay at desktop and mobile landscape sizes; no generated mockups serve as QA evidence. Build reports record the source commit. Simulation, progression and UI tests use fresh isolated guest storage.
 
 ## Scope
 

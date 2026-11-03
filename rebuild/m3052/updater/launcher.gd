@@ -1,7 +1,11 @@
 extends Control
+const DATA=preload("res://updater/data_controller.gd")
 const CONTROLLER=preload("res://updater/update_controller.gd")
 var autostart=true
 var updater: Node
+var content: Node
+var content_started=false
+var version_label: Label
 var status: Label
 var bar: ProgressBar
 var action: Button
@@ -22,13 +26,14 @@ func _ready() -> void:
 	box=Control.new();panel.add_child(box)
 	var title=Label.new();title.text="ABYSSAL DOMINION";title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size",25);title.add_theme_color_override("font_color",Color("e1c68b"));box.add_child(title)
-	var version=Label.new();version.text="Version "+str(ProjectSettings.get_setting("application/config/version",""));version.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;box.add_child(version)
+	version_label=Label.new();version_label.text="Version "+str(ProjectSettings.get_setting("application/config/version",""));version_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;box.add_child(version_label)
 	status=Label.new();status.text="Seekarte wird vorbereitet …";status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;status.custom_minimum_size.y=48;status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;box.add_child(status)
 	bar=ProgressBar.new();bar.custom_minimum_size.y=16;bar.show_percentage=false;bar.max_value=1;box.add_child(bar)
 	action=Button.new();action.text="Updates prüfen";action.custom_minimum_size.y=48;action.pressed.connect(_action);box.add_child(action)
 	play=Button.new();play.text="Spielen";play.custom_minimum_size.y=48;play.pressed.connect(_play);box.add_child(play)
-	var hint=Label.new();hint.text="Android kann den Download beim App-Wechsel fortsetzen.";hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;hint.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;hint.add_theme_font_size_override("font_size",13);box.add_child(hint)
+	var hint=Label.new();hint.text="Spieldaten ohne Installation · Android-Updates mit Bestätigung.";hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;hint.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;hint.add_theme_font_size_override("font_size",13);box.add_child(hint)
 	updater=CONTROLLER.new();add_child(updater);updater.changed.connect(_refresh)
+	content=DATA.new();add_child(content);content.changed.connect(_refresh)
 	get_viewport().size_changed.connect(_layout);_layout()
 	if manual:updater.check()
 	elif autostart:
@@ -50,22 +55,34 @@ func _layout() -> void:
 		widget.size=Vector2(box.size.x,slots[i].y)
 
 func _refresh() -> void:
-	status.text=updater.message;bar.value=updater.progress
-	var state=str(updater.state)
+	var boot=get_tree().root.get_node_or_null("DataBoot")
+	if boot!=null:version_label.text="App "+str(ProjectSettings.get_setting("application/config/version",""))+" · Daten "+str(boot.active_revision)
+	if not content_started and updater.state in ["current","offline"]:
+		content_started=true;content.check();return
+	var current=content if content_started else updater
+	status.text=current.message;bar.value=current.progress
+	var state=str(current.state)
 	bar.indeterminate=state in ["checking","verifying"]
 	action.visible=state not in ["checking","downloading","paused","verifying"]
 	action.disabled=state=="installing"
-	action.text="Installation fortsetzen" if state in ["ready","permission"] else ("Update herunterladen" if state=="available" else ("Erneut herunterladen" if state=="error" and not updater.spec.is_empty() else "Updates prüfen"))
+	action.text="Installation fortsetzen" if state in ["ready","permission"] else ("Update herunterladen" if state=="available" else ("Erneut herunterladen" if state=="error" and not current.spec.is_empty() else "Updates prüfen"))
+	if state=="restart":action.text="App schließen"
 	play.text="Spielen · Download läuft weiter" if state in ["downloading","paused"] else "Spielen"
-	if autostart and state in ["current","offline"] and not countdown:
+	if autostart and state in ["current","offline","unsupported"] and content_started and not countdown:
 		countdown=true
 		await get_tree().create_timer(1.2).timeout
-		if is_inside_tree() and updater.state==state:_play()
+		if is_inside_tree() and current.state==state:_play()
 
 func _action() -> void:
-	if updater.state in ["ready","permission"]:updater.install()
+	if content_started:
+		if content.state=="restart":get_tree().quit()
+		elif content.state=="error" and not content.spec.is_empty():content.download()
+		else:content.check()
+	elif updater.state in ["ready","permission"]:updater.install()
 	elif updater.state=="available" or (updater.state=="error" and not updater.spec.is_empty()):updater.download()
 	else:updater.check()
 
 func _play() -> void:
+	var boot=get_tree().root.get_node_or_null("DataBoot")
+	if boot!=null:boot.prepare_game()
 	get_tree().change_scene_to_file("res://sea_map.tscn")

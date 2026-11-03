@@ -1,0 +1,31 @@
+extends SceneTree
+const MODEL=preload("res://updater/data_model.gd")
+var failures: Array[String]=[]
+var count=0
+func check(ok: bool,label: String) -> void:
+	count+=1
+	if not ok:failures.append(label)
+func _initialize() -> void:call_deferred("_run")
+func _run() -> void:
+	var spec=JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/content_spec.json"))
+	check(MODEL.valid_spec(spec),"signed content metadata authenticates with embedded public key")
+	check(MODEL.verify_file(spec,"res://tests/fixtures/content.zip"),"signed ZIP, checksum and internal release identity all match")
+	check(MODEL.manifest({"schema":1,"channel":"test","latest":spec},0).status=="available","new content revision is offered without an APK")
+	check(MODEL.manifest({"schema":1,"channel":"test","latest":spec},int(spec.revision)).status=="current","same content revision is not downloaded again")
+	for patch in [{"sha256":"0".repeat(64)},{"url":"http://evil.test/data.zip"},{"signature":"A".repeat(342)+"=="},{"revision":1.5},{"revision":true},{"abi":2},{"min_apk":305900},{"bytes":250000001},{"engine":"4.8.stable"}]:
+		var bad=spec.duplicate(true);bad.merge(patch,true)
+		check(not MODEL.valid_spec(bad),"altered data metadata rejected: "+str(patch.keys()))
+	var renamed=spec.duplicate(true);renamed.revision=int(spec.revision)+1;renamed.url=MODEL.ROOT+"data-%d/ABYSSAL_DATA_%d.zip"%[int(renamed.revision),int(renamed.revision)]
+	check(not MODEL.verify_file(renamed,"res://tests/fixtures/content.zip"),"signed old data cannot be relabeled as a newer revision")
+	var bytes=FileAccess.get_file_as_bytes("res://tests/fixtures/content.zip");bytes[int(bytes.size()/2)]^=1
+	var f=FileAccess.open("user://bad-content.zip",FileAccess.WRITE);f.store_buffer(bytes);f.close()
+	check(not MODEL.verify_file(spec,"user://bad-content.zip"),"modified downloaded ZIP never activates")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://bad-content.zip"))
+	var boot=get_tree().root.get_node("DataBoot")
+	check(boot.accept(spec,"res://tests/fixtures/content.zip") in ["mounted","restart"],"authenticated newer data can be staged in an owned cache slot")
+	check(boot.active_revision==int(spec.revision),"startup patch activates before gameplay resources load")
+	boot.prepare_game();boot.mark_healthy()
+	check(bool(boot.read_record(boot.RECORD).get("confirmed",false)),"successful game startup confirms the data trial")
+	check(boot.accept(spec,"res://tests/fixtures/content.zip")=="stale","already applied data cannot be mounted as a downgrade")
+	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}))
+	quit(0 if failures.is_empty() else 1)

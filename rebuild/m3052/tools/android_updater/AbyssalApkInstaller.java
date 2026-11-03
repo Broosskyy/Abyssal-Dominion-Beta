@@ -195,6 +195,163 @@ public final class AbyssalApkInstaller extends GodotPlugin {
         }
     }
 
+    private static final String DATA_PREFS = "abyssal_background_data_v1";
+    private static final String DATA_RELEASE_ROOT =
+        "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/";
+    private static final String DATA_DIRECTORY = "abyssal_data_downloads";
+
+    private static boolean trustedDataDownload(String url, int version, String digest, int length) {
+        if (version < 1 || version > 1000000 || length < 1000 || length > 250000000) return false;
+        if (digest == null || !digest.matches("^[0-9a-f]{64}$")) return false;
+        final String code = Integer.toString(version);
+        return (DATA_RELEASE_ROOT + "data-" + code + "/ABYSSAL_DATA_" + code + ".zip").equals(url);
+    }
+
+    private static SharedPreferences dataPreferences(Activity activity) {
+        return activity.getSharedPreferences(DATA_PREFS, Context.MODE_PRIVATE);
+    }
+
+    private static DownloadManager dataDownloads(Activity activity) {
+        return (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
+    }
+
+    private static File dataDestination(Activity activity, int version) {
+        File base = activity.getExternalFilesDir(null);
+        if (base == null) return null;
+        return new File(new File(base, DATA_DIRECTORY), "data-" + version + ".zip");
+    }
+
+    // Returns a small machine-readable result. Never pass arbitrary file paths
+    // or domains from remote manifests into the native download system.
+    @UsedByGodot
+    public String enqueueBackgroundPack(String url, int version, String digest, int length) {
+        final Activity activity = getActivity();
+        if (activity == null) return "activity_missing";
+        if (!GAME_ID.equals(activity.getPackageName())
+            || !trustedDataDownload(url, version, digest, length)) return "untrusted_manifest";
+        try {
+            DownloadManager dm = dataDownloads(activity);
+            if (dm == null) return "download_service_missing";
+            SharedPreferences prefs = dataPreferences(activity);
+            long active = prefs.getLong("request", -1L);
+            boolean matching = version == prefs.getInt("version", -1)
+                && length == prefs.getInt("length", -1)
+                && digest.equals(prefs.getString("digest", ""))
+                && url.equals(prefs.getString("url", ""));
+            if (active > 0 && matching) {
+                try (Cursor cursor = dm.query(new DownloadManager.Query().setFilterById(active))) {
+                    if (cursor != null && cursor.moveToFirst()) {
+                        int state = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
+                        if (state == DownloadManager.STATUS_PENDING || state == DownloadManager.STATUS_RUNNING
+                            || state == DownloadManager.STATUS_PAUSED) return "active";
+                        if (state == DownloadManager.STATUS_SUCCESSFUL) {
+                            File file = dataDestination(activity, version);
+                            if (file != null && file.isFile() && file.length() == length)
+                                return "active";
+                        }
+                        // Terminal failure, missing file, or bad size: allow an actual retry.
+                    }
+                }
+            }
+            // Replace only our own previously registered DownloadManager request.
+            if (active > 0) dm.remove(active);
+            File file = dataDestination(activity, version);
+            if (file == null || (!file.getParentFile().exists() && !file.getParentFile().mkdirs()))
+                return "storage_unavailable";
+            if (file.exists() && !file.delete()) return "old_file_locked";
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+            request.setTitle("ABYSSAL DOMINION – Update " + version);
+            request.setDescription("Download läuft auch beim App-Wechsel weiter");
+            request.setMimeType("application/zip");
+            request.setAllowedOverMetered(true);
+            request.setAllowedOverRoaming(false);
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setDestinationInExternalFilesDir(activity, null, DATA_DIRECTORY + "/data-" + version + ".zip");
+            long id = dm.enqueue(request);
+            if (id <= 0) return "enqueue_failed";
+            prefs.edit().putLong("request", id).putInt("version", version)
+                .putInt("length", length).putString("digest", digest)
+                .putString("url", url).apply();
+            return "queued";
+        } catch (Exception ex) {
+            return "enqueue_failed";
+        }
+    }
+
+    @UsedByGodot
+    public String queryBackgroundPack() {
+        final Activity activity = getActivity();
+        if (activity == null) return "{\"status\":\"activity_missing\"}";
+        JSONObject state = new JSONObject();
+        try {
+            SharedPreferences prefs = dataPreferences(activity);
+            final long id = prefs.getLong("request", -1L);
+            final int version = prefs.getInt("version", -1);
+            final int expected = prefs.getInt("length", -1);
+            state.put("version", version);
+            state.put("total", expected);
+            if (id <= 0) {
+                state.put("status", "missing");
+                return state.toString();
+            }
+            DownloadManager dm = dataDownloads(activity);
+            if (dm == null) {
+                state.put("status", "service_unavailable");
+                return state.toString();
+            }
+            try (Cursor cursor = dm.query(new DownloadManager.Query().setFilterById(id))) {
+                if (cursor == null || !cursor.moveToFirst()) {
+                    state.put("status", "missing");
+                    return state.toString();
+                }
+                int status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
+                long received = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                state.put("received", received);
+                if (status == DownloadManager.STATUS_PENDING) state.put("status", "pending");
+                else if (status == DownloadManager.STATUS_RUNNING) state.put("status", "running");
+                else if (status == DownloadManager.STATUS_PAUSED) state.put("status", "paused");
+                else if (status == DownloadManager.STATUS_FAILED) {
+                    state.put("status", "failed");
+                    state.put("reason", cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON)));
+                } else if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                    File file = dataDestination(activity, version);
+                    if (file == null || !file.isFile() || file.length() != expected) {
+                        state.put("status", "size_mismatch");
+                    } else {
+                        state.put("status", "complete");
+                        state.put("path", file.getCanonicalPath());
+                    }
+                } else state.put("status", "unknown");
+            }
+            return state.toString();
+        } catch (Exception ex) {
+            return "{\"status\":\"query_failed\"}";
+        }
+    }
+
+    @UsedByGodot
+    public String discardBackgroundPack() {
+        final Activity activity = getActivity();
+        if (activity == null) return "activity_missing";
+        try {
+            SharedPreferences prefs = dataPreferences(activity);
+            long id = prefs.getLong("request", -1L);
+            int version = prefs.getInt("version", -1);
+            if (id > 0) {
+                DownloadManager dm = dataDownloads(activity);
+                if (dm != null) dm.remove(id);
+            }
+            if (version > 0) {
+                File file = dataDestination(activity, version);
+                if (file != null && file.isFile()) file.delete();
+            }
+            prefs.edit().clear().apply();
+            return "cleared";
+        } catch (Exception ex) {
+            return "clear_failed";
+        }
+    }
+
     @UsedByGodot
     public String installValidatedApk(String absolutePath, int requestedVersion) {
         final Activity activity = getActivity();
