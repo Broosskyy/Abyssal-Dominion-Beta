@@ -34,3 +34,13 @@ CHANGE ONLY THE CREAM SAIL FABRIC and the little pennant to look battle-damaged.
 The vessel is STILL AFLOAT AND FUNCTIONAL, with all masts upright and the entire wooden hull unchanged. No sinking or wreckage. No flames, smoke, explosions, water, foam, shadows, extra objects, new weapons, labels, borders, UI or background. Real transparent alpha outside the ships, preserve transparency. No checkerboard pattern painted into the image.
 Most important invariant: switching between original and edited frame in game must NOT make the hull or mast jump, change length, or change shape. This is a conservative sail-damage edit of the same eight images, not eight newly generated boats.
 ```
+
+## Verifizierter Stand
+
+CI-Lauf https://github.com/Broosskyy/Abyssal-Dominion-Beta/actions/runs/41634960002 erfolgreich. Source-Commit a24c7f8dce6375b9368f6bf2da3c5e7a4de55e21. APK 39250536 Bytes, SHA-256 de090d506da3d31d9964b09626baac5bc4d9322446ca9b6a46d85995c8376e08, Version 0.305.6-test.1 / 305601. Signatur, ARM64 und 16-KB-Ausrichtung geprüft.
+
+1035 automatische Prüfungen bestanden: Simulation 22, Progression 63, Schiffsgeometrie/Zustände 767, UI 183. 62 PNGs sind per SHA-256 auditiert; die Messdaten enthalten 28 Quellgrafiken und 90 Frames einschließlich der bestehenden Originale.
+
+Die Laufzeitgalerie mit allen acht beschädigten Richtungen wurde angesehen. Aus der tatsächlichen Zustandswechsel-Aufnahme wurden Frames bei 100%, 25% und erneut 100% HP geprüft: beschädigte Segel erscheinen nur im niedrigen positiven HP-Zustand und verschwinden nach Wiederherstellung; der Rumpf bleibt am gemeinsamen Bezugspunkt. Der Aufnahmelauf setzt HP für den kontrollierten Vergleich direkt und ist kein physischer Android-Reparaturbutton-Test.
+
+Quellcode, zusätzliche Grafik, APK und Aufnahmen sind im Repository gesichert. Physischer Android-Test weiterhin nicht durchgeführt. Der Satz betrifft die Küstenschaluppe; andere Schiffsdesigns erhalten dadurch keine zusätzlichen beschädigten Ansichten.
