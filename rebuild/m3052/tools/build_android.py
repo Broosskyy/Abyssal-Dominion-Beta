@@ -19,7 +19,12 @@ def checked(command, log, env=None):
     log.write_text(result.stdout, encoding='utf-8')
     if result.returncode or any(s in result.stdout for s in
                               ('SCRIPT ERROR:', 'Parse Error:', 'Failed to load script')):
-        raise RuntimeError(result.stdout[-8000:])
+        lines = result.stdout.splitlines()
+        errors = []
+        for i, line in enumerate(lines):
+            if any(s in line for s in ('ERROR:', 'Parse Error:', 'Error at', 'SCRIPT ERROR:')):
+                errors.extend(lines[max(0, i-1):i+4])
+        raise RuntimeError('\n'.join(errors) + '\n' + result.stdout[-8000:])
     return result.stdout
 
 

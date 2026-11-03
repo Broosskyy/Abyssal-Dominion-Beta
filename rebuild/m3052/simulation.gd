@@ -535,7 +535,7 @@ func export_save() -> Dictionary:
 		"position":[player.pos.x,player.pos.y],"hp":player.hp,"docked":docked}
 
 func restore_save(data: Dictionary) -> bool:
-	if int(data.get("schema",0)) not in [1,2]: return false
+	if not int(data.get("schema",0)) in [1,2]: return false
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
 	player.skin=clampi(int(data.get("skin",22)),0,25)
 	kills=maxi(0,int(data.get("kills",0)))
