@@ -125,6 +125,19 @@ func _run() -> void:
 	game._open_modal("Logbuch")
 	await process_frame;await process_frame
 	check(game.modal_scroll.scroll_vertical==0,"changing menus resets scroll instead of opening half-way down")
+	root.size=Vector2i(720,405)
+	await process_frame
+	game._layout();game._open_modal("Bewaffnung")
+	await process_frame;await process_frame
+	root.size=Vector2i(1280,720)
+	await process_frame
+	game._layout();game._open_modal("Hafen")
+	await process_frame;await process_frame
+	check(game.modal_scroll.get_rect().end.x<=game.modal.size.x-54,"compact-to-wide menu transition keeps content inside the decorative frame")
+	var menu_bounds=true
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		menu_bounds=menu_bounds and button.get_global_rect().end.x<=game.modal_scroll.get_global_rect().end.x+1
+	check(menu_bounds,"actual harbor buttons stay inside the scroll viewport after resize")
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)

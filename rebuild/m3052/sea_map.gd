@@ -456,6 +456,7 @@ func _text(parent: Node,text: String,fontsize: int=14,color: Color=GOLD) -> Labe
 func _button(parent: Node,text: String,callback: Callable) -> Button:
 	var b =Button.new()
 	b.text=text
+	b.clip_text=true
 	b.focus_mode=Control.FOCUS_NONE
 	b.add_theme_font_size_override("font_size",14)
 	b.add_theme_color_override("font_color",GOLD)
@@ -816,7 +817,7 @@ func _open_modal(kind: String) -> void:
 	else:
 		var info =_text(modal_body,"M3053 · HAFEN & SEEGEBIETE\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nHAFEN: Andocken, Rumpf reparieren und Kanonen, Harpunen, Rumpf oder Segel verbessern.\nLOGBUCH: Sieben aufeinanderfolgende Aufträge.\nKARTEN: Portale zur Karibischen See, zum Nordmeer und zu den Schattengewässern.\n\nZwei Finger / Mausrad: Zoom. Ziehen / rechte Maustaste: Kamera.\nZIEL zentriert die Kamera.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",15)
 		info.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-		info.custom_minimum_size=Vector2(modal_scroll.size.x-20,300)
+		info.custom_minimum_size.y=300
 	modal.show()
 	modal_backdrop.show()
 	modal_scroll.set_deferred("scroll_vertical",scroll_position)
@@ -824,7 +825,7 @@ func _open_modal(kind: String) -> void:
 func _info(text: String,color: Color=GOLD) -> Label:
 	var label = _text(modal_body,text,14,color)
 	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	label.custom_minimum_size.x=modal_scroll.size.x-20
+	label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	return label
 
 func _action(text: String,callback: Callable) -> Button:
