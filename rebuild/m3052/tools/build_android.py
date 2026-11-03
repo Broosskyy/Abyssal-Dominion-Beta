@@ -58,7 +58,7 @@ def main():
         pattern = re.compile('^'+re.escape(key)+r'\s*=.*$', re.MULTILINE)
         text = pattern.sub(lambda _: line, text) if pattern.search(text) else text+'\n'+line+'\n'
     settings.write_text(text)
-    for script in ['content.gd', 'simulation.gd']:
+    for script in ['content.gd', 'simulation.gd', 'ship_visuals.gd']:
         checked([engine, '--headless', '--path', str(ROOT), '--check-only', '--script', script], output.with_suffix('.'+script+'.check.log'))
     checked([engine, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.import.log'))
     results = []

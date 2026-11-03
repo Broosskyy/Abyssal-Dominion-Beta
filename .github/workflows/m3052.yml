@@ -53,6 +53,10 @@ jobs:
             XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --fixed-fps 60 --script tests/capture_scene.gd -- --out="$GITHUB_WORKSPACE/releases/M3054/captures/$scene" "--$scene" $extra > "releases/M3054/captures/$scene.log" 2>&1 || { cat "releases/M3054/captures/$scene.log"; exit 1; }
             cat "releases/M3054/captures/$scene.log"
             if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3054/captures/$scene.log"; then exit 1; fi
+            if [ "$scene" = maneuver ]; then
+              ffmpeg -hide_banner -loglevel error -framerate 60 -i releases/M3054/captures/maneuver/motion_%03d.png -vf 'scale=960:-2' -c:v libx264 -crf 28 -pix_fmt yuv420p -movflags +faststart releases/M3054/captures/maneuver/course_change.mp4
+              rm releases/M3054/captures/maneuver/motion_*.png
+            fi
           done
           for page in 0 1 2; do
             XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/ship_render_capture.gd -- --out="$GITHUB_WORKSPACE/releases/M3054/captures/ship-audit" "--page=$page" > "releases/M3054/captures/ship-audit-$page.log" 2>&1 || { cat "releases/M3054/captures/ship-audit-$page.log"; exit 1; }
