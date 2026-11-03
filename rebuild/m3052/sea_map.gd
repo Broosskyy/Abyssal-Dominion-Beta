@@ -577,7 +577,9 @@ func _layout() -> void:
 	var bottom =s.y-76
 	var bw =102.0 if compact else 124.0
 	var total =bw*3+12
-	for i in 3:_place(ammo_buttons[i],s.x*0.5-total*0.5-(90 if compact else 0)+i*(bw+6),bottom,bw,51)
+	for i in 3:
+		ammo_buttons[i].add_theme_font_size_override("font_size",11 if compact else 12)
+		_place(ammo_buttons[i],s.x*0.5-total*0.5-(90 if compact else 0)+i*(bw+6),bottom,bw,51)
 	_place(repair,s.x-275,bottom,122,51)
 	_place(attack,s.x-145,bottom-10,132,65)
 	_place(status,maxf(12,s.x*0.5-260),s.y-23,520,20)

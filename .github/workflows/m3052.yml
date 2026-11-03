@@ -14,6 +14,12 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            rebuild/m3052
+            updates
+            .github/workflows
+          fetch-depth: 1
       - name: Plan native versus content release
         id: plan
         run: python3 rebuild/m3052/tools/release_plan.py
