@@ -1,0 +1,65 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "apk": "ABYSSAL_DOMINION_M3057_REBUILD_ARM64.apk",
+  "sha256": "345b5c221faad50106c2fa69334f9e490a9d5b7e8a779364ccd5579c5233ba36",
+  "bytes": 91286690,
+  "tests": [
+    {
+      "test": "simulation_test",
+      "checks": 22,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "progression_test",
+      "checks": 63,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ship_visual_test",
+      "checks": 767,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ui_test",
+      "checks": 183,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "updater_test",
+      "checks": 42,
+      "failures": [],
+      "native_download_simulation": true,
+      "physical_android_test": false,
+      "status": "PASS"
+    }
+  ],
+  "audited_pngs": 62,
+  "signature": "PASS",
+  "certificate_sha256": "278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b",
+  "version_code": 305701,
+  "package": "com.abyssaldominion.rebuild",
+  "updater_native": true,
+  "update_distribution": "GITHUB_RELEASES_MANIFEST_PUBLISHED_LAST",
+  "alignment_16k": "PASS",
+  "physical_android_test": "NOT_PERFORMED",
+  "mode": "LOCAL_GUEST_SEA_CHART",
+  "public_server": false,
+  "milestone": "M3057",
+  "regions": 3,
+  "quest_chain": 7,
+  "equipment_categories": 4,
+  "equipment_tiers": 3,
+  "source_commit": "4fbdd9162072263e6c86fa16ca91ad39c3792db7",
+  "measured_ship_sources": 28,
+  "measured_ship_frames": 90,
+  "eight_direction_designs": 1,
+  "starter_states": [
+    "intact",
+    "damaged"
+  ],
+  "starter_damage_hp_ratio": 0.35
+}
