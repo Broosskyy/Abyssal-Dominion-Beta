@@ -21,7 +21,7 @@ func _run() -> void:
 	var f=FileAccess.open("user://bad-content.zip",FileAccess.WRITE);f.store_buffer(bytes);f.close()
 	check(not MODEL.verify_file(spec,"user://bad-content.zip"),"modified downloaded ZIP never activates")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://bad-content.zip"))
-	var boot=get_tree().root.get_node("DataBoot")
+	var boot=root.get_node("DataBoot")
 	check(boot.accept(spec,"res://tests/fixtures/content.zip") in ["mounted","restart"],"authenticated newer data can be staged in an owned cache slot")
 	check(boot.active_revision==int(spec.revision),"startup patch activates before gameplay resources load")
 	boot.prepare_game();boot.mark_healthy()
