@@ -2,6 +2,10 @@
 
 The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.4-test.4` / Android code `305404`. M3052 is retained in Git history and `releases/M3052/`.
 
+## Aktuelle Vorgabe: 2D zuerst
+
+Wir stabilisieren zunächst den bestehenden 2D-Spielkern. 3D-Modelle und ein Wechsel der Rendertechnik sind für diese Phase nicht vorgesehen. Ein Referenzschiff mit vorhandenen Richtungsbildern dient zur Prüfung von Fahrt, Zielwahl, Kampf, Beute, Hafen und Speichern, bevor weitere Designs ausgebaut werden. Vergleich, offene Grafikgrenzen und Abnahmekriterien stehen in [2D zuerst](../../docs/design/2D_FIRST.md).
+
 ## M3054 ship rendering changes
 
 Analysis of `206697.mp4` and the actual source sprites identified reflection-origin jumps, a non-clockwise atlas order, unequal transparent padding, generic misplaced hull pivots and detached wake/shadows. M3054 draws every ship from measured visible bounds and a per-frame opaque hull pivot. Reflection uses a canvas transform around that pivot, with positive destination rectangles. Four-heading atlases use explicit ordering and course hysteresis. Shadows, selection rings, hit origins and compact wake strokes share the logical waterline point. Default camera zoom is about 17% closer. Shipyard previews use trimmed frames.
