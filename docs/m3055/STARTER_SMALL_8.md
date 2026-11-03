@@ -38,3 +38,15 @@ Distinct front and rear: the pointed bow and bowsprit ALWAYS opposite the flat s
 Crisp painted game asset finish, strong readable silhouette at 150 pixels in gameplay, moderate detail, clean edge antialiasing, soft consistent neutral lighting without baked ground shadows.
 Equal-sized invisible cells, a complete isolated sprite centered in each, generous space around all silhouettes, at least 10 percent clear margin between ships and cell edges. True transparent alpha outside ships. No sea, water, foam, wakes, shadows, terrain, labels, compass text, borders, grid, title, UI or watermark. Eight ships only.
 ```
+
+## Geprüfter Build
+
+- Version 0.305.5-test.2, Android-Code 305502, Paket com.abyssaldominion.rebuild.
+- Source-Commit d79286ac38e78c0a4441cee4ac6b4955634fb73d.
+- [Erfolgreicher CI-Lauf](https://github.com/Broosskyy/Abyssal-Dominion-Beta/actions/runs/41628517659).
+- 951 Prüfungen erfolgreich: Simulation 22, Progression 63, Schiffsgeometrie/Richtungen 686, UI 180.
+- 61 PNGs mit geprüften Kontrollsummen; 27 Schiffsquellen und 82 erfasste intakte Frames einschließlich der erhaltenen Originale.
+- APK 38.549.876 Bytes, SHA-256 26abc3ba9c2ac36639c9bb1813d5a084ae2c56d052f23e3b2101aabeaeee9b31; Signatur und 16-KB-Ausrichtung bestanden.
+- Acht Richtungen in der tatsächlichen Laufzeitgalerie angesehen. Eine Überschneidung von Bug/Richtungspfeil mit dem Schiffsnamen in der Südansicht wurde dabei entdeckt und in diesem Build korrigiert.
+- Kontrollierte Ost-/West-Fahrbilder zeigen den Rumpf am logischen Auswahlpunkt. Die Bewegungsaufnahme und Galerie liegen unter releases/M3055/captures.
+- Physischer Android-Test nicht durchgeführt. Beschädigte Richtungsbilder und Starter-Medium/Large-Freischaltungen bleiben offen.
