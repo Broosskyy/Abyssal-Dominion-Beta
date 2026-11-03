@@ -66,6 +66,9 @@ var last_touch_ms := -10000
 var interact: Button
 var player_xp: ProgressBar
 var extra_icons: Dictionary = {}
+var modal_backdrop: ColorRect
+var modal_skin: StyleBoxTexture
+var modal_compact_skin: StyleBoxFlat
 
 func _ready() -> void:
 	_load_assets()
@@ -116,6 +119,7 @@ func _load_assets() -> void:
 		extra_icons[name] = load("res://assets/expanded/"+name+".png")
 
 func _process(delta: float) -> void:
+	if modal_backdrop!=null:modal_backdrop.visible=modal.visible
 	elapsed += delta
 	accumulator = minf(accumulator+delta,0.2)
 	while accumulator >= 1.0/30.0:
@@ -394,19 +398,30 @@ func _build_ui() -> void:
 	quest_text=_text(quest_panel,"",12)
 	quest_text.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	quest_claim=_button(quest_panel,"BELOHNUNG ABHOLEN",func():sim.claim_quest();_save_progress();_refresh_ui())
+	modal_backdrop=ColorRect.new()
+	modal_backdrop.color=Color(0.002,0.009,0.018,0.77)
+	modal_backdrop.z_index=19
+	modal_backdrop.visible=false
+	modal_backdrop.mouse_filter=Control.MOUSE_FILTER_STOP
+	ui.add_child(modal_backdrop)
 	modal=_panel(ui)
-	var modal_style=StyleBoxTexture.new()
-	modal_style.texture=load("res://assets/expanded/panel_frame.png")
-	modal_style.texture_margin_left=58
-	modal_style.texture_margin_right=42
-	modal_style.texture_margin_top=65
-	modal_style.texture_margin_bottom=38
-	modal.add_theme_stylebox_override("panel",modal_style)
+	modal_skin=StyleBoxTexture.new()
+	modal_skin.texture=load("res://assets/expanded/panel_frame.png")
+	modal_skin.texture_margin_left=58
+	modal_skin.texture_margin_right=42
+	modal_skin.texture_margin_top=65
+	modal_skin.texture_margin_bottom=38
+	modal_compact_skin=StyleBoxFlat.new()
+	modal_compact_skin.bg_color=Color("081d28")
+	modal_compact_skin.border_color=GOLD
+	modal_compact_skin.set_border_width_all(2)
+	modal_compact_skin.set_corner_radius_all(7)
 	modal.z_index=20
 	modal.visible=false
 	modal_title=_text(modal,"",20)
 	modal_close=_button(modal,"SCHLIESSEN",func():modal.hide();_save_progress())
 	modal_scroll=ScrollContainer.new()
+	modal_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
 	modal.add_child(modal_scroll)
 	modal_body=VBoxContainer.new()
 	modal_body.size_flags_horizontal=Control.SIZE_EXPAND_FILL
@@ -458,11 +473,19 @@ func _layout() -> void:
 	_place(quest_text,12,8,204,50)
 	_place(quest_claim,10,62,208,31)
 	var width =minf(640,s.x-32)
-	var height =minf(560,s.y-60)
+	var height =minf(560,s.y-24)
+	_place(modal_backdrop,0,0,s.x,s.y)
 	_place(modal,(s.x-width)*0.5,(s.y-height)*0.5,width,height)
-	_place(modal_title,52,27,width-220,32)
-	_place(modal_close,width-163,28,112,36)
-	_place(modal_scroll,52,76,width-100,height-118)
+	if compact:
+		modal.add_theme_stylebox_override("panel",modal_compact_skin)
+		_place(modal_title,20,14,width-170,32)
+		_place(modal_close,width-138,14,118,36)
+		_place(modal_scroll,20,63,width-40,height-84)
+	else:
+		modal.add_theme_stylebox_override("panel",modal_skin)
+		_place(modal_title,58,104,width-220,32)
+		_place(modal_close,width-170,104,112,36)
+		_place(modal_scroll,58,150,width-110,height-198)
 
 func _refresh_ui() -> void:
 	if player_name==null:return
@@ -481,7 +504,8 @@ func _refresh_ui() -> void:
 		target_hp.value=selected.hp
 		target_numbers.text="%d / %d HP · %d m"%[int(selected.hp),int(selected.max_hp),roundi(sim.player.pos.distance_to(selected.pos))]
 	attack.text="FEUER STOPP" if sim.firing else "FEUER"
-	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0
+	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0 or sim.docked
+	repair.disabled=sim.docked
 	repair.text="REPAR. STOPP" if sim.repairing else "REPARATUR"
 	for i in 3:
 		ammo_buttons[i].text=("● " if sim.ammo_mode==i else "")+str(sim.player.ammo[i])
@@ -586,13 +610,14 @@ func _open_modal(kind: String) -> void:
 	else:
 		var info =_text(modal_body,"M3053 · HAFEN & SEEGEBIETE\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nHAFEN: Andocken, Rumpf reparieren und Kanonen, Harpunen, Rumpf oder Segel verbessern.\nLOGBUCH: Sieben aufeinanderfolgende Aufträge.\nKARTEN: Portale zur Karibischen See, zum Nordmeer und zu den Schattengewässern.\n\nZwei Finger / Mausrad: Zoom. Ziehen / rechte Maustaste: Kamera.\nZIEL zentriert die Kamera.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",15)
 		info.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-		info.custom_minimum_size=Vector2(modal.size.x-50,300)
+		info.custom_minimum_size=Vector2(modal_scroll.size.x-20,300)
 	modal.show()
+	modal_backdrop.show()
 
 func _info(text: String,color: Color=GOLD) -> Label:
 	var label = _text(modal_body,text,14,color)
 	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	label.custom_minimum_size.x=modal.size.x-120
+	label.custom_minimum_size.x=modal_scroll.size.x-20
 	return label
 
 func _action(text: String,callback: Callable) -> Button:

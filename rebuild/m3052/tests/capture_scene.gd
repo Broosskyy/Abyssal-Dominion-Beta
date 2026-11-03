@@ -29,6 +29,11 @@ func _run() -> void:
 	if combat:
 		game.sim.select(2)
 		game.sim.firing=true
+		var atlas=Image.load_from_file("res://assets/reference/monsters/tiamat.png")
+		print(JSON.stringify({"tiamat_source_size":[atlas.get_width(),atlas.get_height()]}))
+		atlas.resize(768,roundi(float(atlas.get_height())*768.0/float(atlas.get_width())))
+		DirAccess.make_dir_recursive_absolute(output)
+		atlas.save_png(output+"/tiamat_atlas.png")
 	if yard:game._open_modal("Werft")
 	if north:
 		game.sim.configure_map(1)
