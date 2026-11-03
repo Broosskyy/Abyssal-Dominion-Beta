@@ -16,10 +16,17 @@ static func heading_column(heading: Vector2,previous: int=-1) -> int:
 	var sector=posmod(roundi((heading.angle()+PI*0.25)/(PI*0.5)),4)
 	return CLOCKWISE_TO_ATLAS[sector]
 
+static func heading_eight(heading: Vector2,previous: int=-1) -> int:
+	if heading.length_squared()<0.0001:return previous if previous>=0 and previous<8 else 0
+	if previous>=0 and previous<8:
+		var center=-PI*0.5+float(previous)*PI*0.25
+		if absf(wrapf(heading.angle()-center,-PI,PI))<=PI*0.125+0.06:return previous
+	return posmod(roundi((heading.angle()+PI*0.5)/(PI*0.25)),8)
+
 static func geometry(frame: Dictionary,length: float) -> Dictionary:
 	var data: Array=frame.rect
 	var source=Rect2(float(data[0]),float(data[1]),float(data[2]),float(data[3]))
-	var scale=length/maxf(source.size.x,source.size.y)
+	var scale=length/float(frame.get("reference_extent",maxf(source.size.x,source.size.y)))
 	var pivot=Vector2(float(frame.pivot[0]),float(frame.pivot[1]))*scale
 	return {"source":source,"destination":Rect2(-pivot,source.size*scale),"scale":scale,"pivot":pivot}
 

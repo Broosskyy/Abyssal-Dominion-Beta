@@ -13,7 +13,7 @@ func _run() -> void:
 	current_scene=game
 	await process_frame
 	check(game.ship_textures.size()==10 and game.atlas_textures.size()==16,"ten own ship designs and sixteen directional reference atlases loaded")
-	check(game.skins.size()==26,"all 26 ship designs are selectable")
+	check(game.skins.size()==27,"all 27 ship designs including Small Starter are selectable")
 	for dimensions in [Vector2i(1280,720),Vector2i(844,390),Vector2i(720,405)]:
 		root.size=dimensions
 		await process_frame

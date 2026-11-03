@@ -41,6 +41,14 @@ def measure(root):
             'size': list(image.size), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
             'kind': 'directional' if directional else 'single_view',
             'headings': ['NE', 'NW', 'SW', 'SE'] if directional else ['SOURCE_VIEW'], 'frames': frames}
+    overrides_path = root / 'assets/visuals/directional_overrides.json'
+    if overrides_path.exists():
+        for key, descriptor in json.loads(overrides_path.read_text())['entries'].items():
+            path = root / key
+            image = Image.open(path)
+            if list(image.size) != descriptor['size'] or hashlib.sha256(path.read_bytes()).hexdigest() != descriptor['sha256']:
+                raise ValueError('Directional override source changed: '+key)
+            entries[key] = descriptor
     return {'version': 1, 'alpha_threshold': 40,
             'anchor_rule': 'Opaque hull point: lower 45-88% silhouette band median X, nearest to 74% silhouette Y. Measured per frame.',
             'entries': entries}

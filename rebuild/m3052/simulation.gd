@@ -44,7 +44,7 @@ var message := "Seekarte antippen: Kurs setzen · Schiff antippen: Ziel wählen"
 func _init() -> void:
 	player = {"id": 0, "pos": START, "heading": Vector2(-1, 0), "path": [], "hp": PLAYER_HP,
 		"max_hp": PLAYER_HP, "speed": PLAYER_SPEED, "reload": 0.0, "gold": 240,
-		"ammo": [600, 120, 100], "skin": 22, "last_hit": -100.0, "respawn": 0.0, "slow": 0.0}
+		"ammo": [600, 120, 100], "skin": 26, "last_hit": -100.0, "respawn": 0.0, "slow": 0.0}
 	islands = [
 		{"pos": Vector2(1530, 1250), "radius": 145.0, "art": "tropical", "width": 490.0, "name": "Port Azur"},
 		{"pos": Vector2(2640, 1390), "radius": 120.0, "art": "rock", "width": 410.0, "name": "Korsarenbucht"},
@@ -537,7 +537,7 @@ func export_save() -> Dictionary:
 func restore_save(data: Dictionary) -> bool:
 	if not int(data.get("schema",0)) in [1,2]: return false
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
-	player.skin=clampi(int(data.get("skin",22)),0,25)
+	player.skin=clampi(int(data.get("skin",26)),0,26)
 	kills=maxi(0,int(data.get("kills",0)))
 	claimed=bool(data.get("claimed",false))
 	quest_index=clampi(int(data.get("quest_index",1 if claimed else 0)),0,CONTENT.QUESTS.size())

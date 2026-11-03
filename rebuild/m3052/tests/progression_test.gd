@@ -96,6 +96,9 @@ func _initialize() -> void:
 	check(restored.level==4 and restored.xp==27 and restored.quest_index==3 and restored.loot_collected==7,"XP and quest progress survive JSON roundtrip")
 	check(restored.upgrades.hull==1 and restored.upgrades.cannon==1 and int(restored.player.max_hp)==2800,"equipment and derived stats survive JSON roundtrip")
 	check(restored.docked and restored.player.pos==sim.player.pos and int(restored.player.gold)==int(sim.player.gold),"docking, wallet and position survive reload")
+	var starter_save=sim.export_save()
+	starter_save["skin"]=26
+	check(restored.restore_save(starter_save) and int(restored.player.skin)==26,"new Small Starter survives save and restore without clamping to an old design")
 	var legacy={"schema":1,"gold":543,"ammo":[50,20,10],"skin":8,"kills":3,"claimed":true}
 	check(restored.restore_save(legacy) and int(restored.player.gold)==543 and int(restored.player.skin)==8 and restored.quest_index==1,"M3052 legacy wallet, design and claimed quest migrate")
 	check(not restored.restore_save({"schema":999}),"unsupported saves are rejected")

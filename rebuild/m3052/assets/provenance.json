@@ -562,6 +562,15 @@
         485
       ],
       "normalization": "RGBA cropped standalone panel; resized to max 640 px"
+    },
+    {
+      "path": "assets/generated/ships/starter_small_8_intact.png",
+      "bytes": 1109712,
+      "sha256": "b2a7ca2a680b4fa9949743c1080295da7e9d9ac1251ba45349252ee41077230c",
+      "source": "Built-in image generation; Small Starter candidate from uploaded Masterkonzept V3.8 Visual Bible Fig.7 upper row",
+      "asset_id": "SHIP-STARTER-001",
+      "layout": "Eight intact headings N NE E SE / S SW W NW",
+      "receipt": "docs/m3055/STARTER_SMALL_8.md"
     }
   ]
 }

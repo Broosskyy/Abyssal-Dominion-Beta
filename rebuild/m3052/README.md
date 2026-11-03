@@ -1,10 +1,18 @@
-# Abyssal Dominion M3054 — ship rendering fixes and audit
+# Abyssal Dominion M3055 — Small Starter in eight directions
 
-The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.4-test.4` / Android code `305404`. M3052 is retained in Git history and `releases/M3052/`.
+The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.5-test.1` / Android code `305501`. M3052 is retained in Git history and `releases/M3052/`.
 
 ## Aktuelle Vorgabe: 2D zuerst
 
 Wir stabilisieren zunächst den bestehenden 2D-Spielkern. 3D-Modelle und ein Wechsel der Rendertechnik sind für diese Phase nicht vorgesehen. Ein Referenzschiff mit vorhandenen Richtungsbildern dient zur Prüfung von Fahrt, Zielwahl, Kampf, Beute, Hafen und Speichern, bevor weitere Designs ausgebaut werden. Vergleich, offene Grafikgrenzen und Abnahmekriterien stehen in [2D zuerst](../../docs/design/2D_FIRST.md).
+
+## M3055 Small Starter
+
+The new Küstenschaluppe uses the stable ID SHIP-STARTER-001 and saved design index 26. It has eight generated intact 2D headings: N, NE, E, SE, S, SW, W and NW. Fresh guests start with it; existing saves retain their selected design. It is selectable in HAFEN → Werft, labeled 8 ANSICHTEN. All previous 26 designs and source images remain available.
+
+Explicit sprite bounds and reviewed hull anchors share one fixed magnification across all eight headings, preserving natural foreshortening. Heading hysteresis avoids rapid switching at sector boundaries. The starter is displayed smaller than larger test designs. No model or 3D runtime has been introduced.
+
+This is the first integrated art candidate, with generated detail/proportion differences still subject to review. Damaged sprites remain open; every positive-HP frame currently uses the intact set. See [asset receipt](../../docs/m3055/STARTER_SMALL_8.md) and [Seafight design comparison](../../docs/design/SEAFIGHT_DESIGN_COMPARISON.md). CI captures all eight headings through the actual runtime renderer (gallery page 3), plus the existing maneuver video and gameplay captures.
 
 ## M3054 ship rendering changes
 
@@ -19,7 +27,7 @@ See [`docs/m3054/SHIP_RENDER_AUDIT.md`](../../docs/m3054/SHIP_RENDER_AUDIT.md) f
 - Three connected regions: Caribbean Sea (level 1), North Sea (level 2), Shadow Waters (level 4). Regional island art, mirrored layouts, ocean tint and increasingly strong enemies. East/west portals require physical sailing and six seconds without damage. Returning during a session preserves previous enemy and loot state.
 - Physical harbor marker, docking, departure, paid drydock repair and four functional equipment categories with three purchased tiers: cannon/chain damage, harpoon damage, maximum hull HP and sailing speed. Docking pauses local combat.
 - Captain XP and levels 1–20, with seven sequential quests for combat, salvage, monsters, exploration and elite ships. Rewards are claimed once; previous achievements count toward subsequent tasks.
-- Four visual loot categories and equipment/quest/map icons extracted from the supplied 110-PNG reference collection. Seventeen additional cropped runtime images, including a panel frame; all 60 PNGs have provenance and SHA-256 checksums. Full reference boards are not copied into runtime as backgrounds.
+- Four visual loot categories and equipment/quest/map icons extracted from the supplied 110-PNG reference collection. Seventeen additional cropped runtime images, including a panel frame; all 61 PNGs have provenance and SHA-256 checksums. Full reference boards are not copied into runtime as backgrounds.
 - Guest save schema 2 persists level, XP, equipment, quest counters, visited regions, current region, position and hull. Schema-1 M3052 saves retain wallet, ammunition, design and claimed first quest. Existing app package, signing cache and save filename are retained.
 
 ## Controls
@@ -28,7 +36,7 @@ Tap water to sail and an enemy to select it. FEUER toggles cannon fire. Harpoons
 
 ## Build and verification
 
-`.github/workflows/m3052.yml` builds `releases/M3054/ABYSSAL_DOMINION_M3054_REBUILD_ARM64.apk`. The builder audits every PNG, imports and tests the project, verifies embedded textures, ARM64 engine, signature, 16 KB alignment and application/version identity. CI also captures actual gameplay at desktop and mobile landscape sizes; no generated mockups serve as QA evidence. Build reports record the source commit. Simulation, progression and UI tests use fresh isolated guest storage.
+`.github/workflows/m3052.yml` builds `releases/M3055/ABYSSAL_DOMINION_M3055_REBUILD_ARM64.apk`. The builder audits every PNG, imports and tests the project, verifies embedded textures, ARM64 engine, signature, 16 KB alignment and application/version identity. CI also captures actual gameplay at desktop and mobile landscape sizes; no generated mockups serve as QA evidence. Build reports record the source commit. Simulation, progression and UI tests use fresh isolated guest storage.
 
 ## Scope
 

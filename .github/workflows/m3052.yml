@@ -1,4 +1,4 @@
-name: M3054 ship rendering audit and fixes - Android
+name: M3055 ship rendering audit and fixes - Android
 on:
   workflow_dispatch:
   push:
@@ -41,7 +41,7 @@ jobs:
             keytool -genkeypair -keystore "$HOME/.cache/abyssal-test-signing/debug.keystore" -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Abyssal Development,O=Abyssal Dominion,C=DE'
           fi
       - name: Test and verify APK
-        run: python3 rebuild/m3052/tools/build_android.py --godot /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --keystore "$HOME/.cache/abyssal-test-signing/debug.keystore" --output "$GITHUB_WORKSPACE/releases/M3054/ABYSSAL_DOMINION_M3054_REBUILD_ARM64.apk"
+        run: python3 rebuild/m3052/tools/build_android.py --godot /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --keystore "$HOME/.cache/abyssal-test-signing/debug.keystore" --output "$GITHUB_WORKSPACE/releases/M3055/ABYSSAL_DOMINION_M3055_REBUILD_ARM64.apk"
       - name: Capture desktop and mobile gameplay
         shell: bash
         run: |
@@ -50,27 +50,27 @@ jobs:
             sudo apt-get update -qq
             sudo apt-get install -y -qq ffmpeg
           fi
-          mkdir -p releases/M3054/captures
+          mkdir -p releases/M3055/captures
           for scene in combat harbor maps north maneuver; do
             extra=""
             if [ "$scene" = harbor ] || [ "$scene" = maps ]; then extra="--mobile"; fi
-            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --fixed-fps 60 --script tests/capture_scene.gd -- --out="$GITHUB_WORKSPACE/releases/M3054/captures/$scene" "--$scene" $extra > "releases/M3054/captures/$scene.log" 2>&1 || { cat "releases/M3054/captures/$scene.log"; exit 1; }
-            cat "releases/M3054/captures/$scene.log"
-            if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3054/captures/$scene.log"; then exit 1; fi
+            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --fixed-fps 60 --script tests/capture_scene.gd -- --out="$GITHUB_WORKSPACE/releases/M3055/captures/$scene" "--$scene" $extra > "releases/M3055/captures/$scene.log" 2>&1 || { cat "releases/M3055/captures/$scene.log"; exit 1; }
+            cat "releases/M3055/captures/$scene.log"
+            if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3055/captures/$scene.log"; then exit 1; fi
             if [ "$scene" = maneuver ]; then
-              ffmpeg -hide_banner -loglevel error -framerate 20 -i releases/M3054/captures/maneuver/motion_%03d.png -vf 'scale=960:-2' -c:v libx264 -crf 28 -pix_fmt yuv420p -movflags +faststart releases/M3054/captures/maneuver/course_change.mp4
-              rm releases/M3054/captures/maneuver/motion_*.png
+              ffmpeg -hide_banner -loglevel error -framerate 20 -i releases/M3055/captures/maneuver/motion_%03d.png -vf 'scale=960:-2' -c:v libx264 -crf 28 -pix_fmt yuv420p -movflags +faststart releases/M3055/captures/maneuver/course_change.mp4
+              rm releases/M3055/captures/maneuver/motion_*.png
             fi
           done
-          for page in 0 1 2; do
-            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a --server-args='-screen 0 1600x2304x24' /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/ship_render_capture.gd -- --out="$GITHUB_WORKSPACE/releases/M3054/captures/ship-audit" "--page=$page" > "releases/M3054/captures/ship-audit-$page.log" 2>&1 || { cat "releases/M3054/captures/ship-audit-$page.log"; exit 1; }
-            cat "releases/M3054/captures/ship-audit-$page.log"
-            if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3054/captures/ship-audit-$page.log"; then exit 1; fi
+          for page in 0 1 2 3; do
+            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a --server-args='-screen 0 1600x2304x24' /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/ship_render_capture.gd -- --out="$GITHUB_WORKSPACE/releases/M3055/captures/ship-audit" "--page=$page" > "releases/M3055/captures/ship-audit-$page.log" 2>&1 || { cat "releases/M3055/captures/ship-audit-$page.log"; exit 1; }
+            cat "releases/M3055/captures/ship-audit-$page.log"
+            if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3055/captures/ship-audit-$page.log"; then exit 1; fi
           done
       - uses: actions/upload-artifact@v4
         with:
-          name: Abyssal-Dominion-M3054-Android
-          path: releases/M3054/
+          name: Abyssal-Dominion-M3055-Android
+          path: releases/M3055/
           if-no-files-found: error
           retention-days: 90
       - name: Preserve verified APK in repository
@@ -84,6 +84,6 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f releases/M3054/*.apk releases/M3054/*.build.json releases/M3054/*.signature.txt releases/M3054/*.manifest.txt releases/M3054/captures/
-          git commit -m 'Preserve verified M3054 APK, ship galleries and gameplay captures [skip ci]'
+          git add -f releases/M3055/*.apk releases/M3055/*.build.json releases/M3055/*.signature.txt releases/M3055/*.manifest.txt releases/M3055/captures/
+          git commit -m 'Preserve verified M3055 APK, ship galleries and gameplay captures [skip ci]'
           git push origin HEAD:main

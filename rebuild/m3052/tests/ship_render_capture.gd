@@ -8,7 +8,7 @@ func _run() -> void:
 		if arg.begins_with("--out="):output=arg.trim_prefix("--out=")
 		if arg.begins_with("--page="):page=int(arg.trim_prefix("--page="))
 	root.content_scale_size=Vector2i.ZERO
-	root.size=Vector2i(1280,2120 if page==0 else 1720)
+	root.size=Vector2i(1280,900 if page==3 else (2120 if page==0 else 1720))
 	var game=load("res://sea_map.tscn").instantiate()
 	game.gallery_page=page
 	root.add_child(game)
