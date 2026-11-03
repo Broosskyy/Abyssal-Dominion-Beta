@@ -69,5 +69,16 @@ func _run() -> void:
 	game._open_modal("Hafen")
 	await process_frame;await process_frame;await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output+"/harbor-menu-top.png")
+	game.modal.hide();game.modal_backdrop.hide();game.sim.depart()
+	game.sim.player.pos=Vector2(2200,2400);game.sim.player.heading=Vector2(1,-1).normalized()
+	npc.art=14;npc.name="Schmuggler";npc.pos=Vector2(1980,2400);npc.heading=game.sim.player.heading;npc.path=[];npc.aggressive=false
+	var galleon: Dictionary=npc.duplicate(true)
+	galleon.id=999;galleon.art=12;galleon.name="Königsgaleone";galleon.pos=Vector2(2440,2400);galleon.elite=false
+	game.sim.npcs.append(galleon);game.sim.target=-1
+	game.camera.position=game.sim.player.pos;game._refresh_ui();game.queue_redraw()
+	game.ocean.set_shader_parameter("camera_world",game.camera.position)
+	game.chart_mini.camera_world=game.camera.position;game.chart_mini.queue_redraw()
+	await process_frame;await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(output+"/fleet-scale.png")
 	print(JSON.stringify({"status":"CAPTURED","scenario":"real four-view movement and live harbor","frames":140,"telemetry":true}))
 	quit()

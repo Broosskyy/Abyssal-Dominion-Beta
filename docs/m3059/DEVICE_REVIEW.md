@@ -6,6 +6,8 @@ Two behavior defects were confirmed against source: docking returned before the 
 
 Neutral ships now use amber markers and health bars, hostile/retaliating NPCs use red, monsters remain distinguishable on the minimap, and the selected minimap target has a small outline. The target card follows the same neutral/hostile health colors. The clipped cannon icon was removed from the narrow weapons button. Docked status explicitly says to depart, and harbor copy reflects a moving sea rather than a paused simulation.
 
+Visible ship size now follows the hull catalog for both player and NPC versions, instead of deriving NPC size from elite rank. In particular the elite pinnace was previously 150 world units while a non-elite galleon was 136; it is now 92 versus 156. This changes artwork scale, not HP, damage or rewards. Renderer evidence includes a same-heading small-hull / starter / galleon comparison.
+
 Existing source ship views, source resolution and atlas artwork are unchanged. Low-resolution four-view NPC art still differs visibly from the newer eight-view starter, especially at close zoom. These corrections do not claim new NPC perspectives or replacement artwork. Further fleet art and UI direction remain active work.
 
 Validation includes moored-captain protection with moving patrols in all three regions, exact diagonal motion, neutral proximity/selection and retaliation, menu reopen/reset/purchase-scroll behavior, and the existing simulation, progression, rendering and signed resource-pack checks. Renderer evidence adds a live-harbor image, menu-top image and a measured patrol-distance receipt. No bootstrap/native files are changed, so distribution remains data-only for shell 305901.

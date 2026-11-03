@@ -14,6 +14,11 @@ func _run() -> void:
 	await process_frame
 	check(game.ship_textures.size()==10 and game.atlas_textures.size()==16,"ten own ship designs and sixteen directional reference atlases loaded")
 	check(game.skins.size()==27,"all 27 ship designs including Small Starter are selectable")
+	check(game._actor_visual_length(game.sim.npcs[14])<game._actor_visual_length(game.sim.npcs[12])*0.7,"elite pinnace stays visibly smaller than a non-elite galleon")
+	var previous_skin: int=game.sim.player.skin
+	game.sim.player.skin=24
+	check(is_equal_approx(game._actor_visual_length(game.sim.player),game._actor_visual_length(game.sim.npcs[14])),"player and NPC versions of the same hull use the same visible size")
+	game.sim.player.skin=previous_skin
 	check(game._starter_texture(2400,2400)==game.starter_texture,"full HP selects actual intact starter texture")
 	check(game._starter_texture(600,2400)==game.starter_damaged_texture,"low HP selects actual damaged starter texture")
 	check(game._starter_texture(2400,2400)==game.starter_texture,"repair returns actual texture to intact without stale damage cache")

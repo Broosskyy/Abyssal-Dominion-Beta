@@ -284,12 +284,21 @@ func _draw_portal_marker(point: Vector2,locked: bool) -> void:
 func _starter_texture(hp: float,max_hp: float) -> Texture2D:
 	return starter_damaged_texture if VISUALS.damage_state(hp,max_hp)==1 else starter_texture
 
+func _actor_visual_length(actor: Dictionary) -> float:
+	if int(actor.id)==0:
+		var skin=int(sim.player.skin)
+		if skin==26:return 132.0
+		if skin>=10:return float(CONTENT.SHIP_LENGTHS[skin-10])
+		return 156.0
+	if actor.kind=="ship":return float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])
+	return 150.0
+
 func _draw_actor(actor: Dictionary) -> void:
 	if float(actor.hp)<=0:return
 	var is_player = int(actor.id)==0
 	var point: Vector2=actor.pos
 	var heading: Vector2=actor.heading
-	var length=(132.0 if int(sim.player.skin)==26 else 156.0) if is_player else (150.0 if actor.elite else 136.0)
+	var length=_actor_visual_length(actor)
 	if not actor.path.is_empty():
 		var side=Vector2(-heading.y,heading.x)
 		for j in 4:
