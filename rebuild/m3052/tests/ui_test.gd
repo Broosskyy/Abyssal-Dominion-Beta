@@ -4,6 +4,11 @@ var count:=0
 func check(ok: bool,label: String) -> void:
 	count+=1
 	if not ok:failures.append(label)
+func label_fits(button: Button) -> bool:
+	var font=button.get_theme_font("font")
+	var skin=button.get_theme_stylebox("normal")
+	var available=button.size.x-skin.get_content_margin(SIDE_LEFT)-skin.get_content_margin(SIDE_RIGHT)
+	return font.get_string_size(button.text,HORIZONTAL_ALIGNMENT_LEFT,-1,button.get_theme_font_size("font_size")).x<=available+1
 func _initialize() -> void:
 	call_deferred("_run")
 func _run() -> void:
@@ -28,6 +33,7 @@ func _run() -> void:
 		game._layout()
 		game.sim.select(2)
 		game._refresh_ui()
+		for nav: Button in game.nav_buttons:check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
 		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.interact,game.loadout_button]
 		controls.append_array(game.ammo_buttons)
 		for control: Control in controls:
@@ -62,6 +68,11 @@ func _run() -> void:
 	game.sim.select(2)
 	game._toggle_fire()
 	check(game.sim.firing,"fire control changes actual simulation state")
+	check(label_fits(game.attack),"active fire stop action is fully readable at compact size")
+	game.sim.player.hp=1000;game.sim.player.last_hit=-100
+	game.repair.pressed.emit();game._refresh_ui()
+	check(label_fits(game.repair),"active repair stop action is fully readable at compact size")
+	game.repair.pressed.emit();game._refresh_ui()
 	game.ammo_buttons[1].pressed.emit()
 	check(game.sim.ammo_mode==1,"ammo UI selects actual chain ammunition")
 	game._refresh_ui()

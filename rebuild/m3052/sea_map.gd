@@ -504,6 +504,7 @@ func _build_ui() -> void:
 	nav_buttons.append(_button(chrome,"HAFEN",func():_open_modal("Hafen")))
 	nav_buttons.append(_button(chrome,"LOGBUCH",func():_open_modal("Logbuch")))
 	nav_buttons.append(_button(chrome,"KARTEN",func():_open_modal("Seekarten")))
+	for nav: Button in nav_buttons:nav.add_theme_font_size_override("font_size",13)
 	player_panel=_panel(ui)
 	player_portrait=_portrait(player_panel)
 	player_name=_text(player_panel,"",15,CYAN)
@@ -688,10 +689,10 @@ func _refresh_ui() -> void:
 		var disposition="IM KAMPF" if sim.npc_engages(selected) else ("FEINDLICH" if CONTENT.MAPS[sim.map_id].npc_hostile else "NEUTRAL")
 		target_health_skin.bg_color=Color("b36452") if bool(selected.aggressive) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) else Color("baa165")
 		target_numbers.text="%d / %d HP\n%s · %d m"%[int(selected.hp),int(selected.max_hp),disposition,roundi(sim.player.pos.distance_to(selected.pos))]
-	attack.text="FEUER STOPP" if sim.firing else "FEUER"
+	attack.text="STOPP" if sim.firing else "FEUER"
 	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0 or sim.docked
 	repair.disabled=sim.docked
-	repair.text="REPAR. STOPP" if sim.repairing else "REPARATUR"
+	repair.text="STOPP" if sim.repairing else "REPARATUR"
 	for i in 3:
 		ammo_buttons[i].text=["Vollkugeln","Kettenkugeln","Harpunen"][i]+"\n"+("✓ " if sim.ammo_mode==i else "")+str(sim.player.ammo[i])
 		ammo_buttons[i].set_pressed_no_signal(sim.ammo_mode==i)
