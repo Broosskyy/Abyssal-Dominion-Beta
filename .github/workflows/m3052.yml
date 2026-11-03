@@ -46,6 +46,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          if ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
           mkdir -p releases/M3054/captures
           for scene in combat harbor maps north maneuver; do
             extra=""
@@ -54,7 +58,7 @@ jobs:
             cat "releases/M3054/captures/$scene.log"
             if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3054/captures/$scene.log"; then exit 1; fi
             if [ "$scene" = maneuver ]; then
-              ffmpeg -hide_banner -loglevel error -framerate 60 -i releases/M3054/captures/maneuver/motion_%03d.png -vf 'scale=960:-2' -c:v libx264 -crf 28 -pix_fmt yuv420p -movflags +faststart releases/M3054/captures/maneuver/course_change.mp4
+              ffmpeg -hide_banner -loglevel error -framerate 20 -i releases/M3054/captures/maneuver/motion_%03d.png -vf 'scale=960:-2' -c:v libx264 -crf 28 -pix_fmt yuv420p -movflags +faststart releases/M3054/captures/maneuver/course_change.mp4
               rm releases/M3054/captures/maneuver/motion_*.png
             fi
           done

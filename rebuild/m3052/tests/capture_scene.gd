@@ -58,9 +58,9 @@ func _run() -> void:
 	for i in (420 if demo else 180):
 		await process_frame
 		if maneuver and i==90:game.sim.course(game.sim.START-Vector2(240,0))
-		if maneuver:
+		if maneuver and i%3==0:
 			await RenderingServer.frame_post_draw
-			var motion_error=root.get_texture().get_image().save_png(output+"/motion_%03d.png"%i)
+			var motion_error=root.get_texture().get_image().save_png(output+"/motion_%03d.png"%int(i/3.0))
 			if motion_error!=OK:push_error("Maneuver frame failed")
 		if demo and i==230:
 			game.sim.course(game.sim.npcs[1].pos)
