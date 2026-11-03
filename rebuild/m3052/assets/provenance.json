@@ -581,6 +581,16 @@
       "asset_id": "SHIP-STARTER-001",
       "layout": "N NE E SE / S SW W NW; damaged but afloat",
       "receipt": "docs/m3056/STARTER_DAMAGE.md"
+    },
+    {
+      "path": "assets/reference/landmarks/port_watchtower.png",
+      "bytes": 24676,
+      "sha256": "446253f26e9b6387965d05499d109e39df826fedb76777c07b32d871e5072de1",
+      "source_archive": "SeaBattles (1.24.0).apks",
+      "layout": "single static watchtower sprite; no ship direction claims",
+      "source_serialized_file": "sharedassets0.assets",
+      "source_name": "RoyaleTowerIcon3",
+      "source_path_id": 682
     }
   ]
 }

@@ -21,3 +21,7 @@ The four existing island PNGs were measured using alpha ≥180, largest connecte
 ## Verification limits
 
 Tests cover signed metadata, tampered ZIPs, replayed revisions, activation, independent pack-only scene loading, navigation legs, free navigation for eight-view/3D metadata, measured collision geometry and existing gameplay/UI/save behavior. Renderer captures include actual simulated legacy motion plus telemetry and water/coast/ammunition views. They are controlled fixtures, not device replays. Physical Android data-download/background/relaunch acceptance remains pending. Further ships, guild islands, detailed cannon loadouts and guild systems remain separate content/system work; none are claimed by this foundation update.
+
+## First content-only acceptance release
+
+After the bootstrap was built and verified, a separate game-only change adds the extracted static RoyaleTowerIcon3 sprite as a neutral harbor watchtower, aligns island captions with measured coast bounds and suppresses the harbor icon beneath nearby ship labels. This is scenery, not implemented guild ownership or siege rules. The source PNG is recorded in assets/provenance.json. Its release must report apk_built=false and preserve the existing native version/signature before this is described as an end-to-end data-only publishing test.

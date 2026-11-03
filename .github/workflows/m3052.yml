@@ -141,7 +141,7 @@ jobs:
           if [ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]; then echo 'Newer source exists; leaving artifact available.'; exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f updates/*.json releases/M3059/*.build.json releases/M3059/data.json releases/M3059/captures/ rebuild/m3052/updater/data_public.pem rebuild/m3052/assets/content_version.json
-          if [ -f releases/M3059/latest.json ]; then git add -f releases/M3059/latest.json releases/M3059/*.signature.txt releases/M3059/*.manifest.txt releases/M3059/*.android-xml.txt; fi
+          git add --sparse -f updates/*.json releases/M3059/*.build.json releases/M3059/data.json releases/M3059/captures/ rebuild/m3052/updater/data_public.pem rebuild/m3052/assets/content_version.json
+          if [ -f releases/M3059/latest.json ]; then git add --sparse -f releases/M3059/latest.json releases/M3059/*.signature.txt releases/M3059/*.manifest.txt releases/M3059/*.android-xml.txt; fi
           git commit -m 'Preserve signed data release, optional bootstrap and renderer checks [skip ci]'
           git -c pack.window=0 push origin HEAD:main

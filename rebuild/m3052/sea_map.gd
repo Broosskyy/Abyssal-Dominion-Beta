@@ -102,6 +102,7 @@ func _ready() -> void:
 	if data_boot!=null:data_boot.mark_healthy()
 
 func _load_assets() -> void:
+	extra_icons.port_watchtower=load("res://assets/reference/landmarks/port_watchtower.png")
 	ship_frames=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/ship_frames.json")).entries
 	var pack: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(USER_ROOT+"pack.json"))
 	for item: Dictionary in pack.ship_catalog:
@@ -172,15 +173,21 @@ func _draw() -> void:
 		var dimensions = tex.get_size()*width/tex.get_width()
 		var point: Vector2 = island.pos
 		draw_texture_rect(tex,Rect2(point-dimensions*Vector2(0.5,0.65),dimensions),false)
-		_label(point+Vector2(0,dimensions.y*0.31+20),island.name,16,GOLD)
+		if island.pos==sim.islands[0].pos:
+			var tower: Texture2D=extra_icons.port_watchtower
+			var tower_size=tower.get_size()*42.0/tower.get_width()
+			var foundation: Vector2=island.bounds.get_center()+Vector2(10,24)
+			draw_texture_rect(tower,Rect2(foundation-tower_size*Vector2(0.5,0.96),tower_size),false)
+		_label(Vector2(point.x,island.bounds.end.y+26),island.name,16,GOLD)
 	# Planned route and tap marker remain visible without obscuring the sea.
 	# Docks and portals occupy water cells and are also marked on the minimap.
 	# Compact anchor replaces the oversized dock circle and upgrade-arrow placeholder.
-	var anchor=sim.harbor
-	draw_circle(anchor-Vector2(0,23),6,GOLD,false,2.0,true)
-	draw_line(anchor-Vector2(0,17),anchor+Vector2(0,17),GOLD,2.5,true)
-	draw_line(anchor-Vector2(13,7),anchor+Vector2(13,-7),GOLD,2.0,true)
-	draw_arc(anchor+Vector2(0,1),23,0,PI,24,GOLD,2.5,true)
+	if _landmark_label_visible(sim.harbor):
+		var anchor=sim.harbor
+		draw_circle(anchor-Vector2(0,23),6,GOLD,false,2.0,true)
+		draw_line(anchor-Vector2(0,17),anchor+Vector2(0,17),GOLD,2.5,true)
+		draw_line(anchor-Vector2(13,7),anchor+Vector2(13,-7),GOLD,2.0,true)
+		draw_arc(anchor+Vector2(0,1),23,0,PI,24,GOLD,2.5,true)
 	if _landmark_label_visible(sim.harbor):_label(sim.harbor+Vector2(0,100),"HAFEN · ANDOCKEN",13,GOLD)
 	for portal in sim.portals:
 		if not view.has_point(portal.pos): continue

@@ -25,10 +25,11 @@ func _run() -> void:
 		await process_frame;await RenderingServer.frame_post_draw
 		if root.get_texture().get_image().save_png(output+"/motion_%03d.png"%frame)!=OK:quit(1);return
 	var f=FileAccess.open(output+"/zigzag.json",FileAccess.WRITE);f.store_string(JSON.stringify(telemetry));f.close()
-	game.sim.player.pos=Vector2(1850,1400);game.camera.position=game.sim.player.pos;game.sim.npcs.clear()
+	game.sim.player.pos=Vector2(1800,1320);game.camera.position=Vector2(1720,1180);game.sim.npcs.clear()
 	game.camera.zoom=Vector2.ONE*.96;game._refresh_ui();game.queue_redraw()
 	game.ocean.set_shader_parameter("camera_world",game.camera.position)
-	game.chart_mini.camera_world=game.camera.position;game.chart_mini.queue_redraw()
+	game.ocean.set_shader_parameter("map_zoom",game.camera.zoom.x)
+	game.chart_mini.camera_world=game.camera.position;game.chart_mini.view_world=game.get_viewport_rect().size/game.camera.zoom;game.chart_mini.queue_redraw()
 	await process_frame;await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output+"/coast-water-ammo.png")
 	print(JSON.stringify({"status":"CAPTURED","scenario":"real four-view movement","frames":140,"telemetry":true}))
