@@ -1,7 +1,7 @@
 {
   "engine": "4.7.2.stable.official.ed1daf0bf",
   "apk": "ABYSSAL_DOMINION_M3053_REBUILD_ARM64.apk",
-  "sha256": "8992cdb8dcf7c0dc01a41ef0cc885512495ee448907d9ac9f757d8692e267ccf",
+  "sha256": "64af64bf02aabb50256e1ae7d8b516e4df24132f4845eee2ca6960d6fc1000c1",
   "bytes": 37824321,
   "tests": [
     {
@@ -34,5 +34,5 @@
   "quest_chain": 7,
   "equipment_categories": 4,
   "equipment_tiers": 3,
-  "source_commit": "03ec4704d5f9b11ad56418356f909307c9a18579"
+  "source_commit": "321510adffce1422cfa3af704febb1fcb60a7291"
 }
