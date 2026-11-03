@@ -27,7 +27,10 @@ func _initialize() -> void:
 	check(sim.course(right),"click sets route")
 	for i in 500:sim._move(sim.player,1.0/30.0)
 	check(sim.player.pos.distance_to(right)<4,"ship reaches destination around island")
-	check(not sim.course(sim.islands[0].pos),"island interior rejects course")
+	var land=Vector2.ZERO
+	for vertex: Vector2 in sim.islands[0].outline:land+=vertex
+	land/=sim.islands[0].outline.size()
+	check(not sim.course(land),"measured island interior rejects course")
 
 	sim=SIM.new()
 	npc=sim.npcs[0]
