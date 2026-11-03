@@ -3,9 +3,9 @@ const MONSTER_COLUMNS := 4
 const MONSTER_ROWS := 10
 ## Authored gameplay data, separate from simulation and presentation.
 const MAPS := [
-	{"name":"Karibische See", "code":"1-1", "level":1, "art":["tropical","rock","tropical","tropical","rock","tropical","tropical","rock","tropical"], "tint":Color(0.75,1.14,1.12), "enemy_scale":1.0},
-	{"name":"Nordmeer", "code":"2-1", "level":2, "art":["snow2","snow","snow2","snow","rock","snow2","snow","rock","snow2"], "tint":Color(0.78,0.98,1.32), "enemy_scale":1.5},
-	{"name":"Schattengewässer", "code":"3-1", "level":4, "art":["rock","rock","snow2","rock","rock","snow","rock","rock","snow2"], "tint":Color(0.90,0.68,1.02), "enemy_scale":2.2}
+	{"name":"Karibische See", "code":"1-1", "level":1, "art":["tropical","rock","tropical","tropical","rock","tropical","tropical","rock","tropical"], "tint":Color(0.75,1.14,1.12), "npc_hostile":false, "enemy_scale":1.0},
+	{"name":"Nordmeer", "code":"2-1", "level":2, "art":["snow2","snow","snow2","snow","rock","snow2","snow","rock","snow2"], "tint":Color(0.78,0.98,1.32), "npc_hostile":false, "enemy_scale":1.5},
+	{"name":"Schattengewässer", "code":"3-1", "level":4, "art":["rock","rock","snow2","rock","rock","snow","rock","rock","snow2"], "tint":Color(0.90,0.68,1.02), "npc_hostile":true, "enemy_scale":2.2}
 ]
 const UPGRADE_KEYS := ["cannon","harpoon","hull","sails"]
 const UPGRADES := {

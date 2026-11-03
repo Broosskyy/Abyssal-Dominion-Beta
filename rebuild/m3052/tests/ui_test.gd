@@ -23,7 +23,7 @@ func _run() -> void:
 		game._layout()
 		game.sim.select(2)
 		game._refresh_ui()
-		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.interact]
+		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.interact,game.loadout_button]
 		controls.append_array(game.ammo_buttons)
 		for control: Control in controls:
 			var rect=control.get_global_rect()
@@ -32,6 +32,11 @@ func _run() -> void:
 			for j in range(i+1,controls.size()):
 				check(not controls[i].get_global_rect().intersects(controls[j].get_global_rect()),"independent touch targets %s / %s at %s"%[controls[i].name,controls[j].name,dimensions])
 		check(not game.player_panel.get_global_rect().intersects(game.target_panel.get_global_rect()),"player and target cards do not overlap")
+		check(game.player_portrait.texture!=null and game.target_portrait.texture!=null,"player and selected NPC show actual ship portraits")
+		check(game.combat_dock.get_global_rect().encloses(game.attack.get_global_rect()),"combat actions are contained in the unified lower dock")
+		game.loadout_button.pressed.emit()
+		check(game.modal_kind=="Bewaffnung" and game.modal.visible,"quick weapons control opens real ammunition and cannon information")
+		game.modal.hide()
 		game._open_modal("Werft")
 		await process_frame
 		check(game.modal_scroll.size.y>100 and game.modal_scroll.get_v_scroll_bar().max_value>game.modal_scroll.size.y,"shipyard uses actual scrollable content")

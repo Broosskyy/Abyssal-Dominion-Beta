@@ -25,10 +25,35 @@ func _initialize() -> void:
 	for point: Vector2 in route:
 		safe=safe and sim.segment_free(before,point);before=point
 	check(safe,"every zigzag segment is checked against coastline geometry")
+	body.path=route
+	var diagonal_motion=true
+	for _i in 160:
+		sim._move(body,0.1)
+		if not body.path.is_empty():diagonal_motion=diagonal_motion and absf(absf(body.heading.x)-absf(body.heading.y))<0.001
+	check(diagonal_motion and body.pos.distance_to(Vector2(950,500))<0.01,"actual movement preserves diagonal headings through waypoints without corner cutting")
+	body.pos=Vector2(500,500)
 	body.view_count=8
 	check(sim.plan_actor_path(body,Vector2(950,500)).size()==1,"eight-view ships retain free straight navigation")
 	body.renderer="3d";body.view_count=4
 	check(sim.plan_actor_path(body,Vector2(950,500)).size()==1,"future 3D renderer does not inherit legacy zigzag restriction")
+	for map_index in [0,1,2]:
+		sim.configure_map(map_index)
+		sim.shots.clear()
+		body=sim.npcs[0];sim.npcs.clear();sim.npcs.append(body)
+		body.pos=Vector2(700,500);body.home=body.pos;body.reload=0.0
+		sim.player.pos=Vector2(500,500);sim.player.hp=sim.player.max_hp
+		sim.select(body.id)
+		for _i in 30:sim._step_npc(body,1.0/30.0)
+		check(sim.shots.is_empty() if map_index<2 else not sim.shots.is_empty(),"entry maps never attack on proximity or selection; hostile map still does: "+str(map_index))
+		sim.shots.clear();body.aggressive=true;body.reload=0.0;body.pos=Vector2(700,500)
+		sim._step_npc(body,0.1)
+		check(not sim.shots.is_empty(),"provoked NPC can retaliate on map "+str(map_index))
+		sim.player.pos=Vector2(2500,500);sim._step_npc(body,0.1)
+		check(not body.aggressive and body.state=="patrol","escaping combat clears retaliation instead of permanent pursuit: "+str(map_index))
+	sim=SIM.new()
+	body=sim.npcs[0];body.pos=Vector2(500,500);body.home=body.pos;body.patrol=0
+	var patrol=sim._patrol_path(body)
+	check(not patrol.is_empty() and patrol.back().distance_to(body.home)>=220,"patrols cover a substantial course rather than tiny circles")
 	for island: Dictionary in sim.islands:
 		var centroid=Vector2.ZERO
 		for vertex: Vector2 in island.outline:centroid+=vertex

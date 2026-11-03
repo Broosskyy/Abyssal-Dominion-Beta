@@ -166,9 +166,11 @@ func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
 	var before: Vector2=body.pos
 	for waypoint: Vector2 in base:
 		var accepted=false
-		for size in [96.0,48.0,24.0,12.0]:
-			for side in [1,-1]:
-				var legs=NAV.diagonal_leg(before,waypoint,size,side if int(body.id)%2==0 else -side)
+		var cross_heading: float=body.heading.y if absf(waypoint.x-before.x)>=absf(waypoint.y-before.y) else body.heading.x
+		var preferred_side=1 if cross_heading>0.01 else (-1 if cross_heading< -0.01 else (1 if int(body.id)%2==0 else -1))
+		for size in [150.0,96.0,48.0,24.0,12.0]:
+			for side in [preferred_side,-preferred_side]:
+				var legs=NAV.diagonal_leg(before,waypoint,size,side)
 				var cursor=before
 				var safe=true
 				for leg: Vector2 in legs:
@@ -263,7 +265,8 @@ func _move(body: Dictionary, delta: float) -> void:
 	while travel > 0.01 and not body.path.is_empty():
 		var goal: Vector2 = body.path[0]
 		var gap: Vector2 = goal - body.pos
-		if gap.length() < 2.0:
+		if gap.length() < 0.001:
+			body.pos=goal
 			body.path.pop_front()
 			continue
 		body.heading = gap.normalized()
@@ -275,6 +278,24 @@ func _move(body: Dictionary, delta: float) -> void:
 		body.pos = next
 		travel -= amount
 		if amount >= gap.length(): body.path.pop_front()
+
+func npc_engages(npc: Dictionary) -> bool:
+	# Entry regions are neutral: proximity and selecting a target never provoke fire.
+	return int(player.hp)>0 and npc.pos.distance_to(npc.home)<900 and npc.pos.distance_to(player.pos)<1000 and (bool(npc.aggressive) or (bool(CONTENT.MAPS[map_id].npc_hostile) and npc.pos.distance_to(player.pos)<380))
+
+func _patrol_path(npc: Dictionary) -> Array[Vector2]:
+	# Long diamond circuits match the authored diagonal views instead of tiny loops.
+	var offsets=[Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT,Vector2.UP]
+	for radius in [340.0,220.0,140.0]:
+		for attempt in 4:
+			var index=posmod(int(npc.patrol)+1+attempt,4)
+			var goal: Vector2=npc.home+offsets[index]*radius
+			if npc.pos.distance_to(goal)<60:continue
+			var route=plan_actor_path(npc,goal)
+			if not route.is_empty():
+				npc.patrol=index
+				return route
+	return []
 
 func _step_npc(npc: Dictionary, delta: float) -> void:
 	if int(npc.hp) <= 0:
@@ -289,25 +310,24 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 	npc.slow = maxf(0, float(npc.slow) - delta)
 	npc.repath -= delta
 	var distance: float = npc.pos.distance_to(player.pos)
-	var pursue = int(player.hp) > 0 and (distance < 300 or bool(npc.aggressive)) and npc.pos.distance_to(npc.home) < 900
+	var pursue = npc_engages(npc)
 	if pursue:
 		npc.state = "attack" if distance < 390 else "approach"
 		if distance > 305 and float(npc.repath) <= 0:
 			npc.path = plan_actor_path(npc,player.pos)
-			npc.repath = 1.5
+			npc.repath = 3.0
 		elif distance <= 305:
 			npc.path = []
 		if distance < 420 and float(npc.reload) <= 0 and segment_free(npc.pos, player.pos):
 			_launch(npc.id, 0, "harpoon" if npc.kind == "monster" else "cannon", roundi((36.0 if npc.elite else 23.0)*float(CONTENT.MAPS[map_id].enemy_scale)), 2)
 			npc.reload = 3.2 if npc.kind == "monster" else 2.6
 	else:
+		if npc.state!="patrol":npc.path=[]
 		npc.state = "patrol"
 		npc.aggressive = false
-		if npc.path.is_empty():
-			npc.patrol = (int(npc.patrol) + 1) % 4
-			var offsets = [Vector2(140, 0), Vector2(0, 135), Vector2(-145, 0), Vector2(0, -135)]
-			var destination: Vector2 = npc.home + offsets[int(npc.patrol)]
-			npc.path = plan_actor_path(npc,destination)
+		if npc.path.is_empty() and float(npc.repath)<=0:
+			npc.path = _patrol_path(npc)
+			npc.repath=2.0 if npc.path.is_empty() else 0.0
 	_move(npc, delta)
 
 func _fire_player() -> void:

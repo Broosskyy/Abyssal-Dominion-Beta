@@ -32,5 +32,21 @@ func _run() -> void:
 	game.chart_mini.camera_world=game.camera.position;game.chart_mini.view_world=game.get_viewport_rect().size/game.camera.zoom;game.chart_mini.queue_redraw()
 	await process_frame;await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output+"/coast-water-ammo.png")
+	npc.pos=game.sim.player.pos+Vector2(230,-30);npc.hp=npc.max_hp;npc.aggressive=false;npc.state="patrol"
+	game.sim.npcs.append(npc);game.sim.select(npc.id)
+	for dimensions in [Vector2i(720,405),Vector2i(844,390)]:
+		root.size=dimensions
+		await process_frame
+		game._layout();game._refresh_ui();game.queue_redraw()
+		game.camera.position=game.sim.player.pos
+		game.ocean.set_shader_parameter("camera_world",game.camera.position)
+		game.ocean.set_shader_parameter("viewport_size",game.get_viewport_rect().size)
+		game.chart_mini.camera_world=game.camera.position;game.chart_mini.view_world=game.get_viewport_rect().size/game.camera.zoom;game.chart_mini.queue_redraw()
+		await process_frame;await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png(output+"/hud-%dx%d.png" % [dimensions.x,dimensions.y])
+		game._open_modal("Bewaffnung")
+		await process_frame;await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png(output+"/weapons-%dx%d.png" % [dimensions.x,dimensions.y])
+		game.modal.hide();game.modal_backdrop.hide()
 	print(JSON.stringify({"status":"CAPTURED","scenario":"real four-view movement","frames":140,"telemetry":true}))
 	quit()
