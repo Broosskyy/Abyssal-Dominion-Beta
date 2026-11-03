@@ -36,6 +36,13 @@ func _run() -> void:
 		await process_frame
 		check(game.modal_scroll.size.y>100 and game.modal_scroll.get_v_scroll_bar().max_value>game.modal_scroll.size.y,"shipyard uses actual scrollable content")
 		game.modal.hide()
+	root.size=Vector2i(1280,720)
+	await process_frame
+	game._layout();game._open_modal("Hafen")
+	check(game.modal_scroll.position.x>=76 and game.modal_scroll.get_rect().end.y<=game.modal.size.y-78,"decorative frame has an inset safe scroll area")
+	game.sim.player.pos=game.sim.portals[0].pos
+	check(not game._landmark_label_visible(game.sim.player.pos),"actual portal suppresses overlapping caption beneath captain name")
+	game.sim.player.pos=game.sim.START
 	var hp=int(game.sim.player.hp)
 	var gold=int(game.sim.player.gold)
 	var position: Vector2=game.sim.player.pos

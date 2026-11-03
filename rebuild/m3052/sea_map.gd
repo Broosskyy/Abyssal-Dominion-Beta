@@ -179,15 +179,13 @@ func _draw() -> void:
 	_ellipse_line(sim.harbor,Vector2(86,36),Color(0.85,0.72,0.4,0.5),2.0)
 	var harbor_icon: Texture2D = extra_icons.upgrade_sails
 	draw_texture_rect(harbor_icon,Rect2(sim.harbor-Vector2(40,70),Vector2(80,80)),false)
-	_label(sim.harbor+Vector2(0,56),"HAFEN · ANDOCKEN",13,GOLD)
+	if _landmark_label_visible(sim.harbor):_label(sim.harbor+Vector2(0,100),"HAFEN · ANDOCKEN",13,GOLD)
 	for portal in sim.portals:
 		if not view.has_point(portal.pos): continue
 		var pp: Vector2 = portal.pos
-		_ellipse_line(pp,Vector2(80,35),Color(0.4,0.75,1,0.4+0.2*sin(elapsed*2)),2.5)
-		var portal_icon: Texture2D = icons.portal
-		draw_texture_rect(portal_icon,Rect2(pp-Vector2(48,67),Vector2(96,96)),false)
-		var region = CONTENT.MAPS[int(portal.destination)]
-		_label(pp+Vector2(0,55),"%s · AB LV. %d" % [region.name,region.level],14,CYAN)
+		var region: Dictionary = CONTENT.MAPS[int(portal.destination)]
+		_draw_portal_marker(pp,int(region.level)>sim.level)
+		if _landmark_label_visible(pp):_label(pp+Vector2(0,100),"%s · AB LV. %d" % [region.name,region.level],14,CYAN)
 	if not sim.player.path.is_empty():
 		var before: Vector2 = sim.player.pos
 		for point: Vector2 in sim.player.path:
@@ -234,7 +232,6 @@ func _draw() -> void:
 		if event.type=="impact":
 			var fade = maxf(0,1-age/0.6)
 			_ellipse_line(p,Vector2(12+age*45,8+age*22),Color(0.95,0.84,0.60,fade),2.3)
-			_label(p+Vector2(0,-65-age*33),"−%d"%int(event.value),19,Color(1,0.65,0.33,1-age/1.2))
 		elif event.type=="muzzle" and age<0.35:
 			draw_circle(p,8+age*18,Color(1,0.73,0.3,(1-age/0.35)*0.65))
 		elif event.type=="sunk":
@@ -244,6 +241,28 @@ func _draw() -> void:
 		elif event.type=="level":
 			_ellipse_line(p,Vector2(50+age*80,22+age*35),Color(0.5,0.9,1,1-age/1.2),2.2)
 			_label(p+Vector2(0,-100-age*25),"KAPITÄNSSTUFE %d" % int(event.value),22,CYAN)
+
+	for group: Dictionary in VISUALS.impact_labels(sim.events,sim.clock):
+		var age=sim.clock-float(group.time)
+		_label(group.pos+Vector2(0,-65-age*33-float(group.lane)*26),"−%d"%int(group.value),19,Color(1,0.65,0.33,1-age/1.2))
+
+func _landmark_label_visible(point: Vector2) -> bool:
+	var bodies: Array=[sim.player]
+	bodies.append_array(sim.npcs)
+	return VISUALS.landmark_label_visible(point,bodies)
+
+func _draw_portal_marker(point: Vector2,locked: bool) -> void:
+	# Transparent chart gate, not a repair chest or an opaque inventory tile.
+	var color=Color("a79c78") if locked else Color("66cddd")
+	_ellipse(point,Vector2(76,31),Color(color,0.07))
+	for i in 3:
+		var phase=fmod(elapsed*0.35+float(i)/3.0,1.0)
+		_ellipse_line(point,Vector2(42+phase*42,17+phase*17),Color(color,(1-phase)*0.6),2.0)
+	for i in 4:
+		var angle=float(i)*PI*0.5
+		var tip=point+Vector2(cos(angle)*85,sin(angle)*35)
+		var inner=point+Vector2(cos(angle)*70,sin(angle)*28)
+		draw_line(inner,tip,color,2.2,true)
 
 func _starter_texture(hp: float,max_hp: float) -> Texture2D:
 	return starter_damaged_texture if VISUALS.damage_state(hp,max_hp)==1 else starter_texture
@@ -574,9 +593,9 @@ func _layout() -> void:
 		_place(modal_scroll,20,63,width-40,height-84)
 	else:
 		modal.add_theme_stylebox_override("panel",modal_skin)
-		_place(modal_title,58,104,width-220,32)
+		_place(modal_title,76,110,width-238,32)
 		_place(modal_close,width-170,104,112,36)
-		_place(modal_scroll,58,150,width-110,height-198)
+		_place(modal_scroll,76,160,width-130,height-238)
 
 func _refresh_ui() -> void:
 	if player_name==null:return

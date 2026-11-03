@@ -1,6 +1,10 @@
-# Abyssal Dominion M3057 — Android background updater
+# Abyssal Dominion M3058 — video regressions
 
-The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.7-test.2` / Android code `305702`. M3052 is retained in Git history and `releases/M3052/`.
+The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.8-test.1` / Android code `305801`. M3052 is retained in Git history and `releases/M3052/`.
+
+## M3058 video regressions
+
+Submitted recordings 206805/206806/206807 show an opaque chest used as a chart portal, stacked damage numbers and harbor content reaching into its decorative frame. Gates now use transparent chart rings, navigation captions yield to nearby ships, damage text totals a short volley without changing simulation damage, and the decorated panel has a deeper safe scroll inset. Phone-sized runtime captures retain the project canvas stretch at 2340×1080. Existing low-resolution NPC art and four-view limits remain open; no new ship art is claimed. See [video audit](../../docs/m3058/VIDEO_AUDIT.md).
 
 ## M3057 updater
 
@@ -46,7 +50,7 @@ Tap water to sail and an enemy to select it. FEUER toggles cannon fire. Harpoons
 
 ## Build and verification
 
-`.github/workflows/m3052.yml` builds `releases/M3057/ABYSSAL_DOMINION_M3057_REBUILD_ARM64.apk`. The builder audits every PNG, imports and tests the project, verifies embedded textures, ARM64 engine, signature, 16 KB alignment and application/version identity. CI also captures actual gameplay at desktop and mobile landscape sizes; no generated mockups serve as QA evidence. Build reports record the source commit. Simulation, progression and UI tests use fresh isolated guest storage.
+`.github/workflows/m3052.yml` builds `releases/M3058/ABYSSAL_DOMINION_M3058_REBUILD_ARM64.apk`. The builder audits every PNG, imports and tests the project, verifies embedded textures, ARM64 engine, signature, 16 KB alignment and application/version identity. CI also captures actual gameplay at desktop and mobile landscape sizes; no generated mockups serve as QA evidence. Build reports record the source commit. Simulation, progression and UI tests use fresh isolated guest storage.
 
 ## Scope
 

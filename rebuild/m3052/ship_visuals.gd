@@ -41,3 +41,33 @@ static func world_rect(frame: Dictionary,point: Vector2,length: float,flipped: b
 	var local: Rect2=spec.destination
 	if flipped:local.position.x=-local.end.x
 	return Rect2(point+local.position,local.size)
+
+## Captions stay clear of live ships passing through a dock or gate.
+static func landmark_label_visible(point: Vector2,bodies: Array) -> bool:
+	for body: Dictionary in bodies:
+		if float(body.get("hp",0))>0 and point.distance_to(body.pos)<180:return false
+	return true
+
+## Display totals for closely spaced hits; simulation damage remains unchanged.
+static func impact_labels(events: Array,now: float) -> Array[Dictionary]:
+	var groups: Array[Dictionary]=[]
+	for event: Dictionary in events:
+		var age=now-float(event.time)
+		if event.type!="impact" or age<0 or age>=1.48:continue
+		var merged=false
+		for i in range(groups.size()-1,-1,-1):
+			var group: Dictionary=groups[i]
+			if int(group.actor)==int(event.actor) and float(event.time)-float(group.time)<=0.28:
+				group.value+=int(event.value)
+				merged=true
+				break
+		if not merged:groups.append({"actor":int(event.actor),"pos":event.pos,"time":float(event.time),"value":int(event.value),"lane":0})
+	var lanes: Dictionary={}
+	for i in range(groups.size()-1,-1,-1):
+		var group: Dictionary=groups[i]
+		group.lane=int(lanes.get(group.actor,0))
+		lanes[group.actor]=int(group.lane)+1
+	var visible: Array[Dictionary]=[]
+	for group: Dictionary in groups:
+		if now-float(group.time)<1.2:visible.append(group)
+	return visible
