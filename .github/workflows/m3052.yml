@@ -50,7 +50,8 @@ jobs:
           for scene in combat harbor maps north; do
             extra=""
             if [ "$scene" = harbor ] || [ "$scene" = maps ]; then extra="--mobile"; fi
-            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --path rebuild/m3052 --fixed-fps 60 --script tests/capture_scene.gd -- --out="$GITHUB_WORKSPACE/releases/M3053/captures/$scene" "--$scene" $extra > "releases/M3053/captures/$scene.log" 2>&1
+            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --fixed-fps 60 --script tests/capture_scene.gd -- --out="$GITHUB_WORKSPACE/releases/M3053/captures/$scene" "--$scene" $extra > "releases/M3053/captures/$scene.log" 2>&1 || { cat "releases/M3053/captures/$scene.log"; exit 1; }
+            cat "releases/M3053/captures/$scene.log"
             if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3053/captures/$scene.log"; then exit 1; fi
           done
       - uses: actions/upload-artifact@v4
