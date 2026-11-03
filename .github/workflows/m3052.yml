@@ -60,6 +60,9 @@ jobs:
             sudo apt-get install -y -qq ffmpeg
           fi
           mkdir -p releases/M3057/captures
+          XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/capture_updater.gd -- --out="$GITHUB_WORKSPACE/releases/M3057/captures/updater" > releases/M3057/captures/updater.log 2>&1 || { cat releases/M3057/captures/updater.log; exit 1; }
+          cat releases/M3057/captures/updater.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' releases/M3057/captures/updater.log; then exit 1; fi
           for scene in combat harbor maps north maneuver damage; do
             extra=""
             if [ "$scene" = harbor ] || [ "$scene" = maps ]; then extra="--mobile"; fi
@@ -78,9 +81,6 @@ jobs:
             cat "releases/M3057/captures/ship-audit-$page.log"
             if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3057/captures/ship-audit-$page.log"; then exit 1; fi
           done
-          XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/capture_updater.gd -- --out="$GITHUB_WORKSPACE/releases/M3057/captures/updater" > releases/M3057/captures/updater.log 2>&1 || { cat releases/M3057/captures/updater.log; exit 1; }
-          cat releases/M3057/captures/updater.log
-          if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' releases/M3057/captures/updater.log; then exit 1; fi
       - uses: actions/upload-artifact@v4
         with:
           name: Abyssal-Dominion-M3057-Android

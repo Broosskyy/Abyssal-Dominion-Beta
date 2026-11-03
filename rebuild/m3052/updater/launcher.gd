@@ -7,7 +7,7 @@ var bar: ProgressBar
 var action: Button
 var play: Button
 var panel: Panel
-var box: VBoxContainer
+var box: Control
 var countdown=false
 
 func _ready() -> void:
@@ -19,7 +19,7 @@ func _ready() -> void:
 	skin.set_border_width_all(1);skin.set_corner_radius_all(16)
 	skin.content_margin_left=28;skin.content_margin_right=28;skin.content_margin_top=24;skin.content_margin_bottom=24
 	panel.add_theme_stylebox_override("panel",skin)
-	box=VBoxContainer.new();box.add_theme_constant_override("separation",12);box.alignment=BoxContainer.ALIGNMENT_CENTER;panel.add_child(box)
+	box=Control.new();panel.add_child(box)
 	var title=Label.new();title.text="ABYSSAL DOMINION";title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size",25);title.add_theme_color_override("font_color",Color("e1c68b"));box.add_child(title)
 	var version=Label.new();version.text="Version "+str(ProjectSettings.get_setting("application/config/version",""));version.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;box.add_child(version)
@@ -40,8 +40,14 @@ func _layout() -> void:
 	var width=minf(540,s.x-32)
 	panel.size=Vector2(width,minf(410,s.y-24))
 	panel.position=(s-panel.size)*0.5
-	box.position=Vector2(24,16)
-	box.size=panel.size-Vector2(48,32)
+	box.position=Vector2(24,(panel.size.y-318)/2)
+	box.size=Vector2(panel.size.x-48,318)
+	# Fixed slots avoid Container minimum-height feedback from wrapped labels.
+	var slots=[Vector2(0,32),Vector2(36,24),Vector2(70,52),Vector2(132,16),Vector2(164,48),Vector2(222,48),Vector2(282,36)]
+	for i in box.get_child_count():
+		var widget=box.get_child(i) as Control
+		widget.position=Vector2(0,slots[i].x)
+		widget.size=Vector2(box.size.x,slots[i].y)
 
 func _refresh() -> void:
 	status.text=updater.message;bar.value=updater.progress
