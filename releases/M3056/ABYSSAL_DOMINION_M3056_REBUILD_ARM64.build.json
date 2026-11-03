@@ -1,0 +1,52 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "apk": "ABYSSAL_DOMINION_M3056_REBUILD_ARM64.apk",
+  "sha256": "de090d506da3d31d9964b09626baac5bc4d9322446ca9b6a46d85995c8376e08",
+  "bytes": 39250536,
+  "tests": [
+    {
+      "test": "simulation_test",
+      "checks": 22,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "progression_test",
+      "checks": 63,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ship_visual_test",
+      "checks": 767,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ui_test",
+      "checks": 183,
+      "failures": [],
+      "status": "PASS"
+    }
+  ],
+  "audited_pngs": 62,
+  "signature": "PASS",
+  "alignment_16k": "PASS",
+  "physical_android_test": "NOT_PERFORMED",
+  "mode": "LOCAL_GUEST_SEA_CHART",
+  "public_server": false,
+  "milestone": "M3056",
+  "regions": 3,
+  "quest_chain": 7,
+  "equipment_categories": 4,
+  "equipment_tiers": 3,
+  "source_commit": "a24c7f8dce6375b9368f6bf2da3c5e7a4de55e21",
+  "measured_ship_sources": 28,
+  "measured_ship_frames": 90,
+  "eight_direction_designs": 1,
+  "starter_states": [
+    "intact",
+    "damaged"
+  ],
+  "starter_damage_hp_ratio": 0.35
+}
