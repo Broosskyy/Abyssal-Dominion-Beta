@@ -1,0 +1,46 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "apk": "ABYSSAL_DOMINION_M3054_REBUILD_ARM64.apk",
+  "sha256": "d69f4bea71f1731436653c86a31c9bf0c83ff514df7ad452fbb7aa56775c11d6",
+  "bytes": 37832740,
+  "tests": [
+    {
+      "test": "simulation_test",
+      "checks": 22,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "progression_test",
+      "checks": 62,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ship_visual_test",
+      "checks": 617,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ui_test",
+      "checks": 180,
+      "failures": [],
+      "status": "PASS"
+    }
+  ],
+  "audited_pngs": 60,
+  "signature": "PASS",
+  "alignment_16k": "PASS",
+  "physical_android_test": "NOT_PERFORMED",
+  "mode": "LOCAL_GUEST_SEA_CHART",
+  "public_server": false,
+  "milestone": "M3054",
+  "regions": 3,
+  "quest_chain": 7,
+  "equipment_categories": 4,
+  "equipment_tiers": 3,
+  "source_commit": "04ab0f0af6fdb9285e4e6acc8787824a47289d0f",
+  "measured_ship_sources": 26,
+  "measured_ship_frames": 74
+}
