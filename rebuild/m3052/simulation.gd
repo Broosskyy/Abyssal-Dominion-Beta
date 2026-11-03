@@ -298,7 +298,7 @@ func _fire_player() -> void:
 		firing = false
 		return
 	player.ammo[ammo_mode] -= count
-		_launch(0, target, AMMO_NAMES[ammo_mode], weapon_damage(ammo_mode), count)
+	_launch(0, target, AMMO_NAMES[ammo_mode], weapon_damage(ammo_mode), count)
 	player.reload = 1.65
 	victim.aggressive = true
 	repairing = false
