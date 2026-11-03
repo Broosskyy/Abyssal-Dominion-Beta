@@ -1,0 +1,96 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "milestone": "M3059",
+  "source_commit": "69d56d3b0398bdbf1e0bdf86d2d6297f0021e734",
+  "bootstrap_sha256": "38990a296a1c2131b97a3c411aa3963e1082a4a6af78a333128c4437b3d37238",
+  "tests": [
+    {
+      "test": "simulation_test",
+      "checks": 22,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "progression_test",
+      "checks": 63,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ship_visual_test",
+      "checks": 777,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ui_test",
+      "checks": 186,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "updater_test",
+      "checks": 42,
+      "failures": [],
+      "native_download_simulation": true,
+      "physical_android_test": false,
+      "status": "PASS"
+    },
+    {
+      "test": "navigation_test",
+      "checks": 26,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "content_update_test",
+      "checks": 19,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "content_pack_boot_test",
+      "checks": 8,
+      "failures": [],
+      "game_loaded_from_data_pack": true,
+      "status": "PASS"
+    }
+  ],
+  "data": {
+    "revision": 28,
+    "abi": 1,
+    "engine": "4.7.2.stable",
+    "min_apk": 305901,
+    "bytes": 10643946,
+    "sha256": "89d6ec9e05abfeda5d7b28cbc8742a6f8cdec52bc1e7785a3ea26d9d8a94a24d",
+    "signature": "CqyHOHV+SIPV7aojFkFJ3lbrinYK+pmhAuSaO0z5jYbpzyY9FnmtkGZxd/5gCYOTPvP/9H+8AiB9+9QJAZwuC5ge4pjf1zwWJvr0oBjj+/8J90CF3HnVVeGujITvEbflLFM9G1STvVfFGoJ/zN0eHj5eORz6G6WN2YswfdC7ERvimZmjQXuFa+4knnM2DG/h7soLXYYy3b7kE6iLERkoMyUIvxLApT6QTdLa9xroUQKEmrqKH49Qb9RNHtBwzf+p1ZDPWE5OhMVUkCPaOBJgoyUjOK+FaVP4Qu99oJv4pfrE0Rt1Yx2J7OrPIc2YCEw6BD+lcqk+2BzCFx6fH5Gw7g==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-28/ABYSSAL_DATA_28.zip"
+  },
+  "audited_pngs": 62,
+  "physical_android_test": "NOT_PERFORMED",
+  "apk_built": true,
+  "apk": "ABYSSAL_DOMINION_M3059_REBUILD_ARM64.apk",
+  "sha256": "a7af10f4bd81b4a84dc2acce387f00471aa2b19391aac842f9abc18c3b881e98",
+  "bytes": 91310211,
+  "signature": "PASS",
+  "certificate_sha256": "278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b",
+  "version_code": 305901,
+  "package": "com.abyssaldominion.rebuild",
+  "updater_native": true,
+  "update_distribution": "GITHUB_RELEASES_MANIFEST_PUBLISHED_LAST",
+  "alignment_16k": "PASS",
+  "mode": "LOCAL_GUEST_SEA_CHART",
+  "public_server": false,
+  "regions": 3,
+  "quest_chain": 7,
+  "equipment_categories": 4,
+  "equipment_tiers": 3,
+  "measured_ship_sources": 28,
+  "measured_ship_frames": 90,
+  "eight_direction_designs": 1,
+  "starter_states": [
+    "intact",
+    "damaged"
+  ],
+  "starter_damage_hp_ratio": 0.35
+}

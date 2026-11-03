@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "channel": "test",
+  "latest": {
+    "version_code": 305901,
+    "package": "com.abyssaldominion.rebuild",
+    "certificate_sha256": "278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b",
+    "bytes": 91310211,
+    "sha256": "a7af10f4bd81b4a84dc2acce387f00471aa2b19391aac842f9abc18c3b881e98",
+    "bootstrap_sha256": "38990a296a1c2131b97a3c411aa3963e1082a4a6af78a333128c4437b3d37238",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/abyssal-305901-android/ABYSSAL_DOMINION_305901.apk"
+  }
+}

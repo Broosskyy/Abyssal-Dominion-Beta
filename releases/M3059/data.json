@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "channel": "test",
+  "latest": {
+    "revision": 28,
+    "abi": 1,
+    "engine": "4.7.2.stable",
+    "min_apk": 305901,
+    "bytes": 10643946,
+    "sha256": "89d6ec9e05abfeda5d7b28cbc8742a6f8cdec52bc1e7785a3ea26d9d8a94a24d",
+    "signature": "CqyHOHV+SIPV7aojFkFJ3lbrinYK+pmhAuSaO0z5jYbpzyY9FnmtkGZxd/5gCYOTPvP/9H+8AiB9+9QJAZwuC5ge4pjf1zwWJvr0oBjj+/8J90CF3HnVVeGujITvEbflLFM9G1STvVfFGoJ/zN0eHj5eORz6G6WN2YswfdC7ERvimZmjQXuFa+4knnM2DG/h7soLXYYy3b7kE6iLERkoMyUIvxLApT6QTdLa9xroUQKEmrqKH49Qb9RNHtBwzf+p1ZDPWE5OhMVUkCPaOBJgoyUjOK+FaVP4Qu99oJv4pfrE0Rt1Yx2J7OrPIc2YCEw6BD+lcqk+2BzCFx6fH5Gw7g==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-28/ABYSSAL_DATA_28.zip"
+  }
+}
