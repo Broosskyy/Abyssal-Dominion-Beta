@@ -1,0 +1,85 @@
+{
+  "method": "Mean absolute RGB matching on opaque lower 28 percent of each healthy frame; search +/-7 source pixels. This estimates translation, not full geometric identity.",
+  "rows": [
+    {
+      "heading": "N",
+      "sample_pixels": 9728,
+      "best_hull_translation": [
+        0,
+        0
+      ],
+      "mean_rgb_error": 10.37,
+      "estimated_translation_world_px": 0.0
+    },
+    {
+      "heading": "NE",
+      "sample_pixels": 12448,
+      "best_hull_translation": [
+        -1,
+        0
+      ],
+      "mean_rgb_error": 8.87,
+      "estimated_translation_world_px": 0.377
+    },
+    {
+      "heading": "E",
+      "sample_pixels": 20819,
+      "best_hull_translation": [
+        0,
+        0
+      ],
+      "mean_rgb_error": 7.77,
+      "estimated_translation_world_px": 0.0
+    },
+    {
+      "heading": "SE",
+      "sample_pixels": 10944,
+      "best_hull_translation": [
+        -1,
+        0
+      ],
+      "mean_rgb_error": 9.64,
+      "estimated_translation_world_px": 0.377
+    },
+    {
+      "heading": "S",
+      "sample_pixels": 7186,
+      "best_hull_translation": [
+        0,
+        0
+      ],
+      "mean_rgb_error": 11.39,
+      "estimated_translation_world_px": 0.0
+    },
+    {
+      "heading": "SW",
+      "sample_pixels": 11009,
+      "best_hull_translation": [
+        0,
+        0
+      ],
+      "mean_rgb_error": 9.45,
+      "estimated_translation_world_px": 0.0
+    },
+    {
+      "heading": "W",
+      "sample_pixels": 20914,
+      "best_hull_translation": [
+        0,
+        0
+      ],
+      "mean_rgb_error": 8.14,
+      "estimated_translation_world_px": 0.0
+    },
+    {
+      "heading": "NW",
+      "sample_pixels": 11837,
+      "best_hull_translation": [
+        0,
+        0
+      ],
+      "mean_rgb_error": 9.29,
+      "estimated_translation_world_px": 0.0
+    }
+  ]
+}

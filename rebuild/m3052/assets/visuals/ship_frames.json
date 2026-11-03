@@ -1574,6 +1574,157 @@
           "reference_extent": 350
         }
       ]
+    },
+    "assets/generated/ships/starter_small_8_damaged.png": {
+      "size": [
+        1774,
+        887
+      ],
+      "sha256": "c09a1c0680620e74e68f4484a5fc1d3c044be8dca6492e72940f3c31085a099e",
+      "kind": "eight_direction",
+      "headings": [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+      ],
+      "condition": "damaged",
+      "asset_id": "SHIP-STARTER-001",
+      "frames": [
+        {
+          "rect": [
+            151,
+            25,
+            140,
+            386
+          ],
+          "pivot": [
+            71,
+            277
+          ],
+          "column": 0,
+          "row": 0,
+          "heading": "N",
+          "reference_extent": 350
+        },
+        {
+          "rect": [
+            534,
+            30,
+            262,
+            372
+          ],
+          "pivot": [
+            119,
+            274
+          ],
+          "column": 1,
+          "row": 0,
+          "heading": "NE",
+          "reference_extent": 350
+        },
+        {
+          "rect": [
+            946,
+            44,
+            354,
+            325
+          ],
+          "pivot": [
+            170,
+            261
+          ],
+          "column": 2,
+          "row": 0,
+          "heading": "E",
+          "reference_extent": 350
+        },
+        {
+          "rect": [
+            1439,
+            41,
+            251,
+            342
+          ],
+          "pivot": [
+            122,
+            250
+          ],
+          "column": 3,
+          "row": 0,
+          "heading": "SE",
+          "reference_extent": 350
+        },
+        {
+          "rect": [
+            155,
+            476,
+            136,
+            369
+          ],
+          "pivot": [
+            68,
+            255
+          ],
+          "column": 0,
+          "row": 1,
+          "heading": "S",
+          "reference_extent": 350
+        },
+        {
+          "rect": [
+            518,
+            485,
+            275,
+            334
+          ],
+          "pivot": [
+            138,
+            250
+          ],
+          "column": 1,
+          "row": 1,
+          "heading": "SW",
+          "reference_extent": 350
+        },
+        {
+          "rect": [
+            916,
+            484,
+            361,
+            317
+          ],
+          "pivot": [
+            184,
+            254
+          ],
+          "column": 2,
+          "row": 1,
+          "heading": "W",
+          "reference_extent": 350
+        },
+        {
+          "rect": [
+            1415,
+            482,
+            271,
+            362
+          ],
+          "pivot": [
+            134,
+            253
+          ],
+          "column": 3,
+          "row": 1,
+          "heading": "NW",
+          "reference_extent": 350
+        }
+      ],
+      "anchor_alignment": "Lower hull RGB registration against intact source; NE and SE pivots shifted -1 source pixel X."
     }
   }
 }

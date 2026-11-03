@@ -571,6 +571,16 @@
       "asset_id": "SHIP-STARTER-001",
       "layout": "Eight intact headings N NE E SE / S SW W NW",
       "receipt": "docs/m3055/STARTER_SMALL_8.md"
+    },
+    {
+      "path": "assets/generated/ships/starter_small_8_damaged.png",
+      "bytes": 1061029,
+      "sha256": "c09a1c0680620e74e68f4484a5fc1d3c044be8dca6492e72940f3c31085a099e",
+      "source": "Built-in image editing of the existing eight-direction Small Starter; torn sail state",
+      "reference": "assets/generated/ships/starter_small_8_intact.png",
+      "asset_id": "SHIP-STARTER-001",
+      "layout": "N NE E SE / S SW W NW; damaged but afloat",
+      "receipt": "docs/m3056/STARTER_DAMAGE.md"
     }
   ]
 }

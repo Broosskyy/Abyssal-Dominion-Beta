@@ -23,6 +23,12 @@ static func heading_eight(heading: Vector2,previous: int=-1) -> int:
 		if absf(wrapf(heading.angle()-center,-PI,PI))<=PI*0.125+0.06:return previous
 	return posmod(roundi((heading.angle()+PI*0.5)/(PI*0.25)),8)
 
+## 0=intact, 1=damaged but afloat, 2=sunk. Damage threshold is a local test value.
+static func damage_state(hp: float,max_hp: float) -> int:
+	if hp<=0:return 2
+	if max_hp>0 and hp/max_hp<=0.35:return 1
+	return 0
+
 static func geometry(frame: Dictionary,length: float) -> Dictionary:
 	var data: Array=frame.rect
 	var source=Rect2(float(data[0]),float(data[1]),float(data[2]),float(data[3]))

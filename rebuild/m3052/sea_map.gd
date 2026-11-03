@@ -72,6 +72,7 @@ var modal_skin: StyleBoxTexture
 var modal_compact_skin: StyleBoxFlat
 var ship_frames: Dictionary = {}
 var starter_texture: Texture2D
+var starter_damaged_texture: Texture2D
 var facing_cache: Dictionary = {}
 var direction_cache: Dictionary = {}
 var gallery_page := -1
@@ -114,6 +115,7 @@ func _load_assets() -> void:
 		skins.append({"name":hull_names[i],"directional":true,"atlas":i})
 		skin_previews.append(_ship_preview(atlas_textures[i],0))
 	starter_texture=load("res://assets/generated/ships/starter_small_8_intact.png")
+	starter_damaged_texture=load("res://assets/generated/ships/starter_small_8_damaged.png")
 	skins.append({"name":"Küstenschaluppe","asset_id":"SHIP-STARTER-001","views":8})
 	skin_previews.append(_ship_preview(starter_texture,5))
 	for name in ["tropical","rock","snow","snow2"]:
@@ -243,7 +245,11 @@ func _draw() -> void:
 			_ellipse_line(p,Vector2(50+age*80,22+age*35),Color(0.5,0.9,1,1-age/1.2),2.2)
 			_label(p+Vector2(0,-100-age*25),"KAPITÄNSSTUFE %d" % int(event.value),22,CYAN)
 
+func _starter_texture(hp: float,max_hp: float) -> Texture2D:
+	return starter_damaged_texture if VISUALS.damage_state(hp,max_hp)==1 else starter_texture
+
 func _draw_actor(actor: Dictionary) -> void:
+	if float(actor.hp)<=0:return
 	var is_player = int(actor.id)==0
 	var point: Vector2=actor.pos
 	var heading: Vector2=actor.heading
@@ -269,7 +275,7 @@ func _draw_actor(actor: Dictionary) -> void:
 	elif is_player and int(sim.player.skin)==26:
 		var col=VISUALS.heading_eight(heading,int(direction_cache.get(int(actor.id),-1)))
 		direction_cache[int(actor.id)]=col
-		_draw_ship_frame(starter_texture,point,length,col,false,sin(elapsed*1.7+actor.id)*1.2)
+		_draw_ship_frame(_starter_texture(float(actor.hp),float(actor.max_hp)),point,length,col,false,sin(elapsed*1.7+actor.id)*1.2)
 	elif is_player and int(sim.player.skin)<10:
 		var tex=ship_textures[int(sim.player.skin)]
 		var flipped=VISUALS.facing_right(heading,bool(facing_cache.get(int(actor.id),false)))
@@ -317,14 +323,14 @@ func _draw_ship_frame(texture: Texture2D,point: Vector2,length: float,column: in
 	draw_set_transform(Vector2.ZERO)
 
 func _draw_ship_gallery() -> void:
-	if gallery_page==3:
-		_draw_starter_gallery()
+	if gallery_page in [3,4]:
+		_draw_starter_gallery(gallery_page==4)
 		return
 	var first=0 if gallery_page==0 else 10+(gallery_page-1)*8
 	var last=10 if gallery_page==0 else mini(first+8,skins.size())
 	var before=sim.player.duplicate(true)
 	var directions=[Vector2(1,-1),Vector2(-1,-1),Vector2(-1,1),Vector2(1,1)]
-	_label(Vector2(640,26),"M3055 · ORIGINAL RUNTIME RENDERER · WATERLINE ANCHORS",20,GOLD)
+	_label(Vector2(640,26),"M3056 · ORIGINAL RUNTIME RENDERER · WATERLINE ANCHORS",20,GOLD)
 	for c in 4:_label(Vector2(320+c*240,59),["NORDOST","NORDWEST","SÜDWEST","SÜDOST"][c],14,CYAN)
 	for skin in range(first,last):
 		var y=216.0+float(skin-first)*200.0
@@ -342,16 +348,17 @@ func _draw_ship_gallery() -> void:
 			draw_line(ground-Vector2(0,4),ground+Vector2(0,4),Color("ffae66"),1)
 	sim.player=before
 
-func _draw_starter_gallery() -> void:
+func _draw_starter_gallery(damaged: bool=false) -> void:
 	var before=sim.player.duplicate(true)
 	var headings=[Vector2.UP,Vector2(1,-1),Vector2.RIGHT,Vector2(1,1),Vector2.DOWN,Vector2(-1,1),Vector2.LEFT,Vector2(-1,-1)]
 	var labels=["NORD","NORDOST","OST","SÜDOST","SÜD","SÜDWEST","WEST","NORDWEST"]
-	_label(Vector2(640,38),"M3055 · SMALL STARTER · 8 INTAKTE 2D-ANSICHTEN",21,GOLD)
+	_label(Vector2(640,38),"M3056 · SMALL STARTER · "+("8 BESCHÄDIGTE ANSICHTEN" if damaged else "8 INTAKTE ANSICHTEN"),21,GOLD)
 	_label(Vector2(640,70),"Laufzeit-Renderer · feste Vergrößerung · orange = Wasserlinienanker",13,CYAN)
 	for i in 8:
 		var ground=Vector2(200+(i%4)*290,300+int(i/4)*370)
 		_label(ground-Vector2(0,180),labels[i],16,CYAN)
 		sim.player.skin=26
+		sim.player.hp=float(sim.player.max_hp)*(0.25 if damaged else 1.0)
 		sim.player.pos=ground
 		sim.player.heading=headings[i].normalized()
 		sim.player.path=[]
@@ -624,7 +631,7 @@ func _open_modal(kind: String) -> void:
 		_info("26 DESIGNS · 16 mit vier Richtungsbildern, 10 mit einem gespiegelten Einzelbild. Fehlende Perspektiven werden nicht als echte Ansichten ausgegeben.",CYAN)
 		for i in skins.size():
 			var index =i
-			var b =_button(modal_body,str(skins[i].name)+(" · 8 ANSICHTEN" if i==26 else (" · EINZELBILD" if i<10 else " · 4 ANSICHTEN"))+("   ✓" if int(sim.player.skin)==i else "   AUSRÜSTEN"),func():_equip(index))
+			var b =_button(modal_body,str(skins[i].name)+(" · 8×2 ANSICHTEN" if i==26 else (" · EINZELBILD" if i<10 else " · 4 ANSICHTEN"))+("   ✓" if int(sim.player.skin)==i else "   AUSRÜSTEN"),func():_equip(index))
 			b.custom_minimum_size.y=64
 			b.icon=skin_previews[i]
 			b.expand_icon=true

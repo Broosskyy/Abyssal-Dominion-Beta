@@ -11,6 +11,7 @@ func _run() -> void:
 	var maps=false
 	var north=false
 	var maneuver=false
+	var damage=false
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--out="):output=arg.trim_prefix("--out=")
 		if arg=="--mobile":dimensions=Vector2i(844,390)
@@ -21,6 +22,7 @@ func _run() -> void:
 		if arg=="--maps":maps=true
 		if arg=="--north":north=true
 		if arg=="--maneuver":maneuver=true
+		if arg=="--damage":damage=true
 	root.content_scale_size=Vector2i.ZERO
 	root.size=dimensions
 	var game=load("res://sea_map.tscn").instantiate()
@@ -54,11 +56,22 @@ func _run() -> void:
 		game.sim.player.pos=game.sim.START
 		game.camera.position=game.sim.player.pos
 		game.sim.course(game.sim.START+Vector2(240,0))
+	if damage:
+		game.sim.npcs.clear()
+		game.sim.player.skin=26
+		game.sim.player.pos=game.sim.START
+		game.sim.player.heading=Vector2.RIGHT
+		game.sim.player.path=[]
+		game.sim.repairing=false
+		game.sim.player.hp=game.sim.player.max_hp
+		game.camera.position=game.sim.player.pos
 	DirAccess.make_dir_recursive_absolute(output)
 	for i in (420 if demo else 180):
 		await process_frame
+		if damage and i in [45,90,135]:
+			game.sim.player.hp=float(game.sim.player.max_hp)*(1.0 if i==90 else 0.25)
 		if maneuver and i==90:game.sim.course(game.sim.START-Vector2(240,0))
-		if maneuver and i%3==0:
+		if (maneuver or damage) and i%3==0:
 			await RenderingServer.frame_post_draw
 			var motion_error=root.get_texture().get_image().save_png(output+"/motion_%03d.png"%int(i/3.0))
 			if motion_error!=OK:push_error("Maneuver frame failed")
