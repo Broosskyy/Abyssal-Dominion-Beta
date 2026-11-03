@@ -2,7 +2,7 @@ config_version=5
 
 [application]
 config/name="Abyssal Dominion M3055"
-config/version="0.305.5-test.1"
+config/version="0.305.5-test.2"
 config/icon="res://assets/app_icon.svg"
 boot_splash/show_image=false
 run/main_scene="res://sea_map.tscn"

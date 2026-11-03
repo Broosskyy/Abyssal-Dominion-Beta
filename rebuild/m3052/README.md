@@ -1,6 +1,6 @@
 # Abyssal Dominion M3055 — Small Starter in eight directions
 
-The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.5-test.1` / Android code `305501`. M3052 is retained in Git history and `releases/M3052/`.
+The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.5-test.2` / Android code `305502`. M3052 is retained in Git history and `releases/M3052/`.
 
 ## Aktuelle Vorgabe: 2D zuerst
 

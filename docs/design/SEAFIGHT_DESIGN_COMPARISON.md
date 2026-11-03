@@ -12,7 +12,7 @@ Recherche und visuelle Prüfung am 3. November 2026. Zehn konkrete Bilddateien w
 | [Deutsche FAQ Seite 17](https://board-de.seafight.com/threads/schiffsdesigns.72018/page-17) | Moderatorangaben zu acht Fahrtrichtungen bei mehreren Designs, etwa Halbinsel-Pirat und Schwarzer Kater | Acht Richtungen sind ebenfalls ausdrücklich dokumentiert |
 | [Französischer Thread Design flute](https://board-fr.seafight.com/threads/design-flute.85912/) | Verlinktes Bild DWGvI2U.png visuell geprüft | Vergleich von acht Ansichten mit zwei sichtbaren Segelzuständen |
 | [Französischer Thread Seite 40](https://board-fr.seafight.com/threads/et-demain-sur-seafight.79618/page-40) | Verlinktes Bild Lkk1pN5.png visuell geprüft | Derselbe Rumpf aus acht Richtungen; je eine helle/vollere und dunkle/reduzierte Segelvariante |
-| [Französischer Thread Seite 47](https://board-fr.seafight.com/threads/et-demain-sur-seafight.79618/page-47) | Über die Bildsuche zugeordnete Datei YLzcmbT.png visuell geprüft | Weiteres Mehransichtenblatt mit zwei Segelzuständen; genaue Zuordnung zu einem Designnamen nicht gesichert |
+| [Französischer Thread Seite 47](https://board-fr.seafight.com/threads/et-demain-sur-seafight.79618/page-47) | YLzcmbT.png im HTML von Beitrag 544138 als Aigle royal identifiziert und visuell geprüft | Mehransichtenblatt von Royal Eagle / Aigle royal mit zwei Segelzuständen |
 | [Italienischer Design-Katalog](https://board-it.seafight.com/threads/design.65156/) | Verlinktes 12-stufiges Übersichtsbild | Farbe und Emblem können innerhalb einer Designfamilie variieren, ohne jeweils einen neuen Grundrumpf darzustellen |
 
 Die französischen Bilder sind Nutzerbeiträge im Spieleforum. Sie sind visuell nützliche Referenzen, aber keine technische Spezifikation des Clients. Aus ihnen folgt weder die verwendete Engine noch, dass alle sichtbaren Varianten automatisch bei bestimmten HP-Schwellen ausgelöst werden.
@@ -47,5 +47,5 @@ Die Originale wurden nur für die lokale Sichtprüfung geladen und nicht als neu
 - Night of the Tentacle: https://board-en.seafight.com/attachments/ship_06-1-png.15891/
 - Mehransichten Flute: https://i.imgur.com/DWGvI2U.png
 - Mehransichten Seite 40: https://i.imgur.com/Lkk1pN5.png
-- Mehransichten über Seite 47 gefunden: https://i.imgur.com/YLzcmbT.png
+- Mehransichten Royal Eagle / Aigle royal (Beitrag 544138): https://i.imgur.com/YLzcmbT.png
 - Eliteübersicht: https://sharedimages.bpsecure.com/CMTool_FileUpload/support/cmt/0322/0b678861b978742433f45891512c7c685ab314d5.png

@@ -287,12 +287,13 @@ func _draw_actor(actor: Dictionary) -> void:
 		draw_line(nose-heading*8-side,nose,CYAN,1.4,true)
 	var name: String = str(skins[int(sim.player.skin)].name) if is_player else str(actor.name)
 	var color = CYAN if is_player else (Color("e4b6ee") if monster else Color("e4c596"))
-	var baseline = point+Vector2(0,47)
+	var name_offset=68.0 if is_player and int(sim.player.skin)==26 else 47.0
+	var baseline = point+Vector2(0,name_offset)
 	_label(baseline,("✦ "+name) if is_player else name,14 if is_player else 13,color)
-	var bar = Rect2(point+Vector2(-43,55),Vector2(86,4))
+	var bar = Rect2(point+Vector2(-43,name_offset+8),Vector2(86,4))
 	draw_rect(bar,Color("071820"))
 	draw_rect(Rect2(bar.position,Vector2(bar.size.x*float(actor.hp)/float(actor.max_hp),4)),Color("60b682") if is_player else Color("b36452"))
-	if float(actor.slow)>0: _label(point+Vector2(0,80),"VERLANGSAMT",10,Color("9fdbf4"))
+	if float(actor.slow)>0: _label(point+Vector2(0,name_offset+33),"VERLANGSAMT",10,Color("9fdbf4"))
 
 func _draw_atlas(tex: Texture2D,point: Vector2,width: float,col: int,row: int,columns: int,rows: int) -> void:
 	var cell = tex.get_size()/Vector2(columns,rows)

@@ -92,7 +92,7 @@ def main():
     subprocess.run([str(bt/'zipalign'), '-c', '-P', '16', '4', str(output)], check=True)
     manifest = subprocess.check_output([str(bt/'aapt'), 'dump', 'badging', str(output)], text=True)
     output.with_suffix('.manifest.txt').write_text(manifest)
-    if "name='com.abyssaldominion.rebuild' versionCode='305501' versionName='0.305.5-test.1'" not in manifest:
+    if "name='com.abyssaldominion.rebuild' versionCode='305502' versionName='0.305.5-test.2'" not in manifest:
         raise RuntimeError('Unexpected Android identity')
     report = {'engine': version, 'apk': output.name, 'sha256': hashlib.sha256(output.read_bytes()).hexdigest(),
               'bytes': output.stat().st_size, 'tests': results, 'audited_pngs': len(assets),
