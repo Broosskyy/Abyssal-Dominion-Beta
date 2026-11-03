@@ -1,0 +1,38 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "apk": "ABYSSAL_DOMINION_M3053_REBUILD_ARM64.apk",
+  "sha256": "8992cdb8dcf7c0dc01a41ef0cc885512495ee448907d9ac9f757d8692e267ccf",
+  "bytes": 37824321,
+  "tests": [
+    {
+      "test": "simulation_test",
+      "checks": 22,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "progression_test",
+      "checks": 62,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ui_test",
+      "checks": 180,
+      "failures": [],
+      "status": "PASS"
+    }
+  ],
+  "audited_pngs": 60,
+  "signature": "PASS",
+  "alignment_16k": "PASS",
+  "physical_android_test": "NOT_PERFORMED",
+  "mode": "LOCAL_GUEST_SEA_CHART",
+  "public_server": false,
+  "milestone": "M3053",
+  "regions": 3,
+  "quest_chain": 7,
+  "equipment_categories": 4,
+  "equipment_tiers": 3,
+  "source_commit": "03ec4704d5f9b11ad56418356f909307c9a18579"
+}
