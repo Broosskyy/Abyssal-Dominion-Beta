@@ -631,8 +631,8 @@ func _layout() -> void:
 	_place(player_portrait,7,6,48,49);_place(player_name,62,3,player_panel.size.x-70,22)
 	_place(player_hp,62,27,player_panel.size.x-72,9);_place(player_numbers,62,38,player_panel.size.x-70,20)
 	_place(player_xp,8,60,player_panel.size.x-16,3)
-	var tw=204.0 if compact else 240.0
-	_place(target_panel,s.x*.5-tw*.5,top,tw,72)
+	var tw=player_panel.size.x
+	_place(target_panel,12,top+72,tw,72)
 	_place(target_portrait,7,5,48,51);_place(target_name,62,3,tw-70,22);_place(target_hp,62,27,tw-72,8);_place(target_numbers,62,36,tw-70,32)
 	var mw=128.0 if compact else 180.0
 	var mh=108.0 if compact else 154.0
@@ -658,7 +658,7 @@ func _layout() -> void:
 	_place(ammo_selector,side_x-2,s.y-small*2-42,small+4,small+16)
 	var status_x=maxf(236 if compact else 294,s.x*.5-220)
 	_place(status,status_x,dy-26,minf(440,side_x-status_x-12),20)
-	_place(interact,s.x*.5-110,dy-64,220,36)
+	_place(interact,12,top+152,player_panel.size.x,36)
 	_place(quest_panel,12,s.y-(116 if compact else 150)-10,208 if compact else 270,116 if compact else 150)
 	quest_panel.visible=true
 	_place(quest_tab,5,4,quest_panel.size.x*.5-7,23);_place(system_tab,quest_panel.size.x*.5+2,4,quest_panel.size.x*.5-7,23)

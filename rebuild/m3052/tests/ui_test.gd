@@ -43,6 +43,11 @@ func _run() -> void:
 			for j in range(i+1,controls.size()):
 				check(not controls[i].get_global_rect().intersects(controls[j].get_global_rect()),"independent touch targets %s / %s at %s"%[controls[i].name,controls[j].name,dimensions])
 		check(not game.player_panel.get_global_rect().intersects(game.target_panel.get_global_rect()),"player and target cards do not overlap")
+		var center_water=Rect2(Vector2(dimensions)*.5-Vector2(80,120),Vector2(160,185))
+		var clear_center=true
+		for control: Control in [game.player_panel,game.target_panel,game.chart_mini,game.combat_dock,game.attack,game.repair,game.ammo_selector,game.quest_panel,game.interact]:
+			clear_center=clear_center and not control.get_global_rect().intersects(center_water)
+		check(clear_center,"HUD reserves clear water around the centered player at "+str(dimensions))
 		check(game.player_portrait.texture!=null and game.target_portrait.texture!=null,"player and selected NPC show actual ship portraits")
 		check(game.attack.get_global_rect().position.x>dimensions.x*.7 and game.combat_dock.get_global_rect().encloses(game.ammo_buttons[0].get_global_rect()),"round fire control stays on the right and quick ammunition stays in the lower deck")
 		game.loadout_button.pressed.emit()

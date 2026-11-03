@@ -23,6 +23,8 @@ func _run() -> void:
 	game.sim.npcs.clear();game.sim.npcs.append(npc);game.sim.select(npc.id)
 	for dimensions in [Vector2i(1280,720),Vector2i(844,390),Vector2i(720,405),Vector2i(1560,720)]:
 		root.size=dimensions
+		game.camera.position=game.sim.player.pos
+		game.camera.zoom=Vector2.ONE*(.78 if dimensions.y<560 else .96)
 		await _shot(game,output,"hud-%dx%d" % [dimensions.x,dimensions.y])
 		game._open_modal("Munition")
 		await _shot(game,output,"ammo-%dx%d" % [dimensions.x,dimensions.y])

@@ -13,12 +13,12 @@ The simulation regression sails actual routes out and back through all three reg
 ## Functional UI
 
 - Six gold symbol navigation cells: Ship, Harbor/Shipyard, Quests, Maps, Supplies and Menu. Each opens an existing or live-data-backed panel.
-- Ship and target portraits/health, actual gold/captain progress, a framed minimap with coordinates and moving markers.
+- Ship and target portraits/health stacked on the left, actual gold/captain progress, a framed minimap with coordinates and moving markers. Context actions also sit on the left so centered player artwork stays unobstructed on compact screens.
 - Round fire, repair and ammunition-selection controls; selected-ammunition quick slots with actual stock; lower HP/XP bars.
 - Contextual ammunition list with real damage, purpose, stock, current selection and working load actions. No invented infinite stock or unimplemented powers.
 - System and Quest tabs using real local messages and progression. This does not add online chat, guilds or a public server.
 - Consistent framed lists, scrollable content and compact/wide layout coverage. Ten authored SVG symbols are stored and checksum-verified alongside the existing artwork provenance.
 
-Runtime evidence captures 1280x720, 844x390, 720x405 and the phone-like 1560x720 aspect. Separate before/after gate images and a receipt record a touch-queued crossing. These are actual renderer fixtures, not mockup composites or a claim of physical-device acceptance for this new revision. The reference mockups remain direction for further world art; this update does not recreate their 3D ships, water or islands.
+Runtime evidence captures 1280x720, 844x390, 720x405 and the phone-like 1560x720 aspect, with the normal follow camera centered on the player. Separate before/after gate images and a receipt record a touch-queued crossing. These are actual renderer fixtures, not mockup composites or a claim of physical-device acceptance for this new revision. The reference mockups remain direction for further world art; this update does not recreate their 3D ships, water or islands.
 
 Distribution is a signed data package for native version 305901. Protected engine/native/updater files have not changed, so no new APK is required.
