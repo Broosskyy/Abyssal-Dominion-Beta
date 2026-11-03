@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def checked(command, log, env=None):
     result = subprocess.run(command, env=env, text=True, stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT, timeout=240)
+                            stderr=subprocess.STDOUT, timeout=1200)
     log.write_text(result.stdout, encoding='utf-8')
     if result.returncode or any(s in result.stdout for s in
                               ('SCRIPT ERROR:', 'Parse Error:', 'Failed to load script')):
@@ -58,11 +58,11 @@ def main():
         pattern = re.compile('^'+re.escape(key)+r'\s*=.*$', re.MULTILINE)
         text = pattern.sub(lambda _: line, text) if pattern.search(text) else text+'\n'+line+'\n'
     settings.write_text(text)
-    for script in ['content.gd', 'simulation.gd', 'ship_visuals.gd']:
+    for script in ['content.gd', 'simulation.gd', 'ship_visuals.gd', 'updater/update_model.gd', 'updater/update_controller.gd', 'updater/launcher.gd']:
         checked([engine, '--headless', '--path', str(ROOT), '--check-only', '--script', script], output.with_suffix('.'+script+'.check.log'))
     checked([engine, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.import.log'))
     results = []
-    for name in ['simulation_test', 'progression_test', 'ship_visual_test', 'ui_test']:
+    for name in ['simulation_test', 'progression_test', 'ship_visual_test', 'ui_test', 'updater_test']:
         with tempfile.TemporaryDirectory() as user_data:
             env = dict(os.environ, XDG_DATA_HOME=user_data)
             log = checked([engine, '--headless', '--path', str(ROOT), '--quit-after', '120',
@@ -75,6 +75,11 @@ def main():
     with zipfile.ZipFile(output) as z:
         if z.testzip() or 'lib/arm64-v8a/libgodot_android.so' not in z.namelist():
             raise RuntimeError('APK integrity or ARM64 engine missing')
+        dex = b''.join(z.read(n) for n in z.namelist() if re.fullmatch(r'classes\d*\.dex', n))
+        for symbol in [b'AbyssalApkInstaller', b'enqueueBackgroundApk', b'queryBackgroundApk', b'installValidatedApk', b'android/app/DownloadManager']:
+            if symbol not in dex: raise RuntimeError('Native updater absent from APK: '+str(symbol))
+        if z.read('assets/updater/config.json') != (ROOT/'updater/config.json').read_bytes():
+            raise RuntimeError('Updater configuration missing or changed')
         geometry_path = 'assets/assets/visuals/ship_frames.json'
         if geometry_path not in z.namelist() or z.read(geometry_path) != (ROOT/'assets/visuals/ship_frames.json').read_bytes():
             raise RuntimeError('Measured sprite geometry missing or different in APK')
@@ -89,15 +94,22 @@ def main():
     sig = subprocess.check_output([str(java/'bin/java'), '-jar', str(bt/'lib/apksigner.jar'),
                                    'verify', '--verbose', '--print-certs', str(output)], text=True)
     output.with_suffix('.signature.txt').write_text(sig)
+    certificate = '278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b'
+    if 'certificate SHA-256 digest: '+certificate not in sig:
+        raise RuntimeError('Signing certificate differs from installed M3056; refusing incompatible update')
+    xml = subprocess.check_output([str(bt/'aapt'), 'dump', 'xmltree', str(output), 'AndroidManifest.xml'], text=True)
+    for token in ['android.permission.INTERNET', 'android.permission.REQUEST_INSTALL_PACKAGES', 'org.godotengine.plugin.v2.AbyssalApkInstaller', 'com.abyssal.updater.AbyssalFileProvider', 'com.abyssaldominion.rebuild.abyssalupdater.files']:
+        if token not in xml: raise RuntimeError('Updater manifest entry missing: '+token)
+    output.with_suffix('.android-xml.txt').write_text(xml)
     subprocess.run([str(bt/'zipalign'), '-c', '-P', '16', '4', str(output)], check=True)
     manifest = subprocess.check_output([str(bt/'aapt'), 'dump', 'badging', str(output)], text=True)
     output.with_suffix('.manifest.txt').write_text(manifest)
-    if "name='com.abyssaldominion.rebuild' versionCode='305601' versionName='0.305.6-test.1'" not in manifest:
+    if "name='com.abyssaldominion.rebuild' versionCode='305701' versionName='0.305.7-test.1'" not in manifest:
         raise RuntimeError('Unexpected Android identity')
     report = {'engine': version, 'apk': output.name, 'sha256': hashlib.sha256(output.read_bytes()).hexdigest(),
               'bytes': output.stat().st_size, 'tests': results, 'audited_pngs': len(assets),
-              'signature': 'PASS', 'alignment_16k': 'PASS', 'physical_android_test': 'NOT_PERFORMED',
-              'mode': 'LOCAL_GUEST_SEA_CHART', 'public_server': False, 'milestone': 'M3056',
+              'signature': 'PASS', 'certificate_sha256': certificate, 'version_code': 305701, 'package': 'com.abyssaldominion.rebuild', 'updater_native': True, 'update_distribution': 'PENDING_PUBLIC_CHANNEL_APPROVAL', 'alignment_16k': 'PASS', 'physical_android_test': 'NOT_PERFORMED',
+              'mode': 'LOCAL_GUEST_SEA_CHART', 'public_server': False, 'milestone': 'M3057',
               'regions': 3, 'quest_chain': 7, 'equipment_categories': 4, 'equipment_tiers': 3,
               'source_commit': os.environ.get('GITHUB_SHA', 'local'),
               'measured_ship_sources': 28, 'measured_ship_frames': 90, 'eight_direction_designs': 1, 'starter_states': ['intact','damaged'], 'starter_damage_hp_ratio': 0.35}

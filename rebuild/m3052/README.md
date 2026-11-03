@@ -1,6 +1,10 @@
-# Abyssal Dominion M3056 — paired intact and damaged Small Starter
+# Abyssal Dominion M3057 — Android background updater
 
-The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.6-test.1` / Android code `305601`. M3052 is retained in Git history and `releases/M3052/`.
+The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.7-test.1` / Android code `305701`. M3052 is retained in Git history and `releases/M3052/`.
+
+## M3057 updater
+
+Android launcher and HAFEN → UPDATES PRÜFEN now use a native DownloadManager bridge based on Realm 733. Files are verified before Android installation; gameplay and guest storage stay available. One manual bootstrap install is required. Public APK/manifest hosting is pending approval, so this private build does not yet provide a live automatic distribution channel. See [updater flow and limits](../../docs/m3057/UPDATER.md).
 
 ## Aktuelle Vorgabe: 2D zuerst
 
@@ -42,10 +46,10 @@ Tap water to sail and an enemy to select it. FEUER toggles cannon fire. Harpoons
 
 ## Build and verification
 
-`.github/workflows/m3052.yml` builds `releases/M3056/ABYSSAL_DOMINION_M3056_REBUILD_ARM64.apk`. The builder audits every PNG, imports and tests the project, verifies embedded textures, ARM64 engine, signature, 16 KB alignment and application/version identity. CI also captures actual gameplay at desktop and mobile landscape sizes; no generated mockups serve as QA evidence. Build reports record the source commit. Simulation, progression and UI tests use fresh isolated guest storage.
+`.github/workflows/m3052.yml` builds `releases/M3057/ABYSSAL_DOMINION_M3057_REBUILD_ARM64.apk`. The builder audits every PNG, imports and tests the project, verifies embedded textures, ARM64 engine, signature, 16 KB alignment and application/version identity. CI also captures actual gameplay at desktop and mobile landscape sizes; no generated mockups serve as QA evidence. Build reports record the source commit. Simulation, progression and UI tests use fresh isolated guest storage.
 
 ## Scope
 
-Local guest gameplay. This scene is not connected to M3051's separate development server. Public networking, accounts, multiplayer/PvP, guilds, cross-device acceptance, production signing and an updater remain open. Three regional layouts share a base geometry transformed per region; this is not a claim of three entirely independent authored worlds. NPC state on other maps is retained during the current session, not serialized across app restarts. Captain level and equipment are functional; cosmetics are still free test designs.
+Local guest gameplay. This scene is not connected to M3051's separate development server. Public networking, accounts, multiplayer/PvP, guilds, cross-device acceptance, production signing and updater distribution remain open. Three regional layouts share a base geometry transformed per region; this is not a claim of three entirely independent authored worlds. NPC state on other maps is retained during the current session, not serialized across app restarts. Captain level and equipment are functional; cosmetics are still free test designs.
 
 Supplied/reference art is used in the private development repository; public redistribution rights have not been established. Automated checks and rendered captures do not constitute a physical Android device playtest.

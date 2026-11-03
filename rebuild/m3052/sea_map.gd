@@ -664,6 +664,10 @@ func _open_modal(kind: String) -> void:
 				buy.disabled=int(sim.player.gold)<30
 			_action("SCHIFFSDESIGN WÄHLEN · 26 DESIGNS",func():_open_modal("Werft"))
 			_action("ABLEGEN",func():sim.depart();modal.hide();_save_progress();_refresh_ui())
+		_action("UPDATES PRÜFEN",func():
+			_save_progress()
+			get_tree().set_meta("abyssal_manual_update",true)
+			get_tree().change_scene_to_file("res://updater/launcher.tscn"))
 	elif kind=="Logbuch":
 		_info("KAPITÄNSLOGBUCH · AUFTRÄGE & FORTSCHRITT",CYAN)
 		_info("Lv. %d · Erfahrung %d / %d · %d geborgene Kisten · %d besiegte Seeungeheuer" % [sim.level,sim.xp,sim.xp_required(),sim.loot_collected,sim.monster_kills])
