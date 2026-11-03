@@ -1,6 +1,7 @@
 extends Node2D
 const SIM = preload("res://simulation.gd")
 const MINI = preload("res://minimap.gd")
+const CONTENT = preload("res://content.gd")
 const USER_ROOT := "res://assets/user/"
 const SAVE := "user://captain_m3052.json"
 const GOLD := Color("dcc18a")
@@ -62,6 +63,9 @@ var pinch_distance := 0.0
 var suppress_tap_until := 0
 var drawn_shots := 0
 var last_touch_ms := -10000
+var interact: Button
+var player_xp: ProgressBar
+var extra_icons: Dictionary = {}
 
 func _ready() -> void:
 	_load_assets()
@@ -108,6 +112,8 @@ func _load_assets() -> void:
 	for name in ["cannonball","harpoon","chain","repair_chest","portal"]:
 		icons[name] = load(USER_ROOT+"ui/"+name+".png")
 	beast = load("res://assets/reference/monsters/tiamat.png")
+	for name in ["cannon_0","cannon_1","cannon_2","harpoon_0","harpoon_1","harpoon_2","loot_0","loot_1","loot_2","loot_3","upgrade_cannon","upgrade_harpoon","upgrade_hull","upgrade_sails","quest_book","world_chart"]:
+		extra_icons[name] = load("res://assets/expanded/"+name+".png")
 
 func _process(delta: float) -> void:
 	elapsed += delta
@@ -121,6 +127,7 @@ func _process(delta: float) -> void:
 	ocean.set_shader_parameter("camera_world",camera.position)
 	ocean.set_shader_parameter("map_zoom",camera.zoom.x)
 	ocean.set_shader_parameter("viewport_size",get_viewport_rect().size)
+	ocean.set_shader_parameter("region_tint",CONTENT.MAPS[sim.map_id].tint)
 	chart_mini.camera_world = camera.position
 	chart_mini.view_world = get_viewport_rect().size/camera.zoom
 	chart_mini.queue_redraw()
@@ -150,6 +157,19 @@ func _draw() -> void:
 		draw_texture_rect(tex,Rect2(point-dimensions*Vector2(0.5,0.65),dimensions),false)
 		_label(point+Vector2(0,dimensions.y*0.31+20),island.name,16,GOLD)
 	# Planned route and tap marker remain visible without obscuring the sea.
+	# Docks and portals occupy water cells and are also marked on the minimap.
+	_ellipse_line(sim.harbor,Vector2(86,36),Color(0.85,0.72,0.4,0.5),2.0)
+	var harbor_icon: Texture2D = extra_icons.upgrade_sails
+	draw_texture_rect(harbor_icon,Rect2(sim.harbor-Vector2(40,70),Vector2(80,80)),false)
+	_label(sim.harbor+Vector2(0,56),"HAFEN · ANDOCKEN",13,GOLD)
+	for portal in sim.portals:
+		if not view.has_point(portal.pos): continue
+		var pp: Vector2 = portal.pos
+		_ellipse_line(pp,Vector2(80,35),Color(0.4,0.75,1,0.4+0.2*sin(elapsed*2)),2.5)
+		var portal_icon: Texture2D = icons.portal
+		draw_texture_rect(portal_icon,Rect2(pp-Vector2(48,67),Vector2(96,96)),false)
+		var region = CONTENT.MAPS[int(portal.destination)]
+		_label(pp+Vector2(0,55),"%s · AB LV. %d" % [region.name,region.level],14,CYAN)
 	if not sim.player.path.is_empty():
 		var before: Vector2 = sim.player.pos
 		for point: Vector2 in sim.player.path:
@@ -163,8 +183,8 @@ func _draw() -> void:
 		if not view.has_point(drop.pos): continue
 		var p: Vector2 = drop.pos+Vector2(0,sin(elapsed*2+drop.id)*3)
 		_ellipse(p,Vector2(31,13),Color(0.95,0.7,0.2,0.1))
-		var tex: Texture2D = icons.repair_chest
-		var dims = tex.get_size()*36.0/maxf(tex.get_width(),tex.get_height())
+		var tex: Texture2D = extra_icons["loot_%d" % int(drop.get("art",0))]
+		var dims = tex.get_size()*49.0/maxf(tex.get_width(),tex.get_height())
 		draw_texture_rect(tex,Rect2(p-dims*0.5,dims),false)
 		_label(p+Vector2(0,31),"BEUTE",10,GOLD)
 	var fleet: Array[Dictionary] = []
@@ -203,6 +223,9 @@ func _draw() -> void:
 			_ellipse(p,Vector2(70*age+5,36*age+5),Color(0.38,0.55,0.56,(1-age/1.2)*0.4))
 		elif event.type=="loot":
 			_label(p+Vector2(0,-30-age*45),"+%d GOLD"%int(event.value),19,Color(0.95,0.81,0.4,1-age/1.2))
+		elif event.type=="level":
+			_ellipse_line(p,Vector2(50+age*80,22+age*35),Color(0.5,0.9,1,1-age/1.2),2.2)
+			_label(p+Vector2(0,-100-age*25),"KAPITÄNSSTUFE %d" % int(event.value),22,CYAN)
 
 func _draw_actor(actor: Dictionary) -> void:
 	var is_player = int(actor.id)==0
@@ -328,13 +351,15 @@ func _build_ui() -> void:
 	chrome=_panel(ui)
 	title=_text(chrome,"ABYSSAL DOMINION",17)
 	resources=_text(chrome,"",13,CYAN)
-	nav_buttons.append(_button(chrome,"WERFT",func():_open_modal("Werft")))
-	nav_buttons.append(_button(chrome,"AUFTRAG",func():quest_panel.visible=not quest_panel.visible))
-	nav_buttons.append(_button(chrome,"MENÜ",func():_open_modal("Seekarten-Menü")))
+	nav_buttons.append(_button(chrome,"HAFEN",func():_open_modal("Hafen")))
+	nav_buttons.append(_button(chrome,"LOGBUCH",func():_open_modal("Logbuch")))
+	nav_buttons.append(_button(chrome,"KARTEN",func():_open_modal("Seekarten")))
 	player_panel=_panel(ui)
 	player_name=_text(player_panel,"",15,CYAN)
 	player_hp=_bar(player_panel)
 	player_numbers=_text(player_panel,"",11)
+	player_name.clip_text=true
+	player_xp=_bar(player_panel)
 	target_panel=_panel(ui)
 	target_name=_text(target_panel,"",14)
 	target_hp=_bar(target_panel)
@@ -360,14 +385,23 @@ func _build_ui() -> void:
 	center_button.tooltip_text="Kamera zum Schiff"
 	zoom_in=_button(ui,"+",func():_zoom(1.15))
 	zoom_out=_button(ui,"−",func():_zoom(1.0/1.15))
+	interact=_button(ui,"HAFEN",_interact)
+	interact.name="InteractButton"
 	status=_text(ui,"",12,Color("b3ccd0"))
 	status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	quest_panel=_panel(ui)
 	quest_text=_text(quest_panel,"",12)
 	quest_text.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	quest_claim=_button(quest_panel,"BELOHNUNG ABHOLEN",func():sim.claim_quest();_save_progress())
+	quest_claim=_button(quest_panel,"BELOHNUNG ABHOLEN",func():sim.claim_quest();_save_progress();_refresh_ui())
 	modal=_panel(ui)
+	var modal_style=StyleBoxTexture.new()
+	modal_style.texture=load("res://assets/expanded/panel_frame.png")
+	modal_style.texture_margin_left=58
+	modal_style.texture_margin_right=42
+	modal_style.texture_margin_top=65
+	modal_style.texture_margin_bottom=38
+	modal.add_theme_stylebox_override("panel",modal_style)
 	modal.z_index=20
 	modal.visible=false
 	modal_title=_text(modal,"",20)
@@ -400,6 +434,7 @@ func _layout() -> void:
 	_place(player_name,12,7,216,24)
 	_place(player_hp,12,36,player_panel.size.x-24,10)
 	_place(player_numbers,12,49,216,20)
+	_place(player_xp,12,72,player_panel.size.x-24,3)
 	var tw = 204.0 if s.x<800 else 240.0
 	_place(target_panel,s.x*0.5-tw*0.5,54,tw,78)
 	_place(target_name,12,7,218,24)
@@ -410,6 +445,7 @@ func _layout() -> void:
 	_place(zoom_out,s.x-108,chart_mini.position.y+chart_mini.size.y+8,44,40)
 	_place(zoom_in,s.x-59,chart_mini.position.y+chart_mini.size.y+8,44,40)
 	_place(center_button,s.x-59,chart_mini.position.y+chart_mini.size.y+53,44,40)
+	_place(interact,12,142,208 if s.x<800 else 236,42)
 	var bottom =s.y-76
 	var bw =102.0 if compact else 124.0
 	var total =bw*3+12
@@ -424,15 +460,18 @@ func _layout() -> void:
 	var width =minf(640,s.x-32)
 	var height =minf(560,s.y-60)
 	_place(modal,(s.x-width)*0.5,(s.y-height)*0.5,width,height)
-	_place(modal_title,18,12,width-170,32)
-	_place(modal_close,width-145,10,130,36)
-	_place(modal_scroll,18,58,width-36,height-75)
+	_place(modal_title,52,27,width-220,32)
+	_place(modal_close,width-163,28,112,36)
+	_place(modal_scroll,52,76,width-100,height-118)
 
 func _refresh_ui() -> void:
 	if player_name==null:return
-	player_name.text="✦ "+str(skins[int(sim.player.skin)].name)+" · Lv. 1"
+	player_name.text="Lv. %d · %s" % [sim.level,skins[int(sim.player.skin)].name]
+	player_hp.max_value=sim.player.max_hp
 	player_hp.value=sim.player.hp
-	player_numbers.text="RUMPF %d / %d"%[int(sim.player.hp),sim.PLAYER_HP]
+	player_numbers.text="%d/%d HP · EP %d/%d" % [int(sim.player.hp),int(sim.player.max_hp),sim.xp,sim.xp_required()]
+	player_xp.max_value=sim.xp_required()
+	player_xp.value=sim.xp
 	resources.text="GOLD  %s     VERSENKT  %d"%[str(sim.player.gold),sim.kills]
 	var selected =sim.actor(sim.target)
 	target_panel.visible=not selected.is_empty() and sim.target>0 and int(selected.hp)>0
@@ -448,9 +487,18 @@ func _refresh_ui() -> void:
 		ammo_buttons[i].text=("● " if sim.ammo_mode==i else "")+str(sim.player.ammo[i])
 		ammo_buttons[i].tooltip_text=["Vollkugeln: gegen Schiffe","Kettenkugeln: verlangsamen Schiffe","Harpunen: gegen Monster"][i]
 	status.text=sim.message
-	quest_text.text="KÜSTENWACHE\nVersenke 3 Gegner: %d / 3 · 180 Gold"%mini(sim.kills,3)
-	quest_claim.disabled=sim.kills<3 or sim.claimed
-	quest_claim.text="ABGESCHLOSSEN" if sim.claimed else "BELOHNUNG ABHOLEN"
+	var quest = sim.current_quest()
+	quest_claim.disabled=quest.is_empty() or sim.quest_progress()<int(quest.goal)
+	quest_text.text="ALLE AUFTRÄGE ERLEDIGT" if quest.is_empty() else "%s · %d/%d\n%d Gold · %d EP" % [str(quest.name).to_upper(),mini(sim.quest_progress(),int(quest.goal)),quest.goal,quest.gold,quest.xp]
+	quest_claim.text="ABGESCHLOSSEN" if quest.is_empty() else "BELOHNUNG ABHOLEN"
+	if sim.docked:
+		interact.text="ABLEGEN"
+	elif sim.near_portal()>=0:
+		interact.text="PORTAL BETRETEN"
+	elif sim.can_dock():
+		interact.text="IM HAFEN ANDOCKEN"
+	else:
+		interact.text="KURS ZUM HAFEN"
 
 func _toggle_fire() -> void:
 	if sim.target<1:return
@@ -478,11 +526,130 @@ func _open_modal(kind: String) -> void:
 			var index =i
 			var b =_button(modal_body,["150 Vollkugeln","60 Kettenkugeln","40 Harpunen"][i]+" · 30 Gold",func():sim.buy_ammo(index);_save_progress();_refresh_ui())
 			b.custom_minimum_size.y=48
+	elif kind=="Hafen":
+		_info("PORT AZUR · AUSRÜSTUNG & VERSORGUNG" if sim.map_id==0 else "HAFEN · AUSRÜSTUNG & VERSORGUNG",CYAN)
+		if not sim.docked:
+			_info("Fahre zum goldenen Hafensymbol und docke an. Im Hafen pausiert die lokale Seekarte. Distanz: %d m." % roundi(sim.player.pos.distance_to(sim.harbor)))
+			_action("KURS ZUM HAFEN",func():sim.course(sim.harbor);modal.hide())
+			var dock_button = _action("ANDOCKEN",func():
+				if sim.dock():_save_progress();_open_modal("Hafen")
+				_refresh_ui())
+			dock_button.disabled=not sim.can_dock()
+		else:
+			_info("Kapitänsstufe %d · %d Gold · %d / %d Rumpfpunkte" % [sim.level,sim.player.gold,sim.player.hp,sim.player.max_hp])
+			var repair_cost = sim.harbor_repair_cost()
+			var repair_button = _action("TROCKENDOCK · %d Gold" % repair_cost,func():sim.harbor_repair();_save_progress();_open_modal("Hafen");_refresh_ui())
+			repair_button.disabled=repair_cost<=0 or int(sim.player.gold)<repair_cost
+			for key in CONTENT.UPGRADE_KEYS:
+				_upgrade_row(str(key))
+			_info("MUNITIONSNACHSCHUB",CYAN)
+			for i in 3:
+				var index = i
+				var buy = _action(["150 Vollkugeln","60 Kettenkugeln","40 Harpunen"][i]+" · 30 Gold",func():sim.buy_ammo(index);_save_progress();_open_modal("Hafen");_refresh_ui())
+				buy.disabled=int(sim.player.gold)<30
+			_action("SCHIFFSDESIGN WÄHLEN · 26 DESIGNS",func():_open_modal("Werft"))
+			_action("ABLEGEN",func():sim.depart();modal.hide();_save_progress();_refresh_ui())
+	elif kind=="Logbuch":
+		_info("KAPITÄNSLOGBUCH · AUFTRÄGE & FORTSCHRITT",CYAN)
+		_info("Lv. %d · Erfahrung %d / %d · %d geborgene Kisten · %d besiegte Seeungeheuer" % [sim.level,sim.xp,sim.xp_required(),sim.loot_collected,sim.monster_kills])
+		for i in CONTENT.QUESTS.size():
+			var q: Dictionary = CONTENT.QUESTS[i]
+			if i < sim.quest_index:
+				_info("✓ "+str(q.name)+" · abgeschlossen",CYAN)
+			elif i==sim.quest_index:
+				_info("AKTIV · %s\n%s · %d/%d\nBelohnung: %d Gold und %d EP" % [q.name,q.description,mini(sim.quest_progress(),int(q.goal)),q.goal,q.gold,q.xp])
+				var claim = _action("BELOHNUNG ABHOLEN",func():sim.claim_quest();_save_progress();_open_modal("Logbuch");_refresh_ui())
+				claim.disabled=sim.quest_progress()<int(q.goal)
+			else:
+				_info("%d · %s\n%s" % [i+1,q.name,q.description],Color("84999c"))
+	elif kind=="Seekarten":
+		_info("DREI SEEGEBIETE · PORTALE VERBINDEN DIE SEEKARTEN",CYAN)
+		for i in CONTENT.MAPS.size():
+			var region: Dictionary = CONTENT.MAPS[i]
+			var index = i
+			var locked = sim.level<int(region.level)
+			var row = HBoxContainer.new()
+			row.add_theme_constant_override("separation",12)
+			modal_body.add_child(row)
+			_picture(row,extra_icons.world_chart,64)
+			var column = VBoxContainer.new()
+			column.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			row.add_child(column)
+			var label = _text(column,"%s · %s\nAb Lv. %d · Gegnerstärke ×%.1f" % [region.code,region.name,region.level,region.enemy_scale],14,CYAN)
+			label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+			var text = "DU BIST HIER" if i==sim.map_id else ("GESPERRT · LV. %d" % region.level if locked else ("PORTAL BETRETEN" if sim.near_portal()==i else "KURS ZUM PORTAL"))
+			var travel_button = _button(column,text,func():_navigate_region(index))
+			travel_button.custom_minimum_size.y=44
+			travel_button.disabled=i==sim.map_id or locked or sim.docked
+		_info("Portale liegen am östlichen und westlichen Kartenrand. Ein Wechsel ist erst 6 Sekunden nach dem letzten Treffer möglich. Im Hafen zuerst ablegen.")
+		_action("STEUERUNG & SPIELINFO",func():_open_modal("Spielinfo"))
 	else:
-		var info =_text(modal_body,"M3052 · NEUE LOKALE SEEKARTE\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nZwei Finger / Mausrad: Zoom. Rechte Maustaste: Kamera verschieben.\n⌖ zentriert die Kamera wieder auf deinem Schiff.\n\nGastfortschritt wird auf diesem Gerät gespeichert.\nDiese neue Seekarte ist noch nicht mit dem Online-Testserver verbunden.",15)
+		var info =_text(modal_body,"M3053 · HAFEN & SEEGEBIETE\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nHAFEN: Andocken, Rumpf reparieren und Kanonen, Harpunen, Rumpf oder Segel verbessern.\nLOGBUCH: Sieben aufeinanderfolgende Aufträge.\nKARTEN: Portale zur Karibischen See, zum Nordmeer und zu den Schattengewässern.\n\nZwei Finger / Mausrad: Zoom. Ziehen / rechte Maustaste: Kamera.\nZIEL zentriert die Kamera.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",15)
 		info.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		info.custom_minimum_size=Vector2(modal.size.x-50,300)
 	modal.show()
+
+func _info(text: String,color: Color=GOLD) -> Label:
+	var label = _text(modal_body,text,14,color)
+	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	label.custom_minimum_size.x=modal.size.x-120
+	return label
+
+func _action(text: String,callback: Callable) -> Button:
+	var button = _button(modal_body,text,callback)
+	button.custom_minimum_size.y=46
+	return button
+
+func _picture(parent: Node,texture: Texture2D,width: float) -> void:
+	var picture = TextureRect.new()
+	picture.texture=texture
+	picture.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	picture.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	picture.custom_minimum_size=Vector2(width,width)
+	picture.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	parent.add_child(picture)
+
+func _upgrade_row(key: String) -> void:
+	var config: Dictionary=CONTENT.UPGRADES[key]
+	var row = HBoxContainer.new()
+	row.add_theme_constant_override("separation",12)
+	modal_body.add_child(row)
+	var art_key = key+"_%d" % mini(2,int(sim.upgrades[key])) if key in ["cannon","harpoon"] else str(config.icon)
+	_picture(row,extra_icons[art_key],88)
+	var column = VBoxContainer.new()
+	column.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	row.add_child(column)
+	var label = _text(column,"%s · Stufe %d/3\n%s" % [config.name,sim.upgrades[key],config.effect],14,CYAN)
+	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	var cost: int=sim.upgrade_cost(key)
+	var button = _button(column,"MAXIMALE STUFE" if cost<0 else "VERBESSERN · %d Gold" % cost,func():sim.buy_upgrade(key);_save_progress();_open_modal("Hafen");_refresh_ui())
+	button.custom_minimum_size.y=44
+	button.disabled=cost<0 or int(sim.player.gold)<cost
+
+func _navigate_region(destination: int) -> void:
+	if sim.near_portal()==destination:
+		if sim.travel(destination):
+			pan=Vector2.ZERO
+			camera.position=sim.player.pos
+			_save_progress()
+	else:
+		for portal in sim.portals:
+			if int(portal.destination)==destination:sim.course(portal.pos)
+	modal.hide()
+	_refresh_ui()
+
+func _interact() -> void:
+	if sim.docked:
+		sim.depart()
+		modal.hide()
+	elif sim.near_portal()>=0:
+		_navigate_region(sim.near_portal())
+	elif sim.can_dock():
+		if sim.dock():_open_modal("Hafen")
+	else:
+		sim.course(sim.harbor)
+	_save_progress()
+	_refresh_ui()
 
 func _equip(index: int) -> void:
 	sim.player.skin=index
@@ -553,22 +720,14 @@ func _tap(screen: Vector2) -> void:
 	_refresh_ui()
 
 func _save_progress() -> void:
-	var data: Dictionary={"schema":1,"gold":sim.player.gold,"ammo":sim.player.ammo,"skin":sim.player.skin,
-		"kills":sim.kills,"claimed":sim.claimed}
+	var data: Dictionary=sim.export_save()
 	var file =FileAccess.open(SAVE,FileAccess.WRITE)
 	if file!=null:file.store_string(JSON.stringify(data));file.close()
 
 func _load_progress() -> void:
 	if not FileAccess.file_exists(SAVE):return
 	var data: Variant=JSON.parse_string(FileAccess.get_file_as_string(SAVE))
-	if not data is Dictionary or data.get("schema")!=1:return
-	sim.player.gold=clampi(int(data.get("gold",240)),0,99999999)
-	sim.player.skin=clampi(int(data.get("skin",22)),0,skins.size()-1)
-	sim.kills=maxi(0,int(data.get("kills",0)))
-	sim.claimed=bool(data.get("claimed",false))
-	var ammo: Variant=data.get("ammo",[])
-	if ammo is Array and ammo.size()==3:
-		for i in 3:sim.player.ammo[i]=clampi(int(ammo[i]),0,999999)
+	if data is Dictionary:sim.restore_save(data)
 
 func _notification(what: int) -> void:
 	if what==NOTIFICATION_APPLICATION_PAUSED or what==NOTIFICATION_WM_CLOSE_REQUEST:

@@ -1,32 +1,25 @@
-# Abyssal Dominion M3052 — rebuilt sea chart
+# Abyssal Dominion M3053 — harbors, equipment and regions
 
-Open **this directory's** `project.godot` with Godot 4.7.2. This is an independent Node2D scene and fixed-step simulation; it does not inherit the old M303/M3051 scene stack.
+The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.3-test.3` / Android code `305303`. M3052 is retained in Git history and `releases/M3052/`.
 
-This reconstructs the unfinished M3052 work described in the previous chat. That original working directory was not recovered. The verified M3051 snapshot remains available at the repository root.
+## Playable additions
 
-## Implemented
-
-- New 4400 × 3200 sea chart, nine navigable island landmarks, animated blue ocean and minimap.
-- Twenty-six test ship designs (ten supplied illustrations plus sixteen directional reference hulls) selectable through the scrollable shipyard without resetting player state.
-- Sixteen directional NPC ship atlases: four retained reference ships and twelve newly extracted SeaBattles hulls. Full sails always use the visually audited second row; moving never selects a damaged-looking row.
-- Sixteen independently moving NPC ships plus animated Tiamat. Patrol, chase, return, fire, sinking and respawn are simulation states.
-- Click/tap routes around islands, direct movement, facing-independent fire, camera drag, pinch/wheel zoom, minimap navigation and recenter.
-- Visible cannon/chain/harpoon projectiles, damage on impact, incoming NPC shots, chain slowdown, range/line-of-fire/ammo rules, repair restrictions and physical single-payout loot.
-- A kill quest, ammo purchases, local guest wallet/ammo/design/quest persistence.
-- Desktop and narrow landscape HUD; scrolling shipyard, real controls and isolated automated QA.
+- Three connected regions: Caribbean Sea (level 1), North Sea (level 2), Shadow Waters (level 4). Regional island art, mirrored layouts, ocean tint and increasingly strong enemies. East/west portals require physical sailing and six seconds without damage. Returning during a session preserves previous enemy and loot state.
+- Physical harbor marker, docking, departure, paid drydock repair and four functional equipment categories with three purchased tiers: cannon/chain damage, harpoon damage, maximum hull HP and sailing speed. Docking pauses local combat.
+- Captain XP and levels 1–20, with seven sequential quests for combat, salvage, monsters, exploration and elite ships. Rewards are claimed once; previous achievements count toward subsequent tasks.
+- Four visual loot categories and equipment/quest/map icons extracted from the supplied 110-PNG reference collection. Seventeen additional cropped runtime images, including a panel frame; all 60 PNGs have provenance and SHA-256 checksums. Full reference boards are not copied into runtime as backgrounds.
+- Guest save schema 2 persists level, XP, equipment, quest counters, visited regions, current region, position and hull. Schema-1 M3052 saves retain wallet, ammunition, design and claimed first quest. Existing app package, signing cache and save filename are retained.
 
 ## Controls
 
-Tap water to sail. Tap an enemy and press **FEUER**. Full cannonballs or chain shot target ships; harpoons target the monster. Sail over loot to collect it. Repair requires six seconds without a hit. Pinch/wheel zooms; drag/right-drag pans; **ZIEL** recenters. The shipyard contains all 26 test cosmetics and ammunition restocking.
+Tap water to sail and an enemy to select it. FEUER toggles cannon fire. Harpoons target monsters; cannon/chain target ships. Sail over chests to collect them. HAFEN opens harbor services and sets a route to the dock; the contextual button docks, departs or enters a nearby portal. LOGBUCH shows quests. KARTEN sets a course to unlocked portals. Pinch/wheel zooms, drag/right-drag pans and ZIEL recenters.
 
-## Validation and Android
+## Build and verification
 
-`tests/simulation_test.gd` exercises actual navigation, NPC movement, projectile timing, rewards and combat invariants. `tests/ui_test.gd` loads the scene and checks controls at 1280×720, 844×390 and 720×405, scrollability, equipment and persistence. Each CI test gets fresh user storage.
+`.github/workflows/m3052.yml` builds `releases/M3053/ABYSSAL_DOMINION_M3053_REBUILD_ARM64.apk`. The builder audits every PNG, imports and tests the project, verifies embedded textures, ARM64 engine, signature, 16 KB alignment and application/version identity. CI also captures actual gameplay at desktop and mobile landscape sizes; no generated mockups serve as QA evidence. Build reports record the source commit. Simulation, progression and UI tests use fresh isolated guest storage.
 
-The dedicated `m3052.yml` workflow exports and verifies `releases/M3052/ABYSSAL_DOMINION_M3052_REBUILD_ARM64.apk`. The separate development package `com.abyssaldominion.rebuild` installs beside M3051. Its debug key is kept in the private Actions cache, not source control. Production signing and an updater are not implemented.
+## Scope
 
-## Remaining scope
+Local guest gameplay. This scene is not connected to M3051's separate development server. Public networking, accounts, multiplayer/PvP, guilds, cross-device acceptance, production signing and an updater remain open. Three regional layouts share a base geometry transformed per region; this is not a claim of three entirely independent authored worlds. NPC state on other maps is retained during the current session, not serialized across app restarts. Captain level and equipment are functional; cosmetics are still free test designs.
 
-This rebuilt scene is **local guest gameplay**. M3051's separate server test remains in the old project; the new simulation has not yet been networked. Accounts, persistent server progress, public WSS operation, cross-device acceptance, PvP, guilds and the full reference-game feature set remain open. Android export/signature checks are not a physical-device playtest. The visual target is not yet a pixel-identical recreation of the screenshots.
-
-All selected PNGs have hashes and provenance under `assets/`. Supplied/reference artwork is retained for private development; public redistribution rights have not been established. Original multi-gigabyte source archives are not duplicated in Git.
+Supplied/reference art is used in the private development repository; public redistribution rights have not been established. Automated checks and rendered captures do not constitute a physical Android device playtest.

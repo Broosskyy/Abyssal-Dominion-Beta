@@ -3,6 +3,7 @@ uniform sampler2D wave_noise : repeat_enable, filter_linear;
 uniform vec2 camera_world = vec2(2100.0,1450.0);
 uniform vec2 viewport_size = vec2(1280.0,720.0);
 uniform float map_zoom = 0.8;
+uniform vec3 region_tint = vec3(0.75,1.14,1.12);
 void fragment(){
  vec2 world = (UV-vec2(0.5))*viewport_size/map_zoom + camera_world;
  vec2 p=world/210.0;
@@ -16,5 +17,5 @@ void fragment(){
  vec3 water=mix(deep,blue,clamp(0.18+n*0.54+m*0.25+swell*0.12,0.0,1.0));
  water+=vec3(0.13,0.30,0.36)*glints*0.19;
  float vignette=1.0-0.24*dot(UV-0.5,UV-0.5);
- COLOR=vec4(water*vignette,1.0);
+ COLOR=vec4(water*region_tint*vignette,1.0);
 }

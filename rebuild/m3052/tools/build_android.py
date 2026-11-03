@@ -55,7 +55,7 @@ def main():
     settings.write_text(text)
     checked([engine, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.import.log'))
     results = []
-    for name in ['simulation_test', 'ui_test']:
+    for name in ['simulation_test', 'progression_test', 'ui_test']:
         with tempfile.TemporaryDirectory() as user_data:
             env = dict(os.environ, XDG_DATA_HOME=user_data)
             log = checked([engine, '--headless', '--path', str(ROOT), '--quit-after', '120',
@@ -82,12 +82,14 @@ def main():
     subprocess.run([str(bt/'zipalign'), '-c', '-P', '16', '4', str(output)], check=True)
     manifest = subprocess.check_output([str(bt/'aapt'), 'dump', 'badging', str(output)], text=True)
     output.with_suffix('.manifest.txt').write_text(manifest)
-    if "name='com.abyssaldominion.rebuild' versionCode='305202' versionName='0.305.2-test.2'" not in manifest:
+    if "name='com.abyssaldominion.rebuild' versionCode='305303' versionName='0.305.3-test.3'" not in manifest:
         raise RuntimeError('Unexpected Android identity')
     report = {'engine': version, 'apk': output.name, 'sha256': hashlib.sha256(output.read_bytes()).hexdigest(),
               'bytes': output.stat().st_size, 'tests': results, 'audited_pngs': len(assets),
               'signature': 'PASS', 'alignment_16k': 'PASS', 'physical_android_test': 'NOT_PERFORMED',
-              'mode': 'LOCAL_GUEST_SEA_CHART', 'public_server': False}
+              'mode': 'LOCAL_GUEST_SEA_CHART', 'public_server': False, 'milestone': 'M3053',
+              'regions': 3, 'quest_chain': 7, 'equipment_categories': 4, 'equipment_tiers': 3,
+              'source_commit': os.environ.get('GITHUB_SHA', 'local')}
     output.with_suffix('.build.json').write_text(json.dumps(report, indent=2))
     print(json.dumps(report, indent=2))
 

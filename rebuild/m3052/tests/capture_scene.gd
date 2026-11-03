@@ -7,12 +7,18 @@ func _run() -> void:
 	var combat=false
 	var yard=false
 	var demo=false
+	var harbor=false
+	var maps=false
+	var north=false
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--out="):output=arg.trim_prefix("--out=")
 		if arg=="--mobile":dimensions=Vector2i(844,390)
 		if arg=="--combat":combat=true
 		if arg=="--yard":yard=true
 		if arg=="--demo":demo=true
+		if arg=="--harbor":harbor=true
+		if arg=="--maps":maps=true
+		if arg=="--north":north=true
 	root.content_scale_size=Vector2i.ZERO
 	root.size=dimensions
 	var game=load("res://sea_map.tscn").instantiate()
@@ -24,6 +30,17 @@ func _run() -> void:
 		game.sim.select(2)
 		game.sim.firing=true
 	if yard:game._open_modal("Werft")
+	if north:
+		game.sim.configure_map(1)
+		game.sim.level=3
+	if harbor:
+		game.sim.player.pos=game.sim.harbor
+		game.camera.position=game.sim.player.pos
+		game.sim.player.gold=1200
+		game.sim.dock()
+		game._open_modal("Hafen")
+	if maps:game._open_modal("Seekarten")
+	game._refresh_ui()
 	DirAccess.make_dir_recursive_absolute(output)
 	for i in (420 if demo else 180):
 		await process_frame

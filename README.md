@@ -1,8 +1,8 @@
 # Abyssal Dominion
 
-**Current gameplay rebuild: [M3052](rebuild/m3052/README.md).** Open `rebuild/m3052/project.godot` with Godot 4.7.2. This independent sea chart includes moving NPCs, impact-based cannon combat, collectible loot, 26 selectable test designs and a responsive shipyard/HUD. Android builds and verification use `.github/workflows/m3052.yml`; APKs are preserved under `releases/M3052/` after successful CI.
+**Current gameplay build: [M3053 — harbors, equipment and three regions](rebuild/m3052/README.md).** Open `rebuild/m3052/project.godot` in Godot 4.7.2. Current Android version is `0.305.3-test.3`; CI preserves verified APKs and rendered gameplay captures in `releases/M3053/`. The existing `com.abyssaldominion.rebuild` package and guest save migrate from M3052.
 
-The new scene is local guest gameplay. Networking and cross-device acceptance remain open. The M3051 root project below is retained as a historical working snapshot, including its separate server test.
+M3053 adds physical docking, drydock repair, four equipment categories with three functional tiers, captain XP/levels, seven quests, two additional portal-linked regions and 17 cropped runtime images from the supplied reference collection. All 60 PNGs have hashes and provenance. This remains local guest gameplay; public multiplayer and cross-device acceptance remain open. See the active project README for controls, limits and validation.
 
 ## M3051 historical snapshot
 

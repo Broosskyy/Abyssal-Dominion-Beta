@@ -306,6 +306,261 @@
       "bytes": 46840,
       "sha256": "cd3e76cc9c0133a0dcb71dd2e49a6f33f9663a5e275730bcc12acfa198efdfb2",
       "source_archive": "Abyssal_Dominion_M3050_Schiffe_Original_UI_Import.zip"
+    },
+    {
+      "path": "assets/expanded/cannon_0.png",
+      "bytes": 95092,
+      "sha256": "330002e2985326147d2c2c658a65f77f5c9b0a708671ba1ccdaef8ffdbe82ef6",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169286.png",
+      "source_sha256": "9adb2c0ee93c143ba30196b3ee01df7e89b00cdc8f7f45d23198a75003071871",
+      "crop_xyxy": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/cannon_1.png",
+      "bytes": 111227,
+      "sha256": "870dc9dbf7642615780c5a8f222b5be1f8a48492261f1cb1e0b3c414cfbe31f7",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169286.png",
+      "source_sha256": "9adb2c0ee93c143ba30196b3ee01df7e89b00cdc8f7f45d23198a75003071871",
+      "crop_xyxy": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/cannon_2.png",
+      "bytes": 123080,
+      "sha256": "bed2231b4d5f17365207608169d9fade56ce619a03b47f16fa59e10ce1636bf3",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169286.png",
+      "source_sha256": "9adb2c0ee93c143ba30196b3ee01df7e89b00cdc8f7f45d23198a75003071871",
+      "crop_xyxy": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/harpoon_0.png",
+      "bytes": 50105,
+      "sha256": "f1ec89c7e120bd97225d1ffe31017887457cbfde53c190c365b63a5193f95fd7",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169279.png",
+      "source_sha256": "de309baa0625b88f9014f01f00e2616b4cc60751c2e3ba26846338f63d2c150d",
+      "crop_xyxy": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery; discarded isolated neighboring cell fragments"
+    },
+    {
+      "path": "assets/expanded/harpoon_1.png",
+      "bytes": 60682,
+      "sha256": "9fdaca0c6d288882d25e187d18c57961669bd4ac3bddb3f2bad0fdf83b020a15",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169279.png",
+      "source_sha256": "de309baa0625b88f9014f01f00e2616b4cc60751c2e3ba26846338f63d2c150d",
+      "crop_xyxy": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery; discarded isolated neighboring cell fragments"
+    },
+    {
+      "path": "assets/expanded/harpoon_2.png",
+      "bytes": 99957,
+      "sha256": "38e8c2fac402644ad66335c484d146b0856751b10ee64af87583289523a4201b",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169279.png",
+      "source_sha256": "de309baa0625b88f9014f01f00e2616b4cc60751c2e3ba26846338f63d2c150d",
+      "crop_xyxy": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery; discarded isolated neighboring cell fragments"
+    },
+    {
+      "path": "assets/expanded/loot_0.png",
+      "bytes": 129074,
+      "sha256": "f62ed6f47700e022568121f08693baaa119c50319505b08579d0a83e0f1c587d",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169325.png",
+      "source_sha256": "c8f51618f7f2aee489ab3ba0ead1b68a775c154f6ceebbc138af6cdd4c8eafcb",
+      "crop_xyxy": [
+        0,
+        0,
+        768,
+        512
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/loot_1.png",
+      "bytes": 120327,
+      "sha256": "b32e800ed787047a3408ef616119714860fc06a58f8816471610e6f79d857321",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169325.png",
+      "source_sha256": "c8f51618f7f2aee489ab3ba0ead1b68a775c154f6ceebbc138af6cdd4c8eafcb",
+      "crop_xyxy": [
+        768,
+        0,
+        1536,
+        512
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/loot_2.png",
+      "bytes": 118654,
+      "sha256": "6ea1ff6bf965d367bccf60ef8ea7a7d848935f08db248db2e7400c5d242c9eae",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169325.png",
+      "source_sha256": "c8f51618f7f2aee489ab3ba0ead1b68a775c154f6ceebbc138af6cdd4c8eafcb",
+      "crop_xyxy": [
+        0,
+        512,
+        768,
+        1024
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/loot_3.png",
+      "bytes": 130920,
+      "sha256": "187394d0323f8e02389845220a175ff26e3aecc1d00cdc37bb44066253acbdc2",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169325.png",
+      "source_sha256": "c8f51618f7f2aee489ab3ba0ead1b68a775c154f6ceebbc138af6cdd4c8eafcb",
+      "crop_xyxy": [
+        768,
+        512,
+        1536,
+        1024
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/upgrade_cannon.png",
+      "bytes": 130842,
+      "sha256": "31ded8ec2ac5c1a1bb96efb94c9713af10365e7253aabea6f10ec96a06352d94",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169363.png",
+      "source_sha256": "3d1e54bfcc389d861b5eef2b053ce7b1fa34b26da01df826c1ecdc5b0f24a6b0",
+      "crop_xyxy": [
+        627,
+        0,
+        940,
+        314
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/upgrade_harpoon.png",
+      "bytes": 119482,
+      "sha256": "88331b0ae9d7f702a261ed6f01d1820f033e909dab7dcb2cec8657697a239b83",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169363.png",
+      "source_sha256": "3d1e54bfcc389d861b5eef2b053ce7b1fa34b26da01df826c1ecdc5b0f24a6b0",
+      "crop_xyxy": [
+        940,
+        0,
+        1254,
+        314
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/upgrade_hull.png",
+      "bytes": 115912,
+      "sha256": "98321a6ba535dd0abb7d5e6ed93ea432e6597d965bc27d5a278c7ec85edb42ba",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169363.png",
+      "source_sha256": "3d1e54bfcc389d861b5eef2b053ce7b1fa34b26da01df826c1ecdc5b0f24a6b0",
+      "crop_xyxy": [
+        0,
+        314,
+        314,
+        627
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/upgrade_sails.png",
+      "bytes": 133985,
+      "sha256": "2277fc5b34f84115cf6f6916af93030bcbe1766aec6464d104a63b67302a7034",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169363.png",
+      "source_sha256": "3d1e54bfcc389d861b5eef2b053ce7b1fa34b26da01df826c1ecdc5b0f24a6b0",
+      "crop_xyxy": [
+        314,
+        314,
+        627,
+        627
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/quest_book.png",
+      "bytes": 112635,
+      "sha256": "78776b695babcad138a077eefcf9a1da701dee6207aa4303ac8983829022b89a",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169363.png",
+      "source_sha256": "3d1e54bfcc389d861b5eef2b053ce7b1fa34b26da01df826c1ecdc5b0f24a6b0",
+      "crop_xyxy": [
+        0,
+        627,
+        314,
+        940
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/world_chart.png",
+      "bytes": 126939,
+      "sha256": "e90566720eaab379d4ef911a21ed9d7767edffca746db1f8b153b0438b95a599",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "169363.png",
+      "source_sha256": "3d1e54bfcc389d861b5eef2b053ce7b1fa34b26da01df826c1ecdc5b0f24a6b0",
+      "crop_xyxy": [
+        627,
+        940,
+        940,
+        1254
+      ],
+      "normalization": "RGBA alpha-bounds, max 256 px motif, 16 px padding; no generated imagery"
+    },
+    {
+      "path": "assets/expanded/panel_frame.png",
+      "bytes": 431359,
+      "sha256": "58f907f7943d402e053523055c83d58f0ee3245d4369915bd2e7732439cc7c20",
+      "source_archive": "Abyssal_Dominion_Alle_Grafiken_Originale_Erweitert_110_PNG.zip",
+      "source_image": "165865.png",
+      "source_sha256": "a212c9a184c66c6c9ea5422cde8203dae17356e005c9e1f8689b66462d075e74",
+      "crop_xyxy": [
+        0,
+        0,
+        735,
+        485
+      ],
+      "normalization": "RGBA cropped standalone panel; resized to max 640 px"
     }
   ]
 }

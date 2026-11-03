@@ -1,4 +1,5 @@
 extends RefCounted
+const CONTENT = preload("res://content.gd")
 ## Independent fixed-step sea simulation. No dependency on legacy map scripts.
 const WORLD := Vector2(4400, 3200)
 const CELL := 48
@@ -21,6 +22,23 @@ var target := -1
 var ammo_mode := 0
 var kills := 0
 var claimed := false
+var map_id := 0
+var docked := false
+var level := 1
+var xp := 0
+var quest_index := 0
+var loot_collected := 0
+var monster_kills := 0
+var elite_kills := 0
+var visited := [true, false, false]
+var upgrades := {"cannon":0, "harpoon":0, "hull":0, "sails":0}
+var portals: Array[Dictionary] = [
+	{"pos":Vector2(4070,1600),"destination":1},
+	{"pos":Vector2(330,1600),"destination":2}]
+var harbor := Vector2(1920,1450)
+var base_islands: Array[Dictionary] = []
+var base_npcs: Array[Dictionary] = []
+var map_states: Dictionary = {}
 var message := "Seekarte antippen: Kurs setzen · Schiff antippen: Ziel wählen"
 
 func _init() -> void:
@@ -59,6 +77,9 @@ func _init() -> void:
 	_add_drop(START + Vector2(-170, 130), 25)
 	_add_drop(START + Vector2(220, -120), 25)
 	_add_drop(Vector2(2170, 1780), 30)
+	base_islands = islands.duplicate(true)
+	base_npcs = npcs.duplicate(true)
+	configure_map(0)
 
 func _build_grid() -> void:
 	grid.region = Rect2i(0, 0, ceili(WORLD.x / CELL), ceili(WORLD.y / CELL))
@@ -125,6 +146,7 @@ func plan_path(start: Vector2, goal: Vector2) -> Array[Vector2]:
 	return result
 
 func course(point: Vector2) -> bool:
+	if docked: return false
 	if int(player.hp) <= 0: return false
 	var route = plan_path(player.pos, point)
 	if route.is_empty():
@@ -155,7 +177,8 @@ func set_ammo(index: int) -> void:
 	message = ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer"][index]
 
 func toggle_repair() -> void:
-	if int(player.hp) <= 0 or int(player.hp) >= PLAYER_HP:
+	if docked: return
+	if int(player.hp) <= 0 or int(player.hp) >= int(player.max_hp):
 		message = "Rumpf ist vollständig intakt"
 		return
 	if clock - float(player.last_hit) < 6.0:
@@ -168,21 +191,22 @@ func toggle_repair() -> void:
 	message = "Reparatur läuft" if repairing else "Reparatur gestoppt"
 
 func step(delta: float) -> void:
+	if docked: return
 	clock += delta
 	player.reload = maxf(0, float(player.reload) - delta)
 	player.slow = maxf(0, float(player.slow) - delta)
 	if int(player.hp) <= 0:
 		player.respawn -= delta
 		if float(player.respawn) <= 0:
-			player.hp = PLAYER_HP
+			player.hp = player.max_hp
 			player.pos = START
 			player.last_hit = clock
 			message = "Wieder auf See · Rumpf repariert"
 	else:
 		_move(player, delta)
 		if repairing:
-			player.hp = minf(PLAYER_HP, float(player.hp) + 90.0 * delta)
-			if float(player.hp) >= PLAYER_HP: repairing = false
+			player.hp = minf(float(player.max_hp), float(player.hp) + 90.0 * delta)
+			if float(player.hp) >= float(player.max_hp): repairing = false
 		if firing and target > 0 and float(player.reload) <= 0:
 			_fire_player()
 	for npc in npcs:
@@ -192,6 +216,7 @@ func step(delta: float) -> void:
 		if int(player.hp) > 0 and player.pos.distance_to(drops[i].pos) < 80:
 			var amount = int(drops[i].gold)
 			player.gold += amount
+			loot_collected += 1
 			message = "+%d Gold · Beute geborgen" % amount
 			_event("loot", drops[i].pos, amount, 0)
 			drops.remove_at(i)
@@ -237,7 +262,7 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 		elif distance <= 305:
 			npc.path = []
 		if distance < 420 and float(npc.reload) <= 0 and segment_free(npc.pos, player.pos):
-			_launch(npc.id, 0, "harpoon" if npc.kind == "monster" else "cannon", 36 if npc.elite else 23, 2)
+			_launch(npc.id, 0, "harpoon" if npc.kind == "monster" else "cannon", roundi((36.0 if npc.elite else 23.0)*float(CONTENT.MAPS[map_id].enemy_scale)), 2)
 			npc.reload = 3.2 if npc.kind == "monster" else 2.6
 	else:
 		npc.state = "patrol"
@@ -250,6 +275,7 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 	_move(npc, delta)
 
 func _fire_player() -> void:
+	if docked or int(player.hp)<=0: return
 	var victim = actor(target)
 	if victim.is_empty() or int(victim.hp) <= 0:
 		firing = false
@@ -272,7 +298,7 @@ func _fire_player() -> void:
 		firing = false
 		return
 	player.ammo[ammo_mode] -= count
-	_launch(0, target, AMMO_NAMES[ammo_mode], [31, 19, 96][ammo_mode], count)
+		_launch(0, target, AMMO_NAMES[ammo_mode], weapon_damage(ammo_mode), count)
 	player.reload = 1.65
 	victim.aggressive = true
 	repairing = false
@@ -327,22 +353,28 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 			message = "Versenkt · Rückkehr in 8 Sekunden"
 		elif int(shot.source) == 0:
 			kills += 1
+			if victim.kind == "monster": monster_kills += 1
+			elif victim.elite: elite_kills += 1
+			award_xp(150 if victim.kind == "monster" else (60 if victim.elite else 25))
 			_add_drop(victim.pos, int(victim.reward))
 			message = "Ziel versenkt · zur Beute fahren"
 			if target == int(victim.id): firing = false
 
 func _add_drop(point: Vector2, gold: int) -> void:
 	next_id += 1
-	drops.append({"id": next_id, "pos": point, "gold": gold})
+	drops.append({"id": next_id, "pos": point, "gold": gold, "art":2 if gold>=200 else (1 if gold>=100 else 0)})
 
 func _event(kind: String, point: Vector2, value: int, id: int) -> void:
 	events.append({"type": kind, "pos": point, "value": value, "actor": id, "time": clock})
 
 func claim_quest() -> bool:
-	if kills < 3 or claimed: return false
+	var quest = current_quest()
+	if quest.is_empty() or quest_progress() < int(quest.goal): return false
+	player.gold += int(quest.gold)
+	award_xp(int(quest.xp))
+	quest_index += 1
 	claimed = true
-	player.gold += 180
-	message = "Auftrag abgeschlossen · +180 Gold"
+	message = "Auftrag abgeschlossen · +%d Gold · +%d EP" % [quest.gold,quest.xp]
 	return true
 
 func buy_ammo(index: int) -> bool:
@@ -350,4 +382,187 @@ func buy_ammo(index: int) -> bool:
 	player.gold -= 30
 	player.ammo[index] += [150, 60, 40][index]
 	message = "Munitionsvorrat aufgefüllt"
+	return true
+
+func xp_required() -> int:
+	return 100 + (level - 1) * 70
+
+func award_xp(amount: int) -> void:
+	if amount <= 0 or level >= 20: return
+	xp += amount
+	while level < 20 and xp >= xp_required():
+		xp -= xp_required()
+		level += 1
+		_event("level", player.pos, level, 0)
+	if level >= 20: xp = 0
+
+func current_quest() -> Dictionary:
+	return CONTENT.QUESTS[quest_index] if quest_index < CONTENT.QUESTS.size() else {}
+
+func quest_progress() -> int:
+	var quest = current_quest()
+	if quest.is_empty(): return 0
+	match str(quest.stat):
+		"kills": return kills
+		"loot": return loot_collected
+		"monsters": return monster_kills
+		"elites": return elite_kills
+		"north": return 1 if visited[1] else 0
+		"abyss": return 1 if visited[2] else 0
+	return 0
+
+func weapon_damage(mode: int) -> int:
+	var key = "harpoon" if mode == 2 else "cannon"
+	var bonus = 0.35 if mode == 2 else 0.25
+	return roundi(float([31,19,96][mode]) * (1.0 + float(upgrades[key]) * bonus))
+
+func apply_upgrades() -> void:
+	player.max_hp = PLAYER_HP + int(upgrades.hull) * 400
+	player.hp = minf(float(player.hp),float(player.max_hp))
+	player.speed = PLAYER_SPEED * (1.0 + 0.12 * float(upgrades.sails))
+
+func upgrade_cost(key: String) -> int:
+	if not upgrades.has(key) or int(upgrades[key]) >= 3: return -1
+	return [150,400,850][int(upgrades[key])]
+
+func buy_upgrade(key: String) -> bool:
+	var cost = upgrade_cost(key)
+	if not docked or cost < 0 or int(player.gold) < cost: return false
+	player.gold -= cost
+	upgrades[key] += 1
+	apply_upgrades()
+	message = "%s auf Stufe %d verbessert" % [CONTENT.UPGRADES[key].name,upgrades[key]]
+	return true
+
+func can_dock() -> bool:
+	return int(player.hp) > 0 and player.pos.distance_to(harbor) <= 160 and clock - float(player.last_hit) >= 6.0
+
+func dock() -> bool:
+	if not can_dock():
+		message = "Zum Hafen fahren · Andocken erst 6 Sekunden ohne Treffer"
+		return false
+	docked = true
+	firing = false
+	repairing = false
+	player.path = []
+	shots.clear()
+	message = "Im Hafen · Schiff ausrüsten und Vorräte ergänzen"
+	return true
+
+func depart() -> void:
+	docked = false
+	message = "Leinen los · gute Fahrt, Kapitän!"
+
+func harbor_repair_cost() -> int:
+	return maxi(0,ceili((float(player.max_hp) - float(player.hp)) / 40.0))
+
+func harbor_repair() -> bool:
+	var cost = harbor_repair_cost()
+	if not docked or cost <= 0 or int(player.gold) < cost: return false
+	player.gold -= cost
+	player.hp = player.max_hp
+	message = "Rumpf im Trockendock vollständig repariert"
+	return true
+
+func near_portal() -> int:
+	for portal in portals:
+		if player.pos.distance_to(portal.pos) <= 135: return int(portal.destination)
+	return -1
+
+func travel(destination: int) -> bool:
+	if destination < 0 or destination >= CONTENT.MAPS.size() or destination == map_id or docked or int(player.hp) <= 0: return false
+	if near_portal() != destination:
+		message = "Für den Kartenwechsel zum Portal fahren"
+		return false
+	if level < int(CONTENT.MAPS[destination].level):
+		message = "Dieses Seegebiet öffnet ab Kapitänsstufe %d" % CONTENT.MAPS[destination].level
+		return false
+	if clock - float(player.last_hit) < 6.0:
+		message = "Kartenwechsel erst 6 Sekunden ohne Treffer"
+		return false
+	map_states[map_id] = {"npcs":npcs.duplicate(true),"drops":drops.duplicate(true)}
+	configure_map(destination)
+	player.pos = START
+	player.path = []
+	firing = false
+	repairing = false
+	target = -1
+	shots.clear()
+	events.clear()
+	message = "%s erreicht · Karte %s" % [CONTENT.MAPS[map_id].name,CONTENT.MAPS[map_id].code]
+	return true
+
+func _map_point(point: Vector2) -> Vector2:
+	if map_id == 1: return Vector2(WORLD.x - point.x,point.y)
+	if map_id == 2: return Vector2(point.x,WORLD.y - point.y)
+	return point
+
+func configure_map(destination: int) -> void:
+	map_id = clampi(destination,0,CONTENT.MAPS.size()-1)
+	visited[map_id] = true
+	var config = CONTENT.MAPS[map_id]
+	islands = base_islands.duplicate(true)
+	for i in islands.size():
+		islands[i].pos = _map_point(base_islands[i].pos)
+		islands[i].art = config.art[i]
+		if map_id > 0: islands[i].name = (["Eishafen","Frostbucht","Weißes Riff","Gletscherwacht","Eisbrecherbucht","Nordstern","Winterhafen","Frostzahn","Polarwacht"] if map_id == 1 else ["Nebelwacht","Schwarze Bucht","Totenriff","Schattenklippen","Korsarenfestung","Nachtwacht","Dämmerhafen","Drachenzahn","Knochenriff"])[i]
+	npcs = base_npcs.duplicate(true)
+	for npc in npcs:
+		npc.pos = _map_point(npc.pos)
+		npc.home = npc.pos
+		npc.path = []
+		npc.hp = roundi(float(npc.max_hp) * float(config.enemy_scale))
+		npc.max_hp = npc.hp
+		npc.reward = roundi(float(npc.reward) * float(config.enemy_scale))
+		if map_id > 0: npc.name = ("Frost · " if map_id == 1 else "Schatten · ") + str(npc.name)
+	if map_states.has(map_id):
+		npcs = map_states[map_id].npcs.duplicate(true)
+		drops = map_states[map_id].drops.duplicate(true)
+	else:
+		drops.clear()
+		_add_drop(START + Vector2(-170,130),25 + map_id * 15)
+		_add_drop(START + Vector2(220,-120),25 + map_id * 15)
+		_add_drop(_map_point(Vector2(2170,1780)),30 + map_id * 20)
+	portals[0].destination = (map_id + 1) % 3
+	portals[1].destination = (map_id + 2) % 3
+	_build_grid()
+
+func export_save() -> Dictionary:
+	return {"schema":2,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
+		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
+		"monster_kills":monster_kills,"elite_kills":elite_kills,"level":level,"xp":xp,
+		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":map_id,
+		"position":[player.pos.x,player.pos.y],"hp":player.hp,"docked":docked}
+
+func restore_save(data: Dictionary) -> bool:
+	if int(data.get("schema",0)) not in [1,2]: return false
+	player.gold=clampi(int(data.get("gold",240)),0,99999999)
+	player.skin=clampi(int(data.get("skin",22)),0,25)
+	kills=maxi(0,int(data.get("kills",0)))
+	claimed=bool(data.get("claimed",false))
+	quest_index=clampi(int(data.get("quest_index",1 if claimed else 0)),0,CONTENT.QUESTS.size())
+	loot_collected=maxi(0,int(data.get("loot_collected",0)))
+	monster_kills=maxi(0,int(data.get("monster_kills",0)))
+	elite_kills=maxi(0,int(data.get("elite_kills",0)))
+	level=clampi(int(data.get("level",1)),1,20)
+	xp=clampi(int(data.get("xp",0)),0,xp_required()-1)
+	var saved_upgrades: Variant=data.get("upgrades",{})
+	if saved_upgrades is Dictionary:
+		for key in CONTENT.UPGRADE_KEYS:upgrades[key]=clampi(int(saved_upgrades.get(key,0)),0,3)
+	apply_upgrades()
+	var stock: Variant=data.get("ammo",[])
+	if stock is Array and stock.size()==3:
+		for i in 3:player.ammo[i]=clampi(int(stock[i]),0,999999)
+	var saved_visited: Variant=data.get("visited",[])
+	if saved_visited is Array and saved_visited.size()==3:
+		for i in 3:visited[i]=bool(saved_visited[i])
+	configure_map(clampi(int(data.get("map_id",0)),0,2))
+	player.pos=START
+	var position: Variant=data.get("position",[])
+	if position is Array and position.size()==2:
+		var point=Vector2(float(position[0]),float(position[1]))
+		if point.is_finite() and not blocked(point):player.pos=point
+	player.hp=clampi(int(data.get("hp",player.max_hp)),0,int(player.max_hp))
+	if int(player.hp)==0:player.respawn=8.0
+	docked=bool(data.get("docked",false)) and can_dock()
 	return true

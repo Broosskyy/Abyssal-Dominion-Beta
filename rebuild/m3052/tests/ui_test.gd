@@ -20,7 +20,7 @@ func _run() -> void:
 		game._layout()
 		game.sim.select(2)
 		game._refresh_ui()
-		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button]
+		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.interact]
 		controls.append_array(game.ammo_buttons)
 		for control: Control in controls:
 			var rect=control.get_global_rect()
@@ -49,6 +49,46 @@ func _run() -> void:
 	game.sim.player.gold=0
 	game._load_progress()
 	check(int(game.sim.player.gold)==543 and int(game.sim.player.skin)==8,"guest save reloads wallet and ship design")
+	for dimensions in [Vector2i(1280,720),Vector2i(844,390),Vector2i(720,405)]:
+		root.size=dimensions
+		await process_frame
+		game._layout()
+		for kind in ["Hafen","Logbuch","Seekarten"]:
+			game._open_modal(kind)
+			await process_frame
+			check(game.modal.visible and game.modal_scroll.size.y>100,"new gameplay panel opens at %s: %s"%[dimensions,kind])
+			check(game.modal.get_global_rect().end.x<=dimensions.x+1 and game.modal.get_global_rect().end.y<=dimensions.y+1,"panel stays inside viewport: "+kind)
+			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
+	game.modal.hide()
+	game.sim.player.pos=game.sim.harbor
+	game.sim.player.last_hit=-100
+	game._interact()
+	check(game.sim.docked and game.modal_kind=="Hafen","harbor interaction opens actual docked equipment")
+	game.sim.player.gold=1000
+	game._open_modal("Hafen")
+	var purchases=game.modal_body.find_children("*","Button",true,false)
+	var upgraded=false
+	for button: Button in purchases:
+		if button.text=="VERBESSERN · 150 Gold":
+			button.pressed.emit()
+			upgraded=true
+			break
+	check(upgraded and int(game.sim.upgrades.cannon)==1 and int(game.sim.player.gold)==850,"equipment UI purchases real cannon upgrade")
+	game._interact()
+	check(not game.sim.docked and not game.modal.visible,"departure interaction closes harbor and resumes sea")
+	game.sim.kills=3
+	game._open_modal("Logbuch")
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text=="BELOHNUNG ABHOLEN":
+			button.pressed.emit()
+			break
+	check(game.sim.quest_index==1 and game.sim.level>=2,"logbook claim advances quest and actual captain level")
+	game.sim.player.pos=game.sim.portals[0].pos
+	game.sim.player.last_hit=-100
+	game._navigate_region(1)
+	check(game.sim.map_id==1 and game.camera.position==game.sim.player.pos,"map UI switches simulation, recenters camera and saves")
+	game._load_progress()
+	check(game.sim.map_id==1 and game.sim.upgrades.cannon==1,"new map and equipment survive UI save reload")
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)

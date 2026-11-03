@@ -1,4 +1,5 @@
 extends Control
+const CONTENT = preload("res://content.gd")
 var simulation: RefCounted
 var camera_world := Vector2.ZERO
 var view_world := Vector2(1600,900)
@@ -16,7 +17,8 @@ func _draw() -> void:
 	var r = Rect2(Vector2(8,25), size-Vector2(16,35))
 	draw_rect(Rect2(Vector2.ZERO,size),Color("071a25"))
 	draw_rect(Rect2(Vector2.ZERO,size),Color("9a7845"),false,1.5)
-	draw_string(ThemeDB.fallback_font,Vector2(10,17),"KARIBISCHE SEE · 1/1",HORIZONTAL_ALIGNMENT_LEFT,-1,11,Color("d7c092"))
+	var region: Dictionary = CONTENT.MAPS[simulation.map_id]
+	draw_string(ThemeDB.fallback_font,Vector2(10,17),"%s · %s" % [region.code,region.name],HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("d7c092"))
 	draw_rect(r,Color("123b4b"))
 	for island in simulation.islands:
 		var p: Vector2=r.position+island.pos/simulation.WORLD*r.size
@@ -25,6 +27,11 @@ func _draw() -> void:
 		if int(npc.hp)>0:
 			var p: Vector2=r.position+npc.pos/simulation.WORLD*r.size
 			draw_circle(p,2.2,Color("ed7867") if npc.kind=="ship" else Color("d29cdb"))
+	for portal in simulation.portals:
+		var p: Vector2 = r.position+portal.pos/simulation.WORLD*r.size
+		draw_rect(Rect2(p-Vector2(2,3),Vector2(4,6)),Color("9b93ff"))
+	var port: Vector2 = r.position+simulation.harbor/simulation.WORLD*r.size
+	draw_circle(port,3.0,Color("f4c56c"))
 	var box = Rect2(r.position+(camera_world-view_world*0.5)/simulation.WORLD*r.size,view_world/simulation.WORLD*r.size)
 	draw_rect(box,Color(0.65,0.88,0.85,0.6),false,1.0)
 	var player: Vector2=r.position+simulation.player.pos/simulation.WORLD*r.size

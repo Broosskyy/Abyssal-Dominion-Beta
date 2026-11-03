@@ -1,4 +1,4 @@
-name: M3052 rebuilt sea chart - Android
+name: M3053 harbors, equipment and regions - Android
 on:
   workflow_dispatch:
   push:
@@ -41,11 +41,22 @@ jobs:
             keytool -genkeypair -keystore "$HOME/.cache/abyssal-test-signing/debug.keystore" -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Abyssal Development,O=Abyssal Dominion,C=DE'
           fi
       - name: Test and verify APK
-        run: python3 rebuild/m3052/tools/build_android.py --godot /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --keystore "$HOME/.cache/abyssal-test-signing/debug.keystore" --output "$GITHUB_WORKSPACE/releases/M3052/ABYSSAL_DOMINION_M3052_REBUILD_ARM64.apk"
+        run: python3 rebuild/m3052/tools/build_android.py --godot /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --keystore "$HOME/.cache/abyssal-test-signing/debug.keystore" --output "$GITHUB_WORKSPACE/releases/M3053/ABYSSAL_DOMINION_M3053_REBUILD_ARM64.apk"
+      - name: Capture desktop and mobile gameplay
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p releases/M3053/captures
+          for scene in combat harbor maps north; do
+            extra=""
+            if [ "$scene" = harbor ] || [ "$scene" = maps ]; then extra="--mobile"; fi
+            XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --path rebuild/m3052 --fixed-fps 60 --script tests/capture_scene.gd -- --out="$GITHUB_WORKSPACE/releases/M3053/captures/$scene" "--$scene" $extra > "releases/M3053/captures/$scene.log" 2>&1
+            if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "releases/M3053/captures/$scene.log"; then exit 1; fi
+          done
       - uses: actions/upload-artifact@v4
         with:
-          name: Abyssal-Dominion-M3052-Android
-          path: releases/M3052/ABYSSAL_DOMINION_M3052_REBUILD_ARM64.*
+          name: Abyssal-Dominion-M3053-Android
+          path: releases/M3053/
           if-no-files-found: error
           retention-days: 90
       - name: Preserve verified APK in repository
@@ -59,6 +70,6 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f releases/M3052/*.apk releases/M3052/*.build.json releases/M3052/*.signature.txt releases/M3052/*.manifest.txt
-          git commit -m 'Preserve verified M3052 Android rebuild APK [skip ci]'
+          git add -f releases/M3053/*.apk releases/M3053/*.build.json releases/M3053/*.signature.txt releases/M3053/*.manifest.txt releases/M3053/captures/
+          git commit -m 'Preserve verified M3053 Android APK and gameplay captures [skip ci]'
           git push origin HEAD:main
