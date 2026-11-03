@@ -688,6 +688,8 @@ func _layout() -> void:
 	modal.add_theme_stylebox_override("panel",modal_compact_skin)
 	_place(modal_title,18,12,width-160,30);_place(modal_close,width-136,12,118,32)
 	_place(modal_scroll,18,56,width-36,height-74)
+	modal_body.size.x=modal_scroll.size.x
+	modal_body.queue_sort()
 
 func _refresh_ui() -> void:
 	if player_name==null:return
@@ -900,6 +902,8 @@ func _open_modal(kind: String) -> void:
 		var info =_text(modal_body,"ABYSSAL DOMINION · STEUERUNG\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nHAFEN: Andocken, Rumpf reparieren und Kanonen, Harpunen, Rumpf oder Segel verbessern.\nLOGBUCH: Sieben aufeinanderfolgende Aufträge.\nKARTEN: Portale zur Karibischen See, zum Nordmeer und zu den Schattengewässern.\n\nZwei Finger / Mausrad: Zoom. Ziehen / rechte Maustaste: Kamera.\nDas Fadenkreuz zentriert die Kamera. Portale antippen: hinfahren und automatisch wechseln.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",15)
 		info.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		info.custom_minimum_size.y=300
+	modal_body.size.x=modal_scroll.size.x
+	modal_body.queue_sort()
 	modal.show()
 	modal_backdrop.show()
 	modal_scroll.set_deferred("scroll_vertical",scroll_position)

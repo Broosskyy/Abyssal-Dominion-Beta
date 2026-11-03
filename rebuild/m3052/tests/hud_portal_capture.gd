@@ -6,7 +6,14 @@ func _shot(game: Node,output: String,name: String) -> void:
 	game.ocean.set_shader_parameter("map_zoom",game.camera.zoom.x)
 	game.ocean.set_shader_parameter("viewport_size",game.get_viewport_rect().size)
 	game.chart_mini.camera_world=game.camera.position;game.chart_mini.view_world=game.get_viewport_rect().size/game.camera.zoom;game.chart_mini.queue_redraw()
-	await process_frame;await process_frame;await RenderingServer.frame_post_draw
+	# Container minimum sizes and wrapping need several layout passes after profile changes.
+	for _frame in 8:await process_frame
+	if game.modal.visible:
+		var bounds: Rect2=game.modal_scroll.get_global_rect()
+		for button: Button in game.modal_body.find_children("*","Button",true,false):
+			if button.get_global_rect().end.x>bounds.end.x+1:
+				push_error("Rendered modal content exceeds scroll viewport: "+name);quit(1);return
+	await RenderingServer.frame_post_draw
 	if root.get_texture().get_image().save_png(output+"/"+name+".png")!=OK:push_error("HUD capture failed")
 func _run() -> void:
 	var output="user://hud-portal"
