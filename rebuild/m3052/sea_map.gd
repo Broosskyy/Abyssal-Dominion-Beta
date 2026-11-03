@@ -588,6 +588,8 @@ func _build_ui() -> void:
 	modal_backdrop.mouse_filter=Control.MOUSE_FILTER_STOP
 	ui.add_child(modal_backdrop)
 	modal=_panel(ui)
+	# Scroll clipping must remain in unscaled viewport space. HUD orbs scale separately.
+	modal.set_as_top_level(true)
 	modal_skin=StyleBoxTexture.new()
 	modal_skin.texture=load("res://assets/expanded/panel_frame.png")
 	modal_skin.texture_margin_left=58
@@ -601,7 +603,7 @@ func _build_ui() -> void:
 	modal_compact_skin.set_corner_radius_all(7)
 	modal.z_index=20
 	modal.visible=false
-	modal_title=_text(modal,"",20)
+	modal_title=_text(modal,"",22)
 	modal_close=_button(modal,"SCHLIESSEN",func():modal.hide();_save_progress())
 	modal_scroll=ScrollContainer.new()
 	modal_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
@@ -678,13 +680,14 @@ func _layout() -> void:
 	_place(quest_text,10,33,quest_panel.size.x-20,quest_panel.size.y-72)
 	_place(system_label,10,33,quest_panel.size.x-20,quest_panel.size.y-42)
 	_place(quest_claim,8,quest_panel.size.y-32,quest_panel.size.x-16,25)
-	var width=minf(640,s.x-32)
-	var height=minf(560,s.y-24)
+	var menu_size=viewport_size
+	var width=minf(720,menu_size.x-32)
+	var height=minf(620,menu_size.y-24)
 	_place(modal_backdrop,0,0,s.x,s.y)
 	if modal_kind=="Munition":
-		width=minf(430,s.x-32);height=minf(380,s.y-108)
-		_place(modal,s.x-width-16,maxf(12,s.y-height-104),width,height)
-	else:_place(modal,(s.x-width)*.5,(s.y-height)*.5,width,height)
+		width=minf(480,menu_size.x-32);height=minf(420,menu_size.y-108)
+		_place(modal,menu_size.x-width-16,maxf(12,menu_size.y-height-104),width,height)
+	else:_place(modal,(menu_size.x-width)*.5,(menu_size.y-height)*.5,width,height)
 	modal.add_theme_stylebox_override("panel",modal_compact_skin)
 	_place(modal_title,18,12,width-160,30);_place(modal_close,width-136,12,118,32)
 	_place(modal_scroll,18,56,width-36,height-74)
@@ -909,14 +912,15 @@ func _open_modal(kind: String) -> void:
 	modal_scroll.set_deferred("scroll_vertical",scroll_position)
 
 func _info(text: String,color: Color=GOLD) -> Label:
-	var label = _text(modal_body,text,14,color)
+	var label = _text(modal_body,text,16,color)
 	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	return label
 
 func _action(text: String,callback: Callable) -> Button:
 	var button = _button(modal_body,text,callback)
-	button.custom_minimum_size.y=46
+	button.custom_minimum_size.y=50
+	button.add_theme_font_size_override("font_size",16)
 	return button
 
 func _picture(parent: Node,texture: Texture2D,width: float) -> void:
