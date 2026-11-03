@@ -1,0 +1,72 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "milestone": "M3059",
+  "source_commit": "9865330d33ba2db45b39ffaefe9aae518c35a2a7",
+  "bootstrap_sha256": "38990a296a1c2131b97a3c411aa3963e1082a4a6af78a333128c4437b3d37238",
+  "tests": [
+    {
+      "test": "simulation_test",
+      "checks": 22,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "progression_test",
+      "checks": 63,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ship_visual_test",
+      "checks": 777,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ui_test",
+      "checks": 186,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "updater_test",
+      "checks": 42,
+      "failures": [],
+      "native_download_simulation": true,
+      "physical_android_test": false,
+      "status": "PASS"
+    },
+    {
+      "test": "navigation_test",
+      "checks": 26,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "content_update_test",
+      "checks": 19,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "content_pack_boot_test",
+      "checks": 8,
+      "failures": [],
+      "game_loaded_from_data_pack": true,
+      "status": "PASS"
+    }
+  ],
+  "data": {
+    "revision": 29,
+    "abi": 1,
+    "engine": "4.7.2.stable",
+    "min_apk": 305901,
+    "bytes": 10664090,
+    "sha256": "7d34e3904862f83ea37d67362ea02e5824d87a2f9467f9768d5538aefdc1b0c8",
+    "signature": "S9kUZMwkrnVN7+arwHoCYWn+V3ne4hLfcLgRHBvxpI6JnI7xGYff0p/Is7NmmOKrBGqMa5Z8r/dMB2R8klUGC6YHoPBEQ8lV+zkrqlaEY5iH37N8+mMJ7bZqVSF8GtsEXmLq4kVybQR0ml6YGJ8rq8FHnw8nDRoLTwADuLsPNG+Y6MjnL8sEY7o6xK7GS7pVyffVOuD8uEWBoOGTV2jU2MxOxiT9sw/HWV8RvjeNIAxqr25y87JFu9Tr8kD0ID2cxZ9JXJ45BGi1v1imPrM8pezhbfKAa4j9ps69QOJMHlN1FGO9fbnvUygVKO6WHdt4i6j47VUaww7ngZH5JIRh2Q==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-29/ABYSSAL_DATA_29.zip"
+  },
+  "audited_pngs": 63,
+  "physical_android_test": "NOT_PERFORMED",
+  "apk_built": false
+}
