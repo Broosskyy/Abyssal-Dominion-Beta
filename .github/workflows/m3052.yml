@@ -28,6 +28,8 @@ jobs:
           path: ~/.cache/abyssal-test-signing
           key: m3052-private-debug-signing-v1
       - name: Install Godot and development signing key
+        env:
+          ABYSSAL_ANDROID_KEYSTORE_BASE64: ${{ secrets.ABYSSAL_ANDROID_KEYSTORE_BASE64 }}
         shell: bash
         run: |
           set -euo pipefail
@@ -37,6 +39,9 @@ jobs:
           curl -fL --retry 3 -o /tmp/templates.tpz https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz
           mkdir -p "$HOME/.local/share/godot/export_templates/4.7.2.stable" "$HOME/.cache/abyssal-test-signing"
           unzip -p /tmp/templates.tpz templates/android_debug.apk > "$HOME/.local/share/godot/export_templates/4.7.2.stable/android_debug.apk"
+          if [ -n "$ABYSSAL_ANDROID_KEYSTORE_BASE64" ]; then
+            python3 -c 'import os,base64,pathlib; pathlib.Path.home().joinpath(".cache/abyssal-test-signing/debug.keystore").write_bytes(base64.b64decode(os.environ["ABYSSAL_ANDROID_KEYSTORE_BASE64"],validate=True))'
+          fi
           test -f "$HOME/.cache/abyssal-test-signing/debug.keystore" || { echo 'Original signing key unavailable: refusing to generate an incompatible replacement.'; exit 1; }
           tpl="$HOME/.local/share/godot/export_templates/4.7.2.stable"
           unzip -p /tmp/templates.tpz templates/android_source.zip > "$tpl/android_source.zip"
@@ -72,7 +77,7 @@ jobs:
             if [ "$scene" = maneuver ] || [ "$scene" = damage ]; then
               clip_name=course_change
               if [ "$scene" = damage ]; then clip_name=health_state_change; fi
-              ffmpeg -hide_banner -loglevel error -framerate 20 -i releases/M3057/captures/$scene/motion_%03d.png -vf 'scale=960:-2' -c:v libx264 -crf 28 -pix_fmt yuv420p -movflags +faststart releases/M3057/captures/$scene/$clip_name.mp4
+              ffmpeg -y -hide_banner -loglevel error -framerate 20 -i releases/M3057/captures/$scene/motion_%03d.png -vf 'scale=960:-2' -c:v libx264 -crf 28 -pix_fmt yuv420p -movflags +faststart releases/M3057/captures/$scene/$clip_name.mp4
               rm releases/M3057/captures/$scene/motion_*.png
             fi
           done
@@ -110,6 +115,8 @@ jobs:
             exit 1
           fi
           gh release create abyssal-305702-android "$RUNNER_TEMP/ABYSSAL_DOMINION_305702.apk" releases/M3057/latest.json --target "$GITHUB_SHA" --title 'Abyssal Dominion M3057 Android' --notes-file "$RUNNER_TEMP/release-notes.md" --prerelease
+          curl -fL --retry 3 -o "$RUNNER_TEMP/served.apk" https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/abyssal-305702-android/ABYSSAL_DOMINION_305702.apk
+          python3 -c 'import hashlib,json,os,pathlib; manifest=json.loads(pathlib.Path("releases/M3057/latest.json").read_text())["latest"]; apk=pathlib.Path(os.environ["RUNNER_TEMP"])/"served.apk"; assert apk.stat().st_size==manifest["bytes"] and hashlib.sha256(apk.read_bytes()).hexdigest()==manifest["sha256"]; print("ANONYMOUS_APK_DOWNLOAD_VERIFIED")'
           mkdir -p updates
           cp releases/M3057/latest.json updates/latest.json
       - name: Preserve verified APK in repository
