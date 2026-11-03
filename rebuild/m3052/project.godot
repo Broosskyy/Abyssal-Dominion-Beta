@@ -1,8 +1,8 @@
 config_version=5
 
 [application]
-config/name="Abyssal Dominion M3053"
-config/version="0.305.3-test.3"
+config/name="Abyssal Dominion M3054"
+config/version="0.305.4-test.4"
 config/icon="res://assets/app_icon.svg"
 boot_splash/show_image=false
 run/main_scene="res://sea_map.tscn"

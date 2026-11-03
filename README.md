@@ -1,8 +1,10 @@
 # Abyssal Dominion
 
-**Current gameplay build: [M3053 — harbors, equipment and three regions](rebuild/m3052/README.md).** Open `rebuild/m3052/project.godot` in Godot 4.7.2. Current Android version is `0.305.3-test.3`; CI preserves verified APKs and rendered gameplay captures in `releases/M3053/`. The existing `com.abyssaldominion.rebuild` package and guest save migrate from M3052.
+**Current gameplay build: [M3054 — ship rendering audit and fixes](rebuild/m3052/README.md).** Open `rebuild/m3052/project.godot` in Godot 4.7.2. Current Android version is `0.305.4-test.4`; CI preserves verified APKs and rendered gameplay captures in `releases/M3054/`. The existing `com.abyssaldominion.rebuild` package and guest save migrate from M3052.
 
 M3053 adds physical docking, drydock repair, four equipment categories with three functional tiers, captain XP/levels, seven quests, two additional portal-linked regions and 17 cropped runtime images from the supplied reference collection. All 60 PNGs have hashes and provenance. This remains local guest gameplay; public multiplayer and cross-device acceptance remain open. See the active project README for controls, limits and validation.
+
+M3054 corrects displaced reflected ships, direction ordering, transparent-padding scale differences, waterline pivots and detached wake/shadows. Source ship art remains unchanged. [Video analysis and limitations](docs/m3054/SHIP_RENDER_AUDIT.md) include the distinction between ten single-view concepts and sixteen four-view atlases. CI renders all 26 ships and preserves an actual maneuver video.
 
 ## M3051 historical snapshot
 

@@ -2,6 +2,7 @@ extends Node2D
 const SIM = preload("res://simulation.gd")
 const MINI = preload("res://minimap.gd")
 const CONTENT = preload("res://content.gd")
+const VISUALS = preload("res://ship_visuals.gd")
 const USER_ROOT := "res://assets/user/"
 const SAVE := "user://captain_m3052.json"
 const GOLD := Color("dcc18a")
@@ -12,7 +13,7 @@ var water: ColorRect
 var ocean: ShaderMaterial
 var ui: Control
 var chart_mini: Control
-var desired_zoom := 0.82
+var desired_zoom := 0.96
 var pan := Vector2.ZERO
 var camera_locked := true
 var accumulator := 0.0
@@ -69,6 +70,10 @@ var extra_icons: Dictionary = {}
 var modal_backdrop: ColorRect
 var modal_skin: StyleBoxTexture
 var modal_compact_skin: StyleBoxFlat
+var ship_frames: Dictionary = {}
+var facing_cache: Dictionary = {}
+var direction_cache: Dictionary = {}
+var gallery_page := -1
 
 func _ready() -> void:
 	_load_assets()
@@ -93,11 +98,12 @@ func _ready() -> void:
 	_refresh_ui()
 
 func _load_assets() -> void:
+	ship_frames=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/ship_frames.json")).entries
 	var pack: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(USER_ROOT+"pack.json"))
 	for item: Dictionary in pack.ship_catalog:
 		skins.append(item)
 		ship_textures.append(load(USER_ROOT+str(item.path)))
-		skin_previews.append(ship_textures.back())
+		skin_previews.append(_ship_preview(ship_textures.back(),0))
 	for name in ["redkorsar","elite2","elite3","elite4","elite5","elite6","elite7","elite9","elite10","boneship","burningdutchman1","blackbeardspirates"]:
 		atlas_textures.append(load("res://assets/fleet/"+str(name)+".png"))
 	for name in ["elite8","warship","pinnace","flyingdutchman"]:
@@ -105,11 +111,7 @@ func _load_assets() -> void:
 	var hull_names = ["Roter Korsar","Jadebrigg","Kupfersegler","Küstenfregatte","Goldene Armada","Eisfregatte","Schattensegler","Admiralswache","Elite-Galeone","Knochenschiff","Brennender Holländer","Schwarzbart","Königsgaleone","Kriegsschiff","Schmuggler","Fliegender Holländer"]
 	for i in atlas_textures.size():
 		skins.append({"name":hull_names[i],"directional":true,"atlas":i})
-		var preview = AtlasTexture.new()
-		preview.atlas=atlas_textures[i]
-		var cell = atlas_textures[i].get_size()/Vector2(4,2)
-		preview.region=Rect2(Vector2(0,cell.y),cell)
-		skin_previews.append(preview)
+		skin_previews.append(_ship_preview(atlas_textures[i],0))
 	for name in ["tropical","rock","snow","snow2"]:
 		island_textures[name] = load("res://assets/reference/islands/"+name+".png")
 	for name in ["cannonball","harpoon","chain","repair_chest","portal"]:
@@ -120,6 +122,9 @@ func _load_assets() -> void:
 
 func _process(delta: float) -> void:
 	if modal_backdrop!=null:modal_backdrop.visible=modal.visible
+	if gallery_page>=0:
+		queue_redraw()
+		return
 	elapsed += delta
 	accumulator = minf(accumulator+delta,0.2)
 	while accumulator >= 1.0/30.0:
@@ -147,6 +152,9 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	if camera == null: return
+	if gallery_page>=0:
+		_draw_ship_gallery()
+		return
 	var view = Rect2(camera.position-get_viewport_rect().size/camera.zoom*0.5,get_viewport_rect().size/camera.zoom).grow(350)
 	# Projected art is drawn on the same 2D chart as movement and collision.
 	for island in sim.islands:
@@ -235,35 +243,40 @@ func _draw_actor(actor: Dictionary) -> void:
 	var is_player = int(actor.id)==0
 	var point: Vector2=actor.pos
 	var heading: Vector2=actor.heading
+	var length=156.0 if is_player else (150.0 if actor.elite else 136.0)
 	if not actor.path.is_empty():
-		for j in 5:
-			var p = point-heading*(30+float(j)*17)
-			var fade = (1.0-float(j)/5.0)*0.24
-			_ellipse_line(p,Vector2(11+j*2,4+j),Color(0.68,0.91,0.9,fade),1.4)
-	_ellipse(point+Vector2(2,8),Vector2(58,19),Color(0.005,0.03,0.045,0.28))
+		var side=Vector2(-heading.y,heading.x)
+		for j in 4:
+			var tail=point-heading*(24+float(j)*12)
+			var spread=8+float(j)*2
+			var foam=Color(0.62,0.86,0.87,(1.0-float(j)/4.0)*0.13)
+			draw_line(tail+side*spread,tail-heading*9+side*(spread+1.5),foam,1.1,true)
+			draw_line(tail-side*spread,tail-heading*9-side*(spread+1.5),foam,1.1,true)
+	_ellipse(point+Vector2(0,3),Vector2(length*0.32,length*0.085),Color(0.005,0.03,0.045,0.17))
 	if sim.target==int(actor.id):
-		_ellipse_line(point+Vector2(0,8),Vector2(70,28),Color("ed9d67"),2.0)
+		_ellipse_line(point,Vector2(length*0.44,length*0.16),Color("ed9d67"),2.0)
 	if is_player:
-		_ellipse_line(point+Vector2(0,8),Vector2(67,25),Color(0.37,0.84,0.83,0.4),1.1)
+		_ellipse_line(point,Vector2(length*0.44,length*0.16),Color(0.37,0.84,0.83,0.4),1.1)
 	var monster = not is_player and actor.kind=="monster"
 	if monster:
 		var col = posmod(roundi((heading.angle()+PI*0.25)/TAU*4),4)
 		var row = int(elapsed*6)%CONTENT.MONSTER_ROWS
 		_draw_atlas(beast,point,210.0,col,row,CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS)
 	elif is_player and int(sim.player.skin)<10:
-		var index: int = int(sim.player.skin) if is_player else int(actor.art)
-		var tex = ship_textures[posmod(index,ship_textures.size())]
-		var width = 160.0 if is_player else (153.0 if actor.elite else 136.0)
-		var dims = tex.get_size()*width/tex.get_width()
-		var rect = Rect2(point-dims*Vector2(0.5,0.73)+Vector2(0,sin(elapsed*1.7+actor.id)*1.6),dims)
-		if heading.x>0.1:
-			rect.position.x+=dims.x
-			rect.size.x=-dims.x
-		draw_texture_rect(tex,rect,false)
+		var tex=ship_textures[int(sim.player.skin)]
+		var flipped=VISUALS.facing_right(heading,bool(facing_cache.get(int(actor.id),false)))
+		facing_cache[int(actor.id)]=flipped
+		_draw_ship_frame(tex,point,length,0,flipped,sin(elapsed*1.7+actor.id)*1.2)
 	else:
 		var tex = atlas_textures[int(sim.player.skin)-10] if is_player else atlas_textures[posmod(int(actor.art),atlas_textures.size())]
-		var col = posmod(roundi((heading.angle()+PI*0.25)/TAU*4),4)
-		_draw_atlas(tex,point,178.0 if is_player else (169.0 if actor.elite else 148.0),col,1,4,2)
+		var col=VISUALS.heading_column(heading,int(direction_cache.get(int(actor.id),-1)))
+		direction_cache[int(actor.id)]=col
+		_draw_ship_frame(tex,point,length,col,false,sin(elapsed*1.7+actor.id)*1.2)
+	if is_player or sim.target==int(actor.id):
+		var nose=point+heading*length*0.38
+		var side=Vector2(-heading.y,heading.x)*4
+		draw_line(nose-heading*8+side,nose,CYAN,1.4,true)
+		draw_line(nose-heading*8-side,nose,CYAN,1.4,true)
 	var name: String = str(skins[int(sim.player.skin)].name) if is_player else str(actor.name)
 	var color = CYAN if is_player else (Color("e4b6ee") if monster else Color("e4c596"))
 	var baseline = point+Vector2(0,47)
@@ -277,6 +290,45 @@ func _draw_atlas(tex: Texture2D,point: Vector2,width: float,col: int,row: int,co
 	var cell = tex.get_size()/Vector2(columns,rows)
 	var dims = cell*width/cell.x
 	draw_texture_rect_region(tex,Rect2(point-dims*Vector2(0.5,0.68),dims),Rect2(Vector2(col,row)*cell,cell))
+
+func _ship_preview(texture: Texture2D,column: int) -> AtlasTexture:
+	var frame: Dictionary=ship_frames[texture.resource_path.trim_prefix("res://")].frames[column]
+	var r: Array=frame.rect
+	var preview=AtlasTexture.new()
+	preview.atlas=texture
+	preview.region=Rect2(r[0],r[1],r[2],r[3])
+	return preview
+
+func _draw_ship_frame(texture: Texture2D,point: Vector2,length: float,column: int,flipped: bool,bob: float) -> void:
+	var frame: Dictionary=ship_frames[texture.resource_path.trim_prefix("res://")].frames[column]
+	var geometry: Dictionary=VISUALS.geometry(frame,length)
+	# Positive source/destination rectangles; reflection is around the measured hull anchor.
+	draw_set_transform(point+Vector2(0,bob),0,Vector2(-1,1) if flipped else Vector2.ONE)
+	draw_texture_rect_region(texture,geometry.destination,geometry.source)
+	draw_set_transform(Vector2.ZERO)
+
+func _draw_ship_gallery() -> void:
+	var first=0 if gallery_page==0 else 10+(gallery_page-1)*8
+	var last=10 if gallery_page==0 else mini(first+8,skins.size())
+	var before=sim.player.duplicate(true)
+	var directions=[Vector2(1,-1),Vector2(-1,-1),Vector2(-1,1),Vector2(1,1)]
+	_label(Vector2(640,26),"M3054 · ORIGINAL RUNTIME RENDERER · WATERLINE ANCHORS",20,GOLD)
+	for c in 4:_label(Vector2(320+c*240,59),["NORDOST","NORDWEST","SÜDWEST","SÜDOST"][c],14,CYAN)
+	for skin in range(first,last):
+		var y=120.0+float(skin-first)*132.0
+		_label(Vector2(100,y-18),str(skins[skin].name),13,GOLD)
+		_label(Vector2(100,y+5),"Einzelbild / Spiegelung" if skin<10 else "4 echte Atlasansichten",10,CYAN)
+		draw_line(Vector2(14,y+78),Vector2(1266,y+78),Color(0.3,0.5,0.6,0.2))
+		for c in 4:
+			var ground=Vector2(320+c*240,y)
+			sim.player.skin=skin
+			sim.player.pos=ground
+			sim.player.heading=directions[c].normalized()
+			sim.player.path=[]
+			_draw_actor(sim.player)
+			draw_line(ground-Vector2(4,0),ground+Vector2(4,0),Color("ffae66"),1)
+			draw_line(ground-Vector2(0,4),ground+Vector2(0,4),Color("ffae66"),1)
+	sim.player=before
 
 func _ellipse(point: Vector2,radii: Vector2,color: Color) -> void:
 	var vertices = PackedVector2Array()
@@ -437,7 +489,7 @@ func _layout() -> void:
 	var s =get_viewport_rect().size
 	var compact =s.y<560 or s.x<1000
 	if compact and elapsed<0.1:
-		desired_zoom=0.67
+		desired_zoom=0.78
 		camera.zoom=Vector2.ONE*desired_zoom
 	water.size=s
 	_place(chrome,0,0,s.x,42)
@@ -537,10 +589,10 @@ func _open_modal(kind: String) -> void:
 		modal_body.remove_child(child)
 		child.queue_free()
 	if kind=="Werft":
-		_text(modal_body,"SCHIFFSDESIGNS · Alle 26 Designs im Test frei auswählbar",14,CYAN)
+		_info("26 DESIGNS · 16 mit vier Richtungsbildern, 10 mit einem gespiegelten Einzelbild. Fehlende Perspektiven werden nicht als echte Ansichten ausgegeben.",CYAN)
 		for i in skins.size():
 			var index =i
-			var b =_button(modal_body,str(skins[i].name)+("   ✓ AUSGERÜSTET" if int(sim.player.skin)==i else "   AUSRÜSTEN"),func():_equip(index))
+			var b =_button(modal_body,str(skins[i].name)+(" · EINZELBILD" if i<10 else " · 4 ANSICHTEN")+("   ✓" if int(sim.player.skin)==i else "   AUSRÜSTEN"),func():_equip(index))
 			b.custom_minimum_size.y=64
 			b.icon=skin_previews[i]
 			b.expand_icon=true

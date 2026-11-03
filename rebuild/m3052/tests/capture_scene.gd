@@ -10,6 +10,7 @@ func _run() -> void:
 	var harbor=false
 	var maps=false
 	var north=false
+	var maneuver=false
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--out="):output=arg.trim_prefix("--out=")
 		if arg=="--mobile":dimensions=Vector2i(844,390)
@@ -19,6 +20,7 @@ func _run() -> void:
 		if arg=="--harbor":harbor=true
 		if arg=="--maps":maps=true
 		if arg=="--north":north=true
+		if arg=="--maneuver":maneuver=true
 	root.content_scale_size=Vector2i.ZERO
 	root.size=dimensions
 	var game=load("res://sea_map.tscn").instantiate()
@@ -46,9 +48,20 @@ func _run() -> void:
 		game._open_modal("Hafen")
 	if maps:game._open_modal("Seekarten")
 	game._refresh_ui()
+	if maneuver:
+		game.sim.npcs.clear()
+		game.sim.player.skin=0
+		game.sim.player.pos=game.sim.START
+		game.camera.position=game.sim.player.pos
+		game.sim.course(game.sim.START+Vector2(240,0))
 	DirAccess.make_dir_recursive_absolute(output)
 	for i in (420 if demo else 180):
 		await process_frame
+		if maneuver and i==90:game.sim.course(game.sim.START-Vector2(240,0))
+		if maneuver:
+			await RenderingServer.frame_post_draw
+			var motion_error=root.get_texture().get_image().save_png(output+"/motion_%03d.png"%i)
+			if motion_error!=OK:push_error("Maneuver frame failed")
 		if demo and i==230:
 			game.sim.course(game.sim.npcs[1].pos)
 		if demo and i==350:
