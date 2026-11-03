@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "channel": "test",
+  "latest": {
+    "version_code": 305801,
+    "package": "com.abyssaldominion.rebuild",
+    "certificate_sha256": "278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b",
+    "bytes": 91288802,
+    "sha256": "0c823cd88ed6aee4af7fc1786dd38727044c1f4e8844f15c7a1e5aed3487a50c",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/abyssal-305801-android/ABYSSAL_DOMINION_305801.apk"
+  }
+}

@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): false
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Abyssal Development, O=Abyssal Dominion, C=DE
+Signer #1 certificate SHA-256 digest: 278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b
+Signer #1 certificate SHA-1 digest: 7ffbd7461fba79b3271bb66ad8cc2a49cce0603f
+Signer #1 certificate MD5 digest: 1b81d3f710b0b601ae9d376be394b733
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 2048
+Signer #1 public key SHA-256 digest: 45f0cce0a0f10399837bd360ec79457d4246e441bfea5806167c1cc224146efd
+Signer #1 public key SHA-1 digest: 4956b5069b3d502b3fcacd1c80d3ab297269fc78
+Signer #1 public key MD5 digest: 041a3b9847fe54e0109796f9ba6e49cd
