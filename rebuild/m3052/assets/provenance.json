@@ -149,7 +149,8 @@
       "path": "assets/reference/monsters/tiamat.png",
       "bytes": 2780019,
       "sha256": "7c6940364ccdce71c1bc3d6e7e05eecb916927ded2a26cc6270b47741988995d",
-      "source_archive": "existing verified SeaBattles reference pack"
+      "source_archive": "existing verified SeaBattles reference pack",
+      "layout": "4 headings x 10 animation rows; visually audited against full 2048x4096 atlas, M3053"
     },
     {
       "path": "assets/reference/ocean/wave_noise.png",

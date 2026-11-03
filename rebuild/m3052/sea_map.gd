@@ -248,8 +248,8 @@ func _draw_actor(actor: Dictionary) -> void:
 	var monster = not is_player and actor.kind=="monster"
 	if monster:
 		var col = posmod(roundi((heading.angle()+PI*0.25)/TAU*4),4)
-		var row = int(elapsed*6)%8
-		_draw_atlas(beast,point,210.0,col,row,4,8)
+		var row = int(elapsed*6)%CONTENT.MONSTER_ROWS
+		_draw_atlas(beast,point,210.0,col,row,CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS)
 	elif is_player and int(sim.player.skin)<10:
 		var index: int = int(sim.player.skin) if is_player else int(actor.art)
 		var tex = ship_textures[posmod(index,ship_textures.size())]

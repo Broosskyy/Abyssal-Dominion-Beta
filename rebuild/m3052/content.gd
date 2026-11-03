@@ -1,4 +1,6 @@
 extends RefCounted
+const MONSTER_COLUMNS := 4
+const MONSTER_ROWS := 10
 ## Authored gameplay data, separate from simulation and presentation.
 const MAPS := [
 	{"name":"Karibische See", "code":"1-1", "level":1, "art":["tropical","rock","tropical","tropical","rock","tropical","tropical","rock","tropical"], "tint":Color(0.75,1.14,1.12), "enemy_scale":1.0},
