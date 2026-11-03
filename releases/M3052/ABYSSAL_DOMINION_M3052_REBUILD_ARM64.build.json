@@ -1,0 +1,26 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "apk": "ABYSSAL_DOMINION_M3052_REBUILD_ARM64.apk",
+  "sha256": "466813476d89800d598340d53fa2f2df24a60cbb3c0c576f4ad9b0fae6777af3",
+  "bytes": 36042955,
+  "tests": [
+    {
+      "test": "simulation_test",
+      "checks": 22,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "ui_test",
+      "checks": 120,
+      "failures": [],
+      "status": "PASS"
+    }
+  ],
+  "audited_pngs": 43,
+  "signature": "PASS",
+  "alignment_16k": "PASS",
+  "physical_android_test": "NOT_PERFORMED",
+  "mode": "LOCAL_GUEST_SEA_CHART",
+  "public_server": false
+}
