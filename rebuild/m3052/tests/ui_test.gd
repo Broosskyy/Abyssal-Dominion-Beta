@@ -217,6 +217,28 @@ func _run() -> void:
 	game._set_display(1,true);game.modal.hide()
 	root.size=Vector2i(1560,720);await process_frame;game._layout()
 	check(game.attack.get_global_rect().size.x>=140,"comfortable wide-phone layout has a larger primary attack button")
+	check(game.combat_dock.get_global_rect().end.x<game.repair.get_global_rect().position.x,"wide deck is grouped beside the right-hand combat controls")
+	check(str(game.ammo_selector.get("quantity")).is_empty(),"ammunition chooser does not duplicate quick-slot stock counters")
+	game.sim.configure_map(0);game.sim.islands.clear();game.sim.docked=false;game.sim.player.hp=2400
+	game.sim.player.pos=Vector2(2100,2000);game.sim.player.reload=0;game.sim.ammo_mode=0;game.sim.player.ammo[0]=30
+	game.sim.player.path=[]
+	game.sim.npcs.clear();game.sim.npcs.append(game.sim.base_npcs[0].duplicate(true))
+	var victim: Dictionary=game.sim.npcs[0];victim.pos=game.sim.player.pos+Vector2(200,0);victim.hp=victim.max_hp
+	game.sim.select(victim.id);game._refresh_ui()
+	check(str(game.attack.get("state_label"))=="BEREIT","fire button reports a real reachable ship with loaded cannon ammunition")
+	var stock: int=game.sim.player.ammo[0]
+	game._refresh_ui();game._refresh_ui()
+	check(int(game.sim.player.ammo[0])==stock,"refreshing readiness never consumes ammunition")
+	victim.pos=game.sim.player.pos+Vector2(700,0);game._refresh_ui()
+	check(str(game.attack.get("state_label"))=="ZU WEIT" and game.sim.player.path.is_empty(),"range warning does not issue an automatic pursuit course")
+	victim.pos=game.sim.player.pos+Vector2(200,0);game.sim.set_ammo(2);game._refresh_ui()
+	check(str(game.attack.get("state_label"))=="WAFFE WECHSELN","ship selected with harpoons gives a weapon warning before firing")
+	game.sim.set_ammo(0);game.sim.player.ammo[0]=2;game._refresh_ui()
+	check(str(game.attack.get("state_label"))=="MUNITION LEER","cannon readiness requires stock for all three shots in a volley")
+	game.sim.player.ammo[0]=30;game.sim._fire_player();game._refresh_ui()
+	check(int(game.sim.player.ammo[0])==27 and str(game.attack.get("state_label")).begins_with("LÄDT"),"actual volley consumes three rounds and drives the reload display")
+	game.sim.docked=true;game._refresh_ui()
+	check(game.attack.disabled and str(game.attack.get("state_label"))=="IM HAFEN","docked state is visible on the disabled attack control")
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)

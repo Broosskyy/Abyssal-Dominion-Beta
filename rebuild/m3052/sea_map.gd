@@ -2,6 +2,7 @@ extends Node2D
 const SIM = preload("res://simulation.gd")
 const MINI = preload("res://minimap.gd")
 const HUD=preload("res://nautical_button.gd")
+const HUD_PANEL=preload("res://nautical_panel.gd")
 const CONTENT = preload("res://content.gd")
 const VISUALS = preload("res://ship_visuals.gd")
 const USER_ROOT := "res://assets/user/"
@@ -456,7 +457,7 @@ func _label(point: Vector2,text: String,fontsize: int,color: Color) -> void:
 	draw_string(font,p,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,color)
 
 func _panel(parent: Node) -> Panel:
-	var p =Panel.new()
+	var p =HUD_PANEL.new()
 	var style =StyleBoxFlat.new()
 	style.bg_color=Color(0.025,0.07,0.09,0.94)
 	style.border_color=Color("93764b")
@@ -657,7 +658,7 @@ func _layout() -> void:
 	_place(center_button,s.x-z-12,top+mh+z+10,z,z)
 	var q=44.0 if compact else 52.0
 	var group=4*q+24
-	var left=(s.x-group)*.5
+	var left=(s.x-group)*.5 if compact else s.x-118-60-28-group-20
 	var dh=104.0 if compact else 116.0
 	var dy=s.y-dh-6
 	_place(combat_dock,left-8,dy,group+16,dh)
@@ -698,13 +699,13 @@ func _refresh_ui() -> void:
 	if player_name==null:return
 	for nav: Button in nav_buttons:
 		nav.set("latched",modal.visible and modal_kind==str(nav.get_meta("modal")));nav.queue_redraw()
-	player_name.text="Lv. %d · %s" % [sim.level,skins[int(sim.player.skin)].name]
+	player_name.text=str(skins[int(sim.player.skin)].name)
 	if portrait_skin!=int(sim.player.skin):
 		portrait_skin=int(sim.player.skin)
 		player_portrait.texture=skin_previews[portrait_skin]
 	player_hp.max_value=sim.player.max_hp
 	player_hp.value=sim.player.hp
-	player_numbers.text="%d / %d HP" % [int(sim.player.hp),int(sim.player.max_hp)]
+	player_numbers.text="Lv. %d · %d / %d HP" % [sim.level,int(sim.player.hp),int(sim.player.max_hp)]
 	player_xp.tooltip_text="Erfahrung %d / %d" % [sim.xp,sim.xp_required()]
 	player_xp.max_value=sim.xp_required()
 	player_xp.value=sim.xp
@@ -729,19 +730,21 @@ func _refresh_ui() -> void:
 	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0 or sim.docked
 	_set_orb(attack,extra_icons["cannon_%d" % mini(2,int(sim.upgrades.cannon))],"",sim.firing,attack.text)
 	attack.set("cooldown",float(sim.player.reload)/1.65)
+	attack.set("state_label",_combat_state())
 	repair.disabled=sim.docked
 	repair.text="STOPP" if sim.repairing else "REPARATUR"
 	_set_orb(repair,extra_icons.upgrade_hull,"",sim.repairing,"STOPP" if sim.repairing else "REP")
 	for i in 3:
 		ammo_buttons[i].text=["Vollkugeln","Kettenkugeln","Harpunen"][i]+"\n"+("✓ " if sim.ammo_mode==i else "")+str(sim.player.ammo[i])
 		ammo_buttons[i].set_pressed_no_signal(sim.ammo_mode==i)
-		_set_orb(ammo_buttons[i],icons[["cannonball","chain","harpoon"][i]],str(sim.player.ammo[i]),sim.ammo_mode==i)
+		_set_orb(ammo_buttons[i],icons[["cannonball","chain","harpoon"][i]],str(sim.player.ammo[i]),sim.ammo_mode==i,["VOLL","KETTE","HARP."][i])
 		ammo_buttons[i].tooltip_text=["Vollkugeln: gegen Schiffe","Kettenkugeln: verlangsamen Schiffe","Harpunen: gegen Monster"][i]
-	_set_orb(ammo_selector,icons[["cannonball","chain","harpoon"][sim.ammo_mode]],str(sim.player.ammo[sim.ammo_mode]),false,["KUGELN","KETTE","HARP."][sim.ammo_mode])
+	_set_orb(ammo_selector,hud_icons.chest,"",false,"MUNITION")
 	deck_hp.max_value=sim.player.max_hp;deck_hp.value=sim.player.hp;deck_xp.max_value=sim.xp_required();deck_xp.value=sim.xp
 	deck_numbers.text="%d / %d HP" % [sim.player.hp,sim.player.max_hp]
 	var reload_text="IM HAFEN" if sim.docked else ("BEREIT" if float(sim.player.reload)<=0 else "LÄDT %.1f s" % float(sim.player.reload))
 	combat_readout.text="%s · %d×%d · %s" % [["Vollkugeln","Kettenkugeln","Harpunen"][sim.ammo_mode],sim.weapon_damage(sim.ammo_mode),1 if sim.ammo_mode==2 else 3,reload_text]
+	combat_readout.add_theme_color_override("font_color",CYAN if _combat_state()=="BEREIT" else GOLD)
 	if message_history.is_empty() or message_history.back()!=sim.message:
 		message_history.append(sim.message)
 		if message_history.size()>3:message_history.pop_front()
@@ -766,6 +769,18 @@ func _refresh_ui() -> void:
 		interact.text="IM HAFEN ANDOCKEN"
 	else:
 		interact.text="KURS ZUM PORTAL" if sim.pending_portal>=0 else "KURS ZUM HAFEN"
+
+func _combat_state() -> String:
+	if int(sim.player.hp)<=0:return "VERSENKT"
+	if sim.docked:return "IM HAFEN"
+	var victim=sim.actor(sim.target)
+	if victim.is_empty() or float(victim.hp)<=0:return "ZIEL WÄHLEN"
+	if (victim.kind=="monster")!=(sim.ammo_mode==2):return "WAFFE WECHSELN"
+	if int(sim.player.ammo[sim.ammo_mode])<(1 if sim.ammo_mode==2 else 3):return "MUNITION LEER"
+	if sim.player.pos.distance_to(victim.pos)>530:return "ZU WEIT"
+	if not sim.segment_free(sim.player.pos,victim.pos):return "INSEL IM WEG"
+	if float(sim.player.reload)>0:return "LÄDT %.1f s" % float(sim.player.reload)
+	return "BEREIT"
 
 func _toggle_fire() -> void:
 	if sim.target<1:return

@@ -6,6 +6,7 @@ var quantity=""
 var nav_mode=false
 var latched=false
 var cooldown=0.0
+var state_label=""
 const GOLD=Color("c7a15a")
 func _ready() -> void:
 	focus_mode=Control.FOCUS_NONE
@@ -21,6 +22,8 @@ func _draw() -> void:
 	if nav_mode:
 		draw_rect(Rect2(Vector2(1,1),size-Vector2(2,2)),Color("30291c") if hot else Color("101c23"))
 		draw_rect(Rect2(Vector2(1,1),size-Vector2(2,2)),gold,false,1.0)
+		for y in 7:draw_line(Vector2(3,3+y),Vector2(size.x-3,3+y),Color(1,.82,.45,.055*(1-float(y)/7)),1)
+		draw_line(Vector2(3,size.y-3),Vector2(size.x-3,size.y-3),Color(0,0,0,.65),1)
 		draw_circle(Vector2(size.x*.5,19),17,Color("201f18"));draw_circle(Vector2(size.x*.5,19),16,Color("7e673d"),false,1,true)
 		if art!=null:draw_texture_rect(art,Rect2(Vector2(size.x*.5-14,5),Vector2(28,28)),false,Color.WHITE if not disabled else Color(.5,.5,.5))
 		var title_size=12 if size.x>=66 else 10
@@ -46,6 +49,15 @@ func _draw() -> void:
 		var dimensions=art.get_size()*diameter*.68/maxf(art.get_width(),art.get_height())
 		draw_texture_rect(art,Rect2(center-dimensions*.5-Vector2(0,3 if not caption.is_empty() else 0),dimensions),false,Color(1,1,1,.35) if disabled else Color.WHITE)
 	if hot:draw_circle(center,radius-6,Color("dfb15c"),false,1.2,true)
+	if latched:
+		draw_arc(center,radius-6,0,TAU,40,Color("80e3dc"),2,true)
+		draw_circle(center+Vector2(radius*.65,-radius*.65),4,Color("80e3dc"))
+	if not state_label.is_empty():
+		var fs=9 if diameter<105 else 10
+		var w=font.get_string_size(state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
+		var pos=Vector2(center.x-w*.5,diameter*.27)
+		draw_string_outline(font,pos,state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,4,Color("071018"))
+		draw_string(font,pos,state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("80e3dc") if state_label=="BEREIT" else Color("edc68c"))
 	if cooldown>0:draw_arc(center,radius-7,-PI*.5,-PI*.5+TAU*(1-clampf(cooldown,0,1)),36,Color("e3bf76"),2,true)
 	if not caption.is_empty():
 		var fs=14 if diameter>70 else 10

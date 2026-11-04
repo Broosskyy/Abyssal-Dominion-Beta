@@ -44,6 +44,9 @@ func _run() -> void:
 	root.size=Vector2i(1560,720)
 	game._set_display(2,false);game.modal.hide();game.modal_backdrop.hide()
 	await _shot(game,output,"hud-large-1560x720")
+	game.sim.player.reload=.9
+	await _shot(game,output,"combat-reload-1560x720")
+	game.sim.player.reload=0
 	game._open_modal("Anzeige")
 	await _shot(game,output,"display-1560x720")
 	game._set_display(1,true);game.modal.hide();game.modal_backdrop.hide()

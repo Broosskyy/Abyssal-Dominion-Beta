@@ -12,13 +12,15 @@ void fragment(){
  float c=dot(world,normalize(vec2(.4,.9)))*.087-TIME*.92;
  float n=texture(wave_noise,world*.0027+vec2(TIME*.003,-TIME*.002)).r;
  float detail=texture(wave_noise,world*.007-vec2(TIME*.004,TIME*.001)).g;
- vec2 slope=d1*cos(a)*.17+d2*cos(b)*.08+normalize(vec2(.4,.9))*cos(c)*.035;
+ vec2 fine=texture(wave_noise,world*.023+vec2(-TIME*.005,TIME*.003)).rg;
+ vec2 slope=d1*cos(a)*.10+d2*cos(b)*.055+normalize(vec2(.4,.9))*cos(c)*.035+(fine-.5)*.16;
  vec3 normal=normalize(vec3(-slope,1.));
  float light=dot(normal,normalize(vec3(-.4,-.6,1.)));
- float crest=pow(max(0.,sin(b)*.5+sin(c)*.25+detail*.25),5.);
- vec3 deep=vec3(.018,.105,.165);vec3 shallow=vec3(.035,.235,.31);
- vec3 sea=mix(deep,shallow,clamp(.28+n*.36+sin(a)*.09,0.,1.));
- sea*=.72+light*.36;
- sea+=vec3(.18,.30,.32)*crest*.18;
+ float crest=pow(max(0.,sin(b)*.35+sin(c)*.2+detail*.45),5.);
+ vec3 deep=vec3(.014,.115,.19);vec3 shallow=vec3(.028,.25,.35);
+ vec3 sea=mix(deep,shallow,clamp(.26+n*.42+sin(a)*.055,0.,1.));
+ sea*=.72+light*.36+(detail-.5)*.18+(fine.r-.5)*.12;
+ float glint=pow(smoothstep(.60,.92,fine.r)*smoothstep(.43,.85,detail),5.);
+ sea+=vec3(.25,.40,.45)*(crest*.28+glint*.22);
  COLOR=vec4(sea*region_tint,1.);
 }
