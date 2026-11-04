@@ -1611,7 +1611,7 @@ func _open_guild() -> void:
 	var towers=HBoxContainer.new();towers.add_theme_constant_override("separation",6);modal_body.add_child(towers)
 	for config: Dictionary in CONTENT.TOWERS:_picture(towers,painted["tower_"+str(config.kind)],64)
 	var state=""
-	if sim.guild_island_held():state="[%s] hält die Insel noch %s · +10 %% Beutegold · die Türme schützen dich" % [sim.guild.tag,_clock_text(sim.fortress_hold)]
+	if sim.guild_island_held():state="[%s] hält die Insel noch %s · +10 %% Beutegold · die Türme feuern nicht auf dich" % [sim.guild.tag,_clock_text(sim.fortress_hold)]
 	elif sim.map_id==CONTENT.FORTRESS_MAP:state="Gehalten von [%s] · %d von %d Türmen stehen" % [CONTENT.FORTRESS_TAG,sim.towers_alive(),CONTENT.TOWERS.size()]
 	else:state="Schattengewässer %s · ab Lv. %d · gehalten von [%s]" % [CONTENT.MAPS[CONTENT.FORTRESS_MAP].code,CONTENT.MAPS[CONTENT.FORTRESS_MAP].level,CONTENT.FORTRESS_TAG]
 	_info(state)
