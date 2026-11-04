@@ -29,7 +29,7 @@ var water: ColorRect
 var ocean: ShaderMaterial
 var ui: Control
 var chart_mini: Control
-var desired_zoom := 0.96
+var desired_zoom := 1.08
 var pan := Vector2.ZERO
 var camera_anchor := Vector2.ZERO
 var camera_locked := true
@@ -405,7 +405,11 @@ func _draw_actor(actor: Dictionary) -> void:
 			var foam=Color(0.62,0.86,0.87,(1.0-float(j)/4.0)*0.13)
 			draw_line(tail+side*spread,tail-heading*9+side*(spread+1.5),foam,1.1,true)
 			draw_line(tail-side*spread,tail-heading*9-side*(spread+1.5),foam,1.1,true)
-	_ellipse(point+Vector2(0,3),Vector2(length*0.32,length*0.085),Color(0.005,0.03,0.045,0.17))
+	_ellipse(point+Vector2(0,4),Vector2(length*0.34,length*0.09),Color(0.0,0.02,0.04,0.34))
+	if is_player and sim.has_blessing():
+		var blessing_pulse=.5+.5*sin(elapsed*3.2)
+		_ellipse(point+Vector2(0,2),Vector2(length*0.62,length*0.24),Color(0.62,0.38,1.0,.08+blessing_pulse*.06))
+		_ellipse_line(point+Vector2(0,2),Vector2(length*0.5,length*0.18),Color(0.86,0.72,1.0,.4),1.8)
 	if sim.target==int(actor.id):
 		_ellipse_line(point,Vector2(length*0.44,length*0.16),Color("ed9d67"),2.0)
 	if is_player:
@@ -473,16 +477,19 @@ func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
 		_medallion(Vector2(-62,19),clampi(floori((sim.level-1)/4.0)+1,1,ROMAN.size()-1))
 		_plate_bar(Rect2(-46,6,114,14),hull_ratio,Color("4fbf5e"),"%s / %s" % [_thousands(int(actor.hp)),_thousands(int(actor.max_hp))],10)
 		_plate_bar(Rect2(-46,23,114,10),shield_ratio,Color("3d8fe0"),_thousands(int(actor.shield)),9)
-		SEA_MARKS.gem_row(self,Vector2(11,45),7,SEA_MARKS.deck_entries(sim),font)
+		var decks=SEA_MARKS.deck_entries(sim)
+		var gem_r=11.0
+		SEA_MARKS.gem_row(self,Vector2(11,50),gem_r,decks,font)
+		if sim.has_blessing():
+			var half=(decks.size()-1)*gem_r*2.05*.5
+			SEA_MARKS.blessing_crystal(self,Vector2(11+half+gem_r*2.15,50),14,painted.crystal_blessing,float(sim.buffs.blessing),CONTENT.BLESSING_SECONDS)
 		var states: Array[Texture2D]=[]
 		if sim.powder_on:states.append(painted.supply_powder)
 		if sim.plates_on:states.append(painted.supply_plates)
-		if sim.has_blessing():states.append(painted.crystal_blessing)
-		if float(sim.buffs.tide_deck)>0:states.append(painted.tide_deck)
 		if sim.guild_island_held():states.append(painted.nav_guild)
 		if float(actor.slow)>0:states.append(icons.chain)
 		for i in states.size():
-			var center=Vector2(11+(float(i)-(states.size()-1)*.5)*19,66)
+			var center=Vector2(11+(float(i)-(states.size()-1)*.5)*19,76)
 			draw_circle(center,8.5,Color(0.02,0.06,0.08,.85))
 			draw_circle(center,8.5,Color("c7a15a"),false,1.0,true)
 			draw_texture_rect(states[i],Rect2(center-Vector2(7,7),Vector2(14,14)),false)
@@ -1514,12 +1521,18 @@ func _draw_ship_stage(stage: Control) -> void:
 	_canvas_text(stage,Vector2(34,39),ROMAN[tier],13,Color("ffe6a8"))
 	_canvas_text(stage,Vector2(34,66),"LV. %d" % sim.level,11,Color("ecd29a"))
 	var gem_y=h-58.0
-	SEA_MARKS.gem_row(stage,Vector2(w*.5,gem_y),16,SEA_MARKS.deck_entries(sim),font)
+	var decks=SEA_MARKS.deck_entries(sim)
+	var gem_x=w*.5-(22.0 if sim.has_blessing() else 0.0)
+	SEA_MARKS.gem_row(stage,Vector2(gem_x,gem_y),16,decks,font)
+	if sim.has_blessing():
+		var half=(decks.size()-1)*16.0*2.05*.5
+		SEA_MARKS.blessing_crystal(stage,Vector2(gem_x+half+46,gem_y),20,painted.crystal_blessing,float(sim.buffs.blessing),CONTENT.BLESSING_SECONDS)
 	var parts: Array[String]=[]
 	for slot in 2:
 		var index=int(sim.deck_slots[slot])
 		parts.append(_deck_title(sim.decks[index]) if index>=0 else "Platz %d frei" % (slot+1))
 	parts.append("Gezeitendeck %s" % (_clock_text(float(sim.buffs.tide_deck)) if float(sim.buffs.tide_deck)>0 else "aus"))
+	if sim.has_blessing():parts.append("Kristallsegen %s" % _clock_text(float(sim.buffs.blessing)))
 	_canvas_text(stage,Vector2(w*.5,h-18),"  ·  ".join(parts),12,Color("e2ecee"))
 
 func _open_ammo() -> void:

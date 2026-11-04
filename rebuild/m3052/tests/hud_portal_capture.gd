@@ -105,6 +105,7 @@ func _systems(game: Node,output: String) -> Dictionary:
 	game.camera.position=(anchor+island.bounds.get_center())*.5;game.camera.zoom=Vector2.ONE*.82
 	await _shot(game,output,"fortress-1280x720")
 	sim.guild={"name":"Sturmkrone","tag":"SKR"};sim.fortress_hold=1500.0
+	sim.grant_deck("cannon",2);sim.grant_deck("armor",1)
 	sim.activate_blessing(600.0);sim.add_tide_deck(1800.0);sim.powder_on=true
 	game.quick_page=1;game._apply_page()
 	await _shot(game,output,"guild-island-1280x720")
