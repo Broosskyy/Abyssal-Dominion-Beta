@@ -31,7 +31,9 @@ static func coast() -> ShaderMaterial:
 	if _coast == null:
 		_coast = ShaderMaterial.new()
 		_coast.shader = preload("res://assets/production/shaders/recovered_coast.gdshader")
-		_coast.set_shader_parameter("coast_foam", load("res://assets/recovered_test/m12/coast_foam.png"))
+		const FOAM := "res://assets/recovered_test/m12/coast_foam.png"
+		if ResourceLoader.exists(FOAM):
+			_coast.set_shader_parameter("coast_foam", load(FOAM))
 	return _coast
 
 

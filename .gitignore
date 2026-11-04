@@ -43,3 +43,8 @@ assets/classic/private_user_art/
 # Build outputs: APKs are published as GitHub releases, captures as release attachments.
 releases/**/*.apk
 releases/M3059/captures/*/
+
+# Material extracted from third-party clients must not be committed.
+legacy/m3051/assets/recovered_test/
+legacy/m3051/assets/classic/private_*/
+legacy/m3051/docs/il2cpp/

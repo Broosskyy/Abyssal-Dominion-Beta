@@ -1,5 +1,7 @@
 > **Archived.** This is the earlier M3051 Godot project (shared WebSocket test chart, preview tooling and the M5–M3048 test/tool history). The active game is in [`rebuild/m3052/`](../../rebuild/m3052/README.md). All paths below are relative to this folder (`legacy/m3051/`).
 
+> **Removed (Nov 2026):** assets extracted from the third-party SeeFight/Seabattles clients (`assets/recovered_test/`, `assets/classic/private_seabattles/`), the IL2CPP metadata reconstruction (`docs/il2cpp/`), Unity asset inventories and the related reconstruction reports. They remain only in Git history. Code paths that loaded them are optional and fall back to procedural visuals and silence.
+
 # Abyssal Dominion — legacy M3051 project
 
 Godot **4.7.2**, mobile-first naval combat prototype. Android test version **M3051 / 0.305.1-test.1**.

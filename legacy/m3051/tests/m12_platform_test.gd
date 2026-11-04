@@ -32,8 +32,7 @@ func _run() -> void:
 	_check(profile.meshes[0].texture.ends_with("clipper_hull.png"), "original Clipper hull mapping")
 	_check(not profile.meshes[1].has("texture"), "missing sail bitmap is not replaced with unrelated atlas")
 	adapter.free()
-	for asset in ["clipper_hull.png", "clipper_details.png", "clipper_details.obj", "clipper_flags.obj", "coast_foam.png"]:
-		_check(load("res://assets/recovered_test/m12/" + asset) != null, "new original resource loads: " + asset)
+	# Assets extracted from the third-party client (assets/recovered_test) were removed from the repository; no load checks.
 	var server := TransportProbeServer.new()
 	root.add_child(server)
 	_check(server.listen(19080) == OK, "actual TCP listener")
