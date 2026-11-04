@@ -659,6 +659,12 @@
       "bytes": 354,
       "sha256": "75c27bf8ef5281e57937210f352331200adbe1130854fe6838054386d8dd6382",
       "source": "Handwritten nautical SVG for visible target cycling"
+    },
+    {
+      "path": "assets/ui/cannon_action.png",
+      "bytes": 227050,
+      "sha256": "494fc27daa3136154163a2108cbc888542a640a4453ee33703117eb3cb37a196",
+      "source": "Original fire-button cannon rendered for Abyssal Dominion; not taken from a third-party atlas"
     }
   ]
 }

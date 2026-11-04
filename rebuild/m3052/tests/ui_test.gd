@@ -50,12 +50,22 @@ func _run() -> void:
 		check(clear_center,"HUD reserves clear water around the centered player at "+str(dimensions))
 		check(game.player_portrait.texture!=null and game.target_portrait.texture!=null,"player and selected NPC show actual ship portraits")
 		check(game.attack.get_global_rect().position.x>dimensions.x*.7 and game.combat_dock.get_global_rect().encloses(game.ammo_buttons[0].get_global_rect()),"round fire control stays on the right and quick ammunition stays in the lower deck")
+		check(str(game.attack.get("art").resource_path).ends_with("cannon_action.png") and game.attack.get("hero"),"fire control uses the dedicated cannon graphic")
+		check(not game.deck_hp.visible and not game.deck_numbers.visible,"combat deck does not repeat the captain HP readout")
+		var details=game.target_numbers.get_rect()
+		var card=game.target_panel.size
+		check(details.position.x>=-1 and details.position.y>=-1 and details.end.x<=card.x+1 and details.end.y<=card.y+1,"target details stay inside the target card")
+		if dimensions.y<560:check(not game.status.get_global_rect().intersects(center_water),"status stays off the centered ship on short displays")
 		game.loadout_button.pressed.emit()
 		check(game.modal_kind=="Bewaffnung" and game.modal.visible,"quick weapons control opens real ammunition and cannon information")
 		game.modal.hide()
 		game._open_modal("Werft")
 		await process_frame
 		check(game.modal_scroll.size.y>100 and game.modal_scroll.get_v_scroll_bar().max_value>game.modal_scroll.size.y,"shipyard uses actual scrollable content")
+		var yard:=0
+		for button in game.modal_body.find_children("*","Button",true,false):
+			if "AUSRÜSTEN" in button.text or "AKTIV" in button.text:yard+=1
+		check(yard==27,"shipyard shows one card for every design")
 		game.modal.hide()
 	root.size=Vector2i(1280,720)
 	await process_frame
