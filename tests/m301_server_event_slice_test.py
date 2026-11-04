@@ -41,7 +41,7 @@ def test_m301_release_is_not_live_or_approved():
     release = json.loads(read('data/release_identity.json'))
     assert (release['milestone'], release['client_version'], release['build_number']) == ('M301', '0.301.0', 301)
     assert release['m301_server_slice_lock'].startswith('Source-level server domain only')
-    assert 'NOT_EVALUATED' in read('M301_SERVER_SLICE_REPORT.md')
+    assert 'NOT_EVALUATED' in read('docs/reports/M301_SERVER_SLICE_REPORT.md')
 
 
 def test_m301_halloween_npcs_and_prize_are_three_distinct_complete_models():

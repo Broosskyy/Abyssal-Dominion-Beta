@@ -39,3 +39,7 @@ assets/classic/private_user_art/
 # Retain the verified APK requested for this development snapshot.
 !releases/
 !releases/**/*.apk
+
+# Build outputs: APKs are published as GitHub releases, captures as release attachments.
+releases/**/*.apk
+releases/M3059/captures/*/

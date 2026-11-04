@@ -1,10 +1,19 @@
 # Abyssal Dominion
 
-**Current gameplay build: [M3054 — ship rendering audit and fixes](rebuild/m3052/README.md).** Open `rebuild/m3052/project.godot` in Godot 4.7.2. Current Android version is `0.305.4-test.4`; CI preserves verified APKs and rendered gameplay captures in `releases/M3054/`. The existing `com.abyssaldominion.rebuild` package and guest save migrate from M3052.
+**Current gameplay build: [M3059 — signed data updates and 2D sea foundations](rebuild/m3052/README.md).** Open `rebuild/m3052/project.godot` in Godot 4.7.2. Current Android version is `0.305.9-test.1` (code `305901`). The bootstrap APK is published as a [GitHub release](https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases); compatible game changes ship as signed `data-N` releases without a new APK. Package `com.abyssaldominion.rebuild` and the guest save migrate from M3052.
 
-M3053 adds physical docking, drydock repair, four equipment categories with three functional tiers, captain XP/levels, seven quests, two additional portal-linked regions and 17 cropped runtime images from the supplied reference collection. All 60 PNGs have hashes and provenance. This remains local guest gameplay; public multiplayer and cross-device acceptance remain open. See the active project README for controls, limits and validation.
+## Repository layout
 
-M3054 corrects displaced reflected ships, direction ordering, transparent-padding scale differences, waterline pivots and detached wake/shadows. Source ship art remains unchanged. [Video analysis and limitations](docs/m3054/SHIP_RENDER_AUDIT.md) include the distinction between ten single-view concepts and sixteen four-view atlases. CI renders all 26 ships and preserves an actual maneuver video.
+| Path | Content |
+| --- | --- |
+| `rebuild/m3052/` | **Active game** (Godot project, tests, build tools, updater). The folder name is kept for the Android upgrade path. |
+| `.github/workflows/m3052.yml` | Active CI: tests, signed data pack, optional APK, release publishing. |
+| `updates/` | Live update manifests (`latest.json`, `data.json`) read by installed apps. |
+| `releases/M30xx/` | Build reports, checksums and capture logs per milestone. APKs live in GitHub releases; renderer captures are attached to each `data-N` release (`ABYSSAL_CAPTURES_N.zip`) and to the CI run artifact. |
+| `docs/` | Design and audit documents; `docs/reports/` holds the historical M162–M3048 production reports. |
+| `project.godot`, `scenes/`, `scripts/`, `assets/`, `tests/`, `tools/` | Legacy M3051 project with the shared WebSocket test chart (see below). Not used by the active build. |
+
+M3054 corrects displaced reflected ships, direction ordering, transparent-padding scale differences, waterline pivots and detached wake/shadows. [Video analysis and limitations](docs/m3054/SHIP_RENDER_AUDIT.md). Later milestones are summarized in the [active project README](rebuild/m3052/README.md).
 
 ## M3051 historical snapshot
 
@@ -22,7 +31,7 @@ Godot **4.7.2**, mobile-first naval combat prototype. Android test version **M30
 
 Open `project.godot` in Godot 4.7.2 and press F6 on `scenes/network/start_menu.tscn`, or F5 for the project. Choose **LOKALE SEEKARTE SPIELEN** for offline play.
 
-The Android APK is in `releases/M3051/` once built. It uses package `com.abyssaldominion.mobile`, so it installs separately from earlier prototype package names. It is signed with a development key, not a Play Store release certificate. This snapshot does not contain the signing key.
+The M3051 APK is published as GitHub release `v0.305.1-test.1`. It uses package `com.abyssaldominion.mobile`, so it installs separately from earlier prototype package names. It is signed with a development key, not a Play Store release certificate. This snapshot does not contain the signing key.
 
 ## Android build
 

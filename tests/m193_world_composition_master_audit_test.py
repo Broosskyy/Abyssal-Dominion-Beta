@@ -9,7 +9,7 @@ def test_m193_contract_and_audit():
     assert c['chart']['target_island_budget']=={'mobile':8,'web':8,'desktop':8}
     assert c['movement_locks']['land_blocks_and_routes_around'] is True
     assert c['movement_locks']['ships_npcs_monsters_bosses_overlap'] is True
-    audit=(ROOT/'M193_MASTER_REFERENCE_AUDIT.md').read_text()
+    audit=(ROOT/'docs/reports/M193_MASTER_REFERENCE_AUDIT.md').read_text()
     assert 'PLACEHOLDER' in audit and 'server-authoritative' in audit
 
 def test_m193_visual_budget_matches_contract():

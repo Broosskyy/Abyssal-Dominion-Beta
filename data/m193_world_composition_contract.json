@@ -18,7 +18,7 @@
     "ships_npcs_monsters_bosses_overlap": true,
     "loot_non_blocking": true
   },
-  "audit": "M193_MASTER_REFERENCE_AUDIT.md",
+  "audit": "docs/reports/M193_MASTER_REFERENCE_AUDIT.md",
   "native_runtime_visual_qa_pending": true,
   "superseded_by": "M194_CROSS_PLATFORM_WORLD_PARITY"
 }

@@ -54,7 +54,7 @@ Tap water to sail and an enemy to select it. FEUER toggles cannon fire. Harpoons
 
 ## Build and verification
 
-`.github/workflows/m3052.yml` builds `the versioned APK in GitHub releases`. The builder audits every PNG, imports and tests the project, verifies embedded textures, ARM64 engine, signature, 16 KB alignment and application/version identity. CI also captures actual gameplay at desktop and mobile landscape sizes; no generated mockups serve as QA evidence. Build reports record the source commit. Simulation, progression and UI tests use fresh isolated guest storage.
+`.github/workflows/m3052.yml` builds the versioned APK (published as a GitHub release) and the signed data pack; renderer captures are attached to each `data-N` release. The builder audits every PNG, imports and tests the project, verifies embedded textures, ARM64 engine, signature, 16 KB alignment and application/version identity. CI also captures actual gameplay at desktop and mobile landscape sizes; no generated mockups serve as QA evidence. Build reports record the source commit. Simulation, progression and UI tests use fresh isolated guest storage.
 
 ## Scope
 

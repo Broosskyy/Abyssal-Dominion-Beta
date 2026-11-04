@@ -15,6 +15,7 @@ const SEA_MARKS = preload("res://sea_marks.gd")
 const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
+const SHOT_COLORS := {"flare":Color("ffe27a"),"pumpkin":Color("ff8a2a"),"snow":Color("f4fbff"),"ice":Color("7fd4ff"),"chain":Color("d7e4ea"),"harpoon":Color("9fd0c8")}
 const USER_ROOT := "res://assets/user/"
 const SAVE := "user://captain_m3052.json"
 const HUD_SAVE := "user://display_m3052.json"
@@ -350,7 +351,7 @@ func _draw() -> void:
 		var direction: Vector2=(victim.pos-shot.pos).normalized()
 		var color = Color("ffe0a2") if int(shot.source)==0 else Color("ff8c56")
 		if int(shot.source)==0:
-			color = {"flare":Color("ffe27a"),"pumpkin":Color("ff8a2a"),"snow":Color("f4fbff"),"ice":Color("7fd4ff"),"chain":Color("d7e4ea"),"harpoon":Color("9fd0c8")}.get(str(shot.weapon), color)
+			color = SHOT_COLORS.get(str(shot.weapon), color)
 		if mortar:_ellipse(shot.pos,Vector2(7,3),Color(0,0,0,.28))
 		draw_line(p-direction*18,p,color,2.4,true)
 		draw_circle(p,(7.0 if mortar else 4.2),Color(0,0,0,0.5))

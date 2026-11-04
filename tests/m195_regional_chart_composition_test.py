@@ -15,4 +15,4 @@ def test_pois_use_full_chart_not_old_prototype_patch():
  assert 'randf_range(-27.0,27.0)' not in s and 'randf_range(-25.0,25.0)' not in s
 
 def test_audit_no_mobile_desktop_world_divergence():
- s=(R/'M193_MASTER_REFERENCE_AUDIT.md').read_text(); assert '6 islands mobile/web, 8 desktop' not in s and '8 identical island composition slots on every platform' in s
+ s=(R/'docs/reports/M193_MASTER_REFERENCE_AUDIT.md').read_text(); assert '6 islands mobile/web, 8 desktop' not in s and '8 identical island composition slots on every platform' in s

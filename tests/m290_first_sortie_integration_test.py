@@ -87,7 +87,7 @@ def test_m290_integration_admin_matrix_native_qa_audit_and_release_identity():
     assert "m290_first_sortie_state" in hud and "_m290_sync_first_sortie_state()" in hud and "_draw_m290_first_sortie_guidance" in hud
     assert "hud._draw_m290_first_sortie_guidance(layout)" in nautical
     assert "FIRST SEA SORTIE · EVENT BINDING · GUIDANCE" in deck and "M290FirstSortieCatalog.authority" in deck
-    assert "No production code called `observe_local_slice_event`" in read("M289_DEEP_AUDIT_FOR_M290.md")
+    assert "No production code called `observe_local_slice_event`" in read("docs/reports/M289_DEEP_AUDIT_FOR_M290.md")
     admin = load("data/admin_content_type_registry.json")
     assert admin["milestone"] == "M301"
     for item in ["first_sortie_integration_definition", "first_sortie_guidance_profile_definition", "first_sortie_event_receipt_policy_definition", "first_sortie_placeholder_profile_definition"]:
