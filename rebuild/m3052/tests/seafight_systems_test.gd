@@ -343,6 +343,21 @@ func _initialize() -> void:
 	var legacy={"schema":2,"gold":700,"ammo":[50,20,10],"skin":3,"upgrades":{"cannon":2,"harpoon":1,"hull":1,"sails":0},"level":5,"hp":1500}
 	var fresh=SIM.new()
 	check(fresh.restore_save(legacy) and int(fresh.upgrades.cannon)==2 and int(fresh.upgrades.hull)==1 and int(fresh.player.max_hp)==2800 and fresh.guild.is_empty() and fresh.decks.is_empty(),"legacy equipment maps onto castles with empty new systems")
+	var sea=SIM.new()
+	var patrol=sea.npcs[1]
+	check(patrol.speed<=40 and sea.player.ammo.size()==7,"patrols sail slower and special ammunition is stocked")
+	sea._hit({"source":0,"damage":10,"weapon":"ice"},patrol)
+	var held=patrol.pos
+	sea._step_npc(patrol,0.5)
+	check(float(patrol.ice)>2 and patrol.pos==held,"ice ammunition freezes the ship in place")
+	sea._hit({"source":0,"damage":10,"weapon":"flare"},patrol)
+	check(float(patrol.spotted)>sea.clock,"flare ammunition marks the target")
+	sea._hit({"source":0,"damage":20,"weapon":"snow"},patrol)
+	check(float(patrol.slow)>7 and is_equal_approx(float(patrol.slow_rate),0.38),"snow ammunition slows harder than chain shot")
+	var pumpkin_before=int(sea.npcs[2].hp)
+	patrol.pos=sea.npcs[2].pos
+	sea._hit({"source":0,"damage":100,"weapon":"pumpkin"},patrol)
+	check(int(sea.npcs[2].hp)<pumpkin_before,"pumpkin ammunition splashes a nearby ship")
 	_staff_checks()
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))

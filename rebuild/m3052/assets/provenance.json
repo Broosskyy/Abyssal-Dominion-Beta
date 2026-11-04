@@ -905,6 +905,30 @@
       "bytes": 190642,
       "sha256": "6db9aea02dbe0744215c49058f8fcae30cd830935cf5a8a30bcb961f1d4ff0d5",
       "source": "Original painted world-chart parchment generated for Abyssal Dominion M3061; not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/ammo_flare.png",
+      "bytes": 412117,
+      "sha256": "f3951db33baf09c75fd114efc9667888553a4a0773b38ffd60bf6763771e8d76",
+      "source": "Original painted flare shell icon generated for Abyssal Dominion M3061; not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/ammo_pumpkin.png",
+      "bytes": 415111,
+      "sha256": "605bb45d42780090f062b054ad6df7aee3d3ca8c03534674c12b83f95a0a093c",
+      "source": "Original painted pumpkin round icon generated for Abyssal Dominion M3061; not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/ammo_snow.png",
+      "bytes": 349297,
+      "sha256": "1da353cace985cdb9d992e7f7de5fca13d3e7f89787e654c287d0a888c3eb192",
+      "source": "Original painted snow round icon generated for Abyssal Dominion M3061; not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/ammo_ice.png",
+      "bytes": 462313,
+      "sha256": "51da465df73a4728cbd4a80f07722b77c34d422856a6d603d45f2e05ae392f76",
+      "source": "Original painted ice round icon generated for Abyssal Dominion M3061; not taken from a third-party game"
     }
   ]
 }
