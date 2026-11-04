@@ -134,6 +134,7 @@ var target_cycle: Button
 var camera_pad_visible := true
 
 func _ready() -> void:
+	_use_uhd()
 	_load_assets()
 	_load_progress()
 	_load_staff()
@@ -162,6 +163,21 @@ func _ready() -> void:
 	if get_tree().current_scene==self:_begin_loading(1.4)
 	var data_boot=get_tree().root.get_node_or_null("DataBoot")
 	if data_boot!=null:data_boot.mark_healthy()
+
+## Desktop play renders at 3840×2160. Layout stays on the 1280×720 design, so every
+## drawn pixel is three times finer. Test runs set content_scale_size to zero and keep their own size.
+func _use_uhd() -> void:
+	if OS.has_feature("mobile") or OS.has_feature("web"):return
+	var window := get_window()
+	if window == null or window.content_scale_size == Vector2i.ZERO:return
+	window.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+	window.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
+	window.content_scale_size = Vector2i(1280, 720)
+	var uhd := Vector2i(3840, 2160)
+	window.size = uhd
+	var screen := DisplayServer.screen_get_size()
+	if screen.x >= uhd.x and screen.y >= uhd.y:
+		window.position = (screen - uhd) / 2
 
 func _load_assets() -> void:
 	for name in ["anchor","ship","book","compass","chest","gear","plus","minus","focus","arrow","target_cycle"]:hud_icons[name]=load("res://assets/ui/icons/"+name+".svg")
