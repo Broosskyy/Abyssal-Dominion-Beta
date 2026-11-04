@@ -102,7 +102,7 @@ func _init() -> void:
 		var shield = roundi(hull * 0.25) if elite else 0
 		npcs.append({"id": i + 1, "name": names[i % names.size()], "kind": "ship", "pos": starts[i],
 			"home": starts[i], "heading": Vector2.LEFT, "path": [], "hp": hull,
-			"max_hp": hull, "shield": shield, "max_shield": shield, "speed": 36.0 + float(i % 3) * 4.0,
+			"max_hp": hull, "shield": shield, "max_shield": shield, "speed": 48.0 + float(i % 3) * 4.0,
 			"reload": float(i % 4) * 0.6, "repath": 0.0, "state": "patrol", "patrol": i % 4,
 			"aggressive": false, "slow": 0.0, "respawn": 0.0, "reward": 110 if elite else 55,
 			"art": i, "elite": elite, "view_count":4, "renderer":"sprite", "navigation":"four_diagonal", "last_hit": -100.0})
@@ -497,13 +497,9 @@ func _move(body: Dictionary, delta: float) -> void:
 			body.pos=goal
 			body.path.pop_front()
 			continue
-		var want: Vector2 = gap.normalized()
-		if int(body.id) == 0 or body.heading.length_squared() < 0.001:
-			body.heading = want
-		else:
-			body.heading = body.heading.slerp(want, clampf(delta * 1.8, 0.0, 1.0)).normalized()
+		body.heading = gap.normalized()
 		var amount = minf(travel, gap.length())
-		var next: Vector2 = body.pos + want * amount
+		var next: Vector2 = body.pos + body.heading * amount
 		if not phasing and not segment_free(body.pos, next):
 			body.path = []
 			return

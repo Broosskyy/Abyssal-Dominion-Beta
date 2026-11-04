@@ -345,7 +345,7 @@ func _initialize() -> void:
 	check(fresh.restore_save(legacy) and int(fresh.upgrades.cannon)==2 and int(fresh.upgrades.hull)==1 and int(fresh.player.max_hp)==2800 and fresh.guild.is_empty() and fresh.decks.is_empty(),"legacy equipment maps onto castles with empty new systems")
 	var sea=SIM.new()
 	var patrol=sea.npcs[1]
-	check(patrol.speed<=40 and sea.player.ammo.size()==7,"patrols sail slower and special ammunition is stocked")
+	check(patrol.speed<sea.PLAYER_SPEED*0.4 and sea.player.ammo.size()==7,"patrols sail slower than the captain and special ammunition is stocked")
 	sea._hit({"source":0,"damage":10,"weapon":"ice"},patrol)
 	var held=patrol.pos
 	sea._step_npc(patrol,0.5)
