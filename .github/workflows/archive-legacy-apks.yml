@@ -1,0 +1,40 @@
+name: Archive M3052-M3056 APKs as releases
+# One-time job: publishes the test APKs that were only stored in Git as
+# GitHub releases, verified against their build.json checksums, so they can
+# be removed from the working tree. Safe to re-run: existing tags are skipped.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/analysis-request-j0c0f4]
+    paths: ['.github/workflows/archive-legacy-apks.yml']
+permissions:
+  contents: write
+jobs:
+  archive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 80709f4066bc9e45bb050c6376850d1bd9f4f185
+          sparse-checkout: releases
+          fetch-depth: 1
+      - name: Publish verified APKs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for v in 3052 3053 3054 3055 3056; do
+            dir="releases/M${v}"
+            apk="$dir/ABYSSAL_DOMINION_M${v}_REBUILD_ARM64.apk"
+            meta="$dir/ABYSSAL_DOMINION_M${v}_REBUILD_ARM64.build.json"
+            want=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["sha256"])' "$meta")
+            echo "$want  $apk" | sha256sum -c -
+            tag="archive-m${v}-android"
+            if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then echo "$tag exists"; continue; fi
+            gh release create "$tag" "$apk" "$meta" --repo "$GITHUB_REPOSITORY" --target 80709f4066bc9e45bb050c6376850d1bd9f4f185 \
+              --title "M${v} test APK (archived)" --notes "Historical M${v} test build moved out of the Git working tree. SHA-256: ${want}" --prerelease
+            curl -fL --retry 3 -o /tmp/served.apk "https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}/$(basename "$apk")"
+            echo "$want  /tmp/served.apk" | sha256sum -c -
+          done
