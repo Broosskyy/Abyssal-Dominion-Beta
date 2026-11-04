@@ -749,6 +749,132 @@
       "bytes": 442749,
       "sha256": "6ac275328eed366ccb5d52cfc5252e021941047a5d1ce813bca67d701f511a04",
       "source": "Original seamless open-sea texture rendered procedurally by tools/make_sea_tile.py (seed 3059) for Abyssal Dominion"
+    },
+    {
+      "path": "assets/ui/painted/nav_bonus.png",
+      "bytes": 26881,
+      "sha256": "54e58e145c4a6b6ecddd07f37d6ab115c6f2ac23ae3e5123c64407930c83d55f",
+      "source": "Original painted bonus-map scroll navigation icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/nav_kessel.png",
+      "bytes": 27501,
+      "sha256": "130da6ddec0cc439f32ad29e79c980ff00cae95e556641092a6a1882d42b0f02",
+      "source": "Original painted tide cauldron navigation icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/nav_guild.png",
+      "bytes": 20495,
+      "sha256": "140957dbdd2b375c2f4d5fc81ebc20af430b9fb66cdb66dfa4c3e6387e0363b8",
+      "source": "Original painted guild banner navigation icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/nav_castles.png",
+      "bytes": 27439,
+      "sha256": "6948e57ac4f98fbd2a99343113bb9cee945e5cf4c2c758bceabfbb823eb541db",
+      "source": "Original painted castle tower navigation icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/supply_powder.png",
+      "bytes": 28316,
+      "sha256": "cc279f6eee7431766c81e7811415c6829bf83b09bdd614bf69b48d4779ba94c5",
+      "source": "Original painted black powder keg supply icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/supply_plates.png",
+      "bytes": 33411,
+      "sha256": "721062cc3d9e8ab72e36c3e4761a93b45be872431e233905615cb25acbf61fad",
+      "source": "Original painted armor plate supply icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/supply_repair.png",
+      "bytes": 34553,
+      "sha256": "78986f9668c7648fb50aad2a4a9c29708f224b09379b03ef1bd6e37960bc9a97",
+      "source": "Original painted emergency repair kit supply icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/supply_shield.png",
+      "bytes": 27384,
+      "sha256": "773407ada3c2b6202e95d1748d5a9c38a648c6a0fce1c762ab65a80b8c00456f",
+      "source": "Original painted shield charge supply icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/essence_flask.png",
+      "bytes": 22720,
+      "sha256": "84064882d31a88764a66895583f109d554bb96628d7da24e3a477781cfdbd04e",
+      "source": "Original painted tide essence flask icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/scroll_fragment.png",
+      "bytes": 34184,
+      "sha256": "751c610df3710bdcd18c32b88725292c0bdbcf9933abc9ac1292bc9155728515",
+      "source": "Original painted bonus-map scroll fragment icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/crystal_blessing.png",
+      "bytes": 25455,
+      "sha256": "7df8259885450785f1d473f26ac38d6a9879e97a65bcedab2ca0631032aebe27",
+      "source": "Original painted crystal blessing buff icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/tide_deck.png",
+      "bytes": 32924,
+      "sha256": "5539793b345110827457eb7de9baf3e608853b4647d4490dc14a2e8cd55f8260",
+      "source": "Original painted tide deck buff icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/castle_crew.png",
+      "bytes": 25858,
+      "sha256": "f9c5b7c51e89fcc90ffe1da9605d3de5fcfb882987d89d603bd88eec83ad102c",
+      "source": "Original painted crew castle icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/castle_war.png",
+      "bytes": 29875,
+      "sha256": "0269e731f47751b2476365ab0dd46cf5ba29286faafbe8e252d5bb888fe98cb6",
+      "source": "Original painted war castle icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/boss_wave.png",
+      "bytes": 29759,
+      "sha256": "96886f8cc639b03cd875adfe753ec09e47543af7a25f914339d7868995f4cb9d",
+      "source": "Original painted boss wave emblem generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/reward_chest.png",
+      "bytes": 33809,
+      "sha256": "af3e0300c260877a7bf514077187bfaabb3ddf366fdf39d49156203085024b4e",
+      "source": "Original painted bonus-map reward chest icon generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/tower_cannon.png",
+      "bytes": 71620,
+      "sha256": "468701ed1bee0b5e175603d163260c991df82fb7e5a8e26d8e14ce65b1d4f15f",
+      "source": "Original painted cannon tower world sprite generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/tower_mortar.png",
+      "bytes": 65826,
+      "sha256": "c196c0ebda9ee1bf3a9b86668cf0c97c812ba2e4614a597c52f75cecae88612d",
+      "source": "Original painted mortar tower world sprite generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/tower_chain.png",
+      "bytes": 57961,
+      "sha256": "e1a9e018dd12aebe4a5b8cfbc403cadf1878080e2a9e4877c1e589fc9dfc3616",
+      "source": "Original painted chain tower world sprite generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/tower_guardian.png",
+      "bytes": 51827,
+      "sha256": "3cb2f95f62bc6a46db90f8e1c38e0072d8b67c817537a0928e10abc0a19df3f5",
+      "source": "Original painted guardian tower world sprite generated for Abyssal Dominion M3060; cut from a generated 2x2 sheet, not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/kessel_scene.jpg",
+      "bytes": 106355,
+      "sha256": "d40a49812f38a2addbecfbe5d1a3616bc94fffef60cdb8bea618c3418f479bba",
+      "source": "Original painted tide-cauldron harbor illustration generated for Abyssal Dominion M3060; not taken from a third-party game"
     }
   ]
 }

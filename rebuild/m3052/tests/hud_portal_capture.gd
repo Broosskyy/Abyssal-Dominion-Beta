@@ -80,5 +80,53 @@ func _run() -> void:
 	var receipt=FileAccess.open(output+"/portal-touch.json",FileAccess.WRITE)
 	receipt.store_string(JSON.stringify({"queued_by_touch":queued,"map":game.sim.map_id,"pending":game.sim.pending_portal,"steps":steps,"camera_synced":game.camera.position==game.sim.player.pos}));receipt.close()
 	if not queued or game.sim.map_id!=1:push_error("Portal capture did not complete its actual crossing");quit(1);return
-	print(JSON.stringify({"status":"CAPTURED","hud_sizes":4,"portal_touch_crossing":true}))
+	var systems=await _systems(game,output)
+	if not systems.ok:push_error("Seafight systems capture failed: "+JSON.stringify(systems));quit(1);return
+	print(JSON.stringify({"status":"CAPTURED","hud_sizes":4,"portal_touch_crossing":true,"systems":systems}))
 	quit()
+func _systems(game: Node,output: String) -> Dictionary:
+	var sim=game.sim
+	root.size=Vector2i(1280,720)
+	# Korsarenfestung with its four towers, first held by the corsairs, then by the captain's guild.
+	sim.level=6;sim.player.hp=sim.player.max_hp;sim.player.last_hit=-100;sim.docked=false
+	sim.configure_map(2);game.previous_region=2
+	var island: Dictionary=sim.fortress_island()
+	var anchor=Vector2(island.bounds.get_center().x,island.bounds.end.y+150)
+	for step in 12:
+		if not sim.blocked(anchor):break
+		anchor.y+=40
+	sim.player.pos=anchor;sim.player.path=[];sim.player.heading=Vector2.UP
+	var towers: Array=[]
+	for npc in sim.npcs:
+		if npc.kind=="tower":towers.append(npc)
+		elif npc.pos.distance_to(anchor)<900:npc.pos=npc.home+Vector2(1200,0)
+	sim.select(int(towers[0].id))
+	game.camera.position=(anchor+island.bounds.get_center())*.5;game.camera.zoom=Vector2.ONE*.82
+	await _shot(game,output,"fortress-1280x720")
+	sim.guild={"name":"Sturmkrone","tag":"SKR"};sim.fortress_hold=1500.0
+	sim.activate_blessing(600.0);sim.add_tide_deck(1800.0);sim.powder_on=true
+	game.quick_page=1;game._apply_page()
+	await _shot(game,output,"guild-island-1280x720")
+	var held=sim.tower_friendly() and sim.tower_tag()=="SKR"
+	game.quick_page=0;game._apply_page();sim.powder_on=false
+	# Harbor panels for the cauldron, bonus scrolls and the guild.
+	sim.player.pos=sim.harbor;sim.docked=true;sim.essence=12;sim.fragments=7;sim.scrolls=[1,0,0]
+	sim.throw_kessel(5,"2026-11-04")
+	for kind in ["Kessel","Bonuskarten","Gilde","Kastelle","Decks"]:
+		game._open_modal(kind)
+		await _shot(game,output,"panel-%s-1280x720" % kind.to_lower())
+	game.modal.hide();game.modal_backdrop.hide()
+	# A real bronze run: scroll spent, wave one spawned on Bronzeriff.
+	sim.depart();sim.player.pos=sim.START;sim.bonus={}
+	var started: bool=sim.start_bonus(0)
+	game._sync_region();game._advance_loading(5.0)
+	for _i in 120:sim.step(1.0/30.0)
+	var wave: int=sim.bonus_wave_alive()
+	for npc in sim.npcs:
+		if bool(npc.get("wave",false)):
+			npc.pos=sim.player.pos+(npc.pos-sim.player.pos).limit_length(380.0);sim.select(int(npc.id));break
+	game.camera.position=sim.player.pos;game.camera.zoom=Vector2.ONE*.82
+	await _shot(game,output,"bonus-wave-1280x720")
+	root.size=Vector2i(720,405);game.camera.zoom=Vector2.ONE*.78
+	await _shot(game,output,"bonus-wave-720x405")
+	return {"ok":towers.size()==4 and held and started and sim.map_id==3 and wave>0,"towers":towers.size(),"guild_held":held,"bonus_started":started,"wave_ships":wave}

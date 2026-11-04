@@ -13,6 +13,7 @@ const SAVE := "user://captain_m3052.json"
 const HUD_SAVE := "user://display_m3052.json"
 const GOLD := Color("dcc18a")
 const CYAN := Color("80e3dc")
+const ROMAN := ["","I","II","III","IV","V","VI","VII","VIII","IX","X"]
 var sim := SIM.new()
 var camera: Camera2D
 var water: ColorRect
@@ -99,9 +100,16 @@ var ruler: Control
 var loading: Control
 var loading_left := 0.0
 var loading_total := 1.0
-var pad_steers := false
-var steer_clock := 0.0
 var message_history: Array[String]=[]
+var player_shield: ProgressBar
+var shield_numbers: Label
+var supply_buttons: Dictionary={}
+var page_button: Button
+var quick_page := 0
+var buff_bar: Control
+var kessel_log: Array[String]=[]
+var guild_name_input: LineEdit
+var guild_tag_input: LineEdit
 var previous_region := -1
 var hud_size := 1 # 0 compact, 1 comfortable, 2 large
 var journal_visible := true
@@ -168,9 +176,15 @@ func _load_assets() -> void:
 	for name in ["cannon_0","cannon_1","cannon_2","harpoon_0","harpoon_1","harpoon_2","loot_0","loot_1","loot_2","loot_3","upgrade_cannon","upgrade_harpoon","upgrade_hull","upgrade_sails","quest_book","world_chart"]:
 		extra_icons[name] = load("res://assets/expanded/"+name+".png")
 	extra_icons.cannon_action=load("res://assets/ui/cannon_action.png")
-	for name in ["nav_ship","nav_shipyard","nav_harbor","nav_quests","nav_charts","nav_supplies","nav_ranking","nav_menu","gold_coins","kills_skull","spyglass","helm_wheel"]:
+	for name in ["nav_ship","nav_shipyard","nav_harbor","nav_quests","nav_charts","nav_supplies","nav_ranking","nav_menu","gold_coins","kills_skull","spyglass","helm_wheel",
+			"nav_bonus","nav_kessel","nav_guild","nav_castles","supply_powder","supply_plates","supply_repair","supply_shield","essence_flask","scroll_fragment",
+			"crystal_blessing","tide_deck","castle_crew","castle_war","boss_wave","reward_chest","tower_cannon","tower_mortar","tower_chain","tower_guardian"]:
 		painted[name]=load("res://assets/ui/painted/"+name+".png")
 	painted.loading=load("res://assets/ui/painted/loading_harbor.jpg")
+	painted.kessel_scene=load("res://assets/ui/painted/kessel_scene.jpg")
+
+func _art(name: String) -> Texture2D:
+	return extra_icons[name] if extra_icons.has(name) else painted.get(name)
 
 func _process(delta: float) -> void:
 	if modal_backdrop!=null:modal_backdrop.visible=modal.visible
@@ -184,9 +198,7 @@ func _process(delta: float) -> void:
 		accumulator -= 1.0/30.0
 	if previous_region!=sim.map_id:_sync_region()
 	if loading_left>0:_advance_loading(delta)
-	if camera_pad.visible and not modal.visible:
-		if pad_steers:_steer(camera_pad.value,delta)
-		else:_pan_camera(camera_pad.value,delta)
+	if camera_pad.visible and not modal.visible:_pan_camera(camera_pad.value,delta)
 	var goal: Vector2 = sim.player.pos if camera_locked else camera_anchor
 	pan=goal-sim.player.pos
 	camera.position = camera.position.lerp(goal,1.0-exp(-delta*5.0))
@@ -232,13 +244,16 @@ func _draw() -> void:
 	# Planned route and tap marker remain visible without obscuring the sea.
 	# Docks and portals occupy water cells and are also marked on the minimap.
 	# Compact anchor replaces the oversized dock circle and upgrade-arrow placeholder.
-	if _landmark_label_visible(sim.harbor):
+	if sim.has_harbor() and _landmark_label_visible(sim.harbor):
 		var anchor=sim.harbor
 		draw_circle(anchor-Vector2(0,23),6,GOLD,false,2.0,true)
 		draw_line(anchor-Vector2(0,17),anchor+Vector2(0,17),GOLD,2.5,true)
 		draw_line(anchor-Vector2(13,7),anchor+Vector2(13,-7),GOLD,2.0,true)
 		draw_arc(anchor+Vector2(0,1),23,0,PI,24,GOLD,2.5,true)
-	if _landmark_label_visible(sim.harbor):_label(sim.harbor+Vector2(0,100),"HAFEN · ANDOCKEN",13,GOLD)
+		_label(sim.harbor+Vector2(0,100),"HAFEN · ANDOCKEN",13,GOLD)
+	for sparkle in sim.sparkles:
+		if float(sparkle.respawn)>0 or not view.has_point(sparkle.pos):continue
+		_draw_sparkle(sparkle.pos,float(sparkle.id))
 	for portal in sim.portals:
 		if not view.has_point(portal.pos): continue
 		var pp: Vector2 = portal.pos
@@ -272,19 +287,23 @@ func _draw() -> void:
 	fleet.sort_custom(func(a,b):return a.pos.y < b.pos.y)
 	for actor: Dictionary in fleet:
 		if int(actor.hp)>0: _draw_actor(actor)
+	for actor: Dictionary in fleet:
+		if int(actor.hp)>0 and actor.get("kind","")=="tower":_nameplate(actor,actor.pos+Vector2(0,-96.0*_plate_scale() if sim.target==int(actor.id) else 16.0))
 	drawn_shots = 0
 	for shot in sim.shots:
 		if float(shot.age)<0: continue
 		drawn_shots += 1
 		var progress = clampf(float(shot.traveled)/float(shot.distance),0,1)
-		var p: Vector2 = shot.pos-Vector2(0,sin(progress*PI)*28)
+		var mortar=shot.weapon=="mortar"
+		var p: Vector2 = shot.pos-Vector2(0,sin(progress*PI)*(110.0 if mortar else 28.0))
 		var victim = sim.actor(int(shot.target))
 		if victim.is_empty(): continue
 		var direction: Vector2=(victim.pos-shot.pos).normalized()
 		var color = Color("ffe0a2") if int(shot.source)==0 else Color("ff8c56")
+		if mortar:_ellipse(shot.pos,Vector2(7,3),Color(0,0,0,.28))
 		draw_line(p-direction*18,p,color,2.4,true)
-		draw_circle(p,4.2,Color(0,0,0,0.5))
-		draw_circle(p,2.7,color)
+		draw_circle(p,(7.0 if mortar else 4.2),Color(0,0,0,0.5))
+		draw_circle(p,(5.0 if mortar else 2.7),color)
 		if shot.weapon=="chain": draw_arc(p,6,0,TAU,12,color,1.2,true)
 		if shot.weapon=="harpoon": draw_line(p-direction*30,p,color,1.4,true)
 	for event in sim.events:
@@ -303,6 +322,13 @@ func _draw() -> void:
 		elif event.type=="level":
 			_ellipse_line(p,Vector2(50+age*80,22+age*35),Color(0.5,0.9,1,1-age/1.2),2.2)
 			_label(p+Vector2(0,-100-age*25),"KAPITÄNSSTUFE %d" % int(event.value),22,CYAN)
+		elif event.type=="essence":
+			_label(p+Vector2(0,-48-age*40),"+%d ESSENZ"%int(event.value),17,Color(0.45,1,0.92,1-age/1.2))
+		elif event.type in ["blessing","tide_deck","supply"]:
+			var tint=Color("c69bff") if event.type=="blessing" else (Color("5fe0d2") if event.type=="tide_deck" else Color("8fd0ff"))
+			_ellipse_line(p,Vector2(40+age*90,16+age*36),Color(tint,1-age/1.2),2.6)
+		elif event.type=="conquest":
+			_label(p+Vector2(0,-120-age*20),"FESTUNG EROBERT",24,Color(1,0.85,0.45,1-age/1.2))
 
 	for group: Dictionary in VISUALS.impact_labels(sim.events,sim.clock):
 		var age=sim.clock-float(group.time)
@@ -340,6 +366,9 @@ func _actor_visual_length(actor: Dictionary) -> float:
 
 func _draw_actor(actor: Dictionary) -> void:
 	if float(actor.hp)<=0:return
+	if actor.get("kind","")=="tower":
+		_draw_tower(actor)
+		return
 	var is_player = int(actor.id)==0
 	var point: Vector2=actor.pos
 	var heading: Vector2=actor.heading
@@ -381,28 +410,135 @@ func _draw_actor(actor: Dictionary) -> void:
 		var side=Vector2(-heading.y,heading.x)*4
 		draw_line(nose-heading*8+side,nose,CYAN,1.4,true)
 		draw_line(nose-heading*8-side,nose,CYAN,1.4,true)
-	var name: String = str(skins[int(sim.player.skin)].name) if is_player else str(actor.name)
-	var hostile=not is_player and (bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile))
-	var elite=bool(actor.get("elite",false))
-	var color = CYAN if is_player else (Color("e4b6ee") if monster else (Color("ff9d8a") if hostile else (Color("ffd98a") if elite else Color("f1e6cc"))))
 	var name_offset=68.0 if is_player and int(sim.player.skin)==26 else 47.0
-	var baseline = point+Vector2(0,name_offset)
-	_label(baseline,("✦ "+name) if is_player else name,15,color)
-	var emblem_y=name_offset+17
-	# The captain's HP lives once, in the top bar. World bars stay on other ships and in gallery sheets.
-	if not is_player or gallery_page>=0:
-		var bar = Rect2(point+Vector2(-46,name_offset+7),Vector2(92,6))
-		draw_rect(bar.grow(1.5),Color(0,0,0,.72))
-		draw_rect(bar,Color("0b1a20"))
-		var health_color=Color("5fc46e") if is_player else (Color("e0604c") if hostile else Color("e1c062"))
-		var filled=Rect2(bar.position,Vector2(bar.size.x*clampf(float(actor.hp)/float(actor.max_hp),0,1),bar.size.y))
-		draw_rect(filled,health_color)
-		draw_rect(Rect2(filled.position,Vector2(filled.size.x,2)),Color(1,1,1,.22))
-		emblem_y=name_offset+30
-	var tier=(floori((sim.level-1)/4.0)+1) if is_player else (4 if monster else (3 if elite else 1)+sim.map_id)
-	var emblem=Color("7fd8ff") if is_player else (Color("d9a0ff") if monster else (Color("ffd27a") if elite else Color("8fbcf0")))
-	_rank_emblem(point+Vector2(0,emblem_y),clampi(tier,1,5),emblem)
-	if float(actor.slow)>0: _label(point+Vector2(0,emblem_y+30),"VERLANGSAMT",11,Color("9fdbf4"))
+	_nameplate(actor,point+Vector2(0,name_offset))
+
+func _plate_scale() -> float:
+	return 1.0 if gallery_page>=0 or camera==null else clampf(1.0/camera.zoom.x,1.0,1.6)
+
+## Nameplates keep a constant on-screen size: captain medallion, guild tag, hull and shield capsules, status icons.
+func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
+	var is_player=int(actor.id)==0
+	var tower=actor.get("kind","")=="tower"
+	var monster=actor.get("kind","")=="monster"
+	var elite=bool(actor.get("elite",false))
+	var hostile=not is_player and (bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) or (tower and not sim.tower_friendly()))
+	var hull_ratio=float(actor.hp)/maxf(1.0,float(actor.max_hp))
+	var max_shield=float(actor.get("max_shield",0))
+	var shield_ratio=float(actor.get("shield",0))/maxf(1.0,max_shield)
+	draw_set_transform(anchor,0,Vector2.ONE*_plate_scale())
+	if is_player:
+		var parts: Array=[]
+		if not sim.guild.is_empty():parts.append(["[%s] " % sim.guild.tag,Color("ffd27a")])
+		parts.append([str(skins[int(sim.player.skin)].name),CYAN])
+		_label_parts(Vector2(11,0),parts,15)
+		_medallion(Vector2(-62,19),clampi(floori((sim.level-1)/4.0)+1,1,ROMAN.size()-1))
+		_plate_bar(Rect2(-46,6,114,14),hull_ratio,Color("4fbf5e"),"%s / %s" % [_thousands(int(actor.hp)),_thousands(int(actor.max_hp))],10)
+		_plate_bar(Rect2(-46,23,114,10),shield_ratio,Color("3d8fe0"),_thousands(int(actor.shield)),9)
+		var states: Array[Texture2D]=[]
+		if sim.powder_on:states.append(painted.supply_powder)
+		if sim.plates_on:states.append(painted.supply_plates)
+		if sim.has_blessing():states.append(painted.crystal_blessing)
+		if float(sim.buffs.tide_deck)>0:states.append(painted.tide_deck)
+		if sim.guild_island_held():states.append(painted.nav_guild)
+		if float(actor.slow)>0:states.append(icons.chain)
+		for i in states.size():
+			var center=Vector2(11+(float(i)-(states.size()-1)*.5)*19,46)
+			draw_circle(center,8.5,Color(0.02,0.06,0.08,.85))
+			draw_circle(center,8.5,Color("c7a15a"),false,1.0,true)
+			draw_texture_rect(states[i],Rect2(center-Vector2(7,7),Vector2(14,14)),false)
+	else:
+		var color=Color("e4b6ee") if monster else (Color("ff9d8a") if hostile else (Color("ffd98a") if elite else Color("f1e6cc")))
+		var health=Color("e0604c") if hostile else (Color("5fc46e") if tower else Color("e1c062"))
+		# Clustered fortress towers only name the one under the spyglass; the rest keep compact bars.
+		var named=not tower or sim.target==int(actor.id)
+		var half=46.0 if named else 28.0
+		var top=0.0
+		if named:
+			var parts: Array=[]
+			if tower:parts.append(["[%s] " % sim.tower_tag(),Color("9fe7a8") if sim.tower_friendly() else Color("ffb37a")])
+			parts.append([str(actor.name),color])
+			_label_parts(Vector2.ZERO,parts,14 if tower else 15)
+			top=6.0
+		_plate_bar(Rect2(-half,top,half*2,7),hull_ratio,health)
+		var below=top+14
+		if max_shield>0:
+			_plate_bar(Rect2(-half,top+9,half*2,4),shield_ratio,Color("3d8fe0"))
+			below=top+19
+		if not tower:
+			var tier=4 if monster else (3 if elite else 1)+mini(sim.map_id,CONTENT.REGION_COUNT-1)
+			if bool(actor.get("boss",false)):tier=5
+			var emblem=Color("d9a0ff") if monster else (Color("ffd27a") if elite else Color("8fbcf0"))
+			_rank_emblem(Vector2(0,below+8),clampi(tier,1,5),emblem)
+			below+=24
+		if float(actor.slow)>0:_label(Vector2(0,below+10),"VERLANGSAMT",11,Color("9fdbf4"))
+	draw_set_transform(Vector2.ZERO)
+
+func _label_parts(point: Vector2,parts: Array,fontsize: int) -> void:
+	var total=0.0
+	for part: Array in parts:total+=font.get_string_size(str(part[0]),HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize).x
+	var x=point.x-total*.5
+	for part: Array in parts:
+		var text=str(part[0])
+		var color: Color=part[1]
+		draw_string_outline(font,Vector2(x,point.y),text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,3,Color(0.01,0.035,0.05,color.a))
+		draw_string(font,Vector2(x,point.y),text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,color)
+		x+=font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize).x
+
+func _capsule(rect: Rect2,color: Color) -> void:
+	if rect.size.x<=0.5 or rect.size.y<=0.5:return
+	if rect.size.x<rect.size.y:
+		draw_rect(rect,color)
+		return
+	var r=rect.size.y*.5
+	var points=PackedVector2Array()
+	for i in 9:points.append(Vector2(rect.end.x-r,rect.position.y+r)+Vector2.from_angle(-PI*.5+PI*float(i)/8.0)*r)
+	for i in 9:points.append(Vector2(rect.position.x+r,rect.position.y+r)+Vector2.from_angle(PI*.5+PI*float(i)/8.0)*r)
+	draw_colored_polygon(points,color)
+
+func _plate_bar(rect: Rect2,ratio: float,color: Color,text: String="",fontsize: int=9) -> void:
+	_capsule(rect.grow(1.5),Color(0,0,0,.78))
+	_capsule(rect,Color("0b1a20"))
+	var filled=Rect2(rect.position,Vector2(rect.size.x*clampf(ratio,0,1),rect.size.y))
+	_capsule(filled,color)
+	_capsule(Rect2(filled.position+Vector2(2,1),Vector2(filled.size.x-4,filled.size.y*.38)),Color(1,1,1,.24))
+	if not text.is_empty():_label(Vector2(rect.get_center().x,rect.get_center().y+fontsize*.36),text,fontsize,Color.WHITE,2)
+
+func _medallion(center: Vector2,tier: int) -> void:
+	draw_circle(center+Vector2(0,1.5),14,Color(0,0,0,.6))
+	draw_circle(center,13,Color("17303c"))
+	draw_circle(center,13,Color("d8b46a"),false,2.0,true)
+	draw_circle(center,9.5,Color("7fd8ff"),false,1.0,true)
+	_label(center+Vector2(0,4),ROMAN[tier],11 if tier<4 else 9,Color("ffe6a8"))
+
+func _draw_tower(actor: Dictionary) -> void:
+	var point: Vector2=actor.pos
+	var guardian=str(actor.tower)=="guardian"
+	if guardian:
+		var phase=fmod(elapsed*.45,1.0)
+		_ellipse_line(point,Vector2(44+phase*26,17+phase*9),Color(0.55,0.86,1,(1-phase)*.5),2.0)
+	if sim.target==int(actor.id):
+		draw_arc(point,float(actor.range),0,TAU,96,Color(1,.55,.35,.2) if not sim.tower_friendly() else Color(.5,1,.6,.2),1.6,true)
+	_ellipse(point+Vector2(0,4),Vector2(30,10),Color(0,0,0,.3))
+	if sim.target==int(actor.id):_ellipse_line(point+Vector2(0,3),Vector2(38,14),Color("ed9d67"),2.0)
+	var tex: Texture2D=painted.get("tower_"+str(actor.tower))
+	if tex!=null:
+		var dims=tex.get_size()*76.0/maxf(tex.get_width(),tex.get_height())
+		draw_texture_rect(tex,Rect2(point-dims*Vector2(0.5,0.9),dims),false)
+	if float(actor.reload)>float(actor.rate)-.25 and str(actor.get("state",""))=="attack":
+		draw_circle(point-Vector2(0,56),6,Color(1,.75,.35,.6))
+
+func _draw_sparkle(point: Vector2,seed: float) -> void:
+	var pulse=0.5+0.5*sin(elapsed*3.2+seed)
+	_ellipse(point+Vector2(0,8),Vector2(30,10),Color(0.3,0.95,0.88,0.07+pulse*0.06))
+	_ellipse_line(point+Vector2(0,8),Vector2(20+pulse*9,7+pulse*3),Color(0.5,1,0.92,0.32),1.4)
+	var lift=point-Vector2(0,8+sin(elapsed*2.0+seed)*3)
+	var star=PackedVector2Array()
+	for i in 8:
+		var angle=float(i)*PI*.25+elapsed*.5+seed
+		star.append(lift+Vector2.from_angle(angle)*((10.0+pulse*3.0) if i%2==0 else 3.4))
+	draw_colored_polygon(star,Color(0.72,1,0.95,0.92))
+	draw_circle(lift,2.6,Color.WHITE)
 
 func _rank_emblem(center: Vector2,tier: int,tint: Color) -> void:
 	var dark=Color(0,0,0,.6)
@@ -499,10 +635,10 @@ func _ellipse_line(point: Vector2,radii: Vector2,color: Color,width: float) -> v
 	for i in 33: vertices.append(point+Vector2(cos(float(i)*TAU/32),sin(float(i)*TAU/32))*radii)
 	draw_polyline(vertices,color,width,true)
 
-func _label(point: Vector2,text: String,fontsize: int,color: Color) -> void:
+func _label(point: Vector2,text: String,fontsize: int,color: Color,outline: int=3) -> void:
 	var width = font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize).x
 	var p = point-Vector2(width*0.5,0)
-	draw_string_outline(font,p,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,3,Color(0.01,0.035,0.05,color.a))
+	draw_string_outline(font,p,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,outline,Color(0.01,0.035,0.05,color.a))
 	draw_string(font,p,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,color)
 
 func _panel(parent: Node) -> Panel:
@@ -589,19 +725,23 @@ func _build_ui() -> void:
 	gold_label=_text(chrome,"",15,Color("ffe2a0"))
 	kills_label=_text(chrome,"",12,Color("eadfc6"))
 	for label in [gold_label,kills_label]:label.clip_text=true;label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
-	var nav_items=[["Schiff","nav_ship","Schiff"],["Werft","nav_shipyard","Werft"],["Hafen","nav_harbor","Hafen"],["Aufträge","nav_quests","Logbuch"],["Karten","nav_charts","Seekarten"],["Vorräte","nav_supplies","Munition"],["Rangliste","nav_ranking","Rangliste"],["Menü","nav_menu","Spielinfo"]]
+	var nav_items=[["Schiff","nav_ship","Schiff"],["Werft","nav_shipyard","Werft"],["Hafen","nav_harbor","Hafen"],["Logbuch","nav_quests","Logbuch"],["Bonus","nav_bonus","Bonuskarten"],["Kessel","nav_kessel","Kessel"],["Gilde","nav_guild","Gilde"],["Rang","nav_ranking","Rangliste"],["Menü","nav_menu","Spielinfo"]]
 	for item in nav_items:
 		var kind: String=item[2]
 		var button=_orb(chrome,str(item[0]),painted[item[1]],func():_open_modal(kind),str(item[0]),true)
+		button.tooltip_text=kind
 		button.set_meta("modal",kind);nav_buttons.append(button)
-	for tag in ["EXP","HP"]:
-		var label=_text(chrome,tag,11,Color("ecd29a"));label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER;meter_tags.append(label)
+	for tag in ["EXP","HP","SCHILD"]:
+		var label=_text(chrome,tag,9,Color("ecd29a"));label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER;meter_tags.append(label)
 	player_xp=_bar(chrome)
-	var xp_style: StyleBoxFlat=player_xp.get_theme_stylebox("fill").duplicate();xp_style.bg_color=Color("2f86c4");player_xp.add_theme_stylebox_override("fill",xp_style)
+	var xp_style: StyleBoxFlat=player_xp.get_theme_stylebox("fill").duplicate();xp_style.bg_color=Color("c79a3f");player_xp.add_theme_stylebox_override("fill",xp_style)
 	player_hp=_bar(chrome)
-	xp_numbers=_text(player_xp,"",10,Color.WHITE)
-	player_numbers=_text(player_hp,"",10,Color.WHITE)
-	for readout: Label in [xp_numbers,player_numbers]:
+	player_shield=_bar(chrome)
+	var shield_style: StyleBoxFlat=player_shield.get_theme_stylebox("fill").duplicate();shield_style.bg_color=Color("2f7fd0");player_shield.add_theme_stylebox_override("fill",shield_style)
+	xp_numbers=_text(player_xp,"",9,Color.WHITE)
+	player_numbers=_text(player_hp,"",9,Color.WHITE)
+	shield_numbers=_text(player_shield,"",9,Color.WHITE)
+	for readout: Label in [xp_numbers,player_numbers,shield_numbers]:
 		readout.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;readout.vertical_alignment=VERTICAL_ALIGNMENT_CENTER;readout.clip_text=true
 		readout.add_theme_color_override("font_outline_color",Color("06121a"));readout.add_theme_constant_override("outline_size",3)
 	target_panel=_panel(ui)
@@ -634,11 +774,20 @@ func _build_ui() -> void:
 		var index=i
 		var button=_orb(ui,"",icons[["cannonball","chain","harpoon"][i]],func():sim.set_ammo(index);_refresh_ui())
 		button.name="Ammo%d" % i;button.toggle_mode=true;ammo_buttons.append(button)
+	for key: String in CONTENT.SUPPLY_KEYS:
+		var supply=key
+		var config: Dictionary=CONTENT.SUPPLIES[key]
+		var button=_orb(ui,"%s · %s" % [config.name,config.effect],painted[config.icon],func():_use_supply(supply),str(config.short))
+		button.name="Supply_"+key;supply_buttons[key]=button
+	page_button=_orb(ui,"Schnellleiste umschalten · Q",null,_flip_page,"1/2");page_button.name="PageButton"
+	page_button.set("pager",true)
 	target_cycle=_orb(ui,"Nächstes sichtbares Ziel · Tab",painted.spyglass,_cycle_target,"ZIEL")
-	ammo_selector=_orb(ui,"Munitionsauswahl",painted.nav_supplies,func():_open_modal("Munition"),"VORRAT")
+	ammo_selector=_orb(ui,"Munition & Gegenstände",painted.nav_supplies,func():_open_modal("Munition"),"VORRAT")
 	loadout_button=_orb(ui,"Bewaffnung",extra_icons.cannon_0,func():_open_modal("Bewaffnung"),"WAFFEN")
-	camera_pad=CAMERA_PAD.new();camera_pad.steering=pad_steers;camera_pad.wheel=painted.helm_wheel;ui.add_child(camera_pad)
+	camera_pad=CAMERA_PAD.new();ui.add_child(camera_pad)
 	interact=_button(ui,"",_interact);interact.name="InteractButton"
+	buff_bar=Control.new();buff_bar.mouse_filter=Control.MOUSE_FILTER_IGNORE;buff_bar.name="BuffBar"
+	buff_bar.draw.connect(_draw_buffs);ui.add_child(buff_bar)
 	status=_text(ui,"",12,Color("e2ecee"));status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
 	status.clip_text=true
 	status.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -711,11 +860,13 @@ func _layout() -> void:
 	_place(kills_label,row+8,3+row,wallet-row-10,row)
 	var meters=140.0 if compact else 204.0
 	var meter_x=s.x-meters-8
-	for i in 2:_place(meter_tags[i],meter_x,3+i*row,28,row)
-	_place(player_xp,meter_x+28,5,meters-28,row-4)
-	_place(player_hp,meter_x+28,5+row,meters-28,row-4)
-	_place(xp_numbers,0,0,player_xp.size.x,player_xp.size.y)
-	_place(player_numbers,0,0,player_hp.size.x,player_hp.size.y)
+	var meter_row=(header-6)/3.0
+	var bars: Array[ProgressBar]=[player_xp,player_hp,player_shield]
+	var readouts: Array[Label]=[xp_numbers,player_numbers,shield_numbers]
+	for i in 3:
+		_place(meter_tags[i],meter_x,3+i*meter_row,34,meter_row)
+		_place(bars[i],meter_x+34,4+i*meter_row,meters-34,meter_row-2)
+		_place(readouts[i],0,0,bars[i].size.x,bars[i].size.y)
 	var nav_left=wallet+8
 	var nav_span=meter_x-10-nav_left
 	var nw=minf(nav_span/nav_buttons.size(),98.0)
@@ -739,6 +890,7 @@ func _layout() -> void:
 	var tx=card_h
 	_place(target_name,tx,3,column-tx-6,18);_place(target_hp,tx,22,column-tx-10,8);_place(target_numbers,tx,31,column-tx-6,card_h-33)
 	_place(interact,left,target_y+card_h+6,column,34)
+	_place(buff_bar,left,target_y+card_h+46,column,30)
 	# Chart with corner controls, as on classic sea-chart clients.
 	var mw=136.0 if compact else 190.0
 	var mh=118.0 if compact else 160.0
@@ -766,9 +918,15 @@ func _layout() -> void:
 	_place(ammo_buttons[1],fx-orb-gap,s.y-orb*2-10-gap,orb,orb)
 	_place(ammo_buttons[2],fx+fire*.5-orb-gap*.5,fy-orb-gap,orb,orb)
 	_place(repair,fx+fire*.5+gap*.5,fy-orb-gap,orb,orb)
-	var hot: Array[Button]=[target_cycle,ammo_selector,loadout_button]
+	# Page two swaps the three ammunition slots for items; powder keeps its own slot above the chain shot.
+	_place(supply_buttons.powder,fx-orb-gap,ammo_buttons[1].position.y-orb-gap,orb,orb)
+	for i in 3:
+		var item: Button=supply_buttons[["repair_kit","shield_charge","plates"][i]]
+		_place(item,ammo_buttons[i].position.x,ammo_buttons[i].position.y,orb,orb)
+	var hot: Array[Button]=[target_cycle,ammo_selector,loadout_button,page_button]
 	var row_x=fx-orb-gap
 	for i in hot.size():_place(hot[hot.size()-1-i],row_x-(i+1)*(orb+gap),s.y-orb-10,orb,orb)
+	_apply_page()
 	var toast_w=minf(380.0,2.0*(ammo_buttons[1].position.x-s.x*.5)-16.0)
 	_place(status,(s.x-toast_w)*.5,s.y-orb-40,toast_w,24)
 	status.set_meta("room",toast_w)
@@ -802,13 +960,36 @@ func _thousands(value: int) -> String:
 
 func _refresh_ui() -> void:
 	if gold_label==null:return
+	var today=Time.get_date_string_from_system()
+	var quest_ready=not sim.current_quest().is_empty() and sim.quest_progress()>=int(sim.current_quest().goal)
 	for nav: Button in nav_buttons:
-		nav.set("latched",modal.visible and modal_kind==str(nav.get_meta("modal")));nav.queue_redraw()
+		var kind=str(nav.get_meta("modal"))
+		var badge=""
+		var alert=false
+		match kind:
+			"Logbuch":
+				badge="!" if quest_ready else "";alert=quest_ready
+			"Bonuskarten":
+				var stock=0
+				for amount in sim.scrolls:stock+=int(amount)
+				badge="!" if not sim.bonus.is_empty() else (str(stock) if stock>0 else "")
+				alert=not sim.bonus.is_empty() or sim.fragments>=int(CONTENT.BONUS_TIERS[0].fragments)
+				if alert and badge.is_empty():badge="+"
+			"Kessel":
+				badge=str(sim.essence);alert=sim.free_flask_ready(today)
+			"Gilde":
+				badge="%d'" % ceili(sim.fortress_hold/60.0) if sim.guild_island_held() else ""
+		nav.set("quantity",badge);nav.set("badge_alert",alert)
+		nav.set("latched",modal.visible and modal_kind==kind);nav.queue_redraw()
 	gold_label.text=_thousands(int(sim.player.gold))
 	kills_label.text="%s versenkt" % _thousands(sim.kills)
 	player_hp.max_value=sim.player.max_hp
 	player_hp.value=sim.player.hp
 	player_numbers.text="%s / %s" % [_thousands(int(sim.player.hp)),_thousands(int(sim.player.max_hp))]
+	player_shield.max_value=maxf(1.0,float(sim.player.max_shield))
+	player_shield.value=sim.player.shield
+	shield_numbers.text="%s / %s" % [_thousands(int(sim.player.shield)),_thousands(int(sim.player.max_shield))]
+	buff_bar.queue_redraw()
 	player_xp.max_value=maxi(1,sim.xp_required())
 	player_xp.value=sim.xp
 	xp_numbers.text="LV. %d · %s / %s" % [sim.level,_thousands(sim.xp),_thousands(sim.xp_required())]
@@ -822,17 +1003,20 @@ func _refresh_ui() -> void:
 				var preview=AtlasTexture.new();preview.atlas=beast
 				preview.region=Rect2(Vector2.ZERO,beast.get_size()/Vector2(CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS))
 				target_portrait.texture=preview
+			elif selected.kind=="tower":target_portrait.texture=painted["tower_"+str(selected.tower)]
 			else:target_portrait.texture=_ship_preview(atlas_textures[int(selected.art)],0)
-		target_name.text=str(selected.name)
+		target_name.text=("[%s] " % sim.tower_tag() if selected.kind=="tower" else "")+str(selected.name)
 		target_hp.max_value=selected.max_hp
 		target_hp.value=selected.hp
 		var disposition="IM KAMPF" if sim.npc_engages(selected) else ("FEINDLICH" if CONTENT.MAPS[sim.map_id].npc_hostile else "NEUTRAL")
+		if selected.kind=="tower" and sim.tower_friendly():disposition="GILDENTURM"
 		target_health_skin.bg_color=Color("c9573f") if bool(selected.aggressive) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) else Color("cfae55")
-		target_numbers.text="%s / %s HP\n%s · %d m"%[_thousands(int(selected.hp)),_thousands(int(selected.max_hp)),disposition,roundi(sim.player.pos.distance_to(selected.pos))]
+		var shield_text=" · Schild %s" % _thousands(int(selected.shield)) if float(selected.get("max_shield",0))>0 else ""
+		target_numbers.text="%s / %s HP%s\n%s · %d m"%[_thousands(int(selected.hp)),_thousands(int(selected.max_hp)),shield_text,disposition,roundi(sim.player.pos.distance_to(selected.pos))]
 	attack.text="STOPP" if sim.firing else "FEUER"
 	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0 or sim.docked
 	_set_orb(attack,extra_icons.cannon_action,"",sim.firing,attack.text)
-	attack.set("cooldown",float(sim.player.reload)/1.65)
+	attack.set("cooldown",float(sim.player.reload)/sim.reload_time())
 	attack.set("state_label",_combat_state())
 	repair.disabled=sim.docked
 	repair.text="STOPP" if sim.repairing else "REPARATUR"
@@ -842,6 +1026,18 @@ func _refresh_ui() -> void:
 		ammo_buttons[i].set_pressed_no_signal(sim.ammo_mode==i)
 		_set_orb(ammo_buttons[i],icons[["cannonball","chain","harpoon"][i]],_thousands(int(sim.player.ammo[i])),sim.ammo_mode==i)
 		ammo_buttons[i].tooltip_text=["Vollkugeln: gegen Schiffe","Kettenkugeln: verlangsamen Schiffe","Harpunen: gegen Monster"][i]
+	for key: String in CONTENT.SUPPLY_KEYS:
+		var item: Button=supply_buttons[key]
+		var config: Dictionary=CONTENT.SUPPLIES[key]
+		var stock=int(sim.supplies[key])
+		var active=(sim.powder_on if key=="powder" else sim.plates_on) if bool(config.toggle) else false
+		var wait=float(sim.cooldowns.get(key,0.0))
+		_set_orb(item,painted[config.icon],_thousands(stock),active,str(config.short))
+		item.set("cooldown",wait/float(config.get("cooldown",1.0)))
+		item.set("state_label","%d s" % ceili(wait) if wait>0 else ("AN" if active else ""))
+		item.disabled=sim.docked or int(sim.player.hp)<=0 or (stock<=0 and not active)
+	_set_orb(page_button,null,"",quick_page==1,"%d/2" % (quick_page+1))
+	page_button.set("state_label","SCHUTZ" if quick_page==1 else "MUNITION")
 	_set_orb(ammo_selector,painted.nav_supplies,"",modal.visible and modal_kind=="Munition","VORRAT")
 	_set_orb(target_cycle,painted.spyglass,"",false,"ZIEL")
 	_set_orb(loadout_button,extra_icons.cannon_0,"",modal.visible and modal_kind=="Bewaffnung","WAFFEN")
@@ -855,13 +1051,28 @@ func _refresh_ui() -> void:
 	status.position.x=ui.size.x*.5-toast_w*.5;status.size.x=toast_w
 	var quest = sim.current_quest()
 	var claimable=not quest.is_empty() and sim.quest_progress()>=int(quest.goal)
+	var raid=sim.in_bonus_map() and not sim.bonus.is_empty()
+	if raid:
+		claimable=false
+		quest_icon.texture=painted.boss_wave
+		var tier: Dictionary=CONTENT.BONUS_TIERS[int(sim.bonus.tier)]
+		var wave=mini(int(sim.bonus.wave),CONTENT.BONUS_WAVES.size()-1)
+		var title="%s · WELLE %d/%d" % [str(tier.name).to_upper(),wave+1,CONTENT.BONUS_WAVES.size()]
+		match str(sim.bonus.state):
+			"break":quest_text.text="%s\n%s formiert sich · %d s" % [title,CONTENT.BONUS_WAVES[wave].label,ceili(float(sim.bonus.timer))]
+			"fight":quest_text.text="%s\n%s · noch %d Gegner" % [title,CONTENT.BONUS_WAVES[wave].label,sim.bonus_wave_alive()]
+			_:quest_text.text="%s GESCHAFFT\nTruhe geborgen · Karte verlassen" % str(tier.name).to_upper()
+	else:
+		quest_icon.texture=painted.nav_quests
+		quest_text.text="ALLE AUFTRÄGE ERLEDIGT\nDas Logbuch bleibt offen" if quest.is_empty() else "%s · %d/%d\n%d Gold · %d EP" % [str(quest.name).to_upper(),mini(sim.quest_progress(),int(quest.goal)),quest.goal,quest.gold,quest.xp]
 	quest_claim.visible=claimable
 	quest_claim.disabled=not claimable
-	quest_text.text="ALLE AUFTRÄGE ERLEDIGT\nDas Logbuch bleibt offen" if quest.is_empty() else "%s · %d/%d\n%d Gold · %d EP" % [str(quest.name).to_upper(),mini(sim.quest_progress(),int(quest.goal)),quest.goal,quest.gold,quest.xp]
 	quest_text.size.x=quest_panel.size.x-quest_panel.size.y-(86 if claimable else 8)
-	interact.visible=sim.docked or sim.near_portal()>=0 or sim.can_dock() or sim.pending_portal>=0
+	interact.visible=sim.in_bonus_map() or sim.docked or sim.near_portal()>=0 or sim.can_dock() or sim.pending_portal>=0
 	interact.disabled=false
-	if sim.docked:
+	if sim.in_bonus_map():
+		interact.text="BONUSKARTE VERLASSEN"
+	elif sim.docked:
 		interact.text="ABLEGEN"
 	elif sim.near_portal()>=0:
 		var region: Dictionary=CONTENT.MAPS[sim.near_portal()]
@@ -894,10 +1105,11 @@ func _combat_state() -> String:
 	if sim.docked:return "IM HAFEN"
 	var victim=sim.actor(sim.target)
 	if victim.is_empty() or float(victim.hp)<=0:return "ZIEL WÄHLEN"
+	if victim.kind=="tower" and sim.tower_friendly():return "GILDENTURM"
 	if (victim.kind=="monster")!=(sim.ammo_mode==2):return "WAFFE WECHSELN"
 	if int(sim.player.ammo[sim.ammo_mode])<(1 if sim.ammo_mode==2 else 3):return "MUNITION LEER"
 	if sim.player.pos.distance_to(victim.pos)>530:return "ZU WEIT"
-	if not sim.segment_free(sim.player.pos,victim.pos):return "INSEL IM WEG"
+	if victim.kind!="tower" and not sim.segment_free(sim.player.pos,victim.pos):return "INSEL IM WEG"
 	if float(sim.player.reload)>0:return ("LÄDT %.1f s" % float(sim.player.reload)).replace(".",",")
 	return "BEREIT"
 
@@ -906,6 +1118,47 @@ func _toggle_fire() -> void:
 	sim.firing=not sim.firing
 	sim.repairing=false
 	_refresh_ui()
+
+func _use_supply(key: String) -> void:
+	if bool(CONTENT.SUPPLIES[key].toggle):sim.toggle_supply(key)
+	else:sim.use_supply(key)
+	_refresh_ui()
+
+func _flip_page() -> void:
+	quick_page=1-quick_page
+	_apply_page()
+	_refresh_ui()
+
+func _apply_page() -> void:
+	for i in 3:
+		ammo_buttons[i].visible=quick_page==0
+		supply_buttons[["repair_kit","shield_charge","plates"][i]].visible=quick_page==1
+
+## Active effects with remaining sea time; emergency cooldowns live on their own orbs.
+func _draw_buffs() -> void:
+	var entries: Array=[]
+	if sim.has_blessing():entries.append([painted.crystal_blessing,_clock_text(float(sim.buffs.blessing)),Color("c69bff")])
+	if float(sim.buffs.tide_deck)>0:entries.append([painted.tide_deck,_clock_text(float(sim.buffs.tide_deck)),Color("5fe0d2")])
+	if sim.guild_island_held():entries.append([painted.nav_guild,_clock_text(sim.fortress_hold),Color("9fe7a8")])
+	var x=0.0
+	var h=buff_bar.size.y
+	for entry: Array in entries:
+		var text: String=entry[1]
+		var w=h+6+font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,11).x+10
+		var skin=StyleBoxFlat.new();skin.bg_color=Color(0.02,0.06,0.08,.82);skin.set_corner_radius_all(int(h*.5))
+		skin.border_color=entry[2];skin.set_border_width_all(1)
+		buff_bar.draw_style_box(skin,Rect2(x,0,w,h))
+		buff_bar.draw_texture_rect(entry[0],Rect2(x+3,3,h-6,h-6),false)
+		buff_bar.draw_string_outline(font,Vector2(x+h+3,h*.5+4),text,HORIZONTAL_ALIGNMENT_LEFT,-1,11,3,Color("06121a"))
+		buff_bar.draw_string(font,Vector2(x+h+3,h*.5+4),text,HORIZONTAL_ALIGNMENT_LEFT,-1,11,Color("f3e0b6"))
+		x+=w+6
+		if x>buff_bar.size.x-40:break
+
+func _clock_text(seconds: float) -> String:
+	var total=ceili(seconds)
+	var hours=floori(total/3600.0)
+	var minutes=floori((total%3600)/60.0)
+	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
 func _open_modal(kind: String) -> void:
 	camera_pad.release()
@@ -918,23 +1171,51 @@ func _open_modal(kind: String) -> void:
 		child.queue_free()
 	_layout()
 	if kind=="Schiff":
-		_info(str(skins[int(sim.player.skin)].name).to_upper(),CYAN)
+		_info(("[%s] " % sim.guild.tag if not sim.guild.is_empty() else "")+str(skins[int(sim.player.skin)].name).to_upper(),CYAN)
 		_picture(modal_body,skin_previews[int(sim.player.skin)],120)
-		_info("Kapitän Lv. %d · Erfahrung %d / %d\nRumpf %d / %d · Fahrt %d\nKanonen St. %d · Harpunen St. %d" % [sim.level,sim.xp,sim.xp_required(),sim.player.hp,sim.player.max_hp,sim.player.speed,sim.upgrades.cannon,sim.upgrades.harpoon])
+		_info("Kapitän Lv. %d · Erfahrung %d / %d\nRumpf %s / %s · Schild %s / %s\nFahrt %d · Nachladen %s s" % [sim.level,sim.xp,sim.xp_required(),_thousands(int(sim.player.hp)),_thousands(int(sim.player.max_hp)),_thousands(int(sim.player.shield)),_thousands(int(sim.player.max_shield)),sim.player.speed,("%.2f" % sim.reload_time()).replace(".",",")])
+		_info("KANONEN · %d an Bord · %d Plätze · %d feuern je Salve" % [sim.player.cannons,sim.cannon_slots(),sim.equipped_cannons()],CYAN)
+		var mounted: Array[String]=[]
+		for slot in 2:
+			var index=int(sim.deck_slots[slot])
+			mounted.append("Platz %d: %s" % [slot+1,_deck_title(sim.decks[index]) if index>=0 else "frei"])
+		if float(sim.buffs.tide_deck)>0:mounted.append("Gezeitendeck aktiv · %s" % _clock_text(float(sim.buffs.tide_deck)))
+		_info("DECKS\n"+"\n".join(mounted))
+		_info("VORRÄTE · Pulver %d · Platten %d · Notreparatur %d · Schildladung %d" % [sim.supplies.powder,sim.supplies.plates,sim.supplies.repair_kit,sim.supplies.shield_charge])
+		_action("DECKS VERWALTEN",func():_open_modal("Decks"))
+		_action("KASTELLE",func():_open_modal("Kastelle"))
 		_action("SCHIFFSDESIGN WÄHLEN",func():_open_modal("Werft"))
 		_action("BEWAFFNUNG",func():_open_modal("Bewaffnung"))
 	elif kind=="Munition":
-		modal_title.text="Munitionsauswahl"
+		modal_title.text="Munition & Gegenstände"
+		_text(modal_body,"KANONENKUGEL-AUSWAHL",13,CYAN)
 		for i in 3:
 			var index=i
 			var row=HBoxContainer.new();row.add_theme_constant_override("separation",12);modal_body.add_child(row)
-			_picture(row,icons[["cannonball","chain","harpoon"][i]],58)
+			_picture(row,icons[["cannonball","chain","harpoon"][i]],52)
 			var column=VBoxContainer.new();column.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(column)
 			column.add_theme_constant_override("separation",2)
-			var label=_text(column,"%s · %d\n%d Schaden · %s" % [["Vollkugeln","Kettenkugeln","Harpunen"][i],sim.player.ammo[i],sim.weapon_damage(i),["Gegen Schiffe","Verlangsamt Schiffe","Gegen Seeungeheuer"][i]],12,CYAN)
+			var boost=" · ×1,4 mit Pulver" if i<2 else ""
+			var label=_text(column,"%s · %d\n%d Schaden%s · %s" % [["Vollkugeln","Kettenkugeln","Harpunen"][i],sim.player.ammo[i],sim.weapon_damage(i),boost,["Gegen Schiffe und Türme","Verlangsamt Schiffe","Gegen Seeungeheuer"][i]],12,CYAN)
 			label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 			var choose=_button(column,"GELADEN" if sim.ammo_mode==i else "LADEN",func():sim.set_ammo(index);modal.hide();_refresh_ui())
 			choose.custom_minimum_size.y=28;choose.add_theme_font_size_override("font_size",11);choose.disabled=sim.ammo_mode==i or int(sim.player.ammo[i])<=0
+		_text(modal_body,"GEGENSTÄNDE",13,CYAN)
+		for key: String in CONTENT.SUPPLY_KEYS:
+			var supply=key
+			var config: Dictionary=CONTENT.SUPPLIES[key]
+			var row=HBoxContainer.new();row.add_theme_constant_override("separation",12);modal_body.add_child(row)
+			_picture(row,painted[config.icon],52)
+			var column=VBoxContainer.new();column.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(column)
+			column.add_theme_constant_override("separation",2)
+			var label=_text(column,"%s · %d\n%s" % [config.name,sim.supplies[key],config.effect],12,CYAN)
+			label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+			var active=(sim.powder_on if key=="powder" else sim.plates_on) if bool(config.toggle) else false
+			var wait=float(sim.cooldowns.get(key,0.0))
+			var text=("AUSSCHALTEN" if active else "EINSCHALTEN") if bool(config.toggle) else ("LÄDT %d s" % ceili(wait) if wait>0 else "EINSETZEN")
+			var use=_button(column,text,func():_use_supply(supply);_open_modal("Munition"))
+			use.custom_minimum_size.y=28;use.add_theme_font_size_override("font_size",11)
+			use.disabled=sim.docked or wait>0 or (int(sim.supplies[key])<=0 and not active)
 	elif kind=="Werft":
 		_info("SCHIFFSDESIGNS · %d Karten, nach Namen sortiert." % skins.size(),CYAN)
 		var order: Array[int]=[]
@@ -978,7 +1259,7 @@ func _open_modal(kind: String) -> void:
 			b.custom_minimum_size.y=48
 	elif kind=="Bewaffnung":
 		_info("BEWAFFNUNG · KANONEN & HARPUNEN",CYAN)
-		_info("Kanonen Stufe %d · Harpunen Stufe %d\nBreitseite: 3 Geschosse · Nachladen: 1,65 Sekunden" % [sim.upgrades.cannon,sim.upgrades.harpoon])
+		_info("Bugkastell Stufe %d · Jagdkastell Stufe %d\n%d von %d Kanonen feuern · Breitseite: 3 Geschosse · Nachladen: %s Sekunden" % [sim.upgrades.cannon,sim.upgrades.harpoon,sim.equipped_cannons(),sim.player.cannons,("%.2f" % sim.reload_time()).replace(".",",")])
 		for i in 3:
 			var index=i
 			var row=HBoxContainer.new();row.add_theme_constant_override("separation",12);modal_body.add_child(row)
@@ -992,7 +1273,9 @@ func _open_modal(kind: String) -> void:
 		_action("AUSRÜSTUNG & NACHSCHUB IM HAFEN",func():_open_modal("Hafen"))
 	elif kind=="Hafen":
 		_info("PORT AZUR · AUSRÜSTUNG & VERSORGUNG" if sim.map_id==0 else "HAFEN · AUSRÜSTUNG & VERSORGUNG",CYAN)
-		if not sim.docked:
+		if not sim.has_harbor():
+			_info("Bonuskarten haben keinen Hafen. Über BONUSKARTE VERLASSEN kehrst du zurück; die aktuelle Welle bleibt gespeichert.")
+		elif not sim.docked:
 			_info("Fahre zum goldenen Hafensymbol und docke an. Dein Schiff liegt dort geschützt; die Patrouillen fahren weiter. Distanz: %d m." % roundi(sim.player.pos.distance_to(sim.harbor)))
 			_action("KURS ZUM HAFEN",func():sim.course(sim.harbor);modal.hide())
 			var dock_button = _action("ANDOCKEN",func():
@@ -1000,19 +1283,33 @@ func _open_modal(kind: String) -> void:
 				_refresh_ui())
 			dock_button.disabled=not sim.can_dock()
 		else:
-			_info("Kapitänsstufe %d · %d Gold · %d / %d Rumpfpunkte" % [sim.level,sim.player.gold,sim.player.hp,sim.player.max_hp])
+			_info("Kapitänsstufe %d · %s Gold · Rumpf %s / %s" % [sim.level,_thousands(int(sim.player.gold)),_thousands(int(sim.player.hp)),_thousands(int(sim.player.max_hp))])
 			var repair_cost = sim.harbor_repair_cost()
 			var repair_button = _action("TROCKENDOCK · %d Gold" % repair_cost,func():sim.harbor_repair();_save_progress();_open_modal("Hafen");_refresh_ui())
 			repair_button.disabled=repair_cost<=0 or int(sim.player.gold)<repair_cost
-			for key in CONTENT.UPGRADE_KEYS:
-				_upgrade_row(str(key))
+			var built=0
+			for key in CONTENT.UPGRADE_KEYS:built+=int(sim.upgrades[key])
+			_action("KASTELLE · %d / %d STUFEN" % [built,CONTENT.UPGRADE_KEYS.size()*CONTENT.CASTLE_MAX],func():_open_modal("Kastelle"))
+			_info("VORRÄTE",CYAN)
+			for key: String in CONTENT.SUPPLY_KEYS:
+				var supply=key
+				var config: Dictionary=CONTENT.SUPPLIES[key]
+				var buy=_action("%d× %s · %d Gold" % [config.pack,config.name,config.price],func():sim.buy_supply(supply);_save_progress();_open_modal("Hafen");_refresh_ui())
+				buy.disabled=int(sim.player.gold)<int(config.price)
+			_info("KANONEN · %d an Bord · %d Plätze" % [sim.player.cannons,sim.cannon_slots()],CYAN)
+			var cannons=_action("2 KANONEN · %d Gold" % sim.cannon_price() if int(sim.player.cannons)<sim.MAX_CANNONS else "KANONENDECK VOLL",func():sim.buy_cannons();_save_progress();_open_modal("Hafen");_refresh_ui())
+			cannons.disabled=int(sim.player.cannons)>=sim.MAX_CANNONS or int(sim.player.gold)<sim.cannon_price()
 			_info("MUNITIONSNACHSCHUB",CYAN)
 			for i in 3:
 				var index = i
 				var buy = _action(["150 Vollkugeln","60 Kettenkugeln","40 Harpunen"][i]+" · 30 Gold",func():sim.buy_ammo(index);_save_progress();_open_modal("Hafen");_refresh_ui())
 				buy.disabled=int(sim.player.gold)<30
+			_action("DECKS & DECKWERFT",func():_open_modal("Decks"))
+			_action("GEZEITENKESSEL",func():_open_modal("Kessel"))
 			_action("SCHIFFSDESIGN WÄHLEN · %d DESIGNS" % skins.size(),func():_open_modal("Werft"))
 			_action("ABLEGEN",func():sim.depart();modal.hide();_save_progress();_refresh_ui())
+		if not sim.docked:_action("KASTELLE ANSEHEN",func():_open_modal("Kastelle"))
+		_action("SEEKARTEN",func():_open_modal("Seekarten"))
 		_action("UPDATES PRÜFEN",func():
 			_save_progress()
 			get_tree().set_meta("abyssal_manual_update",true)
@@ -1036,11 +1333,25 @@ func _open_modal(kind: String) -> void:
 	elif kind=="Rangliste":
 		var ranks=["Schiffsjunge","Matrose","Bootsmann","Steuermann","Leutnant","Kapitän","Kommodore","Admiral"]
 		_info("KAPITÄNSRANG · %s" % ranks[clampi(floori((sim.level-1)/2.5),0,ranks.size()-1)].to_upper(),CYAN)
-		_info("Kapitänsstufe %d · Erfahrung %s / %s\nGold %s\nVersenkte Schiffe %d · davon Elite %d\nSeeungeheuer %d · Beutekisten %d\nAufträge %d / %d · Seegebiete %d / %d" % [sim.level,_thousands(sim.xp),_thousands(sim.xp_required()),_thousands(int(sim.player.gold)),sim.kills,sim.elite_kills,sim.monster_kills,sim.loot_collected,mini(sim.quest_index,CONTENT.QUESTS.size()),CONTENT.QUESTS.size(),sim.visited.count(true),CONTENT.MAPS.size()])
+		_info("Kapitänsstufe %d · Erfahrung %s / %s\nGold %s\nVersenkte Schiffe %d · davon Elite %d\nSeeungeheuer %d · Beutekisten %d\nAufträge %d / %d · Seegebiete %d / %d" % [sim.level,_thousands(sim.xp),_thousands(sim.xp_required()),_thousands(int(sim.player.gold)),sim.kills,sim.elite_kills,sim.monster_kills,sim.loot_collected,mini(sim.quest_index,CONTENT.QUESTS.size()),CONTENT.QUESTS.size(),sim.visited.count(true),CONTENT.REGION_COUNT])
+		_info("Bonuskarten geschafft %d · Kesselwürfe %d\nZerstörte Türme %d · Festungseroberungen %d\nGilde %s" % [sim.bonus_runs,sim.kessel_throws,sim.tower_kills,sim.fortress_conquests,"[%s] %s" % [sim.guild.tag,sim.guild.name] if not sim.guild.is_empty() else "keine"])
 		_info("Diese Rangliste zählt deinen Fortschritt auf diesem Gerät. Ranglisten gegen andere Kapitäne und Gilden kommen mit dem Online-Server.",Color("84999c"))
+	elif kind=="Decks":
+		_open_decks()
+	elif kind=="Kastelle":
+		_info("KASTELLE · DAUERHAFTE HAFENAUSBAUTEN",CYAN)
+		_info("Sechs Kastelle mit je %d Stufen. Stufe 1 bis 3 sind sofort offen, danach kommt alle drei Kapitänsstufen eine weitere hinzu. Aktuell offen: bis Stufe %d." % [CONTENT.CASTLE_MAX,sim.castle_cap()])
+		if not sim.docked:_info("Ausbauen kannst du nur angedockt im Hafen.",Color("edc68c"))
+		for key in CONTENT.UPGRADE_KEYS:_upgrade_row(str(key))
+	elif kind=="Kessel":
+		_open_kessel()
+	elif kind=="Bonuskarten":
+		_open_bonus()
+	elif kind=="Gilde":
+		_open_guild()
 	elif kind=="Seekarten":
 		_info("DREI SEEGEBIETE · PORTALE VERBINDEN DIE SEEKARTEN",CYAN)
-		for i in CONTENT.MAPS.size():
+		for i in CONTENT.REGION_COUNT:
 			var region: Dictionary = CONTENT.MAPS[i]
 			var index = i
 			var locked = sim.level<int(region.level)
@@ -1056,8 +1367,10 @@ func _open_modal(kind: String) -> void:
 			var text = "DU BIST HIER" if i==sim.map_id else ("GESPERRT · LV. %d" % region.level if locked else ("PORTAL BETRETEN" if sim.near_portal()==i else "KURS ZUM PORTAL"))
 			var travel_button = _button(column,text,func():_navigate_region(index))
 			travel_button.custom_minimum_size.y=44
-			travel_button.disabled=i==sim.map_id or locked or sim.docked
+			travel_button.disabled=i==sim.map_id or locked or sim.docked or sim.in_bonus_map()
 		_info("Tippe auf ein Portal oder auf KURS ZUM PORTAL. Dein Schiff fährt hin und wechselt beim Erreichen automatisch. Levelgrenzen bleiben gültig; nach einem Treffer wartet das Portal 6 Sekunden. Im Hafen zuerst ablegen.")
+		_info("BONUSKARTEN · Bronzeriff B-1, Silberbucht B-2 und Goldene Lagune B-3 öffnest du mit Schriftrollen.",CYAN)
+		_action("BONUSKARTEN",func():_open_modal("Bonuskarten"))
 		_action("STEUERUNG & SPIELINFO",func():_open_modal("Spielinfo"))
 	elif kind=="Anzeige":
 		_info("DEINE SEEKARTE · DEINE OBERFLÄCHE",CYAN)
@@ -1068,13 +1381,14 @@ func _open_modal(kind: String) -> void:
 			choice.disabled=hud_size==i
 		_action("AUFTRAGSLEISTE: "+("EIN" if journal_visible else "AUS"),func():_set_display(hud_size,not journal_visible))
 		_action("JOYSTICK: "+("EIN" if camera_pad_visible else "AUS"),func():camera_pad_visible=not camera_pad_visible;_set_display(hud_size,journal_visible))
-		_action("JOYSTICK STEUERT: "+("SCHIFF" if pad_steers else "KAMERA"),func():pad_steers=not pad_steers;_set_display(hud_size,journal_visible))
-		_info("Die Auftragsleiste oben links öffnet das Logbuch. Joystick als Kamera: Seekarte erkunden, das Schiff hält seinen Kurs. Joystick als Steuer: Schiff direkt lenken. Fadenkreuz an der Karte: zurück zum Schiff. Fernrohr: nächstes sichtbares Ziel.")
-		_action("STANDARD WIEDERHERSTELLEN",func():camera_pad_visible=true;pad_steers=false;_set_display(1,true))
+		_info("Die Auftragsleiste oben links öffnet das Logbuch. Der Joystick bewegt nur die Kamera: Seekarte erkunden, das Schiff hält seinen Kurs. Gefahren wird per Antippen. Fadenkreuz an der Karte: zurück zum Schiff. Fernrohr: nächstes sichtbares Ziel.")
+		_action("STANDARD WIEDERHERSTELLEN",func():camera_pad_visible=true;_set_display(1,true))
 	else:
-		_action("UPDATES PRÜFEN",func():_save_progress();get_tree().set_meta("abyssal_manual_update",true);get_tree().change_scene_to_file("res://updater/launcher.tscn"))
+		_action("SEEKARTEN",func():_open_modal("Seekarten"))
+		_action("KASTELLE",func():_open_modal("Kastelle"))
 		_action("ANZEIGE & HUD ANPASSEN",func():_open_modal("Anzeige"))
-		var info =_text(modal_body,"ABYSSAL DOMINION · STEUERUNG\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nHAFEN: Andocken, Rumpf reparieren und Kanonen, Harpunen, Rumpf oder Segel verbessern.\nLOGBUCH: Sieben aufeinanderfolgende Aufträge.\nKARTEN: Portale zur Karibischen See, zum Nordmeer und zu den Schattengewässern.\n\nZwei Finger / Mausrad / Plus und Minus an der Karte: Zoom. Joystick links unten oder Ziehen / rechte Maustaste: Kamera; in der Anzeige auch als Steuer wählbar. Fernrohr / Tab: nächstes Ziel.\nDas Fadenkreuz an der Karte zentriert die Kamera. Die Randleisten zeigen Spalten und Reihen der Seekarte. Portale antippen: hinfahren und automatisch wechseln.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",15)
+		_action("UPDATES PRÜFEN",func():_save_progress();get_tree().set_meta("abyssal_manual_update",true);get_tree().change_scene_to_file("res://updater/launcher.tscn"))
+		var info =_text(modal_body,"ABYSSAL DOMINION · STEUERUNG\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe und Türme, Harpunen gegen Seeungeheuer.\nFahre über Beute, um Gold einzusammeln, und durch glitzernde Strömungen für Gezeitenessenz.\n\nRUMPF & SCHILD: Der Schild fängt Treffer zuerst ab und lädt sich 8 Sekunden nach dem letzten Treffer wieder auf. REP repariert den Rumpf ohne Gegenstand.\nSCHNELLLEISTE: Pulver schaltet +40 % Salvenschaden ein und verbraucht nur bei einer gültigen Salve. Der Pfeilknopf wechselt zu Notreparatur, Schildladung und Panzerplatten.\n\nHAFEN: Trockendock, Vorräte, Kanonen, Decks und Kastelle.\nKESSEL: Gezeitenessenz einwerfen, offene Preistabelle, Meilensteine bei 10, 25, 50 und 100.\nBONUSKARTEN: Fragmente zu Schriftrollen zusammensetzen, fünf Wellen mit Checkpoint.\nGILDE: Kürzel vor dem Schiffsnamen, Korsarenfestung mit vier Türmen in den Schattengewässern.\n\nZwei Finger / Mausrad / Plus und Minus an der Karte: Zoom. Joystick links unten oder Ziehen / rechte Maustaste: Kamera. Fernrohr / Tab: nächstes Ziel. Tasten 1 bis 3 Munition, 4 bis 7 Gegenstände, Q Schnellleiste.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",15)
 		info.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		info.custom_minimum_size.y=300
 	modal_body.size.x=modal_scroll.size.x
@@ -1110,16 +1424,209 @@ func _upgrade_row(key: String) -> void:
 	row.add_theme_constant_override("separation",12)
 	modal_body.add_child(row)
 	var art_key = key+"_%d" % mini(2,int(sim.upgrades[key])) if key in ["cannon","harpoon"] else str(config.icon)
-	_picture(row,extra_icons[art_key],88)
+	_picture(row,_art(art_key),80)
 	var column = VBoxContainer.new()
 	column.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	row.add_child(column)
-	var label = _text(column,"%s · Stufe %d/3\n%s" % [config.name,sim.upgrades[key],config.effect],14,CYAN)
+	var stage=int(sim.upgrades[key])
+	var label = _text(column,"%s · %s · Stufe %d/%d\n%s" % [config.name,config.role,stage,CONTENT.CASTLE_MAX,config.effect],14,CYAN)
 	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	var cost: int=sim.upgrade_cost(key)
-	var button = _button(column,"MAXIMALE STUFE" if cost<0 else "VERBESSERN · %d Gold" % cost,func():sim.buy_upgrade(key);_save_progress();_open_modal("Hafen");_refresh_ui())
+	var gated=cost>=0 and stage>=sim.castle_cap()
+	var text="MAXIMALE STUFE" if cost<0 else ("AB KAPITÄNSSTUFE %d" % ((stage-2)*3) if gated else "VERBESSERN · %d Gold" % cost)
+	var button = _button(column,text,func():sim.buy_upgrade(key);_save_progress();_open_modal("Kastelle");_refresh_ui())
 	button.custom_minimum_size.y=44
-	button.disabled=cost<0 or int(sim.player.gold)<cost
+	button.disabled=cost<0 or gated or not sim.docked or int(sim.player.gold)<cost
+
+func _deck_title(deck: Dictionary) -> String:
+	return "%s %s" % [CONTENT.DECKS[str(deck.type)].name,CONTENT.DECK_TIERS[int(deck.tier)]]
+
+func _deck_effect(deck: Dictionary) -> String:
+	var config: Dictionary=CONTENT.DECKS[str(deck.type)]
+	return str(config.effect) % int(config.values[int(deck.tier)])
+
+func _banner(texture: Texture2D,height: float) -> void:
+	var frame=TextureRect.new()
+	frame.texture=texture
+	frame.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	frame.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	frame.custom_minimum_size=Vector2(0,height)
+	frame.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	frame.clip_contents=true
+	frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	modal_body.add_child(frame)
+
+func _row(texture: Texture2D,text: String,size: float=64.0) -> VBoxContainer:
+	var row=HBoxContainer.new();row.add_theme_constant_override("separation",12);modal_body.add_child(row)
+	if texture!=null:_picture(row,texture,size)
+	var column=VBoxContainer.new();column.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(column)
+	column.add_theme_constant_override("separation",4)
+	var label=_text(column,text,14,CYAN);label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	return column
+
+func _row_button(parent: Node,text: String,callback: Callable,disabled: bool=false) -> Button:
+	var button=_button(parent,text,callback)
+	button.custom_minimum_size.y=40
+	button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	button.disabled=disabled
+	return button
+
+const DECK_ART := {"cannon":"cannon_1","armor":"upgrade_hull","hunter":"harpoon_1","navigation":"upgrade_sails","logistics":"castle_crew"}
+
+func _open_decks() -> void:
+	_info("DECKS · ZWEI DECKPLÄTZE · JEDER TYP NUR EINMAL",CYAN)
+	for slot in 2:
+		var place=slot
+		var index=int(sim.deck_slots[slot])
+		if index<0:
+			_info("Platz %d · frei" % (slot+1),Color("bac7c7"))
+			continue
+		var column=_row(_art(DECK_ART[str(sim.decks[index].type)]),"Platz %d · %s\n%s" % [slot+1,_deck_title(sim.decks[index]),_deck_effect(sim.decks[index])],52)
+		_row_button(column,"ABBAUEN",func():sim.unequip_deck(place);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
+	var tide=float(sim.buffs.tide_deck)
+	_row(painted.tide_deck,"GEZEITENDECK · "+("aktiv %s · +10 Kanonenplätze" % _clock_text(tide) if tide>0 else "nicht aktiv · aus Gezeitenkessel und Meilensteinen"),52)
+	if not sim.docked:_info("Decks werden angedockt im Hafen umgebaut.",Color("edc68c"))
+	_info("DECKLAGER · %d DECKS" % sim.decks.size(),CYAN)
+	if sim.decks.is_empty():_info("Noch keine Decks. Stufe I gibt es in der Deckwerft, höhere Stufen aus Bonuskarten und dem Kessel.",Color("bac7c7"))
+	for i in sim.decks.size():
+		var index=i
+		var deck: Dictionary=sim.decks[i]
+		var column=_row(_art(DECK_ART[str(deck.type)]),"%s\n%s" % [_deck_title(deck),_deck_effect(deck)],52)
+		var buttons=HBoxContainer.new();buttons.add_theme_constant_override("separation",6);column.add_child(buttons)
+		for slot in 2:
+			var place=slot
+			var here=int(sim.deck_slots[slot])==i
+			_row_button(buttons,("MONTIERT %d" if here else "PLATZ %d") % (slot+1),func():sim.equip_deck(index,place);_save_progress();_open_modal("Decks");_refresh_ui(),here or not sim.docked)
+	if sim.docked:
+		_info("DECKWERFT · STUFE I",CYAN)
+		for key: String in CONTENT.DECK_KEYS:
+			var type=key
+			var config: Dictionary=CONTENT.DECKS[key]
+			var owned=sim.owns_deck(key,0)
+			var buy=_action(("%s I · VORHANDEN" if owned else "%s I · %d Gold") % ([config.name] if owned else [config.name,config.price]),func():sim.buy_deck(type);_save_progress();_open_modal("Decks");_refresh_ui())
+			buy.disabled=owned or int(sim.player.gold)<int(config.price)
+	_info("Doppelte Decks werden automatisch in %d Gezeitenessenz umgewandelt." % CONTENT.DUPLICATE_DECK_ESSENCE,Color("bac7c7"))
+
+func _open_kessel() -> void:
+	modal_title.text="Gezeitenkessel"
+	_banner(painted.kessel_scene,150)
+	_info("GEZEITENESSENZ · %d" % sim.essence,CYAN)
+	var today=Time.get_date_string_from_system()
+	if not sim.docked:
+		_info("Der Kessel steht im Hafen. Essenz sammelst du auf See: glitzernde Strömungen, versenkte Gegner, Aufträge, Bonuskarten und die Korsarenfestung.",Color("edc68c"))
+	var flask=_action("TAGESFLASCHE · KOSTENLOS" if sim.free_flask_ready(today) else "TAGESFLASCHE · MORGEN WIEDER",func():_kessel_results(sim.claim_free_flask(today)))
+	flask.disabled=not sim.docked or not sim.free_flask_ready(today)
+	var throws=HBoxContainer.new();throws.add_theme_constant_override("separation",6);modal_body.add_child(throws)
+	for amount: int in CONTENT.KESSEL_THROWS:
+		var count=amount
+		var button=_row_button(throws,"×%d" % amount,func():_kessel_results(sim.throw_kessel(count,today)),not sim.docked or sim.essence<amount)
+		button.custom_minimum_size.y=46
+		button.add_theme_font_size_override("font_size",16)
+	var meter=_bar(modal_body)
+	meter.max_value=CONTENT.KESSEL_CYCLE;meter.value=sim.kessel_meter;meter.custom_minimum_size.y=16
+	var meter_style: StyleBoxFlat=meter.get_theme_stylebox("fill").duplicate();meter_style.bg_color=Color("3fc7b8");meter.add_theme_stylebox_override("fill",meter_style)
+	var steps: Array[String]=[]
+	for milestone: Dictionary in CONTENT.KESSEL_MILESTONES:
+		steps.append("%s %d: %s" % ["✓" if sim.kessel_meter>=int(milestone.at) else "·",milestone.at,milestone.name])
+	_info("KESSELMETER · %d / %d\n%s" % [sim.kessel_meter,CONTENT.KESSEL_CYCLE,"\n".join(steps)])
+	if not kessel_log.is_empty():
+		_info("LETZTE WÜRFE",CYAN)
+		var recent=kessel_log.duplicate();recent.reverse()
+		_info("\n".join(PackedStringArray(recent.slice(0,8))),Color("e2ecee"))
+	_info("PREISTABELLE · offen einsehbar",CYAN)
+	var table: Array[String]=[]
+	for entry: Dictionary in CONTENT.KESSEL_POOL:
+		var pack=" ×%d" % int(entry.amount) if int(entry.amount)>1 and str(entry.id)!="tide_deck" else ""
+		table.append("%d %% · %s%s · %s" % [entry.weight,entry.name,pack,CONTENT.RARITIES[int(entry.rarity)]])
+	_info("\n".join(table),Color("bac7c7"))
+	_info("Doppelte Decks werden in %d Essenz umgewandelt. Essenz gibt es nur im Spiel, nicht gegen Echtgeld." % CONTENT.DUPLICATE_DECK_ESSENCE,Color("84999c"))
+
+func _kessel_results(results: Array) -> void:
+	for result: Dictionary in results:
+		kessel_log.append("%s%s · %s" % ["★ " if bool(result.get("milestone",false)) else "",result.text,CONTENT.RARITIES[clampi(int(result.rarity),0,3)]])
+	while kessel_log.size()>24:kessel_log.pop_front()
+	_save_progress()
+	_open_modal("Kessel")
+	_refresh_ui()
+
+func _open_bonus() -> void:
+	_info("BONUSKARTEN · FÜNF WELLEN · CHECKPOINT NACH JEDER WELLE",CYAN)
+	_info("Schriftrollenfragmente %d · Schriftrollen: Bronze %d · Silber %d · Gold %d\nAbgeschlossene Bonuskarten %d" % [sim.fragments,sim.scrolls[0],sim.scrolls[1],sim.scrolls[2],sim.bonus_runs])
+	if not sim.bonus.is_empty():
+		var tier: Dictionary=CONTENT.BONUS_TIERS[int(sim.bonus.tier)]
+		var done=str(sim.bonus.state)=="done"
+		var text="%s-BONUSKARTE · %s" % [str(tier.name).to_upper(),"GESCHAFFT" if done else "WELLE %d/%d" % [mini(int(sim.bonus.wave)+1,CONTENT.BONUS_WAVES.size()),CONTENT.BONUS_WAVES.size()]]
+		if done and sim.bonus.has("chest"):text+="\nTruhe: "+str(sim.bonus.chest)
+		var column=_row(painted.reward_chest if done else painted.boss_wave,text,64)
+		if sim.in_bonus_map():_row_button(column,"BONUSKARTE VERLASSEN",func():modal.hide();_interact())
+	for i in CONTENT.BONUS_TIERS.size():
+		var index=i
+		var tier: Dictionary=CONTENT.BONUS_TIERS[i]
+		var region: Dictionary=CONTENT.MAPS[int(tier.map)]
+		var running=not sim.bonus.is_empty() and int(sim.bonus.tier)==i
+		var column=_row(painted.scroll_fragment,"%s-SCHRIFTROLLE · %s %s\nAb Lv. %d · Gegnerstärke ×%s · %d Fragmente" % [str(tier.name).to_upper(),region.name,region.code,tier.level,str(region.enemy_scale).replace(".",","),tier.fragments],64)
+		var buttons=HBoxContainer.new();buttons.add_theme_constant_override("separation",6);column.add_child(buttons)
+		_row_button(buttons,"ZUSAMMENSETZEN",func():sim.craft_scroll(index);_save_progress();_open_modal("Bonuskarten");_refresh_ui(),sim.fragments<int(tier.fragments))
+		var blocked=sim.in_bonus_map() or sim.level<int(tier.level) or (not running and (int(sim.scrolls[i])<=0 or not sim.bonus.is_empty()))
+		_row_button(buttons,"FORTSETZEN" if running else ("AB LV. %d" % tier.level if sim.level<int(tier.level) else "STARTEN"),func():_start_bonus(index),blocked)
+	_info("WELLEN · 1 Eröffnung · 2 Druck · 3 Elite · 4 Admiral · 5 Leviathan",CYAN)
+	_info("Jede Welle zahlt Gold und 1 Gezeitenessenz. Die Truhe am Ende enthält Pulver, Platten, eine Notreparatur, einen Kristallsegen und ein Deck der Kartenstufe.\nKein Lebenssystem: Wirst du versenkt, geht es nach 8 Sekunden an derselben Welle weiter. Verlassen speichert die aktuelle Welle.")
+	_info("Fragmente gibt es aus dem Kessel und der Korsarenfestung.",Color("84999c"))
+
+func _start_bonus(tier: int) -> void:
+	if sim.docked:sim.depart()
+	sim.start_bonus(tier)
+	if previous_region!=sim.map_id:_sync_region()
+	else:_open_modal("Bonuskarten")
+	_refresh_ui()
+
+func _line_edit(placeholder: String,limit: int) -> LineEdit:
+	var field=LineEdit.new()
+	field.placeholder_text=placeholder
+	field.max_length=limit
+	field.custom_minimum_size.y=44
+	field.add_theme_font_size_override("font_size",16)
+	field.add_theme_color_override("font_color",Color("f3e0b6"))
+	var skin=StyleBoxFlat.new();skin.bg_color=Color("0b1d26");skin.border_color=Color("67583f");skin.set_border_width_all(1);skin.set_corner_radius_all(4);skin.set_content_margin_all(8)
+	field.add_theme_stylebox_override("normal",skin)
+	var focus=skin.duplicate();focus.border_color=GOLD
+	field.add_theme_stylebox_override("focus",focus)
+	modal_body.add_child(field)
+	return field
+
+func _open_guild() -> void:
+	_info("GILDE · LOKALE VORSCHAU",CYAN)
+	_info("Gilden laufen in dieser Version lokal auf deinem Gerät. Mitglieder, Gildenchat und Gildenkriege kommen mit dem Online-Server.",Color("84999c"))
+	if sim.guild.is_empty():
+		_info("Gründe deine Gilde für %d Gold. Das Kürzel steht vor deinem Schiffsnamen und auf gehaltenen Türmen." % CONTENT.GUILD_COST)
+		guild_name_input=_line_edit("Gildenname · 3 bis 24 Zeichen",24)
+		guild_tag_input=_line_edit("Kürzel · 2 bis 4 Buchstaben oder Ziffern",4)
+		var found=_action("GILDE GRÜNDEN · %d Gold" % CONTENT.GUILD_COST,func():
+			sim.found_guild(guild_name_input.text,guild_tag_input.text)
+			_save_progress();_open_modal("Gilde");_refresh_ui())
+		found.disabled=int(sim.player.gold)<CONTENT.GUILD_COST
+	else:
+		_info("[%s] %s · Anführer: du (lokal)" % [sim.guild.tag,sim.guild.name],Color("ffd27a"))
+	_info("GILDENINSEL · KORSARENFESTUNG",CYAN)
+	var towers=HBoxContainer.new();towers.add_theme_constant_override("separation",6);modal_body.add_child(towers)
+	for config: Dictionary in CONTENT.TOWERS:_picture(towers,painted["tower_"+str(config.kind)],64)
+	var state=""
+	if sim.guild_island_held():state="[%s] hält die Insel noch %s · +10 %% Beutegold · die Türme feuern nicht auf dich" % [sim.guild.tag,_clock_text(sim.fortress_hold)]
+	elif sim.map_id==CONTENT.FORTRESS_MAP:state="Gehalten von [%s] · %d von %d Türmen stehen" % [CONTENT.FORTRESS_TAG,sim.towers_alive(),CONTENT.TOWERS.size()]
+	else:state="Schattengewässer %s · ab Lv. %d · gehalten von [%s]" % [CONTENT.MAPS[CONTENT.FORTRESS_MAP].code,CONTENT.MAPS[CONTENT.FORTRESS_MAP].level,CONTENT.FORTRESS_TAG]
+	_info(state)
+	_info("Kanonenturm: Doppelschuss · Mörserturm: weite Bögen · Kettenturm: bremst · Wächterturm: lädt die Schilde der anderen Türme. Zerstöre alle vier für +900 Gold, +3 Essenz und +2 Fragmente. Mit Gilde hältst du die Insel 30 Minuten.",Color("bac7c7"))
+	_info("Eroberungen %d · zerstörte Türme %d" % [sim.fortress_conquests,sim.tower_kills])
+	if sim.map_id==CONTENT.FORTRESS_MAP:
+		var course=_action("KURS ZUR FESTUNG",func():
+			var island: Dictionary=sim.fortress_island()
+			sim.course(Vector2(island.bounds.get_center().x,island.bounds.end.y+140))
+			modal.hide();_refresh_ui())
+		course.disabled=sim.docked
+	else:
+		var travel=_action("KURS SCHATTENGEWÄSSER",func():_navigate_region(CONTENT.FORTRESS_MAP))
+		travel.disabled=sim.docked or sim.in_bonus_map() or sim.level<int(CONTENT.MAPS[CONTENT.FORTRESS_MAP].level)
+	if not sim.guild.is_empty():_action("GILDE AUFLÖSEN",func():sim.leave_guild();_save_progress();_open_modal("Gilde");_refresh_ui())
 
 func _sync_region() -> void:
 	previous_region=sim.map_id
@@ -1140,7 +1647,10 @@ func _chart_course(point: Vector2) -> void:
 	sim.course(point);_refresh_ui()
 
 func _interact() -> void:
-	if sim.docked:
+	if sim.in_bonus_map():
+		sim.leave_bonus()
+		if previous_region!=sim.map_id:_sync_region()
+	elif sim.docked:
 		sim.depart()
 		modal.hide()
 	elif sim.near_portal()>=0:
@@ -1210,11 +1720,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode==KEY_1:sim.set_ammo(0)
 		if event.keycode==KEY_2:sim.set_ammo(1)
 		if event.keycode==KEY_3:sim.set_ammo(2)
+		var hotkeys=[KEY_4,KEY_5,KEY_6,KEY_7]
+		if event.keycode in hotkeys:_use_supply(CONTENT.SUPPLY_KEYS[hotkeys.find(event.keycode)])
+		if event.keycode==KEY_Q:_flip_page()
 
 func _hud_contains(screen: Vector2) -> bool:
 	if modal.visible:return true
-	var controls: Array[Control]=[chrome,target_panel,chart_mini,quest_panel,attack,repair,ammo_selector,loadout_button,center_button,settings_button,target_cycle,camera_pad,zoom_in,zoom_out,interact]
+	var controls: Array[Control]=[chrome,target_panel,chart_mini,quest_panel,attack,repair,ammo_selector,loadout_button,center_button,settings_button,target_cycle,camera_pad,zoom_in,zoom_out,interact,page_button]
 	controls.append_array(ammo_buttons)
+	for item: Button in supply_buttons.values():controls.append(item)
 	for control: Control in controls:
 		if control.is_visible_in_tree() and control.get_global_rect().has_point(screen):return true
 	return false
@@ -1259,16 +1773,14 @@ func _load_display() -> void:
 	hud_size=clampi(int(data.get("hud_size",1)),0,2)
 	journal_visible=bool(data.get("journal_visible",true))
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
-	pad_steers=bool(data.get("pad_steers",false))
 
 func _set_display(size_index: int,show_journal: bool) -> void:
 	hud_size=clampi(size_index,0,2)
 	journal_visible=show_journal
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"pad_steers":pad_steers}))
+		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible}))
 		file.close()
-	if camera_pad!=null:camera_pad.set("steering",pad_steers)
 	_layout()
 	_open_modal("Anzeige")
 	_refresh_ui()
@@ -1276,22 +1788,6 @@ func _set_display(size_index: int,show_journal: bool) -> void:
 func _pan_camera(direction: Vector2,delta: float) -> void:
 	if direction==Vector2.ZERO:return
 	_shift_camera(direction*620.0*maxf(delta,0.0)/camera.zoom)
-
-func _steer(direction: Vector2,delta: float) -> void:
-	if direction==Vector2.ZERO:
-		steer_clock=0.0
-		return
-	steer_clock-=delta
-	if steer_clock>0 or sim.docked or int(sim.player.hp)<=0:return
-	steer_clock=0.18
-	var goal: Vector2=sim.player.pos+direction.normalized()*220.0
-	if sim.blocked(goal) or not sim.segment_free(sim.player.pos,goal):
-		sim.message="Küste voraus · andere Richtung wählen"
-		return
-	sim.pending_portal=-1;sim.repairing=false
-	sim.player.path=[goal]
-	sim.message="Freie Fahrt"
-	pan=Vector2.ZERO;camera_locked=true;camera_anchor=sim.player.pos
 
 func _shift_camera(offset: Vector2) -> void:
 	if camera_locked:camera_anchor=sim.player.pos+pan
