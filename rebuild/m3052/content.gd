@@ -109,3 +109,49 @@ const TOWERS := [
 	{"kind":"guardian", "name":"Wächterturm", "hp":1900, "range":390.0, "damage":28, "shots":2, "reload":2.2, "offset":Vector2(0.0,0.06)}
 ]
 const GUILD_COST := 300
+## Staff: roles carry permission lists, never hard-coded powers. Online, the server issues and
+## verifies roles; this test build unlocks them with local codes stored only as SHA-256 hashes.
+const STAFF_ENVIRONMENT := "TEST · LOKAL"
+const STAFF_CODE_SALT := "abyssal-staff:"
+const STAFF_PERMISSIONS := {
+	"presence":"Sichtbarkeit wechseln", "inspect":"Ziele inspizieren", "moderate":"Moderation",
+	"teleport":"Teleport auf der Karte", "map":"Kartenwechsel per Teleport", "summon":"Ziele herbeirufen",
+	"ship":"Staff-Schiffswerte", "spawn":"Gegner und Übungsziele erzeugen", "world":"Welt-Werkzeuge",
+	"grant":"Gegenstände gewähren", "audit":"Protokoll einsehen"}
+const STAFF_ROLE_ORDER := ["ADMIN","GM","MOD","QA"]
+const STAFF_ROLES := {
+	"ADMIN":{"name":"Administrator", "badge":"ADM", "color":Color("ff6a4d"), "code_sha256":"81bc757120c494c3adf767943b4f0bb80809cf4eed439d37d90bdd0f58da706c",
+		"permissions":["presence","inspect","moderate","teleport","map","summon","ship","spawn","world","grant","audit"]},
+	"GM":{"name":"Game Master", "badge":"GM", "color":Color("ffc04d"), "code_sha256":"357be708eaa149775a2fe75a035016ead9642b52485a8cb5de1813f0a8ca8489",
+		"permissions":["presence","inspect","moderate","teleport","map","summon","ship","spawn","world","audit"]},
+	"MOD":{"name":"Moderator", "badge":"MOD", "color":Color("4fc3ff"), "code_sha256":"2d144429d36a979d75571ad273e39d2a08f1c8d86e9954375cb537d0f7e294f5",
+		"permissions":["presence","inspect","moderate","audit"]},
+	"QA":{"name":"Qualitätssicherung", "badge":"QA", "color":Color("7be07b"), "code_sha256":"ca7877db550cc694a163841018d4b22d4024e3aae9f69429ccc14c7fb9f3ace8",
+		"permissions":["presence","inspect","teleport","map","ship","spawn","world","audit"]}
+}
+const STAFF_PRESENCE_ORDER := ["official","normal","ghost","spectator"]
+const STAFF_PRESENCE := {
+	"official":{"name":"OFFIZIELL", "effect":"Abzeichen, Aura und Kartenmarker sichtbar"},
+	"normal":{"name":"NORMAL", "effect":"Fährt wie ein Kapitän, ohne Abzeichen"},
+	"ghost":{"name":"GEIST", "effect":"Unsichtbar für Kapitäne, Gegner greifen nicht an"},
+	"spectator":{"name":"ZUSCHAUER", "effect":"Nur beobachten · kein Feuer, kein Ziel für Gegner"}
+}
+const STAFF_FLAG_ORDER := ["god","no_aggro","speed","instant_reload","unlimited_ammo","no_collision"]
+const STAFF_FLAGS := {
+	"god":"Unverwundbar", "no_aggro":"Kein Aggro", "speed":"Eilfahrt ×2,5",
+	"instant_reload":"Sofort nachladen", "unlimited_ammo":"Munition unbegrenzt", "no_collision":"Kollision aus"
+}
+const STAFF_SPAWN_ORDER := ["dummy","ship","elite","admiral","monster"]
+const STAFF_SPAWNS := {
+	"dummy":{"name":"Übungsziel", "hp":6000}, "ship":{"name":"Patrouille", "hp":420},
+	"elite":{"name":"Elite-Schiff", "hp":760}, "admiral":{"name":"Admiral", "hp":2660}, "monster":{"name":"Leviathan", "hp":2310}
+}
+const STAFF_GRANT_ORDER := ["gold","essence","fragments","scrolls","supplies","ammo","decks","blessing","tide_deck","flask","level"]
+const STAFF_GRANTS := {
+	"gold":"10.000 Gold", "essence":"25 Gezeitenessenz", "fragments":"16 Fragmente", "scrolls":"je 1 Schriftrolle",
+	"supplies":"je 10 Vorräte", "ammo":"Munition auffüllen", "decks":"alle Decks Stufe III", "blessing":"Kristallsegen 15 min",
+	"tide_deck":"Gezeitendeck 30 min", "flask":"Tagesflasche zurücksetzen", "level":"Kapitänsstufe +1"
+}
+## Guild tags that imitate staff badges are refused, including digit look-alikes such as 4DM or M0D.
+const RESERVED_TAGS := ["ADM","ADMN","GM","GMS","MOD","MODS","QA","STAF","DEV","DEVS","TEAM","SYS","SUPP","GOD","OP","OPS","TEST"]
+const RESERVED_PREFIXES := ["ADM","MOD","GM"]

@@ -1,6 +1,8 @@
 extends RefCounted
 const CONTENT = preload("res://content.gd")
 const NAV=preload("res://navigation.gd")
+const STAFF=preload("res://staff.gd")
+const LOOKALIKE := {"0":"O","1":"I","3":"E","4":"A","5":"S","7":"T","8":"B"}
 var island_shapes: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/island_collision.json")).entries
 ## Independent fixed-step sea simulation. No dependency on legacy map scripts.
 const WORLD := Vector2(4400, 3200)
@@ -66,6 +68,9 @@ var harbor := Vector2(1920,1450)
 var base_islands: Array[Dictionary] = []
 var base_npcs: Array[Dictionary] = []
 var map_states: Dictionary = {}
+var staff := STAFF.new()
+var staff_kills := 0
+var staff_marked := false
 var message := "Seekarte antippen: Kurs setzen · Schiff antippen: Ziel wählen"
 
 func _init() -> void:
@@ -221,7 +226,9 @@ func course(point: Vector2) -> bool:
 	pending_portal=-1
 	if docked: return false
 	if int(player.hp) <= 0: return false
-	var route = plan_path(player.pos, point)
+	var route: Array[Vector2] = []
+	if staff.flag("no_collision"): route.append(point.clamp(Vector2(40, 40), WORLD - Vector2(40, 40)))
+	else: route = plan_path(player.pos, point)
 	if route.is_empty():
 		message = "Küste voraus · bitte freies Wasser wählen"
 		return false
@@ -479,6 +486,8 @@ func step(delta: float) -> void:
 
 func _move(body: Dictionary, delta: float) -> void:
 	var travel = float(body.speed) * (0.55 if float(body.slow) > 0 else 1.0) * delta
+	var phasing := int(body.id) == 0 and staff.flag("no_collision")
+	if int(body.id) == 0 and staff.flag("speed"): travel *= 2.5
 	while travel > 0.01 and not body.path.is_empty():
 		var goal: Vector2 = body.path[0]
 		var gap: Vector2 = goal - body.pos
@@ -489,7 +498,7 @@ func _move(body: Dictionary, delta: float) -> void:
 		body.heading = gap.normalized()
 		var amount = minf(travel, gap.length())
 		var next: Vector2 = body.pos + body.heading * amount
-		if not segment_free(body.pos, next):
+		if not phasing and not segment_free(body.pos, next):
 			body.path = []
 			return
 		body.pos = next
@@ -498,6 +507,7 @@ func _move(body: Dictionary, delta: float) -> void:
 
 func npc_engages(npc: Dictionary) -> bool:
 	if docked or int(player.hp)<=0: return false
+	if staff.hidden() or staff.flag("no_aggro"): return false
 	if npc.kind == "tower": return not tower_friendly() and npc.pos.distance_to(player.pos) <= float(npc.range)
 	# Bonus-wave hunters chase anywhere on their instance.
 	if bool(npc.get("hunter",false)): return true
@@ -523,7 +533,7 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 		_step_tower(npc, delta)
 		return
 	if int(npc.hp) <= 0:
-		if bool(npc.get("wave",false)): return
+		if bool(npc.get("wave",false)) or bool(npc.get("staff_spawn",false)): return
 		npc.respawn -= delta
 		if float(npc.respawn) <= 0:
 			npc.hp = npc.max_hp
@@ -531,6 +541,10 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 			npc.pos = npc.home
 			npc.aggressive = false
 			npc.path = []
+		return
+	if bool(npc.get("frozen",false)):
+		npc.path = []
+		npc.state = "frozen"
 		return
 	npc.reload = maxf(0, float(npc.reload) - delta)
 	npc.slow = maxf(0, float(npc.slow) - delta)
@@ -561,6 +575,10 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 
 func _fire_player() -> void:
 	if docked or int(player.hp)<=0: return
+	if staff.spectating():
+		message = "Zuschauer-Modus · kein Feuer"
+		firing = false
+		return
 	var victim = actor(target)
 	if victim.is_empty() or int(victim.hp) <= 0:
 		firing = false
@@ -583,11 +601,12 @@ func _fire_player() -> void:
 		player.reload = 0.3
 		return
 	var count = 1 if ammo_mode == 2 else 3
-	if int(player.ammo[ammo_mode]) < count:
+	var unlimited := staff.flag("unlimited_ammo")
+	if not unlimited and int(player.ammo[ammo_mode]) < count:
 		message = "Munition leer · Nachschub in der Werft"
 		firing = false
 		return
-	player.ammo[ammo_mode] -= count
+	if not unlimited: player.ammo[ammo_mode] -= count
 	var damage := float(weapon_damage(ammo_mode))
 	if bool(victim.elite) or victim.kind == "tower": damage *= 1.0 + 0.1 * float(upgrades.war)
 	var powdered := powder_on and ammo_mode < 2 and int(supplies.powder) > 0
@@ -596,7 +615,7 @@ func _fire_player() -> void:
 		supplies.powder -= 1
 		if int(supplies.powder) <= 0: powder_on = false
 	_launch(0, target, AMMO_NAMES[ammo_mode], roundi(damage), count)
-	player.reload = reload_time()
+	player.reload = 0.25 if staff.flag("instant_reload") else reload_time()
 	victim.aggressive = true
 	repairing = false
 	message = ("Breitseite mit Schwarzpulver!" if powdered else "Breitseite!") if ammo_mode != 2 else "Harpune abgefeuert"
@@ -634,6 +653,7 @@ func _step_shots(delta: float) -> void:
 
 ## Shields absorb first; armor plates reduce the player's incoming damage before that.
 func apply_damage(victim: Dictionary, amount: int) -> int:
+	if int(victim.id) == 0 and (staff.flag("god") or staff.hidden()): return 0
 	var dealt := amount
 	if int(victim.id) == 0 and plates_on and int(supplies.plates) > 0:
 		dealt = roundi(float(dealt) * 0.65)
@@ -665,6 +685,11 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 			message = "Versenkt · neuer Versuch in 8 Sekunden" if in_bonus_map() else "Versenkt · Rückkehr in 8 Sekunden"
 		elif int(shot.source) == 0:
 			if target == int(victim.id): firing = false
+			# Staff results never reach rankings, quests or the economy.
+			if staff.active() or bool(victim.get("staff_spawn", false)):
+				staff_kills += 1
+				message = "%s versenkt · Staff-Abschuss zählt nicht" % victim.name
+				return
 			if victim.kind == "tower":
 				tower_kills += 1
 				award_xp(80)
@@ -869,7 +894,7 @@ func leave_bonus() -> bool:
 	var saved: Array = bonus.origin_pos
 	var finished := str(bonus.state) == "done"
 	if finished:
-		bonus_runs += 1
+		if not staff.active() and not bool(bonus.get("staff", false)): bonus_runs += 1
 		bonus = {}
 	else:
 		bonus.state = "break"
@@ -972,11 +997,22 @@ func _finish_wave() -> void:
 	var scale := float(CONTENT.MAPS[map_id].enemy_scale)
 	var wave := int(bonus.wave)
 	var gold := roundi(80.0 * float(wave + 1) * scale)
-	player.gold += gold
-	essence += 1
-	award_xp(40 * (wave + 1))
-	_event("essence", player.pos, 1, 0)
+	var scored := not staff.active() and not bool(bonus.get("staff", false))
+	if scored:
+		player.gold += gold
+		essence += 1
+		award_xp(40 * (wave + 1))
+		_event("essence", player.pos, 1, 0)
 	bonus.wave = wave + 1
+	if not scored:
+		if int(bonus.wave) >= CONTENT.BONUS_WAVES.size():
+			bonus.state = "done"
+			bonus.chest = "Staff-Testlauf · keine Truhe"
+		else:
+			bonus.state = "break"
+			bonus.timer = 4.0
+		message = "Welle %d geschafft · Staff-Test ohne Belohnung" % (wave + 1)
+		return
 	if int(bonus.wave) >= CONTENT.BONUS_WAVES.size():
 		bonus.state = "done"
 		var chest := roundi(500.0 * scale)
@@ -1010,6 +1046,9 @@ func found_guild(title: String, tag: String) -> bool:
 	if not valid or tag == CONTENT.FORTRESS_TAG:
 		message = "Kürzel: 2 bis 4 Buchstaben oder Ziffern"
 		return false
+	if reserved_tag(tag):
+		message = "Kürzel [%s] ist dem Spielteam vorbehalten" % tag
+		return false
 	if int(player.gold) < CONTENT.GUILD_COST:
 		message = "Gildengründung kostet %d Gold" % CONTENT.GUILD_COST
 		return false
@@ -1017,6 +1056,15 @@ func found_guild(title: String, tag: String) -> bool:
 	guild = {"name": title, "tag": tag}
 	message = "Gilde [%s] %s gegründet" % [tag, title]
 	return true
+
+## Staff badges are reserved, including digit look-alikes such as 4DM or M0D.
+static func reserved_tag(tag: String) -> bool:
+	var plain := ""
+	for character in tag.to_upper(): plain += str(LOOKALIKE.get(character, character))
+	if plain in CONTENT.RESERVED_TAGS: return true
+	for prefix: String in CONTENT.RESERVED_PREFIXES:
+		if plain.begins_with(prefix): return true
+	return false
 
 func leave_guild() -> bool:
 	if guild.is_empty(): return false
@@ -1103,6 +1151,389 @@ func _check_fortress() -> void:
 		for npc in npcs:
 			if npc.kind == "tower": npc.respawn = 6.0
 		message = "Korsarenfestung erobert · [%s] hält die Gildeninsel 30 Minuten" % guild.tag
+
+# --- Staff tools -------------------------------------------------------------------
+# Every tool validates its input, then asks staff.authorize(), which writes the audit entry.
+
+const STAFF_SPAWN_CAP := 12
+const STAFF_PLACES := ["harbor","start","portal_east","portal_west","fortress"]
+var staff_inspected := -1
+
+func staff_sign_in(code: String) -> bool:
+	if staff.active():
+		message = "Bereits angemeldet · %s" % staff.title()
+		return false
+	if not staff.sign_in(code, export_save()):
+		message = "Staff-Zugang abgelehnt · Code prüfen"
+		return false
+	staff_inspected = -1
+	message = "Staff-Zugang · %s · %s" % [staff.title(), CONTENT.STAFF_ENVIRONMENT]
+	return true
+
+## Restoring rewinds to the snapshot taken at sign-in; keeping marks the save as staff-modified.
+func staff_sign_out(restore: bool) -> bool:
+	if not staff.active(): return false
+	var snapshot: Dictionary = staff.snapshot.duplicate(true)
+	var restored := restore and not snapshot.is_empty()
+	var touched := staff.touched
+	if bool(bonus.get("staff", false)) and in_bonus_map():
+		var origin := clampi(int(bonus.origin), 0, CONTENT.REGION_COUNT - 1)
+		var saved: Array = bonus.origin_pos
+		bonus = {}
+		configure_map(origin)
+		_arrive(_free_water(Vector2(float(saved[0]), float(saved[1]))))
+	staff.sign_out(restored)
+	_clear_staff_spawns()
+	for npc in npcs: npc.erase("frozen")
+	if restored:
+		map_states.clear()
+		restore_save(snapshot)
+		target = -1
+		firing = false
+		shots.clear()
+		events.clear()
+		pending_portal = -1
+		message = "Staff abgemeldet · Spielstand wie vor der Anmeldung"
+	else:
+		if touched: staff_marked = true
+		message = "Staff abgemeldet · Änderungen behalten" + (" · Spielstand markiert" if touched else "")
+	staff_inspected = -1
+	return true
+
+func _staff_allow(permission: String, action: String, detail: String = "") -> bool:
+	if not staff.active():
+		message = "Kein Staff-Zugang aktiv"
+		return false
+	if staff.authorize(permission, action, detail): return true
+	message = "Recht fehlt · %s" % CONTENT.STAFF_PERMISSIONS.get(permission, permission)
+	return false
+
+func staff_set_presence(mode: String) -> bool:
+	if not mode in CONTENT.STAFF_PRESENCE_ORDER or mode == staff.presence: return false
+	if not _staff_allow("presence", "Sichtbarkeit", CONTENT.STAFF_PRESENCE[mode].name): return false
+	staff.presence = mode
+	if staff.hidden(): _calm_all()
+	if staff.spectating(): firing = false
+	message = "Sichtbarkeit: %s · %s" % [CONTENT.STAFF_PRESENCE[mode].name, CONTENT.STAFF_PRESENCE[mode].effect]
+	return true
+
+func staff_toggle(key: String) -> bool:
+	if not CONTENT.STAFF_FLAGS.has(key): return false
+	var on := not staff.flag(key)
+	if not _staff_allow("ship", CONTENT.STAFF_FLAGS[key], "an" if on else "aus"): return false
+	staff.flags[key] = on
+	if key == "no_aggro" and on: _calm_all()
+	message = "%s %s" % [CONTENT.STAFF_FLAGS[key], "an" if on else "aus"]
+	return true
+
+func staff_set_tap_teleport(on: bool) -> bool:
+	if on == staff.tap_teleport: return false
+	if on and not _staff_allow("teleport", "Tipp-Teleport", "an"): return false
+	staff.tap_teleport = on
+	if not on: staff.record("Tipp-Teleport", "aus")
+	message = "Tipp-Teleport %s" % ("an · Wasser antippen, um dorthin zu springen" if on else "aus")
+	return true
+
+func _calm_all() -> void:
+	for npc in npcs:
+		npc.aggressive = false
+		if npc.kind != "tower": npc.path = []
+	shots = shots.filter(func(shot: Dictionary) -> bool: return int(shot.target) != 0)
+
+func staff_ship(action: String) -> bool:
+	if not action in ["repair","cleanse","cooldowns"]: return false
+	var names := {"repair":"Rumpf und Schild voll", "cleanse":"Effekte und Treffersperre gelöscht", "cooldowns":"Abklingzeiten zurückgesetzt"}
+	if not _staff_allow("ship", "Schiff", names[action]): return false
+	match action:
+		"repair":
+			if int(player.hp) <= 0: player.respawn = 0.0
+			player.hp = player.max_hp
+			player.shield = player.max_shield
+			repairing = false
+		"cleanse":
+			player.slow = 0.0
+			player.last_hit = -100.0
+		"cooldowns":
+			for key in cooldowns.keys(): cooldowns[key] = 0.0
+			player.reload = 0.0
+	staff.touched = true
+	message = "Staff · %s" % names[action]
+	return true
+
+func staff_place_point(place: String) -> Vector2:
+	match place:
+		"harbor": return harbor + Vector2(70, 50)
+		"portal_east": return portals[0].pos - Vector2(170, 0) if portals.size() > 0 else START
+		"portal_west": return portals[1].pos + Vector2(170, 0) if portals.size() > 1 else START
+		"fortress":
+			var island := fortress_island()
+			if island.is_empty(): return Vector2(-1, -1)
+			return Vector2(island.bounds.get_center().x, island.bounds.end.y + 150.0)
+	return START
+
+## Staff teleport ignores level gates and the 6-second rule. Other maps need the "map" right.
+func staff_teleport(destination: int, place: String = "start", point: Vector2 = Vector2(-1, -1)) -> bool:
+	if destination < 0 or destination >= CONTENT.MAPS.size(): return false
+	if point.x < 0 and not place in STAFF_PLACES: return false
+	var to_bonus := bool(CONTENT.MAPS[destination].get("bonus", false))
+	var tier := destination - CONTENT.REGION_COUNT
+	if to_bonus and not bonus.is_empty() and not bool(bonus.get("staff", false)) and not (in_bonus_map() and destination == map_id):
+		message = "Laufende %s-Bonuskarte zuerst beenden" % CONTENT.BONUS_TIERS[int(bonus.tier)].name
+		return false
+	if place == "fortress" and point.x < 0 and destination != CONTENT.FORTRESS_MAP:
+		message = "Die Korsarenfestung liegt in den Schattengewässern"
+		return false
+	if place == "harbor" and point.x < 0 and to_bonus:
+		message = "Bonuskarten haben keinen Hafen"
+		return false
+	var label := "%s %s" % [CONTENT.MAPS[destination].code, CONTENT.MAPS[destination].name]
+	var detail := label + (" · %d/%d" % [roundi(point.x), roundi(point.y)] if point.x >= 0 else " · " + place)
+	if not _staff_allow("map" if destination != map_id else "teleport", "Teleport", detail): return false
+	docked = false
+	if int(player.hp) <= 0:
+		player.hp = player.max_hp
+		player.shield = player.max_shield
+		player.respawn = 0.0
+	if destination != map_id:
+		var origin := map_id
+		var origin_pos: Vector2 = player.pos
+		if in_bonus_map():
+			if bool(bonus.get("staff", false)):
+				origin = int(bonus.origin)
+				origin_pos = Vector2(float(bonus.origin_pos[0]), float(bonus.origin_pos[1]))
+				bonus = {}
+			elif not bonus.is_empty():
+				if str(bonus.state) == "done": bonus = {}
+				else:
+					bonus.state = "break"
+					bonus.timer = 3.0
+		else:
+			map_states[map_id] = {"npcs":npcs.duplicate(true),"drops":drops.duplicate(true)}
+		if to_bonus and bonus.is_empty():
+			bonus = {"tier": tier, "wave": 0, "state": "break", "timer": 3.0, "origin": origin, "origin_pos": [origin_pos.x, origin_pos.y], "staff": true}
+		elif to_bonus:
+			bonus.state = "break"
+			bonus.timer = 3.0
+		configure_map(destination)
+	var goal := point if point.x >= 0 else staff_place_point(place)
+	_arrive(_free_water(goal))
+	staff.touched = true
+	_event("teleport", player.pos, 0, 0)
+	message = "Teleport · %s" % detail
+	return true
+
+func staff_teleport_target() -> bool:
+	var victim := actor(target)
+	if victim.is_empty() or int(victim.get("id", 0)) == 0: return false
+	if not _staff_allow("teleport", "Zum Ziel springen", str(victim.name)): return false
+	var keep := target
+	_arrive(_free_water(victim.pos + Vector2(-180, 90)))
+	target = keep
+	staff.touched = true
+	_event("teleport", player.pos, 0, 0)
+	message = "Neben %s gesprungen" % victim.name
+	return true
+
+func staff_summon_target() -> bool:
+	var victim := actor(target)
+	if victim.is_empty() or int(victim.get("id", 0)) == 0: return false
+	if victim.kind == "tower":
+		message = "Türme stehen fest auf der Insel"
+		return false
+	if not _staff_allow("summon", "Herbeirufen", str(victim.name)): return false
+	var spot := _free_water(player.pos + player.heading * 220.0)
+	victim.pos = spot
+	victim.home = spot
+	victim.path = []
+	staff.touched = true
+	_event("teleport", spot, 0, int(victim.id))
+	message = "%s herbeigerufen" % victim.name
+	return true
+
+func staff_spawn_count() -> int:
+	var alive := 0
+	for npc in npcs:
+		if bool(npc.get("staff_spawn", false)) and int(npc.hp) > 0: alive += 1
+	return alive
+
+func staff_spawn(kind: String) -> bool:
+	if not CONTENT.STAFF_SPAWNS.has(kind): return false
+	npcs = npcs.filter(func(npc: Dictionary) -> bool: return not bool(npc.get("staff_spawn", false)) or int(npc.hp) > 0)
+	if staff_spawn_count() >= STAFF_SPAWN_CAP:
+		message = "Höchstens %d Staff-Ziele gleichzeitig" % STAFF_SPAWN_CAP
+		return false
+	var config: Dictionary = CONTENT.STAFF_SPAWNS[kind]
+	if not _staff_allow("spawn", "Erzeugen", str(config.name)): return false
+	var body: Dictionary = (base_npcs[base_npcs.size() - 1] if kind == "monster" else base_npcs[{"dummy":0,"ship":1,"elite":4,"admiral":7}[kind]]).duplicate(true)
+	var elite := kind in ["elite","admiral","monster"]
+	var scale := float(CONTENT.MAPS[map_id].enemy_scale)
+	next_id += 1
+	body.id = next_id
+	body.name = "%s · Staff" % config.name
+	body.max_hp = roundi(float(config.hp) * (1.0 if kind == "dummy" else scale))
+	body.hp = body.max_hp
+	body.max_shield = roundi(float(body.max_hp) * 0.25) if elite and kind != "monster" else 0
+	body.shield = body.max_shield
+	body.elite = elite
+	body.reward = 0
+	body.power = 48.0 if kind == "admiral" else (36.0 if elite else 23.0)
+	if kind == "admiral": body.art = 7
+	var spot := _free_water(player.pos + player.heading * 300.0)
+	body.pos = spot
+	body.home = spot
+	body.path = []
+	body.respawn = 0.0
+	body.reload = 2.0
+	body.staff_spawn = true
+	body.frozen = kind == "dummy"
+	body.aggressive = kind != "dummy"
+	body.hunter = kind != "dummy"
+	npcs.append(body)
+	target = int(body.id)
+	staff.touched = true
+	_event("teleport", spot, 0, int(body.id))
+	message = "%s erzeugt · angewählt" % config.name
+	return true
+
+func _clear_staff_spawns() -> void:
+	npcs = npcs.filter(func(npc: Dictionary) -> bool: return not bool(npc.get("staff_spawn", false)))
+	for key in map_states.keys():
+		var state: Dictionary = map_states[key]
+		state.npcs = state.npcs.filter(func(npc: Dictionary) -> bool: return not bool(npc.get("staff_spawn", false)))
+	if actor(target).is_empty(): target = -1
+
+func staff_clear_spawns() -> bool:
+	if npcs.filter(func(npc: Dictionary) -> bool: return bool(npc.get("staff_spawn", false))).is_empty():
+		message = "Keine Staff-Ziele auf dieser Karte"
+		return false
+	if not _staff_allow("spawn", "Staff-Ziele entfernen", "%d Ziele" % staff_spawn_count()): return false
+	_clear_staff_spawns()
+	message = "Staff-Ziele entfernt"
+	return true
+
+func staff_target(action: String) -> bool:
+	var victim := actor(target)
+	if victim.is_empty() or int(victim.get("id", 0)) == 0 or not action in ["freeze","heal","sink","calm"]: return false
+	if action == "sink" and int(victim.hp) <= 0: return false
+	var names := {"freeze":"Einfrieren" if not bool(victim.get("frozen", false)) else "Auftauen", "heal":"Heilen", "sink":"Versenken", "calm":"Beruhigen"}
+	if not _staff_allow("world", names[action], str(victim.name)): return false
+	match action:
+		"freeze":
+			victim.frozen = not bool(victim.get("frozen", false))
+			if bool(victim.frozen): victim.path = []
+		"heal":
+			victim.hp = victim.max_hp
+			victim.shield = victim.get("max_shield", 0)
+		"sink":
+			victim.hp = 0
+			victim.path = []
+			victim.respawn = 90.0 if victim.kind == "tower" else 48.0
+			firing = false
+			_event("sunk", victim.pos, 0, int(victim.id))
+		"calm":
+			victim.aggressive = false
+			victim.hunter = false
+			victim.path = []
+	staff.touched = true
+	message = "%s · %s" % [names[action], victim.name]
+	return true
+
+func staff_world(action: String) -> bool:
+	if not action in ["reset_npcs","reset_fortress","skip_wave","loot"]: return false
+	if action == "reset_fortress" and map_id != CONTENT.FORTRESS_MAP:
+		message = "Die Korsarenfestung liegt in den Schattengewässern"
+		return false
+	if action == "skip_wave" and (not in_bonus_map() or bonus.is_empty() or str(bonus.state) == "done"):
+		message = "Wellen gibt es nur auf einer laufenden Bonuskarte"
+		return false
+	var names := {"reset_npcs":"Gegner zurückgesetzt", "reset_fortress":"Festungstürme erneuert", "skip_wave":"Welle übersprungen", "loot":"Beutekiste abgeworfen"}
+	if not _staff_allow("world", "Welt", names[action]): return false
+	match action:
+		"reset_npcs":
+			if in_bonus_map():
+				npcs.clear()
+				bonus.state = "break"
+				bonus.timer = 3.0
+			else:
+				var keep: Vector2 = player.pos
+				map_states.erase(map_id)
+				configure_map(map_id)
+				player.pos = keep
+			target = -1
+			firing = false
+			shots.clear()
+		"reset_fortress":
+			for npc in npcs:
+				if npc.kind != "tower": continue
+				npc.hp = npc.max_hp
+				npc.shield = npc.max_shield
+				npc.respawn = 0.0
+				npc.aggressive = false
+		"skip_wave":
+			if str(bonus.state) == "fight":
+				for npc in npcs:
+					if bool(npc.get("wave", false)): npc.hp = 0
+			else: bonus.timer = 0.0
+		"loot":
+			_add_drop(_free_water(player.pos + player.heading * 140.0), 250)
+	staff.touched = true
+	message = "Staff · %s" % names[action]
+	return true
+
+func staff_grant(kind: String) -> bool:
+	if not CONTENT.STAFF_GRANTS.has(kind): return false
+	if kind == "level" and level >= 20:
+		message = "Höchste Kapitänsstufe erreicht"
+		return false
+	if not _staff_allow("grant", "Gewähren", CONTENT.STAFF_GRANTS[kind]): return false
+	match kind:
+		"gold": player.gold += 10000
+		"essence": essence += 25
+		"fragments": fragments += 16
+		"scrolls":
+			for i in scrolls.size(): scrolls[i] += 1
+		"supplies":
+			for key in CONTENT.SUPPLY_KEYS: supplies[key] += 10
+		"ammo":
+			for i in 3: player.ammo[i] += [1500, 600, 400][i]
+		"decks":
+			for type in CONTENT.DECK_KEYS:
+				if not owns_deck(type, 2): grant_deck(type, 2)
+		"blessing": activate_blessing()
+		"tide_deck": add_tide_deck(1800.0)
+		"flask": free_flask_day = ""
+		"level":
+			level += 1
+			xp = 0
+			apply_upgrades()
+			_event("level", player.pos, level, 0)
+	staff.touched = true
+	message = "Gewährt · %s" % CONTENT.STAFF_GRANTS[kind]
+	return true
+
+## Inspection is logged once per target so the panel can refresh freely.
+func staff_inspect() -> Dictionary:
+	var victim := actor(target)
+	if victim.is_empty() or int(victim.get("id", 0)) == 0 or not staff.can("inspect"): return {}
+	if staff_inspected != target:
+		staff_inspected = target
+		staff.record("Inspizieren", str(victim.name))
+	return {"id": int(victim.id), "name": str(victim.name), "kind": str(victim.kind), "hp": int(victim.hp), "max_hp": int(victim.max_hp),
+		"shield": int(victim.get("shield", 0)), "max_shield": int(victim.get("max_shield", 0)), "state": str(victim.get("state", "")),
+		"aggressive": bool(victim.get("aggressive", false)), "frozen": bool(victim.get("frozen", false)), "elite": bool(victim.get("elite", false)),
+		"reward": int(victim.get("reward", 0)), "staff_spawn": bool(victim.get("staff_spawn", false)),
+		"pos": victim.pos, "distance": roundi(player.pos.distance_to(victim.pos))}
+
+func _free_water(goal: Vector2) -> Vector2:
+	var low := Vector2(80, 80)
+	var high := WORLD - Vector2(80, 80)
+	goal = goal.clamp(low, high) if goal.is_finite() else START
+	if not blocked(goal): return goal
+	for radius in [70.0, 140.0, 210.0, 300.0, 420.0, 560.0, 760.0]:
+		for turn in 12:
+			var point: Vector2 = (goal + Vector2.from_angle(TAU * float(turn) / 12.0) * radius).clamp(low, high)
+			if not blocked(point): return point
+	return START
 
 # --- Quests, economy and progression -----------------------------------------------
 
@@ -1330,7 +1761,7 @@ func export_save() -> Dictionary:
 		region = int(bonus.origin)
 		position = Vector2(float(bonus.origin_pos[0]), float(bonus.origin_pos[1]))
 	var run := {}
-	if not bonus.is_empty():
+	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
 	return {"schema":3,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
@@ -1341,7 +1772,7 @@ func export_save() -> Dictionary:
 		"essence":essence,"fragments":fragments,"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
 		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
 		"deck_slots":deck_slots.duplicate(),"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),
-		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold}
+		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
 	if not int(data.get("schema",0)) in [1,2,3]: return false
@@ -1403,6 +1834,7 @@ func restore_save(data: Dictionary) -> bool:
 	if saved_guild is Dictionary and saved_guild.has("name") and saved_guild.has("tag"):
 		guild={"name":str(saved_guild.name).left(24),"tag":str(saved_guild.tag).left(4).to_upper()}
 	fortress_conquests=maxi(0,int(data.get("fortress_conquests",0)))
+	staff_marked=bool(data.get("staff_marked",false))
 	fortress_hold=clampf(float(data.get("fortress_hold",0.0)),0.0,CONTENT.FORTRESS_HOLD) if not guild.is_empty() else 0.0
 	apply_upgrades()
 	var stock: Variant=data.get("ammo",[])
