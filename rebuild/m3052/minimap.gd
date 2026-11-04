@@ -76,6 +76,13 @@ func _draw() -> void:
 	var player: Vector2=r.position+simulation.player.pos/simulation.WORLD*r.size
 	var heading: Vector2=simulation.player.heading
 	var side=Vector2(-heading.y,heading.x)
+	var staff=simulation.staff
+	if staff.shows_badge():
+		var pulse=.5+.5*sin(Time.get_ticks_msec()/260.0)
+		draw_circle(player,6.5+pulse*2.0,Color(staff.color(),.22))
+		draw_arc(player,7.0+pulse*2.0,0,TAU,20,staff.color(),1.4,true)
+	elif staff.hidden():
+		draw_arc(player,6.5,0,TAU,16,Color(staff.color(),.45),1.0,true)
 	draw_colored_polygon(PackedVector2Array([player+heading*5,player-heading*3.5+side*3.5,player-heading*3.5-side*3.5]),Color("9cfff0"))
 	var title=str(region.name)
 	var tw=font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,10).x

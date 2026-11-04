@@ -60,6 +60,7 @@ func _run() -> void:
 	await _shot(game,output,"display-1560x720")
 	game._set_display(1,true);game.modal.hide();game.modal_backdrop.hide()
 	root.size=Vector2i(1280,720)
+	game.sim.configure_map(0);game.previous_region=0;game.sim.docked=false;game.sim.bonus={}
 	game.sim.npcs.clear();game.sim.drops.clear();game.sim.player.pos=game.sim.portals[0].pos-Vector2(220,0)
 	game.camera.position=game.sim.portals[0].pos;game.camera.force_update_scroll()
 	await _shot(game,output,"portal-before")
@@ -121,6 +122,7 @@ func _systems(game: Node,output: String) -> Dictionary:
 	var started: bool=sim.start_bonus(0)
 	game._sync_region();game._advance_loading(5.0)
 	for _i in 120:sim.step(1.0/30.0)
+	var bonus_map: int=sim.map_id
 	var wave: int=sim.bonus_wave_alive()
 	for npc in sim.npcs:
 		if bool(npc.get("wave",false)):
@@ -129,4 +131,28 @@ func _systems(game: Node,output: String) -> Dictionary:
 	await _shot(game,output,"bonus-wave-1280x720")
 	root.size=Vector2i(720,405);game.camera.zoom=Vector2.ONE*.78
 	await _shot(game,output,"bonus-wave-720x405")
-	return {"ok":towers.size()==4 and held and started and sim.map_id==3 and wave>0,"towers":towers.size(),"guild_held":held,"bonus_started":started,"wave_ships":wave}
+	# Staff presence on the sea, the tools, the world chart, the guide, the ship window and a throw in flight.
+	sim.leave_bonus();game._sync_region();game._advance_loading(5.0)
+	root.size=Vector2i(1280,720);game.camera.zoom=Vector2.ONE*.96
+	sim.staff_sign_in("ADMIN-3060");game._refresh_ui()
+	sim.player.pos=sim.START;sim.player.heading=Vector2.RIGHT
+	game.camera.position=sim.player.pos;game.camera.force_update_scroll()
+	await _shot(game,output,"staff-badge-1280x720")
+	game._open_modal("Staff")
+	await _shot(game,output,"staff-overview-1280x720")
+	game.modal_tab["Staff"]="TELEPORT";game._open_modal("Staff")
+	await _shot(game,output,"staff-teleport-1280x720")
+	game.modal.hide();game.modal_backdrop.hide()
+	game._open_modal("Seekarten")
+	await _shot(game,output,"world-chart-1280x720")
+	game.modal_tab["Seekarten"]="ANLEITUNG";game._open_modal("Seekarten")
+	await _shot(game,output,"chart-guide-1280x720")
+	game._open_modal("Schiff")
+	await _shot(game,output,"ship-window-1280x720")
+	sim.docked=true;sim.essence=8
+	game.kessel_throw={"start":Time.get_ticks_msec()-180,"results":[{"icon":game.painted.gold_coins,"rarity":3,"text":"Gold"},{"icon":game.painted.scroll_fragment,"rarity":1,"text":"Fragment"}]}
+	game._open_modal("Kessel")
+	await _shot(game,output,"kessel-throw-1280x720")
+	var shown: bool=game.sim.staff.shows_badge() and game.staff_pill.visible and game.modal_body.get_node_or_null("KesselStage")!=null and game.modal_body.get_node_or_null("KesselStage").busy()
+	sim.staff_sign_out(true);game.modal.hide();game.modal_backdrop.hide()
+	return {"ok":towers.size()==4 and held and started and bonus_map==3 and wave>0 and shown,"towers":towers.size(),"guild_held":held,"bonus_started":started,"wave_ships":wave,"staff_badge":shown}

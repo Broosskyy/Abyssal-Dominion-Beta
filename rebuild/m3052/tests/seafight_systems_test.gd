@@ -12,6 +12,91 @@ func duel(sim) -> Dictionary:
 	sim.player.pos=Vector2(500,500);npc.pos=Vector2(900,500);npc.home=npc.pos
 	sim.npcs.append(npc);sim.select(npc.id)
 	return npc
+func last_audit(sim) -> Dictionary:
+	return sim.staff.audit[sim.staff.audit.size()-1] if not sim.staff.audit.is_empty() else {}
+func _staff_checks() -> void:
+	# Roles, codes and the audit trail.
+	for role in CONTENT.STAFF_ROLE_ORDER:check(sim_role("%s-3060" % role)==role,"%s test code unlocks its role" % role)
+	check(sim_role("admin 3060")=="ADMIN" and sim_role("ADMIN-3061")=="" and sim_role("")=="","codes ignore case and separators but nothing else")
+	var plain:=true
+	for role in CONTENT.STAFF_ROLE_ORDER:plain=plain and not "3060" in str(CONTENT.STAFF_ROLES[role].code_sha256)
+	check(plain,"content stores only code hashes")
+	var sim=SIM.new()
+	check(not sim.staff_sign_in("falsch") and not sim.staff.active() and not bool(last_audit(sim).allowed),"wrong code is refused and logged")
+	check(not sim.staff_teleport(0,"harbor") and not sim.staff_grant("gold"),"tools need a signed-in role")
+	sim.player.gold=500
+	check(sim.staff_sign_in("mod-3060") and sim.staff.role=="MOD" and sim.staff.shows_badge() and sim.staff.badge()=="MOD","moderator signs in with an official badge")
+	check(not sim.staff_spawn("dummy") and not sim.staff_grant("gold") and not sim.staff_teleport(0,"harbor") and int(sim.player.gold)==500,"moderator cannot spawn, grant or teleport")
+	check(not bool(last_audit(sim).allowed) and "Recht fehlt" in str(last_audit(sim).detail),"refused tools are written to the audit trail")
+	check(sim.staff_set_presence("ghost") and sim.staff.hidden() and not sim.staff.shows_badge(),"ghost presence hides the badge")
+	var npc: Dictionary=duel(sim);npc.aggressive=true
+	check(not sim.npc_engages(npc) and sim.apply_damage(sim.player,400)==0,"ghosts are not attacked")
+	check(sim.staff_sign_out(true) and not sim.staff.active() and int(sim.player.gold)==500,"sign-out restores the starting state")
+	# Ship powers.
+	sim=SIM.new();sim.staff_sign_in("ADMIN-3060")
+	check(sim.staff_toggle("god") and sim.apply_damage(sim.player,900)==0 and int(sim.player.hp)==sim.PLAYER_HP,"god mode ignores damage")
+	npc=duel(sim);npc.aggressive=true
+	check(sim.npc_engages(npc),"an official staff ship is still a target")
+	check(sim.staff_toggle("no_aggro") and not sim.npc_engages(npc) and not bool(npc.aggressive),"no-aggro calms enemies")
+	sim.staff_toggle("unlimited_ammo");sim.staff_toggle("instant_reload")
+	var ammo: int=sim.player.ammo[0];sim.player.reload=0;sim._fire_player()
+	check(int(sim.player.ammo[0])==ammo and is_equal_approx(float(sim.player.reload),0.25),"unlimited ammo and instant reload")
+	sim.staff_toggle("speed");sim.player.path=[sim.player.pos+Vector2(2000,0)];sim.player.pos=Vector2(500,900);sim.player.path=[Vector2(2000,900)]
+	sim._move(sim.player,1.0)
+	check(is_equal_approx(float(sim.player.pos.x),500+sim.PLAYER_SPEED*2.5),"rush speed moves 2.5 times as far")
+	# Staff kills never score.
+	sim.select(npc.id);npc.hp=1;npc.shield=0
+	var gold: int=sim.player.gold
+	sim._hit({"source":0,"damage":50,"weapon":"cannon"},npc)
+	check(sim.kills==0 and sim.drops.is_empty() and sim.xp==0 and int(sim.player.gold)==gold and sim.staff_kills==1,"staff kills give no loot, XP or ranking")
+	# Teleport across maps, including bonus maps.
+	sim.level=1
+	check(sim.staff_teleport(2,"fortress") and sim.map_id==2 and not sim.blocked(sim.player.pos) and sim.player.pos.y>sim.fortress_island().bounds.end.y,"teleport ignores level gates and lands below the fortress")
+	check(sim.staff_teleport(2,"",Vector2(3000,700)) and sim.player.pos.distance_to(Vector2(3000,700))<200,"teleport to a chart point")
+	check(sim.staff_teleport(4,"start") and sim.in_bonus_map() and bool(sim.bonus.staff) and int(sim.bonus.origin)==2,"teleport opens a staff test run on a bonus map")
+	sim.step(3.5)
+	for body: Dictionary in sim.npcs:body.hp=0
+	gold=sim.player.gold;sim.step(0.1)
+	check(int(sim.bonus.wave)==1 and int(sim.player.gold)==gold,"staff test waves pay nothing")
+	check(sim.staff_world("skip_wave") and sim.bonus_wave_alive()==0,"skip wave on a staff run")
+	var saved: Dictionary=sim.export_save()
+	check(int(saved.map_id)==2 and (saved.bonus as Dictionary).is_empty(),"staff test runs are never saved")
+	check(sim.staff_teleport(0,"harbor") and sim.map_id==0 and sim.bonus.is_empty() and sim.player.pos.distance_to(sim.harbor)<200,"teleport home closes the test run")
+	# Spawns, target tools and grants.
+	check(sim.staff_spawn("dummy") and bool(sim.actor(sim.target).frozen) and bool(sim.actor(sim.target).staff_spawn) and int(sim.actor(sim.target).reward)==0,"training target spawns frozen and selected")
+	var dummy: Dictionary=sim.actor(sim.target)
+	check(sim.staff_inspect().get("name","")==dummy.name and sim.staff_target("sink") and int(dummy.hp)==0,"inspect and sink the selected target")
+	sim.step(60)
+	check(int(dummy.hp)==0,"staff targets do not respawn")
+	for i in 14:sim.staff_spawn("ship")
+	check(sim.staff_spawn_count()==12,"staff spawns are capped")
+	check(sim.staff_clear_spawns() and sim.staff_spawn_count()==0,"staff spawns can be cleared")
+	gold=sim.player.gold
+	check(sim.staff_grant("gold") and int(sim.player.gold)==gold+10000 and sim.staff_grant("decks") and sim.owns_deck("cannon",2),"admin grants gold and decks")
+	check(sim.staff.touched and sim.staff.audit.size()>=10,"privileged actions are audited")
+	var state: Dictionary=JSON.parse_string(JSON.stringify(sim.staff.export_state()))
+	var copy=SIM.new();copy.staff.restore_state(state)
+	check(copy.staff.role=="ADMIN" and copy.staff.flag("god") and copy.staff.audit.size()==sim.staff.audit.size(),"staff session survives an app restart")
+	check(sim.staff_sign_out(false) and sim.staff_marked and bool(sim.export_save().staff_marked) and not sim.staff.flag("god"),"keeping staff changes marks the save")
+	# GM has no grant right; QA has no summon right.
+	sim=SIM.new();sim.staff_sign_in("GM-3060")
+	check(not sim.staff_grant("gold") and sim.staff_spawn("ship"),"game master spawns but cannot grant")
+	sim.staff_sign_out(true)
+	sim.staff_sign_in("QA-3060");npc=duel(sim)
+	check(not sim.staff_summon_target() and sim.staff_teleport_target() and sim.target==int(npc.id),"QA jumps to targets but cannot summon")
+	check(sim.staff_set_presence("spectator"),"spectator presence")
+	sim.player.reload=0;sim.firing=true;sim._fire_player()
+	check(sim.shots.is_empty() and not sim.firing,"spectators cannot fire")
+	# A real bonus run blocks staff test runs.
+	sim=SIM.new();sim.level=2;sim.scrolls[0]=1;sim.player.last_hit=-100;sim.start_bonus(0);sim.staff_sign_in("ADMIN-3060")
+	check(not sim.staff_teleport(4,"start") and sim.staff_teleport(0,"start") and str(sim.bonus.state)=="break" and not sim.in_bonus_map(),"teleporting out pauses a real bonus run")
+	# Guild tags that imitate staff badges.
+	for tag in ["ADM","4DM","M0D","GM1","QA","MODS"]:check(SIM.reserved_tag(tag),"guild tag %s is reserved" % tag)
+	for tag in ["TSW","KRAK","AB"]:check(not SIM.reserved_tag(tag),"guild tag %s is allowed" % tag)
+	sim=SIM.new();sim.player.gold=1000
+	check(not sim.found_guild("Falsche Admins","4DM") and sim.guild.is_empty(),"founding refuses a reserved tag")
+func sim_role(code: String) -> String:
+	return preload("res://staff.gd").role_for_code(code)
 func _initialize() -> void:
 	# Hull and shield are separate resources.
 	var sim=SIM.new()
@@ -258,6 +343,7 @@ func _initialize() -> void:
 	var legacy={"schema":2,"gold":700,"ammo":[50,20,10],"skin":3,"upgrades":{"cannon":2,"harpoon":1,"hull":1,"sails":0},"level":5,"hp":1500}
 	var fresh=SIM.new()
 	check(fresh.restore_save(legacy) and int(fresh.upgrades.cannon)==2 and int(fresh.upgrades.hull)==1 and int(fresh.player.max_hp)==2800 and fresh.guild.is_empty() and fresh.decks.is_empty(),"legacy equipment maps onto castles with empty new systems")
+	_staff_checks()
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)

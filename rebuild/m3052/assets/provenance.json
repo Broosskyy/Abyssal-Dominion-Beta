@@ -875,6 +875,36 @@
       "bytes": 106355,
       "sha256": "d40a49812f38a2addbecfbe5d1a3616bc94fffef60cdb8bea618c3418f479bba",
       "source": "Original painted tide-cauldron harbor illustration generated for Abyssal Dominion M3060; not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/staff_seal.png",
+      "bytes": 30770,
+      "sha256": "1056f64303a81f8df87fc22c5c64e78eaa8586b2252ddc4c9af0e1368e56c5a9",
+      "source": "Original painted staff seal generated for Abyssal Dominion M3061; not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/staff_teleport.png",
+      "bytes": 28679,
+      "sha256": "899e29c7f4f8fd6f5447c4a564a65490982c6ba2fccd3771fd0625cb4666bbe3",
+      "source": "Original painted staff teleport icon generated for Abyssal Dominion M3061; not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/staff_dummy.png",
+      "bytes": 25240,
+      "sha256": "c3976aa732f87f2f5bdf89ead303c5df9a734bcbb94bc0266a297fcc4bf930d4",
+      "source": "Original painted staff training-target icon generated for Abyssal Dominion M3061; not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/staff_ledger.png",
+      "bytes": 34344,
+      "sha256": "1292f7f36462fb34baa28c06e3439ebe1da7380c89be7247b1511f78ce0474f2",
+      "source": "Original painted staff ledger icon generated for Abyssal Dominion M3061; not taken from a third-party game"
+    },
+    {
+      "path": "assets/ui/painted/chart_parchment.jpg",
+      "bytes": 190642,
+      "sha256": "6db9aea02dbe0744215c49058f8fcae30cd830935cf5a8a30bcb961f1d4ff0d5",
+      "source": "Original painted world-chart parchment generated for Abyssal Dominion M3061; not taken from a third-party game"
     }
   ]
 }
