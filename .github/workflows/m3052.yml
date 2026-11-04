@@ -39,6 +39,7 @@ jobs:
       - name: Install engine and prepare pinned content signing
         env:
           ABYSSAL_ANDROID_KEYSTORE_BASE64: ${{ secrets.ABYSSAL_ANDROID_KEYSTORE_BASE64 }}
+          ABYSSAL_CONTENT_SIGNING_KEY: ${{ secrets.ABYSSAL_CONTENT_SIGNING_KEY }}
           SHELL_NEEDED: ${{ steps.plan.outputs.shell_needed }}
         shell: bash
         run: |
@@ -50,6 +51,7 @@ jobs:
           tpl="$HOME/.local/share/godot/export_templates/4.7.2.stable"
           mkdir -p "$tpl" "$HOME/.cache/abyssal-test-signing"
           unzip -p /tmp/templates.tpz templates/android_debug.apk > "$tpl/android_debug.apk"
+          if [ -z "$ABYSSAL_ANDROID_KEYSTORE_BASE64" ]; then echo '::warning::Signing keystore comes only from the Actions cache; store it in the ABYSSAL_ANDROID_KEYSTORE_BASE64 secret (docs/SIGNING.md).'; fi
           if [ -n "$ABYSSAL_ANDROID_KEYSTORE_BASE64" ]; then
             python3 -c 'import os,base64,pathlib; pathlib.Path.home().joinpath(".cache/abyssal-test-signing/debug.keystore").write_bytes(base64.b64decode(os.environ["ABYSSAL_ANDROID_KEYSTORE_BASE64"],validate=True))'
           fi
@@ -57,10 +59,18 @@ jobs:
           test -f "$signing" || { echo 'Original signing key unavailable; refusing replacement.'; exit 1; }
           keytool -exportcert -alias androiddebugkey -keystore "$signing" -storepass android -file /tmp/certificate.der
           test "$(sha256sum /tmp/certificate.der | cut -d' ' -f1)" = 278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b
-          keytool -importkeystore -srckeystore "$signing" -srcstorepass android -srcalias androiddebugkey -destkeystore /tmp/content-signing.p12 -deststoretype PKCS12 -deststorepass android -noprompt
-          openssl pkcs12 -in /tmp/content-signing.p12 -nocerts -nodes -passin pass:android -out /tmp/content-private.pem
+          if [ -n "$ABYSSAL_CONTENT_SIGNING_KEY" ]; then
+            # Dedicated data-pack key (docs/SIGNING.md). Changes data_public.pem, so release_plan demands a new bootstrap APK.
+            printf '%s\n' "$ABYSSAL_CONTENT_SIGNING_KEY" > /tmp/content-private.pem
+          else
+            keytool -importkeystore -srckeystore "$signing" -srcstorepass android -srcalias androiddebugkey -destkeystore /tmp/content-signing.p12 -deststoretype PKCS12 -deststorepass android -noprompt
+            openssl pkcs12 -in /tmp/content-signing.p12 -nocerts -nodes -passin pass:android -out /tmp/content-private.pem
+          fi
           chmod 600 /tmp/content-private.pem
           openssl pkey -in /tmp/content-private.pem -pubout -out rebuild/m3052/updater/data_public.pem
+          if ! git diff --quiet -- rebuild/m3052/updater/data_public.pem && [ "$SHELL_NEEDED" != true ]; then
+            echo '::error::Data signing key changed: installed apps would reject every data pack. Bump VERSION_CODE so a new bootstrap APK ships the new public key.'; exit 1
+          fi
           if [ "$SHELL_NEEDED" = true ]; then
             unzip -p /tmp/templates.tpz templates/android_source.zip > "$tpl/android_source.zip"
             unzip -p /tmp/templates.tpz templates/version.txt > "$tpl/version.txt"

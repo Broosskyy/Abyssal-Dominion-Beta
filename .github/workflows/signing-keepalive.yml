@@ -1,0 +1,37 @@
+name: Keep signing cache alive
+# Safety net while the Android keystore exists only in the Actions cache:
+# GitHub evicts caches that are not accessed for 7 days. Restoring the entry
+# every two days keeps it alive. Remove this workflow once the keystore is
+# stored in the ABYSSAL_ANDROID_KEYSTORE_BASE64 secret (see docs/SIGNING.md).
+on:
+  schedule:
+    - cron: '17 4 */2 * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  keepalive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/cache/restore@v4
+        id: signing
+        with:
+          path: ~/.cache/abyssal-test-signing
+          key: m3052-private-debug-signing-v1
+          fail-on-cache-miss: false
+      - name: Verify pinned certificate
+        env:
+          HAS_SECRET: ${{ secrets.ABYSSAL_ANDROID_KEYSTORE_BASE64 != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          signing="$HOME/.cache/abyssal-test-signing/debug.keystore"
+          if [ ! -f "$signing" ]; then
+            if [ "$HAS_SECRET" = true ]; then echo 'Cache gone, but the secret holds the keystore.'; exit 0; fi
+            echo '::error::Signing keystore missing from cache and no ABYSSAL_ANDROID_KEYSTORE_BASE64 secret is set.'; exit 1
+          fi
+          keytool -exportcert -alias androiddebugkey -keystore "$signing" -storepass android -file /tmp/certificate.der >/dev/null
+          test "$(sha256sum /tmp/certificate.der | cut -d' ' -f1)" = 278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b
+          if [ "$HAS_SECRET" != true ]; then echo '::warning::The signing keystore exists only in the Actions cache. Store it in the ABYSSAL_ANDROID_KEYSTORE_BASE64 secret (docs/SIGNING.md).'; fi
+          echo 'Signing cache present and certificate matches.'
