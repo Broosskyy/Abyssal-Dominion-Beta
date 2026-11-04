@@ -23,7 +23,8 @@ static func gem(canvas: CanvasItem,center: Vector2,r: float,color: Color,tier: i
 	canvas.draw_colored_polygon(PackedVector2Array([center,center+Vector2(w,0),center+Vector2(0,r)]),color.darkened(.2))
 	canvas.draw_colored_polygon(PackedVector2Array([center+Vector2(0,-r),center+Vector2(-w*.5,-r*.5),center+Vector2(0,-r*.2)]),Color(light,.9))
 	var rim=outline.duplicate();rim.append(outline[0])
-	canvas.draw_polyline(rim,Color("f5d78d"),1.3,true)
+	canvas.draw_polyline(rim,Color("fff0c2"),maxf(1.6,r*.16),true)
+	canvas.draw_colored_polygon(PackedVector2Array([center+Vector2(0,-r*.55),center+Vector2(w*.28,-r*.15),center+Vector2(0,-r*.05)]),Color(1,1,1,.35))
 	if font!=null and tier>=0 and r>=9:
 		var text: String=ROMAN[clampi(tier,0,2)]
 		var fs=maxi(8,roundi(r*.78))
@@ -45,6 +46,19 @@ static func gem_row(canvas: CanvasItem,center: Vector2,r: float,entries: Array,f
 	for i in entries.size():
 		var entry: Dictionary=entries[i]
 		gem(canvas,center+Vector2(-half+i*gap,0),r,entry.get("color",Color.WHITE),int(entry.get("tier",-1)),bool(entry.get("lit",false)),font,float(entry.get("glow",0.0)))
+
+## Kristallsegen beside the deck row: the crystal, a gold ring and a timer that runs down.
+static func blessing_crystal(canvas: CanvasItem,center: Vector2,r: float,texture: Texture2D,remaining: float,total: float) -> void:
+	var pulse=.5+.5*sin(Time.get_ticks_msec()/240.0)
+	canvas.draw_circle(center,r*1.45,Color("c69bff",.16+.14*pulse))
+	canvas.draw_circle(center+Vector2(0,1.5),r,Color(0,0,0,.45))
+	canvas.draw_circle(center,r*.92,Color("140818"))
+	if texture!=null:
+		var s=r*1.55
+		canvas.draw_texture_rect(texture,Rect2(center-Vector2(s,s)*.5,Vector2(s,s)),false)
+	var ratio=clampf(remaining/maxf(total,.001),0.0,1.0)
+	canvas.draw_arc(center,r*1.12,-PI*.5,-PI*.5+TAU*ratio,28,Color("f3d2ff"),maxf(2.0,r*.16),true)
+	canvas.draw_arc(center,r*1.12,0,TAU,28,Color("f5d78d"),maxf(1.3,r*.09),true)
 
 ## Staff role badge: a pointed shield plate in the role colour with the role tag.
 static func staff_badge(canvas: CanvasItem,left_middle: Vector2,tag: String,color: Color,font: Font,fs: int=11) -> float:

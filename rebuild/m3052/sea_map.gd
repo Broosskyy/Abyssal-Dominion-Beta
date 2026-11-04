@@ -29,7 +29,7 @@ var water: ColorRect
 var ocean: ShaderMaterial
 var ui: Control
 var chart_mini: Control
-var desired_zoom := 0.96
+var desired_zoom := 1.08
 var pan := Vector2.ZERO
 var camera_anchor := Vector2.ZERO
 var camera_locked := true
@@ -64,6 +64,16 @@ var center_button: Button
 var zoom_in: Button
 var zoom_out: Button
 var ammo_buttons: Array[Button] = []
+var special_buttons: Array[Button] = []
+const AMMO_UI := [
+	{"name":"Vollkugeln","use":"Gegen Schiffe und Türme","icon":"cannonball"},
+	{"name":"Kettenkugeln","use":"Verlangsamt Schiffe","icon":"chain"},
+	{"name":"Harpunen","use":"Gegen Seeungeheuer","icon":"harpoon"},
+	{"name":"Leuchtkugeln","use":"Markiert das Ziel · Folgetreffer +15 %","icon":"ammo_flare"},
+	{"name":"Kürbismunition","use":"Splitter im Umkreis","icon":"ammo_pumpkin"},
+	{"name":"Schneemunition","use":"Starke Verlangsamung","icon":"ammo_snow"},
+	{"name":"Eismunition","use":"Friert das Ziel kurz ein","icon":"ammo_ice"}
+]
 var nav_buttons: Array[Button] = []
 var quest_panel: Panel
 var quest_text: Label
@@ -134,6 +144,7 @@ var target_cycle: Button
 var camera_pad_visible := true
 
 func _ready() -> void:
+	_use_uhd()
 	_load_assets()
 	_load_progress()
 	_load_staff()
@@ -162,6 +173,25 @@ func _ready() -> void:
 	if get_tree().current_scene==self:_begin_loading(1.4)
 	var data_boot=get_tree().root.get_node_or_null("DataBoot")
 	if data_boot!=null:data_boot.mark_healthy()
+
+## One screen pixel is one drawn pixel. Desktop opens at 3840×2160. Phones use the
+## device resolution instead of stretching a 1280×720 picture. Tests that clear the
+## content scale keep the size they chose.
+func _use_uhd() -> void:
+	if OS.has_feature("web"):return
+	var window := get_window()
+	if window == null or window.content_scale_size == Vector2i.ZERO:return
+	window.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
+	window.content_scale_size = Vector2i.ZERO
+	if OS.has_feature("mobile"):return
+	var uhd := Vector2i(3840, 2160)
+	window.size = uhd
+	var screen := DisplayServer.screen_get_size()
+	if screen.x >= uhd.x and screen.y >= uhd.y:
+		window.position = (screen - uhd) / 2
+
+func _sharp_zoom() -> float:
+	return desired_zoom * clampf(get_viewport_rect().size.y / 720.0, 1.0, 1.7)
 
 func _load_assets() -> void:
 	for name in ["anchor","ship","book","compass","chest","gear","plus","minus","focus","arrow","target_cycle"]:hud_icons[name]=load("res://assets/ui/icons/"+name+".svg")
@@ -195,7 +225,7 @@ func _load_assets() -> void:
 	for name in ["nav_ship","nav_shipyard","nav_harbor","nav_quests","nav_charts","nav_supplies","nav_ranking","nav_menu","gold_coins","kills_skull","spyglass","helm_wheel",
 			"nav_bonus","nav_kessel","nav_guild","nav_castles","supply_powder","supply_plates","supply_repair","supply_shield","essence_flask","scroll_fragment",
 			"crystal_blessing","tide_deck","castle_crew","castle_war","boss_wave","reward_chest","tower_cannon","tower_mortar","tower_chain","tower_guardian",
-			"staff_seal","staff_teleport","staff_dummy","staff_ledger"]:
+			"staff_seal","staff_teleport","staff_dummy","staff_ledger","ammo_flare","ammo_pumpkin","ammo_snow","ammo_ice"]:
 		painted[name]=load("res://assets/ui/painted/"+name+".png")
 	painted.loading=load("res://assets/ui/painted/loading_harbor.jpg")
 	painted.kessel_scene=load("res://assets/ui/painted/kessel_scene.jpg")
@@ -221,7 +251,7 @@ func _process(delta: float) -> void:
 	var goal: Vector2 = sim.player.pos if camera_locked else camera_anchor
 	pan=goal-sim.player.pos
 	camera.position = camera.position.lerp(goal,1.0-exp(-delta*5.0))
-	camera.zoom = camera.zoom.lerp(Vector2.ONE*desired_zoom,1.0-exp(-delta*8.0))
+	camera.zoom = camera.zoom.lerp(Vector2.ONE*_sharp_zoom(),1.0-exp(-delta*8.0))
 	ocean.set_shader_parameter("camera_world",camera.position)
 	ocean.set_shader_parameter("map_zoom",camera.zoom.x)
 	ocean.set_shader_parameter("viewport_size",get_viewport_rect().size)
@@ -319,12 +349,15 @@ func _draw() -> void:
 		if victim.is_empty(): continue
 		var direction: Vector2=(victim.pos-shot.pos).normalized()
 		var color = Color("ffe0a2") if int(shot.source)==0 else Color("ff8c56")
+		if int(shot.source)==0:
+			color = {"flare":Color("ffe27a"),"pumpkin":Color("ff8a2a"),"snow":Color("f4fbff"),"ice":Color("7fd4ff"),"chain":Color("d7e4ea"),"harpoon":Color("9fd0c8")}.get(str(shot.weapon), color)
 		if mortar:_ellipse(shot.pos,Vector2(7,3),Color(0,0,0,.28))
 		draw_line(p-direction*18,p,color,2.4,true)
 		draw_circle(p,(7.0 if mortar else 4.2),Color(0,0,0,0.5))
 		draw_circle(p,(5.0 if mortar else 2.7),color)
-		if shot.weapon=="chain": draw_arc(p,6,0,TAU,12,color,1.2,true)
+		if str(shot.weapon) in ["chain","snow","ice","flare","pumpkin"]: draw_arc(p,6,0,TAU,12,color,1.4,true)
 		if shot.weapon=="harpoon": draw_line(p-direction*30,p,color,1.4,true)
+		if shot.weapon=="flare": draw_circle(p,9,Color(1,.9,.4,.35))
 	for event in sim.events:
 		var age: float = sim.clock-float(event.time)
 		if age>1.2: continue
@@ -405,7 +438,11 @@ func _draw_actor(actor: Dictionary) -> void:
 			var foam=Color(0.62,0.86,0.87,(1.0-float(j)/4.0)*0.13)
 			draw_line(tail+side*spread,tail-heading*9+side*(spread+1.5),foam,1.1,true)
 			draw_line(tail-side*spread,tail-heading*9-side*(spread+1.5),foam,1.1,true)
-	_ellipse(point+Vector2(0,3),Vector2(length*0.32,length*0.085),Color(0.005,0.03,0.045,0.17))
+	_ellipse(point+Vector2(0,4),Vector2(length*0.34,length*0.09),Color(0.0,0.02,0.04,0.34))
+	if is_player and sim.has_blessing():
+		var blessing_pulse=.5+.5*sin(elapsed*3.2)
+		_ellipse(point+Vector2(0,2),Vector2(length*0.62,length*0.24),Color(0.62,0.38,1.0,.08+blessing_pulse*.06))
+		_ellipse_line(point+Vector2(0,2),Vector2(length*0.5,length*0.18),Color(0.86,0.72,1.0,.4),1.8)
 	if sim.target==int(actor.id):
 		_ellipse_line(point,Vector2(length*0.44,length*0.16),Color("ed9d67"),2.0)
 	if is_player:
@@ -433,9 +470,11 @@ func _draw_actor(actor: Dictionary) -> void:
 	if is_player and sim.staff.shows_badge():
 		var pulse=.5+.5*sin(elapsed*4.0)
 		_ellipse_line(point,Vector2(length*0.52,length*0.2),Color(sim.staff.color(),.28+pulse*.35),2.4)
-	if bool(actor.get("frozen",false)):
+	if bool(actor.get("frozen",false)) or float(actor.get("ice",0.0))>0.0:
 		_ellipse_line(point,Vector2(length*0.5,length*0.19),Color("b7e7ff",.85),2.2)
 		draw_arc(point,length*0.28,0,TAU,28,Color("e8f7ff",.7),1.6,true)
+	if float(actor.get("spotted",0.0))>sim.clock:
+		draw_circle(point-Vector2(0,length*0.35),8,Color("ffe27a",.85))
 	if is_player or sim.target==int(actor.id):
 		var nose=point+heading*length*0.38
 		var side=Vector2(-heading.y,heading.x)*4
@@ -445,7 +484,10 @@ func _draw_actor(actor: Dictionary) -> void:
 	_nameplate(actor,point+Vector2(0,name_offset))
 
 func _plate_scale() -> float:
-	return 1.0 if gallery_page>=0 or camera==null else clampf(1.0/camera.zoom.x,1.0,1.6)
+	if gallery_page>=0 or camera==null:return 1.0
+	var grow=clampf(get_viewport_rect().size.y/720.0,1.0,1.7)
+	if grow<=1.001:return clampf(1.0/camera.zoom.x,1.0,1.6)
+	return grow*clampf(desired_zoom*grow/maxf(camera.zoom.x,0.05),1.0,1.6)
 
 ## Nameplates keep a constant on-screen size: captain medallion, guild tag, hull and shield capsules, status icons.
 func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
@@ -473,16 +515,19 @@ func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
 		_medallion(Vector2(-62,19),clampi(floori((sim.level-1)/4.0)+1,1,ROMAN.size()-1))
 		_plate_bar(Rect2(-46,6,114,14),hull_ratio,Color("4fbf5e"),"%s / %s" % [_thousands(int(actor.hp)),_thousands(int(actor.max_hp))],10)
 		_plate_bar(Rect2(-46,23,114,10),shield_ratio,Color("3d8fe0"),_thousands(int(actor.shield)),9)
-		SEA_MARKS.gem_row(self,Vector2(11,45),7,SEA_MARKS.deck_entries(sim),font)
+		var decks=SEA_MARKS.deck_entries(sim)
+		var gem_r=11.0
+		SEA_MARKS.gem_row(self,Vector2(11,50),gem_r,decks,font)
+		if sim.has_blessing():
+			var half=(decks.size()-1)*gem_r*2.05*.5
+			SEA_MARKS.blessing_crystal(self,Vector2(11+half+gem_r*2.15,50),14,painted.crystal_blessing,float(sim.buffs.blessing),CONTENT.BLESSING_SECONDS)
 		var states: Array[Texture2D]=[]
 		if sim.powder_on:states.append(painted.supply_powder)
 		if sim.plates_on:states.append(painted.supply_plates)
-		if sim.has_blessing():states.append(painted.crystal_blessing)
-		if float(sim.buffs.tide_deck)>0:states.append(painted.tide_deck)
 		if sim.guild_island_held():states.append(painted.nav_guild)
 		if float(actor.slow)>0:states.append(icons.chain)
 		for i in states.size():
-			var center=Vector2(11+(float(i)-(states.size()-1)*.5)*19,66)
+			var center=Vector2(11+(float(i)-(states.size()-1)*.5)*19,76)
 			draw_circle(center,8.5,Color(0.02,0.06,0.08,.85))
 			draw_circle(center,8.5,Color("c7a15a"),false,1.0,true)
 			draw_texture_rect(states[i],Rect2(center-Vector2(7,7),Vector2(14,14)),false)
@@ -675,10 +720,12 @@ func _ellipse_line(point: Vector2,radii: Vector2,color: Color,width: float) -> v
 	draw_polyline(vertices,color,width,true)
 
 func _label(point: Vector2,text: String,fontsize: int,color: Color,outline: int=3) -> void:
-	var width = font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize).x
+	var grow=1.0 if gallery_page>=0 or camera==null else clampf(get_viewport_rect().size.y/720.0,1.0,1.7)
+	var fs=maxi(fontsize,roundi(float(fontsize)*grow))
+	var width = font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
 	var p = point-Vector2(width*0.5,0)
-	draw_string_outline(font,p,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,outline,Color(0.01,0.035,0.05,color.a))
-	draw_string(font,p,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,color)
+	draw_string_outline(font,p,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,outline,Color(0.01,0.035,0.05,color.a))
+	draw_string(font,p,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,color)
 
 func _panel(parent: Node) -> Panel:
 	var p =HUD_PANEL.new()
@@ -805,6 +852,11 @@ func _build_ui() -> void:
 		var index=i
 		var button=_orb(ui,"",icons[["cannonball","chain","harpoon"][i]],func():sim.set_ammo(index);_refresh_ui())
 		button.name="Ammo%d" % i;button.toggle_mode=true;ammo_buttons.append(button)
+	for i in 4:
+		var index=i+3
+		var special=_orb(ui,str(AMMO_UI[index].name),_ammo_texture(index),func():sim.set_ammo(index);_refresh_ui(),str(AMMO_UI[index].name).left(6))
+		special.name="SpecialAmmo%d" % i
+		special_buttons.append(special)
 	for key: String in CONTENT.SUPPLY_KEYS:
 		var supply=key
 		var config: Dictionary=CONTENT.SUPPLIES[key]
@@ -877,7 +929,7 @@ func _layout() -> void:
 	if ui==null:return
 	var viewport_size=get_viewport_rect().size
 	# Scale only the HUD. Ocean, camera, world input and simulation keep viewport coordinates.
-	var base=clampf(viewport_size.y/600.0,1.0,1.35)
+	var base=maxf(viewport_size.y/600.0,1.0)
 	var requested=base*[0.86,1.0,1.14][hud_size]
 	hud_scale=clampf(requested,0.86,minf(viewport_size.x/720.0,viewport_size.y/390.0))
 	ui.scale=Vector2.ONE*hud_scale
@@ -967,18 +1019,34 @@ func _layout() -> void:
 	var hot: Array[Button]=[target_cycle,ammo_selector,loadout_button,page_button]
 	var row_x=fx-orb-gap
 	for i in hot.size():_place(hot[hot.size()-1-i],row_x-(i+1)*(orb+gap),s.y-orb-10,orb,orb)
+	var pack=36.0 if compact else 44.0
+	var host_left=row_x-(hot.size()+1)*(orb+gap)
+	var left_limit=(pad+16.0) if camera_pad_visible else 12.0
+	var special_x=host_left-gap-pack*2.0
+	var special_y=s.y-orb-10.0-pack-gap
+	var show_specials=special_x>=left_limit and special_y>header+8.0
+	for i in special_buttons.size():
+		var slot=i%2
+		var line=int(i/2.0)
+		special_buttons[i].visible=show_specials
+		if show_specials:_place(special_buttons[i],special_x+slot*(pack+gap),special_y-line*(pack+gap),pack,pack)
 	_apply_page()
 	var toast_w=minf(380.0,2.0*(ammo_buttons[1].position.x-s.x*.5)-16.0)
 	_place(status,(s.x-toast_w)*.5,s.y-orb-40,toast_w,24)
 	status.set_meta("room",toast_w)
 	var menu_size=viewport_size
-	var width=minf(720,menu_size.x-32)
-	var height=minf(620,menu_size.y-24)
+	var grow=clampf(viewport_size.y/720.0,1.0,1.7)
+	modal.scale=Vector2.ONE*grow
+	var visual_w=minf(720.0*grow,menu_size.x-32.0)
+	var visual_h=minf(620.0*grow,menu_size.y-24.0)
+	var width=visual_w/grow
+	var height=visual_h/grow
 	_place(modal_backdrop,0,0,s.x,s.y)
 	if modal_kind=="Munition":
-		width=minf(480,menu_size.x-32);height=minf(420,menu_size.y-108)
-		_place(modal,menu_size.x-width-16,maxf(12,menu_size.y-height-104),width,height)
-	else:_place(modal,(menu_size.x-width)*.5,(menu_size.y-height)*.5,width,height)
+		visual_w=minf(480.0*grow,menu_size.x-32.0);visual_h=minf(420.0*grow,menu_size.y-108.0)
+		width=visual_w/grow;height=visual_h/grow
+		_place(modal,menu_size.x-visual_w-16.0,maxf(12.0,menu_size.y-visual_h-104.0),width,height)
+	else:_place(modal,(menu_size.x-visual_w)*.5,(menu_size.y-visual_h)*.5,width,height)
 	var head=46.0 if height<420 else 52.0
 	modal.header=head
 	var title_w=clampf(font.get_string_size(modal_title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,21).x+70,200,width-170)
@@ -1080,6 +1148,11 @@ func _refresh_ui() -> void:
 		ammo_buttons[i].set_pressed_no_signal(sim.ammo_mode==i)
 		_set_orb(ammo_buttons[i],icons[["cannonball","chain","harpoon"][i]],_thousands(int(sim.player.ammo[i])),sim.ammo_mode==i)
 		ammo_buttons[i].tooltip_text=["Vollkugeln: gegen Schiffe","Kettenkugeln: verlangsamen Schiffe","Harpunen: gegen Monster"][i]
+	for i in special_buttons.size():
+		var index=i+3
+		var button=special_buttons[i]
+		_set_orb(button,_ammo_texture(index),_thousands(int(sim.player.ammo[index])),sim.ammo_mode==index,str(AMMO_UI[index].name).left(6))
+		button.tooltip_text="%s · %s" % [AMMO_UI[index].name, AMMO_UI[index].use]
 	for key: String in CONTENT.SUPPLY_KEYS:
 		var item: Button=supply_buttons[key]
 		var config: Dictionary=CONTENT.SUPPLIES[key]
@@ -1514,22 +1587,36 @@ func _draw_ship_stage(stage: Control) -> void:
 	_canvas_text(stage,Vector2(34,39),ROMAN[tier],13,Color("ffe6a8"))
 	_canvas_text(stage,Vector2(34,66),"LV. %d" % sim.level,11,Color("ecd29a"))
 	var gem_y=h-58.0
-	SEA_MARKS.gem_row(stage,Vector2(w*.5,gem_y),16,SEA_MARKS.deck_entries(sim),font)
+	var decks=SEA_MARKS.deck_entries(sim)
+	var gem_x=w*.5-(22.0 if sim.has_blessing() else 0.0)
+	SEA_MARKS.gem_row(stage,Vector2(gem_x,gem_y),16,decks,font)
+	if sim.has_blessing():
+		var half=(decks.size()-1)*16.0*2.05*.5
+		SEA_MARKS.blessing_crystal(stage,Vector2(gem_x+half+46,gem_y),20,painted.crystal_blessing,float(sim.buffs.blessing),CONTENT.BLESSING_SECONDS)
 	var parts: Array[String]=[]
 	for slot in 2:
 		var index=int(sim.deck_slots[slot])
 		parts.append(_deck_title(sim.decks[index]) if index>=0 else "Platz %d frei" % (slot+1))
 	parts.append("Gezeitendeck %s" % (_clock_text(float(sim.buffs.tide_deck)) if float(sim.buffs.tide_deck)>0 else "aus"))
+	if sim.has_blessing():parts.append("Kristallsegen %s" % _clock_text(float(sim.buffs.blessing)))
 	_canvas_text(stage,Vector2(w*.5,h-18),"  ·  ".join(parts),12,Color("e2ecee"))
+
+func _ammo_texture(index: int) -> Texture2D:
+	var key=str(AMMO_UI[index].icon)
+	return icons[key] if icons.has(key) else painted[key]
 
 func _open_ammo() -> void:
 	_section("KANONENKUGEL-AUSWAHL")
-	for i in 3:
+	for i in AMMO_UI.size():
 		var index=i
+		var entry: Dictionary=AMMO_UI[i]
 		var boost=" · ×1,4 mit Pulver" if i<2 else ""
-		var column=_row(icons[["cannonball","chain","harpoon"][i]],"%s · %d\n%d Schaden%s · %s" % [["Vollkugeln","Kettenkugeln","Harpunen"][i],sim.player.ammo[i],sim.weapon_damage(i),boost,["Gegen Schiffe und Türme","Verlangsamt Schiffe","Gegen Seeungeheuer"][i]],40,CYAN if sim.ammo_mode==i else Color(0,0,0,0))
-		var choose=_row_button(column,"GELADEN" if sim.ammo_mode==i else "LADEN",func():sim.set_ammo(index);modal.hide();_refresh_ui(),sim.ammo_mode==i or int(sim.player.ammo[i])<=0,"normal" if sim.ammo_mode==i else "primary")
+		var ammo_column=_row(_ammo_texture(i),"%s · %d\n%d Schaden%s · %s" % [entry.name,sim.player.ammo[i],sim.weapon_damage(i),boost,entry.use],40,CYAN if sim.ammo_mode==i else Color(0,0,0,0))
+		var choose=_row_button(ammo_column,"GELADEN" if sim.ammo_mode==i else "LADEN",func():sim.set_ammo(index);modal.hide();_refresh_ui(),sim.ammo_mode==i or int(sim.player.ammo[i])<=0,"normal" if sim.ammo_mode==i else "primary")
 		choose.custom_minimum_size.y=30;choose.add_theme_font_size_override("font_size",12)
+		if i>=3:
+			var buy=_row_button(ammo_column,"12 · 80 GOLD",func():sim.buy_ammo(index);_save_progress();_open_modal("Munition");_refresh_ui(),not sim.docked or int(sim.player.gold)<80)
+			buy.custom_minimum_size.y=30;buy.add_theme_font_size_override("font_size",12)
 	_section("GEGENSTÄNDE")
 	for key: String in CONTENT.SUPPLY_KEYS:
 		var supply=key
@@ -1577,11 +1664,12 @@ func _open_shipyard() -> void:
 
 func _open_weapons() -> void:
 	_banner_card(extra_icons.cannon_0,"BEWAFFNUNG · KANONEN & HARPUNEN","Bugkastell Stufe %d · Jagdkastell Stufe %d\n%d von %d Kanonen feuern · Breitseite: 3 Geschosse · Nachladen: %s Sekunden" % [sim.upgrades.cannon,sim.upgrades.harpoon,sim.equipped_cannons(),sim.player.cannons,("%.2f" % sim.reload_time()).replace(".",",")])
-	for i in 3:
+	for i in AMMO_UI.size():
 		var index=i
-		var column=_row(icons[["cannonball","chain","harpoon"][i]],"%s · %d im Lager\n%d Schaden je Geschoss · %s" % [["Vollkugeln","Kettenkugeln","Harpunen"][i],sim.player.ammo[i],sim.weapon_damage(i),["gegen Schiffe und Türme","bremst Schiffe","gegen Seeungeheuer"][i]],48,CYAN if sim.ammo_mode==i else Color(0,0,0,0))
+		var entry: Dictionary=AMMO_UI[i]
+		var column=_row(_ammo_texture(i),"%s · %d im Lager\n%d Schaden je Geschoss · %s" % [entry.name,sim.player.ammo[i],sim.weapon_damage(i),entry.use],48,CYAN if sim.ammo_mode==i else Color(0,0,0,0))
 		_row_button(column,"GELADEN" if sim.ammo_mode==i else "LADEN",func():sim.set_ammo(index);_refresh_ui();_open_modal("Bewaffnung"),sim.ammo_mode==i,"normal" if sim.ammo_mode==i else "primary")
-	_note("Vollkugeln gegen Schiffe · Kettenkugeln bremsen Schiffe · Harpunen gegen Seeungeheuer")
+	_note("Vollkugeln, Ketten, Leucht, Kürbis, Schnee und Eis gegen Schiffe. Harpunen gegen Seeungeheuer. Leuchtkugeln markieren, Kürbisse splittern, Schnee bremst, Eis friert ein.")
 	_action("AUSRÜSTUNG & NACHSCHUB IM HAFEN",func():_open_modal("Hafen"))
 
 # --- Harbor, logbook and ranking -----------------------------------------------------------
@@ -2029,7 +2117,7 @@ func _open_info() -> void:
 	_section("HAFEN, KESSEL, BONUSKARTEN, GILDE")
 	_note("HAFEN: Trockendock, Vorräte, Kanonen, Decks und Kastelle.\nKESSEL: Gezeitenessenz einwerfen, offene Preistabelle, Meilensteine bei 10, 25, 50 und 100.\nBONUSKARTEN: Fragmente zu Schriftrollen zusammensetzen, fünf Wellen mit Checkpoint.\nGILDE: Kürzel vor dem Schiffsnamen, Korsarenfestung mit vier Türmen in den Schattengewässern.",Color("e2ecee"))
 	_section("TASTEN & GESTEN")
-	_note("Zwei Finger / Mausrad / Plus und Minus an der Karte: Zoom. Joystick links unten oder Ziehen / rechte Maustaste: Kamera. Fernrohr / Tab: nächstes Ziel. Tasten 1 bis 3 Munition, 4 bis 7 Gegenstände, Q Schnellleiste.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",Color("bac7c7"))
+	_note("Zwei Finger / Mausrad / Plus und Minus an der Karte: Zoom. Joystick links unten oder Ziehen / rechte Maustaste: Kamera. Fernrohr / Tab: nächstes Ziel. Tasten 1 bis 3 Munition, 8 Leucht, 9 Kürbis, 0 Schnee, Minus Eis, 4 bis 7 Gegenstände, Q Schnellleiste.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",Color("bac7c7"))
 
 # --- Staff tools ----------------------------------------------------------------------
 
@@ -2324,6 +2412,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode==KEY_1:sim.set_ammo(0)
 		if event.keycode==KEY_2:sim.set_ammo(1)
 		if event.keycode==KEY_3:sim.set_ammo(2)
+		if event.keycode==KEY_8:sim.set_ammo(3)
+		if event.keycode==KEY_9:sim.set_ammo(4)
+		if event.keycode==KEY_0:sim.set_ammo(5)
+		if event.keycode==KEY_MINUS:sim.set_ammo(6)
 		var hotkeys=[KEY_4,KEY_5,KEY_6,KEY_7]
 		if event.keycode in hotkeys:_use_supply(CONTENT.SUPPLY_KEYS[hotkeys.find(event.keycode)])
 		if event.keycode==KEY_Q:_flip_page()
@@ -2331,6 +2423,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _hud_contains(screen: Vector2) -> bool:
 	if modal.visible:return true
 	var controls: Array[Control]=[chrome,target_panel,chart_mini,quest_panel,attack,repair,ammo_selector,loadout_button,center_button,settings_button,target_cycle,camera_pad,zoom_in,zoom_out,interact,page_button,staff_pill]
+	controls.append_array(special_buttons)
 	controls.append_array(ammo_buttons)
 	for item: Button in supply_buttons.values():controls.append(item)
 	for control: Control in controls:
