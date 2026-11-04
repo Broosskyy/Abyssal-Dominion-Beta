@@ -34,11 +34,11 @@ func _run() -> void:
 		game._layout()
 		game.sim.select(2)
 		game._refresh_ui()
-		check(game.nav_buttons.size()==8,"top bar carries eight sea-chart menus")
+		check(game.nav_buttons.size()==9,"top bar carries nine sea-chart menus")
 		for nav: Button in game.nav_buttons:
 			check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
 			check(nav.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and nav.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x,"navigation stays between wallet and captain meters at "+str(dimensions))
-		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.settings_button,game.interact,game.loadout_button,game.ammo_selector,game.camera_pad,game.target_cycle]
+		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.settings_button,game.interact,game.loadout_button,game.ammo_selector,game.camera_pad,game.target_cycle,game.page_button,game.supply_buttons.powder]
 		controls.append_array(game.ammo_buttons)
 		for control: Control in controls:
 			var rect=control.get_global_rect()
@@ -64,7 +64,19 @@ func _run() -> void:
 		check(game.attack.get_global_rect().position.x>dimensions.x*.7 and ring,"cannon stays bottom-right with ammunition and repair within thumb reach")
 		check(game.loadout_button.get_global_rect().end.x<game.ammo_buttons[0].get_global_rect().position.x and is_equal_approx(game.loadout_button.get_global_rect().position.y,game.ammo_buttons[0].get_global_rect().position.y),"utility slots continue the bottom row left of the cannon")
 		check(str(game.attack.get("art").resource_path).ends_with("cannon_action.png") and game.attack.get("hero"),"fire control uses the dedicated cannon graphic")
-		check(game.player_hp.get_parent()==game.chrome and game.player_xp.get_parent()==game.chrome,"captain HP and experience appear once, in the top bar")
+		check(game.player_hp.get_parent()==game.chrome and game.player_xp.get_parent()==game.chrome and game.player_shield.get_parent()==game.chrome,"captain experience, hull and shield meters sit in the top bar")
+		check(game.player_shield.get_global_rect().position.y>=game.player_hp.get_global_rect().end.y-1 and game.player_shield.get_global_rect().end.y<=game.chrome.get_global_rect().end.y+1,"shield meter stacks below hull inside the top bar at "+str(dimensions))
+		game.quick_page=1;game._apply_page()
+		var page_two: Array=[game.supply_buttons.repair_kit,game.supply_buttons.shield_charge,game.supply_buttons.plates]
+		var paged=true
+		for i in 3:
+			paged=paged and page_two[i].visible and not game.ammo_buttons[i].visible and page_two[i].get_global_rect()==game.ammo_buttons[i].get_global_rect()
+		var ammo_slots: Array=[game.ammo_buttons[0],game.ammo_buttons[1],game.ammo_buttons[2]]
+		for item: Control in page_two:
+			for control: Control in controls:
+				if control.visible and not control in ammo_slots:paged=paged and not item.get_global_rect().intersects(control.get_global_rect())
+		check(paged,"page two swaps ammunition for emergency items in the same thumb slots at "+str(dimensions))
+		game.quick_page=0;game._apply_page()
 		check(game.chart_mini.get_global_rect().encloses(Rect2(game.zoom_in.get_global_rect().get_center(),Vector2.ONE)) and game.chart_mini.get_global_rect().encloses(Rect2(game.settings_button.get_global_rect().get_center(),Vector2.ONE)),"map controls sit on the chart frame corners")
 		var details=game.target_numbers.get_rect()
 		var card=game.target_panel.size
@@ -115,11 +127,11 @@ func _run() -> void:
 		root.size=dimensions
 		await process_frame
 		game._layout()
-		for kind in ["Hafen","Logbuch","Seekarten"]:
+		for kind in ["Hafen","Logbuch","Seekarten","Kessel","Bonuskarten","Gilde","Kastelle","Decks","Schiff","Munition"]:
 			game._open_modal(kind)
-			await process_frame
+			if kind in ["Hafen","Kessel","Gilde"]:await process_frame
 			check(game.modal.visible and game.modal_scroll.size.y>100,"new gameplay panel opens at %s: %s"%[dimensions,kind])
-			check(game.modal.get_global_rect().end.x<=dimensions.x+1 and game.modal.get_global_rect().end.y<=dimensions.y+1,"panel stays inside viewport: "+kind)
+			check(game.modal.get_global_rect().position.x>=0 and game.modal.get_global_rect().position.y>=0 and game.modal.get_global_rect().end.x<=dimensions.x+1 and game.modal.get_global_rect().end.y<=dimensions.y+1,"panel stays inside viewport: "+kind)
 			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
 	game.modal.hide()
 	game.sim.player.pos=game.sim.harbor
@@ -128,6 +140,10 @@ func _run() -> void:
 	check(game.sim.docked and game.modal_kind=="Hafen","harbor interaction opens actual docked equipment")
 	game.sim.player.gold=1000
 	game._open_modal("Hafen")
+	var castles_link=false
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text.begins_with("KASTELLE"):button.pressed.emit();castles_link=true;break
+	check(castles_link and game.modal_kind=="Kastelle","harbor links to the castle yard")
 	var purchases=game.modal_body.find_children("*","Button",true,false)
 	var upgraded=false
 	for button: Button in purchases:
@@ -135,7 +151,23 @@ func _run() -> void:
 			button.pressed.emit()
 			upgraded=true
 			break
-	check(upgraded and int(game.sim.upgrades.cannon)==1 and int(game.sim.player.gold)==850,"equipment UI purchases real cannon upgrade")
+	check(upgraded and int(game.sim.upgrades.cannon)==1 and int(game.sim.player.gold)==850,"castle UI purchases real Bugkastell upgrade")
+	game._open_modal("Hafen")
+	var stocked=false
+	var powder_before=int(game.sim.supplies.powder)
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text.begins_with("10× Schwarzpulver"):button.pressed.emit();stocked=true;break
+	check(stocked and int(game.sim.supplies.powder)==powder_before+10 and int(game.sim.player.gold)==790,"harbor UI buys a real pack of black powder")
+	game.sim.essence=6;game.kessel_log.clear()
+	game._open_modal("Kessel")
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text=="×5":button.pressed.emit();break
+	check(game.sim.essence==1 and game.kessel_log.size()>=5 and game.modal_kind=="Kessel","cauldron UI throws five essence and logs every result")
+	var throw_one: Button=null
+	game.sim.essence=0;game._open_modal("Kessel")
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text=="×1":throw_one=button
+	check(throw_one!=null and throw_one.disabled,"cauldron throw stays disabled without essence")
 	game._interact()
 	check(not game.sim.docked and not game.modal.visible,"departure interaction closes harbor and resumes sea")
 	game.sim.kills=3
@@ -225,6 +257,8 @@ func _run() -> void:
 	game._load_progress()
 	check(game.sim.map_id==1,"automatic portal arrival is saved to the captain file")
 	# Exercise preferences through the actual settings callbacks at every supported size.
+	# Buff timers and shield regeneration advance with sea time, so the sea pauses while only display options change.
+	game.set_process(false)
 	var captain_before: Dictionary=game.sim.export_save()
 	for dimensions in [Vector2i(1280,720),Vector2i(1560,720),Vector2i(844,390),Vector2i(720,405)]:
 		root.size=dimensions
@@ -238,7 +272,7 @@ func _run() -> void:
 			for button: Button in game.modal_body.find_children("*","Button",true,false):
 				check(button.get_global_rect().end.x<=game.modal_scroll.get_global_rect().end.x+1,"display option stays inside the scaled scroll viewport")
 			game.modal.hide()
-			var touch: Array=[game.attack,game.repair,game.ammo_selector,game.center_button,game.settings_button,game.zoom_in,game.zoom_out,game.loadout_button,game.camera_pad,game.target_cycle]
+			var touch: Array=[game.attack,game.repair,game.ammo_selector,game.center_button,game.settings_button,game.zoom_in,game.zoom_out,game.loadout_button,game.camera_pad,game.target_cycle,game.page_button,game.supply_buttons.powder]
 			touch.append_array(game.ammo_buttons)
 			for control: Control in touch:
 				var bounds=control.get_global_rect()
@@ -251,6 +285,7 @@ func _run() -> void:
 	game.hud_size=0;game.journal_visible=true;game._load_display();game._layout()
 	check(game.hud_size==2 and not game.quest_panel.visible,"HUD size and journal visibility survive reload")
 	check(game.sim.export_save()==captain_before,"display choices preserve all captain progress")
+	game.set_process(true)
 	game._set_display(1,true);game.modal.hide()
 	root.size=Vector2i(1560,720);await process_frame;game._layout()
 	check(game.attack.get_global_rect().size.x>=140,"comfortable wide-phone layout has a larger primary attack button")
@@ -335,10 +370,43 @@ func _run() -> void:
 	check(game.sim.message=="Kein Ziel im sichtbaren Bereich","empty view gives clear feedback without a fake target")
 	root.size=Vector2i(720,405);await process_frame;game._layout()
 	check(game.quest_panel.visible and game.camera_pad.visible and not game.quest_panel.get_global_rect().intersects(game.camera_pad.get_global_rect()),"short phone layout keeps the quest bar top-left and the joystick bottom-left")
-	game.pad_steers=true;game.camera_pad.steering=true;game.sim.player.path=[]
-	game._steer(Vector2.RIGHT,1.0)
-	check(not game.sim.player.path.is_empty() and game.sim.player.path[0].x>game.sim.player.pos.x and game.camera_locked,"helm mode steers the ship toward the stick and keeps the camera on it")
-	game.pad_steers=false;game.camera_pad.steering=false;game.sim.player.path=[]
+	check(game.camera_pad.get("steering")==null and not game.has_method("_steer"),"design lock: the joystick has no ship-steering mode")
+	# Quick-bar items act on the real simulation.
+	game.modal.hide();game.sim.docked=false;game.sim.player.hp=1200;game.sim.player.last_hit=-100;game.sim.powder_on=false
+	game.sim.supplies.powder=4;game._refresh_ui()
+	game.supply_buttons.powder.pressed.emit()
+	check(game.sim.powder_on and int(game.sim.supplies.powder)==4 and game.supply_buttons.powder.get("latched"),"powder orb toggles black powder without spending it")
+	game.supply_buttons.powder.pressed.emit()
+	check(not game.sim.powder_on,"powder orb switches black powder off again")
+	game.page_button.pressed.emit()
+	check(game.quick_page==1 and game.supply_buttons.repair_kit.visible and not game.ammo_buttons[0].visible,"page control shows the emergency items")
+	var kits=int(game.sim.supplies.repair_kit)
+	game.supply_buttons.repair_kit.pressed.emit()
+	check(int(game.sim.supplies.repair_kit)==kits-1 and int(game.sim.player.hp)>1200 and float(game.sim.cooldowns.repair_kit)>0 and game.supply_buttons.repair_kit.get("cooldown")>0,"emergency repair heals once and shows its own cooldown")
+	game.repair.pressed.emit()
+	check(int(game.sim.supplies.repair_kit)==kits-1,"basic repair never consumes an emergency item")
+	game.sim.repairing=false
+	game.page_button.pressed.emit()
+	check(game.quick_page==0 and game.ammo_buttons[0].visible and not game.supply_buttons.repair_kit.visible,"page control returns to the ammunition slots")
+	# Guild founding and the bonus map run entirely through the menus.
+	game.sim.player.gold=1000;game._open_modal("Gilde")
+	game.guild_name_input.text="Sturmkrone";game.guild_tag_input.text="skr"
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text.begins_with("GILDE GRÜNDEN"):button.pressed.emit();break
+	check(str(game.sim.guild.get("tag",""))=="SKR" and int(game.sim.player.gold)==700 and game.modal_kind=="Gilde","guild UI founds a local guild with a validated tag")
+	var labelled=false
+	for label: Label in game.modal_body.find_children("*","Label",true,false):labelled=labelled or "lokal" in label.text
+	check(labelled,"guild panel labels the preview as local, not online")
+	game.sim.configure_map(0);game.previous_region=0;game.sim.player.pos=game.sim.START;game.sim.level=4;game.sim.scrolls=[1,0,0];game.sim.bonus={}
+	game._open_modal("Bonuskarten")
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text=="STARTEN" and not button.disabled:button.pressed.emit();break
+	check(game.sim.map_id==3 and game.previous_region==3 and int(game.sim.scrolls[0])==0,"bonus UI spends a scroll and opens Bronzeriff")
+	game._advance_loading(5.0);game._refresh_ui()
+	check(game.interact.visible and game.interact.text=="BONUSKARTE VERLASSEN" and "WELLE 1/5" in game.quest_text.text and not game.sim.has_harbor(),"bonus map shows its wave tracker and an exit instead of a harbor")
+	game._interact()
+	check(game.sim.map_id==0 and game.previous_region==0 and not game.sim.bonus.is_empty(),"leaving a bonus map returns to the origin and keeps the checkpoint")
+	game._advance_loading(5.0)
 	# Dispatch through the viewport, including release outside the joystick hit box.
 	game.camera_pad_visible=true;game.modal.hide();root.size=Vector2i(1280,720)
 	await process_frame;game._layout();game.sim.player.path=[]
