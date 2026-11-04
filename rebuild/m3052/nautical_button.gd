@@ -7,6 +7,7 @@ var nav_mode=false
 var latched=false
 var cooldown=0.0
 var state_label=""
+var hero:=false
 const GOLD=Color("c7a15a")
 func _ready() -> void:
 	focus_mode=Control.FOCUS_NONE
@@ -19,6 +20,32 @@ func _draw() -> void:
 	var gold=Color("f5d78d") if hot else GOLD
 	if disabled:gold=Color("746747")
 	var font=ThemeDB.fallback_font
+	if hero:
+		var diameter=minf(size.x,size.y)
+		var center=Vector2(size.x*.5,diameter*.5)
+		var radius=diameter*.5-2
+		draw_circle(center+Vector2(0,3),radius+1,Color(0,0,0,.42))
+		draw_circle(center,radius,Color("102028"))
+		draw_circle(center,radius,gold,false,2.4,true)
+		draw_circle(center,radius-4,Color("80623a"),false,1.0,true)
+		if art!=null:
+			var dimensions=art.get_size()*diameter*.84/maxf(art.get_width(),art.get_height())
+			draw_texture_rect(art,Rect2(center-dimensions*.5,dimensions),false,Color(1,1,1,.45) if disabled else Color.WHITE)
+		if latched:draw_arc(center,radius-5,0,TAU,40,Color("80e3dc"),2.2,true)
+		if not state_label.is_empty():
+			var fs=10 if diameter<120 else 12
+			var label_width=font.get_string_size(state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
+			var pos=Vector2(center.x-label_width*.5,16)
+			draw_string_outline(font,pos,state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,4,Color("071018"))
+			draw_string(font,pos,state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("80e3dc") if state_label=="BEREIT" else Color("edc68c"))
+		if not caption.is_empty():
+			var fs=16 if diameter>100 else 13
+			var label_width=font.get_string_size(caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
+			var pos=Vector2(center.x-label_width*.5,diameter-8)
+			draw_string_outline(font,pos,caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,4,Color("071018"))
+			draw_string(font,pos,caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("f3e0b6"))
+		if cooldown>0:draw_arc(center,radius-6,-PI*.5,-PI*.5+TAU*(1-clampf(cooldown,0,1)),36,Color("e3bf76"),2.4,true)
+		return
 	if nav_mode:
 		draw_rect(Rect2(Vector2(1,1),size-Vector2(2,2)),Color("30291c") if hot else Color("101c23"))
 		draw_rect(Rect2(Vector2(1,1),size-Vector2(2,2)),gold,false,1.0)

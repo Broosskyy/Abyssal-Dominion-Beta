@@ -162,6 +162,7 @@ func _load_assets() -> void:
 	beast = load("res://assets/reference/monsters/tiamat.png")
 	for name in ["cannon_0","cannon_1","cannon_2","harpoon_0","harpoon_1","harpoon_2","loot_0","loot_1","loot_2","loot_3","upgrade_cannon","upgrade_harpoon","upgrade_hull","upgrade_sails","quest_book","world_chart"]:
 		extra_icons[name] = load("res://assets/expanded/"+name+".png")
+	extra_icons.cannon_action=load("res://assets/ui/cannon_action.png")
 
 func _process(delta: float) -> void:
 	if modal_backdrop!=null:modal_backdrop.visible=modal.visible
@@ -373,10 +374,12 @@ func _draw_actor(actor: Dictionary) -> void:
 	var name_offset=68.0 if is_player and int(sim.player.skin)==26 else 47.0
 	var baseline = point+Vector2(0,name_offset)
 	_label(baseline,("✦ "+name) if is_player else name,14 if is_player else 13,color)
-	var bar = Rect2(point+Vector2(-43,name_offset+8),Vector2(86,4))
-	draw_rect(bar,Color("071820"))
-	var health_color=Color("60b682") if is_player else (Color("b36452") if bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) else Color("baa165"))
-	draw_rect(Rect2(bar.position,Vector2(bar.size.x*float(actor.hp)/float(actor.max_hp),4)),health_color)
+	# The captain's HP lives once, on the edge card. World bars stay on other ships and in gallery sheets.
+	if not is_player or gallery_page>=0:
+		var bar = Rect2(point+Vector2(-43,name_offset+8),Vector2(86,4))
+		draw_rect(bar,Color("071820"))
+		var health_color=Color("60b682") if is_player else (Color("b36452") if bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) else Color("baa165"))
+		draw_rect(Rect2(bar.position,Vector2(bar.size.x*float(actor.hp)/float(actor.max_hp),4)),health_color)
 	if float(actor.slow)>0: _label(point+Vector2(0,name_offset+33),"VERLANGSAMT",10,Color("9fdbf4"))
 
 func _draw_atlas(tex: Texture2D,point: Vector2,width: float,col: int,row: int,columns: int,rows: int) -> void:
@@ -554,14 +557,18 @@ func _build_ui() -> void:
 	player_hp=_bar(player_panel)
 	player_numbers=_text(player_panel,"",11)
 	player_name.clip_text=true
+	player_numbers.clip_text=true
 	player_xp=_bar(player_panel)
 	var xp_style: StyleBoxFlat=player_xp.get_theme_stylebox("fill").duplicate();xp_style.bg_color=Color("348cb6");player_xp.add_theme_stylebox_override("fill",xp_style)
 	target_panel=_panel(ui)
 	target_portrait=_portrait(target_panel)
+	target_panel.clip_contents=true
 	target_name=_text(target_panel,"",13);target_name.clip_text=true
 	target_hp=_bar(target_panel)
 	target_health_skin=target_hp.get_theme_stylebox("fill").duplicate();target_hp.add_theme_stylebox_override("fill",target_health_skin)
 	target_numbers=_text(target_panel,"",11)
+	target_numbers.clip_text=true
+	target_numbers.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	chart_mini=MINI.new();chart_mini.simulation=sim
 	chart_mini.course_requested.connect(func(point):_chart_course(point))
 	ui.add_child(chart_mini)
@@ -569,8 +576,10 @@ func _build_ui() -> void:
 	combat_readout=_text(combat_dock,"",10,GOLD);combat_readout.clip_text=true
 	deck_hp=_bar(combat_dock);deck_xp=_bar(combat_dock);deck_xp.add_theme_stylebox_override("fill",xp_style)
 	deck_numbers=_text(combat_dock,"",9,Color.WHITE);deck_numbers.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	for duplicate in [deck_hp,deck_xp,deck_numbers]:duplicate.visible=false
 	loadout_button=_orb(ui,"Bewaffnung",extra_icons.cannon_0,func():_open_modal("Bewaffnung"),"WAFFEN")
-	attack=_orb(ui,"Feuer ein/aus",extra_icons.cannon_2,_toggle_fire,"FEUER");attack.name="FireButton"
+	attack=_orb(ui,"Feuer ein/aus",extra_icons.cannon_action,_toggle_fire,"FEUER");attack.name="FireButton"
+	attack.set("hero",true)
 	repair=_orb(ui,"Schiff reparieren",extra_icons.upgrade_hull,func():sim.toggle_repair();_refresh_ui(),"REP");repair.name="RepairButton"
 	ammo_selector=_orb(ui,"Munitionsauswahl",icons.cannonball,func():_open_modal("Munition"),"KUGELN")
 	for i in 3:
@@ -583,12 +592,15 @@ func _build_ui() -> void:
 	zoom_in=_orb(ui,"Näher zoomen",hud_icons.plus,func():_zoom(1.15))
 	zoom_out=_orb(ui,"Weiter zoomen",hud_icons.minus,func():_zoom(1.0/1.15))
 	interact=_button(ui,"",_interact);interact.name="InteractButton"
-	status=_text(ui,"",11,Color("b3ccd0"));status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	status=_text(ui,"",11,Color("b3ccd0"));status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	status.clip_text=true
+	status.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+	status.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	quest_panel=_panel(ui)
 	quest_tab=_button(quest_panel,"AUFTRAG",func():system_view=false;_refresh_ui())
 	system_tab=_button(quest_panel,"SYSTEM",func():system_view=true;_refresh_ui())
 	for tab in [quest_tab,system_tab]:tab.add_theme_font_size_override("font_size",10)
-	quest_text=_text(quest_panel,"",11);quest_text.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	quest_text=_text(quest_panel,"",11);quest_text.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;quest_text.clip_text=true
 	system_label=_text(quest_panel,"",11,Color("bac7c7"));system_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;system_label.clip_text=true
 	quest_claim=_button(quest_panel,"BELOHNUNG ABHOLEN",func():sim.claim_quest();_save_progress();_refresh_ui());quest_claim.add_theme_font_size_override("font_size",10)
 	modal_backdrop=ColorRect.new()
@@ -642,23 +654,24 @@ func _layout() -> void:
 		desired_zoom=0.78
 		camera.zoom=Vector2.ONE*desired_zoom
 	water.size=viewport_size
-	var header=54.0 if compact else 62.0
+	var header=50.0 if compact else 56.0
 	_place(chrome,0,0,s.x,header)
-	title.visible=not compact;_place(title,12,4,210,18)
-	_place(resources,12,5 if compact else 24,154 if compact else 250,44 if compact else 32)
+	title.visible=not compact;_place(title,12,2,180,16)
+	resources.clip_text=true
+	_place(resources,12,3 if compact else 26,154 if compact else 250,20)
 	resources.visible=true
 	var nw=62.0 if compact else 80.0
 	var nav_x=(s.x-nw*nav_buttons.size())*.5
 	resources.size.x=maxf(90,nav_x-24)
-	for i in nav_buttons.size():_place(nav_buttons[i],nav_x+i*nw,2,nw-3,header-4)
-	var top=header+8
-	_place(player_panel,12,top,208 if compact else 236,66)
-	_place(player_portrait,7,6,48,49);_place(player_name,62,3,player_panel.size.x-70,22)
-	_place(player_hp,62,27,player_panel.size.x-72,9);_place(player_numbers,62,38,player_panel.size.x-70,20)
-	_place(player_xp,8,60,player_panel.size.x-16,3)
+	for i in nav_buttons.size():_place(nav_buttons[i],nav_x+i*nw,1,nw-3,header-3)
+	var top=header+6
+	_place(player_panel,12,top,196 if compact else 220,58)
+	_place(player_portrait,6,5,42,44);_place(player_name,54,3,player_panel.size.x-60,18)
+	_place(player_hp,54,22,player_panel.size.x-64,8);_place(player_numbers,54,32,player_panel.size.x-60,18)
+	_place(player_xp,8,52,player_panel.size.x-16,3)
 	var tw=player_panel.size.x
-	_place(target_panel,12,top+72,tw,72)
-	_place(target_portrait,7,5,48,51);_place(target_name,62,3,tw-70,22);_place(target_hp,62,27,tw-72,8);_place(target_numbers,62,36,tw-70,32)
+	_place(target_panel,12,top+62,tw,70)
+	_place(target_portrait,6,5,42,44);_place(target_name,54,3,tw-62,18);_place(target_hp,54,22,tw-64,8);_place(target_numbers,54,32,tw-62,34)
 	var mw=128.0 if compact else 180.0
 	var mh=108.0 if compact else 154.0
 	_place(chart_mini,s.x-mw-12,top,mw,mh)
@@ -670,25 +683,27 @@ func _layout() -> void:
 	camera_pad.visible=camera_pad_visible
 	var q=44.0 if compact else 52.0
 	var group=4*q+24
-	var left=(s.x-group)*.5 if compact else s.x-118-60-28-group-20
-	var dh=104.0 if compact else 116.0
-	var dy=s.y-dh-6
+	var fire=108.0 if compact else 128.0
+	var small=50.0 if compact else 58.0
+	var dh=88.0 if compact else 96.0
+	var dy=s.y-dh-8
+	var left=(s.x-group)*.5 if compact else s.x-fire-small-36-group-16
 	_place(combat_dock,left-8,dy,group+16,dh)
-	_place(combat_readout,8,3,group,14)
-	_place(deck_hp,8,19,group,10);_place(deck_xp,8,31,group,7);_place(deck_numbers,8,18,group,12)
-	for i in 3:_place(ammo_buttons[i],left+i*(q+8),dy+42,q,q+12)
-	_place(loadout_button,left+3*(q+8),dy+42,q,q)
-	var fire=92.0 if compact else 118.0
-	_place(attack,s.x-fire-12,s.y-fire-12,fire,fire)
-	var small=52.0 if compact else 60.0
-	var side_x=s.x-fire-small-28
-	_place(repair,side_x,s.y-small-12,small,small)
-	_place(ammo_selector,side_x-2,s.y-small*2-42,small+4,small+16)
-	var status_x=maxf(236 if compact else 294,s.x*.5-220)
-	_place(status,status_x,dy-26,minf(440,side_x-status_x-12),20)
-	_place(interact,12,top+152,player_panel.size.x,36)
-	var journal_height=116.0 if compact else minf(150,s.y-(top+194)-116)
-	var journal_y=s.y-journal_height-(116 if camera_pad_visible and not compact else 10)
+	_place(combat_readout,8,4,group,16)
+	for i in 3:_place(ammo_buttons[i],left+i*(q+8),dy+22,q,q+12)
+	_place(loadout_button,left+3*(q+8),dy+22,q,q)
+	_place(attack,s.x-fire-10,s.y-fire-10,fire,fire)
+	var side_x=s.x-fire-small-24
+	_place(repair,side_x,s.y-small-10,small,small)
+	_place(ammo_selector,side_x,s.y-small*2-28,small,small+12)
+	var nav_right=nav_x+nw*nav_buttons.size()
+	if compact:_place(status,nav_right+8,14,maxf(48,s.x-nav_right-16),22)
+	else:
+		var status_x=maxf(250,s.x*.5-180)
+		_place(status,status_x,dy-22,minf(340,side_x-status_x-12),18)
+	_place(interact,12,top+138,player_panel.size.x,34)
+	var journal_height=96.0 if compact else minf(108.0,maxf(96.0,s.y-(top+160)-124))
+	var journal_y=s.y-journal_height-(112 if camera_pad_visible and not compact else 8)
 	_place(quest_panel,12,journal_y,208 if compact else 270,journal_height)
 	quest_panel.visible=journal_visible and (not compact or not camera_pad_visible)
 	_place(quest_tab,5,4,quest_panel.size.x*.5-7,23);_place(system_tab,quest_panel.size.x*.5+2,4,quest_panel.size.x*.5-7,23)
@@ -719,11 +734,11 @@ func _refresh_ui() -> void:
 		player_portrait.texture=skin_previews[portrait_skin]
 	player_hp.max_value=sim.player.max_hp
 	player_hp.value=sim.player.hp
-	player_numbers.text="Lv. %d · %d / %d HP" % [sim.level,int(sim.player.hp),int(sim.player.max_hp)]
+	player_numbers.text="Lv. %d · %d/%d" % [sim.level,int(sim.player.hp),int(sim.player.max_hp)]
 	player_xp.tooltip_text="Erfahrung %d / %d" % [sim.xp,sim.xp_required()]
 	player_xp.max_value=sim.xp_required()
 	player_xp.value=sim.xp
-	resources.text="GOLD  %s\nLV. %d · %d VERSENKT" % [str(sim.player.gold),sim.level,sim.kills]
+	resources.text="GOLD %s · LV. %d · %d VERSENKT" % [str(sim.player.gold),sim.level,sim.kills]
 	var selected =sim.actor(sim.target)
 	target_panel.visible=not selected.is_empty() and sim.target>0 and int(selected.hp)>0
 	if target_panel.visible:
@@ -742,7 +757,7 @@ func _refresh_ui() -> void:
 		target_numbers.text="%d / %d HP\n%s · %d m"%[int(selected.hp),int(selected.max_hp),disposition,roundi(sim.player.pos.distance_to(selected.pos))]
 	attack.text="STOPP" if sim.firing else "FEUER"
 	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0 or sim.docked
-	_set_orb(attack,extra_icons["cannon_%d" % mini(2,int(sim.upgrades.cannon))],"",sim.firing,attack.text)
+	_set_orb(attack,extra_icons.cannon_action,"",sim.firing,attack.text)
 	attack.set("cooldown",float(sim.player.reload)/1.65)
 	attack.set("state_label",_combat_state())
 	repair.disabled=sim.docked
@@ -831,14 +846,41 @@ func _open_modal(kind: String) -> void:
 			var choose=_button(column,"GELADEN" if sim.ammo_mode==i else "LADEN",func():sim.set_ammo(index);modal.hide();_refresh_ui())
 			choose.custom_minimum_size.y=28;choose.add_theme_font_size_override("font_size",11);choose.disabled=sim.ammo_mode==i or int(sim.player.ammo[i])<=0
 	elif kind=="Werft":
-		_info("SCHIFFSDESIGNS · Wähle deinen Look für die nächste Ausfahrt.",CYAN)
-		for i in skins.size():
-			var index =i
-			var b =_button(modal_body,str(skins[i].name)+("   ✓" if int(sim.player.skin)==i else "   AUSRÜSTEN"),func():_equip(index))
-			b.custom_minimum_size.y=64
-			b.icon=skin_previews[i]
-			b.expand_icon=true
-			b.add_theme_constant_override("icon_max_width",72)
+		_info("SCHIFFSDESIGNS · %d Karten, nach Namen sortiert." % skins.size(),CYAN)
+		var order: Array[int]=[]
+		for i in skins.size():order.append(i)
+		order.sort_custom(func(a,b): return str(skins[a].name).naturalnocasecmp_to(str(skins[b].name))<0)
+		var grid=GridContainer.new()
+		grid.columns=2
+		grid.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		grid.add_theme_constant_override("h_separation",8)
+		grid.add_theme_constant_override("v_separation",8)
+		modal_body.add_child(grid)
+		for raw in order:
+			var index: int=raw
+			var card=VBoxContainer.new()
+			card.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			card.add_theme_constant_override("separation",4)
+			grid.add_child(card)
+			var frame=Panel.new()
+			frame.custom_minimum_size=Vector2(0,108)
+			frame.clip_contents=true
+			var frame_style=StyleBoxFlat.new()
+			frame_style.bg_color=Color("071820")
+			frame_style.border_color=CYAN if int(sim.player.skin)==index else Color("67583f")
+			frame_style.set_border_width_all(1)
+			frame_style.set_corner_radius_all(4)
+			frame.add_theme_stylebox_override("panel",frame_style)
+			card.add_child(frame)
+			var preview=_portrait(frame)
+			preview.texture=skin_previews[index]
+			preview.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			var equipped=int(sim.player.skin)==index
+			var choose=_button(card,str(skins[index].name)+("\nAKTIV" if equipped else "\nAUSRÜSTEN"),func():_equip(index))
+			choose.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+			choose.custom_minimum_size.y=46
+			choose.add_theme_font_size_override("font_size",12)
+			choose.disabled=equipped
 		_text(modal_body,"MUNITIONSNACHSCHUB · Je 30 Gold",14,CYAN)
 		for i in 3:
 			var index =i
