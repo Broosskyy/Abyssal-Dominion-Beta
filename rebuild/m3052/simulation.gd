@@ -7,6 +7,11 @@ const WORLD := Vector2(4400, 3200)
 const CELL := 48
 const PLAYER_SPEED := 165.0
 const PLAYER_HP := 2400
+const PLAYER_SHIELD := 1000
+const SHIELD_DELAY := 8.0
+const BASE_CANNON_SLOTS := 10
+const MAX_CANNONS := 40
+const BASE_RELOAD := 1.65
 const START := Vector2(2100, 1450)
 const AMMO_NAMES := ["cannon", "chain", "harpoon"]
 var player: Dictionary
@@ -14,10 +19,12 @@ var npcs: Array[Dictionary] = []
 var islands: Array[Dictionary] = []
 var shots: Array[Dictionary] = []
 var drops: Array[Dictionary] = []
+var sparkles: Array[Dictionary] = []
 var events: Array[Dictionary] = []
 var clock := 0.0
 var next_id := 1000
 var grid := AStarGrid2D.new()
+var rng := RandomNumberGenerator.new()
 var firing := false
 var repairing := false
 var target := -1
@@ -33,11 +40,28 @@ var quest_index := 0
 var loot_collected := 0
 var monster_kills := 0
 var elite_kills := 0
+var tower_kills := 0
 var visited := [true, false, false]
-var upgrades := {"cannon":0, "harpoon":0, "hull":0, "sails":0}
-var portals: Array[Dictionary] = [
-	{"pos":Vector2(4070,1600),"destination":1},
-	{"pos":Vector2(330,1600),"destination":2}]
+var upgrades := {"cannon":0, "hull":0, "sails":0, "crew":0, "harpoon":0, "war":0}
+var supplies := {"powder":10, "plates":10, "repair_kit":2, "shield_charge":2}
+var powder_on := false
+var plates_on := false
+var cooldowns := {"repair_kit":0.0, "shield_charge":0.0}
+var buffs := {"blessing":0.0, "tide_deck":0.0}
+var essence := 3
+var fragments := 0
+var scrolls := [0, 0, 0]
+var kessel_meter := 0
+var kessel_throws := 0
+var free_flask_day := ""
+var decks: Array = []
+var deck_slots := [-1, -1]
+var bonus: Dictionary = {}
+var bonus_runs := 0
+var guild: Dictionary = {}
+var fortress_conquests := 0
+var fortress_hold := 0.0
+var portals: Array[Dictionary] = []
 var harbor := Vector2(1920,1450)
 var base_islands: Array[Dictionary] = []
 var base_npcs: Array[Dictionary] = []
@@ -45,9 +69,11 @@ var map_states: Dictionary = {}
 var message := "Seekarte antippen: Kurs setzen · Schiff antippen: Ziel wählen"
 
 func _init() -> void:
+	rng.seed = 3060
 	player = {"id": 0, "pos": START, "heading": Vector2(-1, 0), "path": [], "hp": PLAYER_HP,
-		"max_hp": PLAYER_HP, "speed": PLAYER_SPEED, "reload": 0.0, "gold": 240,
-		"ammo": [600, 120, 100], "skin": 26, "last_hit": -100.0, "respawn": 0.0, "slow": 0.0}
+		"max_hp": PLAYER_HP, "shield": PLAYER_SHIELD, "max_shield": PLAYER_SHIELD, "speed": PLAYER_SPEED,
+		"reload": 0.0, "gold": 240, "ammo": [600, 120, 100], "cannons": BASE_CANNON_SLOTS, "skin": 26,
+		"last_hit": -100.0, "respawn": 0.0, "slow": 0.0}
 	islands = [
 		{"pos": Vector2(1530, 1250), "radius": 145.0, "art": "tropical", "width": 490.0, "name": "Port Azur"},
 		{"pos": Vector2(2640, 1390), "radius": 120.0, "art": "rock", "width": 410.0, "name": "Korsarenbucht"},
@@ -66,17 +92,19 @@ func _init() -> void:
 	var names = ["Roter Korsar", "Jadebrigg", "Kupfersegler", "Küstenfregatte", "Goldene Armada", "Eisfregatte", "Schattensegler", "Admiralswache", "Elite-Galeone", "Knochenschiff", "Brennender Holländer", "Schwarzbart", "Königsgaleone", "Kriegsschiff", "Schmuggler", "Fliegender Holländer"]
 	for i in starts.size():
 		var elite = i % 5 == 4
+		var hull = 760 if elite else 420
+		var shield = roundi(hull * 0.25) if elite else 0
 		npcs.append({"id": i + 1, "name": names[i % names.size()], "kind": "ship", "pos": starts[i],
-			"home": starts[i], "heading": Vector2.LEFT, "path": [], "hp": 760 if elite else 420,
-			"max_hp": 760 if elite else 420, "speed": 66.0 + float(i % 3) * 8.0,
+			"home": starts[i], "heading": Vector2.LEFT, "path": [], "hp": hull,
+			"max_hp": hull, "shield": shield, "max_shield": shield, "speed": 66.0 + float(i % 3) * 8.0,
 			"reload": float(i % 4) * 0.6, "repath": 0.0, "state": "patrol", "patrol": i % 4,
 			"aggressive": false, "slow": 0.0, "respawn": 0.0, "reward": 110 if elite else 55,
-			"art": i, "elite": elite, "view_count":4, "renderer":"sprite", "navigation":"four_diagonal"})
+			"art": i, "elite": elite, "view_count":4, "renderer":"sprite", "navigation":"four_diagonal", "last_hit": -100.0})
 	npcs.append({"id": 100, "name": "Tiamat · Tiefenwächter", "kind": "monster", "pos": Vector2(2590, 1750),
 		"home": Vector2(2590, 1750), "heading": Vector2.LEFT, "path": [], "hp": 1650,
-		"max_hp": 1650, "speed": 48.0, "reload": 1.0, "repath": 0.0, "state": "patrol",
+		"max_hp": 1650, "shield": 0, "max_shield": 0, "speed": 48.0, "reload": 1.0, "repath": 0.0, "state": "patrol",
 		"patrol": 0, "aggressive": false, "slow": 0.0, "respawn": 0.0, "reward": 240,
-		"art": 0, "elite": true})
+		"art": 0, "elite": true, "last_hit": -100.0})
 	_add_drop(START + Vector2(-170, 130), 25)
 	_add_drop(START + Vector2(220, -120), 25)
 	_add_drop(Vector2(2170, 1780), 30)
@@ -113,6 +141,11 @@ func blocked(point: Vector2, margin: float = 36.0) -> bool:
 		if Geometry2D.is_point_in_polygon(point,polygon):return true
 		for i in polygon.size():
 			if Geometry2D.get_closest_point_to_segment(point,polygon[i],polygon[(i+1)%polygon.size()]).distance_to(point)<margin:return true
+	return false
+
+func on_land(point: Vector2) -> bool:
+	for island in islands:
+		if island.bounds.has_point(point) and Geometry2D.is_point_in_polygon(point,island.outline):return true
 	return false
 
 func segment_free(a: Vector2, b: Vector2) -> bool:
@@ -231,8 +264,180 @@ func toggle_repair() -> void:
 		player.path = []
 	message = "Reparatur läuft" if repairing else "Reparatur gestoppt"
 
+# --- Ship supplies -----------------------------------------------------------------
+
+func toggle_supply(key: String) -> bool:
+	if not key in ["powder","plates"]: return false
+	var active: bool = powder_on if key == "powder" else plates_on
+	if not active and int(supplies[key]) <= 0:
+		message = "Keine %s mehr · Nachschub im Hafen oder im Kessel" % CONTENT.SUPPLIES[key].name
+		return false
+	if key == "powder": powder_on = not powder_on
+	else: plates_on = not plates_on
+	active = not active
+	message = "%s %s" % [CONTENT.SUPPLIES[key].name, "aktiv" if active else "aus"]
+	return true
+
+func use_supply(key: String) -> bool:
+	if not key in ["repair_kit","shield_charge"] or docked or int(player.hp) <= 0: return false
+	var config: Dictionary = CONTENT.SUPPLIES[key]
+	if float(cooldowns[key]) > 0:
+		message = "%s lädt noch %d s" % [config.name, ceili(float(cooldowns[key]))]
+		return false
+	if int(supplies[key]) <= 0:
+		message = "Keine %s mehr · Nachschub im Hafen oder im Kessel" % config.name
+		return false
+	if key == "repair_kit":
+		if float(player.hp) >= float(player.max_hp):
+			message = "Rumpf ist vollständig intakt"
+			return false
+		player.hp = minf(float(player.max_hp), float(player.hp) + float(player.max_hp) * 0.35)
+	else:
+		if float(player.shield) >= float(player.max_shield):
+			message = "Schild ist voll geladen"
+			return false
+		player.shield = minf(float(player.max_shield), float(player.shield) + float(player.max_shield) * 0.5)
+	supplies[key] -= 1
+	cooldowns[key] = float(config.cooldown)
+	_event("supply", player.pos, 0, 0)
+	message = "%s eingesetzt" % config.name
+	return true
+
+func buy_supply(key: String) -> bool:
+	if not CONTENT.SUPPLIES.has(key) or not docked: return false
+	var config: Dictionary = CONTENT.SUPPLIES[key]
+	if int(player.gold) < int(config.price): return false
+	player.gold -= int(config.price)
+	supplies[key] += int(config.pack)
+	message = "%d× %s gekauft" % [config.pack, config.name]
+	return true
+
+func buy_cannons() -> bool:
+	if not docked or int(player.cannons) >= MAX_CANNONS or int(player.gold) < cannon_price(): return false
+	player.gold -= cannon_price()
+	player.cannons = mini(MAX_CANNONS, int(player.cannons) + 2)
+	message = "2 Kanonen gekauft · %d an Bord" % player.cannons
+	return true
+
+func cannon_price() -> int:
+	return 160 + maxi(0, int(player.cannons) - BASE_CANNON_SLOTS) * 20
+
+# --- Buffs, decks and derived ship values ------------------------------------------
+
+func has_blessing() -> bool:
+	return float(buffs.blessing) > 0
+
+func activate_blessing(seconds: float = CONTENT.BLESSING_SECONDS) -> void:
+	var before := float(player.max_hp)
+	buffs.blessing = maxf(float(buffs.blessing), seconds)
+	apply_upgrades()
+	player.hp = minf(float(player.max_hp), float(player.hp) + maxf(0, float(player.max_hp) - before))
+	_event("blessing", player.pos, 0, 0)
+
+func add_tide_deck(seconds: float) -> void:
+	buffs.tide_deck = minf(CONTENT.TIDE_DECK_CAP, float(buffs.tide_deck) + seconds)
+	_event("tide_deck", player.pos, 0, 0)
+
+func deck_value(type: String) -> float:
+	var total := 0.0
+	for slot in deck_slots:
+		if int(slot) < 0 or int(slot) >= decks.size(): continue
+		var deck: Dictionary = decks[int(slot)]
+		if str(deck.type) == type: total += float(CONTENT.DECKS[type].values[int(deck.tier)])
+	return total
+
+func cannon_slots() -> int:
+	return BASE_CANNON_SLOTS + roundi(deck_value("cannon")) + (10 if float(buffs.tide_deck) > 0 else 0) + (5 if has_blessing() else 0)
+
+func equipped_cannons() -> int:
+	return mini(int(player.cannons), cannon_slots())
+
+func owns_deck(type: String, tier: int) -> bool:
+	for deck: Dictionary in decks:
+		if str(deck.type) == type and int(deck.tier) == tier: return true
+	return false
+
+func grant_deck(type: String, tier: int) -> bool:
+	if not CONTENT.DECKS.has(type): return false
+	tier = clampi(tier, 0, CONTENT.DECK_TIERS.size() - 1)
+	var title := "%s %s" % [CONTENT.DECKS[type].name, CONTENT.DECK_TIERS[tier]]
+	if owns_deck(type, tier):
+		essence += CONTENT.DUPLICATE_DECK_ESSENCE
+		message = "%s doppelt · in %d Gezeitenessenz umgewandelt" % [title, CONTENT.DUPLICATE_DECK_ESSENCE]
+		return false
+	decks.append({"type":type, "tier":tier})
+	var mounted := false
+	for slot in deck_slots:
+		if int(slot) >= 0 and str(decks[int(slot)].type) == type: mounted = true
+	if not mounted:
+		for i in deck_slots.size():
+			if int(deck_slots[i]) < 0:
+				deck_slots[i] = decks.size() - 1
+				break
+	apply_upgrades()
+	message = "Neues Deck: %s" % title
+	return true
+
+func equip_deck(index: int, slot: int) -> bool:
+	if index < 0 or index >= decks.size() or slot < 0 or slot >= deck_slots.size(): return false
+	if not docked:
+		message = "Decks werden im Hafen umgebaut"
+		return false
+	for other in deck_slots.size():
+		if other != slot and int(deck_slots[other]) >= 0 and str(decks[int(deck_slots[other])].type) == str(decks[index].type):
+			message = "Dieser Decktyp ist bereits montiert"
+			return false
+	deck_slots[slot] = index
+	apply_upgrades()
+	message = "%s montiert" % CONTENT.DECKS[str(decks[index].type)].name
+	return true
+
+func unequip_deck(slot: int) -> bool:
+	if slot < 0 or slot >= deck_slots.size() or int(deck_slots[slot]) < 0 or not docked: return false
+	deck_slots[slot] = -1
+	apply_upgrades()
+	message = "Deckplatz %d frei" % (slot + 1)
+	return true
+
+func buy_deck(type: String) -> bool:
+	if not docked or not CONTENT.DECKS.has(type) or owns_deck(type, 0): return false
+	var price := int(CONTENT.DECKS[type].price)
+	if int(player.gold) < price: return false
+	player.gold -= price
+	return grant_deck(type, 0)
+
+func reload_time() -> float:
+	return BASE_RELOAD * (1.0 - 0.04 * float(upgrades.crew))
+
+func loot_gold(amount: int) -> int:
+	var factor := 1.0 + 0.08 * float(upgrades.crew) + deck_value("logistics") / 100.0 + (0.1 if guild_island_held() else 0.0)
+	return roundi(float(amount) * factor)
+
+# --- Simulation step ---------------------------------------------------------------
+
+func _tick_timers(delta: float) -> void:
+	for key in cooldowns.keys(): cooldowns[key] = maxf(0.0, float(cooldowns[key]) - delta)
+	if has_blessing():
+		buffs.blessing = maxf(0.0, float(buffs.blessing) - delta)
+		if not has_blessing():
+			apply_upgrades()
+			message = "Kristallsegen verblasst"
+	if float(buffs.tide_deck) > 0:
+		buffs.tide_deck = maxf(0.0, float(buffs.tide_deck) - delta)
+		if float(buffs.tide_deck) <= 0: message = "Gezeitendeck abgelaufen · Kanonenplätze wieder %d" % cannon_slots()
+	if fortress_hold > 0:
+		fortress_hold = maxf(0.0, fortress_hold - delta)
+		if fortress_hold <= 0 and not guild.is_empty(): message = "Korsaren erobern die Festung zurück"
+	if int(player.hp) > 0 and clock - float(player.last_hit) >= SHIELD_DELAY:
+		player.shield = minf(float(player.max_shield), float(player.shield) + float(player.max_shield) * 0.05 * delta)
+	for sparkle in sparkles:
+		if float(sparkle.respawn) > 0:
+			sparkle.respawn = float(sparkle.respawn) - delta
+			if float(sparkle.respawn) <= 0: sparkle.pos = _sparkle_point()
+
 func step(delta: float) -> void:
 	clock += delta
+	_tick_timers(delta)
 	player.reload = maxf(0, float(player.reload) - delta)
 	player.slow = maxf(0, float(player.slow) - delta)
 	if docked:
@@ -242,9 +447,10 @@ func step(delta: float) -> void:
 		player.respawn -= delta
 		if float(player.respawn) <= 0:
 			player.hp = player.max_hp
+			player.shield = player.max_shield
 			player.pos = START
 			player.last_hit = clock
-			message = "Wieder auf See · Rumpf repariert"
+			message = "Neuer Versuch · die Welle wartet" if in_bonus_map() else "Wieder auf See · Rumpf repariert"
 	else:
 		_move(player, delta)
 		if pending_portal>=0 and near_portal()==pending_portal:
@@ -252,13 +458,15 @@ func step(delta: float) -> void:
 				message="Portal wartet · noch %d Sekunden ohne Treffer" % ceili(6.0-clock+float(player.last_hit))
 			elif travel(pending_portal):return
 		if repairing:
-			player.hp = minf(float(player.max_hp), float(player.hp) + 90.0 * delta)
+			player.hp = minf(float(player.max_hp), float(player.hp) + 90.0 * (1.5 if has_blessing() else 1.0) * delta)
 			if float(player.hp) >= float(player.max_hp): repairing = false
 		if firing and target > 0 and float(player.reload) <= 0:
 			_fire_player()
+		_collect_sparkles()
 	for npc in npcs:
 		_step_npc(npc, delta)
 	_step_shots(delta)
+	_step_bonus(delta)
 	for i in range(drops.size() - 1, -1, -1):
 		if int(player.hp) > 0 and player.pos.distance_to(drops[i].pos) < 80:
 			var amount = int(drops[i].gold)
@@ -289,8 +497,12 @@ func _move(body: Dictionary, delta: float) -> void:
 		if amount >= gap.length(): body.path.pop_front()
 
 func npc_engages(npc: Dictionary) -> bool:
+	if docked or int(player.hp)<=0: return false
+	if npc.kind == "tower": return not tower_friendly() and npc.pos.distance_to(player.pos) <= float(npc.range)
+	# Bonus-wave hunters chase anywhere on their instance.
+	if bool(npc.get("hunter",false)): return true
 	# Entry regions are neutral: proximity and selecting a target never provoke fire.
-	return not docked and int(player.hp)>0 and npc.pos.distance_to(npc.home)<900 and npc.pos.distance_to(player.pos)<1000 and (bool(npc.aggressive) or (bool(CONTENT.MAPS[map_id].npc_hostile) and npc.pos.distance_to(player.pos)<380))
+	return npc.pos.distance_to(npc.home)<900 and npc.pos.distance_to(player.pos)<1000 and (bool(npc.aggressive) or (bool(CONTENT.MAPS[map_id].npc_hostile) and npc.pos.distance_to(player.pos)<380))
 
 func _patrol_path(npc: Dictionary) -> Array[Vector2]:
 	# Long diamond circuits match the authored diagonal views instead of tiny loops.
@@ -307,16 +519,23 @@ func _patrol_path(npc: Dictionary) -> Array[Vector2]:
 	return []
 
 func _step_npc(npc: Dictionary, delta: float) -> void:
+	if npc.kind == "tower":
+		_step_tower(npc, delta)
+		return
 	if int(npc.hp) <= 0:
+		if bool(npc.get("wave",false)): return
 		npc.respawn -= delta
 		if float(npc.respawn) <= 0:
 			npc.hp = npc.max_hp
+			npc.shield = npc.get("max_shield",0)
 			npc.pos = npc.home
 			npc.aggressive = false
 			npc.path = []
 		return
 	npc.reload = maxf(0, float(npc.reload) - delta)
 	npc.slow = maxf(0, float(npc.slow) - delta)
+	if float(npc.get("max_shield",0)) > 0 and clock - float(npc.get("last_hit",-100.0)) >= SHIELD_DELAY:
+		npc.shield = minf(float(npc.max_shield), float(npc.shield) + float(npc.max_shield) * 0.03 * delta)
 	npc.repath -= delta
 	var distance: float = npc.pos.distance_to(player.pos)
 	var pursue = npc_engages(npc)
@@ -328,7 +547,8 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 		elif distance <= 305:
 			npc.path = []
 		if distance < 420 and float(npc.reload) <= 0 and segment_free(npc.pos, player.pos):
-			_launch(npc.id, 0, "harpoon" if npc.kind == "monster" else "cannon", roundi((36.0 if npc.elite else 23.0)*float(CONTENT.MAPS[map_id].enemy_scale)), 2)
+			var power := float(npc.get("power", 36.0 if npc.elite else 23.0))
+			_launch(npc.id, 0, "harpoon" if npc.kind == "monster" else "cannon", roundi(power*float(CONTENT.MAPS[map_id].enemy_scale)), 2)
 			npc.reload = 3.2 if npc.kind == "monster" else 2.6
 	else:
 		if npc.state!="patrol":npc.path=[]
@@ -345,15 +565,20 @@ func _fire_player() -> void:
 	if victim.is_empty() or int(victim.hp) <= 0:
 		firing = false
 		return
+	if victim.kind == "tower" and tower_friendly():
+		message = "Diese Türme gehören deiner Gilde"
+		firing = false
+		return
 	if (victim.kind == "monster") != (ammo_mode == 2):
-		message = "Harpunen gegen Seeungeheuer" if victim.kind == "monster" else "Voll- oder Kettenkugeln gegen Schiffe"
+		message = "Harpunen gegen Seeungeheuer" if victim.kind == "monster" else "Voll- oder Kettenkugeln gegen Schiffe und Türme"
 		firing = false
 		return
 	if player.pos.distance_to(victim.pos) > 530:
 		message = "Ziel außer Reichweite · näher heranfahren"
 		player.reload = 0.3
 		return
-	if not segment_free(player.pos, victim.pos):
+	# Towers stand above the coastline, so islands never block the line to them.
+	if victim.kind != "tower" and not segment_free(player.pos, victim.pos):
 		message = "Insel versperrt die Schusslinie"
 		player.reload = 0.3
 		return
@@ -363,11 +588,18 @@ func _fire_player() -> void:
 		firing = false
 		return
 	player.ammo[ammo_mode] -= count
-	_launch(0, target, AMMO_NAMES[ammo_mode], weapon_damage(ammo_mode), count)
-	player.reload = 1.65
+	var damage := float(weapon_damage(ammo_mode))
+	if bool(victim.elite) or victim.kind == "tower": damage *= 1.0 + 0.1 * float(upgrades.war)
+	var powdered := powder_on and ammo_mode < 2 and int(supplies.powder) > 0
+	if powdered:
+		damage *= 1.4
+		supplies.powder -= 1
+		if int(supplies.powder) <= 0: powder_on = false
+	_launch(0, target, AMMO_NAMES[ammo_mode], roundi(damage), count)
+	player.reload = reload_time()
 	victim.aggressive = true
 	repairing = false
-	message = "Breitseite!" if ammo_mode != 2 else "Harpune abgefeuert"
+	message = ("Breitseite mit Schwarzpulver!" if powdered else "Breitseite!") if ammo_mode != 2 else "Harpune abgefeuert"
 
 func _launch(source_id: int, target_id: int, weapon: String, damage: int, count: int) -> void:
 	var source = actor(source_id)
@@ -391,7 +623,7 @@ func _step_shots(delta: float) -> void:
 			shots.remove_at(i)
 			continue
 		var gap: Vector2 = victim.pos - shot.pos
-		var speed = 530.0 if shot.weapon == "harpoon" else 470.0
+		var speed = 530.0 if shot.weapon == "harpoon" else (380.0 if shot.weapon == "mortar" else 470.0)
 		var amount = speed * delta
 		if gap.length() <= amount + 12:
 			_hit(shot, victim)
@@ -400,31 +632,60 @@ func _step_shots(delta: float) -> void:
 			shot.pos += gap.normalized() * amount
 			shot.traveled += amount
 
+## Shields absorb first; armor plates reduce the player's incoming damage before that.
+func apply_damage(victim: Dictionary, amount: int) -> int:
+	var dealt := amount
+	if int(victim.id) == 0 and plates_on and int(supplies.plates) > 0:
+		dealt = roundi(float(dealt) * 0.65)
+		supplies.plates -= 1
+		if int(supplies.plates) <= 0: plates_on = false
+	var absorbed := mini(int(victim.get("shield", 0)), dealt)
+	victim.shield = int(victim.get("shield", 0)) - absorbed
+	victim.hp = maxi(0, int(victim.hp) - (dealt - absorbed))
+	return dealt
+
 func _hit(shot: Dictionary, victim: Dictionary) -> void:
 	if int(victim.hp) <= 0: return
-	victim.hp = maxi(0, int(victim.hp) - int(shot.damage))
+	var dealt := apply_damage(victim, int(shot.damage))
 	if shot.weapon == "chain": victim.slow = 4.0
 	if int(victim.id) == 0:
 		player.last_hit = clock
 		repairing = false
-	_event("impact", victim.pos, shot.damage, victim.id)
+	else:
+		victim.last_hit = clock
+	_event("impact", victim.pos, dealt, victim.id)
 	if int(victim.hp) == 0:
 		victim.path = []
-		victim.respawn = 8.0 if int(victim.id) == 0 else 48.0
+		victim.respawn = 8.0 if int(victim.id) == 0 else (90.0 if victim.kind == "tower" else 48.0)
 		_event("sunk", victim.pos, 0, victim.id)
 		if int(victim.id) == 0:
 			pending_portal=-1
 			firing = false
 			repairing = false
-			message = "Versenkt · Rückkehr in 8 Sekunden"
+			message = "Versenkt · neuer Versuch in 8 Sekunden" if in_bonus_map() else "Versenkt · Rückkehr in 8 Sekunden"
 		elif int(shot.source) == 0:
+			if target == int(victim.id): firing = false
+			if victim.kind == "tower":
+				tower_kills += 1
+				award_xp(80)
+				message = "%s zerstört" % victim.name
+				_check_fortress()
+				return
 			kills += 1
 			if victim.kind == "monster": monster_kills += 1
 			elif victim.elite: elite_kills += 1
 			award_xp(150 if victim.kind == "monster" else (60 if victim.elite else 25))
-			_add_drop(victim.pos, int(victim.reward))
+			_add_drop(victim.pos, loot_gold(int(victim.reward)))
+			_roll_essence(victim)
 			message = "Ziel versenkt · zur Beute fahren"
-			if target == int(victim.id): firing = false
+
+func _roll_essence(victim: Dictionary) -> void:
+	var amount := 0
+	if victim.kind == "monster": amount = 2
+	elif rng.randf() < (0.5 if bool(victim.elite) else 0.25): amount = 1
+	if amount <= 0: return
+	essence += amount
+	_event("essence", victim.pos, amount, 0)
 
 func _add_drop(point: Vector2, gold: int) -> void:
 	next_id += 1
@@ -433,14 +694,427 @@ func _add_drop(point: Vector2, gold: int) -> void:
 func _event(kind: String, point: Vector2, value: int, id: int) -> void:
 	events.append({"type": kind, "pos": point, "value": value, "actor": id, "time": clock})
 
+# --- Gezeitenessenz: sparkles and the cauldron -------------------------------------
+
+func _sparkle_point() -> Vector2:
+	var avoid: Array[Vector2] = [START, harbor]
+	for portal in portals: avoid.append(portal.pos)
+	for attempt in 40:
+		var point := Vector2(rng.randf_range(260, WORLD.x - 260), rng.randf_range(260, WORLD.y - 260))
+		if blocked(point, 70.0): continue
+		var clear := true
+		for spot in avoid: clear = clear and point.distance_to(spot) > 300
+		if clear: return point
+	return Vector2(WORLD.x * 0.5, WORLD.y * 0.25)
+
+func _spawn_sparkles() -> void:
+	sparkles.clear()
+	for i in 5:
+		next_id += 1
+		sparkles.append({"id": next_id, "pos": _sparkle_point(), "respawn": 0.0})
+
+func _collect_sparkles() -> void:
+	for sparkle in sparkles:
+		if float(sparkle.respawn) > 0 or player.pos.distance_to(sparkle.pos) > 70: continue
+		essence += 1
+		_event("essence", sparkle.pos, 1, 0)
+		message = "Glitzernde Strömung · +1 Gezeitenessenz"
+		sparkle.respawn = 90.0
+
+func free_flask_ready(today: String) -> bool:
+	return not today.is_empty() and free_flask_day != today
+
+func claim_free_flask(today: String) -> Array:
+	if not docked or not free_flask_ready(today):
+		message = "Die Tagesflasche gibt es einmal täglich im Hafen"
+		return []
+	free_flask_day = today
+	var results := [_kessel_draw()]
+	_kessel_meter_step(results)
+	message = "Tagesflasche geworfen · %s" % results[0].text
+	return results
+
+func throw_kessel(count: int, today: String = "") -> Array:
+	if not count in CONTENT.KESSEL_THROWS: return []
+	if not docked:
+		message = "Der Gezeitenkessel steht im Hafen · zuerst andocken"
+		return []
+	if essence < count:
+		message = "Zu wenig Gezeitenessenz · %d benötigt" % count
+		return []
+	essence -= count
+	var results := []
+	for i in count:
+		results.append(_kessel_draw())
+		_kessel_meter_step(results)
+	message = "%d× in den Kessel geworfen" % count
+	return results
+
+func _kessel_draw() -> Dictionary:
+	var roll := rng.randi_range(1, 100)
+	var entry: Dictionary = CONTENT.KESSEL_POOL[0]
+	for candidate: Dictionary in CONTENT.KESSEL_POOL:
+		roll -= int(candidate.weight)
+		if roll <= 0:
+			entry = candidate
+			break
+	kessel_throws += 1
+	return _grant(str(entry.id), int(entry.amount), str(entry.name), int(entry.rarity))
+
+func _kessel_meter_step(results: Array) -> void:
+	kessel_meter += 1
+	for milestone: Dictionary in CONTENT.KESSEL_MILESTONES:
+		if int(milestone.at) == kessel_meter:
+			var reward := _grant(str(milestone.id), int(milestone.amount), str(milestone.name), 3)
+			reward.milestone = true
+			results.append(reward)
+	if kessel_meter >= CONTENT.KESSEL_CYCLE: kessel_meter = 0
+
+func _grant(id: String, amount: int, title: String, rarity: int) -> Dictionary:
+	var text := title
+	match id:
+		"fragment":
+			fragments += amount
+			text = "%d× Schriftrollenfragment" % amount
+		"ammo0", "ammo1", "ammo2":
+			player.ammo[int(id.right(1))] += amount
+			text = "%d %s" % [amount, title]
+		"powder", "plates", "repair_kit", "shield_charge":
+			supplies[id] += amount
+			text = "%d× %s" % [amount, CONTENT.SUPPLIES[id].name]
+		"gold":
+			player.gold += amount
+			text = "%d Gold" % amount
+		"essence":
+			essence += amount
+			text = "%d Gezeitenessenz" % amount
+		"tide_deck":
+			add_tide_deck(float(amount))
+			text = "Gezeitendeck +%d min" % roundi(amount / 60.0)
+		"scroll0", "scroll1", "scroll2":
+			scrolls[int(id.right(1))] += amount
+			text = "%s-Schriftrolle" % CONTENT.BONUS_TIERS[int(id.right(1))].name
+		"blessing":
+			activate_blessing(float(amount))
+			text = "Kristallsegen %d min" % roundi(amount / 60.0)
+		_:
+			if id == "deck" or id.begins_with("deck_"):
+				var parts := id.split("_")
+				var type: String = parts[1] if parts.size() > 1 else CONTENT.DECK_KEYS[rng.randi_range(0, CONTENT.DECK_KEYS.size() - 1)]
+				var tier := int(parts[2]) if parts.size() > 2 else 0
+				var fresh := grant_deck(type, tier)
+				text = "%s %s%s" % [CONTENT.DECKS[type].name, CONTENT.DECK_TIERS[tier], "" if fresh else " · Duplikat → %d Essenz" % CONTENT.DUPLICATE_DECK_ESSENCE]
+	return {"id": id, "text": text, "rarity": rarity}
+
+# --- Bonus maps --------------------------------------------------------------------
+
+func in_bonus_map() -> bool:
+	return bool(CONTENT.MAPS[map_id].get("bonus", false))
+
+func has_harbor() -> bool:
+	return not in_bonus_map()
+
+func craft_scroll(tier: int) -> bool:
+	if tier < 0 or tier >= CONTENT.BONUS_TIERS.size(): return false
+	var cost := int(CONTENT.BONUS_TIERS[tier].fragments)
+	if fragments < cost:
+		message = "%d Fragmente für eine %s-Schriftrolle nötig" % [cost, CONTENT.BONUS_TIERS[tier].name]
+		return false
+	fragments -= cost
+	scrolls[tier] += 1
+	message = "%s-Schriftrolle zusammengesetzt" % CONTENT.BONUS_TIERS[tier].name
+	return true
+
+func start_bonus(tier: int) -> bool:
+	if tier < 0 or tier >= CONTENT.BONUS_TIERS.size() or in_bonus_map(): return false
+	var config: Dictionary = CONTENT.BONUS_TIERS[tier]
+	var resume := not bonus.is_empty() and int(bonus.tier) == tier
+	if not bonus.is_empty() and not resume:
+		message = "Erst die laufende %s-Bonuskarte beenden" % CONTENT.BONUS_TIERS[int(bonus.tier)].name
+		return false
+	if docked:
+		message = "Vor der Bonuskarte zuerst ablegen"
+		return false
+	if int(player.hp) <= 0: return false
+	if level < int(config.level):
+		message = "%s-Bonuskarte: Kapitänsstufe %d benötigt" % [config.name, config.level]
+		return false
+	if clock - float(player.last_hit) < 6.0:
+		message = "Bonuskarte erst 6 Sekunden ohne Treffer"
+		return false
+	if not resume:
+		if int(scrolls[tier]) <= 0:
+			message = "Keine %s-Schriftrolle · Fragmente sammeln" % config.name
+			return false
+		scrolls[tier] -= 1
+		bonus = {"tier": tier, "wave": 0, "state": "break", "timer": 3.0, "origin": map_id, "origin_pos": [player.pos.x, player.pos.y]}
+	else:
+		bonus.origin = map_id
+		bonus.origin_pos = [player.pos.x, player.pos.y]
+	map_states[map_id] = {"npcs":npcs.duplicate(true),"drops":drops.duplicate(true)}
+	configure_map(int(config.map))
+	# A resumed run restarts its current wave from the checkpoint.
+	bonus.state = "break"
+	bonus.timer = 3.0
+	_arrive(START)
+	message = "%s-Bonuskarte · %s" % [config.name, "Welle %d fortgesetzt" % (int(bonus.wave) + 1) if resume else "erste Welle formiert sich"]
+	return true
+
+func leave_bonus() -> bool:
+	if not in_bonus_map() or bonus.is_empty(): return false
+	if str(bonus.state) == "fight" and clock - float(player.last_hit) < 6.0:
+		message = "Ausgang erst 6 Sekunden ohne Treffer"
+		return false
+	var origin := clampi(int(bonus.origin), 0, CONTENT.REGION_COUNT - 1)
+	var saved: Array = bonus.origin_pos
+	var finished := str(bonus.state) == "done"
+	if finished:
+		bonus_runs += 1
+		bonus = {}
+	else:
+		bonus.state = "break"
+		bonus.timer = 3.0
+	configure_map(origin)
+	var point := Vector2(float(saved[0]), float(saved[1])) if saved.size() == 2 else START
+	_arrive(point if point.is_finite() and not blocked(point) else START)
+	message = "Bonuskarte abgeschlossen · zurück auf %s" % CONTENT.MAPS[map_id].name if finished else "Bonuskarte verlassen · Welle %d bleibt gespeichert" % (int(bonus.wave) + 1)
+	return true
+
+func _arrive(point: Vector2) -> void:
+	pending_portal = -1
+	player.pos = point
+	player.path = []
+	firing = false
+	repairing = false
+	target = -1
+	shots.clear()
+	events.clear()
+
+func bonus_wave_alive() -> int:
+	var alive := 0
+	for npc in npcs:
+		if bool(npc.get("wave",false)) and int(npc.hp) > 0: alive += 1
+	return alive
+
+func _step_bonus(delta: float) -> void:
+	if bonus.is_empty() or not in_bonus_map(): return
+	match str(bonus.state):
+		"break":
+			bonus.timer = float(bonus.timer) - delta
+			if float(bonus.timer) <= 0:
+				_spawn_wave()
+				bonus.state = "fight"
+		"fight":
+			if bonus_wave_alive() == 0: _finish_wave()
+
+func _spawn_wave() -> void:
+	var alive: Array[Dictionary] = []
+	for npc in npcs:
+		if not bool(npc.get("wave",false)) or int(npc.hp) > 0: alive.append(npc)
+	npcs = alive
+	if bonus_wave_alive() > 0: return
+	var wave: Dictionary = CONTENT.BONUS_WAVES[int(bonus.wave)]
+	var tier: Dictionary = CONTENT.BONUS_TIERS[int(bonus.tier)]
+	var scale := float(CONTENT.MAPS[map_id].enemy_scale)
+	var roster: Array[String] = []
+	for i in int(wave.ships): roster.append("ship")
+	for i in int(wave.elites): roster.append("elite")
+	if not str(wave.boss).is_empty(): roster.append(str(wave.boss))
+	for i in roster.size():
+		var role := roster[i]
+		var angle := TAU * float(i) / float(roster.size()) + float(bonus.wave) * 0.7
+		var point := _spawn_point(angle)
+		var body: Dictionary
+		if role == "monster":
+			body = base_npcs[base_npcs.size() - 1].duplicate(true)
+			body.name = "Leviathan · %stiefe" % tier.name
+			body.max_hp = roundi(1650.0 * scale * 1.4)
+			body.reward = roundi(240.0 * scale)
+		else:
+			body = base_npcs[(i * 3 + int(bonus.wave) * 2) % (base_npcs.size() - 1)].duplicate(true)
+			var elite := role != "ship"
+			body.elite = elite
+			body.max_hp = roundi((760.0 if elite else 420.0) * scale * (3.5 if role == "admiral" else 1.0))
+			body.max_shield = roundi(float(body.max_hp) * (0.4 if role == "admiral" else 0.25)) if elite else 0
+			body.reward = roundi((110.0 if elite else 55.0) * scale * (3.0 if role == "admiral" else 1.0))
+			body.power = 36.0 if elite else 23.0
+			if role == "admiral":
+				body.art = 7
+				body.name = "Admiral · %sflotte" % tier.name
+				body.power = 48.0
+			else:
+				body.name = "%s · %s" % [tier.name, body.name]
+		next_id += 1
+		body.id = next_id
+		body.hp = body.max_hp
+		body.shield = body.get("max_shield", 0)
+		body.pos = point
+		body.home = point
+		body.path = []
+		body.aggressive = true
+		body.hunter = true
+		body.wave = true
+		body.boss = role in ["admiral","monster"]
+		body.respawn = 0.0
+		body.reload = 1.5 + float(i) * 0.4
+		npcs.append(body)
+	message = "Welle %d/%d · %s" % [int(bonus.wave) + 1, CONTENT.BONUS_WAVES.size(), wave.label]
+
+func _spawn_point(angle: float) -> Vector2:
+	for radius in [720.0, 600.0, 860.0, 480.0]:
+		for turn in 8:
+			var point: Vector2 = player.pos + Vector2.from_angle(angle + float(turn) * 0.35) * radius
+			if not blocked(point, 60.0): return point
+	return START + Vector2.from_angle(angle) * 400.0
+
+func _finish_wave() -> void:
+	var tier := int(bonus.tier)
+	var scale := float(CONTENT.MAPS[map_id].enemy_scale)
+	var wave := int(bonus.wave)
+	var gold := roundi(80.0 * float(wave + 1) * scale)
+	player.gold += gold
+	essence += 1
+	award_xp(40 * (wave + 1))
+	_event("essence", player.pos, 1, 0)
+	bonus.wave = wave + 1
+	if int(bonus.wave) >= CONTENT.BONUS_WAVES.size():
+		bonus.state = "done"
+		var chest := roundi(500.0 * scale)
+		player.gold += chest
+		supplies.powder += 5
+		supplies.plates += 5
+		supplies.repair_kit += 1
+		activate_blessing()
+		var type: String = CONTENT.DECK_KEYS[rng.randi_range(0, CONTENT.DECK_KEYS.size() - 1)]
+		var deck_note: String = _grant("deck_%s_%d" % [type, tier], 1, "", 3).text
+		bonus.chest = "%d Gold · 5 Pulver · 5 Platten · 1 Notreparatur · %s" % [chest, deck_note]
+		message = "Bonuskarte geschafft · Kristallsegen aktiv · Truhe: %d Gold" % chest
+	else:
+		bonus.state = "break"
+		bonus.timer = 4.0
+		message = "Welle %d geschafft · +%d Gold · +1 Essenz" % [wave + 1, gold]
+
+# --- Guild and fortress ------------------------------------------------------------
+
+func found_guild(title: String, tag: String) -> bool:
+	title = title.strip_edges()
+	tag = tag.strip_edges().to_upper()
+	if not guild.is_empty():
+		message = "Du führst bereits die Gilde %s" % guild.name
+		return false
+	if title.length() < 3 or title.length() > 24:
+		message = "Gildenname: 3 bis 24 Zeichen"
+		return false
+	var valid := tag.length() >= 2 and tag.length() <= 4
+	for character in tag: valid = valid and (character >= "A" and character <= "Z" or character >= "0" and character <= "9")
+	if not valid or tag == CONTENT.FORTRESS_TAG:
+		message = "Kürzel: 2 bis 4 Buchstaben oder Ziffern"
+		return false
+	if int(player.gold) < CONTENT.GUILD_COST:
+		message = "Gildengründung kostet %d Gold" % CONTENT.GUILD_COST
+		return false
+	player.gold -= CONTENT.GUILD_COST
+	guild = {"name": title, "tag": tag}
+	message = "Gilde [%s] %s gegründet" % [tag, title]
+	return true
+
+func leave_guild() -> bool:
+	if guild.is_empty(): return false
+	message = "Gilde [%s] aufgelöst" % guild.tag
+	guild = {}
+	fortress_hold = 0.0
+	return true
+
+func guild_island_held() -> bool:
+	return not guild.is_empty() and fortress_hold > 0
+
+func tower_friendly() -> bool:
+	return guild_island_held()
+
+func tower_tag() -> String:
+	return str(guild.tag) if tower_friendly() else CONTENT.FORTRESS_TAG
+
+func fortress_island() -> Dictionary:
+	if map_id != CONTENT.FORTRESS_MAP: return {}
+	return islands[CONTENT.FORTRESS_ISLAND]
+
+func _add_fortress() -> void:
+	var island: Dictionary = islands[CONTENT.FORTRESS_ISLAND]
+	island.name = "Korsarenfestung"
+	var center: Vector2 = island.bounds.get_center()
+	for i in CONTENT.TOWERS.size():
+		var config: Dictionary = CONTENT.TOWERS[i]
+		var point: Vector2 = center + config.offset * island.bounds.size
+		while not on_land(point) and point.distance_to(center) > 8: point = point.move_toward(center, 8.0)
+		var shield := roundi(float(config.hp) * 0.3)
+		npcs.append({"id": 400 + i, "name": config.name, "kind": "tower", "tower": config.kind, "pos": point,
+			"home": point, "heading": Vector2.LEFT, "path": [], "hp": config.hp, "max_hp": config.hp,
+			"shield": shield, "max_shield": shield, "speed": 0.0, "reload": float(i) * 0.7, "repath": 0.0,
+			"state": "guard", "patrol": 0, "aggressive": false, "slow": 0.0, "respawn": 0.0, "reward": 0,
+			"art": i, "elite": true, "range": config.range, "damage": config.damage, "shots": config.shots,
+			"rate": config.reload, "last_hit": -100.0})
+
+func towers_alive() -> int:
+	var alive := 0
+	for npc in npcs:
+		if npc.kind == "tower" and int(npc.hp) > 0: alive += 1
+	return alive
+
+func _step_tower(npc: Dictionary, delta: float) -> void:
+	if int(npc.hp) <= 0:
+		npc.respawn = float(npc.respawn) - delta
+		if float(npc.respawn) <= 0:
+			npc.hp = npc.max_hp
+			npc.shield = npc.max_shield
+			npc.aggressive = false
+		return
+	npc.reload = maxf(0, float(npc.reload) - delta)
+	if str(npc.tower) != "guardian" and _guardian_alive():
+		npc.shield = minf(float(npc.max_shield), float(npc.shield) + 40.0 * delta)
+	if not npc_engages(npc):
+		npc.state = "guard"
+		return
+	npc.state = "attack"
+	if float(npc.reload) > 0: return
+	var weapon := "chain" if str(npc.tower) == "chain" else ("mortar" if str(npc.tower) == "mortar" else "cannon")
+	_launch(int(npc.id), 0, weapon, int(npc.damage), int(npc.shots))
+	npc.reload = float(npc.rate)
+
+func _guardian_alive() -> bool:
+	for npc in npcs:
+		if npc.kind == "tower" and str(npc.tower) == "guardian" and int(npc.hp) > 0: return true
+	return false
+
+func _check_fortress() -> void:
+	if towers_alive() > 0: return
+	fortress_conquests += 1
+	player.gold += 900
+	essence += 3
+	fragments += 2
+	award_xp(300)
+	var island := fortress_island()
+	_event("conquest", island.bounds.get_center() if not island.is_empty() else player.pos, 900, 0)
+	if guild.is_empty():
+		for npc in npcs:
+			if npc.kind == "tower": npc.respawn = 180.0
+		message = "Korsarenfestung erobert · +900 Gold · gründe eine Gilde, um sie zu halten"
+	else:
+		fortress_hold = CONTENT.FORTRESS_HOLD
+		for npc in npcs:
+			if npc.kind == "tower": npc.respawn = 6.0
+		message = "Korsarenfestung erobert · [%s] hält die Gildeninsel 30 Minuten" % guild.tag
+
+# --- Quests, economy and progression -----------------------------------------------
+
 func claim_quest() -> bool:
 	var quest = current_quest()
 	if quest.is_empty() or quest_progress() < int(quest.goal): return false
 	player.gold += int(quest.gold)
+	essence += int(quest.get("essence", 0))
 	award_xp(int(quest.xp))
 	quest_index += 1
 	claimed = true
-	message = "Auftrag abgeschlossen · +%d Gold · +%d EP" % [quest.gold,quest.xp]
+	message = "Auftrag abgeschlossen · +%d Gold · +%d EP · +%d Essenz" % [quest.gold,quest.xp,quest.get("essence",0)]
 	return true
 
 func buy_ammo(index: int) -> bool:
@@ -479,29 +1153,44 @@ func quest_progress() -> int:
 
 func weapon_damage(mode: int) -> int:
 	var key = "harpoon" if mode == 2 else "cannon"
-	var bonus = 0.35 if mode == 2 else 0.25
-	return roundi(float([31,19,96][mode]) * (1.0 + float(upgrades[key]) * bonus))
+	var bonus_rate = 0.35 if mode == 2 else 0.25
+	var value: float = float([31,19,96][mode]) * (1.0 + float(upgrades[key]) * bonus_rate)
+	if mode < 2: value *= float(equipped_cannons()) / float(BASE_CANNON_SLOTS)
+	else: value *= 1.0 + deck_value("hunter") / 100.0
+	if has_blessing(): value *= 1.15
+	return roundi(value)
 
 func apply_upgrades() -> void:
-	player.max_hp = PLAYER_HP + int(upgrades.hull) * 400
+	var armor := 1.0 + deck_value("armor") / 100.0
+	var blessed := has_blessing()
+	player.max_hp = roundi(float(PLAYER_HP + int(upgrades.hull) * 400) * armor * (1.2 if blessed else 1.0))
+	player.max_shield = roundi(float(PLAYER_SHIELD + int(upgrades.hull) * 120) * armor)
 	player.hp = minf(float(player.hp),float(player.max_hp))
-	player.speed = PLAYER_SPEED * (1.0 + 0.12 * float(upgrades.sails))
+	player.shield = minf(float(player.shield),float(player.max_shield))
+	player.speed = PLAYER_SPEED * (1.0 + 0.12 * float(upgrades.sails) + deck_value("navigation") / 100.0) * (1.1 if blessed else 1.0)
+
+## Captain level paces the castles: levels 1-3 are always open, then one more every three levels.
+func castle_cap() -> int:
+	return mini(CONTENT.CASTLE_MAX, 3 + floori(level / 3.0))
 
 func upgrade_cost(key: String) -> int:
-	if not upgrades.has(key) or int(upgrades[key]) >= 3: return -1
-	return [150,400,850][int(upgrades[key])]
+	if not upgrades.has(key) or int(upgrades[key]) >= CONTENT.CASTLE_MAX: return -1
+	return CONTENT.CASTLE_COSTS[int(upgrades[key])]
 
 func buy_upgrade(key: String) -> bool:
 	var cost = upgrade_cost(key)
 	if not docked or cost < 0 or int(player.gold) < cost: return false
+	if int(upgrades[key]) >= castle_cap():
+		message = "%s Stufe %d: Kapitänsstufe %d benötigt" % [CONTENT.UPGRADES[key].name, int(upgrades[key]) + 1, (int(upgrades[key]) - 2) * 3]
+		return false
 	player.gold -= cost
 	upgrades[key] += 1
 	apply_upgrades()
-	message = "%s auf Stufe %d verbessert" % [CONTENT.UPGRADES[key].name,upgrades[key]]
+	message = "%s auf Stufe %d ausgebaut" % [CONTENT.UPGRADES[key].name,upgrades[key]]
 	return true
 
 func can_dock() -> bool:
-	return int(player.hp) > 0 and player.pos.distance_to(harbor) <= 160 and clock - float(player.last_hit) >= 6.0
+	return has_harbor() and int(player.hp) > 0 and player.pos.distance_to(harbor) <= 160 and clock - float(player.last_hit) >= 6.0
 
 func dock() -> bool:
 	if not can_dock():
@@ -540,7 +1229,7 @@ func request_portal(destination: int) -> bool:
 	pending_portal=-1
 	if docked:message="Vor der Überfahrt zuerst im Hafen ablegen";return false
 	if int(player.hp)<=0:return false
-	if destination<0 or destination>=CONTENT.MAPS.size() or destination==map_id:return false
+	if destination<0 or destination>=CONTENT.REGION_COUNT or destination==map_id:return false
 	if level<int(CONTENT.MAPS[destination].level):
 		message="%s: Kapitänsstufe %d benötigt" % [CONTENT.MAPS[destination].name,CONTENT.MAPS[destination].level]
 		return false
@@ -559,7 +1248,7 @@ func request_portal(destination: int) -> bool:
 	return false
 
 func travel(destination: int) -> bool:
-	if destination < 0 or destination >= CONTENT.MAPS.size() or destination == map_id or docked or int(player.hp) <= 0: return false
+	if destination < 0 or destination >= CONTENT.REGION_COUNT or destination == map_id or docked or int(player.hp) <= 0: return false
 	if near_portal() != destination:
 		message = "Für den Kartenwechsel zum Portal fahren"
 		return false
@@ -571,26 +1260,36 @@ func travel(destination: int) -> bool:
 		return false
 	map_states[map_id] = {"npcs":npcs.duplicate(true),"drops":drops.duplicate(true)}
 	configure_map(destination)
-	pending_portal=-1
-	player.pos = START
-	player.path = []
-	firing = false
-	repairing = false
-	target = -1
-	shots.clear()
-	events.clear()
+	_arrive(START)
 	message = "%s erreicht · Karte %s" % [CONTENT.MAPS[map_id].name,CONTENT.MAPS[map_id].code]
 	return true
 
 func _map_point(point: Vector2) -> Vector2:
-	if map_id == 1: return Vector2(WORLD.x - point.x,point.y)
-	if map_id == 2: return Vector2(point.x,WORLD.y - point.y)
+	match map_id:
+		1, 4: return Vector2(WORLD.x - point.x,point.y)
+		2, 5: return Vector2(point.x,WORLD.y - point.y)
+		3: return WORLD - point
 	return point
 
 func configure_map(destination: int) -> void:
 	map_id = clampi(destination,0,CONTENT.MAPS.size()-1)
-	visited[map_id] = true
+	if map_id < visited.size(): visited[map_id] = true
 	var config = CONTENT.MAPS[map_id]
+	portals.clear()
+	if bool(config.get("bonus", false)):
+		var tier := map_id - CONTENT.REGION_COUNT
+		islands.clear()
+		for i in CONTENT.BONUS_ISLANDS.size():
+			var island: Dictionary = base_islands[CONTENT.BONUS_ISLANDS[i]].duplicate(true)
+			island.pos = _map_point(island.pos)
+			island.art = config.art[i]
+			island.name = CONTENT.BONUS_ISLAND_NAMES[tier][i]
+			islands.append(island)
+		npcs.clear()
+		drops.clear()
+		sparkles.clear()
+		_build_grid()
+		return
 	islands = base_islands.duplicate(true)
 	for i in islands.size():
 		islands[i].pos = _map_point(base_islands[i].pos)
@@ -603,9 +1302,12 @@ func configure_map(destination: int) -> void:
 		npc.path = []
 		npc.hp = roundi(float(npc.max_hp) * float(config.enemy_scale))
 		npc.max_hp = npc.hp
+		npc.max_shield = roundi(float(npc.max_shield) * float(config.enemy_scale))
+		npc.shield = npc.max_shield
 		npc.reward = roundi(float(npc.reward) * float(config.enemy_scale))
 		if map_id > 0: npc.name = ("Frost · " if map_id == 1 else "Schatten · ") + str(npc.name)
-	if map_states.has(map_id):
+	var restored := map_states.has(map_id)
+	if restored:
 		npcs = map_states[map_id].npcs.duplicate(true)
 		drops = map_states[map_id].drops.duplicate(true)
 	else:
@@ -613,19 +1315,36 @@ func configure_map(destination: int) -> void:
 		_add_drop(START + Vector2(-170,130),25 + map_id * 15)
 		_add_drop(START + Vector2(220,-120),25 + map_id * 15)
 		_add_drop(_map_point(Vector2(2170,1780)),30 + map_id * 20)
-	portals[0].destination = (map_id + 1) % 3
-	portals[1].destination = (map_id + 2) % 3
+	portals.append({"pos":Vector2(4070,1600),"destination":(map_id + 1) % CONTENT.REGION_COUNT})
+	portals.append({"pos":Vector2(330,1600),"destination":(map_id + 2) % CONTENT.REGION_COUNT})
 	_build_grid()
+	if map_id == CONTENT.FORTRESS_MAP:
+		islands[CONTENT.FORTRESS_ISLAND].name = "Korsarenfestung"
+		if not restored: _add_fortress()
+	_spawn_sparkles()
 
 func export_save() -> Dictionary:
-	return {"schema":2,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	var region := map_id
+	var position: Vector2 = player.pos
+	if in_bonus_map() and not bonus.is_empty():
+		region = int(bonus.origin)
+		position = Vector2(float(bonus.origin_pos[0]), float(bonus.origin_pos[1]))
+	var run := {}
+	if not bonus.is_empty():
+		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
+	return {"schema":3,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
-		"monster_kills":monster_kills,"elite_kills":elite_kills,"level":level,"xp":xp,
-		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":map_id,
-		"position":[player.pos.x,player.pos.y],"hp":player.hp,"docked":docked}
+		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
+		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
+		"position":[position.x,position.y],"hp":player.hp,"shield":player.shield,"docked":docked,
+		"cannons":player.cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
+		"essence":essence,"fragments":fragments,"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
+		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
+		"deck_slots":deck_slots.duplicate(),"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),
+		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold}
 
 func restore_save(data: Dictionary) -> bool:
-	if not int(data.get("schema",0)) in [1,2]: return false
+	if not int(data.get("schema",0)) in [1,2,3]: return false
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
 	player.skin=clampi(int(data.get("skin",26)),0,26)
 	kills=maxi(0,int(data.get("kills",0)))
@@ -634,11 +1353,57 @@ func restore_save(data: Dictionary) -> bool:
 	loot_collected=maxi(0,int(data.get("loot_collected",0)))
 	monster_kills=maxi(0,int(data.get("monster_kills",0)))
 	elite_kills=maxi(0,int(data.get("elite_kills",0)))
+	tower_kills=maxi(0,int(data.get("tower_kills",0)))
 	level=clampi(int(data.get("level",1)),1,20)
 	xp=clampi(int(data.get("xp",0)),0,xp_required()-1)
 	var saved_upgrades: Variant=data.get("upgrades",{})
 	if saved_upgrades is Dictionary:
-		for key in CONTENT.UPGRADE_KEYS:upgrades[key]=clampi(int(saved_upgrades.get(key,0)),0,3)
+		for key in CONTENT.UPGRADE_KEYS:upgrades[key]=clampi(int(saved_upgrades.get(key,0)),0,CONTENT.CASTLE_MAX)
+	player.cannons=clampi(int(data.get("cannons",BASE_CANNON_SLOTS)),BASE_CANNON_SLOTS,MAX_CANNONS)
+	var saved_supplies: Variant=data.get("supplies",{})
+	if saved_supplies is Dictionary:
+		for key in CONTENT.SUPPLY_KEYS:supplies[key]=clampi(int(saved_supplies.get(key,supplies[key])),0,99999)
+	var saved_buffs: Variant=data.get("buffs",{})
+	if saved_buffs is Dictionary:
+		buffs.blessing=clampf(float(saved_buffs.get("blessing",0.0)),0.0,CONTENT.BLESSING_SECONDS)
+		buffs.tide_deck=clampf(float(saved_buffs.get("tide_deck",0.0)),0.0,CONTENT.TIDE_DECK_CAP)
+	essence=clampi(int(data.get("essence",essence)),0,99999)
+	fragments=clampi(int(data.get("fragments",0)),0,99999)
+	var saved_scrolls: Variant=data.get("scrolls",[])
+	if saved_scrolls is Array and saved_scrolls.size()==scrolls.size():
+		for i in scrolls.size():scrolls[i]=clampi(int(saved_scrolls[i]),0,999)
+	kessel_meter=clampi(int(data.get("kessel_meter",0)),0,CONTENT.KESSEL_CYCLE-1)
+	kessel_throws=maxi(0,int(data.get("kessel_throws",0)))
+	free_flask_day=str(data.get("free_flask_day",""))
+	decks.clear()
+	var saved_decks: Variant=data.get("decks",[])
+	if saved_decks is Array:
+		for entry: Variant in saved_decks:
+			if entry is Dictionary and CONTENT.DECKS.has(str(entry.get("type",""))):
+				decks.append({"type":str(entry.type),"tier":clampi(int(entry.get("tier",0)),0,CONTENT.DECK_TIERS.size()-1)})
+	deck_slots=[-1,-1]
+	var saved_slots: Variant=data.get("deck_slots",[])
+	if saved_slots is Array and saved_slots.size()==2:
+		for i in 2:
+			var index:=int(saved_slots[i])
+			if index>=0 and index<decks.size() and not index in deck_slots:deck_slots[i]=index
+	bonus={}
+	bonus_runs=maxi(0,int(data.get("bonus_runs",0)))
+	var run: Variant=data.get("bonus",{})
+	if run is Dictionary and not run.is_empty():
+		if bool(run.get("done",false)):
+			bonus_runs+=1
+		else:
+			var origin_pos: Variant=run.get("origin_pos",[START.x,START.y])
+			bonus={"tier":clampi(int(run.get("tier",0)),0,CONTENT.BONUS_TIERS.size()-1),"wave":clampi(int(run.get("wave",0)),0,CONTENT.BONUS_WAVES.size()-1),
+				"state":"break","timer":3.0,"origin":clampi(int(run.get("origin",0)),0,CONTENT.REGION_COUNT-1),
+				"origin_pos":origin_pos if origin_pos is Array and origin_pos.size()==2 else [START.x,START.y]}
+	guild={}
+	var saved_guild: Variant=data.get("guild",{})
+	if saved_guild is Dictionary and saved_guild.has("name") and saved_guild.has("tag"):
+		guild={"name":str(saved_guild.name).left(24),"tag":str(saved_guild.tag).left(4).to_upper()}
+	fortress_conquests=maxi(0,int(data.get("fortress_conquests",0)))
+	fortress_hold=clampf(float(data.get("fortress_hold",0.0)),0.0,CONTENT.FORTRESS_HOLD) if not guild.is_empty() else 0.0
 	apply_upgrades()
 	var stock: Variant=data.get("ammo",[])
 	if stock is Array and stock.size()==3:
@@ -646,13 +1411,16 @@ func restore_save(data: Dictionary) -> bool:
 	var saved_visited: Variant=data.get("visited",[])
 	if saved_visited is Array and saved_visited.size()==3:
 		for i in 3:visited[i]=bool(saved_visited[i])
-	configure_map(clampi(int(data.get("map_id",0)),0,2))
+	configure_map(clampi(int(data.get("map_id",0)),0,CONTENT.REGION_COUNT-1))
 	player.pos=START
 	var position: Variant=data.get("position",[])
 	if position is Array and position.size()==2:
 		var point=Vector2(float(position[0]),float(position[1]))
 		if point.is_finite() and not blocked(point):player.pos=point
 	player.hp=clampi(int(data.get("hp",player.max_hp)),0,int(player.max_hp))
+	player.shield=clampi(int(data.get("shield",player.max_shield)),0,int(player.max_shield))
 	if int(player.hp)==0:player.respawn=8.0
+	powder_on=false
+	plates_on=false
 	docked=bool(data.get("docked",false)) and can_dock()
 	return true

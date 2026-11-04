@@ -81,7 +81,7 @@ func _initialize() -> void:
 		for i in 300:
 			sim.step(1.0/30.0)
 			for body: Dictionary in sim.npcs:
-				if sim.blocked(body.pos,15):invariant=false
+				if body.kind!="tower" and sim.blocked(body.pos,15):invariant=false
 		check(invariant,"regional NPC navigation avoids coastlines %d"%region)
 
 	for start_region in 3:
