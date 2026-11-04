@@ -1,26 +1,22 @@
 shader_type canvas_item;
 uniform sampler2D wave_noise : repeat_enable, filter_linear;
+uniform sampler2D sea_tile : repeat_enable, filter_linear;
 uniform vec2 camera_world=vec2(2100.,1450.);
 uniform vec2 viewport_size=vec2(1280.,720.);
 uniform float map_zoom=.96;
 uniform vec3 region_tint=vec3(.75,1.14,1.12);
 void fragment(){
  vec2 world=(UV-.5)*viewport_size/map_zoom+camera_world;
- vec2 d1=normalize(vec2(.9,.35));vec2 d2=normalize(vec2(-.35,.95));
- float a=dot(world,d1)*.026-TIME*.68;
- float b=dot(world,d2)*.051+TIME*.49;
- float c=dot(world,normalize(vec2(.4,.9)))*.087-TIME*.92;
- float n=texture(wave_noise,world*.0016+vec2(TIME*.002,-TIME*.0014)).r;
- float detail=texture(wave_noise,world*.0042-vec2(TIME*.0022,TIME*.0008)).g;
- vec2 fine=texture(wave_noise,world*.009+vec2(-TIME*.002,TIME*.0014)).rg;
- vec2 slope=d1*cos(a)*.12+d2*cos(b)*.07+normalize(vec2(.4,.9))*cos(c)*.04+(fine-.5)*.035;
- vec3 normal=normalize(vec3(-slope,1.));
- float light=dot(normal,normalize(vec3(-.4,-.6,1.)));
- float crest=pow(max(0.,sin(b)*.35+sin(c)*.2+detail*.45),5.);
- vec3 deep=vec3(.014,.115,.19);vec3 shallow=vec3(.028,.25,.35);
- vec3 sea=mix(deep,shallow,clamp(.26+n*.42+sin(a)*.055,0.,1.));
- sea*=.76+light*.32+(detail-.5)*.08+(fine.r-.5)*.03;
- float glint=pow(smoothstep(.60,.92,fine.r)*smoothstep(.43,.85,detail),5.);
- sea+=vec3(.25,.40,.45)*(crest*.28+glint*.22);
- COLOR=vec4(sea*region_tint,1.);
+ // Two rotated samples of the same seamless grain tile hide its 400 px repeat.
+ mat2 turn=mat2(vec2(.8,.6),vec2(-.6,.8));
+ vec3 grain=texture(sea_tile,world/400.).rgb;
+ // The second layer drifts slowly, so its specks cross the first layer and the sea twinkles.
+ vec3 grain2=texture(sea_tile,turn*world/655.+vec2(.37+TIME*.0045,.11+TIME*.0028)).rgb;
+ vec3 sea=mix(grain,grain2,.38);
+ float broad=texture(wave_noise,world*.0006+vec2(TIME*.0016,-TIME*.0011)).r;
+ float swell=texture(wave_noise,world*.0018-vec2(TIME*.003,TIME*.002)).g;
+ sea*=.9+broad*.14+(swell-.5)*.05;
+ float twinkle=max(grain.b,grain2.b)-.62;
+ sea+=vec3(.10,.16,.22)*clamp(twinkle*3.,0.,1.)*(.5+.5*sin(TIME*1.7+dot(world,vec2(.031,.047))));
+ COLOR=vec4(sea*mix(vec3(1.),region_tint,.5),1.);
 }

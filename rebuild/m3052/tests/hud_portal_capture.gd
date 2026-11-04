@@ -73,6 +73,9 @@ func _run() -> void:
 		steps+=1;game.sim.step(1.0/30.0)
 		if game.sim.map_id==1:break
 	game._process(0)
+	game._advance_loading(0.7)
+	await _shot(game,output,"loading-1280x720")
+	game._advance_loading(5.0)
 	await _shot(game,output,"portal-after")
 	var receipt=FileAccess.open(output+"/portal-touch.json",FileAccess.WRITE)
 	receipt.store_string(JSON.stringify({"queued_by_touch":queued,"map":game.sim.map_id,"pending":game.sim.pending_portal,"steps":steps,"camera_synced":game.camera.position==game.sim.player.pos}));receipt.close()
