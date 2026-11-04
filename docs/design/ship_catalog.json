@@ -1,0 +1,2238 @@
+{
+  "version": 1,
+  "generationen": [
+    {
+      "id": "S",
+      "title": "Starter",
+      "classes": "S1–S3",
+      "look": "Normal, lesbar, charaktervoll; altes Holz, neutrale Segel, wenig Metall",
+      "limit": "Keine Elite-Optik, keine Fantasy-Motive"
+    },
+    {
+      "id": "I",
+      "title": "Generation I · Küstenflotte",
+      "classes": "1–10",
+      "look": "Holz, Leinen, Messing; Kutter, Sloop, Kogge; 1–2 Masten; warme Naturtöne mit je einer Akzentfarbe",
+      "limit": "Bodenständig, keine Glow-Effekte"
+    },
+    {
+      "id": "II",
+      "title": "Generation II · Handelsrouten",
+      "classes": "11–20",
+      "look": "Neue Rümpfe: Karavelle, Schoner, Brigg, Fleute; regionale Farbwelten (Mittelmeer-Terrakotta, Nordmeer-Klinkerblau, Tropen-Türkis)",
+      "limit": "Erste Themen über Bemalung und Segelzeichen, noch realistisch"
+    },
+    {
+      "id": "III",
+      "title": "Generation III · Kriegsmarine",
+      "classes": "21–30",
+      "look": "Korvette, Fregatte, Galeasse; Kanonendecks, Ruderreihen, Metallbeschläge; Flaggen der Flotten",
+      "limit": "Spürbar mächtiger, aber noch keine Magie"
+    },
+    {
+      "id": "IV",
+      "title": "Generation IV · Erste Elite",
+      "classes": "31–40",
+      "look": "Dunkles Eisen, Stachelbug, schwere Kanonen, einzelne Leuchtakzente (Elite-Bogen 01–10)",
+      "limit": "Mehr Dominanz; Geistermotive nur dezent"
+    },
+    {
+      "id": "V",
+      "title": "Generation V · Ferne Kulturen",
+      "classes": "41–50",
+      "look": "Dschunke, Dau, Katamaran, Polar- und Wüstenschiffe, Elfen- und Kristallkaravellen",
+      "limit": "Starke Identität über Kultur, nicht über Horror"
+    },
+    {
+      "id": "VI",
+      "title": "Generation VI · Außergewöhnliche Bauweisen",
+      "classes": "51–60",
+      "look": "Dampf, Panzerung, Zahnräder, Mischformen aus Tier und Schiff (Wal, Dünenläufer)",
+      "limit": "Fantasy-Anteil steigt"
+    },
+    {
+      "id": "VII",
+      "title": "Generation VII · Legendäre Kriegsschiffe",
+      "classes": "61–70",
+      "look": "Prunkvolle Linienschiffe, Sonnen-, Mond- und Sturmorden; Gold, Silber, Gewitter",
+      "limit": "Starke Formen und Materialien, noch keine Abyss-Motive"
+    },
+    {
+      "id": "VIII",
+      "title": "Generation VIII · Nebel und Tiefe",
+      "classes": "71–80",
+      "look": "Geister, Nebel, Biolumineszenz, Knochen, erste Tentakel",
+      "limit": "Extreme Motive beginnen"
+    },
+    {
+      "id": "IX",
+      "title": "Generation IX · Verfluchte Spitzenklasse",
+      "classes": "81–90",
+      "look": "Käfige, Dämonen, Kraken, Höllenfeuer; starke Effekte und Silhouetten",
+      "limit": "Sehr starke Effekte, aber klar lesbare Silhouette"
+    },
+    {
+      "id": "X",
+      "title": "Generation X · Abyssale Endstufe",
+      "classes": "91–100",
+      "look": "Lebende Schiffe, Leviathane, Leere und Sterne; ikonische Spitzenklassen",
+      "limit": "Maximale reguläre Eskalation"
+    },
+    {
+      "id": "P",
+      "title": "Prestige",
+      "classes": "P1–P5",
+      "look": "Eigenständige Statuskategorie, je ein einzigartiges Leitmotiv",
+      "limit": "Nicht Klasse 101–105"
+    }
+  ],
+  "klassen": [
+    {
+      "klasse": "S1",
+      "name": "Küstenschaluppe",
+      "generation": "S",
+      "rumpf": "Schaluppe (vorhanden, SHIP-STARTER-001)",
+      "takelage": "1 Mast, Gaffelsegel + Fock",
+      "farben": "altes Holz, Leinen",
+      "motiv": "schlichte Bronzeakzente",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 1,
+        "schaden": 1,
+        "tempo": 1
+      },
+      "quelle": "vorhanden im Spiel",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Küstenschaluppe' for the pirate MMO Abyssal Dominion: Schaluppe (vorhanden, SHIP-STARTER-001), 1 Mast, Gaffelsegel + Fock, colours altes Holz, Leinen, motif: schlichte Bronzeakzente. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "S2",
+      "name": "Blauwasser-Kutter",
+      "generation": "S",
+      "rumpf": "Kutter, länger und breiter",
+      "takelage": "2 Masten, Gaffel + Toppsegel",
+      "farben": "gedämpftes Dunkelblau, helles Leinen",
+      "motiv": "Anker auf dem Großsegel",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 1,
+        "schaden": 1,
+        "tempo": 3
+      },
+      "quelle": "neu (Masterkonzept Starter 02)",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Blauwasser-Kutter' for the pirate MMO Abyssal Dominion: Kutter, länger und breiter, 2 Masten, Gaffel + Toppsegel, colours gedämpftes Dunkelblau, helles Leinen, motif: Anker auf dem Großsegel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "S3",
+      "name": "Grauer Wächter",
+      "generation": "S",
+      "rumpf": "kleine Brigg mit schwerem Rumpf",
+      "takelage": "2 Masten, Rahsegel",
+      "farben": "Grau/Schwarz, dunkles Holz, Eisen",
+      "motiv": "genietete Bugplatte",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 1,
+        "tempo": 1
+      },
+      "quelle": "neu (Masterkonzept Starter 03)",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Grauer Wächter' for the pirate MMO Abyssal Dominion: kleine Brigg mit schwerem Rumpf, 2 Masten, Rahsegel, colours Grau/Schwarz, dunkles Holz, Eisen, motif: genietete Bugplatte. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "1",
+      "name": "Möwenkutter",
+      "generation": "I",
+      "rumpf": "Kutter",
+      "takelage": "1 Mast, Gaffelsegel",
+      "farben": "Naturholz, Leinen, Weiß",
+      "motiv": "Möwenwimpel",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 1,
+        "schaden": 1,
+        "tempo": 4
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Möwenkutter' for the pirate MMO Abyssal Dominion: Kutter, 1 Mast, Gaffelsegel, colours Naturholz, Leinen, Weiß, motif: Möwenwimpel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "2",
+      "name": "Ankerlicht",
+      "generation": "I",
+      "rumpf": "Sloop",
+      "takelage": "1 Mast, Gaffel + Fock",
+      "farben": "Holz, Leinen, Messinglaterne",
+      "motiv": "Laterne am Heck",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 2,
+        "schaden": 2,
+        "tempo": 2
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Ankerlicht' for the pirate MMO Abyssal Dominion: Sloop, 1 Mast, Gaffel + Fock, colours Holz, Leinen, Messinglaterne, motif: Laterne am Heck. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "3",
+      "name": "Salzkogge",
+      "generation": "I",
+      "rumpf": "Kogge, hoher Freibord",
+      "takelage": "1 Mast, ein großes Rahsegel",
+      "farben": "Eiche, ungefärbtes Segel",
+      "motiv": "Fässer an Deck",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 4,
+        "schaden": 1,
+        "tempo": 1
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Salzkogge' for the pirate MMO Abyssal Dominion: Kogge, hoher Freibord, 1 Mast, ein großes Rahsegel, colours Eiche, ungefärbtes Segel, motif: Fässer an Deck. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "4",
+      "name": "Brisenläufer",
+      "generation": "I",
+      "rumpf": "Sloop, schlank",
+      "takelage": "1 Mast, Gaffel + Toppsegel",
+      "farben": "helles Holz, Himmelblau",
+      "motiv": "blauer Streifen am Rumpf",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 1,
+        "schaden": 1,
+        "tempo": 4
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Brisenläufer' for the pirate MMO Abyssal Dominion: Sloop, schlank, 1 Mast, Gaffel + Toppsegel, colours helles Holz, Himmelblau, motif: blauer Streifen am Rumpf. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "5",
+      "name": "Hafenkrähe",
+      "generation": "I",
+      "rumpf": "bewaffneter Kutter",
+      "takelage": "1 Mast, Gaffel",
+      "farben": "dunkles Holz, Schwarz",
+      "motiv": "Krähenwimpel, 2 Drehbassen",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 1,
+        "schaden": 4,
+        "tempo": 2
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Hafenkrähe' for the pirate MMO Abyssal Dominion: bewaffneter Kutter, 1 Mast, Gaffel, colours dunkles Holz, Schwarz, motif: Krähenwimpel, 2 Drehbassen. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "6",
+      "name": "Leuchtturmsloop",
+      "generation": "I",
+      "rumpf": "Sloop",
+      "takelage": "1 Mast, Gaffel + 2 Vorsegel",
+      "farben": "Weiß/Rot geringelt",
+      "motiv": "rot-weiße Bordwand",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 1,
+        "tempo": 2
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Leuchtturmsloop' for the pirate MMO Abyssal Dominion: Sloop, 1 Mast, Gaffel + 2 Vorsegel, colours Weiß/Rot geringelt, motif: rot-weiße Bordwand. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "7",
+      "name": "Bernsteinkogge",
+      "generation": "I",
+      "rumpf": "Kogge mit Achterkastell",
+      "takelage": "1 Mast, Rahsegel + Besan",
+      "farben": "Honigholz, Bernsteingelb",
+      "motiv": "gelbes Segel mit Sonnenring",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 2,
+        "schaden": 2,
+        "tempo": 2
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Bernsteinkogge' for the pirate MMO Abyssal Dominion: Kogge mit Achterkastell, 1 Mast, Rahsegel + Besan, colours Honigholz, Bernsteingelb, motif: gelbes Segel mit Sonnenring. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "8",
+      "name": "Riffkutter",
+      "generation": "I",
+      "rumpf": "breiter Kutter",
+      "takelage": "2 Masten, Gaffel",
+      "farben": "Holz, Türkis",
+      "motiv": "Korallenrot am Bug",
+      "rolle": "Entern / Nahkampf",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 3,
+        "tempo": 1
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Riffkutter' for the pirate MMO Abyssal Dominion: breiter Kutter, 2 Masten, Gaffel, colours Holz, Türkis, motif: Korallenrot am Bug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "9",
+      "name": "Grünspan-Sloop",
+      "generation": "I",
+      "rumpf": "Sloop mit Kanonendeck",
+      "takelage": "2 Masten, Gaffel + Toppsegel",
+      "farben": "Holz, Kupfer/Grünspan",
+      "motiv": "Kupferbeschlag am Bug",
+      "rolle": "Kanonenspezialist",
+      "werte": {
+        "rumpf": 2,
+        "schaden": 4,
+        "tempo": 1
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Grünspan-Sloop' for the pirate MMO Abyssal Dominion: Sloop mit Kanonendeck, 2 Masten, Gaffel + Toppsegel, colours Holz, Kupfer/Grünspan, motif: Kupferbeschlag am Bug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "10",
+      "name": "Kapitänskogge",
+      "generation": "I",
+      "rumpf": "große Kogge, Vor- und Achterkastell",
+      "takelage": "2 Masten, Rahsegel",
+      "farben": "dunkles Holz, Weinrot, Messing",
+      "motiv": "erstes Familienwappen",
+      "rolle": "Schwer / Belagerung",
+      "werte": {
+        "rumpf": 4,
+        "schaden": 3,
+        "tempo": 1
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Kapitänskogge' for the pirate MMO Abyssal Dominion: große Kogge, Vor- und Achterkastell, 2 Masten, Rahsegel, colours dunkles Holz, Weinrot, Messing, motif: erstes Familienwappen. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "11",
+      "name": "Terrakotta-Karavelle",
+      "generation": "II",
+      "rumpf": "Karavelle",
+      "takelage": "2 Masten, Lateinersegel",
+      "farben": "Terrakotta, Sand",
+      "motiv": "Sonnenrad",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 2,
+        "schaden": 2,
+        "tempo": 5
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Terrakotta-Karavelle' for the pirate MMO Abyssal Dominion: Karavelle, 2 Masten, Lateinersegel, colours Terrakotta, Sand, motif: Sonnenrad. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "12",
+      "name": "Nordklinker",
+      "generation": "II",
+      "rumpf": "Klinkerrumpf-Brigg",
+      "takelage": "2 Masten, Rahsegel",
+      "farben": "Klinkerblau, Weiß",
+      "motiv": "Schneeflockenwimpel",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 5,
+        "schaden": 2,
+        "tempo": 2
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Nordklinker' for the pirate MMO Abyssal Dominion: Klinkerrumpf-Brigg, 2 Masten, Rahsegel, colours Klinkerblau, Weiß, motif: Schneeflockenwimpel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "13",
+      "name": "Türkisschoner",
+      "generation": "II",
+      "rumpf": "Schoner",
+      "takelage": "2 Masten, Gaffel",
+      "farben": "Türkis, helles Holz",
+      "motiv": "Muschelornament",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 2,
+        "schaden": 2,
+        "tempo": 5
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Türkisschoner' for the pirate MMO Abyssal Dominion: Schoner, 2 Masten, Gaffel, colours Türkis, helles Holz, motif: Muschelornament. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "14",
+      "name": "Gewürzfleute",
+      "generation": "II",
+      "rumpf": "Fleute, bauchiger Rumpf",
+      "takelage": "3 Masten, Rahsegel",
+      "farben": "Zimtbraun, Safrangelb",
+      "motiv": "Gewürzsäcke an Deck",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 4,
+        "schaden": 2,
+        "tempo": 3
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Gewürzfleute' for the pirate MMO Abyssal Dominion: Fleute, bauchiger Rumpf, 3 Masten, Rahsegel, colours Zimtbraun, Safrangelb, motif: Gewürzsäcke an Deck. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "15",
+      "name": "Silbermöwe",
+      "generation": "II",
+      "rumpf": "Toppsegelschoner",
+      "takelage": "2 Masten",
+      "farben": "Silbergrau, Weiß",
+      "motiv": "Möwenfigur am Bug",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 3,
+        "tempo": 3
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Silbermöwe' for the pirate MMO Abyssal Dominion: Toppsegelschoner, 2 Masten, colours Silbergrau, Weiß, motif: Möwenfigur am Bug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "16",
+      "name": "Lagunenbrigg",
+      "generation": "II",
+      "rumpf": "Brigg",
+      "takelage": "2 Masten, Rahsegel",
+      "farben": "Lagunengrün, Elfenbein",
+      "motiv": "Wellenband",
+      "rolle": "Kanonenspezialist",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 5,
+        "tempo": 2
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Lagunenbrigg' for the pirate MMO Abyssal Dominion: Brigg, 2 Masten, Rahsegel, colours Lagunengrün, Elfenbein, motif: Wellenband. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "17",
+      "name": "Marktkaravelle",
+      "generation": "II",
+      "rumpf": "Karavelle mit Achterdeck",
+      "takelage": "3 Masten, Rah + Lateiner",
+      "farben": "Purpur, Gold",
+      "motiv": "Gildenbanner der Handelsliga",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 4,
+        "schaden": 2,
+        "tempo": 3
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Marktkaravelle' for the pirate MMO Abyssal Dominion: Karavelle mit Achterdeck, 3 Masten, Rah + Lateiner, colours Purpur, Gold, motif: Gildenbanner der Handelsliga. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "18",
+      "name": "Frostfleute",
+      "generation": "II",
+      "rumpf": "Fleute, verstärkter Bug",
+      "takelage": "3 Masten",
+      "farben": "Eisblau, Grau",
+      "motiv": "Eisbrecherkeil (dezent)",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 5,
+        "schaden": 2,
+        "tempo": 2
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Frostfleute' for the pirate MMO Abyssal Dominion: Fleute, verstärkter Bug, 3 Masten, colours Eisblau, Grau, motif: Eisbrecherkeil (dezent). Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "19",
+      "name": "Korsarenschoner",
+      "generation": "II",
+      "rumpf": "schneller Schoner",
+      "takelage": "2 Masten, Gaffel + Rah",
+      "farben": "Schwarz/Rot",
+      "motiv": "gekreuzte Säbel",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 2,
+        "schaden": 5,
+        "tempo": 3
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Korsarenschoner' for the pirate MMO Abyssal Dominion: schneller Schoner, 2 Masten, Gaffel + Rah, colours Schwarz/Rot, motif: gekreuzte Säbel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "20",
+      "name": "Seidenstraßen-Brigg",
+      "generation": "II",
+      "rumpf": "große Brigg",
+      "takelage": "2 Masten + Klüver",
+      "farben": "Jade, Rotlack",
+      "motiv": "Laternenreihe",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 3,
+        "tempo": 3
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Seidenstraßen-Brigg' for the pirate MMO Abyssal Dominion: große Brigg, 2 Masten + Klüver, colours Jade, Rotlack, motif: Laternenreihe. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "21",
+      "name": "Kanonenfalke",
+      "generation": "III",
+      "rumpf": "Korvette",
+      "takelage": "3 Masten",
+      "farben": "Marineblau, Weiß",
+      "motiv": "Falkenwappen",
+      "rolle": "Kanonenspezialist",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 5,
+        "tempo": 2
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Kanonenfalke' for the pirate MMO Abyssal Dominion: Korvette, 3 Masten, colours Marineblau, Weiß, motif: Falkenwappen. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "22",
+      "name": "Remora-Galeasse",
+      "generation": "III",
+      "rumpf": "Galeasse mit Ruderreihe",
+      "takelage": "2 Masten, Lateiner",
+      "farben": "Rot, Bronze",
+      "motiv": "Ramme am Bug",
+      "rolle": "Entern / Nahkampf",
+      "werte": {
+        "rumpf": 4,
+        "schaden": 4,
+        "tempo": 2
+      },
+      "quelle": "neu (Idee aus NPC-Bogen Galeasse)",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Remora-Galeasse' for the pirate MMO Abyssal Dominion: Galeasse mit Ruderreihe, 2 Masten, Lateiner, colours Rot, Bronze, motif: Ramme am Bug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "23",
+      "name": "Eisenmöwe",
+      "generation": "III",
+      "rumpf": "leichte Fregatte",
+      "takelage": "3 Masten",
+      "farben": "Grau, Eisen",
+      "motiv": "genietete Bordwand",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 5,
+        "schaden": 2,
+        "tempo": 2
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Eisenmöwe' for the pirate MMO Abyssal Dominion: leichte Fregatte, 3 Masten, colours Grau, Eisen, motif: genietete Bordwand. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "24",
+      "name": "Brandungsbrecher",
+      "generation": "III",
+      "rumpf": "Korvette, niedriger Rumpf",
+      "takelage": "2 Masten, Rah",
+      "farben": "Sturmgrau, Weiß",
+      "motiv": "Wellenbug",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 2,
+        "schaden": 2,
+        "tempo": 5
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Brandungsbrecher' for the pirate MMO Abyssal Dominion: Korvette, niedriger Rumpf, 2 Masten, Rah, colours Sturmgrau, Weiß, motif: Wellenbug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "25",
+      "name": "Kronenkorvette",
+      "generation": "III",
+      "rumpf": "Korvette mit Prunkheck",
+      "takelage": "3 Masten",
+      "farben": "Königsblau, Gold",
+      "motiv": "Lilie/Krone (eigene Form)",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 3,
+        "tempo": 3
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Kronenkorvette' for the pirate MMO Abyssal Dominion: Korvette mit Prunkheck, 3 Masten, colours Königsblau, Gold, motif: Lilie/Krone (eigene Form). Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "26",
+      "name": "Salvenbrigg",
+      "generation": "III",
+      "rumpf": "Kanonenbrigg, 2 Decks",
+      "takelage": "2 Masten",
+      "farben": "Ochsenblut, Schwarz",
+      "motiv": "doppelte Kanonenreihe",
+      "rolle": "Kanonenspezialist",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 5,
+        "tempo": 2
+      },
+      "quelle": "neu (Idee aus NPC-Bogen Kanonen-Brig)",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Salvenbrigg' for the pirate MMO Abyssal Dominion: Kanonenbrigg, 2 Decks, 2 Masten, colours Ochsenblut, Schwarz, motif: doppelte Kanonenreihe. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "27",
+      "name": "Riffjäger",
+      "generation": "III",
+      "rumpf": "Fregatte, schlank",
+      "takelage": "3 Masten",
+      "farben": "Seegrün, Messing",
+      "motiv": "Haizahnreihe am Bug",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 2,
+        "schaden": 5,
+        "tempo": 3
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Riffjäger' for the pirate MMO Abyssal Dominion: Fregatte, schlank, 3 Masten, colours Seegrün, Messing, motif: Haizahnreihe am Bug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "28",
+      "name": "Mörserkogge",
+      "generation": "III",
+      "rumpf": "Bombardierkogge",
+      "takelage": "2 Masten",
+      "farben": "Ruß, Bronze",
+      "motiv": "Mörser mittschiffs",
+      "rolle": "Schwer / Belagerung",
+      "werte": {
+        "rumpf": 5,
+        "schaden": 4,
+        "tempo": 1
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Mörserkogge' for the pirate MMO Abyssal Dominion: Bombardierkogge, 2 Masten, colours Ruß, Bronze, motif: Mörser mittschiffs. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "29",
+      "name": "Wachfregatte",
+      "generation": "III",
+      "rumpf": "Fregatte",
+      "takelage": "3 Masten",
+      "farben": "Weiß, Ankerblau",
+      "motiv": "Ankerwappen (Wache)",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 5,
+        "schaden": 2,
+        "tempo": 2
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Wachfregatte' for the pirate MMO Abyssal Dominion: Fregatte, 3 Masten, colours Weiß, Ankerblau, motif: Ankerwappen (Wache). Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "30",
+      "name": "Admiralitätsfregatte",
+      "generation": "III",
+      "rumpf": "schwere Fregatte",
+      "takelage": "3 Masten + Klüver",
+      "farben": "Dunkelblau, Gold",
+      "motiv": "Flaggenreihe, Galionsfigur",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 3,
+        "tempo": 3
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Admiralitätsfregatte' for the pirate MMO Abyssal Dominion: schwere Fregatte, 3 Masten + Klüver, colours Dunkelblau, Gold, motif: Flaggenreihe, Galionsfigur. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "31",
+      "name": "Sturmwind",
+      "generation": "IV",
+      "rumpf": "schnelles Eliteschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Messing",
+      "motiv": "Kompassrose",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 3,
+        "tempo": 6
+      },
+      "quelle": "Bogen Elite 01",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Sturmwind' for the pirate MMO Abyssal Dominion: schnelles Eliteschiff, 3 Masten, colours Schwarz, Messing, motif: Kompassrose. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "32",
+      "name": "Seelenreißer",
+      "generation": "IV",
+      "rumpf": "ausgewogenes Eliteschiff",
+      "takelage": "3 Masten",
+      "farben": "Nachtblau, Gold",
+      "motiv": "Sternrad",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 4,
+        "schaden": 4,
+        "tempo": 4
+      },
+      "quelle": "Bogen Elite 02",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Seelenreißer' for the pirate MMO Abyssal Dominion: ausgewogenes Eliteschiff, 3 Masten, colours Nachtblau, Gold, motif: Sternrad. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "33",
+      "name": "Eisenwächter",
+      "generation": "IV",
+      "rumpf": "Panzerschiff",
+      "takelage": "3 Masten",
+      "farben": "Eisengrau",
+      "motiv": "Plattenpanzer",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 3,
+        "tempo": 3
+      },
+      "quelle": "Bogen Elite 03",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Eisenwächter' for the pirate MMO Abyssal Dominion: Panzerschiff, 3 Masten, colours Eisengrau, motif: Plattenpanzer. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "34",
+      "name": "Wilderzahn",
+      "generation": "IV",
+      "rumpf": "Angriffsschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Blutrot",
+      "motiv": "Zahnbug",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 6,
+        "tempo": 4
+      },
+      "quelle": "Bogen Elite 04",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Wilderzahn' for the pirate MMO Abyssal Dominion: Angriffsschiff, 3 Masten, colours Schwarz, Blutrot, motif: Zahnbug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "35",
+      "name": "Geisterkorsar",
+      "generation": "IV",
+      "rumpf": "listiges Eliteschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Giftgrün",
+      "motiv": "grüne Laternen (dezent)",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 5,
+        "schaden": 3,
+        "tempo": 4
+      },
+      "quelle": "Bogen Elite 05",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Geisterkorsar' for the pirate MMO Abyssal Dominion: listiges Eliteschiff, 3 Masten, colours Schwarz, Giftgrün, motif: grüne Laternen (dezent). Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "36",
+      "name": "Donnerklaue",
+      "generation": "IV",
+      "rumpf": "Kanonenschiff",
+      "takelage": "3 Masten",
+      "farben": "Bronze, Ocker",
+      "motiv": "Kanonenbatterie",
+      "rolle": "Kanonenspezialist",
+      "werte": {
+        "rumpf": 4,
+        "schaden": 6,
+        "tempo": 3
+      },
+      "quelle": "Bogen Elite 06",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Donnerklaue' for the pirate MMO Abyssal Dominion: Kanonenschiff, 3 Masten, colours Bronze, Ocker, motif: Kanonenbatterie. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "37",
+      "name": "Tiefenfurie",
+      "generation": "IV",
+      "rumpf": "Spezialist für Entern",
+      "takelage": "3 Masten",
+      "farben": "Violett, Schwarz",
+      "motiv": "Enterhaken",
+      "rolle": "Entern / Nahkampf",
+      "werte": {
+        "rumpf": 5,
+        "schaden": 5,
+        "tempo": 3
+      },
+      "quelle": "Bogen Elite 07",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Tiefenfurie' for the pirate MMO Abyssal Dominion: Spezialist für Entern, 3 Masten, colours Violett, Schwarz, motif: Enterhaken. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "38",
+      "name": "Schattenwind",
+      "generation": "IV",
+      "rumpf": "Aufklärer",
+      "takelage": "3 Masten",
+      "farben": "Petrol, Schwarz",
+      "motiv": "Sternenkarte",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 3,
+        "tempo": 6
+      },
+      "quelle": "Bogen Elite 08",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Schattenwind' for the pirate MMO Abyssal Dominion: Aufklärer, 3 Masten, colours Petrol, Schwarz, motif: Sternenkarte. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "39",
+      "name": "Flammenbanner",
+      "generation": "IV",
+      "rumpf": "Feuerschiff",
+      "takelage": "3 Masten",
+      "farben": "Glutorange, Schwarz",
+      "motiv": "Feuerbanner",
+      "rolle": "Feuer / Schaden über Zeit",
+      "werte": {
+        "rumpf": 3,
+        "schaden": 6,
+        "tempo": 4
+      },
+      "quelle": "Bogen Elite 09",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Flammenbanner' for the pirate MMO Abyssal Dominion: Feuerschiff, 3 Masten, colours Glutorange, Schwarz, motif: Feuerbanner. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "40",
+      "name": "Sturmbasilisk",
+      "generation": "IV",
+      "rumpf": "schweres Eliteschiff",
+      "takelage": "3 Masten",
+      "farben": "Grau, Knochenweiß",
+      "motiv": "Basiliskenkopf",
+      "rolle": "Schwer / Belagerung",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 5,
+        "tempo": 2
+      },
+      "quelle": "Bogen Elite 10",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Sturmbasilisk' for the pirate MMO Abyssal Dominion: schweres Eliteschiff, 3 Masten, colours Grau, Knochenweiß, motif: Basiliskenkopf. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "41",
+      "name": "Jade-Dschunke",
+      "generation": "V",
+      "rumpf": "Dschunke, Lattensegel",
+      "takelage": "3 Masten",
+      "farben": "Jade, Gold",
+      "motiv": "Drachenornamente",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 5,
+        "schaden": 5,
+        "tempo": 5
+      },
+      "quelle": "Bogen D-41",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Jade-Dschunke' for the pirate MMO Abyssal Dominion: Dschunke, Lattensegel, 3 Masten, colours Jade, Gold, motif: Drachenornamente. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "42",
+      "name": "Wüsten-Skimmer",
+      "generation": "V",
+      "rumpf": "Wüstennomaden-Schiff",
+      "takelage": "2 Masten, Lateiner",
+      "farben": "Sand, Ocker",
+      "motiv": "Sonnenzeichen",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 4,
+        "schaden": 4,
+        "tempo": 7
+      },
+      "quelle": "Bogen D-42",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Wüsten-Skimmer' for the pirate MMO Abyssal Dominion: Wüstennomaden-Schiff, 2 Masten, Lateiner, colours Sand, Ocker, motif: Sonnenzeichen. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "43",
+      "name": "Wüsten-Dahow",
+      "generation": "V",
+      "rumpf": "Dau",
+      "takelage": "2 Masten, Lateiner",
+      "farben": "Sandbeige, Rot",
+      "motiv": "Sternsegel",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 4,
+        "tempo": 5
+      },
+      "quelle": "Bogen D-12",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Wüsten-Dahow' for the pirate MMO Abyssal Dominion: Dau, 2 Masten, Lateiner, colours Sandbeige, Rot, motif: Sternsegel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "44",
+      "name": "Silberwind",
+      "generation": "V",
+      "rumpf": "Elfenschiff",
+      "takelage": "3 Masten, geschwungen",
+      "farben": "Silber, Nachtblau",
+      "motiv": "Blattsegel",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 4,
+        "schaden": 4,
+        "tempo": 7
+      },
+      "quelle": "Bogen D-44",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Silberwind' for the pirate MMO Abyssal Dominion: Elfenschiff, 3 Masten, geschwungen, colours Silber, Nachtblau, motif: Blattsegel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "45",
+      "name": "Luminara",
+      "generation": "V",
+      "rumpf": "Himmelspriester-Schiff mit Türmen",
+      "takelage": "2 Türme + Mast",
+      "farben": "Elfenbein, Himmelblau, Gold",
+      "motiv": "Kuppeln",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 4,
+        "tempo": 5
+      },
+      "quelle": "Bogen D-46",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Luminara' for the pirate MMO Abyssal Dominion: Himmelspriester-Schiff mit Türmen, 2 Türme + Mast, colours Elfenbein, Himmelblau, Gold, motif: Kuppeln. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "46",
+      "name": "Kristallkaravelle",
+      "generation": "V",
+      "rumpf": "Gilden-Handelsschiff",
+      "takelage": "3 Masten",
+      "farben": "Rosé, Kristall, Gold",
+      "motiv": "Kristallbesatz",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 4,
+        "tempo": 4
+      },
+      "quelle": "Bogen D-48",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Kristallkaravelle' for the pirate MMO Abyssal Dominion: Gilden-Handelsschiff, 3 Masten, colours Rosé, Kristall, Gold, motif: Kristallbesatz. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "47",
+      "name": "Monsunreiter",
+      "generation": "V",
+      "rumpf": "Auslegerboot (Proa) mit Krabbenscherensegel",
+      "takelage": "2 Masten",
+      "farben": "Tropenholz, Orange",
+      "motiv": "Muschelketten",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 4,
+        "schaden": 4,
+        "tempo": 7
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Monsunreiter' for the pirate MMO Abyssal Dominion: Auslegerboot (Proa) mit Krabbenscherensegel, 2 Masten, colours Tropenholz, Orange, motif: Muschelketten. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "48",
+      "name": "Fjordwacht",
+      "generation": "V",
+      "rumpf": "nordisches Langschiff, Schildreihe",
+      "takelage": "1 Mast, Rahsegel + Ruder",
+      "farben": "Teer, Rot/Weiß gestreift",
+      "motiv": "Schildreihe, Wolfskopf-Steven",
+      "rolle": "Entern / Nahkampf",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 6,
+        "tempo": 4
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Fjordwacht' for the pirate MMO Abyssal Dominion: nordisches Langschiff, Schildreihe, 1 Mast, Rahsegel + Ruder, colours Teer, Rot/Weiß gestreift, motif: Schildreihe, Wolfskopf-Steven. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "49",
+      "name": "Polarbrecher",
+      "generation": "V",
+      "rumpf": "Polarschiff der Nordstämme",
+      "takelage": "3 Masten",
+      "farben": "Eisblau, Weiß",
+      "motiv": "Eiskeil",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 4,
+        "tempo": 4
+      },
+      "quelle": "Bogen D-51",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Polarbrecher' for the pirate MMO Abyssal Dominion: Polarschiff der Nordstämme, 3 Masten, colours Eisblau, Weiß, motif: Eiskeil. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "50",
+      "name": "Sonnenflamme",
+      "generation": "V",
+      "rumpf": "Phönix-Kult-Schiff",
+      "takelage": "3 Masten",
+      "farben": "Feuerrot, Gold",
+      "motiv": "Phönix-Galionsfigur",
+      "rolle": "Feuer / Schaden über Zeit",
+      "werte": {
+        "rumpf": 4,
+        "schaden": 7,
+        "tempo": 5
+      },
+      "quelle": "Bogen D-50",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Sonnenflamme' for the pirate MMO Abyssal Dominion: Phönix-Kult-Schiff, 3 Masten, colours Feuerrot, Gold, motif: Phönix-Galionsfigur. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "51",
+      "name": "Dampfsturm",
+      "generation": "VI",
+      "rumpf": "Dampfschiff (Imperiale Flotte)",
+      "takelage": "Schlote statt Segel",
+      "farben": "Rost, Schwarz, Messing",
+      "motiv": "drei Schornsteine",
+      "rolle": "Schwer / Belagerung",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 7,
+        "tempo": 4
+      },
+      "quelle": "Bogen D-49",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Dampfsturm' for the pirate MMO Abyssal Dominion: Dampfschiff (Imperiale Flotte), Schlote statt Segel, colours Rost, Schwarz, Messing, motif: drei Schornsteine. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "52",
+      "name": "Blutkrallen-Katamaran",
+      "generation": "VI",
+      "rumpf": "Kriegskatamaran",
+      "takelage": "2 Rümpfe, 3 Masten",
+      "farben": "Schwarz, Rot",
+      "motiv": "Krallenbug",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 5,
+        "schaden": 8,
+        "tempo": 6
+      },
+      "quelle": "Bogen D-45",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Blutkrallen-Katamaran' for the pirate MMO Abyssal Dominion: Kriegskatamaran, 2 Rümpfe, 3 Masten, colours Schwarz, Rot, motif: Krallenbug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "53",
+      "name": "Sturmwal",
+      "generation": "VI",
+      "rumpf": "Walrumpf-Mega-Schiff",
+      "takelage": "3 Masten",
+      "farben": "Nachtblau, Gewitterblau",
+      "motiv": "Walkopf als Bug",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 5,
+        "tempo": 5
+      },
+      "quelle": "Pack 07",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Sturmwal' for the pirate MMO Abyssal Dominion: Walrumpf-Mega-Schiff, 3 Masten, colours Nachtblau, Gewitterblau, motif: Walkopf als Bug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "54",
+      "name": "Dünenschreiter",
+      "generation": "VI",
+      "rumpf": "Wüstenkriegsschiff",
+      "takelage": "3 Masten",
+      "farben": "Sand, Bronze",
+      "motiv": "Sandsturm-Effekt",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 6,
+        "tempo": 6
+      },
+      "quelle": "Pack 08",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Dünenschreiter' for the pirate MMO Abyssal Dominion: Wüstenkriegsschiff, 3 Masten, colours Sand, Bronze, motif: Sandsturm-Effekt. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "55",
+      "name": "Mech-Panzerschiff",
+      "generation": "VI",
+      "rumpf": "gepanzertes Dampfschiff mit Rädern",
+      "takelage": "Schlote",
+      "farben": "Bronze, Türkis-Lichter",
+      "motiv": "Kanonenturm",
+      "rolle": "Schwer / Belagerung",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 7,
+        "tempo": 4
+      },
+      "quelle": "Bogen D-15",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Mech-Panzerschiff' for the pirate MMO Abyssal Dominion: gepanzertes Dampfschiff mit Rädern, Schlote, colours Bronze, Türkis-Lichter, motif: Kanonenturm. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "56",
+      "name": "Kupferkoloss",
+      "generation": "VI",
+      "rumpf": "Halbtaucher mit Kupferkuppel",
+      "takelage": "1 Hilfsmast",
+      "farben": "Kupfer, Grünspan",
+      "motiv": "Bullaugen-Reihe",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 5,
+        "tempo": 5
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Kupferkoloss' for the pirate MMO Abyssal Dominion: Halbtaucher mit Kupferkuppel, 1 Hilfsmast, colours Kupfer, Grünspan, motif: Bullaugen-Reihe. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "57",
+      "name": "Windmühlenträger",
+      "generation": "VI",
+      "rumpf": "Rotorschiff",
+      "takelage": "2 Rotortürme",
+      "farben": "Holz, Ziegelrot",
+      "motiv": "drehende Flügel",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 5,
+        "tempo": 6
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Windmühlenträger' for the pirate MMO Abyssal Dominion: Rotorschiff, 2 Rotortürme, colours Holz, Ziegelrot, motif: drehende Flügel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "58",
+      "name": "Eisbrecher",
+      "generation": "VI",
+      "rumpf": "Fraktionsschiff",
+      "takelage": "3 Masten",
+      "farben": "Dunkelblau, Eis",
+      "motiv": "Schneekristall-Segel",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 5,
+        "tempo": 5
+      },
+      "quelle": "Pack 09 / Bogen D-13",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Eisbrecher' for the pirate MMO Abyssal Dominion: Fraktionsschiff, 3 Masten, colours Dunkelblau, Eis, motif: Schneekristall-Segel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "59",
+      "name": "Raketenkogge",
+      "generation": "VI",
+      "rumpf": "Kogge mit Raketengestellen",
+      "takelage": "2 Masten",
+      "farben": "Schwarz, Signalgelb",
+      "motiv": "Raketenbatterie",
+      "rolle": "Feuer / Schaden über Zeit",
+      "werte": {
+        "rumpf": 5,
+        "schaden": 8,
+        "tempo": 6
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Raketenkogge' for the pirate MMO Abyssal Dominion: Kogge mit Raketengestellen, 2 Masten, colours Schwarz, Signalgelb, motif: Raketenbatterie. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "60",
+      "name": "Eisenhager",
+      "generation": "VI",
+      "rumpf": "Panzerschiff",
+      "takelage": "3 Masten",
+      "farben": "Eisen, Weiß",
+      "motiv": "Plattenbug",
+      "rolle": "Schwer / Belagerung",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 7,
+        "tempo": 4
+      },
+      "quelle": "Variation 14/15",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Eisenhager' for the pirate MMO Abyssal Dominion: Panzerschiff, 3 Masten, colours Eisen, Weiß, motif: Plattenbug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "61",
+      "name": "Sonnenlanze",
+      "generation": "VII",
+      "rumpf": "Heiliger-Orden-Schiff",
+      "takelage": "3 Masten",
+      "farben": "Weiß, Gold",
+      "motiv": "Sonnenrad",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 7,
+        "tempo": 7
+      },
+      "quelle": "Pack 04 / Bogen D-17",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Sonnenlanze' for the pirate MMO Abyssal Dominion: Heiliger-Orden-Schiff, 3 Masten, colours Weiß, Gold, motif: Sonnenrad. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "62",
+      "name": "Sternenwind",
+      "generation": "VII",
+      "rumpf": "schnelles Spielerschiff",
+      "takelage": "2 Masten",
+      "farben": "Silber, Weiß, Blitzblau",
+      "motiv": "Kompassstern",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 6,
+        "tempo": 9
+      },
+      "quelle": "Pack 02",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Sternenwind' for the pirate MMO Abyssal Dominion: schnelles Spielerschiff, 2 Masten, colours Silber, Weiß, Blitzblau, motif: Kompassstern. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "63",
+      "name": "Sturmjäger",
+      "generation": "VII",
+      "rumpf": "Sturmschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Blitzblau",
+      "motiv": "Blitzadern",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 9,
+        "tempo": 7
+      },
+      "quelle": "Variation 05",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Sturmjäger' for the pirate MMO Abyssal Dominion: Sturmschiff, 3 Masten, colours Schwarz, Blitzblau, motif: Blitzadern. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "64",
+      "name": "Mondlichtjäger",
+      "generation": "VII",
+      "rumpf": "Nachtjäger",
+      "takelage": "3 Masten",
+      "farben": "Mitternachtsblau, Silber",
+      "motiv": "Mondsichel",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 6,
+        "tempo": 9
+      },
+      "quelle": "Variation 21",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Mondlichtjäger' for the pirate MMO Abyssal Dominion: Nachtjäger, 3 Masten, colours Mitternachtsblau, Silber, motif: Mondsichel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "65",
+      "name": "Kapitänsflagge",
+      "generation": "VII",
+      "rumpf": "Admiralsschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Gold",
+      "motiv": "Kapitänswappen",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 6,
+        "tempo": 7
+      },
+      "quelle": "Variation 10",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Kapitänsflagge' for the pirate MMO Abyssal Dominion: Admiralsschiff, 3 Masten, colours Schwarz, Gold, motif: Kapitänswappen. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "66",
+      "name": "Stahlpanzer",
+      "generation": "VII",
+      "rumpf": "Panzerlinienschiff",
+      "takelage": "3 Masten",
+      "farben": "Stahl, Schwarz",
+      "motiv": "Panzerplatten",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 6,
+        "tempo": 6
+      },
+      "quelle": "Variation 23",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Stahlpanzer' for the pirate MMO Abyssal Dominion: Panzerlinienschiff, 3 Masten, colours Stahl, Schwarz, motif: Panzerplatten. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "67",
+      "name": "Sonnenfluch",
+      "generation": "VII",
+      "rumpf": "Prunkgaleone",
+      "takelage": "2 Masten",
+      "farben": "Weiß, Gold, Bronze",
+      "motiv": "Sonnensegel",
+      "rolle": "Kanonenspezialist",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 9,
+        "tempo": 6
+      },
+      "quelle": "Variation 20",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Sonnenfluch' for the pirate MMO Abyssal Dominion: Prunkgaleone, 2 Masten, colours Weiß, Gold, Bronze, motif: Sonnensegel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "68",
+      "name": "Goldener Wächter",
+      "generation": "VII",
+      "rumpf": "Prunklinienschiff",
+      "takelage": "3 Masten",
+      "farben": "Gold, Elfenbein",
+      "motiv": "Löwenbug",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 6,
+        "tempo": 6
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Goldener Wächter' for the pirate MMO Abyssal Dominion: Prunklinienschiff, 3 Masten, colours Gold, Elfenbein, motif: Löwenbug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "69",
+      "name": "Gewitterkrone",
+      "generation": "VII",
+      "rumpf": "Linienschiff mit Blitzableitern",
+      "takelage": "3 Masten",
+      "farben": "Schiefer, Blitzweiß",
+      "motiv": "Kupferspitzen auf den Masten",
+      "rolle": "Kanonenspezialist",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 9,
+        "tempo": 6
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Gewitterkrone' for the pirate MMO Abyssal Dominion: Linienschiff mit Blitzableitern, 3 Masten, colours Schiefer, Blitzweiß, motif: Kupferspitzen auf den Masten. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "70",
+      "name": "Dunkelsegler",
+      "generation": "VII",
+      "rumpf": "schweres Kriegsschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Grau",
+      "motiv": "schwarzes Wappen",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 9,
+        "tempo": 7
+      },
+      "quelle": "Variation 15",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Dunkelsegler' for the pirate MMO Abyssal Dominion: schweres Kriegsschiff, 3 Masten, colours Schwarz, Grau, motif: schwarzes Wappen. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "71",
+      "name": "Schattenklaue",
+      "generation": "VIII",
+      "rumpf": "kleines Geisterschiff",
+      "takelage": "1 Mast",
+      "farben": "Schwarz, Giftgrün",
+      "motiv": "Totenkopf, grüner Nebel",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 6,
+        "tempo": 9
+      },
+      "quelle": "Pack 01",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Schattenklaue' for the pirate MMO Abyssal Dominion: kleines Geisterschiff, 1 Mast, colours Schwarz, Giftgrün, motif: Totenkopf, grüner Nebel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "72",
+      "name": "Nebelreiter",
+      "generation": "VIII",
+      "rumpf": "Phantomschiff",
+      "takelage": "3 Masten",
+      "farben": "Grau, Geistertürkis",
+      "motiv": "Nebelschleier",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 6,
+        "tempo": 7
+      },
+      "quelle": "Pack 06 / Variation 09",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Nebelreiter' for the pirate MMO Abyssal Dominion: Phantomschiff, 3 Masten, colours Grau, Geistertürkis, motif: Nebelschleier. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "73",
+      "name": "Tiefenangler",
+      "generation": "VIII",
+      "rumpf": "Meereskreatur-Jäger",
+      "takelage": "2 Masten",
+      "farben": "Dunkelblau, Leuchtgrün",
+      "motiv": "Angler-Laterne am Bug",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 9,
+        "tempo": 7
+      },
+      "quelle": "Bogen D-43",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Tiefenangler' for the pirate MMO Abyssal Dominion: Meereskreatur-Jäger, 2 Masten, colours Dunkelblau, Leuchtgrün, motif: Angler-Laterne am Bug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "74",
+      "name": "Nebelwanderer",
+      "generation": "VIII",
+      "rumpf": "Nebelpiraten-Schiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Violett",
+      "motiv": "Violette Laternen",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 6,
+        "tempo": 9
+      },
+      "quelle": "Bogen D-47",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Nebelwanderer' for the pirate MMO Abyssal Dominion: Nebelpiraten-Schiff, 3 Masten, colours Schwarz, Violett, motif: Violette Laternen. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "75",
+      "name": "Schattenwisp",
+      "generation": "VIII",
+      "rumpf": "Irrlicht-Schiff",
+      "takelage": "3 Masten",
+      "farben": "Nachtblau, Irrlichtblau",
+      "motiv": "blaue Flammen",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 6,
+        "tempo": 7
+      },
+      "quelle": "Bogen D-18",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Schattenwisp' for the pirate MMO Abyssal Dominion: Irrlicht-Schiff, 3 Masten, colours Nachtblau, Irrlichtblau, motif: blaue Flammen. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "76",
+      "name": "Geisterflamme",
+      "generation": "VIII",
+      "rumpf": "verfluchtes Schiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Geistergrün",
+      "motiv": "grüne Flammen",
+      "rolle": "Feuer / Schaden über Zeit",
+      "werte": {
+        "rumpf": 6,
+        "schaden": 9,
+        "tempo": 7
+      },
+      "quelle": "Variation 04",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Geisterflamme' for the pirate MMO Abyssal Dominion: verfluchtes Schiff, 3 Masten, colours Schwarz, Geistergrün, motif: grüne Flammen. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "77",
+      "name": "Knochenkiel",
+      "generation": "VIII",
+      "rumpf": "Knochenschiff",
+      "takelage": "1–3 Masten",
+      "farben": "Knochenweiß, Schwarz",
+      "motiv": "Rippenrumpf",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 6,
+        "tempo": 6
+      },
+      "quelle": "Variation 01/13",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Knochenkiel' for the pirate MMO Abyssal Dominion: Knochenschiff, 1–3 Masten, colours Knochenweiß, Schwarz, motif: Rippenrumpf. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "78",
+      "name": "Sirenenzorn",
+      "generation": "VIII",
+      "rumpf": "Sirenen-Schiff",
+      "takelage": "3 Masten",
+      "farben": "Tiefblau, Perlmutt",
+      "motiv": "Sirenen-Galionsfigur",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 6,
+        "tempo": 7
+      },
+      "quelle": "Variation 08/18",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Sirenenzorn' for the pirate MMO Abyssal Dominion: Sirenen-Schiff, 3 Masten, colours Tiefblau, Perlmutt, motif: Sirenen-Galionsfigur. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "79",
+      "name": "Grabesstille",
+      "generation": "VIII",
+      "rumpf": "Gruftschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Violett",
+      "motiv": "Grabsteinreihe",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 6,
+        "tempo": 6
+      },
+      "quelle": "Variation 14/24",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Grabesstille' for the pirate MMO Abyssal Dominion: Gruftschiff, 3 Masten, colours Schwarz, Violett, motif: Grabsteinreihe. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "80",
+      "name": "Tiefenzorn",
+      "generation": "VIII",
+      "rumpf": "Krakenschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Violett",
+      "motiv": "erste Tentakel",
+      "rolle": "Entern / Nahkampf",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 8,
+        "tempo": 6
+      },
+      "quelle": "Variation 03/07",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Tiefenzorn' for the pirate MMO Abyssal Dominion: Krakenschiff, 3 Masten, colours Schwarz, Violett, motif: erste Tentakel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "81",
+      "name": "Seelenkäfig",
+      "generation": "IX",
+      "rumpf": "Käfigschiff",
+      "takelage": "2 Masten + Käfig",
+      "farben": "Schwarz, Seelengrün",
+      "motiv": "gefangene Seele",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 7,
+        "tempo": 8
+      },
+      "quelle": "Bogen D-11 / Variation 06",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Seelenkäfig' for the pirate MMO Abyssal Dominion: Käfigschiff, 2 Masten + Käfig, colours Schwarz, Seelengrün, motif: gefangene Seele. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "82",
+      "name": "Blutkrake",
+      "generation": "IX",
+      "rumpf": "Krakenschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Blutrot",
+      "motiv": "Krakensegel",
+      "rolle": "Entern / Nahkampf",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 9,
+        "tempo": 7
+      },
+      "quelle": "Variation 13",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Blutkrake' for the pirate MMO Abyssal Dominion: Krakenschiff, 3 Masten, colours Schwarz, Blutrot, motif: Krakensegel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "83",
+      "name": "Fluchbringer",
+      "generation": "IX",
+      "rumpf": "Fluchschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Giftgrün",
+      "motiv": "Runenzeichen",
+      "rolle": "Feuer / Schaden über Zeit",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 10,
+        "tempo": 8
+      },
+      "quelle": "Variation 17/20",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Fluchbringer' for the pirate MMO Abyssal Dominion: Fluchschiff, 3 Masten, colours Schwarz, Giftgrün, motif: Runenzeichen. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "84",
+      "name": "Schemenkommandant",
+      "generation": "IX",
+      "rumpf": "Geister-Flaggschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Violett",
+      "motiv": "Geisterkapitän",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 8,
+        "tempo": 8
+      },
+      "quelle": "Variation 16/17 (dt. Name statt Wraith Commander)",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Schemenkommandant' for the pirate MMO Abyssal Dominion: Geister-Flaggschiff, 3 Masten, colours Schwarz, Violett, motif: Geisterkapitän. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "85",
+      "name": "Todeswind",
+      "generation": "IX",
+      "rumpf": "Sturmgeisterschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Violettnebel",
+      "motiv": "zerrissene Segel",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 7,
+        "tempo": 10
+      },
+      "quelle": "Variation 12/22",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Todeswind' for the pirate MMO Abyssal Dominion: Sturmgeisterschiff, 3 Masten, colours Schwarz, Violettnebel, motif: zerrissene Segel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "86",
+      "name": "Verdammnis",
+      "generation": "IX",
+      "rumpf": "Höllenschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Glutrot",
+      "motiv": "Rissmuster",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 10,
+        "tempo": 8
+      },
+      "quelle": "Variation 09/11",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Verdammnis' for the pirate MMO Abyssal Dominion: Höllenschiff, 3 Masten, colours Schwarz, Glutrot, motif: Rissmuster. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "87",
+      "name": "Dämonenkiel",
+      "generation": "IX",
+      "rumpf": "Dämonenschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Rot",
+      "motiv": "Hörner am Bug",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 10,
+        "tempo": 8
+      },
+      "quelle": "Variation 18/22",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Dämonenkiel' for the pirate MMO Abyssal Dominion: Dämonenschiff, 3 Masten, colours Schwarz, Rot, motif: Hörner am Bug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "88",
+      "name": "Dämonen-Katamaran",
+      "generation": "IX",
+      "rumpf": "Doppelrumpf-Dämon",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Violett",
+      "motiv": "Stachelrümpfe",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 7,
+        "tempo": 10
+      },
+      "quelle": "Bogen D-14",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Dämonen-Katamaran' for the pirate MMO Abyssal Dominion: Doppelrumpf-Dämon, 3 Masten, colours Schwarz, Violett, motif: Stachelrümpfe. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "89",
+      "name": "Krakenruf",
+      "generation": "IX",
+      "rumpf": "Event-/Krakenschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Violettlicht",
+      "motiv": "umschlingende Tentakel",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 10,
+        "schaden": 7,
+        "tempo": 7
+      },
+      "quelle": "Pack 03",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Krakenruf' for the pirate MMO Abyssal Dominion: Event-/Krakenschiff, 3 Masten, colours Schwarz, Violettlicht, motif: umschlingende Tentakel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "90",
+      "name": "Höllenfeuer",
+      "generation": "IX",
+      "rumpf": "Boss-Optik als Klasse",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Lava",
+      "motiv": "Drachenbug, Feuer",
+      "rolle": "Feuer / Schaden über Zeit",
+      "werte": {
+        "rumpf": 7,
+        "schaden": 10,
+        "tempo": 8
+      },
+      "quelle": "Pack 05",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Höllenfeuer' for the pirate MMO Abyssal Dominion: Boss-Optik als Klasse, 3 Masten, colours Schwarz, Lava, motif: Drachenbug, Feuer. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "91",
+      "name": "Chaosbringer",
+      "generation": "X",
+      "rumpf": "Chaos-Galeone",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Rot",
+      "motiv": "Chaosstern",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 10,
+        "tempo": 9
+      },
+      "quelle": "Variation 16/25",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Chaosbringer' for the pirate MMO Abyssal Dominion: Chaos-Galeone, 3 Masten, colours Schwarz, Rot, motif: Chaosstern. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "92",
+      "name": "Goldene Verderbnis",
+      "generation": "X",
+      "rumpf": "verfluchte Schatzgaleone",
+      "takelage": "3 Masten",
+      "farben": "Schwarzgold",
+      "motiv": "Goldschädel",
+      "rolle": "Kanonenspezialist",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 10,
+        "tempo": 8
+      },
+      "quelle": "Variation 12/19",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Goldene Verderbnis' for the pirate MMO Abyssal Dominion: verfluchte Schatzgaleone, 3 Masten, colours Schwarzgold, motif: Goldschädel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "93",
+      "name": "Abyssal Schattentiefe",
+      "generation": "X",
+      "rumpf": "Tiefseeschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Tiefseetürkis",
+      "motiv": "Leuchtorgane",
+      "rolle": "Ausgewogen",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 9,
+        "tempo": 9
+      },
+      "quelle": "Variation 07/21",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Abyssal Schattentiefe' for the pirate MMO Abyssal Dominion: Tiefseeschiff, 3 Masten, colours Schwarz, Tiefseetürkis, motif: Leuchtorgane. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "94",
+      "name": "Leviathan",
+      "generation": "X",
+      "rumpf": "Schiff mit Maulsegel",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Knochen",
+      "motiv": "Zahnmaul im Segel",
+      "rolle": "Schwer / Belagerung",
+      "werte": {
+        "rumpf": 10,
+        "schaden": 10,
+        "tempo": 7
+      },
+      "quelle": "Variation 08/24",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Leviathan' for the pirate MMO Abyssal Dominion: Schiff mit Maulsegel, 3 Masten, colours Schwarz, Knochen, motif: Zahnmaul im Segel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "95",
+      "name": "Voidreiter",
+      "generation": "X",
+      "rumpf": "Sternenfahrer",
+      "takelage": "geschwungene Klingensegel",
+      "farben": "Schwarzviolett, Leerenlicht",
+      "motiv": "Leerenauge",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 8,
+        "schaden": 8,
+        "tempo": 10
+      },
+      "quelle": "Bogen D-52",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Voidreiter' for the pirate MMO Abyssal Dominion: Sternenfahrer, geschwungene Klingensegel, colours Schwarzviolett, Leerenlicht, motif: Leerenauge. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "96",
+      "name": "Abyssal-Leviathan",
+      "generation": "X",
+      "rumpf": "lebendes Monsterschiff",
+      "takelage": "3 Masten auf Kreaturenrücken",
+      "farben": "Schwarz, Abyssgrün",
+      "motiv": "Kreaturenkopf mit Tentakeln",
+      "rolle": "Schwer / Belagerung",
+      "werte": {
+        "rumpf": 10,
+        "schaden": 10,
+        "tempo": 7
+      },
+      "quelle": "Pack 10 / Bogen D-16",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Abyssal-Leviathan' for the pirate MMO Abyssal Dominion: lebendes Monsterschiff, 3 Masten auf Kreaturenrücken, colours Schwarz, Abyssgrün, motif: Kreaturenkopf mit Tentakeln. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "97",
+      "name": "Abgrundkrone",
+      "generation": "X",
+      "rumpf": "Korallen-Abyss-Galeone",
+      "takelage": "3 Masten",
+      "farben": "Tiefschwarz, Perlweiß",
+      "motiv": "Krone aus Korallenzacken",
+      "rolle": "Defensiv / Tank",
+      "werte": {
+        "rumpf": 10,
+        "schaden": 8,
+        "tempo": 8
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Abgrundkrone' for the pirate MMO Abyssal Dominion: Korallen-Abyss-Galeone, 3 Masten, colours Tiefschwarz, Perlweiß, motif: Krone aus Korallenzacken. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "98",
+      "name": "Weltenschlund",
+      "generation": "X",
+      "rumpf": "Strudelschiff",
+      "takelage": "2 Masten um Strudelkern",
+      "farben": "Nachtblau, Strudelweiß",
+      "motiv": "rotierender Wirbel im Rumpf",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 10,
+        "schaden": 8,
+        "tempo": 9
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Weltenschlund' for the pirate MMO Abyssal Dominion: Strudelschiff, 2 Masten um Strudelkern, colours Nachtblau, Strudelweiß, motif: rotierender Wirbel im Rumpf. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "99",
+      "name": "Sternenbrecher",
+      "generation": "X",
+      "rumpf": "Meteorgaleone",
+      "takelage": "3 Masten",
+      "farben": "Basalt, Glut, Sternenweiß",
+      "motiv": "Meteoritenbug",
+      "rolle": "Kanonenspezialist",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 10,
+        "tempo": 8
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Sternenbrecher' for the pirate MMO Abyssal Dominion: Meteorgaleone, 3 Masten, colours Basalt, Glut, Sternenweiß, motif: Meteoritenbug. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "100",
+      "name": "Abyssal Dominion",
+      "generation": "X",
+      "rumpf": "Flaggschiff der Tiefe",
+      "takelage": "4 Masten",
+      "farben": "Schwarz, Gold, Abyssgrün",
+      "motiv": "Dominion-Wappen",
+      "rolle": "Schwer / Belagerung",
+      "werte": {
+        "rumpf": 10,
+        "schaden": 10,
+        "tempo": 7
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Abyssal Dominion' for the pirate MMO Abyssal Dominion: Flaggschiff der Tiefe, 4 Masten, colours Schwarz, Gold, Abyssgrün, motif: Dominion-Wappen. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "P1",
+      "name": "Ozeanherz",
+      "generation": "P",
+      "rumpf": "Perlmutt-Galeone",
+      "takelage": "3 Masten",
+      "farben": "Perlmutt, Türkis",
+      "motiv": "pulsierendes Herz im Heck",
+      "rolle": "Taktik / Support",
+      "werte": {
+        "rumpf": 10,
+        "schaden": 9,
+        "tempo": 10
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Ozeanherz' for the pirate MMO Abyssal Dominion: Perlmutt-Galeone, 3 Masten, colours Perlmutt, Türkis, motif: pulsierendes Herz im Heck. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "P2",
+      "name": "Aschenphönix",
+      "generation": "P",
+      "rumpf": "brennende Galeone, die nie verbrennt",
+      "takelage": "3 Masten",
+      "farben": "Asche, Glut",
+      "motiv": "Phönixflügel als Segel",
+      "rolle": "Feuer / Schaden über Zeit",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 10,
+        "tempo": 10
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Aschenphönix' for the pirate MMO Abyssal Dominion: brennende Galeone, die nie verbrennt, 3 Masten, colours Asche, Glut, motif: Phönixflügel als Segel. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "P3",
+      "name": "Sonnenfinsternis",
+      "generation": "P",
+      "rumpf": "Schwarzgold-Linienschiff",
+      "takelage": "3 Masten",
+      "farben": "Schwarz, Korona-Gold",
+      "motiv": "verdeckte Sonne",
+      "rolle": "Angriff",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 10,
+        "tempo": 10
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Sonnenfinsternis' for the pirate MMO Abyssal Dominion: Schwarzgold-Linienschiff, 3 Masten, colours Schwarz, Korona-Gold, motif: verdeckte Sonne. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "P4",
+      "name": "Ewige Flut",
+      "generation": "P",
+      "rumpf": "Wasser-Elementarschiff",
+      "takelage": "Segel aus Wasser",
+      "farben": "Glasblau",
+      "motiv": "fließender Rumpf",
+      "rolle": "Schnell / Aufklärer",
+      "werte": {
+        "rumpf": 9,
+        "schaden": 9,
+        "tempo": 10
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Ewige Flut' for the pirate MMO Abyssal Dominion: Wasser-Elementarschiff, Segel aus Wasser, colours Glasblau, motif: fließender Rumpf. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    },
+    {
+      "klasse": "P5",
+      "name": "Dominion-Thron",
+      "generation": "P",
+      "rumpf": "Thronschiff",
+      "takelage": "4 Masten",
+      "farben": "Obsidian, Gold, Abyssgrün",
+      "motiv": "Thron am Achterdeck",
+      "rolle": "Schwer / Belagerung",
+      "werte": {
+        "rumpf": 10,
+        "schaden": 10,
+        "tempo": 8
+      },
+      "quelle": "neu",
+      "bildvorgabe": "2D game sprite sheet of an original ship 'Dominion-Thron' for the pirate MMO Abyssal Dominion: Thronschiff, 4 Masten, colours Obsidian, Gold, Abyssgrün, motif: Thron am Achterdeck. Fixed elevated three-quarter top-down game camera, 8 headings (N, NE, E, SE, S, SW, W, NW) in one row, second row identical with torn sails, transparent background, consistent scale and waterline, clean edges, no text, no glow outside the silhouette."
+    }
+  ],
+  "npc": [
+    {
+      "stufe": 1,
+      "name": "Küstenkutter",
+      "typ": "Patrouillenboot",
+      "fraktion": "Handelsliga",
+      "verhalten": "passiv",
+      "quelle": "NPC-Bogen 01"
+    },
+    {
+      "stufe": 2,
+      "name": "Seewacht-Sloop",
+      "typ": "Patrouillenschiff",
+      "fraktion": "Imperiale Flotte",
+      "verhalten": "passiv",
+      "quelle": "NPC-Bogen 02"
+    },
+    {
+      "stufe": 2,
+      "name": "Seejäger-Sloop",
+      "typ": "Aufklärer",
+      "fraktion": "Freibeuter",
+      "verhalten": "passiv",
+      "quelle": "NPC-Bogen B 02"
+    },
+    {
+      "stufe": 3,
+      "name": "Handelskogge",
+      "typ": "Händler",
+      "fraktion": "Handelsliga",
+      "verhalten": "passiv, flieht",
+      "quelle": "NPC-Bogen B 03"
+    },
+    {
+      "stufe": 3,
+      "name": "Korsaren-Brig",
+      "typ": "leichtes Kriegsschiff",
+      "fraktion": "Freibeuter",
+      "verhalten": "neutral",
+      "quelle": "NPC-Bogen 03"
+    },
+    {
+      "stufe": 4,
+      "name": "Freibeuter-Galeasse",
+      "typ": "Ruderkriegsschiff",
+      "fraktion": "Freibeuter",
+      "verhalten": "neutral",
+      "quelle": "NPC-Bogen 04"
+    },
+    {
+      "stufe": 5,
+      "name": "Königliche Fregatte",
+      "typ": "schweres Kriegsschiff",
+      "fraktion": "Imperiale Flotte",
+      "verhalten": "neutral",
+      "quelle": "NPC-Bogen 05"
+    },
+    {
+      "stufe": 5,
+      "name": "Brigantine",
+      "typ": "ausgewogen",
+      "fraktion": "Schattenbund",
+      "verhalten": "neutral",
+      "quelle": "NPC-Bogen B 05"
+    },
+    {
+      "stufe": 6,
+      "name": "Schatten-Brigantine",
+      "typ": "schnelles Kriegsschiff",
+      "fraktion": "Schattenbund",
+      "verhalten": "aggressiv in Reichweite",
+      "quelle": "NPC-Bogen 06"
+    },
+    {
+      "stufe": 6,
+      "name": "Schneller Raider",
+      "typ": "Überfallschiff",
+      "fraktion": "Freibeuter",
+      "verhalten": "aggressiv in Reichweite",
+      "quelle": "NPC-Bogen B 06"
+    },
+    {
+      "stufe": 7,
+      "name": "Sturm-Kapitänschiff",
+      "typ": "Kriegsschiff",
+      "fraktion": "Nordische Allianz",
+      "verhalten": "aggressiv in Reichweite",
+      "quelle": "NPC-Bogen 07"
+    },
+    {
+      "stufe": 7,
+      "name": "Kanonen-Brig",
+      "typ": "leichtes Kriegsschiff",
+      "fraktion": "Imperiale Flotte",
+      "verhalten": "aggressiv in Reichweite",
+      "quelle": "NPC-Bogen B 07"
+    },
+    {
+      "stufe": 8,
+      "name": "Donner-Linienschiff",
+      "typ": "Linienschiff",
+      "fraktion": "Imperiale Flotte",
+      "verhalten": "aggressiv",
+      "quelle": "NPC-Bogen 08"
+    },
+    {
+      "stufe": 8,
+      "name": "Panzer-Fregatte",
+      "typ": "schweres Kriegsschiff",
+      "fraktion": "Nordische Allianz",
+      "verhalten": "aggressiv",
+      "quelle": "NPC-Bogen B 08"
+    },
+    {
+      "stufe": 9,
+      "name": "Verderbnis-Kriegsschiff",
+      "typ": "Elite-Kriegsschiff",
+      "fraktion": "Schattenbund",
+      "verhalten": "aggressiv, Spezialangriff",
+      "quelle": "NPC-Bogen 09"
+    },
+    {
+      "stufe": 9,
+      "name": "Feuer-Schnabel",
+      "typ": "Flammenwerfer",
+      "fraktion": "Freibeuter",
+      "verhalten": "aggressiv, Spezialangriff",
+      "quelle": "NPC-Bogen B 09"
+    },
+    {
+      "stufe": 10,
+      "name": "Admirals-Flaggschiff",
+      "typ": "Boss / Kommandoschiff",
+      "fraktion": "Imperiale Flotte",
+      "verhalten": "Boss",
+      "quelle": "NPC-Bogen 10"
+    },
+    {
+      "stufe": 10,
+      "name": "Königs-Barkasse",
+      "typ": "Elite-Patrouille",
+      "fraktion": "Imperiale Flotte",
+      "verhalten": "aggressiv ab niedriger Distanz",
+      "quelle": "NPC-Bogen B 10"
+    }
+  ],
+  "fraktionen": [
+    {
+      "name": "Imperiale Flotte",
+      "farben": "Blau/Gold, Lilie",
+      "rolle": "Patrouillen, Konvoischutz"
+    },
+    {
+      "name": "Freibeuter",
+      "farben": "Rot/Schwarz, Totenkopf",
+      "rolle": "Raub, Überfälle"
+    },
+    {
+      "name": "Nordische Allianz",
+      "farben": "Türkis/Weiß, Dreizack",
+      "rolle": "Eismeer, Eisbrecher"
+    },
+    {
+      "name": "Schattenbund",
+      "farben": "Violett/Schwarz, Steuerrad",
+      "rolle": "Hinterhalte, Nebel"
+    },
+    {
+      "name": "Handelsliga",
+      "farben": "Grün/Gold, Waage",
+      "rolle": "Handelsrouten, Konvois"
+    }
+  ],
+  "pools": {
+    "Events (Saison)": [
+      {
+        "name": "Kürbislaterne",
+        "anlass": "Halloween",
+        "optik": "Kürbisgaleone mit Laternen, orange Glut",
+        "quelle": "neu"
+      },
+      {
+        "name": "Blutmond",
+        "anlass": "Halloween",
+        "optik": "Rote Mondsegel, Nachtfarben",
+        "quelle": "Bogen D-64"
+      },
+      {
+        "name": "Eiskrone",
+        "anlass": "Winter",
+        "optik": "Eiszackenrumpf, Frostlicht",
+        "quelle": "Bogen D-58"
+      },
+      {
+        "name": "Lichtbringer",
+        "anlass": "Sommer / Sonnenwende",
+        "optik": "Weiß-Gold, Sonnenrad",
+        "quelle": "Bogen D-63"
+      },
+      {
+        "name": "Korallenschlinge",
+        "anlass": "Frühling / Meeresfest",
+        "optik": "Korallenbesatz, Türkis/Rosa",
+        "quelle": "Bogen D-61"
+      },
+      {
+        "name": "Karminkrake",
+        "anlass": "Krakenjagd-Event",
+        "optik": "Rote Krakensegel",
+        "quelle": "Bogen D-54"
+      },
+      {
+        "name": "Purpursegel",
+        "anlass": "Jubiläum",
+        "optik": "Purpur, Gold",
+        "quelle": "Bogen D-59"
+      },
+      {
+        "name": "Dämmerwisp",
+        "anlass": "Geisternacht",
+        "optik": "Magenta-Irrlichter",
+        "quelle": "Bogen D-67"
+      },
+      {
+        "name": "Donnerschmiede",
+        "anlass": "Schmiede-Event",
+        "optik": "Zahnradsegel, Glutöfen",
+        "quelle": "Bogen D-62"
+      },
+      {
+        "name": "Neujahrsfunke",
+        "anlass": "Neujahr",
+        "optik": "Feuerwerksgestelle, Silber/Blau",
+        "quelle": "neu"
+      }
+    ],
+    "PvP / Ehre": [
+      {
+        "name": "Ehrenklinge",
+        "anlass": "Ranglisten-Saison",
+        "optik": "Silberne Klingenbug, Wappenbanner",
+        "quelle": "neu"
+      },
+      {
+        "name": "Triumphbogen",
+        "anlass": "Turniersieger",
+        "optik": "Lorbeer, Gold",
+        "quelle": "neu"
+      }
+    ],
+    "Gilden": [
+      {
+        "name": "Gildenbastion",
+        "anlass": "Gildenfestung erobert",
+        "optik": "Turmaufbau mit Gildenbanner (färbbar)",
+        "quelle": "neu"
+      },
+      {
+        "name": "Allianzbanner",
+        "anlass": "Allianzkrieg",
+        "optik": "drei Flaggen, Wappenschilde",
+        "quelle": "neu"
+      }
+    ],
+    "Achievements / Exploration": [
+      {
+        "name": "Kartenzeichner",
+        "anlass": "alle Regionen besucht",
+        "optik": "Sternkarten-Segel, Fernrohre",
+        "quelle": "neu"
+      },
+      {
+        "name": "Wrackschatz",
+        "anlass": "1000 Beutekisten",
+        "optik": "geflickte Segel, Goldladung",
+        "quelle": "neu"
+      }
+    ],
+    "Bosse / Admiräle (nicht spielbar)": [
+      {
+        "name": "Admirals-Flaggschiff",
+        "anlass": "Kartenboss",
+        "optik": "siehe NPC 10",
+        "quelle": "NPC-Bogen 10"
+      },
+      {
+        "name": "Dominion-Erzräuber",
+        "anlass": "Elite-Schlachtschiff",
+        "optik": "Gold/Schwarz, Kompassstern",
+        "quelle": "NPC-&-Elite-Bogen 10"
+      },
+      {
+        "name": "Tiefenbeherrscher",
+        "anlass": "Abyssal-Elite",
+        "optik": "Tentakel, Türkis",
+        "quelle": "NPC-&-Elite-Bogen 09"
+      }
+    ],
+    "Kosmetische Farbreihen": [
+      {
+        "name": "Glutrumpf-Reihe 1–10",
+        "anlass": "Elite-Designvarianten",
+        "optik": "ein Rumpf, 10 Leuchtfarben",
+        "quelle": "Farbbogen 1–10"
+      }
+    ]
+  },
+  "zu_klaeren": [
+    "Pumpkin Reaper, Celestial Jade Dragon, Snow Queen's Wrath, Swamp King, Thunder Serpent, Verdant Spirit, Bone Collector, Dreamweaver, Solar Invictus, Ironclad Enforcer, Kraken's Fury (Bogen „ALL 10 GAME READY“): Herkunft und Rechte klären, erst dann einplanen."
+  ],
+  "sprite_vorgabe": "Pro Schiff ein freigestelltes PNG-Atlasblatt (transparenter Hintergrund, keine Glows/Schatten über die Silhouette hinaus):\n- feste erhöhte Spielkamera (ca. 50° von oben, schräg), dieselbe für alle Schiffe\n- 8 Fahrtrichtungen: N, NE, E, SE, S, SW, W, NW (Bug zeigt jeweils in diese Richtung)\n- 2 Zustände: intakt + beschädigt (zerrissene Segel); Versinken/Feuer/Rauch bleiben separate Effekte\n- gleiche Vergrößerung und gleicher Wasserlinien-Ankerpunkt in allen Richtungen, ausreichend Abstand zwischen den Ansichten\n- Glüh-/Effektebene (Nebel, Flammen, Blitze) als separates PNG, damit die Sprite-Kante sauber bleibt"
+}
