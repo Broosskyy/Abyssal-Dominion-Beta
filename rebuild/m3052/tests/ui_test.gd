@@ -418,6 +418,71 @@ func _run() -> void:
 	check(game.camera_pad.value.x>.9,"owning finger remains captured when dragged outside the joystick")
 	routed.pressed=false;routed.position=routed_drag.position;root.push_input(routed,true);await process_frame
 	check(game.camera_pad.value==Vector2.ZERO and game.sim.player.path.is_empty(),"outside release stops camera input without leaking a sailing command")
+	# A finger drag that starts on a shipyard button scrolls the list and never equips the design.
+	root.size=Vector2i(1280,720);await process_frame;game._layout();game.modal.hide()
+	game._open_modal("Werft");await process_frame;await process_frame
+	var skin_before: int=int(game.sim.player.skin)
+	var yard_button: Button=null
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if "AUSRÜSTEN" in button.text:yard_button=button;break
+	check(yard_button!=null,"shipyard still offers a design that is not equipped")
+	if yard_button!=null:
+		var origin: Vector2=yard_button.get_global_rect().get_center()
+		var emulated=InputEventMouseButton.new();emulated.device=-1;emulated.button_index=MOUSE_BUTTON_LEFT;emulated.pressed=true;emulated.position=origin
+		var finger=InputEventScreenTouch.new();finger.index=9;finger.pressed=true;finger.position=origin
+		root.push_input(emulated,true);root.push_input(finger,true);await process_frame
+		var slide=InputEventScreenDrag.new();slide.index=9;slide.position=origin+Vector2(0,-90);slide.relative=Vector2(0,-90)
+		root.push_input(slide,true);await process_frame;await process_frame
+		finger.pressed=false;finger.position=slide.position;root.push_input(finger,true)
+		emulated.pressed=false;emulated.position=slide.position;root.push_input(emulated,true);await process_frame
+		check(game.modal_scroll.scroll_vertical>0 and int(game.sim.player.skin)==skin_before,"dragging across a shipyard button scrolls and does not equip")
+		game.modal.hide();game._open_modal("Werft");await process_frame;await process_frame
+		for button: Button in game.modal_body.find_children("*","Button",true,false):
+			if "AUSRÜSTEN" in button.text:
+				var tap_at: Vector2=button.get_global_rect().get_center()
+				var tap_mouse=InputEventMouseButton.new();tap_mouse.device=-1;tap_mouse.button_index=MOUSE_BUTTON_LEFT;tap_mouse.pressed=true;tap_mouse.position=tap_at
+				var tap_finger=InputEventScreenTouch.new();tap_finger.index=9;tap_finger.pressed=true;tap_finger.position=tap_at
+				root.push_input(tap_mouse,true);root.push_input(tap_finger,true);await process_frame
+				tap_finger.pressed=false;root.push_input(tap_finger,true)
+				tap_mouse.pressed=false;root.push_input(tap_mouse,true);await process_frame;await process_frame
+				break
+		check(int(game.sim.player.skin)!=skin_before,"a tap without movement still equips the shipyard design")
+	# Staff tools, the world chart and the chart guide.
+	var map_before: int=game.sim.map_id
+	game.modal.hide();game._open_modal("Staff");await process_frame
+	check(not game.sim.staff.active() and game.staff_code_input!=null and not game.modal_tabs.visible,"staff window opens on the local sign-in form")
+	game.staff_code_input.text="ADMIN-3060"
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text=="ANMELDEN":button.pressed.emit();break
+	await process_frame
+	check(game.sim.staff.active() and game.sim.staff.role=="ADMIN" and game.modal_tabs.visible and game.modal_tabs.get_child_count()==7,"admin code opens the staff tools and their tabs")
+	for tab: Button in game.modal_tabs.get_children():
+		if tab.text=="TELEPORT":tab.pressed.emit();break
+	await process_frame
+	var jumped=false
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text.begins_with("2-1") and not button.disabled:button.pressed.emit();jumped=true;break
+	await process_frame
+	check(jumped and game.sim.map_id==1,"staff teleport changes the sea from the map list")
+	game._advance_loading(5.0)
+	game.modal_tab["Staff"]="ÜBERSICHT"
+	game._open_modal("Staff");await process_frame
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text.begins_with("ABMELDEN · ZURÜCKSETZEN"):button.pressed.emit();break
+	await process_frame
+	check(not game.sim.staff.active() and game.sim.map_id==map_before,"signing out with restore returns the sea to the state before the staff session")
+	game._advance_loading(5.0);game.modal.hide()
+	game._open_modal("Seekarten");await process_frame;await process_frame
+	var chart=game.modal_body.get_node_or_null("WorldChart")
+	check(chart!=null and chart.sim==game.sim and chart.parchment!=null,"world chart is drawn from the live simulation and the parchment")
+	for tab: Button in game.modal_tabs.get_children():
+		if tab.text=="ANLEITUNG":tab.pressed.emit();break
+	await process_frame;await process_frame
+	var guide_modes: Array[String]=[]
+	for child in game.modal_body.get_children():
+		if child.get_script()==load("res://chart_guide.gd"):guide_modes.append(str(child.mode))
+	check(guide_modes==["grid","colors","legend"],"chart guide draws the square grid, name colours and minimap legend")
+	game.modal.hide()
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)
