@@ -15,7 +15,8 @@ const BASE_CANNON_SLOTS := 10
 const MAX_CANNONS := 40
 const BASE_RELOAD := 1.65
 const START := Vector2(2100, 1450)
-const AMMO_NAMES := ["cannon", "chain", "harpoon"]
+const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice"]
+const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein"]
 var player: Dictionary
 var npcs: Array[Dictionary] = []
 var islands: Array[Dictionary] = []
@@ -77,7 +78,7 @@ func _init() -> void:
 	rng.seed = 3060
 	player = {"id": 0, "pos": START, "heading": Vector2(-1, 0), "path": [], "hp": PLAYER_HP,
 		"max_hp": PLAYER_HP, "shield": PLAYER_SHIELD, "max_shield": PLAYER_SHIELD, "speed": PLAYER_SPEED,
-		"reload": 0.0, "gold": 240, "ammo": [600, 120, 100], "cannons": BASE_CANNON_SLOTS, "skin": 26,
+		"reload": 0.0, "gold": 240, "ammo": [600, 120, 100, 40, 24, 40, 24], "cannons": BASE_CANNON_SLOTS, "skin": 26,
 		"last_hit": -100.0, "respawn": 0.0, "slow": 0.0}
 	islands = [
 		{"pos": Vector2(1530, 1250), "radius": 145.0, "art": "tropical", "width": 490.0, "name": "Port Azur"},
@@ -101,13 +102,13 @@ func _init() -> void:
 		var shield = roundi(hull * 0.25) if elite else 0
 		npcs.append({"id": i + 1, "name": names[i % names.size()], "kind": "ship", "pos": starts[i],
 			"home": starts[i], "heading": Vector2.LEFT, "path": [], "hp": hull,
-			"max_hp": hull, "shield": shield, "max_shield": shield, "speed": 66.0 + float(i % 3) * 8.0,
+			"max_hp": hull, "shield": shield, "max_shield": shield, "speed": 36.0 + float(i % 3) * 4.0,
 			"reload": float(i % 4) * 0.6, "repath": 0.0, "state": "patrol", "patrol": i % 4,
 			"aggressive": false, "slow": 0.0, "respawn": 0.0, "reward": 110 if elite else 55,
 			"art": i, "elite": elite, "view_count":4, "renderer":"sprite", "navigation":"four_diagonal", "last_hit": -100.0})
 	npcs.append({"id": 100, "name": "Tiamat · Tiefenwächter", "kind": "monster", "pos": Vector2(2590, 1750),
 		"home": Vector2(2590, 1750), "heading": Vector2.LEFT, "path": [], "hp": 1650,
-		"max_hp": 1650, "shield": 0, "max_shield": 0, "speed": 48.0, "reload": 1.0, "repath": 0.0, "state": "patrol",
+		"max_hp": 1650, "shield": 0, "max_shield": 0, "speed": 28.0, "reload": 1.0, "repath": 0.0, "state": "patrol",
 		"patrol": 0, "aggressive": false, "slow": 0.0, "respawn": 0.0, "reward": 240,
 		"art": 0, "elite": true, "last_hit": -100.0})
 	_add_drop(START + Vector2(-170, 130), 25)
@@ -254,7 +255,7 @@ func select(id: int) -> void:
 func set_ammo(index: int) -> void:
 	if index < 0 or index >= AMMO_NAMES.size(): return
 	ammo_mode = index
-	message = ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer"][index]
+	message = AMMO_LABELS[index]
 
 func toggle_repair() -> void:
 	if docked: return
@@ -485,7 +486,8 @@ func step(delta: float) -> void:
 	if events.size() > 120: events = events.slice(events.size() - 120)
 
 func _move(body: Dictionary, delta: float) -> void:
-	var travel = float(body.speed) * (0.55 if float(body.slow) > 0 else 1.0) * delta
+	var slow_rate = float(body.get("slow_rate", 0.55)) if float(body.slow) > 0 else 1.0
+	var travel = float(body.speed) * slow_rate * delta
 	var phasing := int(body.id) == 0 and staff.flag("no_collision")
 	if int(body.id) == 0 and staff.flag("speed"): travel *= 2.5
 	while travel > 0.01 and not body.path.is_empty():
@@ -495,9 +497,13 @@ func _move(body: Dictionary, delta: float) -> void:
 			body.pos=goal
 			body.path.pop_front()
 			continue
-		body.heading = gap.normalized()
+		var want: Vector2 = gap.normalized()
+		if int(body.id) == 0 or body.heading.length_squared() < 0.001:
+			body.heading = want
+		else:
+			body.heading = body.heading.slerp(want, clampf(delta * 1.8, 0.0, 1.0)).normalized()
 		var amount = minf(travel, gap.length())
-		var next: Vector2 = body.pos + body.heading * amount
+		var next: Vector2 = body.pos + want * amount
 		if not phasing and not segment_free(body.pos, next):
 			body.path = []
 			return
@@ -517,7 +523,7 @@ func npc_engages(npc: Dictionary) -> bool:
 func _patrol_path(npc: Dictionary) -> Array[Vector2]:
 	# Long diamond circuits match the authored diagonal views instead of tiny loops.
 	var offsets=[Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT,Vector2.UP]
-	for radius in [340.0,220.0,140.0]:
+	for radius in [520.0, 380.0]:
 		for attempt in 4:
 			var index=posmod(int(npc.patrol)+1+attempt,4)
 			var goal: Vector2=npc.home+offsets[index]*radius
@@ -546,6 +552,11 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 		npc.path = []
 		npc.state = "frozen"
 		return
+	if float(npc.get("ice", 0.0)) > 0.0:
+		npc.ice = maxf(0.0, float(npc.ice) - delta)
+		npc.path = []
+		npc.state = "ice"
+		return
 	npc.reload = maxf(0, float(npc.reload) - delta)
 	npc.slow = maxf(0, float(npc.slow) - delta)
 	if float(npc.get("max_shield",0)) > 0 and clock - float(npc.get("last_hit",-100.0)) >= SHIELD_DELAY:
@@ -570,7 +581,7 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 		npc.aggressive = false
 		if npc.path.is_empty() and float(npc.repath)<=0:
 			npc.path = _patrol_path(npc)
-			npc.repath=2.0 if npc.path.is_empty() else 0.0
+			npc.repath = 9.0 if npc.path.is_empty() else 0.0
 	_move(npc, delta)
 
 func _fire_player() -> void:
@@ -588,7 +599,7 @@ func _fire_player() -> void:
 		firing = false
 		return
 	if (victim.kind == "monster") != (ammo_mode == 2):
-		message = "Harpunen gegen Seeungeheuer" if victim.kind == "monster" else "Voll- oder Kettenkugeln gegen Schiffe und Türme"
+		message = "Harpunen gegen Seeungeheuer" if victim.kind == "monster" else "Diese Munition wirkt gegen Schiffe und Türme"
 		firing = false
 		return
 	if player.pos.distance_to(victim.pos) > 530:
@@ -600,7 +611,7 @@ func _fire_player() -> void:
 		message = "Insel versperrt die Schusslinie"
 		player.reload = 0.3
 		return
-	var count = 1 if ammo_mode == 2 else 3
+	var count = 1 if ammo_mode >= 2 else 3
 	var unlimited := staff.flag("unlimited_ammo")
 	if not unlimited and int(player.ammo[ammo_mode]) < count:
 		message = "Munition leer · Nachschub in der Werft"
@@ -618,7 +629,7 @@ func _fire_player() -> void:
 	player.reload = 0.25 if staff.flag("instant_reload") else reload_time()
 	victim.aggressive = true
 	repairing = false
-	message = ("Breitseite mit Schwarzpulver!" if powdered else "Breitseite!") if ammo_mode != 2 else "Harpune abgefeuert"
+	message = AMMO_LABELS[ammo_mode] if ammo_mode >= 2 else ("Breitseite mit Schwarzpulver!" if powdered else "Breitseite!")
 
 func _launch(source_id: int, target_id: int, weapon: String, damage: int, count: int) -> void:
 	var source = actor(source_id)
@@ -666,14 +677,38 @@ func apply_damage(victim: Dictionary, amount: int) -> int:
 
 func _hit(shot: Dictionary, victim: Dictionary) -> void:
 	if int(victim.hp) <= 0: return
-	var dealt := apply_damage(victim, int(shot.damage))
-	if shot.weapon == "chain": victim.slow = 4.0
+	var damage_amount := int(shot.damage)
+	if float(victim.get("spotted", 0.0)) > clock and str(shot.weapon) != "flare":
+		damage_amount = roundi(float(damage_amount) * 1.15)
+	var dealt := apply_damage(victim, damage_amount)
+	if shot.weapon == "chain":
+		victim.slow = 4.0
+		victim.slow_rate = 0.55
+	elif shot.weapon == "snow":
+		victim.slow = 7.5
+		victim.slow_rate = 0.38
+	elif shot.weapon == "ice":
+		if int(victim.id) == 0:
+			victim.slow = 3.5
+			victim.slow_rate = 0.42
+		else:
+			victim.ice = 3.2
+			victim.path = []
+	elif shot.weapon == "flare":
+		victim.spotted = clock + 8.0
+	elif shot.weapon == "pumpkin" and int(shot.source) == 0:
+		for other in npcs:
+			if int(other.id) == int(victim.id) or int(other.hp) <= 0: continue
+			if other.pos.distance_to(victim.pos) > 110.0: continue
+			apply_damage(other, maxi(1, roundi(float(shot.damage) * 0.35)))
+			other.last_hit = clock
 	if int(victim.id) == 0:
 		player.last_hit = clock
 		repairing = false
 	else:
 		victim.last_hit = clock
 	_event("impact", victim.pos, dealt, victim.id)
+	if not events.is_empty(): events.back()["weapon"] = str(shot.weapon)
 	if int(victim.hp) == 0:
 		victim.path = []
 		victim.respawn = 8.0 if int(victim.id) == 0 else (90.0 if victim.kind == "tower" else 48.0)
@@ -1495,7 +1530,7 @@ func staff_grant(kind: String) -> bool:
 		"supplies":
 			for key in CONTENT.SUPPLY_KEYS: supplies[key] += 10
 		"ammo":
-			for i in 3: player.ammo[i] += [1500, 600, 400][i]
+			for i in player.ammo.size(): player.ammo[i] += [1500, 600, 400, 80, 40, 80, 40][i]
 		"decks":
 			for type in CONTENT.DECK_KEYS:
 				if not owns_deck(type, 2): grant_deck(type, 2)
@@ -1549,9 +1584,12 @@ func claim_quest() -> bool:
 	return true
 
 func buy_ammo(index: int) -> bool:
-	if index < 0 or index > 2 or int(player.hp) <= 0 or int(player.gold) < 30: return false
-	player.gold -= 30
-	player.ammo[index] += [150, 60, 40][index]
+	if index < 0 or index >= AMMO_NAMES.size() or int(player.hp) <= 0: return false
+	var price = 30 if index < 3 else 80
+	var pack = [150, 60, 40, 12, 8, 12, 8][index]
+	if int(player.gold) < price: return false
+	player.gold -= price
+	player.ammo[index] += pack
 	message = "Munitionsvorrat aufgefüllt"
 	return true
 
@@ -1583,6 +1621,11 @@ func quest_progress() -> int:
 	return 0
 
 func weapon_damage(mode: int) -> int:
+	if mode >= 3:
+		var special: float = 31.0 * [0.75, 1.2, 0.8, 0.95][mode - 3]
+		special *= float(equipped_cannons()) / float(BASE_CANNON_SLOTS)
+		if has_blessing(): special *= 1.15
+		return roundi(special)
 	var key = "harpoon" if mode == 2 else "cannon"
 	var bonus_rate = 0.35 if mode == 2 else 0.25
 	var value: float = float([31,19,96][mode]) * (1.0 + float(upgrades[key]) * bonus_rate)
@@ -1838,8 +1881,8 @@ func restore_save(data: Dictionary) -> bool:
 	fortress_hold=clampf(float(data.get("fortress_hold",0.0)),0.0,CONTENT.FORTRESS_HOLD) if not guild.is_empty() else 0.0
 	apply_upgrades()
 	var stock: Variant=data.get("ammo",[])
-	if stock is Array and stock.size()==3:
-		for i in 3:player.ammo[i]=clampi(int(stock[i]),0,999999)
+	if stock is Array and stock.size()>=3:
+		for i in mini(stock.size(), player.ammo.size()): player.ammo[i]=clampi(int(stock[i]),0,999999)
 	var saved_visited: Variant=data.get("visited",[])
 	if saved_visited is Array and saved_visited.size()==3:
 		for i in 3:visited[i]=bool(saved_visited[i])
