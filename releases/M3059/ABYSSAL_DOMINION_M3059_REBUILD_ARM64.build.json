@@ -1,7 +1,7 @@
 {
   "engine": "4.7.2.stable.official.ed1daf0bf",
   "milestone": "M3059",
-  "source_commit": "aba3f38b8e690f4ab529412a5a971ddaf9634d18",
+  "source_commit": "66689097d035e6bf236aaf5d66230dc834488579",
   "bootstrap_sha256": "38990a296a1c2131b97a3c411aa3963e1082a4a6af78a333128c4437b3d37238",
   "tests": [
     {
@@ -18,7 +18,7 @@
     },
     {
       "test": "seafight_systems_test",
-      "checks": 97,
+      "checks": 148,
       "failures": [],
       "status": "PASS"
     },
@@ -30,7 +30,7 @@
     },
     {
       "test": "ui_test",
-      "checks": 2261,
+      "checks": 2270,
       "failures": [],
       "status": "PASS"
     },
@@ -63,14 +63,14 @@
     }
   ],
   "data": {
-    "revision": 45,
+    "revision": 46,
     "abi": 1,
     "engine": "4.7.2.stable",
     "min_apk": 305901,
-    "bytes": 13514578,
-    "sha256": "844485352bab4ae7b04e51fe9d73015e249c973b1bcf0563919cae9495fdb2aa",
-    "signature": "IVQeoxv9V1K6BdG1eAAIhx9zJCNvWd5spPO79fSvUhKIXW2vADLszaWlJvWOZ5Qg35ZsHdkQxe5bTieu10FmI1EopU47Vqf02oODD36xZWW30RMZOyb/VlbRNMw+GExbQPUMgs0XLput6cobQCqKU1Zz7MbyiK8TfYRO/cvunTxXB8Wf+S4LrIVfL5vBmCEsKMH0mGmFnNWtiZaltgtChv++QFTT1KSbdKMPa9yd6ym2En7FTcFYOFrpKbkUdX5HtAmbRwFT6cscv0JceSGJoR3lzYEhoRCkUJU7W2fPTni1MC8WncCRp+RMcWQDSHx6a7ayp1SUaTCUZDVIRvwn4w==",
-    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-45/ABYSSAL_DATA_45.zip"
+    "bytes": 14474411,
+    "sha256": "a5047458083e26798e7ae783217ae9adc0a85a48f39b84f9b9dc60b8fab57469",
+    "signature": "AsYd19+P3ZIb2f2GgN6pBqIoiYj40SYAv81w8GLIvral1AW0YCjKkNp9LTe+Dgo2x+0M+pyge7IxJgkmFuiR/GJ5p/upo3kdFJVlgkochT3FYeqdw2SN4C756RDTcQhNWBdRAVWIrCAG8chRCU2vqfthLqhYoUz6LrTvGvhyWrtfm7urF5ToQresxSi1eDOWG4JyV+rqYiF6lIitzR38XSWTNel0RViolpKKDc+Ivgl+wHFGI2/QZL5mlcZ3eWaeb7EHWEKj+IuWzaazDxnp2CLhugrIHzq9FTKKSUkyHvTO4kZVuvUv+IyVDrcrg5PHkjqQvhnND6sJOh5dhteV8w==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-46/ABYSSAL_DATA_46.zip"
   },
   "audited_pngs": 63,
   "physical_android_test": "NOT_PERFORMED",
