@@ -1,4 +1,5 @@
 extends SceneTree
+const MINI=preload("res://minimap.gd")
 var failures: Array[String]=[]
 var count:=0
 func check(ok: bool,label: String) -> void:
@@ -33,8 +34,11 @@ func _run() -> void:
 		game._layout()
 		game.sim.select(2)
 		game._refresh_ui()
-		for nav: Button in game.nav_buttons:check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
-		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.interact,game.loadout_button,game.ammo_selector,game.camera_pad,game.target_cycle]
+		check(game.nav_buttons.size()==8,"top bar carries eight sea-chart menus")
+		for nav: Button in game.nav_buttons:
+			check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
+			check(nav.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and nav.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x,"navigation stays between wallet and captain meters at "+str(dimensions))
+		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.settings_button,game.interact,game.loadout_button,game.ammo_selector,game.camera_pad,game.target_cycle]
 		controls.append_array(game.ammo_buttons)
 		for control: Control in controls:
 			var rect=control.get_global_rect()
@@ -42,16 +46,26 @@ func _run() -> void:
 		for i in controls.size():
 			for j in range(i+1,controls.size()):
 				check(not controls[i].get_global_rect().intersects(controls[j].get_global_rect()),"independent touch targets %s / %s at %s"%[controls[i].name,controls[j].name,dimensions])
-		check(not game.player_panel.get_global_rect().intersects(game.target_panel.get_global_rect()),"player and target cards do not overlap")
+		check(not game.quest_panel.get_global_rect().intersects(game.target_panel.get_global_rect()),"quest bar and target card do not overlap")
+		check(game.quest_panel.size.y<=44 and not game.quest_panel.get_global_rect().intersects(game.camera_pad.get_global_rect()),"quest bar stays a compact strip clear of the joystick at "+str(dimensions))
 		var center_water=Rect2(Vector2(dimensions)*.5-Vector2(80,120),Vector2(160,185))
 		var clear_center=true
-		for control: Control in [game.player_panel,game.target_panel,game.chart_mini,game.combat_dock,game.attack,game.repair,game.ammo_selector,game.quest_panel,game.interact]:
+		var surroundings: Array=[game.chrome,game.target_panel,game.chart_mini,game.quest_panel,game.interact]
+		surroundings.append_array(controls)
+		for control: Control in surroundings:
 			clear_center=clear_center and not control.get_global_rect().intersects(center_water)
 		check(clear_center,"HUD reserves clear water around the centered player at "+str(dimensions))
-		check(game.player_portrait.texture!=null and game.target_portrait.texture!=null,"player and selected NPC show actual ship portraits")
-		check(game.attack.get_global_rect().position.x>dimensions.x*.7 and game.combat_dock.get_global_rect().encloses(game.ammo_buttons[0].get_global_rect()),"round fire control stays on the right and quick ammunition stays in the lower deck")
+		check(game.target_portrait.texture!=null,"selected NPC shows its actual ship portrait")
+		var hub: Vector2=game.attack.get_global_rect().get_center()
+		var ring=true
+		for orb: Control in [game.ammo_buttons[0],game.ammo_buttons[1],game.ammo_buttons[2],game.repair]:
+			var offset: Vector2=orb.get_global_rect().get_center()-hub
+			ring=ring and not (offset.x>0 and offset.y>0) and offset.length()<game.attack.get_global_rect().size.x*1.25
+		check(game.attack.get_global_rect().position.x>dimensions.x*.7 and ring,"cannon stays bottom-right with ammunition and repair within thumb reach")
+		check(game.loadout_button.get_global_rect().end.x<game.ammo_buttons[0].get_global_rect().position.x and is_equal_approx(game.loadout_button.get_global_rect().position.y,game.ammo_buttons[0].get_global_rect().position.y),"utility slots continue the bottom row left of the cannon")
 		check(str(game.attack.get("art").resource_path).ends_with("cannon_action.png") and game.attack.get("hero"),"fire control uses the dedicated cannon graphic")
-		check(not game.deck_hp.visible and not game.deck_numbers.visible,"combat deck does not repeat the captain HP readout")
+		check(game.player_hp.get_parent()==game.chrome and game.player_xp.get_parent()==game.chrome,"captain HP and experience appear once, in the top bar")
+		check(game.chart_mini.get_global_rect().encloses(Rect2(game.zoom_in.get_global_rect().get_center(),Vector2.ONE)) and game.chart_mini.get_global_rect().encloses(Rect2(game.settings_button.get_global_rect().get_center(),Vector2.ONE)),"map controls sit on the chart frame corners")
 		var details=game.target_numbers.get_rect()
 		var card=game.target_panel.size
 		check(details.position.x>=-1 and details.position.y>=-1 and details.end.x<=card.x+1 and details.end.y<=card.y+1,"target details stay inside the target card")
@@ -135,6 +149,7 @@ func _run() -> void:
 	game.sim.player.last_hit=-100
 	game._navigate_region(1)
 	check(game.sim.map_id==1 and game.camera.position==game.sim.player.pos,"map UI switches simulation, recenters camera and saves")
+	game._advance_loading(5.0)
 	game._load_progress()
 	check(game.sim.map_id==1 and game.sim.upgrades.cannon==1,"new map and equipment survive UI save reload")
 	game._open_modal("Werft")
@@ -172,10 +187,16 @@ func _run() -> void:
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
 		if button.text=="LADEN" and not button.disabled:button.pressed.emit();loaded=true;break
 	check(loaded and game.sim.ammo_mode==1 and not game.modal.visible,"ammunition popup loads actual chain stock and closes")
-	game.system_tab.pressed.emit()
-	check(game.system_label.visible and not game.quest_text.visible,"system tab displays actual game messages")
-	game.quest_tab.pressed.emit()
-	check(game.quest_text.visible and not game.system_label.visible,"quest tab restores the live quest tracker")
+	game._refresh_ui();game.quest_open.pressed.emit()
+	var logged=false
+	for label: Label in game.modal_body.find_children("*","Label",true,false):logged=logged or game.sim.message in label.text
+	check(game.modal_kind=="Logbuch" and logged,"quest bar opens the logbook with the latest real game message")
+	game._open_modal("Rangliste")
+	var ranked=false
+	for label: Label in game.modal_body.find_children("*","Label",true,false):ranked=ranked or ("Versenkte Schiffe %d" % game.sim.kills) in label.text
+	check(ranked,"ranking shows the captain's actual record")
+	game.modal.hide()
+	check(MINI.row_name(0)=="A" and MINI.row_name(26*MINI.SQUARE)=="AA" and MINI.column_name(0)=="1","chart rulers name rows by letters and columns by numbers")
 	game.sim.configure_map(0);game.previous_region=0;game.sim.level=4;game.sim.player.hp=game.sim.player.max_hp;game.sim.player.last_hit=-100;game.sim.docked=false
 	game.sim.npcs.clear();game.sim.player.pos=game.sim.portals[0].pos-Vector2(220,0)
 	game.sim.player.path=[]
@@ -195,6 +216,12 @@ func _run() -> void:
 		if game.sim.map_id!=0:break
 	game._process(0)
 	check(game.sim.map_id==1 and game.camera.position==game.sim.player.pos and game.previous_region==1,"touch-to-arrival crossing switches region, recenters camera and synchronizes scene")
+	check(game.loading.visible and "Nordmeer" in str(game.loading.region) and not str(game.loading.tip).is_empty(),"region change shows the chart loading screen with destination and tip")
+	var path_before: Array=game.sim.player.path.duplicate()
+	game._tap(game.get_viewport_rect().size*.5)
+	check(game.sim.player.path==path_before,"taps during the loading screen do not set a course")
+	game._advance_loading(5.0)
+	check(not game.loading.visible and is_equal_approx(game.loading.progress,1.0),"loading screen completes and reveals the new sea")
 	game._load_progress()
 	check(game.sim.map_id==1,"automatic portal arrival is saved to the captain file")
 	# Exercise preferences through the actual settings callbacks at every supported size.
@@ -211,7 +238,7 @@ func _run() -> void:
 			for button: Button in game.modal_body.find_children("*","Button",true,false):
 				check(button.get_global_rect().end.x<=game.modal_scroll.get_global_rect().end.x+1,"display option stays inside the scaled scroll viewport")
 			game.modal.hide()
-			var touch: Array=[game.attack,game.repair,game.ammo_selector,game.center_button,game.zoom_in,game.zoom_out,game.loadout_button,game.camera_pad,game.target_cycle]
+			var touch: Array=[game.attack,game.repair,game.ammo_selector,game.center_button,game.settings_button,game.zoom_in,game.zoom_out,game.loadout_button,game.camera_pad,game.target_cycle]
 			touch.append_array(game.ammo_buttons)
 			for control: Control in touch:
 				var bounds=control.get_global_rect()
@@ -227,7 +254,7 @@ func _run() -> void:
 	game._set_display(1,true);game.modal.hide()
 	root.size=Vector2i(1560,720);await process_frame;game._layout()
 	check(game.attack.get_global_rect().size.x>=140,"comfortable wide-phone layout has a larger primary attack button")
-	check(game.combat_dock.get_global_rect().end.x<game.repair.get_global_rect().position.x,"wide deck is grouped beside the right-hand combat controls")
+	check(game.attack.get_global_rect().size.x>game.ammo_buttons[0].get_global_rect().size.x*2,"cannon dominates the combat corner on wide phones")
 	check(str(game.ammo_selector.get("quantity")).is_empty(),"ammunition chooser does not duplicate quick-slot stock counters")
 	game.sim.configure_map(0);game.sim.islands.clear();game.sim.docked=false;game.sim.player.hp=2400
 	game.sim.player.pos=Vector2(2100,2000);game.sim.player.reload=0;game.sim.ammo_mode=0;game.sim.player.ammo[0]=30
@@ -294,7 +321,7 @@ func _run() -> void:
 		var npc: Dictionary=game.sim.base_npcs[i].duplicate(true)
 		npc.pos=game.sim.player.pos+Vector2(-150+i*100,-40);npc.hp=npc.max_hp
 		if i==2:npc.hp=0
-		if i==3:npc.pos=game.get_canvas_transform().affine_inverse()*game.player_panel.get_global_rect().get_center()
+		if i==3:npc.pos=game.get_canvas_transform().affine_inverse()*game.quest_panel.get_global_rect().get_center()
 		game.sim.npcs.append(npc)
 	game.sim.target=-1;game.sim.firing=true
 	var first_id: int=game.sim.npcs[0].id
@@ -307,9 +334,11 @@ func _run() -> void:
 	game.sim.npcs.clear();game.target_cycle.pressed.emit()
 	check(game.sim.message=="Kein Ziel im sichtbaren Bereich","empty view gives clear feedback without a fake target")
 	root.size=Vector2i(720,405);await process_frame;game._layout()
-	check(not game.quest_panel.visible and game.camera_pad.visible,"short phone layout reserves bottom-left for the camera and keeps quests in top navigation")
-	game.camera_pad_visible=false;game._layout()
-	check(game.quest_panel.visible,"disabling camera pad restores the compact quest window")
+	check(game.quest_panel.visible and game.camera_pad.visible and not game.quest_panel.get_global_rect().intersects(game.camera_pad.get_global_rect()),"short phone layout keeps the quest bar top-left and the joystick bottom-left")
+	game.pad_steers=true;game.camera_pad.steering=true;game.sim.player.path=[]
+	game._steer(Vector2.RIGHT,1.0)
+	check(not game.sim.player.path.is_empty() and game.sim.player.path[0].x>game.sim.player.pos.x and game.camera_locked,"helm mode steers the ship toward the stick and keeps the camera on it")
+	game.pad_steers=false;game.camera_pad.steering=false;game.sim.player.path=[]
 	# Dispatch through the viewport, including release outside the joystick hit box.
 	game.camera_pad_visible=true;game.modal.hide();root.size=Vector2i(1280,720)
 	await process_frame;game._layout();game.sim.player.path=[]

@@ -15,6 +15,36 @@ func _ready() -> void:
 	for state in ["normal","hover","pressed","hover_pressed","disabled","focus"]:add_theme_stylebox_override(state,StyleBoxEmpty.new())
 	for state in ["font_color","font_hover_color","font_pressed_color","font_hover_pressed_color","font_disabled_color"]:add_theme_color_override(state,Color.TRANSPARENT)
 	add_theme_font_size_override("font_size",10)
+func _outlined(font: Font,text: String,baseline: Vector2,fontsize: int,color: Color) -> void:
+	var width=font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize).x
+	var pos=Vector2(baseline.x-width*.5,baseline.y)
+	draw_string_outline(font,pos,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,4,Color("071018"))
+	draw_string(font,pos,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,color)
+func _bezel(center: Vector2,radius: float,gold: Color) -> void:
+	draw_circle(center+Vector2(0,3),radius+1.5,Color(0,0,0,.45))
+	draw_circle(center,radius,Color("3b2b17"))
+	for band in 7:
+		var t=float(band)/6.0
+		draw_circle(center,(radius-3.5)*(1.0-t*.3),Color("0a161d").lerp(Color("1b3644"),t))
+	draw_circle(center,radius,gold,false,2.2,true)
+	draw_circle(center,radius-3.5,Color("6e5531"),false,1.0,true)
+	draw_arc(center,radius-1.2,PI*1.08,PI*1.78,24,Color(1,.9,.62,.5),1.2,true)
+func _band(center: Vector2,radius: float) -> void:
+	var points=PackedVector2Array()
+	for i in 17:
+		var angle=lerpf(PI*.2,PI*.8,float(i)/16.0)
+		points.append(center+Vector2(cos(angle),sin(angle))*radius)
+	draw_colored_polygon(points,Color(.01,.03,.045,.72))
+## Ammunition art ships on opaque square backgrounds; clamping the disc into the art rect keeps UVs inside the texture.
+func _disc_texture(texture: Texture2D,rect: Rect2,center: Vector2,radius: float,tint: Color) -> void:
+	var points=PackedVector2Array()
+	var uvs=PackedVector2Array()
+	for i in 40:
+		var angle=TAU*float(i)/40.0
+		var point=(center+Vector2(cos(angle),sin(angle))*radius).clamp(rect.position,rect.end)
+		points.append(point)
+		uvs.append((point-rect.position)/rect.size)
+	draw_polygon(points,PackedColorArray([tint]),uvs,texture)
 func _draw() -> void:
 	var hot=not disabled and (latched or button_pressed or is_hovered())
 	var gold=Color("f5d78d") if hot else GOLD
@@ -24,74 +54,52 @@ func _draw() -> void:
 		var diameter=minf(size.x,size.y)
 		var center=Vector2(size.x*.5,diameter*.5)
 		var radius=diameter*.5-2
-		draw_circle(center+Vector2(0,3),radius+1,Color(0,0,0,.42))
-		draw_circle(center,radius,Color("102028"))
-		draw_circle(center,radius,gold,false,2.4,true)
-		draw_circle(center,radius-4,Color("80623a"),false,1.0,true)
+		if latched:draw_circle(center,radius+2,Color(1,.42,.16,.28))
+		_bezel(center,radius,gold)
+		draw_circle(center,radius-6,Color("7a5c34"),false,1.0,true)
 		if art!=null:
-			var dimensions=art.get_size()*diameter*.84/maxf(art.get_width(),art.get_height())
-			draw_texture_rect(art,Rect2(center-dimensions*.5,dimensions),false,Color(1,1,1,.45) if disabled else Color.WHITE)
-		if latched:draw_arc(center,radius-5,0,TAU,40,Color("80e3dc"),2.2,true)
+			var dimensions=art.get_size()*diameter*.8/maxf(art.get_width(),art.get_height())
+			draw_texture_rect(art,Rect2(center-dimensions*.5+Vector2(0,radius*.06),dimensions),false,Color(1,1,1,.45) if disabled else Color.WHITE)
+		if latched:draw_arc(center,radius-5,0,TAU,48,Color("ff9b5a"),2.6,true)
 		if not state_label.is_empty():
 			var fs=10 if diameter<120 else 12
-			var label_width=font.get_string_size(state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
-			var pos=Vector2(center.x-label_width*.5,16)
-			draw_string_outline(font,pos,state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,4,Color("071018"))
-			draw_string(font,pos,state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("80e3dc") if state_label=="BEREIT" else Color("edc68c"))
+			_outlined(font,state_label,Vector2(center.x,center.y-radius*.56),fs,Color("80e3dc") if state_label=="BEREIT" else Color("edc68c"))
 		if not caption.is_empty():
 			var fs=16 if diameter>100 else 13
-			var label_width=font.get_string_size(caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
-			var pos=Vector2(center.x-label_width*.5,diameter-8)
-			draw_string_outline(font,pos,caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,4,Color("071018"))
-			draw_string(font,pos,caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("f3e0b6"))
-		if cooldown>0:draw_arc(center,radius-6,-PI*.5,-PI*.5+TAU*(1-clampf(cooldown,0,1)),36,Color("e3bf76"),2.4,true)
+			_outlined(font,caption,Vector2(center.x,diameter-9),fs,Color("f3e0b6"))
+		if cooldown>0:draw_arc(center,radius-7,-PI*.5,-PI*.5+TAU*(1-clampf(cooldown,0,1)),40,Color("e3bf76"),2.6,true)
 		return
 	if nav_mode:
-		draw_rect(Rect2(Vector2(1,1),size-Vector2(2,2)),Color("30291c") if hot else Color("101c23"))
+		var top=Color("3a3020") if hot else Color("1c282c")
+		var bottom=Color("191409") if hot else Color("0a1317")
+		var corners=PackedVector2Array([Vector2(1,1),Vector2(size.x-1,1),size-Vector2(1,1),Vector2(1,size.y-1)])
+		draw_polygon(corners,PackedColorArray([top,top,bottom,bottom]))
 		draw_rect(Rect2(Vector2(1,1),size-Vector2(2,2)),gold,false,1.0)
-		for y in 7:draw_line(Vector2(3,3+y),Vector2(size.x-3,3+y),Color(1,.82,.45,.055*(1-float(y)/7)),1)
-		draw_line(Vector2(3,size.y-3),Vector2(size.x-3,size.y-3),Color(0,0,0,.65),1)
-		draw_circle(Vector2(size.x*.5,19),17,Color("201f18"));draw_circle(Vector2(size.x*.5,19),16,Color("7e673d"),false,1,true)
-		if art!=null:draw_texture_rect(art,Rect2(Vector2(size.x*.5-14,5),Vector2(28,28)),false,Color.WHITE if not disabled else Color(.5,.5,.5))
+		draw_rect(Rect2(Vector2(3,3),size-Vector2(6,6)),Color(0,0,0,.35),false,1.0)
+		draw_line(Vector2(4,3),Vector2(size.x-4,3),Color(1,.86,.55,.22),1)
+		if latched:draw_line(Vector2(5,size.y-3),Vector2(size.x-5,size.y-3),Color("f5d78d"),2)
+		var icon=minf(minf(size.y-19,size.x-10),40.0)
+		if art!=null:draw_texture_rect(art,Rect2(Vector2((size.x-icon)*.5,3),Vector2(icon,icon)),false,Color.WHITE if not disabled else Color(.5,.5,.5))
 		var title_size=12 if size.x>=66 else 10
-		var w=font.get_string_size(caption,HORIZONTAL_ALIGNMENT_LEFT,-1,title_size).x
-		draw_string(font,Vector2((size.x-w)*.5,size.y-6),caption,HORIZONTAL_ALIGNMENT_LEFT,-1,title_size,Color("f2dfb1"))
+		_outlined(font,caption,Vector2(size.x*.5,size.y-6),title_size,Color("f2dfb1") if not latched else Color("ffe7a6"))
 		return
-	var diameter=minf(size.x,size.y-(12 if not quantity.is_empty() else 0))
-	var center=Vector2(size.x*.5,diameter*.5)
-	var radius=diameter*.5-3
-	draw_circle(center+Vector2(0,3),radius+2,Color(0,0,0,.45))
-	for band in 9:
-		var t=float(band)/8
-		draw_circle(center,radius-t*radius*.22,Color("4c3820").lerp(Color("0b1c26"),t))
-	draw_circle(center,radius,gold,false,2.0,true)
-	draw_circle(center,radius-4,Color("80623a"),false,1.0,true)
-	# Small brass fasteners and a glass sheen keep each control readable at phone scale.
-	for angle in [PI*.25,PI*.75,PI*1.25,PI*1.75]:
-		var rivet=center+Vector2(cos(angle),sin(angle))*(radius-2)
-		draw_circle(rivet,1.5,Color("edcf89"))
-	draw_arc(center,radius-6,PI*1.05,PI*1.75,20,Color(1,.9,.6,.16),3,true)
-	draw_arc(center,radius-1,PI*1.05,PI*1.8,28,Color("fae1a0"),1.3,true)
+	var diameter=minf(size.x,size.y)
+	var center=Vector2(size.x*.5,size.y*.5)
+	var radius=diameter*.5-2
+	_bezel(center,radius,gold)
+	var labelled=not quantity.is_empty() or not caption.is_empty()
 	if art!=null:
-		var dimensions=art.get_size()*diameter*.68/maxf(art.get_width(),art.get_height())
-		draw_texture_rect(art,Rect2(center-dimensions*.5-Vector2(0,3 if not caption.is_empty() else 0),dimensions),false,Color(1,1,1,.35) if disabled else Color.WHITE)
-	if hot:draw_circle(center,radius-6,Color("dfb15c"),false,1.2,true)
+		var dimensions=art.get_size()*diameter*.7/maxf(art.get_width(),art.get_height())
+		_disc_texture(art,Rect2(center-dimensions*.5-Vector2(0,4 if labelled else 0),dimensions),center,radius-4.5,Color(1,1,1,.35) if disabled else Color.WHITE)
+	if hot:draw_circle(center,radius-5,Color("dfb15c"),false,1.2,true)
 	if latched:
-		draw_arc(center,radius-6,0,TAU,40,Color("80e3dc"),2,true)
-		draw_circle(center+Vector2(radius*.65,-radius*.65),4,Color("80e3dc"))
+		draw_arc(center,radius-5,0,TAU,40,Color("80e3dc"),2.2,true)
+		draw_circle(center+Vector2(radius*.68,-radius*.68),4,Color("80e3dc"))
 	if not state_label.is_empty():
-		var fs=9 if diameter<105 else 10
-		var w=font.get_string_size(state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
-		var pos=Vector2(center.x-w*.5,diameter*.27)
-		draw_string_outline(font,pos,state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,4,Color("071018"))
-		draw_string(font,pos,state_label,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("80e3dc") if state_label=="BEREIT" else Color("edc68c"))
-	if cooldown>0:draw_arc(center,radius-7,-PI*.5,-PI*.5+TAU*(1-clampf(cooldown,0,1)),36,Color("e3bf76"),2,true)
-	if not caption.is_empty():
-		var fs=14 if diameter>70 else 10
-		var w=font.get_string_size(caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
-		draw_string_outline(font,Vector2(center.x-w*.5,diameter-9),caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,3,Color("071018"))
-		draw_string(font,Vector2(center.x-w*.5,diameter-9),caption,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("f3e0b6"))
-	if not quantity.is_empty():
-		var w=font.get_string_size(quantity,HORIZONTAL_ALIGNMENT_LEFT,-1,14).x
-		draw_string_outline(font,Vector2(center.x-w*.5,size.y-2),quantity,HORIZONTAL_ALIGNMENT_LEFT,-1,14,3,Color("071018"))
-		draw_string(font,Vector2(center.x-w*.5,size.y-2),quantity,HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("f3e0b6"))
+		_outlined(font,state_label,Vector2(center.x,center.y-radius*.45),9 if diameter<105 else 10,Color("80e3dc") if state_label=="BEREIT" else Color("edc68c"))
+	if cooldown>0:draw_arc(center,radius-6,-PI*.5,-PI*.5+TAU*(1-clampf(cooldown,0,1)),36,Color("e3bf76"),2,true)
+	if labelled:
+		_band(center,radius-3.5)
+		var text=quantity if not quantity.is_empty() else caption
+		var fs=(14 if diameter>=56 else 12) if not quantity.is_empty() else (10 if diameter>=56 else 9)
+		_outlined(font,text,Vector2(center.x,center.y+radius*.74),fs,Color("f3e0b6"))

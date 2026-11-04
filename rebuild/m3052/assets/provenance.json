@@ -665,6 +665,90 @@
       "bytes": 227050,
       "sha256": "494fc27daa3136154163a2108cbc888542a640a4453ee33703117eb3cb37a196",
       "source": "Original fire-button cannon rendered for Abyssal Dominion; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/nav_ship.png",
+      "bytes": 26248,
+      "sha256": "b7d4a67d56c84bd9457ae1d2b084e24f2e39a7f55c0e63b28a93a0b9d2be01cc",
+      "source": "Original painted HUD ship tile generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/nav_shipyard.png",
+      "bytes": 27607,
+      "sha256": "f84be3edd8464454a1b4b3783bdb66a405f9a22b90f4170b17b44764e412010f",
+      "source": "Original painted HUD shipyard tile generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/nav_harbor.png",
+      "bytes": 23923,
+      "sha256": "6a8bf373168f62f7b6864441c226137d3efbedf8b6f186e2b7b4a1d1af9e1684",
+      "source": "Original painted HUD harbor tile generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/nav_quests.png",
+      "bytes": 26264,
+      "sha256": "cbcc8e47a6a967069d6d590cc2a4140be627392c786b67619b71a663c8b2cb2f",
+      "source": "Original painted HUD logbook tile generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/nav_charts.png",
+      "bytes": 30751,
+      "sha256": "019e462561231d7ca31fffea8237ccc68a818aff7385100a582404164e4b1f16",
+      "source": "Original painted HUD sea-chart tile generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/nav_supplies.png",
+      "bytes": 29916,
+      "sha256": "a921cfece59118c52b89bcafd6c8afba278d892df83adc358ec865558d8344d1",
+      "source": "Original painted HUD ammunition/supplies tile generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/nav_ranking.png",
+      "bytes": 32684,
+      "sha256": "69627f1e41e41b0e6363d22ce43e5aca85a00ab51190c1cdbc9879e1a982faaa",
+      "source": "Original painted HUD ranking tile generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/nav_menu.png",
+      "bytes": 32349,
+      "sha256": "97469f856f7c9a56a1de26100613b6f755725a52f48c777ba38f9ae6dd1fb70a",
+      "source": "Original painted HUD game-menu tile generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/gold_coins.png",
+      "bytes": 35073,
+      "sha256": "80ae2985e6a538fb1eebefae291d591a285d5c9bead78bd23acf7e4f83332396",
+      "source": "Original painted HUD gold wallet icon generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/kills_skull.png",
+      "bytes": 23734,
+      "sha256": "8a02d90db8c263fc38c1b4b5bbe76ac0a4ddb3669d4c329fdf405d032bb7c32b",
+      "source": "Original painted HUD sunk-ships counter icon generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/spyglass.png",
+      "bytes": 16637,
+      "sha256": "88268eb06c37646937ec8a051f4ed4c6cb2a0411a16807e98d8184fb82f6e71a",
+      "source": "Original painted HUD target-cycle spyglass icon generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/helm_wheel.png",
+      "bytes": 23809,
+      "sha256": "eed50a91cb0b65273f3eba74d167933f6a077bc53e4076f7a5215817690907a2",
+      "source": "Original painted HUD helm-wheel joystick knob generated for Abyssal Dominion and sliced to 128x128 RGBA; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/loading_harbor.jpg",
+      "bytes": 175319,
+      "sha256": "078c45b9ecb9c42fe1c0b1094f2a79ee8d4399b61a382db8c6fbe21a4861f566",
+      "source": "Original painted harbor-at-dusk loading backdrop generated for Abyssal Dominion; not taken from a third-party atlas"
+    },
+    {
+      "path": "assets/ui/painted/sea_tile.png",
+      "bytes": 442749,
+      "sha256": "6ac275328eed366ccb5d52cfc5252e021941047a5d1ce813bca67d701f511a04",
+      "source": "Original seamless open-sea texture rendered procedurally by tools/make_sea_tile.py (seed 3059) for Abyssal Dominion"
     }
   ]
 }
