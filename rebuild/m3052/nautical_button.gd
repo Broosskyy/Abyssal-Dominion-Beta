@@ -8,6 +8,8 @@ var latched=false
 var cooldown=0.0
 var state_label=""
 var hero:=false
+var pager:=false
+var badge_alert:=false
 const GOLD=Color("c7a15a")
 func _ready() -> void:
 	focus_mode=Control.FOCUS_NONE
@@ -69,6 +71,18 @@ func _draw() -> void:
 			_outlined(font,caption,Vector2(center.x,diameter-9),fs,Color("f3e0b6"))
 		if cooldown>0:draw_arc(center,radius-7,-PI*.5,-PI*.5+TAU*(1-clampf(cooldown,0,1)),40,Color("e3bf76"),2.6,true)
 		return
+	if pager:
+		var h=minf(size.y*.6,34.0)
+		var pill=Rect2(Vector2(2,(size.y-h)*.5),Vector2(size.x-4,h))
+		var skin=StyleBoxFlat.new()
+		skin.bg_color=Color("0d1d25") if not hot else Color("1d3440")
+		skin.border_color=gold;skin.set_border_width_all(2);skin.set_corner_radius_all(int(h*.5))
+		skin.shadow_color=Color(0,0,0,.45);skin.shadow_size=3
+		draw_style_box(skin,pill)
+		var fs=13 if size.x>=56 else 11
+		_outlined(font,"◀ %s ▶" % caption,Vector2(size.x*.5,pill.get_center().y+fs*.36),fs,Color("f3e0b6"))
+		if not state_label.is_empty():_outlined(font,state_label,Vector2(size.x*.5,pill.position.y-3),9,Color("bfa575"))
+		return
 	if nav_mode:
 		var top=Color("3a3020") if hot else Color("1c282c")
 		var bottom=Color("191409") if hot else Color("0a1317")
@@ -82,6 +96,13 @@ func _draw() -> void:
 		if art!=null:draw_texture_rect(art,Rect2(Vector2((size.x-icon)*.5,3),Vector2(icon,icon)),false,Color.WHITE if not disabled else Color(.5,.5,.5))
 		var title_size=12 if size.x>=66 else 10
 		_outlined(font,caption,Vector2(size.x*.5,size.y-6),title_size,Color("f2dfb1") if not latched else Color("ffe7a6"))
+		if not quantity.is_empty():
+			var bw=maxf(16.0,font.get_string_size(quantity,HORIZONTAL_ALIGNMENT_LEFT,-1,10).x+8)
+			var badge=Rect2(Vector2(size.x-bw-3,3),Vector2(bw,15))
+			var chip=StyleBoxFlat.new();chip.bg_color=Color("b8402e") if badge_alert else Color("1f6f6a");chip.set_corner_radius_all(7)
+			chip.border_color=Color("f5d78d");chip.set_border_width_all(1)
+			draw_style_box(chip,badge)
+			_outlined(font,quantity,Vector2(badge.get_center().x,badge.end.y-3.5),10,Color.WHITE)
 		return
 	var diameter=minf(size.x,size.y)
 	var center=Vector2(size.x*.5,size.y*.5)
