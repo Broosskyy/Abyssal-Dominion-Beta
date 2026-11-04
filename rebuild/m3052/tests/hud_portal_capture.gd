@@ -44,6 +44,15 @@ func _run() -> void:
 	root.size=Vector2i(1560,720)
 	game._set_display(2,false);game.modal.hide();game.modal_backdrop.hide()
 	await _shot(game,output,"hud-large-1560x720")
+	var captain_before: Vector2=game.sim.player.pos
+	var stick=InputEventScreenTouch.new();stick.index=12;stick.pressed=true;stick.position=game.camera_pad.size*.5+Vector2(30,0)
+	game.camera_pad._gui_input(stick);game._pan_camera(game.camera_pad.value,.45)
+	game.camera.position=game.sim.player.pos+game.pan;game.camera.force_update_scroll()
+	await _shot(game,output,"camera-pan-1560x720")
+	var pad_receipt=FileAccess.open(output+"/camera-pad.json",FileAccess.WRITE)
+	pad_receipt.store_string(JSON.stringify({"touch_owned":game.camera_pad.touch_id==12,"camera_offset":game.pan.length(),"ship_unchanged":game.sim.player.pos==captain_before}));pad_receipt.close()
+	if game.pan.length()<50 or game.sim.player.pos!=captain_before:push_error("Camera-only joystick acceptance failed");quit(1);return
+	game._recenter_camera();game.camera.position=game.sim.player.pos
 	game.sim.player.reload=.9
 	await _shot(game,output,"combat-reload-1560x720")
 	game.sim.player.reload=0

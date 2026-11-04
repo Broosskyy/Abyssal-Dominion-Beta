@@ -3,6 +3,7 @@ const SIM = preload("res://simulation.gd")
 const MINI = preload("res://minimap.gd")
 const HUD=preload("res://nautical_button.gd")
 const HUD_PANEL=preload("res://nautical_panel.gd")
+const CAMERA_PAD=preload("res://camera_pad.gd")
 const CONTENT = preload("res://content.gd")
 const VISUALS = preload("res://ship_visuals.gd")
 const USER_ROOT := "res://assets/user/"
@@ -18,6 +19,7 @@ var ui: Control
 var chart_mini: Control
 var desired_zoom := 0.96
 var pan := Vector2.ZERO
+var camera_anchor := Vector2.ZERO
 var camera_locked := true
 var accumulator := 0.0
 var refresh_clock := 0.0
@@ -102,6 +104,9 @@ var previous_region := -1
 var hud_size := 1 # 0 compact, 1 comfortable, 2 large
 var journal_visible := true
 var hud_scale := 1.0
+var camera_pad: Control
+var target_cycle: Button
+var camera_pad_visible := true
 
 func _ready() -> void:
 	_load_assets()
@@ -130,7 +135,7 @@ func _ready() -> void:
 	if data_boot!=null:data_boot.mark_healthy()
 
 func _load_assets() -> void:
-	for name in ["anchor","ship","book","compass","chest","gear","plus","minus","focus","arrow"]:hud_icons[name]=load("res://assets/ui/icons/"+name+".svg")
+	for name in ["anchor","ship","book","compass","chest","gear","plus","minus","focus","arrow","target_cycle"]:hud_icons[name]=load("res://assets/ui/icons/"+name+".svg")
 	extra_icons.port_watchtower=load("res://assets/reference/landmarks/port_watchtower.png")
 	ship_frames=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/ship_frames.json")).entries
 	var pack: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(USER_ROOT+"pack.json"))
@@ -169,7 +174,9 @@ func _process(delta: float) -> void:
 		sim.step(1.0/30.0)
 		accumulator -= 1.0/30.0
 	if previous_region!=sim.map_id:_sync_region()
-	var goal: Vector2 = sim.player.pos+pan
+	if camera_pad.visible and not modal.visible:_pan_camera(camera_pad.value,delta)
+	var goal: Vector2 = sim.player.pos if camera_locked else camera_anchor
+	pan=goal-sim.player.pos
 	camera.position = camera.position.lerp(goal,1.0-exp(-delta*5.0))
 	camera.zoom = camera.zoom.lerp(Vector2.ONE*desired_zoom,1.0-exp(-delta*8.0))
 	ocean.set_shader_parameter("camera_world",camera.position)
@@ -570,7 +577,9 @@ func _build_ui() -> void:
 		var index=i
 		var button=_orb(ui,"",icons[["cannonball","chain","harpoon"][i]],func():sim.set_ammo(index);_refresh_ui())
 		button.name="Ammo%d" % i;button.toggle_mode=true;ammo_buttons.append(button)
-	center_button=_orb(ui,"Kamera zum Schiff",hud_icons.focus,func():pan=Vector2.ZERO;camera_locked=true)
+	center_button=_orb(ui,"Kamera zum Schiff",hud_icons.focus,_recenter_camera)
+	camera_pad=CAMERA_PAD.new();ui.add_child(camera_pad)
+	target_cycle=_orb(ui,"Nächstes sichtbares Ziel · Tab",hud_icons.target_cycle,_cycle_target)
 	zoom_in=_orb(ui,"Näher zoomen",hud_icons.plus,func():_zoom(1.15))
 	zoom_out=_orb(ui,"Weiter zoomen",hud_icons.minus,func():_zoom(1.0/1.15))
 	interact=_button(ui,"",_interact);interact.name="InteractButton"
@@ -656,6 +665,9 @@ func _layout() -> void:
 	var z=36.0 if compact else 38.0
 	_place(zoom_out,s.x-2*z-18,top+mh+6,z,z);_place(zoom_in,s.x-z-12,top+mh+6,z,z)
 	_place(center_button,s.x-z-12,top+mh+z+10,z,z)
+	_place(target_cycle,s.x-2*z-18,top+mh+z+10,z,z)
+	_place(camera_pad,12,s.y-104,92,92)
+	camera_pad.visible=camera_pad_visible
 	var q=44.0 if compact else 52.0
 	var group=4*q+24
 	var left=(s.x-group)*.5 if compact else s.x-118-60-28-group-20
@@ -675,8 +687,10 @@ func _layout() -> void:
 	var status_x=maxf(236 if compact else 294,s.x*.5-220)
 	_place(status,status_x,dy-26,minf(440,side_x-status_x-12),20)
 	_place(interact,12,top+152,player_panel.size.x,36)
-	_place(quest_panel,12,s.y-(116 if compact else 150)-10,208 if compact else 270,116 if compact else 150)
-	quest_panel.visible=journal_visible
+	var journal_height=116.0 if compact else minf(150,s.y-(top+194)-116)
+	var journal_y=s.y-journal_height-(116 if camera_pad_visible and not compact else 10)
+	_place(quest_panel,12,journal_y,208 if compact else 270,journal_height)
+	quest_panel.visible=journal_visible and (not compact or not camera_pad_visible)
 	_place(quest_tab,5,4,quest_panel.size.x*.5-7,23);_place(system_tab,quest_panel.size.x*.5+2,4,quest_panel.size.x*.5-7,23)
 	_place(quest_text,10,33,quest_panel.size.x-20,quest_panel.size.y-72)
 	_place(system_label,10,33,quest_panel.size.x-20,quest_panel.size.y-42)
@@ -789,6 +803,7 @@ func _toggle_fire() -> void:
 	_refresh_ui()
 
 func _open_modal(kind: String) -> void:
+	camera_pad.release()
 	var scroll_position=modal_scroll.scroll_vertical if modal.visible and modal_kind==kind else 0
 	modal_kind=kind
 	modal_title.text=kind
@@ -912,12 +927,13 @@ func _open_modal(kind: String) -> void:
 			var choice=_action((["KOMPAKT · mehr freie Seekarte","KOMFORT · größere Anzeigen","GROSS · beste Lesbarkeit"][i])+("   ✓" if hud_size==i else ""),func():_set_display(index,journal_visible))
 			choice.disabled=hud_size==i
 		_action("AUFTRAGSFENSTER: "+("EIN" if journal_visible else "AUS"),func():_set_display(hud_size,not journal_visible))
-		_info("Aufträge bleiben jederzeit oben über Aufträge erreichbar. Zwei Finger zum Zoomen; das Fadenkreuz holt die Kamera zum Schiff zurück.")
-		_action("STANDARD WIEDERHERSTELLEN",func():_set_display(1,true))
+		_action("KAMERA-JOYSTICK: "+("EIN" if camera_pad_visible else "AUS"),func():camera_pad_visible=not camera_pad_visible;_set_display(hud_size,journal_visible))
+		_info("Auf kleinen Displays bleibt bei aktivem Joystick das Auftragsfenster geschlossen. Aufträge sind oben erreichbar. Joystick: nur Kamera. Fadenkreuz: zurück zum Schiff. Zielwechsel: Pfeile neben dem Fadenkreuz oder Tab.")
+		_action("STANDARD WIEDERHERSTELLEN",func():camera_pad_visible=true;_set_display(1,true))
 	else:
 		_action("UPDATES PRÜFEN",func():_save_progress();get_tree().set_meta("abyssal_manual_update",true);get_tree().change_scene_to_file("res://updater/launcher.tscn"))
 		_action("ANZEIGE & HUD ANPASSEN",func():_open_modal("Anzeige"))
-		var info =_text(modal_body,"ABYSSAL DOMINION · STEUERUNG\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nHAFEN: Andocken, Rumpf reparieren und Kanonen, Harpunen, Rumpf oder Segel verbessern.\nLOGBUCH: Sieben aufeinanderfolgende Aufträge.\nKARTEN: Portale zur Karibischen See, zum Nordmeer und zu den Schattengewässern.\n\nZwei Finger / Mausrad: Zoom. Ziehen / rechte Maustaste: Kamera.\nDas Fadenkreuz zentriert die Kamera. Portale antippen: hinfahren und automatisch wechseln.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",15)
+		var info =_text(modal_body,"ABYSSAL DOMINION · STEUERUNG\n\nTippe auf freies Wasser zum Fahren.\nTippe auf ein Schiff und anschließend FEUER.\nVoll- und Kettenkugeln wirken gegen Schiffe, Harpunen gegen Tiamat.\nFahre über Beute, um Gold einzusammeln.\n\nHAFEN: Andocken, Rumpf reparieren und Kanonen, Harpunen, Rumpf oder Segel verbessern.\nLOGBUCH: Sieben aufeinanderfolgende Aufträge.\nKARTEN: Portale zur Karibischen See, zum Nordmeer und zu den Schattengewässern.\n\nZwei Finger / Mausrad: Zoom. Joystick links unten oder Ziehen / rechte Maustaste: Kamera. Zielwechsel: Pfeilbutton / Tab.\nDas Fadenkreuz zentriert die Kamera. Portale antippen: hinfahren und automatisch wechseln.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",15)
 		info.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		info.custom_minimum_size.y=300
 	modal_body.size.x=modal_scroll.size.x
@@ -967,7 +983,7 @@ func _upgrade_row(key: String) -> void:
 func _sync_region() -> void:
 	previous_region=sim.map_id
 	modal.hide()
-	pan=Vector2.ZERO;camera.position=sim.player.pos
+	_recenter_camera();camera.position=sim.player.pos
 	_save_progress();_refresh_ui()
 
 func _navigate_region(destination: int) -> void:
@@ -1033,7 +1049,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			dragging=true
 		elif event.position.distance_to(drag_start)>20:
 			dragging=true
-			pan-=event.relative/camera.zoom
+			_shift_camera(-event.relative/camera.zoom)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton:
 		if event.button_index==MOUSE_BUTTON_WHEEL_UP and event.pressed:_zoom(1.10)
@@ -1043,8 +1059,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index==MOUSE_BUTTON_RIGHT:
 			dragging=event.pressed
 	elif event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
-		pan-=event.relative/camera.zoom
+		_shift_camera(-event.relative/camera.zoom)
 	elif event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode==KEY_TAB:_cycle_target();get_viewport().set_input_as_handled()
 		if event.keycode==KEY_SPACE:_toggle_fire()
 		if event.keycode==KEY_ESCAPE:modal.hide()
 		if event.keycode==KEY_R:sim.toggle_repair()
@@ -1054,7 +1071,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _hud_contains(screen: Vector2) -> bool:
 	if modal.visible:return true
-	for control: Control in [chrome,player_panel,target_panel,chart_mini,quest_panel,combat_dock,attack,repair,ammo_selector,center_button,zoom_in,zoom_out,interact]:
+	for control: Control in [chrome,player_panel,target_panel,chart_mini,quest_panel,combat_dock,attack,repair,ammo_selector,center_button,target_cycle,camera_pad,zoom_in,zoom_out,interact]:
 		if control.is_visible_in_tree() and control.get_global_rect().has_point(screen):return true
 	return false
 
@@ -1087,8 +1104,9 @@ func _load_progress() -> void:
 	if data is Dictionary:sim.restore_save(data)
 
 func _notification(what: int) -> void:
-	if what==NOTIFICATION_APPLICATION_PAUSED or what==NOTIFICATION_WM_CLOSE_REQUEST:
-		_save_progress()
+	if what in [NOTIFICATION_APPLICATION_PAUSED,NOTIFICATION_WM_WINDOW_FOCUS_OUT,NOTIFICATION_WM_CLOSE_REQUEST]:
+		if camera_pad!=null:camera_pad.release()
+		if camera!=null:_save_progress()
 
 func _load_display() -> void:
 	if not FileAccess.file_exists(HUD_SAVE):return
@@ -1096,14 +1114,46 @@ func _load_display() -> void:
 	if not data is Dictionary:return
 	hud_size=clampi(int(data.get("hud_size",1)),0,2)
 	journal_visible=bool(data.get("journal_visible",true))
+	camera_pad_visible=bool(data.get("camera_pad_visible",true))
 
 func _set_display(size_index: int,show_journal: bool) -> void:
 	hud_size=clampi(size_index,0,2)
 	journal_visible=show_journal
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible}))
+		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible}))
 		file.close()
 	_layout()
 	_open_modal("Anzeige")
+	_refresh_ui()
+
+func _pan_camera(direction: Vector2,delta: float) -> void:
+	if direction==Vector2.ZERO:return
+	_shift_camera(direction*620.0*maxf(delta,0.0)/camera.zoom)
+
+func _shift_camera(offset: Vector2) -> void:
+	if camera_locked:camera_anchor=sim.player.pos+pan
+	camera_locked=false
+	camera_anchor=(camera_anchor+offset).clamp(Vector2.ZERO,sim.WORLD)
+	pan=camera_anchor-sim.player.pos
+
+func _recenter_camera() -> void:
+	pan=Vector2.ZERO;camera_locked=true;camera_anchor=sim.player.pos
+	if camera_pad!=null:camera_pad.release()
+
+func _cycle_target() -> void:
+	if modal.visible:return
+	var candidates: Array[int]=[]
+	var viewport=get_viewport_rect().grow(-8)
+	for npc: Dictionary in sim.npcs:
+		if float(npc.hp)<=0:continue
+		var screen: Vector2=get_canvas_transform()*npc.pos
+		if viewport.has_point(screen) and not _hud_contains(screen):candidates.append(int(npc.id))
+	candidates.sort()
+	if candidates.is_empty():
+		sim.message="Kein Ziel im sichtbaren Bereich"
+	else:
+		var index=candidates.find(sim.target)
+		sim.firing=false
+		sim.select(candidates[(index+1)%candidates.size()])
 	_refresh_ui()

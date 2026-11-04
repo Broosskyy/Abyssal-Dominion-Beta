@@ -653,6 +653,12 @@
       "bytes": 439,
       "sha256": "dc492e90e541b5a94c4b600d4abcb302bea6967a37d5fe51f4698cd964d48076",
       "source": "Handwritten nautical SVG icon for Abyssal Dominion HUD"
+    },
+    {
+      "path": "assets/ui/icons/target_cycle.svg",
+      "bytes": 354,
+      "sha256": "75c27bf8ef5281e57937210f352331200adbe1130854fe6838054386d8dd6382",
+      "source": "Handwritten nautical SVG for visible target cycling"
     }
   ]
 }

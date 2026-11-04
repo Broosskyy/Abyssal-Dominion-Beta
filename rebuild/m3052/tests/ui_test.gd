@@ -34,7 +34,7 @@ func _run() -> void:
 		game.sim.select(2)
 		game._refresh_ui()
 		for nav: Button in game.nav_buttons:check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
-		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.interact,game.loadout_button,game.ammo_selector]
+		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.interact,game.loadout_button,game.ammo_selector,game.camera_pad,game.target_cycle]
 		controls.append_array(game.ammo_buttons)
 		for control: Control in controls:
 			var rect=control.get_global_rect()
@@ -201,7 +201,7 @@ func _run() -> void:
 			for button: Button in game.modal_body.find_children("*","Button",true,false):
 				check(button.get_global_rect().end.x<=game.modal_scroll.get_global_rect().end.x+1,"display option stays inside the scaled scroll viewport")
 			game.modal.hide()
-			var touch: Array=[game.attack,game.repair,game.ammo_selector,game.center_button,game.zoom_in,game.zoom_out,game.loadout_button]
+			var touch: Array=[game.attack,game.repair,game.ammo_selector,game.center_button,game.zoom_in,game.zoom_out,game.loadout_button,game.camera_pad,game.target_cycle]
 			touch.append_array(game.ammo_buttons)
 			for control: Control in touch:
 				var bounds=control.get_global_rect()
@@ -239,6 +239,78 @@ func _run() -> void:
 	check(int(game.sim.player.ammo[0])==27 and str(game.attack.get("state_label")).begins_with("LÄDT"),"actual volley consumes three rounds and drives the reload display")
 	game.sim.docked=true;game._refresh_ui()
 	check(game.attack.disabled and str(game.attack.get("state_label"))=="IM HAFEN","docked state is visible on the disabled attack control")
+	# Actual joystick touch ownership, cancellation and camera-only movement.
+	game.sim.docked=false;game.sim.player.path=[];game.modal.hide()
+	game._recenter_camera()
+	var before_pos: Vector2=game.sim.player.pos
+	var before_stock: Array=game.sim.player.ammo.duplicate()
+	var pad_down=InputEventScreenTouch.new();pad_down.index=31;pad_down.pressed=true;pad_down.position=game.camera_pad.size*.5+Vector2(30,0)
+	game.camera_pad._gui_input(pad_down)
+	check(game.camera_pad.value.x>.9,"owning touch moves the camera pad to the right")
+	var second=InputEventScreenTouch.new();second.index=32;second.pressed=true;second.position=Vector2.ZERO
+	game.camera_pad._gui_input(second);second.pressed=false;game.camera_pad._gui_input(second)
+	check(game.camera_pad.touch_id==31 and game.camera_pad.value.x>.9,"another finger cannot steal or release the camera pad")
+	game._pan_camera(game.camera_pad.value,.25)
+	check(game.pan.x>0 and game.sim.player.pos==before_pos and game.sim.player.path.is_empty() and game.sim.player.ammo==before_stock,"camera pan leaves ship position, course and ammunition untouched")
+	check(game._hud_contains(game.camera_pad.get_global_rect().get_center()),"joystick area is protected from tap-to-sail")
+	pad_down.pressed=false;game.camera_pad._gui_input(pad_down)
+	check(game.camera_pad.value==Vector2.ZERO and game.camera_pad.touch_id==-1,"owning finger release returns the joystick to neutral")
+	pad_down.pressed=true;game.camera_pad._gui_input(pad_down);game._open_modal("Anzeige")
+	check(game.camera_pad.value==Vector2.ZERO,"opening a menu releases a held camera control")
+	game.modal.hide()
+	pad_down.pressed=true;game.camera_pad._gui_input(pad_down)
+	game._notification(Node.NOTIFICATION_WM_WINDOW_FOCUS_OUT)
+	check(game.camera_pad.value==Vector2.ZERO,"losing window focus releases held joystick input")
+	game.center_button.pressed.emit()
+	check(game.pan==Vector2.ZERO and game.camera_locked,"recenter button restores ship following and releases joystick")
+	game._pan_camera(Vector2(1,1),100)
+	var destination: Vector2=game.sim.player.pos+game.pan
+	check(destination.x>=0 and destination.y>=0 and destination.x<=game.sim.WORLD.x and destination.y<=game.sim.WORLD.y,"camera pad clamps its destination to the chart")
+	game._recenter_camera()
+	game._pan_camera(Vector2.RIGHT,.2);game.camera_pad.release()
+	var view_anchor: Vector2=game.sim.player.pos+game.pan
+	game.camera.position=view_anchor;game.sim.player.pos+=Vector2(100,0);game.sim.firing=false;game.previous_region=game.sim.map_id
+	game._process(.1)
+	check(game.camera.position.distance_to(view_anchor)<.01,"released camera remains on the inspected chart location while the ship changes position")
+	game.sim.player.pos=before_pos;game._recenter_camera()
+	game.camera_pad_visible=false;game._set_display(1,true)
+	game.camera_pad_visible=true;game._load_display();game._layout()
+	check(not game.camera_pad.visible,"camera joystick preference survives reload")
+	game.camera_pad_visible=true;game._set_display(1,true);game.modal.hide()
+	# Cycle through visible, living targets without arming a volley or altering a course.
+	game.camera.position=game.sim.player.pos;game.camera.force_update_scroll()
+	game.sim.npcs.clear()
+	for i in 4:
+		var npc: Dictionary=game.sim.base_npcs[i].duplicate(true)
+		npc.pos=game.sim.player.pos+Vector2(-150+i*100,-40);npc.hp=npc.max_hp
+		if i==2:npc.hp=0
+		if i==3:npc.pos=game.get_canvas_transform().affine_inverse()*game.player_panel.get_global_rect().get_center()
+		game.sim.npcs.append(npc)
+	game.sim.target=-1;game.sim.firing=true
+	var first_id: int=game.sim.npcs[0].id
+	var second_id: int=game.sim.npcs[1].id
+	game.target_cycle.pressed.emit()
+	check(game.sim.target==first_id and not game.sim.firing,"cycle selects first visible live ship and stops ongoing fire")
+	game.target_cycle.pressed.emit();check(game.sim.target==second_id,"cycle advances to the next visible ship")
+	game.target_cycle.pressed.emit();check(game.sim.target==first_id,"cycle wraps and skips sunk ships and targets behind HUD")
+	check(game.sim.player.pos==before_pos and game.sim.player.ammo==before_stock and game.sim.player.path.is_empty(),"target cycling consumes no ammunition and starts no pursuit")
+	game.sim.npcs.clear();game.target_cycle.pressed.emit()
+	check(game.sim.message=="Kein Ziel im sichtbaren Bereich","empty view gives clear feedback without a fake target")
+	root.size=Vector2i(720,405);await process_frame;game._layout()
+	check(not game.quest_panel.visible and game.camera_pad.visible,"short phone layout reserves bottom-left for the camera and keeps quests in top navigation")
+	game.camera_pad_visible=false;game._layout()
+	check(game.quest_panel.visible,"disabling camera pad restores the compact quest window")
+	# Dispatch through the viewport, including release outside the joystick hit box.
+	game.camera_pad_visible=true;game.modal.hide();root.size=Vector2i(1280,720)
+	await process_frame;game._layout();game.sim.player.path=[]
+	var routed=InputEventScreenTouch.new();routed.index=55;routed.pressed=true;routed.position=game.camera_pad.get_global_rect().get_center()
+	root.push_input(routed,true);await process_frame
+	check(game.camera_pad.touch_id==55,"viewport routes actual screen touch into the scaled joystick")
+	var routed_drag=InputEventScreenDrag.new();routed_drag.index=55;routed_drag.position=routed.position+Vector2(180,0);routed_drag.relative=Vector2(180,0)
+	root.push_input(routed_drag,true);await process_frame
+	check(game.camera_pad.value.x>.9,"owning finger remains captured when dragged outside the joystick")
+	routed.pressed=false;routed.position=routed_drag.position;root.push_input(routed,true);await process_frame
+	check(game.camera_pad.value==Vector2.ZERO and game.sim.player.path.is_empty(),"outside release stops camera input without leaking a sailing command")
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)
