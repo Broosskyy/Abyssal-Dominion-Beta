@@ -49,18 +49,28 @@ func _draw() -> void:
 		var shape=PackedVector2Array()
 		for vertex: Vector2 in island.outline:shape.append(r.position+vertex/simulation.WORLD*r.size)
 		draw_colored_polygon(shape,Color("8fa17a"))
+	for sparkle in simulation.sparkles:
+		if float(sparkle.respawn)>0:continue
+		var p: Vector2=r.position+sparkle.pos/simulation.WORLD*r.size
+		draw_circle(p,1.8,Color("7ff5e6"))
 	for npc in simulation.npcs:
 		if int(npc.hp)<=0:continue
 		var p: Vector2=r.position+npc.pos/simulation.WORLD*r.size
-		var hostile=bool(npc.aggressive) or bool(region.npc_hostile)
-		var color=Color("ff6d5c") if hostile else (Color("f0c35a") if npc.kind=="ship" else Color("d39cf0"))
-		draw_circle(p,2.2,color)
+		if npc.kind=="tower":
+			var held: bool=simulation.tower_friendly()
+			draw_rect(Rect2(p-Vector2(2.5,2.5),Vector2(5,5)),Color("9fe7a8") if held else Color("ff8a4c"))
+			draw_rect(Rect2(p-Vector2(2.5,2.5),Vector2(5,5)),Color("1a0c04"),false,1)
+		else:
+			var hostile=bool(npc.aggressive) or bool(region.npc_hostile)
+			var color=Color("ff6d5c") if hostile else (Color("f0c35a") if npc.kind=="ship" else Color("d39cf0"))
+			draw_circle(p,2.2 if not bool(npc.get("boss",false)) else 3.4,color)
 		if int(npc.id)==int(simulation.target):draw_circle(p,4.0,Color("fff0c0"),false,1.2,true)
 	for portal in simulation.portals:
 		var p: Vector2=r.position+portal.pos/simulation.WORLD*r.size
 		draw_circle(p,3.2,Color("a79edb"),false,1.2,true)
-	var port: Vector2=r.position+simulation.harbor/simulation.WORLD*r.size
-	draw_circle(port,3.0,Color("f4c56c"));draw_circle(port,3.0,Color("2a1a08"),false,1,true)
+	if simulation.has_harbor():
+		var port: Vector2=r.position+simulation.harbor/simulation.WORLD*r.size
+		draw_circle(port,3.0,Color("f4c56c"));draw_circle(port,3.0,Color("2a1a08"),false,1,true)
 	var box=Rect2(r.position+(camera_world-view_world*.5)/simulation.WORLD*r.size,view_world/simulation.WORLD*r.size)
 	draw_rect(box.intersection(r),Color(.85,.95,1,.75),false,1)
 	var player: Vector2=r.position+simulation.player.pos/simulation.WORLD*r.size

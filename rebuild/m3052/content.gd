@@ -103,9 +103,9 @@ const FORTRESS_ISLAND := 4
 const FORTRESS_TAG := "KRF"
 const FORTRESS_HOLD := 1800.0
 const TOWERS := [
-	{"kind":"cannon", "name":"Kanonenturm", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.24,-0.20)},
-	{"kind":"mortar", "name":"Mörserturm", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.20,-0.24)},
-	{"kind":"chain", "name":"Kettenturm", "hp":1150, "range":440.0, "damage":22, "shots":2, "reload":3.2, "offset":Vector2(0.24,0.06)},
-	{"kind":"guardian", "name":"Wächterturm", "hp":1900, "range":390.0, "damage":28, "shots":2, "reload":2.2, "offset":Vector2(-0.16,0.08)}
+	{"kind":"cannon", "name":"Kanonenturm", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.36,-0.04)},
+	{"kind":"mortar", "name":"Mörserturm", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.04,-0.34)},
+	{"kind":"chain", "name":"Kettenturm", "hp":1150, "range":440.0, "damage":22, "shots":2, "reload":3.2, "offset":Vector2(0.38,0.04)},
+	{"kind":"guardian", "name":"Wächterturm", "hp":1900, "range":390.0, "damage":28, "shots":2, "reload":2.2, "offset":Vector2(0.0,0.06)}
 ]
 const GUILD_COST := 300
