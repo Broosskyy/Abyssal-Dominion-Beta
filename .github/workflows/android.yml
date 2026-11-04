@@ -1,15 +1,15 @@
-name: Godot 4.7.2 Android test APK
+name: Legacy M3051 Android test APK
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'project.godot'
-      - 'export_presets.cfg'
-      - 'scripts/**'
-      - 'scenes/**'
-      - 'assets/**'
-      - 'tools/build_android.py'
+      - 'legacy/m3051/project.godot'
+      - 'legacy/m3051/export_presets.cfg'
+      - 'legacy/m3051/scripts/**'
+      - 'legacy/m3051/scenes/**'
+      - 'legacy/m3051/assets/**'
+      - 'legacy/m3051/tools/build_android.py'
       - '.github/workflows/android.yml'
 permissions:
   contents: read
@@ -40,10 +40,11 @@ jobs:
           unzip -p /tmp/templates.tpz templates/android_debug.apk > "$HOME/.local/share/godot/export_templates/4.7.2.stable/android_debug.apk"
           keytool -genkeypair -keystore /tmp/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Android Debug,O=Abyssal Dominion,C=DE'
       - name: Build and verify
+        working-directory: legacy/m3051
         run: python3 tools/build_android.py --godot /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --android-sdk "$ANDROID_HOME" --java-home "$JAVA_HOME" --debug-keystore /tmp/debug.keystore
       - uses: actions/upload-artifact@v4
         with:
           name: Abyssal-Dominion-M3051-Android-ARM64-Test
-          path: builds/android/ABYSSAL_DOMINION_M3051_ARM64_TEST.*
+          path: legacy/m3051/builds/android/ABYSSAL_DOMINION_M3051_ARM64_TEST.*
           if-no-files-found: error
           retention-days: 14

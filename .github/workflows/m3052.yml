@@ -39,6 +39,7 @@ jobs:
       - name: Install engine and prepare pinned content signing
         env:
           ABYSSAL_ANDROID_KEYSTORE_BASE64: ${{ secrets.ABYSSAL_ANDROID_KEYSTORE_BASE64 }}
+          ABYSSAL_CONTENT_SIGNING_KEY: ${{ secrets.ABYSSAL_CONTENT_SIGNING_KEY }}
           SHELL_NEEDED: ${{ steps.plan.outputs.shell_needed }}
         shell: bash
         run: |
@@ -50,6 +51,7 @@ jobs:
           tpl="$HOME/.local/share/godot/export_templates/4.7.2.stable"
           mkdir -p "$tpl" "$HOME/.cache/abyssal-test-signing"
           unzip -p /tmp/templates.tpz templates/android_debug.apk > "$tpl/android_debug.apk"
+          if [ -z "$ABYSSAL_ANDROID_KEYSTORE_BASE64" ]; then echo '::warning::Signing keystore comes only from the Actions cache; store it in the ABYSSAL_ANDROID_KEYSTORE_BASE64 secret (docs/SIGNING.md).'; fi
           if [ -n "$ABYSSAL_ANDROID_KEYSTORE_BASE64" ]; then
             python3 -c 'import os,base64,pathlib; pathlib.Path.home().joinpath(".cache/abyssal-test-signing/debug.keystore").write_bytes(base64.b64decode(os.environ["ABYSSAL_ANDROID_KEYSTORE_BASE64"],validate=True))'
           fi
@@ -57,10 +59,18 @@ jobs:
           test -f "$signing" || { echo 'Original signing key unavailable; refusing replacement.'; exit 1; }
           keytool -exportcert -alias androiddebugkey -keystore "$signing" -storepass android -file /tmp/certificate.der
           test "$(sha256sum /tmp/certificate.der | cut -d' ' -f1)" = 278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b
-          keytool -importkeystore -srckeystore "$signing" -srcstorepass android -srcalias androiddebugkey -destkeystore /tmp/content-signing.p12 -deststoretype PKCS12 -deststorepass android -noprompt
-          openssl pkcs12 -in /tmp/content-signing.p12 -nocerts -nodes -passin pass:android -out /tmp/content-private.pem
+          if [ -n "$ABYSSAL_CONTENT_SIGNING_KEY" ]; then
+            # Dedicated data-pack key (docs/SIGNING.md). Changes data_public.pem, so release_plan demands a new bootstrap APK.
+            printf '%s\n' "$ABYSSAL_CONTENT_SIGNING_KEY" > /tmp/content-private.pem
+          else
+            keytool -importkeystore -srckeystore "$signing" -srcstorepass android -srcalias androiddebugkey -destkeystore /tmp/content-signing.p12 -deststoretype PKCS12 -deststorepass android -noprompt
+            openssl pkcs12 -in /tmp/content-signing.p12 -nocerts -nodes -passin pass:android -out /tmp/content-private.pem
+          fi
           chmod 600 /tmp/content-private.pem
           openssl pkey -in /tmp/content-private.pem -pubout -out rebuild/m3052/updater/data_public.pem
+          if ! git diff --quiet -- rebuild/m3052/updater/data_public.pem && [ "$SHELL_NEEDED" != true ]; then
+            echo '::error::Data signing key changed: installed apps would reject every data pack. Bump VERSION_CODE so a new bootstrap APK ships the new public key.'; exit 1
+          fi
           if [ "$SHELL_NEEDED" = true ]; then
             unzip -p /tmp/templates.tpz templates/android_source.zip > "$tpl/android_source.zip"
             unzip -p /tmp/templates.tpz templates/version.txt > "$tpl/version.txt"
@@ -127,13 +137,15 @@ jobs:
             curl -fL --retry 3 -o "$RUNNER_TEMP/served.apk" "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/abyssal-${SHELL_CODE}-android/ABYSSAL_DOMINION_${SHELL_CODE}.apk"
             python3 -c 'import json,hashlib,pathlib,os; s=json.loads(pathlib.Path("releases/M3059/latest.json").read_text())["latest"]; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"served.apk"; assert p.stat().st_size==s["bytes"] and hashlib.sha256(p.read_bytes()).hexdigest()==s["sha256"]'
           fi
-          gh release create "data-${GITHUB_RUN_NUMBER}" "releases/M3059/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip" releases/M3059/data.json --target "$GITHUB_SHA" --title "Abyssal game data ${GITHUB_RUN_NUMBER}" --notes 'Signed game scripts and assets for the M3059 bootstrap. No Android installation for compatible data updates.' --prerelease
+          # Renderer captures are release evidence, not source: attach them to the release instead of committing ~30 MB of PNG/MP4 per build.
+          (cd releases/M3059 && zip -qr9 "$RUNNER_TEMP/ABYSSAL_CAPTURES_${GITHUB_RUN_NUMBER}.zip" captures)
+          gh release create "data-${GITHUB_RUN_NUMBER}" "releases/M3059/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip" releases/M3059/data.json "$RUNNER_TEMP/ABYSSAL_CAPTURES_${GITHUB_RUN_NUMBER}.zip" --target "$GITHUB_SHA" --title "Abyssal game data ${GITHUB_RUN_NUMBER}" --notes 'Signed game scripts and assets for the M3059 bootstrap. No Android installation for compatible data updates.' --prerelease
           curl -fL --retry 3 -o "$RUNNER_TEMP/served.zip" "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-${GITHUB_RUN_NUMBER}/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip"
           python3 -c 'import json,hashlib,pathlib,os; s=json.loads(pathlib.Path("releases/M3059/data.json").read_text())["latest"]; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"served.zip"; assert p.stat().st_size==s["bytes"] and hashlib.sha256(p.read_bytes()).hexdigest()==s["sha256"]; print("ANONYMOUS_DATA_DOWNLOAD_VERIFIED")'
           mkdir -p updates
           if [ "$SHELL_NEEDED" = true ]; then cp releases/M3059/latest.json updates/latest.json; fi
           cp releases/M3059/data.json updates/data.json
-      - name: Preserve manifests, reports and renderer evidence
+      - name: Preserve manifests, reports and capture logs
         shell: bash
         run: |
           set -euo pipefail
@@ -141,7 +153,7 @@ jobs:
           if [ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]; then echo 'Newer source exists; leaving artifact available.'; exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add --sparse -f updates/*.json releases/M3059/*.build.json releases/M3059/data.json releases/M3059/captures/ rebuild/m3052/updater/data_public.pem rebuild/m3052/assets/content_version.json
+          git add --sparse -f updates/*.json releases/M3059/*.build.json releases/M3059/data.json releases/M3059/captures/*.log rebuild/m3052/updater/data_public.pem rebuild/m3052/assets/content_version.json
           if [ -f releases/M3059/latest.json ]; then git add --sparse -f releases/M3059/latest.json releases/M3059/*.signature.txt releases/M3059/*.manifest.txt releases/M3059/*.android-xml.txt; fi
           git commit -m 'Preserve signed data release, optional bootstrap and renderer checks [skip ci]'
           git -c pack.window=0 push origin HEAD:main

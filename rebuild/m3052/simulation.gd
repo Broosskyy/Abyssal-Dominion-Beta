@@ -2,6 +2,9 @@ extends RefCounted
 const CONTENT = preload("res://content.gd")
 const NAV=preload("res://navigation.gd")
 const STAFF=preload("res://staff.gd")
+const GUILD_OPS = preload("res://sim_guild_ops.gd")
+const BONUS_OPS = preload("res://sim_bonus_ops.gd")
+const STAFF_OPS = preload("res://sim_staff_ops.gd")
 const LOOKALIKE := {"0":"O","1":"I","3":"E","4":"A","5":"S","7":"T","8":"B"}
 var island_shapes: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/island_collision.json")).entries
 ## Independent fixed-step sea simulation. No dependency on legacy map scripts.
@@ -871,195 +874,31 @@ func has_harbor() -> bool:
 	return not in_bonus_map()
 
 func craft_scroll(tier: int) -> bool:
-	if tier < 0 or tier >= CONTENT.BONUS_TIERS.size(): return false
-	var cost := int(CONTENT.BONUS_TIERS[tier].fragments)
-	if fragments < cost:
-		message = "%d Fragmente für eine %s-Schriftrolle nötig" % [cost, CONTENT.BONUS_TIERS[tier].name]
-		return false
-	fragments -= cost
-	scrolls[tier] += 1
-	message = "%s-Schriftrolle zusammengesetzt" % CONTENT.BONUS_TIERS[tier].name
-	return true
+	return BONUS_OPS.craft_scroll(self, tier)
 
 func start_bonus(tier: int) -> bool:
-	if tier < 0 or tier >= CONTENT.BONUS_TIERS.size() or in_bonus_map(): return false
-	var config: Dictionary = CONTENT.BONUS_TIERS[tier]
-	var resume := not bonus.is_empty() and int(bonus.tier) == tier
-	if not bonus.is_empty() and not resume:
-		message = "Erst die laufende %s-Bonuskarte beenden" % CONTENT.BONUS_TIERS[int(bonus.tier)].name
-		return false
-	if docked:
-		message = "Vor der Bonuskarte zuerst ablegen"
-		return false
-	if int(player.hp) <= 0: return false
-	if level < int(config.level):
-		message = "%s-Bonuskarte: Kapitänsstufe %d benötigt" % [config.name, config.level]
-		return false
-	if clock - float(player.last_hit) < 6.0:
-		message = "Bonuskarte erst 6 Sekunden ohne Treffer"
-		return false
-	if not resume:
-		if int(scrolls[tier]) <= 0:
-			message = "Keine %s-Schriftrolle · Fragmente sammeln" % config.name
-			return false
-		scrolls[tier] -= 1
-		bonus = {"tier": tier, "wave": 0, "state": "break", "timer": 3.0, "origin": map_id, "origin_pos": [player.pos.x, player.pos.y]}
-	else:
-		bonus.origin = map_id
-		bonus.origin_pos = [player.pos.x, player.pos.y]
-	map_states[map_id] = {"npcs":npcs.duplicate(true),"drops":drops.duplicate(true)}
-	configure_map(int(config.map))
-	# A resumed run restarts its current wave from the checkpoint.
-	bonus.state = "break"
-	bonus.timer = 3.0
-	_arrive(START)
-	message = "%s-Bonuskarte · %s" % [config.name, "Welle %d fortgesetzt" % (int(bonus.wave) + 1) if resume else "erste Welle formiert sich"]
-	return true
+	return BONUS_OPS.start_bonus(self, tier)
 
 func leave_bonus() -> bool:
-	if not in_bonus_map() or bonus.is_empty(): return false
-	if str(bonus.state) == "fight" and clock - float(player.last_hit) < 6.0:
-		message = "Ausgang erst 6 Sekunden ohne Treffer"
-		return false
-	var origin := clampi(int(bonus.origin), 0, CONTENT.REGION_COUNT - 1)
-	var saved: Array = bonus.origin_pos
-	var finished := str(bonus.state) == "done"
-	if finished:
-		if not staff.active() and not bool(bonus.get("staff", false)): bonus_runs += 1
-		bonus = {}
-	else:
-		bonus.state = "break"
-		bonus.timer = 3.0
-	configure_map(origin)
-	var point := Vector2(float(saved[0]), float(saved[1])) if saved.size() == 2 else START
-	_arrive(point if point.is_finite() and not blocked(point) else START)
-	message = "Bonuskarte abgeschlossen · zurück auf %s" % CONTENT.MAPS[map_id].name if finished else "Bonuskarte verlassen · Welle %d bleibt gespeichert" % (int(bonus.wave) + 1)
-	return true
+	return BONUS_OPS.leave_bonus(self)
 
 func _arrive(point: Vector2) -> void:
-	pending_portal = -1
-	player.pos = point
-	player.path = []
-	firing = false
-	repairing = false
-	target = -1
-	shots.clear()
-	events.clear()
+	BONUS_OPS._arrive(self, point)
 
 func bonus_wave_alive() -> int:
-	var alive := 0
-	for npc in npcs:
-		if bool(npc.get("wave",false)) and int(npc.hp) > 0: alive += 1
-	return alive
+	return BONUS_OPS.bonus_wave_alive(self)
 
 func _step_bonus(delta: float) -> void:
-	if bonus.is_empty() or not in_bonus_map(): return
-	match str(bonus.state):
-		"break":
-			bonus.timer = float(bonus.timer) - delta
-			if float(bonus.timer) <= 0:
-				_spawn_wave()
-				bonus.state = "fight"
-		"fight":
-			if bonus_wave_alive() == 0: _finish_wave()
+	BONUS_OPS._step_bonus(self, delta)
 
 func _spawn_wave() -> void:
-	var alive: Array[Dictionary] = []
-	for npc in npcs:
-		if not bool(npc.get("wave",false)) or int(npc.hp) > 0: alive.append(npc)
-	npcs = alive
-	if bonus_wave_alive() > 0: return
-	var wave: Dictionary = CONTENT.BONUS_WAVES[int(bonus.wave)]
-	var tier: Dictionary = CONTENT.BONUS_TIERS[int(bonus.tier)]
-	var scale := float(CONTENT.MAPS[map_id].enemy_scale)
-	var roster: Array[String] = []
-	for i in int(wave.ships): roster.append("ship")
-	for i in int(wave.elites): roster.append("elite")
-	if not str(wave.boss).is_empty(): roster.append(str(wave.boss))
-	for i in roster.size():
-		var role := roster[i]
-		var angle := TAU * float(i) / float(roster.size()) + float(bonus.wave) * 0.7
-		var point := _spawn_point(angle)
-		var body: Dictionary
-		if role == "monster":
-			body = base_npcs[base_npcs.size() - 1].duplicate(true)
-			body.name = "Leviathan · %stiefe" % tier.name
-			body.max_hp = roundi(1650.0 * scale * 1.4)
-			body.reward = roundi(240.0 * scale)
-		else:
-			body = base_npcs[(i * 3 + int(bonus.wave) * 2) % (base_npcs.size() - 1)].duplicate(true)
-			var elite := role != "ship"
-			body.elite = elite
-			body.max_hp = roundi((760.0 if elite else 420.0) * scale * (3.5 if role == "admiral" else 1.0))
-			body.max_shield = roundi(float(body.max_hp) * (0.4 if role == "admiral" else 0.25)) if elite else 0
-			body.reward = roundi((110.0 if elite else 55.0) * scale * (3.0 if role == "admiral" else 1.0))
-			body.power = 36.0 if elite else 23.0
-			if role == "admiral":
-				body.art = 7
-				body.name = "Admiral · %sflotte" % tier.name
-				body.power = 48.0
-			else:
-				body.name = "%s · %s" % [tier.name, body.name]
-		next_id += 1
-		body.id = next_id
-		body.hp = body.max_hp
-		body.shield = body.get("max_shield", 0)
-		body.pos = point
-		body.home = point
-		body.path = []
-		body.aggressive = true
-		body.hunter = true
-		body.wave = true
-		body.boss = role in ["admiral","monster"]
-		body.respawn = 0.0
-		body.reload = 1.5 + float(i) * 0.4
-		npcs.append(body)
-	message = "Welle %d/%d · %s" % [int(bonus.wave) + 1, CONTENT.BONUS_WAVES.size(), wave.label]
+	BONUS_OPS._spawn_wave(self)
 
 func _spawn_point(angle: float) -> Vector2:
-	for radius in [720.0, 600.0, 860.0, 480.0]:
-		for turn in 8:
-			var point: Vector2 = player.pos + Vector2.from_angle(angle + float(turn) * 0.35) * radius
-			if not blocked(point, 60.0): return point
-	return START + Vector2.from_angle(angle) * 400.0
+	return BONUS_OPS._spawn_point(self, angle)
 
 func _finish_wave() -> void:
-	var tier := int(bonus.tier)
-	var scale := float(CONTENT.MAPS[map_id].enemy_scale)
-	var wave := int(bonus.wave)
-	var gold := roundi(80.0 * float(wave + 1) * scale)
-	var scored := not staff.active() and not bool(bonus.get("staff", false))
-	if scored:
-		player.gold += gold
-		essence += 1
-		award_xp(40 * (wave + 1))
-		_event("essence", player.pos, 1, 0)
-	bonus.wave = wave + 1
-	if not scored:
-		if int(bonus.wave) >= CONTENT.BONUS_WAVES.size():
-			bonus.state = "done"
-			bonus.chest = "Staff-Testlauf · keine Truhe"
-		else:
-			bonus.state = "break"
-			bonus.timer = 4.0
-		message = "Welle %d geschafft · Staff-Test ohne Belohnung" % (wave + 1)
-		return
-	if int(bonus.wave) >= CONTENT.BONUS_WAVES.size():
-		bonus.state = "done"
-		var chest := roundi(500.0 * scale)
-		player.gold += chest
-		supplies.powder += 5
-		supplies.plates += 5
-		supplies.repair_kit += 1
-		activate_blessing()
-		var type: String = CONTENT.DECK_KEYS[rng.randi_range(0, CONTENT.DECK_KEYS.size() - 1)]
-		var deck_note: String = _grant("deck_%s_%d" % [type, tier], 1, "", 3).text
-		bonus.chest = "%d Gold · 5 Pulver · 5 Platten · 1 Notreparatur · %s" % [chest, deck_note]
-		message = "Bonuskarte geschafft · Kristallsegen aktiv · Truhe: %d Gold" % chest
-	else:
-		bonus.state = "break"
-		bonus.timer = 4.0
-		message = "Welle %d geschafft · +%d Gold · +1 Essenz" % [wave + 1, gold]
+	BONUS_OPS._finish_wave(self)
 
 # --- Guild and fortress ------------------------------------------------------------
 
@@ -1098,90 +937,34 @@ static func reserved_tag(tag: String) -> bool:
 	return false
 
 func leave_guild() -> bool:
-	if guild.is_empty(): return false
-	message = "Gilde [%s] aufgelöst" % guild.tag
-	guild = {}
-	fortress_hold = 0.0
-	return true
+	return GUILD_OPS.leave_guild(self)
 
 func guild_island_held() -> bool:
-	return not guild.is_empty() and fortress_hold > 0
+	return GUILD_OPS.guild_island_held(self)
 
 func tower_friendly() -> bool:
-	return guild_island_held()
+	return GUILD_OPS.tower_friendly(self)
 
 func tower_tag() -> String:
-	return str(guild.tag) if tower_friendly() else CONTENT.FORTRESS_TAG
+	return GUILD_OPS.tower_tag(self)
 
 func fortress_island() -> Dictionary:
-	if map_id != CONTENT.FORTRESS_MAP: return {}
-	return islands[CONTENT.FORTRESS_ISLAND]
+	return GUILD_OPS.fortress_island(self)
 
 func _add_fortress() -> void:
-	var island: Dictionary = islands[CONTENT.FORTRESS_ISLAND]
-	island.name = "Korsarenfestung"
-	var center: Vector2 = island.bounds.get_center()
-	for i in CONTENT.TOWERS.size():
-		var config: Dictionary = CONTENT.TOWERS[i]
-		var point: Vector2 = center + config.offset * island.bounds.size
-		while not on_land(point) and point.distance_to(center) > 8: point = point.move_toward(center, 8.0)
-		var shield := roundi(float(config.hp) * 0.3)
-		npcs.append({"id": 400 + i, "name": config.name, "kind": "tower", "tower": config.kind, "pos": point,
-			"home": point, "heading": Vector2.LEFT, "path": [], "hp": config.hp, "max_hp": config.hp,
-			"shield": shield, "max_shield": shield, "speed": 0.0, "reload": float(i) * 0.7, "repath": 0.0,
-			"state": "guard", "patrol": 0, "aggressive": false, "slow": 0.0, "respawn": 0.0, "reward": 0,
-			"art": i, "elite": true, "range": config.range, "damage": config.damage, "shots": config.shots,
-			"rate": config.reload, "last_hit": -100.0})
+	GUILD_OPS._add_fortress(self)
 
 func towers_alive() -> int:
-	var alive := 0
-	for npc in npcs:
-		if npc.kind == "tower" and int(npc.hp) > 0: alive += 1
-	return alive
+	return GUILD_OPS.towers_alive(self)
 
 func _step_tower(npc: Dictionary, delta: float) -> void:
-	if int(npc.hp) <= 0:
-		npc.respawn = float(npc.respawn) - delta
-		if float(npc.respawn) <= 0:
-			npc.hp = npc.max_hp
-			npc.shield = npc.max_shield
-			npc.aggressive = false
-		return
-	npc.reload = maxf(0, float(npc.reload) - delta)
-	if str(npc.tower) != "guardian" and _guardian_alive():
-		npc.shield = minf(float(npc.max_shield), float(npc.shield) + 40.0 * delta)
-	if not npc_engages(npc):
-		npc.state = "guard"
-		return
-	npc.state = "attack"
-	if float(npc.reload) > 0: return
-	var weapon := "chain" if str(npc.tower) == "chain" else ("mortar" if str(npc.tower) == "mortar" else "cannon")
-	_launch(int(npc.id), 0, weapon, int(npc.damage), int(npc.shots))
-	npc.reload = float(npc.rate)
+	GUILD_OPS._step_tower(self, npc, delta)
 
 func _guardian_alive() -> bool:
-	for npc in npcs:
-		if npc.kind == "tower" and str(npc.tower) == "guardian" and int(npc.hp) > 0: return true
-	return false
+	return GUILD_OPS._guardian_alive(self)
 
 func _check_fortress() -> void:
-	if towers_alive() > 0: return
-	fortress_conquests += 1
-	player.gold += 900
-	essence += 3
-	fragments += 2
-	award_xp(300)
-	var island := fortress_island()
-	_event("conquest", island.bounds.get_center() if not island.is_empty() else player.pos, 900, 0)
-	if guild.is_empty():
-		for npc in npcs:
-			if npc.kind == "tower": npc.respawn = 180.0
-		message = "Korsarenfestung erobert · +900 Gold · gründe eine Gilde, um sie zu halten"
-	else:
-		fortress_hold = CONTENT.FORTRESS_HOLD
-		for npc in npcs:
-			if npc.kind == "tower": npc.respawn = 6.0
-		message = "Korsarenfestung erobert · [%s] hält die Gildeninsel 30 Minuten" % guild.tag
+	GUILD_OPS._check_fortress(self)
 
 # --- Staff tools -------------------------------------------------------------------
 # Every tool validates its input, then asks staff.authorize(), which writes the audit entry.
@@ -1191,369 +974,64 @@ const STAFF_PLACES := ["harbor","start","portal_east","portal_west","fortress"]
 var staff_inspected := -1
 
 func staff_sign_in(code: String) -> bool:
-	if staff.active():
-		message = "Bereits angemeldet · %s" % staff.title()
-		return false
-	if not staff.sign_in(code, export_save()):
-		message = "Staff-Zugang abgelehnt · Code prüfen"
-		return false
-	staff_inspected = -1
-	message = "Staff-Zugang · %s · %s" % [staff.title(), CONTENT.STAFF_ENVIRONMENT]
-	return true
+	return STAFF_OPS.staff_sign_in(self, code)
 
-## Restoring rewinds to the snapshot taken at sign-in; keeping marks the save as staff-modified.
 func staff_sign_out(restore: bool) -> bool:
-	if not staff.active(): return false
-	var snapshot: Dictionary = staff.snapshot.duplicate(true)
-	var restored := restore and not snapshot.is_empty()
-	var touched := staff.touched
-	if bool(bonus.get("staff", false)) and in_bonus_map():
-		var origin := clampi(int(bonus.origin), 0, CONTENT.REGION_COUNT - 1)
-		var saved: Array = bonus.origin_pos
-		bonus = {}
-		configure_map(origin)
-		_arrive(_free_water(Vector2(float(saved[0]), float(saved[1]))))
-	staff.sign_out(restored)
-	_clear_staff_spawns()
-	for npc in npcs: npc.erase("frozen")
-	if restored:
-		map_states.clear()
-		restore_save(snapshot)
-		target = -1
-		firing = false
-		shots.clear()
-		events.clear()
-		pending_portal = -1
-		message = "Staff abgemeldet · Spielstand wie vor der Anmeldung"
-	else:
-		if touched: staff_marked = true
-		message = "Staff abgemeldet · Änderungen behalten" + (" · Spielstand markiert" if touched else "")
-	staff_inspected = -1
-	return true
+	return STAFF_OPS.staff_sign_out(self, restore)
 
 func _staff_allow(permission: String, action: String, detail: String = "") -> bool:
-	if not staff.active():
-		message = "Kein Staff-Zugang aktiv"
-		return false
-	if staff.authorize(permission, action, detail): return true
-	message = "Recht fehlt · %s" % CONTENT.STAFF_PERMISSIONS.get(permission, permission)
-	return false
+	return STAFF_OPS._staff_allow(self, permission, action, detail)
 
 func staff_set_presence(mode: String) -> bool:
-	if not mode in CONTENT.STAFF_PRESENCE_ORDER or mode == staff.presence: return false
-	if not _staff_allow("presence", "Sichtbarkeit", CONTENT.STAFF_PRESENCE[mode].name): return false
-	staff.presence = mode
-	if staff.hidden(): _calm_all()
-	if staff.spectating(): firing = false
-	message = "Sichtbarkeit: %s · %s" % [CONTENT.STAFF_PRESENCE[mode].name, CONTENT.STAFF_PRESENCE[mode].effect]
-	return true
+	return STAFF_OPS.staff_set_presence(self, mode)
 
 func staff_toggle(key: String) -> bool:
-	if not CONTENT.STAFF_FLAGS.has(key): return false
-	var on := not staff.flag(key)
-	if not _staff_allow("ship", CONTENT.STAFF_FLAGS[key], "an" if on else "aus"): return false
-	staff.flags[key] = on
-	if key == "no_aggro" and on: _calm_all()
-	message = "%s %s" % [CONTENT.STAFF_FLAGS[key], "an" if on else "aus"]
-	return true
+	return STAFF_OPS.staff_toggle(self, key)
 
 func staff_set_tap_teleport(on: bool) -> bool:
-	if on == staff.tap_teleport: return false
-	if on and not _staff_allow("teleport", "Tipp-Teleport", "an"): return false
-	staff.tap_teleport = on
-	if not on: staff.record("Tipp-Teleport", "aus")
-	message = "Tipp-Teleport %s" % ("an · Wasser antippen, um dorthin zu springen" if on else "aus")
-	return true
+	return STAFF_OPS.staff_set_tap_teleport(self, on)
 
 func _calm_all() -> void:
-	for npc in npcs:
-		npc.aggressive = false
-		if npc.kind != "tower": npc.path = []
-	shots = shots.filter(func(shot: Dictionary) -> bool: return int(shot.target) != 0)
+	STAFF_OPS._calm_all(self)
 
 func staff_ship(action: String) -> bool:
-	if not action in ["repair","cleanse","cooldowns"]: return false
-	var names := {"repair":"Rumpf und Schild voll", "cleanse":"Effekte und Treffersperre gelöscht", "cooldowns":"Abklingzeiten zurückgesetzt"}
-	if not _staff_allow("ship", "Schiff", names[action]): return false
-	match action:
-		"repair":
-			if int(player.hp) <= 0: player.respawn = 0.0
-			player.hp = player.max_hp
-			player.shield = player.max_shield
-			repairing = false
-		"cleanse":
-			player.slow = 0.0
-			player.last_hit = -100.0
-		"cooldowns":
-			for key in cooldowns.keys(): cooldowns[key] = 0.0
-			player.reload = 0.0
-	staff.touched = true
-	message = "Staff · %s" % names[action]
-	return true
+	return STAFF_OPS.staff_ship(self, action)
 
 func staff_place_point(place: String) -> Vector2:
-	match place:
-		"harbor": return harbor + Vector2(70, 50)
-		"portal_east": return portals[0].pos - Vector2(170, 0) if portals.size() > 0 else START
-		"portal_west": return portals[1].pos + Vector2(170, 0) if portals.size() > 1 else START
-		"fortress":
-			var island := fortress_island()
-			if island.is_empty(): return Vector2(-1, -1)
-			return Vector2(island.bounds.get_center().x, island.bounds.end.y + 150.0)
-	return START
+	return STAFF_OPS.staff_place_point(self, place)
 
-## Staff teleport ignores level gates and the 6-second rule. Other maps need the "map" right.
 func staff_teleport(destination: int, place: String = "start", point: Vector2 = Vector2(-1, -1)) -> bool:
-	if destination < 0 or destination >= CONTENT.MAPS.size(): return false
-	if point.x < 0 and not place in STAFF_PLACES: return false
-	var to_bonus := bool(CONTENT.MAPS[destination].get("bonus", false))
-	var tier := destination - CONTENT.REGION_COUNT
-	if to_bonus and not bonus.is_empty() and not bool(bonus.get("staff", false)) and not (in_bonus_map() and destination == map_id):
-		message = "Laufende %s-Bonuskarte zuerst beenden" % CONTENT.BONUS_TIERS[int(bonus.tier)].name
-		return false
-	if place == "fortress" and point.x < 0 and destination != CONTENT.FORTRESS_MAP:
-		message = "Die Korsarenfestung liegt in den Schattengewässern"
-		return false
-	if place == "harbor" and point.x < 0 and to_bonus:
-		message = "Bonuskarten haben keinen Hafen"
-		return false
-	var label := "%s %s" % [CONTENT.MAPS[destination].code, CONTENT.MAPS[destination].name]
-	var detail := label + (" · %d/%d" % [roundi(point.x), roundi(point.y)] if point.x >= 0 else " · " + place)
-	if not _staff_allow("map" if destination != map_id else "teleport", "Teleport", detail): return false
-	docked = false
-	if int(player.hp) <= 0:
-		player.hp = player.max_hp
-		player.shield = player.max_shield
-		player.respawn = 0.0
-	if destination != map_id:
-		var origin := map_id
-		var origin_pos: Vector2 = player.pos
-		if in_bonus_map():
-			if bool(bonus.get("staff", false)):
-				origin = int(bonus.origin)
-				origin_pos = Vector2(float(bonus.origin_pos[0]), float(bonus.origin_pos[1]))
-				bonus = {}
-			elif not bonus.is_empty():
-				if str(bonus.state) == "done": bonus = {}
-				else:
-					bonus.state = "break"
-					bonus.timer = 3.0
-		else:
-			map_states[map_id] = {"npcs":npcs.duplicate(true),"drops":drops.duplicate(true)}
-		if to_bonus and bonus.is_empty():
-			bonus = {"tier": tier, "wave": 0, "state": "break", "timer": 3.0, "origin": origin, "origin_pos": [origin_pos.x, origin_pos.y], "staff": true}
-		elif to_bonus:
-			bonus.state = "break"
-			bonus.timer = 3.0
-		configure_map(destination)
-	var goal := point if point.x >= 0 else staff_place_point(place)
-	_arrive(_free_water(goal))
-	staff.touched = true
-	_event("teleport", player.pos, 0, 0)
-	message = "Teleport · %s" % detail
-	return true
+	return STAFF_OPS.staff_teleport(self, destination, place, point)
 
 func staff_teleport_target() -> bool:
-	var victim := actor(target)
-	if victim.is_empty() or int(victim.get("id", 0)) == 0: return false
-	if not _staff_allow("teleport", "Zum Ziel springen", str(victim.name)): return false
-	var keep := target
-	_arrive(_free_water(victim.pos + Vector2(-180, 90)))
-	target = keep
-	staff.touched = true
-	_event("teleport", player.pos, 0, 0)
-	message = "Neben %s gesprungen" % victim.name
-	return true
+	return STAFF_OPS.staff_teleport_target(self)
 
 func staff_summon_target() -> bool:
-	var victim := actor(target)
-	if victim.is_empty() or int(victim.get("id", 0)) == 0: return false
-	if victim.kind == "tower":
-		message = "Türme stehen fest auf der Insel"
-		return false
-	if not _staff_allow("summon", "Herbeirufen", str(victim.name)): return false
-	var spot := _free_water(player.pos + player.heading * 220.0)
-	victim.pos = spot
-	victim.home = spot
-	victim.path = []
-	staff.touched = true
-	_event("teleport", spot, 0, int(victim.id))
-	message = "%s herbeigerufen" % victim.name
-	return true
+	return STAFF_OPS.staff_summon_target(self)
 
 func staff_spawn_count() -> int:
-	var alive := 0
-	for npc in npcs:
-		if bool(npc.get("staff_spawn", false)) and int(npc.hp) > 0: alive += 1
-	return alive
+	return STAFF_OPS.staff_spawn_count(self)
 
 func staff_spawn(kind: String) -> bool:
-	if not CONTENT.STAFF_SPAWNS.has(kind): return false
-	npcs = npcs.filter(func(npc: Dictionary) -> bool: return not bool(npc.get("staff_spawn", false)) or int(npc.hp) > 0)
-	if staff_spawn_count() >= STAFF_SPAWN_CAP:
-		message = "Höchstens %d Staff-Ziele gleichzeitig" % STAFF_SPAWN_CAP
-		return false
-	var config: Dictionary = CONTENT.STAFF_SPAWNS[kind]
-	if not _staff_allow("spawn", "Erzeugen", str(config.name)): return false
-	var body: Dictionary = (base_npcs[base_npcs.size() - 1] if kind == "monster" else base_npcs[{"dummy":0,"ship":1,"elite":4,"admiral":7}[kind]]).duplicate(true)
-	var elite := kind in ["elite","admiral","monster"]
-	var scale := float(CONTENT.MAPS[map_id].enemy_scale)
-	next_id += 1
-	body.id = next_id
-	body.name = "%s · Staff" % config.name
-	body.max_hp = roundi(float(config.hp) * (1.0 if kind == "dummy" else scale))
-	body.hp = body.max_hp
-	body.max_shield = roundi(float(body.max_hp) * 0.25) if elite and kind != "monster" else 0
-	body.shield = body.max_shield
-	body.elite = elite
-	body.reward = 0
-	body.power = 48.0 if kind == "admiral" else (36.0 if elite else 23.0)
-	if kind == "admiral": body.art = 7
-	var spot := _free_water(player.pos + player.heading * 300.0)
-	body.pos = spot
-	body.home = spot
-	body.path = []
-	body.respawn = 0.0
-	body.reload = 2.0
-	body.staff_spawn = true
-	body.frozen = kind == "dummy"
-	body.aggressive = kind != "dummy"
-	body.hunter = kind != "dummy"
-	npcs.append(body)
-	target = int(body.id)
-	staff.touched = true
-	_event("teleport", spot, 0, int(body.id))
-	message = "%s erzeugt · angewählt" % config.name
-	return true
+	return STAFF_OPS.staff_spawn(self, kind)
 
 func _clear_staff_spawns() -> void:
-	npcs = npcs.filter(func(npc: Dictionary) -> bool: return not bool(npc.get("staff_spawn", false)))
-	for key in map_states.keys():
-		var state: Dictionary = map_states[key]
-		state.npcs = state.npcs.filter(func(npc: Dictionary) -> bool: return not bool(npc.get("staff_spawn", false)))
-	if actor(target).is_empty(): target = -1
+	STAFF_OPS._clear_staff_spawns(self)
 
 func staff_clear_spawns() -> bool:
-	if npcs.filter(func(npc: Dictionary) -> bool: return bool(npc.get("staff_spawn", false))).is_empty():
-		message = "Keine Staff-Ziele auf dieser Karte"
-		return false
-	if not _staff_allow("spawn", "Staff-Ziele entfernen", "%d Ziele" % staff_spawn_count()): return false
-	_clear_staff_spawns()
-	message = "Staff-Ziele entfernt"
-	return true
+	return STAFF_OPS.staff_clear_spawns(self)
 
 func staff_target(action: String) -> bool:
-	var victim := actor(target)
-	if victim.is_empty() or int(victim.get("id", 0)) == 0 or not action in ["freeze","heal","sink","calm"]: return false
-	if action == "sink" and int(victim.hp) <= 0: return false
-	var names := {"freeze":"Einfrieren" if not bool(victim.get("frozen", false)) else "Auftauen", "heal":"Heilen", "sink":"Versenken", "calm":"Beruhigen"}
-	if not _staff_allow("world", names[action], str(victim.name)): return false
-	match action:
-		"freeze":
-			victim.frozen = not bool(victim.get("frozen", false))
-			if bool(victim.frozen): victim.path = []
-		"heal":
-			victim.hp = victim.max_hp
-			victim.shield = victim.get("max_shield", 0)
-		"sink":
-			victim.hp = 0
-			victim.path = []
-			victim.respawn = 90.0 if victim.kind == "tower" else 48.0
-			firing = false
-			_event("sunk", victim.pos, 0, int(victim.id))
-		"calm":
-			victim.aggressive = false
-			victim.hunter = false
-			victim.path = []
-	staff.touched = true
-	message = "%s · %s" % [names[action], victim.name]
-	return true
+	return STAFF_OPS.staff_target(self, action)
 
 func staff_world(action: String) -> bool:
-	if not action in ["reset_npcs","reset_fortress","skip_wave","loot"]: return false
-	if action == "reset_fortress" and map_id != CONTENT.FORTRESS_MAP:
-		message = "Die Korsarenfestung liegt in den Schattengewässern"
-		return false
-	if action == "skip_wave" and (not in_bonus_map() or bonus.is_empty() or str(bonus.state) == "done"):
-		message = "Wellen gibt es nur auf einer laufenden Bonuskarte"
-		return false
-	var names := {"reset_npcs":"Gegner zurückgesetzt", "reset_fortress":"Festungstürme erneuert", "skip_wave":"Welle übersprungen", "loot":"Beutekiste abgeworfen"}
-	if not _staff_allow("world", "Welt", names[action]): return false
-	match action:
-		"reset_npcs":
-			if in_bonus_map():
-				npcs.clear()
-				bonus.state = "break"
-				bonus.timer = 3.0
-			else:
-				var keep: Vector2 = player.pos
-				map_states.erase(map_id)
-				configure_map(map_id)
-				player.pos = keep
-			target = -1
-			firing = false
-			shots.clear()
-		"reset_fortress":
-			for npc in npcs:
-				if npc.kind != "tower": continue
-				npc.hp = npc.max_hp
-				npc.shield = npc.max_shield
-				npc.respawn = 0.0
-				npc.aggressive = false
-		"skip_wave":
-			if str(bonus.state) == "fight":
-				for npc in npcs:
-					if bool(npc.get("wave", false)): npc.hp = 0
-			else: bonus.timer = 0.0
-		"loot":
-			_add_drop(_free_water(player.pos + player.heading * 140.0), 250)
-	staff.touched = true
-	message = "Staff · %s" % names[action]
-	return true
+	return STAFF_OPS.staff_world(self, action)
 
 func staff_grant(kind: String) -> bool:
-	if not CONTENT.STAFF_GRANTS.has(kind): return false
-	if kind == "level" and level >= 20:
-		message = "Höchste Kapitänsstufe erreicht"
-		return false
-	if not _staff_allow("grant", "Gewähren", CONTENT.STAFF_GRANTS[kind]): return false
-	match kind:
-		"gold": player.gold += 10000
-		"essence": essence += 25
-		"fragments": fragments += 16
-		"scrolls":
-			for i in scrolls.size(): scrolls[i] += 1
-		"supplies":
-			for key in CONTENT.SUPPLY_KEYS: supplies[key] += 10
-		"ammo":
-			for i in player.ammo.size(): player.ammo[i] += [1500, 600, 400, 80, 40, 80, 40][i]
-		"decks":
-			for type in CONTENT.DECK_KEYS:
-				if not owns_deck(type, 2): grant_deck(type, 2)
-		"blessing": activate_blessing()
-		"tide_deck": add_tide_deck(1800.0)
-		"flask": free_flask_day = ""
-		"level":
-			level += 1
-			xp = 0
-			apply_upgrades()
-			_event("level", player.pos, level, 0)
-	staff.touched = true
-	message = "Gewährt · %s" % CONTENT.STAFF_GRANTS[kind]
-	return true
+	return STAFF_OPS.staff_grant(self, kind)
 
-## Inspection is logged once per target so the panel can refresh freely.
 func staff_inspect() -> Dictionary:
-	var victim := actor(target)
-	if victim.is_empty() or int(victim.get("id", 0)) == 0 or not staff.can("inspect"): return {}
-	if staff_inspected != target:
-		staff_inspected = target
-		staff.record("Inspizieren", str(victim.name))
-	return {"id": int(victim.id), "name": str(victim.name), "kind": str(victim.kind), "hp": int(victim.hp), "max_hp": int(victim.max_hp),
-		"shield": int(victim.get("shield", 0)), "max_shield": int(victim.get("max_shield", 0)), "state": str(victim.get("state", "")),
-		"aggressive": bool(victim.get("aggressive", false)), "frozen": bool(victim.get("frozen", false)), "elite": bool(victim.get("elite", false)),
-		"reward": int(victim.get("reward", 0)), "staff_spawn": bool(victim.get("staff_spawn", false)),
-		"pos": victim.pos, "distance": roundi(player.pos.distance_to(victim.pos))}
+	return STAFF_OPS.staff_inspect(self)
 
 func _free_water(goal: Vector2) -> Vector2:
 	var low := Vector2(80, 80)
