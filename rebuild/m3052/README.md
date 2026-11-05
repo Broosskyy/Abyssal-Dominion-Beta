@@ -151,3 +151,10 @@ The supplied close-up supersedes the small circular markers from M3064: ten beve
 ## M3066: quieter ship readout and persistent captain ID
 
 The captain nameplate is moved farther below the hull, with a translucent local ID beneath the name. Numeric HP is removed from the ship (the HUD continues to show it); green HP and blue shield gauges remain separate, followed by all ten existing regular deck slots and their special fittings. Rank placement measures the actual high-DPI text size before applying a larger clearance. The local captain ID is generated once and saved in schema 4 without changing combat, inventory, decks, or the data updater; until multiplayer accounts are implemented it is not a server-issued identity.
+
+
+## M3067: ship silhouette-aware labels and original vector deck polish
+
+Captain and NPC nameplates now start below the current visual frame's lowest point, with 34/24 screen-pixel clearances. Changes in heading or sprite size cannot push the ship into its own name; the captain's layout is independent of nearby ships. Selected and ordinary NPC captions are always drawn, and deterministic adjacent slots resolve overlap instead of suppressing NPC names/HP bars. Only real players show pirate-rank insignia. Island names use smaller, zoom-independent typography. Existing HP/shield/deck semantics and the top-HUD numeric readout are unchanged.
+
+The original ten-slot metal assembly gains recessed enamel, hand-drawn bevels and rivets, steel crossbars, per-owned-deck quiet glints and distinct glowing tide/wave, storm/bolt, salvage/hook and blessing/crystal engravings. Unowned slots and inactive effects stay dark. Active HP/shield gauges add a brief visual impact highlight without changing damage. The effects are vector-rendered in Godot with no borrowed textures and no new runtime image dependencies. Phone/wide close encounters, heading-to-hull separation and save-neutral presentation are covered by tests and captures.

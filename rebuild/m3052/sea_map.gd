@@ -16,8 +16,10 @@ const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
 const AMMO_CHOICE=preload("res://ammo_choice.gd")
-const CAPTAIN_PLATE_OFFSET := 50.0
-const OTHER_PLATE_OFFSET := 38.0
+const CAPTAIN_PLATE_OFFSET := 62.0
+const OTHER_PLATE_OFFSET := 48.0
+const CAPTAIN_HULL_CLEARANCE := 34.0
+const NPC_HULL_CLEARANCE := 24.0
 const PLATE_ID_BASELINE := 13.0
 const PLATE_HP_Y := 24.0
 const PLATE_SHIELD_Y := 35.0
@@ -305,7 +307,7 @@ func _draw() -> void:
 			var tower_size=tower.get_size()*42.0/tower.get_width()
 			var foundation: Vector2=island.bounds.get_center()+Vector2(10,24)
 			draw_texture_rect(tower,Rect2(foundation-tower_size*Vector2(0.5,0.96),tower_size),false)
-		_label(Vector2(point.x,island.bounds.end.y+26),island.name,16,GOLD)
+		_map_island_label(Vector2(point.x,island.bounds.end.y+19),str(island.name))
 	# Planned route and tap marker remain visible without obscuring the sea.
 	# Docks and portals occupy water cells and are also marked on the minimap.
 	# Compact anchor replaces the oversized dock circle and upgrade-arrow placeholder.
@@ -405,6 +407,12 @@ func _draw() -> void:
 	for group: Dictionary in VISUALS.impact_labels(sim.events,sim.clock):
 		var age=sim.clock-float(group.time)
 		_label(group.pos+Vector2(0,-65-age*33-float(group.lane)*26),"−%d"%int(group.value),19,Color(1,0.65,0.33,1-age/1.2))
+
+## Island labels stay subordinate to the ships and do not balloon with camera zoom.
+func _map_island_label(point: Vector2,label_text: String) -> void:
+	draw_set_transform(point,0,Vector2.ONE*_plate_scale()*.83)
+	_label(Vector2.ZERO,label_text,13,Color(GOLD,.79),2)
+	draw_set_transform(Vector2.ZERO)
 
 func _landmark_label_visible(point: Vector2) -> bool:
 	var bodies: Array=[sim.player]
@@ -529,6 +537,10 @@ func _plate_title(actor: Dictionary) -> String:
 		title=title.left(title.length()-1);shortened=true
 	return title+"…" if shortened else title
 
+func _plate_has_rank(actor: Dictionary) -> bool:
+	# An NPC rank/elite tier is NOT a player's pirate rank.
+	return int(actor.id)==0 or bool(actor.get("is_player",false))
+
 func _actor_screen_bounds(actor: Dictionary) -> Rect2:
 	var length=_actor_visual_length(actor)
 	var point: Vector2=actor.pos
@@ -550,19 +562,65 @@ func _actor_screen_bounds(actor: Dictionary) -> Rect2:
 	var frame: Dictionary=ship_frames[texture.resource_path.trim_prefix("res://")].frames[column]
 	return transform*VISUALS.world_rect(frame,point,length,flipped)
 
-## Fixed waterline anchors. Nearby ships never move another ship's name, bars
-## or decks. The entire block stays together when the hull changes heading/state.
+## Place a caption below the *visible* sprite, not below its center. The
+## measured atlas frame follows the current heading and its real pivot.
+func _plate_screen_anchor(actor: Dictionary) -> Vector2:
+	var pixels=_plate_pixels()
+	var point: Vector2=get_canvas_transform()*actor.pos
+	var player=int(actor.id)==0
+	var hull: Rect2=_actor_screen_bounds(actor)
+	var minimum=point.y+(CAPTAIN_PLATE_OFFSET if player else OTHER_PLATE_OFFSET)*pixels
+	var clearance=(CAPTAIN_HULL_CLEARANCE if player else NPC_HULL_CLEARANCE)*pixels
+	return Vector2(point.x,maxf(minimum,hull.end.y+clearance))
+
+## No NPC caption is hidden. The captain is never moved by nearby ships.
+## Target and other NPC captions choose a deterministic nearby free position.
 func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 	var placed: Dictionary={}
+	var pending: Array[Dictionary]=[]
 	var pixels=_plate_pixels()
 	for actor: Dictionary in fleet:
 		if int(actor.hp)<=0:continue
 		var point: Vector2=get_canvas_transform()*actor.pos
 		if not get_viewport_rect().grow(180*pixels).has_point(point):continue
 		var player=int(actor.id)==0
-		var width=maxf(188.0 if player else 160.0,_plate_text_width(_plate_title(actor),16 if player else 14)+80.0)*pixels
-		var baseline=point+Vector2(0,(CAPTAIN_PLATE_OFFSET if player else OTHER_PLATE_OFFSET)*pixels)
-		placed[int(actor.id)]=Rect2(baseline-Vector2(width*.5,17*pixels),Vector2(width,(116 if player else 52)*pixels))
+		var width=maxf(188.0 if player else 154.0,_plate_text_width(_plate_title(actor),16 if player else 14)+58.0)*pixels
+		var baseline=_plate_screen_anchor(actor)
+		var rect=Rect2(baseline-Vector2(width*.5,17*pixels),Vector2(width,(116 if player else 56)*pixels))
+		if player:placed[0]=rect
+		else:pending.append({"actor":actor,"rect":rect})
+	pending.sort_custom(func(a,b):
+		var a_id=int(a.actor.id)
+		var b_id=int(b.actor.id)
+		return (0 if a_id==sim.target else a_id+100) < (0 if b_id==sim.target else b_id+100)
+	)
+	var occupied: Array[Rect2]=[]
+	if placed.has(0):occupied.append(placed[0])
+	var view_size=get_viewport_rect().size
+	for entry: Dictionary in pending:
+		var base: Rect2=entry.rect
+		var dx=base.size.x+14*pixels
+		var dy=base.size.y+12*pixels
+		var offsets: Array[Vector2]=[
+			Vector2.ZERO,Vector2(-dx,0),Vector2(dx,0),
+			Vector2(-dx*.55,dy),Vector2(dx*.55,dy),Vector2(0,dy),
+			Vector2(-dx,dy),Vector2(dx,dy),Vector2(0,dy*2.0),
+			Vector2(-dx*1.5,dy),Vector2(dx*1.5,dy)]
+		var best=base
+		var score=INF
+		for offset: Vector2 in offsets:
+			var candidate=Rect2(base.position+offset,base.size)
+			var penalty=offset.length()*.025
+			for other: Rect2 in occupied:
+				if candidate.intersects(other.grow(6*pixels)):
+					var overlap=candidate.intersection(other.grow(6*pixels))
+					penalty+=10000.0+overlap.size.x*overlap.size.y
+			if candidate.position.x<8 or candidate.end.x>view_size.x-8:penalty+=15000
+			if candidate.position.y<68 or candidate.end.y>view_size.y-20:penalty+=15000
+			if penalty<score:score=penalty;best=candidate
+			if score<1.0:break
+		placed[int(entry.actor.id)]=best
+		occupied.append(best)
 	return placed
 
 func _draw_nameplates(fleet: Array[Dictionary]) -> void:
@@ -574,9 +632,6 @@ func _draw_nameplates(fleet: Array[Dictionary]) -> void:
 	for actor: Dictionary in ordered:
 		if not plate_rects.has(int(actor.id)):continue
 		var rect: Rect2=plate_rects[int(actor.id)]
-		# Keep the captain readable when hulls overlap. Other captions yield rather
-		# than jumping to another part of the sea; target details stay in the HUD.
-		if int(actor.id)!=0 and plate_rects.has(0) and rect.intersects(plate_rects[0]):continue
 		_nameplate(actor,inverse*(rect.position+Vector2(rect.size.x*.5,17*pixels)))
 
 ## Readable, anchored name/HP/shield block; ten deck slots follow directly below.
@@ -595,23 +650,25 @@ func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
 	var text_width=_plate_text_width(title,title_size)
 	draw_set_transform(anchor,0,Vector2.ONE*_plate_scale())
 	_label(Vector2(0,0),title,title_size,color,2)
-	if not tower:
-		var tier=clampi(floori((sim.level-1)/4.0)+1,1,5) if player else (4 if monster else (3 if elite else 1))
-		# Emblem width and antialiased outlines are outside the rendered name.
-		_rank_emblem(Vector2(-text_width*.5-23,-6),tier,Color("d5b77a") if player or elite else Color("8fa6b2"))
+	if _plate_has_rank(actor):
+		var tier=clampi(floori((sim.level-1)/4.0)+1,1,5) if player else clampi(int(actor.get("pirate_rank",1)),1,5)
+		# Only real players receive a pirate rank; the emblem clears the full title.
+		_rank_emblem(Vector2(-text_width*.5-23,-6),tier,Color("d5b77a"))
 	var width=132.0 if player else (96.0 if int(actor.id)==sim.target else 84.0)
 	var hull_color=Color("d97660") if hostile else Color("61b967")
 	var identity=_plate_identity(actor)
 	if not identity.is_empty():_label(Vector2(0,PLATE_ID_BASELINE),identity,8,Color(.72,.86,.88,.49),1)
+	var hit_age=sim.clock-float(actor.get("last_hit",-100.0))
+	var hit_flash=clampf(1.0-hit_age/.42,0.0,1.0)
 	if player:
 		# Only the HUD displays numeric HP. The ship gets clean gauges.
-		_status_bar(Rect2(-width*.5,PLATE_HP_Y,width,7),float(actor.hp)/maxf(1,float(actor.max_hp)),Color("49df24"))
+		_status_bar(Rect2(-width*.5,PLATE_HP_Y,width,7),float(actor.hp)/maxf(1,float(actor.max_hp)),Color("49df24"),hit_flash)
 	else:_plate_bar(Rect2(-width*.5,12,width,5),float(actor.hp)/maxf(1,float(actor.max_hp)),hull_color)
 	var shield=float(actor.get("max_shield",0))
 	if shield>0:
-		if player:_status_bar(Rect2(-width*.5,PLATE_SHIELD_Y,width,5),float(actor.get("shield",0))/shield,Color("409fdf"))
+		if player:_status_bar(Rect2(-width*.5,PLATE_SHIELD_Y,width,5),float(actor.get("shield",0))/shield,Color("409fdf"),hit_flash)
 		else:_plate_bar(Rect2(-width*.5,22,width,3),float(actor.get("shield",0))/shield,Color("4d95be"))
-	if player:SEA_MARKS.deck_badge(self,Vector2(0,PLATE_DECK_Y),6.0,sim)
+	if player:SEA_MARKS.deck_badge(self,Vector2(0,PLATE_DECK_Y),6.0,sim,elapsed)
 	if float(actor.get("slow",0))>0:draw_circle(Vector2(width*.5+6,14),2.5,Color("9fdbf4"))
 	if player and sim.staff.hidden():_label(Vector2(0,-20),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color(),2)
 	draw_set_transform(Vector2.ZERO)
@@ -647,13 +704,14 @@ func _plate_bar(rect: Rect2,ratio: float,color: Color,text: String="",fontsize: 
 	if not text.is_empty():_label(Vector2(rect.get_center().x,rect.get_center().y+fontsize*.36),text,fontsize,Color.WHITE,2)
 
 ## Straight combat gauges match the rectangular deck fittings below them.
-func _status_bar(rect: Rect2,ratio: float,color: Color) -> void:
-	draw_rect(rect.grow(1),Color("030b12"))
+func _status_bar(rect: Rect2,ratio: float,color: Color,flash: float=0.0) -> void:
+	draw_rect(rect.grow(1.0+flash*.7),Color("030b12").lerp(color,flash*.3))
 	draw_rect(rect,Color("0a1620"))
 	var fill=Rect2(rect.position,Vector2(rect.size.x*clampf(ratio,0,1),rect.size.y))
 	if fill.size.x<=0:return
-	draw_rect(fill,color)
-	draw_line(fill.position+Vector2(0,1),Vector2(fill.end.x,fill.position.y+1),color.lightened(.3),1,true)
+	draw_rect(fill,color.lightened(.20*flash))
+	draw_line(fill.position+Vector2(0,1),Vector2(fill.end.x,fill.position.y+1),color.lightened(.3+.3*flash),1,true)
+	if flash>0:draw_rect(rect.grow(2),Color(color,.19*flash),false,1.4,true)
 
 func _medallion(center: Vector2,tier: int) -> void:
 	draw_circle(center+Vector2(0,1.5),14,Color(0,0,0,.6))

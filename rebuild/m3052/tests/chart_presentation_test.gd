@@ -53,11 +53,20 @@ func run() -> void:
 					stable=stable and game._nameplate_layout(close)[0]==own
 				for i in npc_positions.size():close[i+1].pos=npc_positions[i]
 				check(stable,"captain block stays anchored while other hulls cross it"+suffix)
-				var center: Vector2=game.get_canvas_transform()*sim.player.pos
 				var anchor=own.position+Vector2(own.size.x*.5,17*game._plate_pixels())
-				check(anchor.is_equal_approx(center+Vector2(0,game.CAPTAIN_PLATE_OFFSET*game._plate_pixels())),"name, identity, health and decks share a fixed waterline anchor"+suffix)
+				check(anchor.is_equal_approx(game._plate_screen_anchor(sim.player)),"name, identity, health and decks share measured hull anchor"+suffix)
+				check(anchor.y>=game._actor_screen_bounds(sim.player).end.y+game.CAPTAIN_HULL_CLEARANCE*game._plate_pixels()-.1,"captain caption clears visible hull"+suffix)
+				check(not placed[0].intersects(placed[sim.target]),"selected NPC text resolves captain collision"+suffix)
+				check(not game._plate_has_rank(close[1]) and game._plate_has_rank(sim.player),"pirate rank is exclusive to players"+suffix)
 			check(game.ammo_selector.visible and game.supply_buttons.values().all(func(item):return item.visible),"single ammunition selector and supplies are visible at %s / profile %d" % [dimensions,profile])
 	check(sim.export_save()==before,"caption layout and HUD refresh preserve the captain save")
+	# Facing changes cannot put any part of the captain caption into the sprite.
+	for heading in [Vector2.UP,Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT,Vector2(1,1).normalized(),Vector2(-1,-1).normalized()]:
+		sim.player.heading=heading
+		game.direction_cache[0]=VISUALS.heading_eight(heading,-1)
+		var hull=game._actor_screen_bounds(sim.player)
+		var anchor=game._plate_screen_anchor(sim.player)
+		check(anchor.y>=hull.end.y+game.CAPTAIN_HULL_CLEARANCE*game._plate_pixels()-.1,"all headings leave hull-to-caption air gap")
 	for i in 4:
 		game._open_modal("Munition");game.ammo_rows[i+3].pressed.emit()
 		check(sim.ammo_mode==i+3,"special ammunition retains its real selection action %d" % i)

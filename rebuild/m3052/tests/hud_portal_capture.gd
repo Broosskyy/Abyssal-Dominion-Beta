@@ -52,6 +52,8 @@ func _run() -> void:
 		await _shot(game,output,"reference-close-%dx%d" % [dimensions.x,dimensions.y])
 		if not game.plate_rects.has(0) or not game.plate_rects.has(int(npc.id)):
 			push_error("Close encounter lost a priority caption");quit(1);return
+		if game.plate_rects[0].intersects(game.plate_rects[int(npc.id)]):
+			push_error("Close encounter did not separate visible captain and NPC captions");quit(1);return
 		var anchored: Rect2=game.plate_rects[0]
 		var npc_before: Vector2=npc.pos
 		npc.pos=game.sim.player.pos+Vector2(40,0)
