@@ -2,6 +2,7 @@ extends SceneTree
 func _initialize() -> void:call_deferred("_run")
 func _shot(game: Node,output: String,name: String) -> void:
 	game._layout();game._refresh_ui();game.queue_redraw()
+	game.plate_overlay.queue_redraw()
 	game.ocean.set_shader_parameter("camera_world",game.camera.position)
 	game.ocean.set_shader_parameter("map_zoom",game.camera.zoom.x)
 	game.ocean.set_shader_parameter("viewport_size",game.get_viewport_rect().size)

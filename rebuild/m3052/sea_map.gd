@@ -12,6 +12,7 @@ const SKIN = preload("res://ui_skin.gd")
 const TOUCH_SCROLL = preload("res://touch_scroll.gd")
 const ORNATE = preload("res://ornate_frame.gd")
 const SEA_MARKS = preload("res://sea_marks.gd")
+const PLATE_OVERLAY = preload("res://ship_plate_overlay.gd")
 const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
@@ -150,6 +151,8 @@ var camera_pad: Control
 var target_cycle: Button
 var camera_pad_visible := true
 var plate_rects: Dictionary = {}
+var plate_overlay: Control
+var plate_fleet: Array[Dictionary] = []
 ## Keep the maximum artwork extent stable across all rendered headings.
 var plate_hull_drop_cache: Dictionary = {}
 var status_age := 0.0
@@ -625,18 +628,13 @@ func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 		placed[int(actor.id)]=Rect2(anchor-Vector2(width*.5,17*pixels),Vector2(width,(116 if player else 56)*pixels))
 	return placed
 
+## Compute world-to-viewport anchors, but paint the entire caption at native
+## screen resolution in a CanvasLayer. Text, bars and deck fittings must NEVER
+## inherit the camera's interpolated fractional zoom or HUD double scaling.
 func _draw_nameplates(fleet: Array[Dictionary]) -> void:
 	plate_rects=_nameplate_layout(fleet)
-	var inverse=get_canvas_transform().affine_inverse()
-	var pixels=_plate_pixels()
-	var ordered=fleet.duplicate()
-	ordered.sort_custom(func(a,b):return (2 if int(a.id)==0 else (1 if int(a.id)==sim.target else 0))<(2 if int(b.id)==0 else (1 if int(b.id)==sim.target else 0)))
-	for actor: Dictionary in ordered:
-		var id=int(actor.id)
-		if not plate_rects.has(id):continue
-		var rect: Rect2=plate_rects[id]
-		var anchor=rect.position+Vector2(rect.size.x*.5,17*pixels)
-		_nameplate(actor,inverse*anchor)
+	plate_fleet=fleet.duplicate()
+	if plate_overlay!=null:plate_overlay.queue_redraw()
 
 ## Readable, anchored name/HP/shield block; ten deck slots follow directly below.
 func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
@@ -921,6 +919,12 @@ func _set_orb(button: Button,texture: Texture2D,amount: String="",active: bool=f
 func _build_ui() -> void:
 	var layer =CanvasLayer.new()
 	add_child(layer)
+	# Screen-space captain/NPC readouts, independent of all Camera2D zoom/pan.
+	plate_overlay=PLATE_OVERLAY.new()
+	plate_overlay.host=self
+	plate_overlay.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	plate_overlay.name="ShipPlateScreenSpace"
+	layer.add_child(plate_overlay)
 	ui=Control.new()
 	ui.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	ui.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -1051,6 +1055,11 @@ func _place(c: Control,x: float,y: float,w: float,h: float) -> void:
 func _layout() -> void:
 	if ui==null:return
 	var viewport_size=get_viewport_rect().size
+	# This overlay deliberately does not inherit the HUD's ui.scale or Camera2D.
+	if plate_overlay!=null:
+		plate_overlay.position=Vector2.ZERO
+		plate_overlay.scale=Vector2.ONE
+		plate_overlay.size=viewport_size
 	# Scale only the HUD. Ocean, camera, world input and simulation keep viewport coordinates.
 	var base=maxf(viewport_size.y/600.0,1.0)
 	var requested=base*[0.86,1.0,1.14][hud_size]

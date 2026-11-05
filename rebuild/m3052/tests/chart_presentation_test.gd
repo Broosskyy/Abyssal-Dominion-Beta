@@ -13,6 +13,8 @@ func run() -> void:
 	await process_frame
 	game.set_process(false);game.elapsed=2.0
 	var sim=game.sim
+	check(game.plate_overlay!=null and game.plate_overlay.get_parent()==game.ui.get_parent(),"ship readouts use an independent screen-space CanvasLayer")
+	check(game.plate_overlay.scale==Vector2.ONE,"ship readouts do not inherit scaled HUD")
 	sim.player.pos=Vector2(2400,1500);sim.player.path=[]
 	var close: Array[Dictionary]=[sim.player]
 	for i in 3:
@@ -30,6 +32,7 @@ func run() -> void:
 	check(game.PLATE_ID_BASELINE<game.PLATE_HP_Y and game.PLATE_HP_Y+7<game.PLATE_SHIELD_Y and game.PLATE_SHIELD_Y+5<game.PLATE_DECK_Y-6,"identity, hull, shield and deck components have distinct rows")
 	for dimensions in [Vector2i(1280,720),Vector2i(844,390),Vector2i(720,405),Vector2i(2340,1080)]:
 		root.size=dimensions;await process_frame
+		check(game.plate_overlay.size.is_equal_approx(Vector2(dimensions)),"ship label canvas follows viewport pixels, not camera coordinates")
 		for profile in 3:
 			game.hud_size=profile;game._layout();game._refresh_ui()
 			for zoom in [.55,.96,1.4]:
