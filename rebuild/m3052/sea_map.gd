@@ -527,7 +527,13 @@ func _draw_actor(actor: Dictionary) -> void:
 			var foam=Color(0.62,0.86,0.87,(1.0-float(j)/4.0)*0.13)
 			draw_line(tail+side*spread,tail-heading*9+side*(spread+1.5),foam,1.1,true)
 			draw_line(tail-side*spread,tail-heading*9-side*(spread+1.5),foam,1.1,true)
-	_ellipse(point+Vector2(0,4),Vector2(length*0.34,length*0.09),Color(0.0,0.02,0.04,0.34))
+	# Mesh ships are lit in their own SubViewport. Do not add the previous
+	# oversized opaque 2D oval beneath their hulls.
+	var mesh_npc=not is_player and mesh_layer!=null and mesh_layer.can_render_actor(actor)
+	if mesh_npc:
+		_ellipse(point+Vector2(0,3),Vector2(length*0.25,length*0.055),Color(0.0,0.02,0.04,0.10))
+	else:
+		_ellipse(point+Vector2(0,4),Vector2(length*0.34,length*0.09),Color(0.0,0.02,0.04,0.34))
 	if is_player and sim.has_blessing():
 		var blessing_pulse=.5+.5*sin(elapsed*3.2)
 		_ellipse(point+Vector2(0,2),Vector2(length*0.62,length*0.24),Color(0.62,0.38,1.0,.08+blessing_pulse*.06))
