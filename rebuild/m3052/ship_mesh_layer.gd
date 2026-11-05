@@ -98,10 +98,8 @@ func resize_view(screen: Vector2) -> void:
 
 func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	var packed: PackedScene=model_scenes[key]
-	var model=packed.instantiate()
-	if not model is Node3D:
-		model.queue_free()
-		return null
+	var model: Node3D=packed.instantiate() as Node3D
+	if model==null:return null
 	var owner=Node3D.new()
 	owner.name="Ship3D_%s"%str(actor.id)
 	world_root.add_child(owner)
@@ -140,7 +138,8 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		# Project ground-plane centers onto the exact 2D chart positions.
 		# Only the mesh gets depth / perspective; taps and combat stay 2D.
 		node.position=Vector3(point.x,0,center.y+(point.y-center.y)/foreshortening)
-		node.rotation.y=-Vector2(actor.heading).angle()-PI*.5
+		var heading: Vector2=actor.heading
+		node.rotation.y=-heading.angle()-PI*.5
 		node.visible=true
 		kept[id]=true
 	for id: Variant in model_instances.keys():
