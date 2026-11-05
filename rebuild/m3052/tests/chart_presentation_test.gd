@@ -33,20 +33,22 @@ func run() -> void:
 				var suffix=" at %s / profile %d / zoom %s" % [dimensions,profile,zoom]
 				check(placed.has(0),"captain caption remains visible in a close encounter"+suffix)
 				check(placed.has(sim.target),"selected target caption remains visible in a close encounter"+suffix)
-				var clear=true
-				var contained=true
-				var thin=true
-				for id in placed:
-					var rect: Rect2=placed[id]
-					contained=contained and Rect2(Vector2.ZERO,Vector2(dimensions)).encloses(rect)
-					thin=thin and rect.size.y<=40.0
-					for other in placed:
-						if other!=id:clear=clear and not rect.intersects(placed[other])
-					for actor: Dictionary in close:clear=clear and not rect.intersects(game._actor_screen_bounds(actor))
-					for control: Control in [game.chrome,game.chart_mini,game.target_panel,game.quest_panel,game.attack]:
-						if control.visible:clear=clear and not rect.intersects(control.get_global_rect())
-				check(clear,"captions avoid each other, live hulls and edge HUD"+suffix)
-				check(contained and thin,"captions stay compact and inside the screen"+suffix)
+				var stable=true
+				var own: Rect2=placed[0]
+				var npc_positions: Array=[]
+				for actor: Dictionary in close:
+					if int(actor.id)!=0:npc_positions.append(actor.pos)
+				# Other hulls cross the captain in both directions; its full block
+				# must not move even one pixel, regardless of heading or target.
+				for shift in [-80.0,-20.0,0.0,20.0,80.0]:
+					for actor: Dictionary in close:
+						if int(actor.id)!=0:actor.pos=sim.player.pos+Vector2(shift,shift*.3)
+					stable=stable and game._nameplate_layout(close)[0]==own
+				for i in npc_positions.size():close[i+1].pos=npc_positions[i]
+				check(stable,"captain block stays anchored while other hulls cross it"+suffix)
+				var center: Vector2=game.get_canvas_transform()*sim.player.pos
+				var anchor=own.position+Vector2(own.size.x*.5,17*game._plate_pixels())
+				check(anchor.is_equal_approx(center+Vector2(0,36*game._plate_pixels())),"name, health and decks share a fixed waterline anchor"+suffix)
 			var specials_clear=true
 			for i in game.special_buttons.size():
 				var button: Button=game.special_buttons[i]

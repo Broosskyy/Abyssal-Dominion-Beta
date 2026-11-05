@@ -183,10 +183,10 @@ func _initialize() -> void:
 	var essence: int=sim.essence
 	check(not sim.grant_deck("armor",0) and sim.essence==essence+CONTENT.DUPLICATE_DECK_ESSENCE and sim.decks.size()==1,"duplicate deck converts into essence")
 	sim.grant_deck("armor",1)
-	check(sim.deck_slots[1]==-1,"a second deck of the same type is stored, not mounted")
+	check(sim.deck_slots.size()==10 and sim.deck_slots[1]==1,"separate physical decks can occupy the ten slots")
 	check(not sim.equip_deck(1,1),"decks are rebuilt only in the harbor")
 	sim.player.pos=sim.harbor;sim.dock()
-	check(not sim.equip_deck(1,1),"the same deck type cannot occupy both slots")
+	check(sim.equip_deck(1,1),"different copies of a deck role can be mounted together")
 	check(sim.equip_deck(1,0) and int(sim.player.max_hp)==roundi(sim.PLAYER_HP*1.15),"higher tier deck replaces the mounted one")
 	sim.player.gold=1000
 	check(sim.buy_deck("cannon") and sim.deck_slots[1]==2 and sim.cannon_slots()==14,"harbor sells a tier I cannon deck that adds capacity")
@@ -335,7 +335,7 @@ func _initialize() -> void:
 	sim.player.gold=900;sim.found_guild("Tiefseewacht","TSW");sim.fortress_hold=100;sim.upgrades.war=5;sim.player.shield=321
 	saved=JSON.parse_string(JSON.stringify(sim.export_save()))
 	restored=SIM.new()
-	check(int(saved.schema)==3 and restored.restore_save(saved),"schema 3 save is accepted")
+	check(int(saved.schema)==4 and restored.restore_save(saved),"schema 4 save is accepted")
 	check(restored.essence==17 and restored.fragments==4 and restored.scrolls==[1,0,2] and restored.kessel_meter==33 and restored.free_flask_day=="2026-11-04","essence, fragments, scrolls and cauldron survive reload")
 	check(int(restored.supplies.powder)==7 and int(restored.player.cannons)==16 and restored.owns_deck("hunter",2) and restored.deck_slots[0]==0,"supplies, cannons and decks survive reload")
 	check(restored.has_blessing() and float(restored.buffs.tide_deck)>0 and restored.guild.tag=="TSW" and restored.guild_island_held(),"timed buffs and guild survive reload")

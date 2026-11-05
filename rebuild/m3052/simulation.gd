@@ -53,7 +53,7 @@ var supplies := {"powder":10, "plates":10, "repair_kit":2, "shield_charge":2}
 var powder_on := false
 var plates_on := false
 var cooldowns := {"repair_kit":0.0, "shield_charge":0.0}
-var buffs := {"blessing":0.0, "tide_deck":0.0}
+var buffs := {"blessing":0.0, "tide_deck":0.0, "storm_deck":0.0, "salvage_deck":0.0}
 var essence := 3
 var fragments := 0
 var scrolls := [0, 0, 0]
@@ -61,7 +61,7 @@ var kessel_meter := 0
 var kessel_throws := 0
 var free_flask_day := ""
 var decks: Array = []
-var deck_slots := [-1, -1]
+var deck_slots := [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
 var bonus: Dictionary = {}
 var bonus_runs := 0
 var guild: Dictionary = {}
@@ -368,23 +368,21 @@ func owns_deck(type: String, tier: int) -> bool:
 		if str(deck.type) == type and int(deck.tier) == tier: return true
 	return false
 
-func grant_deck(type: String, tier: int) -> bool:
+func grant_deck(type: String, tier: int, purchased: bool = false) -> bool:
 	if not CONTENT.DECKS.has(type): return false
 	tier = clampi(tier, 0, CONTENT.DECK_TIERS.size() - 1)
 	var title := "%s %s" % [CONTENT.DECKS[type].name, CONTENT.DECK_TIERS[tier]]
-	if owns_deck(type, tier):
+	if not purchased and owns_deck(type, tier):
 		essence += CONTENT.DUPLICATE_DECK_ESSENCE
 		message = "%s doppelt · in %d Gezeitenessenz umgewandelt" % [title, CONTENT.DUPLICATE_DECK_ESSENCE]
 		return false
+	if decks.size()>=CONTENT.DECK_INVENTORY_MAX:
+		message="Decklager voll";return false
 	decks.append({"type":type, "tier":tier})
-	var mounted := false
-	for slot in deck_slots:
-		if int(slot) >= 0 and str(decks[int(slot)].type) == type: mounted = true
-	if not mounted:
-		for i in deck_slots.size():
-			if int(deck_slots[i]) < 0:
-				deck_slots[i] = decks.size() - 1
-				break
+	for i in deck_slots.size():
+		if int(deck_slots[i]) < 0:
+			deck_slots[i] = decks.size() - 1
+			break
 	apply_upgrades()
 	message = "Neues Deck: %s" % title
 	return true
@@ -394,10 +392,9 @@ func equip_deck(index: int, slot: int) -> bool:
 	if not docked:
 		message = "Decks werden im Hafen umgebaut"
 		return false
+	# A physical deck may move between slots, but never occupy two slots at once.
 	for other in deck_slots.size():
-		if other != slot and int(deck_slots[other]) >= 0 and str(decks[int(deck_slots[other])].type) == str(decks[index].type):
-			message = "Dieser Decktyp ist bereits montiert"
-			return false
+		if other!=slot and int(deck_slots[other])==index:deck_slots[other]=-1
 	deck_slots[slot] = index
 	apply_upgrades()
 	message = "%s montiert" % CONTENT.DECKS[str(decks[index].type)].name
@@ -411,17 +408,47 @@ func unequip_deck(slot: int) -> bool:
 	return true
 
 func buy_deck(type: String) -> bool:
-	if not docked or not CONTENT.DECKS.has(type) or owns_deck(type, 0): return false
-	var price := int(CONTENT.DECKS[type].price)
-	if int(player.gold) < price: return false
-	player.gold -= price
-	return grant_deck(type, 0)
+	if not docked or not CONTENT.DECKS.has(type) or decks.size()>=CONTENT.DECK_INVENTORY_MAX:return false
+	var price=int(CONTENT.DECKS[type].price)
+	if int(player.gold)<price:return false
+	if not grant_deck(type,0,true):return false
+	player.gold-=price
+	return true
+
+func upgrade_deck(index: int) -> bool:
+	if not docked or index<0 or index>=decks.size():return false
+	var tier=int(decks[index].tier)
+	if tier>=CONTENT.DECK_TIERS.size()-1:return false
+	if level<int(CONTENT.DECK_UPGRADE_LEVEL[tier]):
+		message="%sdecks ab Kapitänsstufe %d" % [CONTENT.DECK_TIERS[tier+1],CONTENT.DECK_UPGRADE_LEVEL[tier]];return false
+	var gold=int(CONTENT.DECK_UPGRADE_GOLD[tier])
+	var cost=int(CONTENT.DECK_UPGRADE_ESSENCE[tier])
+	if int(player.gold)<gold or essence<cost:return false
+	player.gold-=gold;essence-=cost
+	decks[index].tier=tier+1
+	apply_upgrades()
+	message="Deck zu %s verbessert" % CONTENT.DECK_TIERS[tier+1]
+	return true
+
+func add_special_deck(key: String,seconds: float) -> bool:
+	if not CONTENT.SPECIAL_DECKS.has(key) or seconds<=0:return false
+	buffs[key]=minf(CONTENT.TIDE_DECK_CAP,float(buffs[key])+seconds)
+	apply_upgrades()
+	message="%s aktiv" % CONTENT.SPECIAL_DECKS[key].name
+	return true
+
+func buy_special_deck(key: String) -> bool:
+	if not docked or not CONTENT.SPECIAL_DECKS.has(key):return false
+	var config: Dictionary=CONTENT.SPECIAL_DECKS[key]
+	if level<int(config.level) or int(player.gold)<int(config.price):return false
+	player.gold-=int(config.price)
+	return add_special_deck(key,float(config.seconds))
 
 func reload_time() -> float:
 	return BASE_RELOAD * (1.0 - 0.04 * float(upgrades.crew))
 
 func loot_gold(amount: int) -> int:
-	var factor := 1.0 + 0.08 * float(upgrades.crew) + deck_value("logistics") / 100.0 + (0.1 if guild_island_held() else 0.0)
+	var factor := 1.0 + 0.08 * float(upgrades.crew) + deck_value("logistics") / 100.0 + (0.1 if guild_island_held() else 0.0) + (0.15 if float(buffs.salvage_deck)>0 else 0.0)
 	return roundi(float(amount) * factor)
 
 # --- Simulation step ---------------------------------------------------------------
@@ -436,6 +463,11 @@ func _tick_timers(delta: float) -> void:
 	if float(buffs.tide_deck) > 0:
 		buffs.tide_deck = maxf(0.0, float(buffs.tide_deck) - delta)
 		if float(buffs.tide_deck) <= 0: message = "Gezeitendeck abgelaufen · Kanonenplätze wieder %d" % cannon_slots()
+	for key: String in CONTENT.SPECIAL_DECKS:
+		if float(buffs[key])<=0:continue
+		buffs[key]=maxf(0.0,float(buffs[key])-delta)
+		if float(buffs[key])<=0:
+			apply_upgrades();message="%s abgelaufen" % CONTENT.SPECIAL_DECKS[key].name
 	if fortress_hold > 0:
 		fortress_hold = maxf(0.0, fortress_hold - delta)
 		if fortress_hold <= 0 and not guild.is_empty(): message = "Korsaren erobern die Festung zurück"
@@ -1115,7 +1147,7 @@ func apply_upgrades() -> void:
 	player.max_shield = roundi(float(PLAYER_SHIELD + int(upgrades.hull) * 120) * armor)
 	player.hp = minf(float(player.hp),float(player.max_hp))
 	player.shield = minf(float(player.shield),float(player.max_shield))
-	player.speed = PLAYER_SPEED * (1.0 + 0.12 * float(upgrades.sails) + deck_value("navigation") / 100.0) * (1.1 if blessed else 1.0)
+	player.speed = PLAYER_SPEED * (1.0 + 0.12 * float(upgrades.sails) + deck_value("navigation") / 100.0) * (1.1 if blessed else 1.0) * (1.12 if float(buffs.storm_deck)>0 else 1.0)
 
 ## Captain level paces the castles: levels 1-3 are always open, then one more every three levels.
 func castle_cap() -> int:
@@ -1280,7 +1312,7 @@ func export_save() -> Dictionary:
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
-	return {"schema":3,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	return {"schema":4,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
@@ -1292,7 +1324,7 @@ func export_save() -> Dictionary:
 		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
-	if not int(data.get("schema",0)) in [1,2,3]: return false
+	if not int(data.get("schema",0)) in [1,2,3,4]: return false
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
 	player.skin=clampi(int(data.get("skin",26)),0,26)
 	kills=maxi(0,int(data.get("kills",0)))
@@ -1315,6 +1347,7 @@ func restore_save(data: Dictionary) -> bool:
 	if saved_buffs is Dictionary:
 		buffs.blessing=clampf(float(saved_buffs.get("blessing",0.0)),0.0,CONTENT.BLESSING_SECONDS)
 		buffs.tide_deck=clampf(float(saved_buffs.get("tide_deck",0.0)),0.0,CONTENT.TIDE_DECK_CAP)
+		for key: String in CONTENT.SPECIAL_DECKS:buffs[key]=clampf(float(saved_buffs.get(key,0.0)),0.0,CONTENT.TIDE_DECK_CAP)
 	essence=clampi(int(data.get("essence",essence)),0,99999)
 	fragments=clampi(int(data.get("fragments",0)),0,99999)
 	var saved_scrolls: Variant=data.get("scrolls",[])
@@ -1329,10 +1362,10 @@ func restore_save(data: Dictionary) -> bool:
 		for entry: Variant in saved_decks:
 			if entry is Dictionary and CONTENT.DECKS.has(str(entry.get("type",""))):
 				decks.append({"type":str(entry.type),"tier":clampi(int(entry.get("tier",0)),0,CONTENT.DECK_TIERS.size()-1)})
-	deck_slots=[-1,-1]
+	deck_slots=[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
 	var saved_slots: Variant=data.get("deck_slots",[])
-	if saved_slots is Array and saved_slots.size()==2:
-		for i in 2:
+	if saved_slots is Array:
+		for i in mini(saved_slots.size(),CONTENT.DECK_SLOT_COUNT):
 			var index:=int(saved_slots[i])
 			if index>=0 and index<decks.size() and not index in deck_slots:deck_slots[i]=index
 	bonus={}

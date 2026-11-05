@@ -47,9 +47,19 @@ const SUPPLIES := {
 	"repair_kit":{"name":"Notreparatur", "short":"NOTREP", "icon":"supply_repair", "toggle":false, "effect":"+35 % Rumpf sofort · 45 s Abklingzeit", "price":90, "pack":1, "cooldown":45.0},
 	"shield_charge":{"name":"Schildladung", "short":"SCHILD", "icon":"supply_shield", "toggle":false, "effect":"+50 % Schild sofort · 40 s Abklingzeit", "price":90, "pack":1, "cooldown":40.0}
 }
-## Decks change cannon capacity and ship roles. Only one deck of each type can be mounted.
+## Ten physical decks in two rows of five; role and material are independent.
+const DECK_SLOT_COUNT := 10
+const DECK_INVENTORY_MAX := 30
 const DECK_KEYS := ["cannon","armor","hunter","navigation","logistics"]
-const DECK_TIERS := ["I · Holz","II · Beschlagen","III · Krieg"]
+const DECK_TIERS := ["Gold","Elite","Kristall"]
+const DECK_TIER_COLORS := [Color("ffb640"),Color("4fa9ff"),Color("bd78f2")]
+const DECK_UPGRADE_GOLD := [900,1800]
+const DECK_UPGRADE_ESSENCE := [0,6]
+const DECK_UPGRADE_LEVEL := [3,8]
+const SPECIAL_DECKS := {
+	"storm_deck":{"name":"Sturmdeck","effect":"+12 % Fahrt","price":900,"seconds":1800.0,"level":3,"icon":"helm_wheel","color":Color("80bdff")},
+	"salvage_deck":{"name":"Bergungsdeck","effect":"+15 % Beutegold","price":900,"seconds":1800.0,"level":3,"icon":"reward_chest","color":Color("edc36a")}
+}
 const DECKS := {
 	"cannon":{"name":"Kanonendeck", "effect":"+%d Kanonenplätze", "values":[4,6,8], "price":600},
 	"armor":{"name":"Panzerdeck", "effect":"+%d %% Rumpf und Schild", "values":[10,15,20], "price":600},

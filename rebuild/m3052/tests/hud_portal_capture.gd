@@ -52,8 +52,13 @@ func _run() -> void:
 		await _shot(game,output,"reference-close-%dx%d" % [dimensions.x,dimensions.y])
 		if not game.plate_rects.has(0) or not game.plate_rects.has(int(npc.id)):
 			push_error("Close encounter lost a priority caption");quit(1);return
-		if game.plate_rects[0].intersects(game.plate_rects[int(npc.id)]):
-			push_error("Close encounter captions overlap");quit(1);return
+		var anchored: Rect2=game.plate_rects[0]
+		var npc_before: Vector2=npc.pos
+		npc.pos=game.sim.player.pos+Vector2(40,0)
+		var pair: Array[Dictionary]=[game.sim.player,npc]
+		if game._nameplate_layout(pair)[0]!=anchored:
+			push_error("Close encounter moved the captain block");quit(1);return
+		npc.pos=npc_before
 	npc.pos=game.sim.player.pos+Vector2(260,70);npc.home=npc.pos
 	root.size=Vector2i(1560,720)
 	game._set_display(2,false);game.modal.hide();game.modal_backdrop.hide()
@@ -97,8 +102,25 @@ func _run() -> void:
 	if not queued or game.sim.map_id!=1:push_error("Portal capture did not complete its actual crossing");quit(1);return
 	var systems=await _systems(game,output)
 	if not systems.ok:push_error("Seafight systems capture failed: "+JSON.stringify(systems));quit(1);return
+	await _deck_reference(game,output)
 	print(JSON.stringify({"status":"CAPTURED","hud_sizes":4,"portal_touch_crossing":true,"systems":systems}))
 	quit()
+
+func _deck_reference(game: Node,output: String) -> void:
+	var sim=game.sim
+	sim.configure_map(0);sim.level=8;sim.player.pos=Vector2(2400,1600);sim.player.path=[]
+	sim.decks.clear();sim.deck_slots.fill(-1)
+	for i in 10:sim.grant_deck(game.CONTENT.DECK_KEYS[i%5],mini(2,floori(i/4.0)),true)
+	sim.add_tide_deck(1200);sim.add_special_deck("storm_deck",1200);sim.add_special_deck("salvage_deck",1200);sim.activate_blessing(600)
+	sim.player.hp=sim.player.max_hp;sim.player.shield=sim.player.max_shield
+	game.camera.position=sim.player.pos;game.camera.zoom=Vector2.ONE*.96
+	sim.npcs.clear();sim.target=-1;sim.message=""
+	for dimensions in [Vector2i(1536,709),Vector2i(844,390)]:
+		root.size=dimensions;game.camera.position=sim.player.pos;game.camera.force_update_scroll()
+		await _shot(game,output,"decks-10-materials-%dx%d" % [dimensions.x,dimensions.y])
+	game._open_modal("Decks")
+	await _shot(game,output,"deck-yard-844x390")
+	game.modal.hide();game.modal_backdrop.hide()
 func _systems(game: Node,output: String) -> Dictionary:
 	var sim=game.sim
 	root.size=Vector2i(1280,720)

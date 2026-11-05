@@ -34,18 +34,58 @@ static func gem(canvas: CanvasItem,center: Vector2,r: float,color: Color,tier: i
 	elif tier>=0:
 		for i in tier+1:canvas.draw_circle(center+Vector2((float(i)-tier*.5)*r*.42,r+2.6),1.1,Color("f5d78d"))
 
-## Deck strip under a nameplate: chevrons left and right, one gem per slot.
+## Fixed physical slots: five columns, two rows. Colour means material, not role.
+static func deck_cells(center: Vector2,r: float) -> Array[Vector2]:
+	var cells: Array[Vector2]=[]
+	for slot in 10:cells.append(center+Vector2((slot%5-2)*r*2.2,(floori(slot/5.0)-.5)*r*2.35))
+	return cells
+
 static func gem_row(canvas: CanvasItem,center: Vector2,r: float,entries: Array,font: Font=null) -> void:
-	var gap=r*2.05
-	var half=(entries.size()-1)*gap*.5
+	var cells=deck_cells(center,r)
+	for slot in 10:
+		var entry: Dictionary=entries[slot] if slot<entries.size() else {}
+		gem(canvas,cells[slot],r,entry.get("color",Color.WHITE),-1,bool(entry.get("lit",false)),null)
 	for side in [-1.0,1.0]:
-		var tip=center+Vector2(side*(half+r*1.55),0)
-		var arm=PackedVector2Array([tip+Vector2(-side*r*.45,-r*.5),tip,tip+Vector2(-side*r*.45,r*.5)])
+		var tip=center+Vector2(side*r*6.2,0)
+		var arm=PackedVector2Array([tip+Vector2(-side*r,-r*1.35),tip,tip+Vector2(-side*r,r*1.35)])
 		canvas.draw_polyline(arm,Color(0,0,0,.6),3.0,true)
-		canvas.draw_polyline(arm,Color("e6c886"),1.5,true)
-	for i in entries.size():
-		var entry: Dictionary=entries[i]
-		gem(canvas,center+Vector2(-half+i*gap,0),r,entry.get("color",Color.WHITE),int(entry.get("tier",-1)),bool(entry.get("lit",false)),font,float(entry.get("glow",0.0)))
+		canvas.draw_polyline(arm,Color("c6a86d"),1.3,true)
+
+## Four distinct original symbols surround the normal decks. Unowned/inactive
+## special decks stay dim; only active timers light the icon and its outer arc.
+static func special_deck_icon(canvas: CanvasItem,center: Vector2,r: float,key: String,active: bool,ratio: float=0.0) -> void:
+	var colors={"tide":Color("5de0d4"),"storm":Color("80bdff"),"salvage":Color("edc36a"),"blessing":Color("bd78f2")}
+	var ink: Color=colors[key] if active else Color("556975",.5)
+	canvas.draw_circle(center,r,Color("06141d",.75))
+	canvas.draw_arc(center,r,0,TAU,24,Color("c6a86d",.7) if active else Color("53606a",.4),1.0,true)
+	if active:canvas.draw_arc(center,r+2,-PI*.5,-PI*.5+TAU*clampf(ratio,0,1),24,ink,1.3,true)
+	if key=="tide":
+		for row in 2:
+			var line=PackedVector2Array()
+			for i in 9:line.append(center+Vector2((i-4)*r*.18,sin(i*PI*.5)*r*.17+(row-.5)*r*.45))
+			canvas.draw_polyline(line,ink,1.5,true)
+	elif key=="storm":
+		var bolt=PackedVector2Array([center+Vector2(.25,-.72)*r,center+Vector2(-.4,.06)*r,center+Vector2(.08,.06)*r,center+Vector2(-.25,.72)*r,center+Vector2(.48,-.15)*r,center+Vector2(.05,-.15)*r])
+		canvas.draw_colored_polygon(bolt,ink)
+	elif key=="salvage":
+		canvas.draw_circle(center-Vector2(0,r*.5),r*.17,ink,false,1.3,true)
+		canvas.draw_line(center-Vector2(0,r*.32),center+Vector2(0,r*.5),ink,1.5,true)
+		canvas.draw_arc(center,r*.53,0,PI,16,ink,1.5,true)
+		canvas.draw_line(center+Vector2(-r*.35,-r*.03),center+Vector2(r*.35,-r*.03),ink,1.2,true)
+	else:gem(canvas,center,r*.72,ink,-1,active)
+
+static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim) -> void:
+	gem_row(canvas,center,r,deck_entries(sim))
+	var tide=float(sim.buffs.tide_deck)
+	if tide>0:
+		for side in [-1.0,1.0]:
+			var edge=PackedVector2Array([center+Vector2(side*r*5.2,-r*2.8),center+Vector2(side*r*6.9,-r*1.9),center+Vector2(side*r*7.2,0),center+Vector2(side*r*6.9,r*1.9),center+Vector2(side*r*5.2,r*2.8)])
+			canvas.draw_polyline(edge,Color("5de0d4",.8),1.4,true)
+	var x=r*8.2;var y=r*1.65;var icon=r*1.35
+	special_deck_icon(canvas,center+Vector2(-x,-y),icon,"tide",tide>0,tide/1800.0)
+	special_deck_icon(canvas,center+Vector2(x,-y),icon,"storm",float(sim.buffs.storm_deck)>0,float(sim.buffs.storm_deck)/1800.0)
+	special_deck_icon(canvas,center+Vector2(-x,y),icon,"salvage",float(sim.buffs.salvage_deck)>0,float(sim.buffs.salvage_deck)/1800.0)
+	special_deck_icon(canvas,center+Vector2(x,y),icon,"blessing",sim.has_blessing(),float(sim.buffs.blessing)/900.0)
 
 ## Kristallsegen beside the deck row: the crystal, a gold ring and a timer that runs down.
 static func blessing_crystal(canvas: CanvasItem,center: Vector2,r: float,texture: Texture2D,remaining: float,total: float) -> void:
@@ -92,12 +132,10 @@ static func check(canvas: CanvasItem,center: Vector2,s: float,color: Color) -> v
 
 static func deck_entries(sim) -> Array:
 	var entries: Array=[]
-	for slot in 2:
+	for slot in 10:
 		var index=int(sim.deck_slots[slot])
 		if index>=0 and index<sim.decks.size():
 			var deck: Dictionary=sim.decks[index]
-			entries.append({"color":DECK_COLORS.get(str(deck.type),Color.WHITE),"tier":int(deck.tier),"lit":true})
-		else:entries.append({"lit":false})
-	var tide=float(sim.buffs.tide_deck)>0
-	entries.append({"color":DECK_COLORS.tide,"tier":-1,"lit":tide,"glow":1.0 if tide else 0.0})
+			entries.append({"slot":slot,"color":sim.CONTENT.DECK_TIER_COLORS[int(deck.tier)],"tier":int(deck.tier),"lit":true})
+		else:entries.append({"slot":slot,"lit":false,"tier":-1})
 	return entries

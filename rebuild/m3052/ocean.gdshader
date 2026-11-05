@@ -20,7 +20,7 @@ void fragment(){
  vec3 surface=texture(sea_tile,world/640.+flow*.24).rgb;
  vec3 crossing=texture(sea_tile,turn*world/1130.-flow*.16).rgb;
  float detail=dot(mix(surface,crossing,.4),vec3(.2126,.7152,.0722));
- vec3 sea=mix(vec3(.012,.088,.142),vec3(.025,.175,.228),depth);
+ vec3 sea=mix(vec3(.025,.19,.32),vec3(.045,.31,.46),depth);
  sea+=(detail-.22)*vec3(.10,.22,.26);
  // Existing directional wave art is only a faint, small-scale shimmer, never a broad band.
  float ripple=texture(wave_noise,world/190.+flow).g;
