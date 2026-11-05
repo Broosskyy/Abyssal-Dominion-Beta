@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "description": "Preserve actual GLB ships; discard broken extreme UV-decimation spikes",
+  "models": [
+    {
+      "file": "crimson_tide_galley.glb",
+      "triangles_scanned": 265,
+      "spikes_removed": 234,
+      "bytes": 709636
+    },
+    {
+      "file": "emerald_voyager.glb",
+      "triangles_scanned": 295,
+      "spikes_removed": 248,
+      "bytes": 712464
+    },
+    {
+      "file": "merchant_brig_2912.glb",
+      "triangles_scanned": 365,
+      "spikes_removed": 310,
+      "bytes": 718592
+    },
+    {
+      "file": "merchant_brig_2921.glb",
+      "triangles_scanned": 285,
+      "spikes_removed": 246,
+      "bytes": 737932
+    },
+    {
+      "file": "merchant_brig_3002.glb",
+      "triangles_scanned": 328,
+      "spikes_removed": 291,
+      "bytes": 742764
+    },
+    {
+      "file": "midnight_mariner.glb",
+      "triangles_scanned": 352,
+      "spikes_removed": 301,
+      "bytes": 727132
+    },
+    {
+      "file": "old_harbor_trader.glb",
+      "triangles_scanned": 261,
+      "spikes_removed": 214,
+      "bytes": 732368
+    },
+    {
+      "file": "weathered_junk.glb",
+      "triangles_scanned": 332,
+      "spikes_removed": 295,
+      "bytes": 723348
+    },
+    {
+      "file": "weathered_voyager.glb",
+      "triangles_scanned": 280,
+      "spikes_removed": 231,
+      "bytes": 739928
+    }
+  ]
+}
