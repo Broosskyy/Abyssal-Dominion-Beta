@@ -209,3 +209,27 @@ The meshes come from user-provided GLB originals, decimated and texture-optimize
 The in-game graphics switch is now directly below the minimap (GRAFIK 2,5D / HYBRID / 3D), and the main menu also has three explicit selection buttons above the ordinary settings. Anzeige shows the active signed data revision and the count of imported real GLBs, so players can distinguish a stale install from a renderer problem. The mode switch no longer forcibly opens the settings panel when pressed on the chart.
 
 The captured M3076 data-72 screenshot proved that the original 9 imported GLBs were drawn but visibly broken into very long jagged triangles: the earlier 78% UV-aware quadric reduction collapsed distant seams. The model normalizer also used the bad spike-extents to scale ships down to tiny hulls. This pass uses a compact reproducible Python-stdlib GLB index filter during release import to degenerate only extreme, implausible long/thin triangles and preserve original PBR materials, texture maps and valid faces. The export test checks the cleaned 3D images; GitHub Actions also commits the repaired GLBs back to main after publishing a verified signed pack. Ship lengths are calibrated to the actual ~1.9-unit source hulls instead of 4–8-unit spike bounds. Same 2D physics, nameplates, NPC IDs, roles and saves are retained.
+
+
+## M3078 GLB orientation and intact-geometry replacement
+
+The nine source Meshy ships are already **Y-up** and have the long hull axis on X.
+Previous builds incorrectly applied an additional -90-degree X rotation, making
+masts and hulls appear tilted/flattened. The NPC 3D layer now preserves the
+original Y-up orientation, maps 2D headings to the hull axis, uses waterlines
+measured from the full source GLB bounds and draws subtler sea shadows.
+The mobile SubViewport resolution is raised to 90%.
+
+The previous aggressive UV mesh decimation / triangle index 'repair' pipeline
+was destructive. It is disabled in CI; the new read-only validator detects
+missing original geometry. The nine user-provided **29k-30k face source models**
+were repacked independently with no geometry or UV edits and mobile PBR textures,
+reducing the nine source GLBs from ~149 MB to ~34 MB total.
+
+**Delivery status:** Renderer/CI text changes are committed on main. The 34 MB
+binary replacement package is a separate conversation artifact, *not yet
+committed to the repository*. Until all nine intact GLBs replace the old
+`assets/npc/meshy/models/*.glb` files and a new signed data update is
+published and installed, visual geometry remains incomplete. The current 3D
+mode is a perspective NPC GLB overlay on the 2D chart; it is not yet a full
+3D island/ocean/player environment.
