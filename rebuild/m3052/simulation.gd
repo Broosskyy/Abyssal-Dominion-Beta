@@ -105,7 +105,7 @@ func _init() -> void:
 	# Only enable the nine-model roster when every one of its PNG sprites exists.
 	var meshy_ready=true
 	for spec: Dictionary in CONTENT.NPC_MESHY_ROSTER:
-		if not ResourceLoader.exists("res://assets/npc/meshy/"+str(spec.key)+".png"):
+		if not ResourceLoader.exists("res://assets/npc/meshy/models/"+str(spec.key)+".glb"):
 			meshy_ready=false
 			break
 	var legacy_names=["Roter Korsar","Jadebrigg","Kupfersegler","Küstenfregatte","Goldene Armada","Eisfregatte","Schattensegler","Admiralswache","Elite-Galeone","Knochenschiff","Brennender Holländer","Schwarzbart","Königsgaleone","Kriegsschiff","Schmuggler","Fliegender Holländer"]

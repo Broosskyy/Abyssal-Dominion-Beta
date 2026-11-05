@@ -13,6 +13,7 @@ const TOUCH_SCROLL = preload("res://touch_scroll.gd")
 const ORNATE = preload("res://ornate_frame.gd")
 const SEA_MARKS = preload("res://sea_marks.gd")
 const PLATE_OVERLAY = preload("res://ship_plate_overlay.gd")
+const MESH_SHIPS = preload("res://ship_mesh_layer.gd")
 const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
@@ -158,6 +159,8 @@ var target_cycle: Button
 var camera_pad_visible := true
 var plate_rects: Dictionary = {}
 var plate_overlay: Control
+var mesh_layer
+var render_mode := "hybrid"
 var plate_fleet: Array[Dictionary] = []
 ## Keep the maximum artwork extent stable across all rendered headings.
 var plate_hull_drop_cache: Dictionary = {}
@@ -538,6 +541,9 @@ func _draw_actor(actor: Dictionary) -> void:
 		var col = posmod(roundi((heading.angle()+PI*0.25)/TAU*4),4)
 		var row = int(elapsed*6)%CONTENT.MONSTER_ROWS
 		_draw_atlas(beast,point,210.0,col,row,CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS)
+	elif not is_player and mesh_layer!=null and mesh_layer.can_render_actor(actor):
+		# Actual GLB mesh is drawn in the matching-position 3D viewport.
+		pass
 	elif is_player and int(sim.player.skin)==26:
 		var col=VISUALS.heading_eight(heading,int(direction_cache.get(int(actor.id),-1)))
 		direction_cache[int(actor.id)]=col
@@ -696,6 +702,7 @@ func _sync_plate_overlay() -> void:
 		if int(npc.hp)>0 and view.has_point(_visual_actor_pos(npc)):fleet.append(npc)
 	plate_fleet=fleet
 	plate_rects=_nameplate_layout(fleet)
+	if mesh_layer!=null:mesh_layer.sync_fleet(fleet,camera,get_viewport_rect().size)
 	plate_overlay.queue_redraw()
 
 ## Kept as a simple explicit regression hook, not called from the map draw.
@@ -987,6 +994,14 @@ func _set_orb(button: Button,texture: Texture2D,amount: String="",active: bool=f
 func _build_ui() -> void:
 	var layer =CanvasLayer.new()
 	add_child(layer)
+	# Render real 3D GLB NPC ships into an alpha SubViewport, composited on the
+	# chart below names, deck badges and the existing touch HUD.
+	mesh_layer=MESH_SHIPS.new()
+	mesh_layer.name="Real3DNpcFleet"
+	mesh_layer.host=self
+	layer.add_child(mesh_layer)
+	mesh_layer.set_render_mode(render_mode)
+	render_mode=mesh_layer.mode
 	# Screen-space captain/NPC readouts, independent of all Camera2D zoom/pan.
 	plate_overlay=PLATE_OVERLAY.new()
 	plate_overlay.host=self
@@ -1124,6 +1139,7 @@ func _layout() -> void:
 	if ui==null:return
 	var viewport_size=get_viewport_rect().size
 	# This overlay deliberately does not inherit the HUD's ui.scale or Camera2D.
+	if mesh_layer!=null:mesh_layer.resize_view(viewport_size)
 	if plate_overlay!=null:
 		plate_overlay.position=Vector2.ZERO
 		plate_overlay.scale=Vector2.ONE
@@ -2325,6 +2341,12 @@ func _guide(mode: String) -> void:
 
 func _open_display() -> void:
 	_banner_card(hud_icons.gear,"DEINE SEEKARTE · DEINE OBERFLÄCHE","Wähle die Größe für Anzeigen, Karte und Kampfbuttons. Die Spielwelt behält ihre eigene Zoomstufe. Deine Auswahl bleibt auf diesem Gerät gespeichert.")
+	_section("GRAFIKANSICHT")
+	for option in [["classic","2,5D KLASSISCH · Sprite-Schiffe"],["hybrid","2,5D HYBRID · echte GLB-Schiffe"],["3d","3D SCHIFFE · geneigte 3D-Kamera"]]:
+		var key=str(option[0])
+		var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
+		choice.disabled=render_mode==key or (key!="classic" and (mesh_layer==null or not mesh_layer.has_complete_fleet()))
+	_note("Beide 3D-Varianten nutzen dieselben echten GLB-Modelle und die bestehende Seekarten-Simulation. Inseln und Wasser bleiben zunächst 2D; der klassische Modus ist der Performance-Fallback.")
 	_section("HUD-GRÖSSE")
 	for i in 3:
 		var index=i
@@ -2705,13 +2727,24 @@ func _load_display() -> void:
 	hud_size=clampi(int(data.get("hud_size",1)),0,2)
 	journal_visible=bool(data.get("journal_visible",true))
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
+	render_mode=str(data.get("render_mode","hybrid"))
+	if render_mode not in ["classic","hybrid","3d"]:render_mode="hybrid"
+
+func _set_render_mode(value: String) -> void:
+	render_mode=value if value in ["classic","hybrid","3d"] else "classic"
+	if mesh_layer!=null:
+		mesh_layer.set_render_mode(render_mode)
+		render_mode=mesh_layer.mode
+	_set_display(hud_size,journal_visible)
+	if camera!=null:_sync_plate_overlay()
+	queue_redraw()
 
 func _set_display(size_index: int,show_journal: bool) -> void:
 	hud_size=clampi(size_index,0,2)
 	journal_visible=show_journal
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible}))
+		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode}))
 		file.close()
 	_layout()
 	_open_modal("Anzeige")

@@ -195,3 +195,10 @@ Nine uploaded GLBs have been converted locally into four-angle transparent PNG a
 
 ### Atomic NPC art activation
 M3075 keeps the entire original 16-NPC gameplay table active until **all nine** sprite PNGs are present as Godot resources. This avoids silently switching enemy health/names while old artwork remains. Once imported, the 16 IDs/spawn coordinates automatically map to the nine authored Meshy roster entries. New files can be delivered with the separate 3 MB four-angle ZIP. The replacement does not touch player hulls, map portals, XP or loot save schema.
+
+
+## M3076 — Real GLB 2.5D / 3D NPC renderer
+
+All nine optimized Meshy .glb files in assets/npc/meshy/models/ are now imported as actual Godot PackedScenes and instanced in a separate transparent 3D SubViewport layered above the existing 2D sea and below the names/touch HUD. No sprites substitute for them. The options in Anzeige provide **2,5D klassisch** (original low-cost 2D sprites), **2,5D hybrid** (orthographic actual 3D GLB ships) and **3D Schiffe** (24-degree tilted GLB render). Mode choice is persisted in the local display configuration, not in character save files. Ship position/heading is read every visual frame from the same simulation interpolation as the 2D world and screen-space nameplates. Water, island art, combat physics, tap navigation, player sprite and inventory remain unchanged. 3D mode in M3076 is specifically a 3D NPC ship view over the original 2D chart, **not** yet a fully modeled 3D landscape with 3D islands and a 3D player ship. Missing/failed GLB imports force the classic mode automatically. Models are loaded once, reused by NPC instances and never alter the underlying gameplay state.
+
+The meshes come from user-provided GLB originals, decimated and texture-optimized, with Z-up conversion to Godot world orientation, model-specific draft correction, and real-time yaw. A half/three-quarter resolution 3D viewport is used on Android to protect frame rate; nameplates remain sharp at native resolution on their separate CanvasLayer. Tests check asset imports, view modes and actual model selection.

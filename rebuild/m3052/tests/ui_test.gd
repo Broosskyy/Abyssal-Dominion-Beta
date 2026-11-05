@@ -20,6 +20,16 @@ func _run() -> void:
 	await process_frame
 	check(game.ship_textures.size()==10 and game.atlas_textures.size()==16,"ten own ship designs and sixteen directional reference atlases loaded")
 	check(game.skins.size()==27,"all 27 ship designs including Small Starter are selectable")
+	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
+	check(game.mesh_layer.mode in ["classic","hybrid","3d"],"game has a valid 2.5D or 3D mode")
+	var before_mode: String=game.render_mode
+	game.mesh_layer.set_render_mode("hybrid")
+	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"hybrid 2.5D renders an actual GLB, not a directional image")
+	game.mesh_layer.set_render_mode("3d")
+	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"3D mode shares the NPC model and simulation")
+	game.mesh_layer.set_render_mode("classic")
+	check(not game.mesh_layer.can_render_actor(game.sim.npcs[0]),"classic 2.5D sprite fallback remains available")
+	game.mesh_layer.set_render_mode(before_mode)
 	check(game.CONTENT.NPC_MESHY_ROSTER.size()==9,"nine approved NPC visual designs and roles")
 	check(game.sim.npcs.filter(func(npc):return npc.kind=="ship").size()==16,"original sixteen ship spawn points are retained")
 	for npc in game.sim.npcs:
