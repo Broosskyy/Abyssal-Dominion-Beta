@@ -89,9 +89,9 @@ jobs:
           set -euo pipefail
           extra=()
           if [ "$SHELL_NEEDED" = false ]; then extra+=(--content-only); fi
-          # Repair collapsed / excessively elongated UV-decimation faces
-          # before Godot imports and bundles the actual GLB ship meshes.
-          python3 rebuild/m3052/tools/repair_meshy_geometry.py
+          # The original Meshy geometry must NEVER be decimated or index-patched
+          # during APK/data builds. Only validate intact geometry in CI.
+          python3 rebuild/m3052/tools/validate_meshy_geometry.py --warn-only
           python3 rebuild/m3052/tools/build_android.py --godot /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --keystore "$HOME/.cache/abyssal-test-signing/debug.keystore" --output "$GITHUB_WORKSPACE/releases/M3059/ABYSSAL_DOMINION_M3059_REBUILD_ARM64.apk" --data-output "$GITHUB_WORKSPACE/releases/M3059/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip" --revision "$GITHUB_RUN_NUMBER" --signing-key /tmp/content-private.pem "${extra[@]}"
           if [ "$SHELL_NEEDED" = true ]; then
             python3 rebuild/m3052/tools/prepare_update_manifest.py releases/M3059/ABYSSAL_DOMINION_M3059_REBUILD_ARM64.apk
