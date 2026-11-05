@@ -56,10 +56,29 @@ func run() -> void:
 				var anchor=own.position+Vector2(own.size.x*.5,17*game._plate_pixels())
 				check(anchor.is_equal_approx(game._plate_screen_anchor(sim.player)),"name, identity, health and decks share measured hull anchor"+suffix)
 				check(anchor.y>=game._actor_screen_bounds(sim.player).end.y+game.CAPTAIN_HULL_CLEARANCE*game._plate_pixels()-.1,"captain caption clears visible hull"+suffix)
-				check(not placed[0].intersects(placed[sim.target]),"selected NPC text resolves captain collision"+suffix)
+				# Close collisions are permitted: a caption must never detach from its own hull.
+				for actor: Dictionary in close:
+					if not placed.has(int(actor.id)):continue
+					var plate: Rect2=placed[int(actor.id)]
+					var plate_anchor=plate.position+Vector2(plate.size.x*.5,17*game._plate_pixels())
+					check(plate_anchor.is_equal_approx(game._plate_screen_anchor(actor)),"actor caption stays directly below its own ship even during overlaps"+suffix)
 				check(not game._plate_has_rank(close[1]) and game._plate_has_rank(sim.player),"pirate rank is exclusive to players"+suffix)
 			check(game.ammo_selector.visible and game.supply_buttons.values().all(func(item):return item.visible),"single ammunition selector and supplies are visible at %s / profile %d" % [dimensions,profile])
 	check(sim.export_save()==before,"caption layout and HUD refresh preserve the captain save")
+	# Video 207270: no horizontal displacement for names as nearby ships
+	# approach, depart, cross the camera or become the selected target.
+	for camera_move in [Vector2.ZERO,Vector2(170,-90),Vector2(-180,130)]:
+		game.camera.position=sim.player.pos+camera_move
+		game.camera.force_update_scroll()
+		for shift in [-210.0,-45.0,0.0,45.0,210.0]:
+			for i in range(1,close.size()):
+				close[i].pos=sim.player.pos+Vector2(shift+float(i-1)*7,38+float(i)*13)
+			var positions: Dictionary=game._nameplate_layout(close)
+			for actor: Dictionary in close:
+				if not positions.has(int(actor.id)):continue
+				var rect: Rect2=positions[int(actor.id)]
+				var center=rect.position+Vector2(rect.size.x*.5,17*game._plate_pixels())
+				check(center.is_equal_approx(game._plate_screen_anchor(actor)),"NPC plate never detaches from ship when camera and neighbors move")
 	# No direction changes may move the status assembly around its own ship.
 	var anchored_y=game._plate_screen_anchor(sim.player).y
 	for heading in [Vector2.UP,Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT,Vector2(1,1).normalized(),Vector2(-1,-1).normalized()]:

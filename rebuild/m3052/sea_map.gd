@@ -152,8 +152,6 @@ var camera_pad_visible := true
 var plate_rects: Dictionary = {}
 ## Keep the maximum artwork extent stable across all rendered headings.
 var plate_hull_drop_cache: Dictionary = {}
-## Only avoidance offsets are eased; every caption remains attached to its hull.
-var npc_plate_ease: Dictionary = {}
 var status_age := 0.0
 var ammo_previews: Dictionary = {}
 
@@ -610,11 +608,12 @@ func _plate_screen_anchor(actor: Dictionary) -> Vector2:
 	var stable_bottom=point.y+_plate_stable_hull_drop(actor)*absf(get_canvas_transform().y.y)
 	return Vector2(point.x,maxf(minimum,stable_bottom+clearance))
 
-## No NPC caption is hidden. The captain is never moved by nearby ships.
-## Target and other NPC captions choose a deterministic nearby free position.
+## Every caption is centered on its OWN sprite. Never move a nameplate to
+## another screen position to avoid neighboring names: the old candidate
+## rectangles moved entire NPC labels 100–300 pixels from their ships.
+## In tight packs names may touch; target/captain draw last and remain legible.
 func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 	var placed: Dictionary={}
-	var pending: Array[Dictionary]=[]
 	var pixels=_plate_pixels()
 	for actor: Dictionary in fleet:
 		if int(actor.hp)<=0:continue
@@ -622,42 +621,8 @@ func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 		if not get_viewport_rect().grow(180*pixels).has_point(point):continue
 		var player=int(actor.id)==0
 		var width=maxf(188.0 if player else 154.0,_plate_text_width(_plate_title(actor),16 if player else 14)+58.0)*pixels
-		var baseline=_plate_screen_anchor(actor)
-		var rect=Rect2(baseline-Vector2(width*.5,17*pixels),Vector2(width,(116 if player else 56)*pixels))
-		if player:placed[0]=rect
-		else:pending.append({"actor":actor,"rect":rect})
-	pending.sort_custom(func(a,b):
-		var a_id=int(a.actor.id)
-		var b_id=int(b.actor.id)
-		return (0 if a_id==sim.target else a_id+100) < (0 if b_id==sim.target else b_id+100)
-	)
-	var occupied: Array[Rect2]=[]
-	if placed.has(0):occupied.append(placed[0])
-	var view_size=get_viewport_rect().size
-	for entry: Dictionary in pending:
-		var base: Rect2=entry.rect
-		var dx=base.size.x+14*pixels
-		var dy=base.size.y+12*pixels
-		var offsets: Array[Vector2]=[
-			Vector2.ZERO,Vector2(-dx,0),Vector2(dx,0),
-			Vector2(-dx*.55,dy),Vector2(dx*.55,dy),Vector2(0,dy),
-			Vector2(-dx,dy),Vector2(dx,dy),Vector2(0,dy*2.0),
-			Vector2(-dx*1.5,dy),Vector2(dx*1.5,dy)]
-		var best=base
-		var score=INF
-		for offset: Vector2 in offsets:
-			var candidate=Rect2(base.position+offset,base.size)
-			var penalty=offset.length()*.025
-			for other: Rect2 in occupied:
-				if candidate.intersects(other.grow(6*pixels)):
-					var overlap=candidate.intersection(other.grow(6*pixels))
-					penalty+=10000.0+overlap.size.x*overlap.size.y
-			if candidate.position.x<8 or candidate.end.x>view_size.x-8:penalty+=15000
-			if candidate.position.y<68 or candidate.end.y>view_size.y-20:penalty+=15000
-			if penalty<score:score=penalty;best=candidate
-			if score<1.0:break
-		placed[int(entry.actor.id)]=best
-		occupied.append(best)
+		var anchor=_plate_screen_anchor(actor)
+		placed[int(actor.id)]=Rect2(anchor-Vector2(width*.5,17*pixels),Vector2(width,(116 if player else 56)*pixels))
 	return placed
 
 func _draw_nameplates(fleet: Array[Dictionary]) -> void:
@@ -666,27 +631,12 @@ func _draw_nameplates(fleet: Array[Dictionary]) -> void:
 	var pixels=_plate_pixels()
 	var ordered=fleet.duplicate()
 	ordered.sort_custom(func(a,b):return (2 if int(a.id)==0 else (1 if int(a.id)==sim.target else 0))<(2 if int(b.id)==0 else (1 if int(b.id)==sim.target else 0)))
-	var visible_ids: Dictionary={}
 	for actor: Dictionary in ordered:
 		var id=int(actor.id)
 		if not plate_rects.has(id):continue
 		var rect: Rect2=plate_rects[id]
-		var desired=rect.position+Vector2(rect.size.x*.5,17*pixels)
-		var base=_plate_screen_anchor(actor)
-		if id!=0:
-			# Never interpolate a label's absolute screen position: it must follow
-			# the vessel immediately. Ease only the local overlap-avoidance offset.
-			var target_offset=desired-base
-			var prior: Vector2=npc_plate_ease.get(id,target_offset)
-			var blend=clampf(get_process_delta_time()*9.0,.0,1.0)
-			var smooth=prior.lerp(target_offset,blend)
-			if smooth.distance_to(target_offset)<.35:smooth=target_offset
-			npc_plate_ease[id]=smooth
-			visible_ids[id]=true
-			desired=base+smooth
-		_nameplate(actor,inverse*desired)
-	for id: Variant in npc_plate_ease.keys():
-		if not visible_ids.has(id):npc_plate_ease.erase(id)
+		var anchor=rect.position+Vector2(rect.size.x*.5,17*pixels)
+		_nameplate(actor,inverse*anchor)
 
 ## Readable, anchored name/HP/shield block; ten deck slots follow directly below.
 func _nameplate(actor: Dictionary,anchor: Vector2) -> void:

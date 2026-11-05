@@ -42,7 +42,7 @@ func _run() -> void:
 		await _shot(game,output,"ammo-%dx%d" % [dimensions.x,dimensions.y])
 		game.modal.hide();game.modal_backdrop.hide()
 	# Reproduce the supplied close encounter through the actual renderer, at phone
-	# and wide landscape sizes. Nameplates must keep the captain and target apart.
+	# and wide landscape sizes. Captions must follow each hull, never detach.
 	npc.pos=game.sim.player.pos+Vector2(-35,30);npc.home=npc.pos
 	for dimensions in [Vector2i(1536,709),Vector2i(844,390)]:
 		root.size=dimensions
@@ -52,8 +52,10 @@ func _run() -> void:
 		await _shot(game,output,"reference-close-%dx%d" % [dimensions.x,dimensions.y])
 		if not game.plate_rects.has(0) or not game.plate_rects.has(int(npc.id)):
 			push_error("Close encounter lost a priority caption");quit(1);return
-		if game.plate_rects[0].intersects(game.plate_rects[int(npc.id)]):
-			push_error("Close encounter did not separate visible captain and NPC captions");quit(1);return
+		var npc_rect: Rect2=game.plate_rects[int(npc.id)]
+		var npc_anchor=npc_rect.position+Vector2(npc_rect.size.x*.5,17*game._plate_pixels())
+		if not npc_anchor.is_equal_approx(game._plate_screen_anchor(npc)):
+			push_error("Close encounter detached NPC caption from its own hull");quit(1);return
 		var anchored: Rect2=game.plate_rects[0]
 		var npc_before: Vector2=npc.pos
 		npc.pos=game.sim.player.pos+Vector2(40,0)
