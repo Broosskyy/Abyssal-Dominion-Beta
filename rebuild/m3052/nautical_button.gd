@@ -20,7 +20,7 @@ func _ready() -> void:
 func _outlined(font: Font,text: String,baseline: Vector2,fontsize: int,color: Color) -> void:
 	var width=font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize).x
 	var pos=Vector2(baseline.x-width*.5,baseline.y)
-	draw_string_outline(font,pos,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,4,Color("071018"))
+	draw_string_outline(font,pos,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,2,Color("071018"))
 	draw_string(font,pos,text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize,color)
 func _bezel(center: Vector2,radius: float,gold: Color) -> void:
 	draw_circle(center+Vector2(0,3),radius+1.5,Color(0,0,0,.45))
@@ -28,9 +28,9 @@ func _bezel(center: Vector2,radius: float,gold: Color) -> void:
 	for band in 7:
 		var t=float(band)/6.0
 		draw_circle(center,(radius-3.5)*(1.0-t*.3),Color("0a161d").lerp(Color("1b3644"),t))
-	draw_circle(center,radius,gold,false,2.2,true)
+	draw_circle(center,radius,gold,false,1.3,true)
 	draw_circle(center,radius-3.5,Color("6e5531"),false,1.0,true)
-	draw_arc(center,radius-1.2,PI*1.08,PI*1.78,24,Color(1,.9,.62,.5),1.2,true)
+	draw_arc(center,radius-1.2,PI*1.08,PI*1.78,24,Color(1,.9,.62,.28),1.2,true)
 func _band(center: Vector2,radius: float) -> void:
 	var points=PackedVector2Array()
 	for i in 17:
@@ -62,7 +62,7 @@ func _draw() -> void:
 		_bezel(center,radius,gold)
 		draw_circle(center,radius-6,Color("7a5c34"),false,1.0,true)
 		if art!=null:
-			var dimensions=art.get_size()*diameter*.8/maxf(art.get_width(),art.get_height())
+			var dimensions=art.get_size()*diameter*.92/maxf(art.get_width(),art.get_height())
 			draw_texture_rect(art,Rect2(center-dimensions*.5+Vector2(0,radius*.06),dimensions),false,Color(1,1,1,.45) if disabled else Color.WHITE)
 		if latched:draw_arc(center,radius-5,0,TAU,48,Color("ff9b5a"),2.6,true)
 		if not state_label.is_empty():

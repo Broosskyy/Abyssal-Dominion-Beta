@@ -143,10 +143,10 @@ func _systems(game: Node,output: String) -> Dictionary:
 	sim.guild={"name":"Sturmkrone","tag":"SKR"};sim.fortress_hold=1500.0
 	sim.grant_deck("cannon",2);sim.grant_deck("armor",1)
 	sim.activate_blessing(600.0);sim.add_tide_deck(1800.0);sim.powder_on=true
-	game.quick_page=1;game._apply_page()
+	game._refresh_ui()
 	await _shot(game,output,"guild-island-1280x720")
 	var held=sim.tower_friendly() and sim.tower_tag()=="SKR"
-	game.quick_page=0;game._apply_page();sim.powder_on=false
+	sim.powder_on=false
 	# Harbor panels for the cauldron, bonus scrolls and the guild.
 	sim.player.pos=sim.harbor;sim.docked=true;sim.essence=12;sim.fragments=7;sim.scrolls=[1,0,0]
 	sim.throw_kessel(5,"2026-11-04")

@@ -37,19 +37,20 @@ static func gem(canvas: CanvasItem,center: Vector2,r: float,color: Color,tier: i
 ## Fixed physical slots: five columns, two rows. Colour means material, not role.
 static func deck_cells(center: Vector2,r: float) -> Array[Vector2]:
 	var cells: Array[Vector2]=[]
-	for slot in 10:cells.append(center+Vector2((slot%5-2)*r*2.2,(floori(slot/5.0)-.5)*r*2.35))
+	for slot in 10:cells.append(center+Vector2((slot%5-2)*r*1.8,(floori(slot/5.0)-.5)*r*1.8))
 	return cells
+
+static func deck_dot(canvas: CanvasItem,center: Vector2,r: float,color: Color,active: bool) -> void:
+	canvas.draw_circle(center,r+1,Color("05121a"))
+	canvas.draw_circle(center,r,color if active else Color("142832"))
+	canvas.draw_circle(center,r,Color("9ba69e",.6) if active else Color("516771",.65),false,.7,true)
+	if active:canvas.draw_circle(center+Vector2(-r*.28,-r*.3),maxf(.6,r*.23),Color(1,1,1,.32))
 
 static func gem_row(canvas: CanvasItem,center: Vector2,r: float,entries: Array,font: Font=null) -> void:
 	var cells=deck_cells(center,r)
 	for slot in 10:
 		var entry: Dictionary=entries[slot] if slot<entries.size() else {}
-		gem(canvas,cells[slot],r,entry.get("color",Color.WHITE),-1,bool(entry.get("lit",false)),null)
-	for side in [-1.0,1.0]:
-		var tip=center+Vector2(side*r*6.2,0)
-		var arm=PackedVector2Array([tip+Vector2(-side*r,-r*1.35),tip,tip+Vector2(-side*r,r*1.35)])
-		canvas.draw_polyline(arm,Color(0,0,0,.6),3.0,true)
-		canvas.draw_polyline(arm,Color("c6a86d"),1.3,true)
+		deck_dot(canvas,cells[slot],r*.65,entry.get("color",Color.WHITE),bool(entry.get("lit",false)))
 
 ## Four distinct original symbols surround the normal decks. Unowned/inactive
 ## special decks stay dim; only active timers light the icon and its outer arc.
@@ -79,9 +80,9 @@ static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim) -> void:
 	var tide=float(sim.buffs.tide_deck)
 	if tide>0:
 		for side in [-1.0,1.0]:
-			var edge=PackedVector2Array([center+Vector2(side*r*5.2,-r*2.8),center+Vector2(side*r*6.9,-r*1.9),center+Vector2(side*r*7.2,0),center+Vector2(side*r*6.9,r*1.9),center+Vector2(side*r*5.2,r*2.8)])
+			var edge=PackedVector2Array([center+Vector2(side*r*4.5,-r*2.2),center+Vector2(side*r*6.6,-r*1.7),center+Vector2(side*r*7.0,0),center+Vector2(side*r*6.6,r*1.7),center+Vector2(side*r*4.5,r*2.2)])
 			canvas.draw_polyline(edge,Color("5de0d4",.8),1.4,true)
-	var x=r*8.2;var y=r*1.65;var icon=r*1.35
+	var x=r*5.8;var y=r*1.15;var icon=r*1.05
 	special_deck_icon(canvas,center+Vector2(-x,-y),icon,"tide",tide>0,tide/1800.0)
 	special_deck_icon(canvas,center+Vector2(x,-y),icon,"storm",float(sim.buffs.storm_deck)>0,float(sim.buffs.storm_deck)/1800.0)
 	special_deck_icon(canvas,center+Vector2(-x,y),icon,"salvage",float(sim.buffs.salvage_deck)>0,float(sim.buffs.salvage_deck)/1800.0)

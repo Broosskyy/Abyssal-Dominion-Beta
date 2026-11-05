@@ -136,3 +136,8 @@ The supplied data-50 device screenshots correct the previous presentation direct
 Ten physical deck slots are shown directly below the bars in two rows of five. Gold decks are orange/yellow, Elite blue and Kristall purple, independently of their equipment role. Purchased copies can share a role, but each physical deck occupies only one slot. The harbor deck yard mounts, removes and upgrades individual decks; Elite opens at level 3, Kristall at level 8. Gezeitendeck, Sturmdeck, Bergungsdeck and Kristallsegen use separate surrounding wave/lightning/anchor/crystal symbols; inactive effects remain dim. Sturmdeck adds 12% speed, Bergungsdeck 15% loot gold, with actual purchases and saved sea-time durations.
 
 Save schema 4 migrates schemas 1–3 and retains the two existing deck slots and values, leaving eight new slots empty. The left-edge deck strip is removed. Water is brighter blue/teal, and short phones group special ammunition into a 2×2 grid beside the combat controls to leave space beneath the ship. [Comparison, economy values and acceptance evidence](../../docs/m3063/DECK_REFERENCE_COMPARISON.md).
+
+
+## M3064: one ammunition selector and point decks
+
+Regular decks now appear as two rows of five material-colored points below name, HP and shield, with special-deck icons around them. One MUNITION button opens all seven ammunition types; selecting a row activates it and closes the list. Four persistent special-ammo buttons and paging are removed. MSDF text and imported texture mipmaps improve scaled rendering; legacy low-resolution NPC artwork remains a source limitation. See [presentation and verification](docs/m3064/AMMO_AND_DECK_PRESENTATION.md).

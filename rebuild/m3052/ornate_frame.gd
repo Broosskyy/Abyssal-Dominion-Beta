@@ -3,6 +3,7 @@ extends Panel
 var header := 52.0
 var ribbon := Rect2()
 var accent := Color("c9a35e")
+var plain := false
 
 func _ready() -> void:
 	add_theme_stylebox_override("panel",StyleBoxEmpty.new())
@@ -16,6 +17,13 @@ func _draw() -> void:
 	if size.x<60 or size.y<60:return
 	var w=size.x;var h=size.y
 	var gold=accent;var bright=accent.lightened(.35);var deep=Color("2a1d0e")
+	if plain:
+		draw_rect(Rect2(Vector2(0,3),size),Color(0,0,0,.4))
+		draw_rect(Rect2(Vector2.ZERO,size),Color("111920",.98))
+		draw_rect(Rect2(Vector2.ONE,size-Vector2.ONE*2),Color("8a7553"),false,1.2)
+		draw_rect(Rect2(3,3,w-6,header-3),Color("1b252b"))
+		draw_line(Vector2(3,header),Vector2(w-3,header),Color("74634c"),1.0)
+		return
 	for i in 3:draw_rect(Rect2(Vector2(-4-i*3,-2-i*2),size+Vector2(8+i*6,10+i*5)),Color(0,0,0,.12))
 	_poly([Vector2(4,4),Vector2(w-4,4),Vector2(w-4,h-4),Vector2(4,h-4)],[Color("10303d"),Color("10303d"),Color("061218"),Color("061218")])
 	for i in range(-int(h),int(w),26):draw_line(Vector2(i,h-4),Vector2(i+h*.55,4),Color(1,1,1,.018),1)
@@ -78,3 +86,4 @@ func _diamond(at: Vector2,r: float,gold: Color,deep: Color) -> void:
 	var edge=points.duplicate();edge.append(points[0])
 	draw_polyline(edge,gold,1.4,true)
 	draw_circle(at,r*.3,gold)
+

@@ -49,22 +49,10 @@ func run() -> void:
 				var center: Vector2=game.get_canvas_transform()*sim.player.pos
 				var anchor=own.position+Vector2(own.size.x*.5,17*game._plate_pixels())
 				check(anchor.is_equal_approx(center+Vector2(0,36*game._plate_pixels())),"name, health and decks share a fixed waterline anchor"+suffix)
-			var specials_clear=true
-			for i in game.special_buttons.size():
-				var button: Button=game.special_buttons[i]
-				if not button.visible:continue
-				var rect=button.get_global_rect()
-				specials_clear=specials_clear and Rect2(Vector2.ZERO,Vector2(dimensions)).encloses(rect)
-				specials_clear=specials_clear and rect.size==game.ammo_buttons[0].get_global_rect().size
-				for j in game.special_buttons.size():
-					if i!=j:specials_clear=specials_clear and not rect.intersects(game.special_buttons[j].get_global_rect())
-				for control: Control in [game.attack,game.page_button,game.target_cycle,game.loadout_button,game.ammo_selector,game.repair,game.supply_buttons.powder]:
-					specials_clear=specials_clear and not rect.intersects(control.get_global_rect())
-				for button_ammo: Button in game.ammo_buttons:specials_clear=specials_clear and not rect.intersects(button_ammo.get_global_rect())
-			check(specials_clear,"special ammunition shares the safe combat grid at %s / profile %d" % [dimensions,profile])
+			check(game.ammo_selector.visible and game.supply_buttons.values().all(func(item):return item.visible),"single ammunition selector and supplies are visible at %s / profile %d" % [dimensions,profile])
 	check(sim.export_save()==before,"caption layout and HUD refresh preserve the captain save")
 	for i in 4:
-		game.special_buttons[i].pressed.emit()
+		game._open_modal("Munition");game.ammo_rows[i+3].pressed.emit()
 		check(sim.ammo_mode==i+3,"special ammunition retains its real selection action %d" % i)
 		var preview: Texture2D=game._ammo_texture(i+3)
 		check(preview is AtlasTexture and preview.region==Rect2(160,160,192,192),"special ammunition excludes the baked checkerboard %d" % i)

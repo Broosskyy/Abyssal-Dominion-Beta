@@ -1312,7 +1312,7 @@ func export_save() -> Dictionary:
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
-	return {"schema":4,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	return {"schema":4,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
@@ -1327,6 +1327,7 @@ func restore_save(data: Dictionary) -> bool:
 	if not int(data.get("schema",0)) in [1,2,3,4]: return false
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
 	player.skin=clampi(int(data.get("skin",26)),0,26)
+	ammo_mode=clampi(int(data.get("ammo_mode",0)),0,AMMO_NAMES.size()-1)
 	kills=maxi(0,int(data.get("kills",0)))
 	claimed=bool(data.get("claimed",false))
 	quest_index=clampi(int(data.get("quest_index",1 if claimed else 0)),0,CONTENT.QUESTS.size())
@@ -1406,3 +1407,4 @@ func restore_save(data: Dictionary) -> bool:
 	plates_on=false
 	docked=bool(data.get("docked",false)) and can_dock()
 	return true
+

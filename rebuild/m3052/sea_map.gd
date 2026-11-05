@@ -15,6 +15,7 @@ const SEA_MARKS = preload("res://sea_marks.gd")
 const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
+const AMMO_CHOICE=preload("res://ammo_choice.gd")
 const SHOT_COLORS := {"flare":Color("ffe27a"),"pumpkin":Color("ff8a2a"),"snow":Color("f4fbff"),"ice":Color("7fd4ff"),"chain":Color("d7e4ea"),"harpoon":Color("9fd0c8")}
 const USER_ROOT := "res://assets/user/"
 const SAVE := "user://captain_m3052.json"
@@ -64,8 +65,7 @@ var repair: Button
 var center_button: Button
 var zoom_in: Button
 var zoom_out: Button
-var ammo_buttons: Array[Button] = []
-var special_buttons: Array[Button] = []
+var ammo_rows: Array[Button] = []
 const AMMO_UI := [
 	{"name":"Vollkugeln","use":"Gegen Schiffe und Türme","icon":"cannonball"},
 	{"name":"Kettenkugeln","use":"Verlangsamt Schiffe","icon":"chain"},
@@ -130,8 +130,6 @@ var message_history: Array[String]=[]
 var player_shield: ProgressBar
 var shield_numbers: Label
 var supply_buttons: Dictionary={}
-var page_button: Button
-var quick_page := 0
 var buff_bar: Control
 var kessel_log: Array[String]=[]
 var guild_name_input: LineEdit
@@ -148,6 +146,13 @@ var status_age := 0.0
 var ammo_previews: Dictionary = {}
 
 func _ready() -> void:
+	# The edge HUD is scaled on high-DPI phones. MSDF prevents magnifying
+	# small raster glyphs along with it; world labels share the same crisp font.
+	if font is FontFile:
+		font.multichannel_signed_distance_field=true
+		font.msdf_pixel_range=16
+		font.msdf_size=48
+	texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_use_uhd()
 	_load_assets()
 	_load_progress()
@@ -580,7 +585,7 @@ func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
 	_plate_bar(Rect2(-width*.5,7,width,8 if player else 5),float(actor.hp)/maxf(1,float(actor.max_hp)),hull_color,_thousands(int(actor.hp)) if player else "",9)
 	var shield=float(actor.get("max_shield",0))
 	if shield>0:_plate_bar(Rect2(-width*.5,20 if player else 15,width,5 if player else 3),float(actor.get("shield",0))/shield,Color("4d95be"))
-	if player:SEA_MARKS.deck_badge(self,Vector2(0,49),6.3,sim)
+	if player:SEA_MARKS.deck_badge(self,Vector2(0,44),6.3,sim)
 	if float(actor.get("slow",0))>0:draw_circle(Vector2(width*.5+6,11),2.5,Color("9fdbf4"))
 	if player and sim.staff.hidden():_label(Vector2(0,-20),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color(),2)
 	draw_set_transform(Vector2.ZERO)
@@ -822,6 +827,7 @@ func _build_ui() -> void:
 	ui=Control.new()
 	ui.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	ui.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	ui.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
 	layer.add_child(ui)
 	ruler=RULER.new();ruler.world_size=sim.WORLD;ui.add_child(ruler)
 	chrome=_panel(ui)
@@ -875,24 +881,13 @@ func _build_ui() -> void:
 	attack=_orb(ui,"Feuer ein/aus",extra_icons.cannon_action,_toggle_fire,"FEUER");attack.name="FireButton"
 	attack.set("hero",true)
 	repair=_orb(ui,"Schiff reparieren",extra_icons.upgrade_hull,func():sim.toggle_repair();_refresh_ui(),"REP");repair.name="RepairButton"
-	for i in 3:
-		var index=i
-		var button=_orb(ui,"",icons[["cannonball","chain","harpoon"][i]],func():sim.set_ammo(index);_refresh_ui())
-		button.name="Ammo%d" % i;button.toggle_mode=true;ammo_buttons.append(button)
-	for i in 4:
-		var index=i+3
-		var special=_orb(ui,str(AMMO_UI[index].name),_ammo_texture(index),func():sim.set_ammo(index);_refresh_ui(),str(AMMO_UI[index].name).left(6))
-		special.name="SpecialAmmo%d" % i
-		special_buttons.append(special)
 	for key: String in CONTENT.SUPPLY_KEYS:
 		var supply=key
 		var config: Dictionary=CONTENT.SUPPLIES[key]
 		var button=_orb(ui,"%s · %s" % [config.name,config.effect],painted[config.icon],func():_use_supply(supply),str(config.short))
 		button.name="Supply_"+key;supply_buttons[key]=button
-	page_button=_orb(ui,"Schnellleiste umschalten · Q",null,_flip_page,"1/2");page_button.name="PageButton"
-	page_button.set("pager",true)
 	target_cycle=_orb(ui,"Nächstes sichtbares Ziel · Tab",painted.spyglass,_cycle_target,"ZIEL")
-	ammo_selector=_orb(ui,"Munition & Gegenstände",painted.nav_supplies,func():_open_modal("Munition"),"VORRAT")
+	ammo_selector=_orb(ui,"Munition auswählen",_ammo_texture(sim.ammo_mode),_toggle_ammo,"MUNITION");ammo_selector.name="AmmoSelector"
 	loadout_button=_orb(ui,"Bewaffnung",extra_icons.cannon_0,func():_open_modal("Bewaffnung"),"WAFFEN")
 	camera_pad=CAMERA_PAD.new();ui.add_child(camera_pad)
 	interact=_button(ui,"",_interact);interact.name="InteractButton"
@@ -911,6 +906,10 @@ func _build_ui() -> void:
 	modal_backdrop.visible=false
 	modal_backdrop.mouse_filter=Control.MOUSE_FILTER_STOP
 	ui.add_child(modal_backdrop)
+	modal_backdrop.gui_input.connect(func(event):
+		if modal_kind!="Munition":return
+		if (event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed):
+			_close_ammo();modal_backdrop.accept_event())
 	staff_pill=_button(ui,"",func():_open_modal("Staff"),"staff")
 	staff_pill.name="StaffPill";staff_pill.visible=false;staff_pill.add_theme_font_size_override("font_size",11)
 	staff_pill.tooltip_text="Staff-Werkzeuge"
@@ -1034,31 +1033,14 @@ func _layout() -> void:
 	var fx=s.x-fire-10
 	var fy=s.y-fire-10
 	_place(attack,fx,fy,fire,fire)
-	_place(ammo_buttons[0],fx-orb-gap,s.y-orb-10,orb,orb)
-	_place(ammo_buttons[1],fx-orb-gap,s.y-orb*2-10-gap,orb,orb)
-	_place(ammo_buttons[2],fx+fire*.5-orb-gap*.5,fy-orb-gap,orb,orb)
+	_place(ammo_selector,fx-orb-gap,s.y-orb-10,orb,orb)
 	_place(repair,fx+fire*.5+gap*.5,fy-orb-gap,orb,orb)
-	# Page two swaps the three ammunition slots for items; powder keeps its own slot above the chain shot.
-	_place(supply_buttons.powder,fx-orb-gap,ammo_buttons[1].position.y-orb-gap,orb,orb)
-	for i in 3:
-		var item: Button=supply_buttons[["repair_kit","shield_charge","plates"][i]]
-		_place(item,ammo_buttons[i].position.x,ammo_buttons[i].position.y,orb,orb)
-	var hot: Array[Button]=[target_cycle,ammo_selector,loadout_button,page_button]
-	var row_x=fx-orb-gap
-	for i in hot.size():_place(hot[hot.size()-1-i],row_x-(i+1)*(orb+gap),s.y-orb-10,orb,orb)
-	# Special rounds share the same grid as the utilities, instead of floating
-	# beside the captain in the middle of the water. Every slot has the same hit size.
-	var pack=orb
-	var special_x=target_cycle.position.x
-	var special_y=s.y-orb*2-gap-10
-	var left_limit=(pad+16.0) if camera_pad_visible else 12.0
-	var show_specials=special_x>=left_limit and special_y>header+8.0
-	for i in special_buttons.size():
-		special_buttons[i].visible=show_specials
-		if show_specials:
-			if compact:_place(special_buttons[i],ammo_buttons[1].position.x-2*(orb+gap)+(i%2)*(orb+gap),supply_buttons.powder.position.y+floori(i/2.0)*(orb+gap),orb,orb)
-			else:_place(special_buttons[i],special_x+i*(pack+gap),special_y,pack,pack)
-	_apply_page()
+	# Supplies retain their own functions; every ammunition type uses one selector.
+	var supply_order=["powder","repair_kit","shield_charge","plates"]
+	for i in supply_order.size():
+		_place(supply_buttons[supply_order[i]],fx-2*(orb+gap)+(i%2)*(orb+gap),fy-(orb+gap)+floori(i/2.0)*(orb+gap),orb,orb)
+	var hot: Array[Button]=[target_cycle,loadout_button]
+	for i in hot.size():_place(hot[hot.size()-1-i],ammo_selector.position.x-(i+1)*(orb+gap),s.y-orb-10,orb,orb)
 	var toast_w=maxf(60.0,minf(380.0,s.x-2.0*(left+column+12)))
 	_place(status,(s.x-toast_w)*.5,header+3+(26.0 if staff_pill.visible else 0.0),toast_w,20 if compact else 24)
 	status.set_meta("room",toast_w)
@@ -1071,14 +1053,18 @@ func _layout() -> void:
 	var height=visual_h/grow
 	_place(modal_backdrop,0,0,s.x,s.y)
 	if modal_kind=="Munition":
-		visual_w=minf(480.0*grow,menu_size.x-32.0);visual_h=minf(420.0*grow,menu_size.y-108.0)
+		var button_rect=ammo_selector.get_global_rect()
+		visual_w=minf(400.0*grow,menu_size.x-24.0)
+		var bottom=button_rect.position.y-10.0
+		var top_limit=chrome.get_global_rect().end.y+10.0
+		visual_h=minf(566.0*grow,maxf(160.0,bottom-top_limit))
 		width=visual_w/grow;height=visual_h/grow
-		_place(modal,menu_size.x-visual_w-16.0,maxf(12.0,menu_size.y-visual_h-104.0),width,height)
+		_place(modal,clampf(button_rect.end.x-visual_w,12.0,menu_size.x-visual_w-12.0),bottom-visual_h,width,height)
 	else:_place(modal,(menu_size.x-visual_w)*.5,(menu_size.y-visual_h)*.5,width,height)
-	var head=46.0 if height<420 else 52.0
+	var head=34.0 if modal_kind=="Munition" else (46.0 if height<420 else 52.0)
 	modal.header=head
-	var title_w=clampf(font.get_string_size(modal_title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,21).x+70,200,width-170)
-	modal.ribbon=Rect2((width-title_w)*.5,8,title_w,head-14)
+	var title_w=width-62 if modal_kind=="Munition" else clampf(font.get_string_size(modal_title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,21).x+70,200,width-170)
+	modal.ribbon=Rect2(10,3,title_w,head-6) if modal_kind=="Munition" else Rect2((width-title_w)*.5,8,title_w,head-14)
 	_place(modal_title,modal.ribbon.position.x+8,modal.ribbon.position.y,title_w-16,modal.ribbon.size.y)
 	var close=head-12
 	_place(modal_close,width-close-12,6,close,close)
@@ -1172,16 +1158,6 @@ func _refresh_ui() -> void:
 	repair.disabled=sim.docked
 	repair.text="STOPP" if sim.repairing else "REPARATUR"
 	_set_orb(repair,extra_icons.upgrade_hull,"",sim.repairing,"STOPP" if sim.repairing else "REP")
-	for i in 3:
-		ammo_buttons[i].text=["Vollkugeln","Kettenkugeln","Harpunen"][i]+"\n"+("✓ " if sim.ammo_mode==i else "")+str(sim.player.ammo[i])
-		ammo_buttons[i].set_pressed_no_signal(sim.ammo_mode==i)
-		_set_orb(ammo_buttons[i],icons[["cannonball","chain","harpoon"][i]],_thousands(int(sim.player.ammo[i])),sim.ammo_mode==i)
-		ammo_buttons[i].tooltip_text=["Vollkugeln: gegen Schiffe","Kettenkugeln: verlangsamen Schiffe","Harpunen: gegen Monster"][i]
-	for i in special_buttons.size():
-		var index=i+3
-		var button=special_buttons[i]
-		_set_orb(button,_ammo_texture(index),_thousands(int(sim.player.ammo[index])),sim.ammo_mode==index,str(AMMO_UI[index].name).left(6))
-		button.tooltip_text="%s · %s" % [AMMO_UI[index].name, AMMO_UI[index].use]
 	for key: String in CONTENT.SUPPLY_KEYS:
 		var item: Button=supply_buttons[key]
 		var config: Dictionary=CONTENT.SUPPLIES[key]
@@ -1192,9 +1168,10 @@ func _refresh_ui() -> void:
 		item.set("cooldown",wait/float(config.get("cooldown",1.0)))
 		item.set("state_label","%d s" % ceili(wait) if wait>0 else ("AN" if active else ""))
 		item.disabled=sim.docked or int(sim.player.hp)<=0 or (stock<=0 and not active)
-	_set_orb(page_button,null,"",quick_page==1,"%d/2" % (quick_page+1))
-	page_button.set("state_label","SCHUTZ" if quick_page==1 else "MUNITION")
-	_set_orb(ammo_selector,painted.nav_supplies,"",modal.visible and modal_kind=="Munition","VORRAT")
+	ammo_selector.text="%s · %d" % [AMMO_UI[sim.ammo_mode].name,sim.player.ammo[sim.ammo_mode]]
+	ammo_selector.tooltip_text="%s · %s · antippen zum Wechseln" % [AMMO_UI[sim.ammo_mode].name,AMMO_UI[sim.ammo_mode].use]
+	_set_orb(ammo_selector,_ammo_texture(sim.ammo_mode),_thousands(int(sim.player.ammo[sim.ammo_mode])),modal.visible and modal_kind=="Munition","MUNITION")
+	ammo_selector.set("state_label","MUNITION")
 	_set_orb(target_cycle,painted.spyglass,"",false,"ZIEL")
 	_set_orb(loadout_button,extra_icons.cannon_0,"",modal.visible and modal_kind=="Bewaffnung","WAFFEN")
 	var staff=sim.staff
@@ -1269,7 +1246,7 @@ func _combat_state() -> String:
 	if victim.is_empty() or float(victim.hp)<=0:return "ZIEL WÄHLEN"
 	if victim.kind=="tower" and sim.tower_friendly():return "GILDENTURM"
 	if (victim.kind=="monster")!=(sim.ammo_mode==2):return "WAFFE WECHSELN"
-	if int(sim.player.ammo[sim.ammo_mode])<(1 if sim.ammo_mode==2 else 3):return "MUNITION LEER"
+	if int(sim.player.ammo[sim.ammo_mode])<(1 if sim.ammo_mode>=2 else 3):return "MUNITION LEER"
 	if sim.player.pos.distance_to(victim.pos)>530:return "ZU WEIT"
 	if victim.kind!="tower" and not sim.segment_free(sim.player.pos,victim.pos):return "INSEL IM WEG"
 	if float(sim.player.reload)>0:return ("LÄDT %.1f s" % float(sim.player.reload)).replace(".",",")
@@ -1286,15 +1263,19 @@ func _use_supply(key: String) -> void:
 	else:sim.use_supply(key)
 	_refresh_ui()
 
-func _flip_page() -> void:
-	quick_page=1-quick_page
-	_apply_page()
+func _toggle_ammo() -> void:
+	if modal.visible and modal_kind=="Munition":_close_ammo()
+	else:_open_modal("Munition")
+
+func _close_ammo() -> void:
+	modal.hide();modal_backdrop.hide()
+	suppress_tap_until=Time.get_ticks_msec()+250
 	_refresh_ui()
 
-func _apply_page() -> void:
-	for i in 3:
-		ammo_buttons[i].visible=quick_page==0
-		supply_buttons[["repair_kit","shield_charge","plates"][i]].visible=quick_page==1
+func _choose_ammo(index: int) -> void:
+	sim.set_ammo(index)
+	_save_progress()
+	_close_ammo()
 
 ## Active effects with remaining sea time; emergency cooldowns live on their own orbs.
 func _draw_buffs() -> void:
@@ -1325,14 +1306,25 @@ func _clock_text(seconds: float) -> String:
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
 const MODAL_TABS := {"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
-const MODAL_TITLES := {"Munition":"Munition & Gegenstände","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
+const MODAL_TITLES := {"Munition":"Munitionsauswahl","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String) -> void:
 	camera_pad.release()
 	var scroll_position=modal_scroll.scroll_vertical if modal.visible and modal_kind==kind else 0
 	modal_kind=kind
+	modal.plain=kind=="Munition"
+	modal_backdrop.color=Color(0,0,0,0) if kind=="Munition" else Color(0.002,0.009,0.018,0.77)
+	modal_title.add_theme_font_size_override("font_size",15 if kind=="Munition" else 21)
+	modal_title.add_theme_constant_override("outline_size",2 if kind=="Munition" else 5)
+	modal_close.add_theme_font_size_override("font_size",20 if kind=="Munition" else 26)
+	if kind=="Munition":
+		for state in ["normal","hover","pressed","hover_pressed","disabled","focus"]:
+			var style=StyleBoxFlat.new();style.bg_color=Color("222d33");style.border_color=Color("8a7553");style.set_border_width_all(1)
+			modal_close.add_theme_stylebox_override(state,style)
+	else:SKIN.dress(modal_close,"close",20.0)
+	modal_title.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if kind=="Munition" else HORIZONTAL_ALIGNMENT_CENTER
 	modal_title.text=str(MODAL_TITLES.get(kind,kind)).to_upper()
-	modal_body.add_theme_constant_override("separation",6 if kind=="Munition" else 10)
+	modal_body.add_theme_constant_override("separation",3 if kind=="Munition" else 10)
 	for child in modal_body.get_children():
 		modal_body.remove_child(child)
 		child.queue_free()
@@ -1361,7 +1353,7 @@ func _open_modal(kind: String) -> void:
 	modal_body.queue_sort()
 	modal.show()
 	modal_backdrop.show()
-	modal_scroll.restore(scroll_position)
+	modal_scroll.restore(sim.ammo_mode*77 if kind=="Munition" else scroll_position)
 
 func _build_tabs(kind: String) -> void:
 	for child in modal_tabs.get_children():
@@ -1637,27 +1629,21 @@ func _ammo_texture(index: int) -> Texture2D:
 	return ammo_previews[key]
 
 func _open_ammo() -> void:
-	_section("KANONENKUGEL-AUSWAHL")
+	ammo_rows.clear()
 	for i in AMMO_UI.size():
 		var index=i
-		var entry: Dictionary=AMMO_UI[i]
-		var boost=" · ×1,4 mit Pulver" if i<2 else ""
-		var ammo_column=_row(_ammo_texture(i),"%s · %d\n%d Schaden%s · %s" % [entry.name,sim.player.ammo[i],sim.weapon_damage(i),boost,entry.use],40,CYAN if sim.ammo_mode==i else Color(0,0,0,0))
-		var choose=_row_button(ammo_column,"GELADEN" if sim.ammo_mode==i else "LADEN",func():sim.set_ammo(index);modal.hide();_refresh_ui(),sim.ammo_mode==i or int(sim.player.ammo[i])<=0,"normal" if sim.ammo_mode==i else "primary")
-		choose.custom_minimum_size.y=30;choose.add_theme_font_size_override("font_size",12)
-		if i>=3:
-			var buy=_row_button(ammo_column,"12 · 80 GOLD",func():sim.buy_ammo(index);_save_progress();_open_modal("Munition");_refresh_ui(),not sim.docked or int(sim.player.gold)<80)
-			buy.custom_minimum_size.y=30;buy.add_theme_font_size_override("font_size",12)
-	_section("GEGENSTÄNDE")
-	for key: String in CONTENT.SUPPLY_KEYS:
-		var supply=key
-		var config: Dictionary=CONTENT.SUPPLIES[key]
-		var active=(sim.powder_on if key=="powder" else sim.plates_on) if bool(config.toggle) else false
-		var column=_row(painted[config.icon],"%s · %d\n%s" % [config.name,sim.supplies[key],config.effect],40,Color("8fd0ff") if active else Color(0,0,0,0))
-		var wait=float(sim.cooldowns.get(key,0.0))
-		var text=("AUSSCHALTEN" if active else "EINSCHALTEN") if bool(config.toggle) else ("LÄDT %d s" % ceili(wait) if wait>0 else "EINSETZEN")
-		var use=_row_button(column,text,func():_use_supply(supply);_open_modal("Munition"),sim.docked or wait>0 or (int(sim.supplies[key])<=0 and not active))
-		use.custom_minimum_size.y=30;use.add_theme_font_size_override("font_size",12)
+		var row=AMMO_CHOICE.new()
+		row.title=str(AMMO_UI[i].name)
+		row.detail="%d Schaden · %s" % [sim.weapon_damage(i),AMMO_UI[i].use]
+		row.stock=_thousands(int(sim.player.ammo[i]))
+		row.loaded=sim.ammo_mode==i
+		row.art=_ammo_texture(i)
+		row.text="%s · Vorrat %d · %s" % [AMMO_UI[i].name,sim.player.ammo[i],AMMO_UI[i].use]
+		row.tooltip_text=row.text
+		row.set_meta("ammo_index",i);row.name="AmmoChoice%d" % i
+		row.custom_minimum_size=Vector2(0,74);row.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		row.pressed.connect(func():_choose_ammo(index))
+		modal_body.add_child(row);ammo_rows.append(row)
 
 func _open_shipyard() -> void:
 	_banner_card(painted.nav_shipyard,"SCHIFFSDESIGNS · %d KARTEN" % skins.size(),"Nach Namen sortiert. Das Design ändert nur das Aussehen; Rumpf, Kanonen und Decks bleiben.")
@@ -1743,6 +1729,13 @@ func _open_harbor() -> void:
 			var index = i
 			var buy = _with_icon(_action(["150 Vollkugeln","60 Kettenkugeln","40 Harpunen"][i]+" · 30 Gold",func():sim.buy_ammo(index);_save_progress();_open_modal("Hafen");_refresh_ui(),"normal",ammo),icons[["cannonball","chain","harpoon"][i]])
 			buy.disabled=int(sim.player.gold)<30
+		_section("SONDERMUNITION · JE 12 FÜR 80 GOLD")
+		var special_stock=_grid(2)
+		for i in range(3,AMMO_UI.size()):
+			var index=i
+			var buy=_action("12 %s · 80 GOLD" % AMMO_UI[i].name,func():sim.buy_ammo(index);_save_progress();_open_modal("Hafen");_refresh_ui(),"normal",special_stock)
+			buy.disabled=int(sim.player.gold)<80
+			_with_icon(buy,_ammo_texture(i))
 		_section("HAFENDIENSTE")
 		var services=_grid(2)
 		_with_icon(_action("DECKS & DECKWERFT",func():_open_modal("Decks"),"normal",services),painted.tide_deck)
@@ -2466,13 +2459,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode==KEY_MINUS:sim.set_ammo(6)
 		var hotkeys=[KEY_4,KEY_5,KEY_6,KEY_7]
 		if event.keycode in hotkeys:_use_supply(CONTENT.SUPPLY_KEYS[hotkeys.find(event.keycode)])
-		if event.keycode==KEY_Q:_flip_page()
 
 func _hud_contains(screen: Vector2) -> bool:
 	if modal.visible:return true
-	var controls: Array[Control]=[chrome,target_panel,chart_mini,quest_panel,attack,repair,ammo_selector,loadout_button,center_button,settings_button,target_cycle,camera_pad,zoom_in,zoom_out,interact,page_button,staff_pill]
-	controls.append_array(special_buttons)
-	controls.append_array(ammo_buttons)
+	var controls: Array[Control]=[chrome,target_panel,chart_mini,quest_panel,attack,repair,ammo_selector,loadout_button,center_button,settings_button,target_cycle,camera_pad,zoom_in,zoom_out,interact,staff_pill]
 	for item: Button in supply_buttons.values():controls.append(item)
 	for control: Control in controls:
 		if control.is_visible_in_tree() and control.get_global_rect().has_point(screen):return true

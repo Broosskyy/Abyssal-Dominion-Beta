@@ -12,6 +12,7 @@ import zipfile
 import base64
 import shutil
 from release_plan import bootstrap_hash
+from texture_quality import prepare as prepare_texture_quality
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -86,8 +87,10 @@ def main():
     for script in ['content.gd', 'simulation.gd', 'sim_staff_ops.gd', 'sim_bonus_ops.gd', 'sim_guild_ops.gd', 'ship_visuals.gd', 'updater/update_model.gd', 'updater/update_controller.gd', 'updater/launcher.gd', 'navigation.gd', 'updater/data_model.gd', 'updater/data_controller.gd', 'updater/data_boot.gd']:
         checked([engine, '--headless', '--path', str(ROOT), '--check-only', '--script', script], output.with_suffix('.'+script.replace('/', '_')+'.check.log'))
     checked([engine, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.import.log'))
+    if prepare_texture_quality(ROOT):
+        checked([engine, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.texture-quality.log'))
     results = []
-    for name in ['simulation_test', 'progression_test', 'seafight_systems_test', 'ship_visual_test', 'ui_test', 'updater_test', 'navigation_test', 'chart_presentation_test', 'deck_progression_test', 'content_update_test']:
+    for name in ['simulation_test', 'progression_test', 'seafight_systems_test', 'ship_visual_test', 'ui_test', 'updater_test', 'navigation_test', 'chart_presentation_test', 'deck_progression_test', 'ammo_picker_test', 'content_update_test']:
         with tempfile.TemporaryDirectory() as user_data:
             env = dict(os.environ, XDG_DATA_HOME=user_data)
             log = checked([engine, '--headless', '--path', str(ROOT), '--quit-after', '120',
