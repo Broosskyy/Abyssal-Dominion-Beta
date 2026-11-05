@@ -45,6 +45,10 @@ var pan := Vector2.ZERO
 var camera_anchor := Vector2.ZERO
 var camera_locked := true
 var accumulator := 0.0
+## Render interpolation only: ship simulation remains server/logic-authoritative at 30 Hz.
+const SIMULATION_TICK := 1.0 / 30.0
+var visual_before: Dictionary = {}
+var visual_after: Dictionary = {}
 var refresh_clock := 0.0
 var save_clock := 0.0
 var elapsed := 0.0
@@ -261,6 +265,23 @@ func _load_assets() -> void:
 func _art(name: String) -> Texture2D:
 	return extra_icons[name] if extra_icons.has(name) else painted.get(name)
 
+## Capture just before/after each movement tick, then draw between both states
+## on every render frame. This avoids 30 Hz hull/plate jumps on 60/120 Hz phones.
+func _visual_snapshot() -> Dictionary:
+	var positions: Dictionary={0:sim.player.pos}
+	for actor: Dictionary in sim.npcs:positions[int(actor.id)]=actor.pos
+	return positions
+
+func _visual_actor_pos(actor: Dictionary) -> Vector2:
+	var id=int(actor.id)
+	var current: Vector2=actor.pos
+	if not visual_before.has(id) or not visual_after.has(id):return current
+	var previous: Vector2=visual_before[id]
+	var latest: Vector2=visual_after[id]
+	# Don't interpolate teleports, respawns, or externally changed positions.
+	if current.distance_squared_to(latest)>.01 or previous.distance_to(latest)>200.0:return current
+	return previous.lerp(latest,clampf(accumulator/SIMULATION_TICK,0.0,1.0))
+
 func _process(delta: float) -> void:
 	status_age += delta
 	if modal_backdrop!=null:modal_backdrop.visible=modal.visible
@@ -270,15 +291,22 @@ func _process(delta: float) -> void:
 		return
 	elapsed += delta
 	accumulator = minf(accumulator+delta,0.2)
-	while accumulator >= 1.0/30.0:
-		sim.step(1.0/30.0)
-		accumulator -= 1.0/30.0
+	while accumulator >= SIMULATION_TICK:
+		visual_before=_visual_snapshot()
+		sim.step(SIMULATION_TICK)
+		visual_after=_visual_snapshot()
+		accumulator -= SIMULATION_TICK
 	if previous_region!=sim.map_id:_sync_region()
 	if loading_left>0:_advance_loading(delta)
 	if camera_pad.visible and not modal.visible:_pan_camera(camera_pad.value,delta)
-	var goal: Vector2 = sim.player.pos if camera_locked else camera_anchor
-	pan=goal-sim.player.pos
-	camera.position = camera.position.lerp(goal,1.0-exp(-delta*5.0))
+	var render_player: Vector2=_visual_actor_pos(sim.player)
+	var goal: Vector2=render_player if camera_locked else camera_anchor
+	pan=goal-render_player
+	# With follow-lock active, frame-interpolated ship and camera stay together.
+	# A one-pixel change in the captain plate is then *real* screen movement,
+	# not a 30 Hz simulation/camera mismatch amplified by high zoom.
+	if camera_locked:camera.position=goal
+	else:camera.position=camera.position.lerp(goal,1.0-exp(-delta*5.0))
 	camera.zoom = camera.zoom.lerp(Vector2.ONE*_sharp_zoom(),1.0-exp(-delta*8.0))
 	# Commit this frame's camera transform before projecting screen-space labels.
 	# Calculating readouts later inside _draw() creates a one-frame delay.
@@ -465,7 +493,7 @@ func _draw_actor(actor: Dictionary) -> void:
 		_draw_tower(actor)
 		return
 	var is_player = int(actor.id)==0
-	var point: Vector2=actor.pos
+	var point: Vector2=_visual_actor_pos(actor)
 	var heading: Vector2=actor.heading
 	var length=_actor_visual_length(actor)
 	if not actor.path.is_empty():
@@ -558,7 +586,7 @@ func _plate_has_rank(actor: Dictionary) -> bool:
 
 func _actor_screen_bounds(actor: Dictionary) -> Rect2:
 	var length=_actor_visual_length(actor)
-	var point: Vector2=actor.pos
+	var point: Vector2=_visual_actor_pos(actor)
 	var transform=get_canvas_transform()
 	if actor.get("kind","")=="tower":return transform*Rect2(point-Vector2(38,76),Vector2(76,82))
 	if actor.get("kind","")=="monster":return transform*Rect2(point-Vector2(80,85),Vector2(160,105))
@@ -614,7 +642,7 @@ func _plate_stable_hull_drop(actor: Dictionary) -> float:
 ## camera motion. Nearby ships never influence the captain's position.
 func _plate_screen_anchor(actor: Dictionary) -> Vector2:
 	var pixels=_plate_pixels()
-	var point: Vector2=get_canvas_transform()*actor.pos
+	var point: Vector2=get_canvas_transform()*_visual_actor_pos(actor)
 	var player=int(actor.id)==0
 	var minimum=point.y+(CAPTAIN_PLATE_OFFSET if player else OTHER_PLATE_OFFSET)*pixels
 	var clearance=(CAPTAIN_HULL_CLEARANCE if player else NPC_HULL_CLEARANCE)*pixels
@@ -630,7 +658,7 @@ func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 	var pixels=_plate_pixels()
 	for actor: Dictionary in fleet:
 		if int(actor.hp)<=0:continue
-		var point: Vector2=get_canvas_transform()*actor.pos
+		var point: Vector2=get_canvas_transform()*_visual_actor_pos(actor)
 		if not get_viewport_rect().grow(180*pixels).has_point(point):continue
 		var player=int(actor.id)==0
 		var width=maxf(188.0 if player else 154.0,_plate_text_width(_plate_title(actor),16 if player else 14)+58.0)*pixels
@@ -646,7 +674,7 @@ func _sync_plate_overlay() -> void:
 	var view=Rect2(camera.position-screen/camera.zoom*.5,screen/camera.zoom).grow(350)
 	var fleet: Array[Dictionary]=[sim.player]
 	for npc: Dictionary in sim.npcs:
-		if int(npc.hp)>0 and view.has_point(npc.pos):fleet.append(npc)
+		if int(npc.hp)>0 and view.has_point(_visual_actor_pos(npc)):fleet.append(npc)
 	plate_fleet=fleet
 	plate_rects=_nameplate_layout(fleet)
 	plate_overlay.queue_redraw()

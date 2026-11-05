@@ -105,6 +105,40 @@ func run() -> void:
 				var rect: Rect2=positions[int(actor.id)]
 				var center=rect.position+Vector2(rect.size.x*.5,17*game._plate_pixels())
 				check(center.is_equal_approx(game._plate_screen_anchor(actor)),"NPC plate never detaches from ship when camera and neighbors move")
+	# Sub-frame interpolation is shared by hull and label, and a locked follow
+	# camera pins the captain plate even at max zoom while moving.
+	var old_player_pos: Vector2=sim.player.pos
+	var old_accumulator: float=game.accumulator
+	var old_before: Dictionary=game.visual_before.duplicate(true)
+	var old_after: Dictionary=game.visual_after.duplicate(true)
+	var old_camera_locked: bool=game.camera_locked
+	game.camera_locked=true
+	for zoom in [1.0,2.4,3.2]:
+		game.camera.zoom=Vector2.ONE*zoom
+		for frame in 12:
+			var previous: Vector2=Vector2(2400+float(frame)*4.0,1500+float(frame)*2.0)
+			var latest: Vector2=previous+Vector2(4.0,2.0)
+			sim.player.pos=latest
+			game.visual_before={0:previous}
+			game.visual_after={0:latest}
+			game.accumulator=game.SIMULATION_TICK*.5
+			var displayed: Vector2=game._visual_actor_pos(sim.player)
+			check(displayed.is_equal_approx(previous.lerp(latest,.5)),"render position interpolates 30 Hz movement between frames")
+			game.camera.position=displayed
+			game.camera.force_update_scroll()
+			var expected_center=get_viewport_rect().size*.5
+			var screen_ship=get_canvas_transform()*displayed
+			var caption=game._plate_screen_anchor(sim.player)
+			check(screen_ship.distance_to(expected_center)<1.0,"smooth player ship is camera-centered while driving at high zoom")
+			check(absf(caption.x-screen_ship.x)<.1,"caption and animated ship share identical horizontal projection")
+	game.accumulator=old_accumulator
+	game.visual_before=old_before
+	game.visual_after=old_after
+	sim.player.pos=old_player_pos
+	game.camera_locked=old_camera_locked
+	game.camera.zoom=Vector2.ONE
+	game.camera.position=sim.player.pos
+	game.camera.force_update_scroll()
 	# No direction changes may move the status assembly around its own ship.
 	var anchored_y=game._plate_screen_anchor(sim.player).y
 	for heading in [Vector2.UP,Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT,Vector2(1,1).normalized(),Vector2(-1,-1).normalized()]:
