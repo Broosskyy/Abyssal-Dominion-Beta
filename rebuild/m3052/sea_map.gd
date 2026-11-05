@@ -1217,7 +1217,7 @@ func _layout() -> void:
 	_place(zoom_in,mx+mw-z*.7,my-z*.3,z,z)
 	_place(center_button,mx-z*.3,my+mh-z*.7,z,z)
 	_place(settings_button,mx+mw-z*.7,my+mh-z*.7,z,z)
-	_place(render_toggle,mx-121.0,my+mh-32.0,112.0,30.0)
+	_place(render_toggle,mx-134.0,my+mh-32.0,112.0,30.0)
 	var pad=92.0 if compact else 104.0
 	_place(camera_pad,12,s.y-pad-12,pad,pad)
 	camera_pad.visible=camera_pad_visible
