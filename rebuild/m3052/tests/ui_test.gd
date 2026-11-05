@@ -20,6 +20,9 @@ func _run() -> void:
 	await process_frame
 	check(game.ship_textures.size()==10 and game.atlas_textures.size()==16,"ten own ship designs and sixteen directional reference atlases loaded")
 	check(game.skins.size()==27,"all 27 ship designs including Small Starter are selectable")
+	for key in ["cannon","armor","hunter","navigation","logistics","tide","storm","salvage","blessing"]:
+		check(game.deck_icons.has(key) and game.deck_icons[key] is Texture2D,"original nautical SVG icon loads for "+key)
+	check(game.attack.has_method("_press_visual"),"combat orb has tap-feedback animation")
 	check(game._actor_visual_length(game.sim.npcs[14])<game._actor_visual_length(game.sim.npcs[12])*0.7,"elite pinnace stays visibly smaller than a non-elite galleon")
 	var previous_skin: int=game.sim.player.skin
 	game.sim.player.skin=24

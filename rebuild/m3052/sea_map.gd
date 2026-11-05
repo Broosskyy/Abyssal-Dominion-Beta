@@ -127,6 +127,7 @@ var portrait_target := -1
 var target_health_skin: StyleBoxFlat
 var hud_icons: Dictionary={}
 var painted: Dictionary={}
+var deck_icons: Dictionary={}
 var ammo_selector: Button
 var settings_button: Button
 var quest_open: Button
@@ -217,6 +218,8 @@ func _sharp_zoom() -> float:
 
 func _load_assets() -> void:
 	for name in ["anchor","ship","book","compass","chest","gear","plus","minus","focus","arrow","target_cycle"]:hud_icons[name]=load("res://assets/ui/icons/"+name+".svg")
+	for key in ["cannon","armor","hunter","navigation","logistics","tide","storm","salvage","blessing"]:
+		deck_icons[key]=load("res://assets/ui/abyssal/"+key+".svg")
 	extra_icons.port_watchtower=load("res://assets/reference/landmarks/port_watchtower.png")
 	ship_frames=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/ship_frames.json")).entries
 	var pack: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(USER_ROOT+"pack.json"))
@@ -1386,20 +1389,24 @@ func _choose_ammo(index: int) -> void:
 ## Active effects with remaining sea time; emergency cooldowns live on their own orbs.
 func _draw_buffs() -> void:
 	var entries: Array=[]
-	if sim.has_blessing():entries.append([painted.crystal_blessing,_clock_text(float(sim.buffs.blessing)),Color("c69bff")])
-	if float(sim.buffs.tide_deck)>0:entries.append([painted.tide_deck,_clock_text(float(sim.buffs.tide_deck)),Color("5fe0d2")])
+	if sim.has_blessing():entries.append([deck_icons.blessing,_clock_text(float(sim.buffs.blessing)),Color("c69bff")])
+	if float(sim.buffs.tide_deck)>0:entries.append([deck_icons.tide,_clock_text(float(sim.buffs.tide_deck)),Color("5fe0d2")])
 	for key: String in CONTENT.SPECIAL_DECKS:
-		if float(sim.buffs[key])>0:entries.append([painted[CONTENT.SPECIAL_DECKS[key].icon],_clock_text(float(sim.buffs[key])),CONTENT.SPECIAL_DECKS[key].color])
+		if float(sim.buffs[key])>0:entries.append([deck_icons[key.trim_suffix("_deck")],_clock_text(float(sim.buffs[key])),CONTENT.SPECIAL_DECKS[key].color])
 	if sim.guild_island_held():entries.append([painted.nav_guild,_clock_text(sim.fortress_hold),Color("9fe7a8")])
 	var x=0.0
 	var h=buff_bar.size.y
 	for entry: Array in entries:
 		var text: String=entry[1]
 		var w=h+6+font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,11).x+10
-		var skin=StyleBoxFlat.new();skin.bg_color=Color(0.02,0.06,0.08,.82);skin.set_corner_radius_all(int(h*.5))
-		skin.border_color=entry[2];skin.set_border_width_all(1)
+		var ink: Color=entry[2]
+		var pulse=.5+.5*sin(elapsed*1.9+float(x)*.04)
+		var skin=StyleBoxFlat.new();skin.bg_color=Color(0.02,0.06,0.08,.87);skin.set_corner_radius_all(int(h*.5))
+		skin.border_color=ink.lightened(.13*pulse);skin.set_border_width_all(1)
 		buff_bar.draw_style_box(skin,Rect2(x,0,w,h))
+		buff_bar.draw_circle(Vector2(x+h*.5,h*.5),h*.38,Color(ink,.07+.06*pulse))
 		buff_bar.draw_texture_rect(entry[0],Rect2(x+3,3,h-6,h-6),false)
+		buff_bar.draw_line(Vector2(x+h*.95,2),Vector2(x+w-8,2),Color(ink,.12+.12*pulse),1.0,true)
 		buff_bar.draw_string_outline(font,Vector2(x+h+3,h*.5+4),text,HORIZONTAL_ALIGNMENT_LEFT,-1,11,3,Color("06121a"))
 		buff_bar.draw_string(font,Vector2(x+h+3,h*.5+4),text,HORIZONTAL_ALIGNMENT_LEFT,-1,11,Color("f3e0b6"))
 		x+=w+6
@@ -1651,6 +1658,15 @@ func _draw_scroll_hint() -> void:
 
 # --- Ship, ammunition, shipyard and weapons ----------------------------------------------
 
+func _start_deck_motion(stage: Control) -> void:
+	# Modest 15 FPS ornament animation, scoped to its modal; no permanent UI timers.
+	var timer=Timer.new()
+	timer.name="DeckArtPulse"
+	timer.wait_time=1.0/15.0
+	timer.autostart=true
+	timer.timeout.connect(func():if is_instance_valid(stage) and stage.is_visible_in_tree():stage.queue_redraw())
+	stage.add_child(timer)
+
 func _open_ship() -> void:
 	var stage=Control.new()
 	stage.name="ShipStage"
@@ -1660,6 +1676,7 @@ func _open_ship() -> void:
 	stage.name="ShipStage"
 	stage.draw.connect(func():_draw_ship_stage(stage))
 	modal_body.add_child(stage)
+	_start_deck_motion(stage)
 	_meter("RUMPF",float(sim.player.hp),float(sim.player.max_hp),Color("4fbf5e"),"%s / %s" % [_thousands(int(sim.player.hp)),_thousands(int(sim.player.max_hp))])
 	_meter("SCHILD",float(sim.player.shield),float(sim.player.max_shield),Color("3d8fe0"),"%s / %s" % [_thousands(int(sim.player.shield)),_thousands(int(sim.player.max_shield))])
 	_meter("LV. %d · EP" % sim.level,float(sim.xp),float(sim.xp_required()),Color("c79a3f"),"%s / %s" % [_thousands(sim.xp),_thousands(sim.xp_required())])
@@ -1673,10 +1690,10 @@ func _open_ship() -> void:
 		var index=int(sim.deck_slots[slot])
 		if index>=0:
 			var deck: Dictionary=sim.decks[index]
-			_row(_art(DECK_ART[str(deck.type)]),"PLATZ %d · %s\n%s" % [slot+1,_deck_title(deck).to_upper(),_deck_effect(deck)],44,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
+			_row(deck_icons[str(deck.type)],"PLATZ %d · %s\n%s" % [slot+1,_deck_title(deck).to_upper(),_deck_effect(deck)],44,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
 		else:_row(null,"PLATZ %d · FREI\nDecks montierst du angedockt im Hafen." % (slot+1),44,Color("4a4234"))
 	var tide=float(sim.buffs.tide_deck)
-	_row(painted.tide_deck,"GEZEITENDECK · "+("aktiv %s · +10 Kanonenplätze" % _clock_text(tide) if tide>0 else "nicht aktiv"),44,SEA_MARKS.DECK_COLORS.tide if tide>0 else Color("4a4234"))
+	_row(deck_icons.tide,"GEZEITENDECK · "+("aktiv %s · +10 Kanonenplätze" % _clock_text(tide) if tide>0 else "nicht aktiv"),44,SEA_MARKS.DECK_COLORS.tide if tide>0 else Color("4a4234"))
 	_section("VORRÄTE")
 	var stock=_grid(2)
 	for key: String in CONTENT.SUPPLY_KEYS:_stat(stock,str(CONTENT.SUPPLIES[key].name).to_upper(),"%d an Bord" % int(sim.supplies[key]),painted[CONTENT.SUPPLIES[key].icon])
@@ -1693,11 +1710,12 @@ func _draw_ship_stage(stage: Control) -> void:
 	var sea=Rect2(5,5,w-10,h-10)
 	stage.draw_polygon(PackedVector2Array([sea.position,Vector2(sea.end.x,sea.position.y),sea.end,Vector2(sea.position.x,sea.end.y)]),PackedColorArray([Color("0c2f3c"),Color("0c2f3c"),Color("06161d"),Color("06161d")]))
 	var center=Vector2(w*.5,h*.47)
+	var breathing=.5+.5*sin(elapsed*.9)
 	for i in 4:
 		var radii=Vector2(w*(.16+.05*i),h*(.05+.018*i))
 		var ring=PackedVector2Array()
-		for j in 33:ring.append(center+Vector2(0,h*.15)+Vector2(cos(j*TAU/32),sin(j*TAU/32))*radii)
-		stage.draw_polyline(ring,Color(.45,.9,.88,.16-.03*i),1.4,true)
+		for j in 33:ring.append(center+Vector2(0,h*.15)+Vector2(cos(j*TAU/32+elapsed*.07))*radii)
+		stage.draw_polyline(ring,Color(.45,.9,.88,.12+.04*breathing-.02*i),1.4,true)
 	var tex: Texture2D=skin_previews[int(sim.player.skin)]
 	var box=Vector2(minf(w*.6,380.0),h*.52)
 	var k=minf(box.x/maxf(tex.get_width(),1),box.y/maxf(tex.get_height(),1))
@@ -1716,7 +1734,7 @@ func _draw_ship_stage(stage: Control) -> void:
 	stage.draw_circle(Vector2(34,34),18,Color("17303c"));stage.draw_arc(Vector2(34,34),18,0,TAU,28,Color("d8b46a"),2.0,true)
 	_canvas_text(stage,Vector2(34,39),ROMAN[tier],13,Color("ffe6a8"))
 	_canvas_text(stage,Vector2(34,66),"LV. %d" % sim.level,11,Color("ecd29a"))
-	SEA_MARKS.deck_badge(stage,Vector2(w*.5,h-55),10,sim)
+	SEA_MARKS.deck_badge(stage,Vector2(w*.5,h-55),10,sim,elapsed)
 	var mounted=0
 	for index in sim.deck_slots:
 		if int(index)>=0:mounted+=1
@@ -1917,13 +1935,18 @@ func _deck_effect(deck: Dictionary) -> String:
 const DECK_ART := {"cannon":"cannon_1","armor":"upgrade_hull","hunter":"harpoon_1","navigation":"upgrade_sails","logistics":"castle_crew"}
 
 func _open_decks() -> void:
-	var stage=Control.new();stage.custom_minimum_size=Vector2(0,118);stage.mouse_filter=Control.MOUSE_FILTER_IGNORE;stage.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	var stage=Control.new()
+	stage.name="DeckOverview"
+	stage.custom_minimum_size=Vector2(0,143)
+	stage.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	stage.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	stage.draw.connect(func():
 		stage.draw_style_box(SKIN.card(),Rect2(Vector2.ZERO,stage.size))
-		SEA_MARKS.deck_badge(stage,Vector2(stage.size.x*.5,43),11,sim)
-		_canvas_text(stage,Vector2(stage.size.x*.5,94),"10 DECKPLÄTZE · ZWEI REIHEN MIT JE FÜNF",12,Color("ecd29a"))
-		_canvas_text(stage,Vector2(stage.size.x*.5,111),"GOLD · ORANGE/GELB     ELITE · BLAU     KRISTALL · LILA",11,Color("c4d5db")))
+		SEA_MARKS.deck_badge(stage,Vector2(stage.size.x*.5,52),10.0,sim,elapsed)
+		_canvas_text(stage,Vector2(stage.size.x*.5,108),"10 DECKPLÄTZE · ZWEI REIHEN MIT JE FÜNF",12,Color("ecd29a"))
+		_canvas_text(stage,Vector2(stage.size.x*.5,129),"GOLD  ·  ELITE  ·  KRISTALL",11,Color("c4d5db")))
 	modal_body.add_child(stage)
+	_start_deck_motion(stage)
 	_section("MONTIERTE DECKS")
 	for slot in CONTENT.DECK_SLOT_COUNT:
 		var place=slot
@@ -1931,26 +1954,26 @@ func _open_decks() -> void:
 		if index<0:
 			_row(null,"PLATZ %d · FREI" % (slot+1),34,Color("4a4234"));continue
 		var deck: Dictionary=sim.decks[index]
-		var column=_row(_art(DECK_ART[str(deck.type)]),"PLATZ %d · %s\n%s" % [slot+1,_deck_title(deck),_deck_effect(deck)],48,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
+		var column=_row(deck_icons[str(deck.type)],"PLATZ %d · %s\n%s" % [slot+1,_deck_title(deck),_deck_effect(deck)],48,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
 		_row_button(column,"ABBAUEN",func():sim.unequip_deck(place);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
 	_section("SONDERDECKS & SEGEN")
 	var tide=float(sim.buffs.tide_deck)
-	_row(painted.tide_deck,"GEZEITENDECK · "+("aktiv %s · +10 Kanonenplätze" % _clock_text(tide) if tide>0 else "aus Gezeitenkessel und Meilensteinen"),48,SEA_MARKS.DECK_COLORS.tide)
+	_row(deck_icons.tide,"GEZEITENDECK · "+("aktiv %s · +10 Kanonenplätze" % _clock_text(tide) if tide>0 else "aus Gezeitenkessel und Meilensteinen"),48,SEA_MARKS.DECK_COLORS.tide)
 	for key: String in CONTENT.SPECIAL_DECKS:
 		var special_key=key
 		var config: Dictionary=CONTENT.SPECIAL_DECKS[key]
 		var left=float(sim.buffs[key])
-		var special=_row(painted[config.icon],"%s · %s\n%s" % [str(config.name).to_upper(),_clock_text(left) if left>0 else "INAKTIV",config.effect],48,config.color)
+		var special=_row(deck_icons[key.trim_suffix("_deck")],"%s · %s\n%s" % [str(config.name).to_upper(),_clock_text(left) if left>0 else "INAKTIV",config.effect],48,config.color)
 		var caption="30 MIN · %d GOLD" % config.price if sim.level>=int(config.level) else "AB KAPITÄNSSTUFE %d" % config.level
 		_row_button(special,caption,func():sim.buy_special_deck(special_key);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.level<int(config.level) or int(sim.player.gold)<int(config.price))
-	_row(painted.crystal_blessing,"KRISTALLSEGEN · "+(_clock_text(float(sim.buffs.blessing)) if sim.has_blessing() else "nicht aktiv · aus dem Gezeitenkessel"),48,Color("bd78f2"))
+	_row(deck_icons.blessing,"KRISTALLSEGEN · "+(_clock_text(float(sim.buffs.blessing)) if sim.has_blessing() else "nicht aktiv · aus dem Gezeitenkessel"),48,Color("bd78f2"))
 	if not sim.docked:_note("Decks werden angedockt im Hafen umgebaut.",Color("edc68c"))
 	_section("DECKLAGER · %d / %d" % [sim.decks.size(),CONTENT.DECK_INVENTORY_MAX])
 	if sim.decks.is_empty():_note("Golddecks kaufst du in der Deckwerft. Im Hafen verbesserst du sie später zu Elite und Kristall.")
 	for i in sim.decks.size():
 		var index=i
 		var deck: Dictionary=sim.decks[i]
-		var column=_row(_art(DECK_ART[str(deck.type)]),"%s\n%s" % [_deck_title(deck),_deck_effect(deck)],48,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
+		var column=_row(deck_icons[str(deck.type)],"%s\n%s" % [_deck_title(deck),_deck_effect(deck)],48,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
 		var controls=HBoxContainer.new();controls.add_theme_constant_override("separation",6);column.add_child(controls)
 		var picker=OptionButton.new();picker.custom_minimum_size=Vector2(118,40);picker.add_theme_font_size_override("font_size",13)
 		for slot in CONTENT.DECK_SLOT_COUNT:picker.add_item("Platz %d" % (slot+1))
@@ -1970,7 +1993,7 @@ func _open_decks() -> void:
 		for key: String in CONTENT.DECK_KEYS:
 			var type=key
 			var config: Dictionary=CONTENT.DECKS[key]
-			var buy=_with_icon(_action("%s · %d GOLD" % [config.name,config.price],func():sim.buy_deck(type);_save_progress();_open_modal("Decks");_refresh_ui(),"normal",yard),_art(DECK_ART[key]))
+			var buy=_with_icon(_action("%s · %d GOLD" % [config.name,config.price],func():sim.buy_deck(type);_save_progress();_open_modal("Decks");_refresh_ui(),"normal",yard),deck_icons[key])
 			buy.disabled=sim.decks.size()>=CONTENT.DECK_INVENTORY_MAX or int(sim.player.gold)<int(config.price)
 	_note("Gekaufte Decks sind einzelne Exemplare. Gleiche Funktionen dürfen auf mehreren Plätzen sitzen. Doppelte Kesselbelohnungen werden weiterhin in %d Gezeitenessenz umgewandelt." % CONTENT.DUPLICATE_DECK_ESSENCE)
 

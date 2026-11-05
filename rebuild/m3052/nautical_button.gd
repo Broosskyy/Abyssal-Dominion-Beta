@@ -11,12 +11,23 @@ var hero:=false
 var pager:=false
 var badge_alert:=false
 const GOLD=Color("c7a15a")
+var motion_time:=0.0
+var press_reaction:=0.0
+func _press_visual() -> void:
+	press_reaction=1.0
+	queue_redraw()
+func _process(delta: float) -> void:
+	motion_time=fposmod(motion_time+delta,TAU*64.0)
+	if press_reaction>0.0:press_reaction=maxf(0.0,press_reaction-delta*3.7)
+	# Idle controls do not redraw; active/cooling controls receive gentle motion.
+	if press_reaction>0.0 or latched or (hero and cooldown>0.0):queue_redraw()
 func _ready() -> void:
 	focus_mode=Control.FOCUS_NONE
 	clip_text=true
 	for state in ["normal","hover","pressed","hover_pressed","disabled","focus"]:add_theme_stylebox_override(state,StyleBoxEmpty.new())
 	for state in ["font_color","font_hover_color","font_pressed_color","font_hover_pressed_color","font_disabled_color"]:add_theme_color_override(state,Color.TRANSPARENT)
 	add_theme_font_size_override("font_size",10)
+	button_down.connect(_press_visual)
 func _outlined(font: Font,text: String,baseline: Vector2,fontsize: int,color: Color) -> void:
 	var width=font.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,fontsize).x
 	var pos=Vector2(baseline.x-width*.5,baseline.y)
@@ -55,11 +66,13 @@ func _draw() -> void:
 	if disabled:gold=Color("746747")
 	var font=ThemeDB.fallback_font
 	if hero:
+		var wave=.5+.5*sin(motion_time*2.0)
 		var diameter=minf(size.x,size.y)
 		var center=Vector2(size.x*.5,diameter*.5)
 		var radius=diameter*.5-2
-		if latched:draw_circle(center,radius+2,Color(1,.42,.16,.28))
+		if latched:draw_circle(center,radius+2,Color(1,.42,.16,.13+.16*wave))
 		_bezel(center,radius,gold)
+		if latched:draw_arc(center,radius-3,motion_time*.55,motion_time*.55+TAU*.18,36,Color("ffe8a1",.55+.4*wave),1.8,true)
 		draw_circle(center,radius-6,Color("7a5c34"),false,1.0,true)
 		if art!=null:
 			var dimensions=art.get_size()*diameter*.92/maxf(art.get_width(),art.get_height())
@@ -72,6 +85,7 @@ func _draw() -> void:
 			var fs=16 if diameter>100 else 13
 			_outlined(font,caption,Vector2(center.x,diameter-9),fs,Color("f3e0b6"))
 		if cooldown>0:draw_arc(center,radius-7,-PI*.5,-PI*.5+TAU*(1-clampf(cooldown,0,1)),40,Color("e3bf76"),2.6,true)
+		if press_reaction>0.0:draw_arc(center,radius*.94+(1.0-press_reaction)*4.0,0,TAU,40,Color("fff1bd",press_reaction*.7),1.8,true)
 		return
 	if pager:
 		var h=minf(size.y*.6,34.0)
@@ -94,6 +108,7 @@ func _draw() -> void:
 		draw_rect(Rect2(Vector2(3,3),size-Vector2(6,6)),Color(0,0,0,.35),false,1.0)
 		draw_line(Vector2(4,3),Vector2(size.x-4,3),Color(1,.86,.55,.22),1)
 		if latched:draw_line(Vector2(5,size.y-3),Vector2(size.x-5,size.y-3),Color("f5d78d"),2)
+		if press_reaction>0.0:draw_rect(Rect2(Vector2(3,3),size-Vector2(6,6)),Color("ffe4a2",press_reaction*.6),false,1.2,true)
 		var icon=minf(minf(size.y-19,size.x-10),40.0)
 		if art!=null:draw_texture_rect(art,Rect2(Vector2((size.x-icon)*.5,3),Vector2(icon,icon)),false,Color.WHITE if not disabled else Color(.5,.5,.5))
 		var title_size=12 if size.x>=66 else 10
@@ -110,13 +125,16 @@ func _draw() -> void:
 	var center=Vector2(size.x*.5,size.y*.5)
 	var radius=diameter*.5-2
 	_bezel(center,radius,gold)
+	if press_reaction>0.0:draw_arc(center,radius*.95+(1.0-press_reaction)*3.0,0,TAU,36,Color("ffe6a8",press_reaction*.65),1.5,true)
 	var labelled=not quantity.is_empty() or not caption.is_empty()
 	if art!=null:
 		var dimensions=art.get_size()*diameter*.7/maxf(art.get_width(),art.get_height())
 		_disc_texture(art,Rect2(center-dimensions*.5-Vector2(0,4 if labelled else 0),dimensions),center,radius-4.5,Color(1,1,1,.35) if disabled else Color.WHITE)
 	if hot:draw_circle(center,radius-5,Color("dfb15c"),false,1.2,true)
 	if latched:
-		draw_arc(center,radius-5,0,TAU,40,Color("80e3dc"),2.2,true)
+		var shimmer=.5+.5*sin(motion_time*2.2)
+		draw_arc(center,radius-5,0,TAU,40,Color("80e3dc",.65+.35*shimmer),2.2,true)
+		draw_arc(center,radius-6,motion_time*.5,motion_time*.5+TAU*.16,22,Color("e4fffa",.5+.5*shimmer),1.0,true)
 		draw_circle(center+Vector2(radius*.68,-radius*.68),4,Color("80e3dc"))
 	if not state_label.is_empty():
 		_outlined(font,state_label,Vector2(center.x,center.y-radius*.45),9 if diameter<105 else 10,Color("80e3dc") if state_label=="BEREIT" else Color("edc68c"))
