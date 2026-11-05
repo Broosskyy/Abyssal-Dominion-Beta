@@ -136,6 +136,7 @@ var painted: Dictionary={}
 var deck_icons: Dictionary={}
 var ammo_selector: Button
 var settings_button: Button
+var render_toggle: Button
 var quest_open: Button
 var quest_icon: TextureRect
 var ruler: Control
@@ -1062,6 +1063,11 @@ func _build_ui() -> void:
 	zoom_in=_orb(ui,"Näher zoomen",hud_icons.plus,func():_zoom(1.15))
 	center_button=_orb(ui,"Kamera zum Schiff",hud_icons.focus,_recenter_camera)
 	settings_button=_orb(ui,"Anzeige & Steuerung",hud_icons.gear,func():_open_modal("Anzeige"));settings_button.name="SettingsButton"
+	# Directly reachable beside the minimap: no hidden submenu or scrolling.
+	render_toggle=_button(ui,"GRAFIK: 2,5D / 3D",_cycle_render_mode,"normal")
+	render_toggle.name="GraphicsModeToggle"
+	render_toggle.tooltip_text="Zwischen klassischer Seekarte, 2,5D mit GLB und 3D-Schiffen wechseln"
+	render_toggle.add_theme_font_size_override("font_size",10)
 	attack=_orb(ui,"Feuer ein/aus",extra_icons.cannon_action,_toggle_fire,"FEUER");attack.name="FireButton"
 	attack.set("hero",true)
 	repair=_orb(ui,"Schiff reparieren",extra_icons.upgrade_hull,func():sim.toggle_repair();_refresh_ui(),"REP");repair.name="RepairButton"
@@ -1211,6 +1217,7 @@ func _layout() -> void:
 	_place(zoom_in,mx+mw-z*.7,my-z*.3,z,z)
 	_place(center_button,mx-z*.3,my+mh-z*.7,z,z)
 	_place(settings_button,mx+mw-z*.7,my+mh-z*.7,z,z)
+	_place(render_toggle,mx+(mw-112.0)*.5,my+mh+11.0,112.0,30.0)
 	var pad=92.0 if compact else 104.0
 	_place(camera_pad,12,s.y-pad-12,pad,pad)
 	camera_pad.visible=camera_pad_visible
@@ -1286,6 +1293,9 @@ func _thousands(value: int) -> String:
 
 func _refresh_ui() -> void:
 	if gold_label==null:return
+	if render_toggle!=null:
+		render_toggle.text={"classic":"GRAFIK 2,5D","hybrid":"GRAFIK HYBRID","3d":"GRAFIK 3D"}.get(render_mode,"GRAFIK")
+		render_toggle.disabled=mesh_layer==null or not mesh_layer.has_complete_fleet()
 	var today=Time.get_date_string_from_system()
 	var quest_ready=not sim.current_quest().is_empty() and sim.quest_progress()>=int(sim.current_quest().goal)
 	for nav: Button in nav_buttons:
@@ -2339,8 +2349,18 @@ func _guide(mode: String) -> void:
 
 # --- Display settings and game info -------------------------------------------------------
 
+func _active_data_revision() -> int:
+	var boot=get_tree().root.get_node_or_null("DataBoot")
+	if boot!=null:return int(boot.active_revision)
+	var file="res://assets/content_version.json"
+	if FileAccess.file_exists(file):
+		var data=JSON.parse_string(FileAccess.get_file_as_string(file))
+		if data is Dictionary:return int(data.get("revision",0))
+	return 0
+
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"DEINE SEEKARTE · DEINE OBERFLÄCHE","Wähle die Größe für Anzeigen, Karte und Kampfbuttons. Die Spielwelt behält ihre eigene Zoomstufe. Deine Auswahl bleibt auf diesem Gerät gespeichert.")
+	_banner_card(hud_icons.gear,"DEINE SEEKARTE · DEINE OBERFLÄCHE","GRAFIKANSICHT direkt unter der Minikarte umschalten oder hier eine Ansicht wählen. Die Einstellung bleibt auf diesem Gerät gespeichert.")
+	_note("DATENUPDATE %d · 3D-MODELLE %d/9 · AKTIV: %s" % [_active_data_revision(),mesh_layer.model_scenes.size() if mesh_layer!=null else 0,render_mode.to_upper()],Color("97e0d5"))
 	_section("GRAFIKANSICHT")
 	for option in [["classic","2,5D KLASSISCH · Sprite-Schiffe"],["hybrid","2,5D HYBRID · echte GLB-Schiffe"],["3d","3D SCHIFFE · geneigte 3D-Kamera"]]:
 		var key=str(option[0])
@@ -2360,6 +2380,13 @@ func _open_display() -> void:
 	_action("STANDARD WIEDERHERSTELLEN",func():camera_pad_visible=true;_set_display(1,true))
 
 func _open_info() -> void:
+	_section("GRAFIKANSICHT · DATENUPDATE %d" % _active_data_revision())
+	_note("Der Umschalter liegt jetzt auch direkt unter der Minikarte. Installierte GLB-Modelle: %d/9." % (mesh_layer.model_scenes.size() if mesh_layer!=null else 0),Color("9be4df"))
+	var modes=_grid(3)
+	for option in [["classic","2,5D"],["hybrid","HYBRID"],["3d","3D"]]:
+		var key=str(option[0])
+		var button=_action(str(option[1])+(" ✓" if key==render_mode else ""),func():_set_render_mode(key),"tab_on" if key==render_mode else "normal",modes)
+		button.disabled=key==render_mode or (key!="classic" and (mesh_layer==null or not mesh_layer.has_complete_fleet()))
 	var links=_grid(2)
 	_with_icon(_action("SEEKARTEN",func():_open_modal("Seekarten"),"normal",links),painted.nav_charts)
 	_with_icon(_action("KARTEN-ANLEITUNG",func():modal_tab["Seekarten"]="ANLEITUNG";_open_modal("Seekarten"),"normal",links),extra_icons.world_chart)
@@ -2730,22 +2757,31 @@ func _load_display() -> void:
 	render_mode=str(data.get("render_mode","hybrid"))
 	if render_mode not in ["classic","hybrid","3d"]:render_mode="hybrid"
 
+func _cycle_render_mode() -> void:
+	var modes=["classic","hybrid","3d"]
+	_set_render_mode(modes[(modes.find(render_mode)+1)%modes.size()])
+
+func _persist_display_preferences() -> void:
+	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
+	if file!=null:
+		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode}))
+		file.close()
+
 func _set_render_mode(value: String) -> void:
 	render_mode=value if value in ["classic","hybrid","3d"] else "classic"
 	if mesh_layer!=null:
 		mesh_layer.set_render_mode(render_mode)
 		render_mode=mesh_layer.mode
-	_set_display(hud_size,journal_visible)
+	_persist_display_preferences()
 	if camera!=null:_sync_plate_overlay()
+	if modal.visible and modal_kind in ["Anzeige","Spielinfo"]:_open_modal(modal_kind)
+	_refresh_ui()
 	queue_redraw()
 
 func _set_display(size_index: int,show_journal: bool) -> void:
 	hud_size=clampi(size_index,0,2)
 	journal_visible=show_journal
-	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
-	if file!=null:
-		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode}))
-		file.close()
+	_persist_display_preferences()
 	_layout()
 	_open_modal("Anzeige")
 	_refresh_ui()

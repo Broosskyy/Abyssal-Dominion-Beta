@@ -89,6 +89,9 @@ jobs:
           set -euo pipefail
           extra=()
           if [ "$SHELL_NEEDED" = false ]; then extra+=(--content-only); fi
+          # Repair collapsed / excessively elongated UV-decimation faces
+          # before Godot imports and bundles the actual GLB ship meshes.
+          python3 rebuild/m3052/tools/repair_meshy_geometry.py
           python3 rebuild/m3052/tools/build_android.py --godot /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --keystore "$HOME/.cache/abyssal-test-signing/debug.keystore" --output "$GITHUB_WORKSPACE/releases/M3059/ABYSSAL_DOMINION_M3059_REBUILD_ARM64.apk" --data-output "$GITHUB_WORKSPACE/releases/M3059/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip" --revision "$GITHUB_RUN_NUMBER" --signing-key /tmp/content-private.pem "${extra[@]}"
           if [ "$SHELL_NEEDED" = true ]; then
             python3 rebuild/m3052/tools/prepare_update_manifest.py releases/M3059/ABYSSAL_DOMINION_M3059_REBUILD_ARM64.apk
@@ -153,7 +156,7 @@ jobs:
           if [ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]; then echo 'Newer source exists; leaving artifact available.'; exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add --sparse -f updates/*.json releases/M3059/*.build.json releases/M3059/data.json releases/M3059/captures/*.log rebuild/m3052/updater/data_public.pem rebuild/m3052/assets/content_version.json
+          git add --sparse -f rebuild/m3052/assets/npc/meshy/models/*.glb rebuild/m3052/assets/npc/meshy/repair_report.json updates/*.json releases/M3059/*.build.json releases/M3059/data.json releases/M3059/captures/*.log rebuild/m3052/updater/data_public.pem rebuild/m3052/assets/content_version.json
           if [ -f releases/M3059/latest.json ]; then git add --sparse -f releases/M3059/latest.json releases/M3059/*.signature.txt releases/M3059/*.manifest.txt releases/M3059/*.android-xml.txt; fi
           git commit -m 'Preserve signed data release, optional bootstrap and renderer checks [skip ci]'
           git -c pack.window=0 push origin HEAD:main

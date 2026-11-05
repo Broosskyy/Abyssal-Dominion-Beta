@@ -22,6 +22,9 @@ func _run() -> void:
 	check(game.skins.size()==27,"all 27 ship designs including Small Starter are selectable")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
 	check(game.mesh_layer.mode in ["classic","hybrid","3d"],"game has a valid 2.5D or 3D mode")
+	check(game.render_toggle is Button and game.render_toggle.visible,"graphics switch exists directly on the chart beside the minimap")
+	check(game.render_toggle.text.begins_with("GRAFIK"),"graphics switch shows its currently selected mode")
+	check(game._active_data_revision()>=0,"display menu reports exact active signed data revision")
 	var before_mode: String=game.render_mode
 	game.mesh_layer.set_render_mode("hybrid")
 	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"hybrid 2.5D renders an actual GLB, not a directional image")
@@ -58,7 +61,7 @@ func _run() -> void:
 		for nav: Button in game.nav_buttons:
 			check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
 			check(nav.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and nav.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x,"navigation stays between wallet and captain meters at "+str(dimensions))
-		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.settings_button,game.interact,game.loadout_button,game.ammo_selector,game.camera_pad,game.target_cycle,game.supply_buttons.powder]
+		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.settings_button,game.render_toggle,game.interact,game.loadout_button,game.ammo_selector,game.camera_pad,game.target_cycle,game.supply_buttons.powder]
 		for item: Button in game.supply_buttons.values():
 			if item not in controls:controls.append(item)
 		for control: Control in controls:

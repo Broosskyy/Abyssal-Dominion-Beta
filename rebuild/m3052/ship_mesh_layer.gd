@@ -6,15 +6,15 @@ const MODEL_ROOT := "res://assets/npc/meshy/models/"
 ## [horizontal water-plane span, original lowest Z, Z height, X midpoint, Y midpoint].
 ## Original Meshy source is Z-up; rotate imported nodes -90 degrees around X.
 const MODEL_INFO := {
-	"old_harbor_trader":[4.557,-1.776,2.817,-0.057,-0.174],
-	"merchant_brig_3002":[5.044,-1.263,2.349,-0.056,0.660],
-	"merchant_brig_2921":[5.449,-2.415,3.248,-0.081,0.607],
-	"merchant_brig_2912":[6.434,-0.795,1.819,0.014,-0.299],
-	"weathered_voyager":[6.018,-1.903,2.972,-0.336,-0.018],
-	"weathered_junk":[4.807,-1.164,2.997,-0.565,0.002],
-	"emerald_voyager":[7.738,-1.927,2.780,0.413,0.475],
-	"midnight_mariner":[5.146,-1.560,2.179,1.037,0.151],
-	"crimson_tide_galley":[4.431,-1.868,4.043,0.310,0.185]
+	"old_harbor_trader":[1.94,-0.26,0.51,0.14,-0.60],
+	"merchant_brig_3002":[1.92,-0.21,0.42,0.16,-0.34],
+	"merchant_brig_2921":[1.95,-0.26,0.54,0.02,-0.42],
+	"merchant_brig_2912":[1.95,-0.29,0.57,0.29,-0.44],
+	"weathered_voyager":[1.94,-0.30,0.60,-0.04,-0.34],
+	"weathered_junk":[1.94,-0.25,0.49,0.19,-0.43],
+	"emerald_voyager":[1.95,-0.27,0.55,0.08,-0.46],
+	"midnight_mariner":[1.94,-0.25,0.51,0.07,-0.40],
+	"crimson_tide_galley":[1.95,-0.32,0.67,0.16,-0.40]
 }
 var host
 var stage: SubViewport
