@@ -16,6 +16,12 @@ const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
 const AMMO_CHOICE=preload("res://ammo_choice.gd")
+const CAPTAIN_PLATE_OFFSET := 50.0
+const OTHER_PLATE_OFFSET := 38.0
+const PLATE_ID_BASELINE := 13.0
+const PLATE_HP_Y := 24.0
+const PLATE_SHIELD_Y := 35.0
+const PLATE_DECK_Y := 65.0
 const SHOT_COLORS := {"flare":Color("ffe27a"),"pumpkin":Color("ff8a2a"),"snow":Color("f4fbff"),"ice":Color("7fd4ff"),"chain":Color("d7e4ea"),"harpoon":Color("9fd0c8")}
 const USER_ROOT := "res://assets/user/"
 const SAVE := "user://captain_m3052.json"
@@ -498,6 +504,18 @@ func _plate_scale() -> float:
 	if gallery_page>=0 or camera==null:return 1.0
 	return _plate_pixels()/maxf(camera.zoom.x,0.05)
 
+## Use the same effective font pixels as _label(), including high-DPI zoom.
+## Otherwise the rank emblem can overlap the measured player name.
+func _plate_text_width(value: String,size: int) -> float:
+	var grow=1.0 if gallery_page>=0 or camera==null else clampf(get_viewport_rect().size.y/720.0,1.0,1.7)
+	var actual=maxi(size,roundi(float(size)*grow))
+	return font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual).x
+
+func _plate_identity(actor: Dictionary) -> String:
+	if int(actor.id)==0:return "ID: "+sim.captain_id
+	var uid:=str(actor.get("player_uid","")).strip_edges()
+	return "ID: "+uid.left(20) if not uid.is_empty() else ""
+
 func _plate_title(actor: Dictionary) -> String:
 	var title=str(skins[int(sim.player.skin)].name) if int(actor.id)==0 else str(actor.name)
 	var title_size=16 if int(actor.id)==0 else 14
@@ -507,7 +525,7 @@ func _plate_title(actor: Dictionary) -> String:
 	elif actor.get("kind","")=="tower":title="[%s] " % sim.tower_tag()+title
 	# Keep the title inside its reserved rectangle, including guild and staff prefixes.
 	var shortened=false
-	while font.get_string_size(title+("…" if shortened else ""),HORIZONTAL_ALIGNMENT_LEFT,-1,title_size).x>210 and title.length()>1:
+	while _plate_text_width(title+("…" if shortened else ""),title_size)>210 and title.length()>1:
 		title=title.left(title.length()-1);shortened=true
 	return title+"…" if shortened else title
 
@@ -542,9 +560,9 @@ func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 		var point: Vector2=get_canvas_transform()*actor.pos
 		if not get_viewport_rect().grow(180*pixels).has_point(point):continue
 		var player=int(actor.id)==0
-		var width=maxf(170.0 if player else 160.0,font.get_string_size(_plate_title(actor),HORIZONTAL_ALIGNMENT_LEFT,-1,16 if player else 14).x+30)*pixels
-		var baseline=point+Vector2(0,(36.0 if player else 30.0)*pixels)
-		placed[int(actor.id)]=Rect2(baseline-Vector2(width*.5,17*pixels),Vector2(width,(106 if player else 43)*pixels))
+		var width=maxf(188.0 if player else 160.0,_plate_text_width(_plate_title(actor),16 if player else 14)+80.0)*pixels
+		var baseline=point+Vector2(0,(CAPTAIN_PLATE_OFFSET if player else OTHER_PLATE_OFFSET)*pixels)
+		placed[int(actor.id)]=Rect2(baseline-Vector2(width*.5,17*pixels),Vector2(width,(116 if player else 52)*pixels))
 	return placed
 
 func _draw_nameplates(fleet: Array[Dictionary]) -> void:
@@ -574,24 +592,27 @@ func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
 	elif monster:color=Color("c6b9d6")
 	var title=_plate_title(actor)
 	var title_size=16 if player else 14
-	var text_width=font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,title_size).x
+	var text_width=_plate_text_width(title,title_size)
 	draw_set_transform(anchor,0,Vector2.ONE*_plate_scale())
 	_label(Vector2(0,0),title,title_size,color,2)
 	if not tower:
 		var tier=clampi(floori((sim.level-1)/4.0)+1,1,5) if player else (4 if monster else (3 if elite else 1))
-		_rank_emblem(Vector2(-text_width*.5-13,-6),tier,Color("d5b77a") if player or elite else Color("8fa6b2"))
+		# Emblem width and antialiased outlines are outside the rendered name.
+		_rank_emblem(Vector2(-text_width*.5-23,-6),tier,Color("d5b77a") if player or elite else Color("8fa6b2"))
 	var width=132.0 if player else (96.0 if int(actor.id)==sim.target else 84.0)
 	var hull_color=Color("d97660") if hostile else Color("61b967")
+	var identity=_plate_identity(actor)
+	if not identity.is_empty():_label(Vector2(0,PLATE_ID_BASELINE),identity,8,Color(.72,.86,.88,.49),1)
 	if player:
-		_label(Vector2(0,14),_thousands(int(actor.hp)),11,Color("b9cbc9"),1)
-		_status_bar(Rect2(-width*.5,20,width,6),float(actor.hp)/maxf(1,float(actor.max_hp)),Color("49df24"))
-	else:_plate_bar(Rect2(-width*.5,7,width,5),float(actor.hp)/maxf(1,float(actor.max_hp)),hull_color)
+		# Only the HUD displays numeric HP. The ship gets clean gauges.
+		_status_bar(Rect2(-width*.5,PLATE_HP_Y,width,7),float(actor.hp)/maxf(1,float(actor.max_hp)),Color("49df24"))
+	else:_plate_bar(Rect2(-width*.5,12,width,5),float(actor.hp)/maxf(1,float(actor.max_hp)),hull_color)
 	var shield=float(actor.get("max_shield",0))
 	if shield>0:
-		if player:_status_bar(Rect2(-width*.5,30,width,4),float(actor.get("shield",0))/shield,Color("409fdf"))
-		else:_plate_bar(Rect2(-width*.5,15,width,3),float(actor.get("shield",0))/shield,Color("4d95be"))
-	if player:SEA_MARKS.deck_badge(self,Vector2(0,59),6.0,sim)
-	if float(actor.get("slow",0))>0:draw_circle(Vector2(width*.5+6,11),2.5,Color("9fdbf4"))
+		if player:_status_bar(Rect2(-width*.5,PLATE_SHIELD_Y,width,5),float(actor.get("shield",0))/shield,Color("409fdf"))
+		else:_plate_bar(Rect2(-width*.5,22,width,3),float(actor.get("shield",0))/shield,Color("4d95be"))
+	if player:SEA_MARKS.deck_badge(self,Vector2(0,PLATE_DECK_Y),6.0,sim)
+	if float(actor.get("slow",0))>0:draw_circle(Vector2(width*.5+6,14),2.5,Color("9fdbf4"))
 	if player and sim.staff.hidden():_label(Vector2(0,-20),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color(),2)
 	draw_set_transform(Vector2.ZERO)
 

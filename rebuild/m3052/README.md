@@ -146,3 +146,8 @@ Regular decks now appear as two rows of five material-colored points below name,
 ## M3065: reference status and metal deck fittings
 
 The supplied close-up supersedes the small circular markers from M3064: ten beveled rectangular deck fields now sit below the name, separate HP number, straight HP bar and additional shield bar. A pirate crest and broad steel special-deck fittings surround the grid, with coloured inlays only for active effects. See [reference details](docs/m3065/REFERENCE_STATUS_AND_DECKS.md).
+
+
+## M3066: quieter ship readout and persistent captain ID
+
+The captain nameplate is moved farther below the hull, with a translucent local ID beneath the name. Numeric HP is removed from the ship (the HUD continues to show it); green HP and blue shield gauges remain separate, followed by all ten existing regular deck slots and their special fittings. Rank placement measures the actual high-DPI text size before applying a larger clearance. The local captain ID is generated once and saved in schema 4 without changing combat, inventory, decks, or the data updater; until multiplayer accounts are implemented it is not a server-issued identity.

@@ -21,6 +21,8 @@ const START := Vector2(2100, 1450)
 const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice"]
 const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein"]
 var player: Dictionary
+## Local captain identity until the server issues persistent multiplayer IDs.
+var captain_id := ""
 var npcs: Array[Dictionary] = []
 var islands: Array[Dictionary] = []
 var shots: Array[Dictionary] = []
@@ -78,6 +80,7 @@ var staff_marked := false
 var message := "Seekarte antippen: Kurs setzen · Schiff antippen: Ziel wählen"
 
 func _init() -> void:
+	captain_id = Crypto.new().generate_random_bytes(6).hex_encode().to_upper()
 	rng.seed = 3060
 	player = {"id": 0, "pos": START, "heading": Vector2(-1, 0), "path": [], "hp": PLAYER_HP,
 		"max_hp": PLAYER_HP, "shield": PLAYER_SHIELD, "max_shield": PLAYER_SHIELD, "speed": PLAYER_SPEED,
@@ -1312,7 +1315,7 @@ func export_save() -> Dictionary:
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
-	return {"schema":4,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	return {"schema":4,"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
@@ -1325,6 +1328,8 @@ func export_save() -> Dictionary:
 
 func restore_save(data: Dictionary) -> bool:
 	if not int(data.get("schema",0)) in [1,2,3,4]: return false
+	var stored_id := str(data.get("captain_id","")).strip_edges().to_upper()
+	if stored_id.length()==12 and stored_id.is_valid_hex_number():captain_id=stored_id
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
 	player.skin=clampi(int(data.get("skin",26)),0,26)
 	ammo_mode=clampi(int(data.get("ammo_mode",0)),0,AMMO_NAMES.size()-1)

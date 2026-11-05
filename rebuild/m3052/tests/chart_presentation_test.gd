@@ -21,6 +21,13 @@ func run() -> void:
 		close.append(npc)
 	sim.npcs.assign(close.slice(1));sim.select(int(close[1].id))
 	var before: Dictionary=sim.export_save().duplicate(true)
+	var saved_id: String=sim.captain_id
+	check(saved_id.length()==12 and saved_id.is_valid_hex_number(),"captain receives a persistent 12-digit hexadecimal identity")
+	check(game._plate_identity(sim.player)=="ID: "+saved_id,"captain identity appears in ship nameplate")
+	check(game._plate_identity(close[1]).is_empty(),"NPCs are not falsely labeled as player identities")
+	var restored=game.SIM.new()
+	check(restored.restore_save(before) and restored.captain_id==saved_id,"local identity survives save/load without an account")
+	check(game.PLATE_ID_BASELINE<game.PLATE_HP_Y and game.PLATE_HP_Y+7<game.PLATE_SHIELD_Y and game.PLATE_SHIELD_Y+5<game.PLATE_DECK_Y-6,"identity, hull, shield and deck components have distinct rows")
 	for dimensions in [Vector2i(1280,720),Vector2i(844,390),Vector2i(720,405),Vector2i(2340,1080)]:
 		root.size=dimensions;await process_frame
 		for profile in 3:
@@ -48,7 +55,7 @@ func run() -> void:
 				check(stable,"captain block stays anchored while other hulls cross it"+suffix)
 				var center: Vector2=game.get_canvas_transform()*sim.player.pos
 				var anchor=own.position+Vector2(own.size.x*.5,17*game._plate_pixels())
-				check(anchor.is_equal_approx(center+Vector2(0,36*game._plate_pixels())),"name, health and decks share a fixed waterline anchor"+suffix)
+				check(anchor.is_equal_approx(center+Vector2(0,game.CAPTAIN_PLATE_OFFSET*game._plate_pixels())),"name, identity, health and decks share a fixed waterline anchor"+suffix)
 			check(game.ammo_selector.visible and game.supply_buttons.values().all(func(item):return item.visible),"single ammunition selector and supplies are visible at %s / profile %d" % [dimensions,profile])
 	check(sim.export_save()==before,"caption layout and HUD refresh preserve the captain save")
 	for i in 4:
