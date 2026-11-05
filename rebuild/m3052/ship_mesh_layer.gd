@@ -3,18 +3,19 @@ extends TextureRect
 ## GLB meshes are not replaced by fake sprites. 2.5D / 3D use the same fleet,
 ## damage, collision, pathfinding, IDs, saves and nameplate screen anchors.
 const MODEL_ROOT := "res://assets/npc/meshy/models/"
-## [horizontal water-plane span, original lowest Z, Z height, X midpoint, Y midpoint].
-## Original Meshy source is Z-up; rotate imported nodes -90 degrees around X.
+## Source Meshy glTF is already Y-UP. No -90-degree X rotation is needed.
+## [hull length X, lowest Y, total Y height, X midpoint, Z midpoint].
+## Measured from the nine complete ORIGINAL ~30k-triangle GLBs (not decimated assets).
 const MODEL_INFO := {
-	"old_harbor_trader":[1.94,-0.26,0.51,0.14,-0.60],
-	"merchant_brig_3002":[1.92,-0.21,0.42,0.16,-0.34],
-	"merchant_brig_2921":[1.95,-0.26,0.54,0.02,-0.42],
-	"merchant_brig_2912":[1.95,-0.29,0.57,0.29,-0.44],
-	"weathered_voyager":[1.94,-0.30,0.60,-0.04,-0.34],
-	"weathered_junk":[1.94,-0.25,0.49,0.19,-0.43],
-	"emerald_voyager":[1.95,-0.27,0.55,0.08,-0.46],
-	"midnight_mariner":[1.94,-0.25,0.51,0.07,-0.40],
-	"crimson_tide_galley":[1.95,-0.32,0.67,0.16,-0.40]
+	"old_harbor_trader":[1.9042,-0.9302,1.8281,-0.0009,0.0031],
+	"merchant_brig_3002":[1.9012,-0.6511,1.3133,-0.0011,-0.0005],
+	"merchant_brig_2921":[1.9025,-0.7811,1.5618,-0.0004,0.0016],
+	"merchant_brig_2912":[1.9022,-0.7712,1.5394,-0.0006,-0.0005],
+	"weathered_voyager":[1.9002,-0.7078,1.4143,-0.0004,-0.0045],
+	"weathered_junk":[1.9014,-0.7706,1.5438,-0.0020,-0.0003],
+	"emerald_voyager":[1.9000,-0.7652,1.5336,0.0008,-0.0004],
+	"midnight_mariner":[1.9016,-0.7520,1.5024,-0.0001,-0.0030],
+	"crimson_tide_galley":[1.9017,-0.6453,1.2821,-0.0002,-0.0001]
 }
 var host
 var stage: SubViewport
@@ -38,6 +39,7 @@ func _ready() -> void:
 	stage.transparent_bg=true
 	stage.render_target_clear_mode=SubViewport.CLEAR_MODE_ALWAYS
 	stage.render_target_update_mode=SubViewport.UPDATE_DISABLED
+	stage.msaa_3d=Viewport.MSAA_2X
 	add_child(stage)
 	world_root=Node3D.new()
 	world_root.name="Fleet3D"
@@ -91,7 +93,7 @@ func resize_view(screen: Vector2) -> void:
 	position=Vector2.ZERO
 	size=screen
 	if stage==null:return
-	var factor=0.76 if OS.has_feature("mobile") else 1.0
+	var factor=0.90 if OS.has_feature("mobile") else 1.0
 	resolution_factor=factor
 	var wanted=Vector2i(maxi(64,roundi(screen.x*factor)),maxi(64,roundi(screen.y*factor)))
 	if stage.size!=wanted:stage.size=wanted
@@ -106,10 +108,10 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	owner.add_child(model)
 	var info: Array=MODEL_INFO[key]
 	var scale_factor=float(host._actor_visual_length(actor))/maxf(float(info[0]),0.1)
-	model.rotation_degrees=Vector3(-90,0,0)
+	model.rotation_degrees=Vector3.ZERO # Original Meshy glTF already uses Y-up.
 	model.scale=Vector3.ONE*scale_factor
 	# Waterline intersects the low hull; sails remain above the sea plane.
-	model.position=Vector3(-float(info[3])*scale_factor,(-float(info[1])-float(info[2])*.13)*scale_factor,float(info[4])*scale_factor)
+	model.position=Vector3(-float(info[3])*scale_factor,(-float(info[1])-float(info[2])*.13)*scale_factor,-float(info[4])*scale_factor)
 	model_instances[int(actor.id)]=owner
 	model_instance_keys[int(actor.id)]=key
 	return owner
@@ -139,7 +141,7 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		# Only the mesh gets depth / perspective; taps and combat stay 2D.
 		node.position=Vector3(point.x,0,center.y+(point.y-center.y)/foreshortening)
 		var heading: Vector2=actor.heading
-		node.rotation.y=-heading.angle()-PI*.5
+		node.rotation.y=-heading.angle() # Original hull length axis is +X.
 		node.visible=true
 		kept[id]=true
 	for id: Variant in model_instances.keys():
