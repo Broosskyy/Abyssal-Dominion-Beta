@@ -60,13 +60,28 @@ func run() -> void:
 				check(not game._plate_has_rank(close[1]) and game._plate_has_rank(sim.player),"pirate rank is exclusive to players"+suffix)
 			check(game.ammo_selector.visible and game.supply_buttons.values().all(func(item):return item.visible),"single ammunition selector and supplies are visible at %s / profile %d" % [dimensions,profile])
 	check(sim.export_save()==before,"caption layout and HUD refresh preserve the captain save")
-	# Facing changes cannot put any part of the captain caption into the sprite.
+	# No direction changes may move the status assembly around its own ship.
+	var anchored_y=game._plate_screen_anchor(sim.player).y
 	for heading in [Vector2.UP,Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT,Vector2(1,1).normalized(),Vector2(-1,-1).normalized()]:
 		sim.player.heading=heading
 		game.direction_cache[0]=VISUALS.heading_eight(heading,-1)
 		var hull=game._actor_screen_bounds(sim.player)
 		var anchor=game._plate_screen_anchor(sim.player)
 		check(anchor.y>=hull.end.y+game.CAPTAIN_HULL_CLEARANCE*game._plate_pixels()-.1,"all headings leave hull-to-caption air gap")
+		check(is_equal_approx(anchor.y,anchored_y),"ship name, ID, bars and decks never jump during rotation")
+	# A damaged sprite has exactly the same caption baseline as the intact ship.
+	var original_hp=int(sim.player.hp)
+	var before_damage=game._plate_screen_anchor(sim.player).y
+	sim.player.hp=maxi(1,roundi(float(sim.player.max_hp)*.25))
+	check(is_equal_approx(game._plate_screen_anchor(sim.player).y,before_damage),"damage visuals cannot shift caption")
+	sim.player.hp=original_hp
+	# NPC heading changes must also leave their own label stationary relative to the hull.
+	var npc=close[1]
+	var npc_y=game._plate_screen_anchor(npc).y
+	for heading in [Vector2.UP,Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT]:
+		npc.heading=heading
+		game.direction_cache[int(npc.id)]=VISUALS.heading_column(heading,-1)
+		check(is_equal_approx(game._plate_screen_anchor(npc).y,npc_y),"NPC caption remains attached across all directions")
 	for i in 4:
 		game._open_modal("Munition");game.ammo_rows[i+3].pressed.emit()
 		check(sim.ammo_mode==i+3,"special ammunition retains its real selection action %d" % i)

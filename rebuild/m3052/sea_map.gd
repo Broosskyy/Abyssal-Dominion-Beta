@@ -150,6 +150,10 @@ var camera_pad: Control
 var target_cycle: Button
 var camera_pad_visible := true
 var plate_rects: Dictionary = {}
+## Keep the maximum artwork extent stable across all rendered headings.
+var plate_hull_drop_cache: Dictionary = {}
+## Only avoidance offsets are eased; every caption remains attached to its hull.
+var npc_plate_ease: Dictionary = {}
 var status_age := 0.0
 var ammo_previews: Dictionary = {}
 
@@ -562,16 +566,49 @@ func _actor_screen_bounds(actor: Dictionary) -> Rect2:
 	var frame: Dictionary=ship_frames[texture.resource_path.trim_prefix("res://")].frames[column]
 	return transform*VISUALS.world_rect(frame,point,length,flipped)
 
-## Place a caption below the *visible* sprite, not below its center. The
-## measured atlas frame follows the current heading and its real pivot.
+## A heading-dependent sprite bounding box makes names/decks jump every time
+## a ship turns (especially the eight-view starter). Measure *all* frames once
+## and reserve a single constant bottom extent for each ship texture/size.
+## This also covers the starter's intact/damaged appearance without jumping.
+func _plate_stable_hull_drop(actor: Dictionary) -> float:
+	var kind=str(actor.get("kind","ship"))
+	if kind=="tower":return 6.0
+	if kind=="monster":return 72.0
+	var player=int(actor.id)==0
+	var length=_actor_visual_length(actor)
+	var sources: Array[Texture2D]=[]
+	if player and int(sim.player.skin)==26:
+		sources.append(starter_texture)
+		sources.append(starter_damaged_texture)
+	elif player and int(sim.player.skin)<10:
+		sources.append(ship_textures[int(sim.player.skin)])
+	else:
+		sources.append(atlas_textures[int(sim.player.skin)-10] if player else atlas_textures[posmod(int(actor.art),atlas_textures.size())])
+	var result=0.0
+	for texture: Texture2D in sources:
+		if texture==null:continue
+		var resource=texture.resource_path.trim_prefix("res://")
+		var key=resource+"|"+str(length)
+		if not plate_hull_drop_cache.has(key):
+			var extent=0.0
+			if ship_frames.has(resource):
+				for frame: Dictionary in ship_frames[resource].frames:
+					var bounds: Rect2=VISUALS.world_rect(frame,Vector2.ZERO,length,false)
+					extent=maxf(extent,bounds.end.y)
+			plate_hull_drop_cache[key]=extent
+		result=maxf(result,float(plate_hull_drop_cache[key]))
+	return result
+
+## The screen offset is constant for each design, independent of heading and
+## camera motion. Nearby ships never influence the captain's position.
 func _plate_screen_anchor(actor: Dictionary) -> Vector2:
 	var pixels=_plate_pixels()
 	var point: Vector2=get_canvas_transform()*actor.pos
 	var player=int(actor.id)==0
-	var hull: Rect2=_actor_screen_bounds(actor)
 	var minimum=point.y+(CAPTAIN_PLATE_OFFSET if player else OTHER_PLATE_OFFSET)*pixels
 	var clearance=(CAPTAIN_HULL_CLEARANCE if player else NPC_HULL_CLEARANCE)*pixels
-	return Vector2(point.x,maxf(minimum,hull.end.y+clearance))
+	var stable_bottom=point.y+_plate_stable_hull_drop(actor)*absf(get_canvas_transform().y.y)
+	return Vector2(point.x,maxf(minimum,stable_bottom+clearance))
 
 ## No NPC caption is hidden. The captain is never moved by nearby ships.
 ## Target and other NPC captions choose a deterministic nearby free position.
@@ -629,10 +666,27 @@ func _draw_nameplates(fleet: Array[Dictionary]) -> void:
 	var pixels=_plate_pixels()
 	var ordered=fleet.duplicate()
 	ordered.sort_custom(func(a,b):return (2 if int(a.id)==0 else (1 if int(a.id)==sim.target else 0))<(2 if int(b.id)==0 else (1 if int(b.id)==sim.target else 0)))
+	var visible_ids: Dictionary={}
 	for actor: Dictionary in ordered:
-		if not plate_rects.has(int(actor.id)):continue
-		var rect: Rect2=plate_rects[int(actor.id)]
-		_nameplate(actor,inverse*(rect.position+Vector2(rect.size.x*.5,17*pixels)))
+		var id=int(actor.id)
+		if not plate_rects.has(id):continue
+		var rect: Rect2=plate_rects[id]
+		var desired=rect.position+Vector2(rect.size.x*.5,17*pixels)
+		var base=_plate_screen_anchor(actor)
+		if id!=0:
+			# Never interpolate a label's absolute screen position: it must follow
+			# the vessel immediately. Ease only the local overlap-avoidance offset.
+			var target_offset=desired-base
+			var prior: Vector2=npc_plate_ease.get(id,target_offset)
+			var blend=clampf(get_process_delta_time()*9.0,.0,1.0)
+			var smooth=prior.lerp(target_offset,blend)
+			if smooth.distance_to(target_offset)<.35:smooth=target_offset
+			npc_plate_ease[id]=smooth
+			visible_ids[id]=true
+			desired=base+smooth
+		_nameplate(actor,inverse*desired)
+	for id: Variant in npc_plate_ease.keys():
+		if not visible_ids.has(id):npc_plate_ease.erase(id)
 
 ## Readable, anchored name/HP/shield block; ten deck slots follow directly below.
 func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
