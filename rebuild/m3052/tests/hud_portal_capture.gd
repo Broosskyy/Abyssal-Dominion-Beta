@@ -110,6 +110,15 @@ func _deck_reference(game: Node,output: String) -> void:
 	var sim=game.sim
 	sim.configure_map(0);sim.level=8;sim.player.pos=Vector2(2400,1600);sim.player.path=[]
 	sim.decks.clear();sim.deck_slots.fill(-1)
+	sim.grant_deck("cannon",0,true);sim.grant_deck("armor",0,true)
+	for key in ["tide_deck","storm_deck","salvage_deck","blessing"]:sim.buffs[key]=0
+	sim.player.hp=sim.player.max_hp;sim.player.shield=sim.player.max_shield
+	game.camera.position=sim.player.pos;game.camera.zoom=Vector2.ONE*.96
+	sim.npcs.clear();sim.target=-1;sim.message=""
+	for dimensions in [Vector2i(1536,709),Vector2i(844,390)]:
+		root.size=dimensions;game.camera.force_update_scroll()
+		await _shot(game,output,"reference-two-gold-%dx%d" % [dimensions.x,dimensions.y])
+	sim.decks.clear();sim.deck_slots.fill(-1)
 	for i in 10:sim.grant_deck(game.CONTENT.DECK_KEYS[i%5],mini(2,floori(i/4.0)),true)
 	sim.add_tide_deck(1200);sim.add_special_deck("storm_deck",1200);sim.add_special_deck("salvage_deck",1200);sim.activate_blessing(600)
 	sim.player.hp=sim.player.max_hp;sim.player.shield=sim.player.max_shield
@@ -118,7 +127,11 @@ func _deck_reference(game: Node,output: String) -> void:
 	for dimensions in [Vector2i(1536,709),Vector2i(844,390)]:
 		root.size=dimensions;game.camera.position=sim.player.pos;game.camera.force_update_scroll()
 		await _shot(game,output,"decks-10-materials-%dx%d" % [dimensions.x,dimensions.y])
+	for deck: Dictionary in sim.decks:deck.tier=1
+	root.size=Vector2i(1536,709);game.camera.force_update_scroll()
+	await _shot(game,output,"reference-ten-elite-1536x709")
 	game._open_modal("Decks")
+	root.size=Vector2i(844,390)
 	await _shot(game,output,"deck-yard-844x390")
 	game.modal.hide();game.modal_backdrop.hide()
 func _systems(game: Node,output: String) -> Dictionary:

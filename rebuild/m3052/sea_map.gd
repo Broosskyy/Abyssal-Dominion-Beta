@@ -500,14 +500,14 @@ func _plate_scale() -> float:
 
 func _plate_title(actor: Dictionary) -> String:
 	var title=str(skins[int(sim.player.skin)].name) if int(actor.id)==0 else str(actor.name)
-	var title_size=15 if int(actor.id)==0 else 14
+	var title_size=16 if int(actor.id)==0 else 14
 	if int(actor.id)==0:
 		if not sim.guild.is_empty():title="[%s] " % sim.guild.tag+title
 		if sim.staff.shows_badge():title="[%s] " % sim.staff.badge()+title
 	elif actor.get("kind","")=="tower":title="[%s] " % sim.tower_tag()+title
 	# Keep the title inside its reserved rectangle, including guild and staff prefixes.
 	var shortened=false
-	while font.get_string_size(title+("…" if shortened else ""),HORIZONTAL_ALIGNMENT_LEFT,-1,title_size).x>185 and title.length()>1:
+	while font.get_string_size(title+("…" if shortened else ""),HORIZONTAL_ALIGNMENT_LEFT,-1,title_size).x>210 and title.length()>1:
 		title=title.left(title.length()-1);shortened=true
 	return title+"…" if shortened else title
 
@@ -542,9 +542,9 @@ func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 		var point: Vector2=get_canvas_transform()*actor.pos
 		if not get_viewport_rect().grow(180*pixels).has_point(point):continue
 		var player=int(actor.id)==0
-		var width=maxf(160.0,font.get_string_size(_plate_title(actor),HORIZONTAL_ALIGNMENT_LEFT,-1,15 if player else 14).x+30)*pixels
+		var width=maxf(170.0 if player else 160.0,font.get_string_size(_plate_title(actor),HORIZONTAL_ALIGNMENT_LEFT,-1,16 if player else 14).x+30)*pixels
 		var baseline=point+Vector2(0,(36.0 if player else 30.0)*pixels)
-		placed[int(actor.id)]=Rect2(baseline-Vector2(width*.5,17*pixels),Vector2(width,(94 if player else 43)*pixels))
+		placed[int(actor.id)]=Rect2(baseline-Vector2(width*.5,17*pixels),Vector2(width,(106 if player else 43)*pixels))
 	return placed
 
 func _draw_nameplates(fleet: Array[Dictionary]) -> void:
@@ -573,19 +573,24 @@ func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
 	elif hostile:color=Color("eab8a7")
 	elif monster:color=Color("c6b9d6")
 	var title=_plate_title(actor)
-	var title_size=15 if player else 14
+	var title_size=16 if player else 14
 	var text_width=font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,title_size).x
 	draw_set_transform(anchor,0,Vector2.ONE*_plate_scale())
 	_label(Vector2(0,0),title,title_size,color,2)
 	if not tower:
 		var tier=clampi(floori((sim.level-1)/4.0)+1,1,5) if player else (4 if monster else (3 if elite else 1))
 		_rank_emblem(Vector2(-text_width*.5-13,-6),tier,Color("d5b77a") if player or elite else Color("8fa6b2"))
-	var width=112.0 if player else (96.0 if int(actor.id)==sim.target else 84.0)
+	var width=132.0 if player else (96.0 if int(actor.id)==sim.target else 84.0)
 	var hull_color=Color("d97660") if hostile else Color("61b967")
-	_plate_bar(Rect2(-width*.5,7,width,8 if player else 5),float(actor.hp)/maxf(1,float(actor.max_hp)),hull_color,_thousands(int(actor.hp)) if player else "",9)
+	if player:
+		_label(Vector2(0,14),_thousands(int(actor.hp)),11,Color("b9cbc9"),1)
+		_status_bar(Rect2(-width*.5,20,width,6),float(actor.hp)/maxf(1,float(actor.max_hp)),Color("49df24"))
+	else:_plate_bar(Rect2(-width*.5,7,width,5),float(actor.hp)/maxf(1,float(actor.max_hp)),hull_color)
 	var shield=float(actor.get("max_shield",0))
-	if shield>0:_plate_bar(Rect2(-width*.5,20 if player else 15,width,5 if player else 3),float(actor.get("shield",0))/shield,Color("4d95be"))
-	if player:SEA_MARKS.deck_badge(self,Vector2(0,44),6.3,sim)
+	if shield>0:
+		if player:_status_bar(Rect2(-width*.5,30,width,4),float(actor.get("shield",0))/shield,Color("409fdf"))
+		else:_plate_bar(Rect2(-width*.5,15,width,3),float(actor.get("shield",0))/shield,Color("4d95be"))
+	if player:SEA_MARKS.deck_badge(self,Vector2(0,59),6.0,sim)
 	if float(actor.get("slow",0))>0:draw_circle(Vector2(width*.5+6,11),2.5,Color("9fdbf4"))
 	if player and sim.staff.hidden():_label(Vector2(0,-20),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color(),2)
 	draw_set_transform(Vector2.ZERO)
@@ -619,6 +624,15 @@ func _plate_bar(rect: Rect2,ratio: float,color: Color,text: String="",fontsize: 
 	_capsule(filled,color)
 	_capsule(Rect2(filled.position+Vector2(2,1),Vector2(filled.size.x-4,filled.size.y*.38)),Color(1,1,1,.24))
 	if not text.is_empty():_label(Vector2(rect.get_center().x,rect.get_center().y+fontsize*.36),text,fontsize,Color.WHITE,2)
+
+## Straight combat gauges match the rectangular deck fittings below them.
+func _status_bar(rect: Rect2,ratio: float,color: Color) -> void:
+	draw_rect(rect.grow(1),Color("030b12"))
+	draw_rect(rect,Color("0a1620"))
+	var fill=Rect2(rect.position,Vector2(rect.size.x*clampf(ratio,0,1),rect.size.y))
+	if fill.size.x<=0:return
+	draw_rect(fill,color)
+	draw_line(fill.position+Vector2(0,1),Vector2(fill.end.x,fill.position.y+1),color.lightened(.3),1,true)
 
 func _medallion(center: Vector2,tier: int) -> void:
 	draw_circle(center+Vector2(0,1.5),14,Color(0,0,0,.6))

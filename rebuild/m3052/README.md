@@ -141,3 +141,8 @@ Save schema 4 migrates schemas 1–3 and retains the two existing deck slots and
 ## M3064: one ammunition selector and point decks
 
 Regular decks now appear as two rows of five material-colored points below name, HP and shield, with special-deck icons around them. One MUNITION button opens all seven ammunition types; selecting a row activates it and closes the list. Four persistent special-ammo buttons and paging are removed. MSDF text and imported texture mipmaps improve scaled rendering; legacy low-resolution NPC artwork remains a source limitation. See [presentation and verification](docs/m3064/AMMO_AND_DECK_PRESENTATION.md).
+
+
+## M3065: reference status and metal deck fittings
+
+The supplied close-up supersedes the small circular markers from M3064: ten beveled rectangular deck fields now sit below the name, separate HP number, straight HP bar and additional shield bar. A pirate crest and broad steel special-deck fittings surround the grid, with coloured inlays only for active effects. See [reference details](docs/m3065/REFERENCE_STATUS_AND_DECKS.md).

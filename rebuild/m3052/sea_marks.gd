@@ -1,5 +1,5 @@
 extends RefCounted
-## Small vector marks shared by nameplates, minimap, chart and menus: deck gems, staff badges,
+## Small vector marks shared by nameplates, minimap, chart and menus: deck tiles, staff badges,
 ## padlocks and check marks. The bundled font has no symbol glyphs, so these are drawn.
 const DECK_COLORS := {"cannon":Color("ff7a45"),"armor":Color("9cbde3"),"hunter":Color("6fd37a"),"navigation":Color("4fd6ec"),"logistics":Color("f2c14e"),"tide":Color("3fe8cf")}
 const ROMAN := ["I","II","III"]
@@ -37,56 +37,93 @@ static func gem(canvas: CanvasItem,center: Vector2,r: float,color: Color,tier: i
 ## Fixed physical slots: five columns, two rows. Colour means material, not role.
 static func deck_cells(center: Vector2,r: float) -> Array[Vector2]:
 	var cells: Array[Vector2]=[]
-	for slot in 10:cells.append(center+Vector2((slot%5-2)*r*1.8,(floori(slot/5.0)-.5)*r*1.8))
+	for slot in 10:cells.append(center+Vector2((slot%5-2)*r*1.9,(floori(slot/5.0)-.5)*r*1.9))
 	return cells
 
-static func deck_dot(canvas: CanvasItem,center: Vector2,r: float,color: Color,active: bool) -> void:
-	canvas.draw_circle(center,r+1,Color("05121a"))
-	canvas.draw_circle(center,r,color if active else Color("142832"))
-	canvas.draw_circle(center,r,Color("9ba69e",.6) if active else Color("516771",.65),false,.7,true)
-	if active:canvas.draw_circle(center+Vector2(-r*.28,-r*.3),maxf(.6,r*.23),Color(1,1,1,.32))
+## Square enamel plates, with a dark metal seat and a clear bevel at native size.
+## These intentionally have neither circular sockets nor diamond silhouettes.
+static func deck_tile(canvas: CanvasItem,center: Vector2,r: float,color: Color,active: bool) -> void:
+	var rect=Rect2(center-Vector2.ONE*r,Vector2.ONE*r*2)
+	canvas.draw_rect(rect.grow(1.0),Color("04101a"))
+	canvas.draw_rect(rect,Color("172b38") if not active else color.darkened(.35))
+	if not active:
+		canvas.draw_rect(rect,Color("668292",.52),false,.7)
+		return
+	canvas.draw_rect(rect.grow(-1),color)
+	canvas.draw_rect(Rect2(rect.position+Vector2(1,1),Vector2(rect.size.x-2,rect.size.y*.38)),color.lightened(.25))
+	canvas.draw_line(rect.position,Vector2(rect.end.x,rect.position.y),color.lightened(.55),1,true)
+	canvas.draw_line(rect.position,Vector2(rect.position.x,rect.end.y),color.lightened(.35),1,true)
+	canvas.draw_line(Vector2(rect.position.x,rect.end.y),rect.end,color.darkened(.55),1,true)
+	canvas.draw_line(Vector2(rect.end.x,rect.position.y),rect.end,color.darkened(.55),1,true)
 
-static func gem_row(canvas: CanvasItem,center: Vector2,r: float,entries: Array,font: Font=null) -> void:
+static func deck_tiles(canvas: CanvasItem,center: Vector2,r: float,entries: Array) -> void:
 	var cells=deck_cells(center,r)
 	for slot in 10:
 		var entry: Dictionary=entries[slot] if slot<entries.size() else {}
-		deck_dot(canvas,cells[slot],r*.65,entry.get("color",Color.WHITE),bool(entry.get("lit",false)))
+		deck_tile(canvas,cells[slot],r*.78,entry.get("color",Color.WHITE),bool(entry.get("lit",false)))
 
-## Four distinct original symbols surround the normal decks. Unowned/inactive
-## special decks stay dim; only active timers light the icon and its outer arc.
-static func special_deck_icon(canvas: CanvasItem,center: Vector2,r: float,key: String,active: bool,ratio: float=0.0) -> void:
-	var colors={"tide":Color("5de0d4"),"storm":Color("80bdff"),"salvage":Color("edc36a"),"blessing":Color("bd78f2")}
-	var ink: Color=colors[key] if active else Color("556975",.5)
-	canvas.draw_circle(center,r,Color("06141d",.75))
-	canvas.draw_arc(center,r,0,TAU,24,Color("c6a86d",.7) if active else Color("53606a",.4),1.0,true)
-	if active:canvas.draw_arc(center,r+2,-PI*.5,-PI*.5+TAU*clampf(ratio,0,1),24,ink,1.3,true)
+static func metal(canvas: CanvasItem,center: Vector2,r: float,vertices: Array,side: float=1.0,active: bool=true) -> void:
+	var points=PackedVector2Array()
+	for v: Vector2 in vertices:points.append(center+Vector2(v.x*side,v.y)*r)
+	var edge=points.duplicate();edge.append(points[0])
+	canvas.draw_polyline(edge,Color("08121a"),3.0,true)
+	var low=INF;var high=-INF
+	for point in points:low=minf(low,point.y);high=maxf(high,point.y)
+	var shades=PackedColorArray()
+	for point in points:
+		var top=Color("e2dfc9") if active else Color("b4c0bf")
+		var bottom=Color("72786d") if active else Color("495d67")
+		shades.append(top.lerp(bottom,(point.y-low)/maxf(.01,high-low)))
+	canvas.draw_polygon(points,shades)
+	canvas.draw_polyline(edge,Color("e6dfc4") if active else Color("b2bbba"),.7,true)
+	if points.size()>2:
+		canvas.draw_line(points[0],points[1],Color("fff3d4") if active else Color("c6cecd"),1.0,true)
+		canvas.draw_line(points[points.size()-2],points[points.size()-1],Color("414d52"),1.2,true)
+
+## Sculpted side fittings replace the old round ability buttons. Inactive fittings
+## stay bare steel; active decks have their own coloured inlay, with no fake timer.
+static func special_deck_arm(canvas: CanvasItem,center: Vector2,r: float,side: float,key: String,active: bool) -> void:
+	var upper=key in ["tide","storm"]
+	var shape: Array=[Vector2(5.25,-1.7),Vector2(8.2,-.1),Vector2(11.55,.05),Vector2(11.65,-1.25),Vector2(12.1,-1.65),Vector2(12.0,1.1),Vector2(8.0,.8),Vector2(5.25,-.1)] if upper else [Vector2(4.7,2.05),Vector2(7.4,2.65),Vector2(8.2,2.25),Vector2(8.5,2.65),Vector2(9.5,2.65),Vector2(9.8,3.1),Vector2(9.45,3.5),Vector2(8.5,3.35),Vector2(8.2,3.65),Vector2(7.7,3.4),Vector2(4.7,3.15)]
+	metal(canvas,center,r,shape,side,active)
+	if upper:
+		var joint=center+Vector2(side*8.0,.32)*r
+		canvas.draw_line(joint-Vector2(0,r*.44),joint+Vector2(0,r*.44),Color("293d48"),.8,true)
+		canvas.draw_circle(joint+Vector2(side*r*.4,0),maxf(.65,r*.11),Color("e9e2ca"),true,-1,true)
+	if not active:return
+	var ink: Color={"tide":Color("5de0d4"),"storm":Color("80bdff"),"salvage":Color("edc36a"),"blessing":Color("bd78f2")}[key]
+	var origin=center+Vector2(side*(7.5 if upper else 6.3),.2 if upper else 2.8)*r
+	var span=r*(2.8 if upper else 1.5)
+	canvas.draw_line(origin-Vector2(span*.5,0),origin+Vector2(span*.5,0),ink,1.6,true)
 	if key=="tide":
-		for row in 2:
-			var line=PackedVector2Array()
-			for i in 9:line.append(center+Vector2((i-4)*r*.18,sin(i*PI*.5)*r*.17+(row-.5)*r*.45))
-			canvas.draw_polyline(line,ink,1.5,true)
+		var wave=PackedVector2Array()
+		for i in 9:wave.append(origin+Vector2((i-4)*r*.3,sin(i*PI*.5)*r*.23))
+		canvas.draw_polyline(wave,ink,1.3,true)
 	elif key=="storm":
-		var bolt=PackedVector2Array([center+Vector2(.25,-.72)*r,center+Vector2(-.4,.06)*r,center+Vector2(.08,.06)*r,center+Vector2(-.25,.72)*r,center+Vector2(.48,-.15)*r,center+Vector2(.05,-.15)*r])
-		canvas.draw_colored_polygon(bolt,ink)
-	elif key=="salvage":
-		canvas.draw_circle(center-Vector2(0,r*.5),r*.17,ink,false,1.3,true)
-		canvas.draw_line(center-Vector2(0,r*.32),center+Vector2(0,r*.5),ink,1.5,true)
-		canvas.draw_arc(center,r*.53,0,PI,16,ink,1.5,true)
-		canvas.draw_line(center+Vector2(-r*.35,-r*.03),center+Vector2(r*.35,-r*.03),ink,1.2,true)
-	else:gem(canvas,center,r*.72,ink,-1,active)
+		canvas.draw_polyline(PackedVector2Array([origin+Vector2(-r*.3,-r*.5),origin+Vector2(r*.2,-r*.05),origin+Vector2(-r*.1,r*.1),origin+Vector2(r*.35,r*.5)]),ink,1.5,true)
+	elif key=="blessing":
+		canvas.draw_colored_polygon(PackedVector2Array([origin+Vector2(0,-r*.48),origin+Vector2(r*.4,0),origin+Vector2(0,r*.48),origin+Vector2(-r*.4,0)]),ink)
+
+## A small pirate crest above the deck tiles, rather than a row of ability discs.
+static func pirate_crest(canvas: CanvasItem,center: Vector2,r: float) -> void:
+	for side in [-1.0,1.0]:
+		metal(canvas,center,r,[Vector2(.5,-.35),Vector2(1.65,-1.0),Vector2(1.95,-.75),Vector2(1.75,-.4),Vector2(.6,.2)],side)
+		metal(canvas,center,r,[Vector2(.4,.2),Vector2(1.65,.85),Vector2(1.85,.55),Vector2(1.6,.3),Vector2(.55,-.3)],side)
+	canvas.draw_circle(center-Vector2(0,r*.23),r*.95,Color("07121a"))
+	canvas.draw_circle(center-Vector2(0,r*.23),r*.8,Color("c8c8b6"))
+	canvas.draw_circle(center-Vector2(r*.16,r*.46),r*.52,Color("e9e3cd"))
+	canvas.draw_rect(Rect2(center+Vector2(-r*.52,r*.05),Vector2(r*1.04,r*.75)),Color("b8bcad"))
+	for side in [-1.0,1.0]:canvas.draw_circle(center+Vector2(side*r*.35,-r*.1),r*.23,Color("162532"))
+	canvas.draw_colored_polygon(PackedVector2Array([center+Vector2(0,r*.12),center+Vector2(-r*.16,r*.4),center+Vector2(r*.16,r*.4)]),Color("27343b"))
+	for x in [-.25,.05,.35]:canvas.draw_line(center+Vector2(x*r,r*.5),center+Vector2(x*r,r*.77),Color("4a5557"),.6,true)
 
 static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim) -> void:
-	gem_row(canvas,center,r,deck_entries(sim))
-	var tide=float(sim.buffs.tide_deck)
-	if tide>0:
-		for side in [-1.0,1.0]:
-			var edge=PackedVector2Array([center+Vector2(side*r*4.5,-r*2.2),center+Vector2(side*r*6.6,-r*1.7),center+Vector2(side*r*7.0,0),center+Vector2(side*r*6.6,r*1.7),center+Vector2(side*r*4.5,r*2.2)])
-			canvas.draw_polyline(edge,Color("5de0d4",.8),1.4,true)
-	var x=r*5.8;var y=r*1.15;var icon=r*1.05
-	special_deck_icon(canvas,center+Vector2(-x,-y),icon,"tide",tide>0,tide/1800.0)
-	special_deck_icon(canvas,center+Vector2(x,-y),icon,"storm",float(sim.buffs.storm_deck)>0,float(sim.buffs.storm_deck)/1800.0)
-	special_deck_icon(canvas,center+Vector2(-x,y),icon,"salvage",float(sim.buffs.salvage_deck)>0,float(sim.buffs.salvage_deck)/1800.0)
-	special_deck_icon(canvas,center+Vector2(x,y),icon,"blessing",sim.has_blessing(),float(sim.buffs.blessing)/900.0)
+	deck_tiles(canvas,center,r,deck_entries(sim))
+	pirate_crest(canvas,center-Vector2(0,r*2.6),r*.82)
+	special_deck_arm(canvas,center,r,-1,"tide",float(sim.buffs.tide_deck)>0)
+	special_deck_arm(canvas,center,r,1,"storm",float(sim.buffs.storm_deck)>0)
+	special_deck_arm(canvas,center,r,-1,"salvage",float(sim.buffs.salvage_deck)>0)
+	special_deck_arm(canvas,center,r,1,"blessing",sim.has_blessing())
 
 ## Kristallsegen beside the deck row: the crystal, a gold ring and a timer that runs down.
 static func blessing_crystal(canvas: CanvasItem,center: Vector2,r: float,texture: Texture2D,remaining: float,total: float) -> void:
