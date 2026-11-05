@@ -60,9 +60,10 @@ func _initialize() -> void:
 	sim.player.last_hit=sim.clock
 	check(not sim.travel(1),"combat prevents portal escape")
 	sim.player.last_hit=-100
+	var base_hull=int(sim.npcs[0].max_hp)
 	sim.npcs[0].hp=123
 	check(sim.travel(1) and sim.map_id==1 and sim.visited[1],"portal loads northern region after unlocking")
-	check(int(sim.npcs[0].max_hp)==roundi(float(SIM.CONTENT.NPC_MESHY_ROSTER[0].hp)*float(SIM.CONTENT.MAPS[1].enemy_scale)) and sim.islands[0].art=="snow2","new map scales new NPC roster health and regional art")
+	check(int(sim.npcs[0].max_hp)==roundi(float(base_hull)*float(SIM.CONTENT.MAPS[1].enemy_scale)) and sim.islands[0].art=="snow2","new map scales whichever verified NPC art roster is installed")
 	check(sim.shots.is_empty() and sim.target==-1 and not sim.firing,"map switch clears stale combat references")
 	var route=sim.plan_path(sim.START,sim.portals[1].pos)
 	check(not route.is_empty(),"northern return portal has a navigable route")

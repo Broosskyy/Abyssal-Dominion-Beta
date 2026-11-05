@@ -191,3 +191,7 @@ M3073's same-frame screen-space nameplate repaint passed its layout checks, but 
 ## M3075 — Nine Meshy ship types and prepared visual replacement
 
 Nine uploaded GLBs have been converted locally into four-angle transparent PNG atlases. The roster in CONTENT.NPC_MESHY_ROSTER contains individual base HP, shield, speed, gun damage and loot, and the existing sixteen ship spawns reuse those nine types without changing NPC IDs, positions, quest logic, portals, tower units or save schema. Region multipliers still apply. The optional sprite index assets/npc/meshy/ship_frames.json and matching PNGs can be copied from the separately delivered NPC sprite ZIP. This GitHub text-only integration deliberately falls back to old 2D reference hulls until the PNG binary assets are added to the repository. Only then will actual Meshy models visually replace existing NPCs. NPC sprites inherit the existing heading_column four-view renderer and the M3074 camera stabilization; phones do not need to parse large source GLBs.
+
+
+### Atomic NPC art activation
+M3075 keeps the entire original 16-NPC gameplay table active until **all nine** sprite PNGs are present as Godot resources. This avoids silently switching enemy health/names while old artwork remains. Once imported, the 16 IDs/spawn coordinates automatically map to the nine authored Meshy roster entries. New files can be delivered with the separate 3 MB four-angle ZIP. The replacement does not touch player hulls, map portals, XP or loot save schema.
