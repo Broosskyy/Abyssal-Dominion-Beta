@@ -354,10 +354,10 @@ func _initialize() -> void:
 	check(float(patrol.spotted)>sea.clock,"flare ammunition marks the target")
 	sea._hit({"source":0,"damage":20,"weapon":"snow"},patrol)
 	check(float(patrol.slow)>7 and is_equal_approx(float(patrol.slow_rate),0.38),"snow ammunition slows harder than chain shot")
-	var pumpkin_before=int(sea.npcs[2].hp)
+	var pumpkin_before=int(sea.npcs[2].hp)+int(sea.npcs[2].shield)
 	patrol.pos=sea.npcs[2].pos
 	sea._hit({"source":0,"damage":100,"weapon":"pumpkin"},patrol)
-	check(int(sea.npcs[2].hp)<pumpkin_before,"pumpkin ammunition splashes a nearby ship")
+	check(int(sea.npcs[2].hp)+int(sea.npcs[2].shield)<pumpkin_before,"pumpkin ammunition splashes a nearby ship, taking shields before hull")
 	_staff_checks()
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
