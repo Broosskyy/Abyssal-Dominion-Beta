@@ -101,17 +101,18 @@ func _init() -> void:
 		Vector2(2230, 1910), Vector2(2990, 1580), Vector2(1170, 1350), Vector2(2420, 870),
 		Vector2(3150, 810), Vector2(1130, 2140), Vector2(3310, 2320), Vector2(1810, 2550),
 		Vector2(3720, 1520), Vector2(640, 980), Vector2(2940, 2650), Vector2(2170, 2440), Vector2(3650, 600)]
-	var names = ["Roter Korsar", "Jadebrigg", "Kupfersegler", "Küstenfregatte", "Goldene Armada", "Eisfregatte", "Schattensegler", "Admiralswache", "Elite-Galeone", "Knochenschiff", "Brennender Holländer", "Schwarzbart", "Königsgaleone", "Kriegsschiff", "Schmuggler", "Fliegender Holländer"]
 	for i in starts.size():
-		var elite = i % 5 == 4
-		var hull = 760 if elite else 420
-		var shield = roundi(hull * 0.25) if elite else 0
-		npcs.append({"id": i + 1, "name": names[i % names.size()], "kind": "ship", "pos": starts[i],
-			"home": starts[i], "heading": Vector2.LEFT, "path": [], "hp": hull,
-			"max_hp": hull, "shield": shield, "max_shield": shield, "speed": 48.0 + float(i % 3) * 4.0,
-			"reload": float(i % 4) * 0.6, "repath": 0.0, "state": "patrol", "patrol": i % 4,
-			"aggressive": false, "slow": 0.0, "respawn": 0.0, "reward": 110 if elite else 55,
-			"art": i, "elite": elite, "view_count":4, "renderer":"sprite", "navigation":"four_diagonal", "last_hit": -100.0})
+		var spec: Dictionary=CONTENT.NPC_MESHY_ROSTER[int(CONTENT.NPC_MESHY_ASSIGNMENTS[i])]
+		var hull=int(spec.hp)
+		var shield=int(spec.shield)
+		npcs.append({"id":i+1,"name":str(spec.name),"kind":"ship","pos":starts[i],
+			"home":starts[i],"heading":Vector2.LEFT,"path":[],"hp":hull,"max_hp":hull,
+			"shield":shield,"max_shield":shield,"speed":float(spec.speed),
+			"power":int(spec.power),"reload":float(i%4)*.6,"repath":0.0,"state":"patrol",
+			"patrol":i%4,"aggressive":false,"slow":0.0,"respawn":0.0,
+			"reward":int(spec.reward),"art":i,"elite":bool(spec.elite),
+			"visual_key":str(spec.key),"view_count":4,"renderer":"sprite",
+			"navigation":"four_diagonal","last_hit":-100.0})
 	npcs.append({"id": 100, "name": "Tiamat · Tiefenwächter", "kind": "monster", "pos": Vector2(2590, 1750),
 		"home": Vector2(2590, 1750), "heading": Vector2.LEFT, "path": [], "hp": 1650,
 		"max_hp": 1650, "shield": 0, "max_shield": 0, "speed": 28.0, "reload": 1.0, "repath": 0.0, "state": "patrol",

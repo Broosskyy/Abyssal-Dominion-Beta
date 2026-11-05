@@ -120,6 +120,7 @@ var player_xp: ProgressBar
 var extra_icons: Dictionary = {}
 var modal_backdrop: ColorRect
 var ship_frames: Dictionary = {}
+var npc_meshy_textures: Dictionary = {}
 var starter_texture: Texture2D
 var starter_damaged_texture: Texture2D
 var facing_cache: Dictionary = {}
@@ -228,6 +229,19 @@ func _load_assets() -> void:
 		deck_icons[key]=load("res://assets/ui/abyssal/"+key+".svg")
 	extra_icons.port_watchtower=load("res://assets/reference/landmarks/port_watchtower.png")
 	ship_frames=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/ship_frames.json")).entries
+	# Load optional textured four-angle Mes​hy sprites. Missing PNGs retain legacy art.
+	var meshy_index="res://assets/npc/meshy/ship_frames.json"
+	if FileAccess.file_exists(meshy_index):
+		var pack_frames=JSON.parse_string(FileAccess.get_file_as_string(meshy_index))
+		if pack_frames is Dictionary:
+			for resource: String in pack_frames.get("entries",{}):
+				var resource_path="res://"+resource
+				if ResourceLoader.exists(resource_path):
+					var png: Texture2D=load(resource_path)
+					if png!=null:
+						var key=resource.get_file().get_basename()
+						npc_meshy_textures[key]=png
+						ship_frames[resource]=pack_frames.entries[resource]
 	var pack: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(USER_ROOT+"pack.json"))
 	for item: Dictionary in pack.ship_catalog:
 		skins.append(item)
@@ -478,6 +492,11 @@ func _draw_portal_marker(point: Vector2,locked: bool) -> void:
 func _starter_texture(hp: float,max_hp: float) -> Texture2D:
 	return starter_damaged_texture if VISUALS.damage_state(hp,max_hp)==1 else starter_texture
 
+func _npc_ship_texture(actor: Dictionary) -> Texture2D:
+	var key=str(actor.get("visual_key",""))
+	if npc_meshy_textures.has(key):return npc_meshy_textures[key]
+	return atlas_textures[posmod(int(actor.art),atlas_textures.size())]
+
 func _actor_visual_length(actor: Dictionary) -> float:
 	if int(actor.id)==0:
 		var skin=int(sim.player.skin)
@@ -529,7 +548,7 @@ func _draw_actor(actor: Dictionary) -> void:
 		facing_cache[int(actor.id)]=flipped
 		_draw_ship_frame(tex,point,length,0,flipped,sin(elapsed*1.7+actor.id)*1.2,hull_alpha)
 	else:
-		var tex = atlas_textures[int(sim.player.skin)-10] if is_player else atlas_textures[posmod(int(actor.art),atlas_textures.size())]
+		var tex = atlas_textures[int(sim.player.skin)-10] if is_player else _npc_ship_texture(actor)
 		var col=VISUALS.heading_column(heading,int(direction_cache.get(int(actor.id),-1)))
 		direction_cache[int(actor.id)]=col
 		_draw_ship_frame(tex,point,length,col,false,sin(elapsed*1.7+actor.id)*1.2,hull_alpha)
@@ -600,7 +619,7 @@ func _actor_screen_bounds(actor: Dictionary) -> Rect2:
 	elif player and int(sim.player.skin)<10:
 		texture=ship_textures[int(sim.player.skin)];flipped=bool(facing_cache.get(0,false))
 	else:
-		texture=atlas_textures[int(sim.player.skin)-10] if player else atlas_textures[posmod(int(actor.art),atlas_textures.size())]
+		texture=atlas_textures[int(sim.player.skin)-10] if player else _npc_ship_texture(actor)
 		column=int(direction_cache.get(int(actor.id),0))
 	var frame: Dictionary=ship_frames[texture.resource_path.trim_prefix("res://")].frames[column]
 	return transform*VISUALS.world_rect(frame,point,length,flipped)
@@ -622,7 +641,7 @@ func _plate_stable_hull_drop(actor: Dictionary) -> float:
 	elif player and int(sim.player.skin)<10:
 		sources.append(ship_textures[int(sim.player.skin)])
 	else:
-		sources.append(atlas_textures[int(sim.player.skin)-10] if player else atlas_textures[posmod(int(actor.art),atlas_textures.size())])
+		sources.append(atlas_textures[int(sim.player.skin)-10] if player else _npc_ship_texture(actor))
 	var result=0.0
 	for texture: Texture2D in sources:
 		if texture==null:continue
@@ -1296,7 +1315,7 @@ func _refresh_ui() -> void:
 				preview.region=Rect2(Vector2.ZERO,beast.get_size()/Vector2(CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS))
 				target_portrait.texture=preview
 			elif selected.kind=="tower":target_portrait.texture=painted["tower_"+str(selected.tower)]
-			else:target_portrait.texture=_ship_preview(atlas_textures[int(selected.art)],0)
+			else:target_portrait.texture=_ship_preview(_npc_ship_texture(selected),0)
 		target_name.text=("[%s] " % sim.tower_tag() if selected.kind=="tower" else "")+str(selected.name)
 		target_hp.max_value=selected.max_hp
 		target_hp.value=selected.hp

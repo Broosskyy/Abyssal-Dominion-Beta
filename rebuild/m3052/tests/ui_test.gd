@@ -20,6 +20,13 @@ func _run() -> void:
 	await process_frame
 	check(game.ship_textures.size()==10 and game.atlas_textures.size()==16,"ten own ship designs and sixteen directional reference atlases loaded")
 	check(game.skins.size()==27,"all 27 ship designs including Small Starter are selectable")
+	check(game.CONTENT.NPC_MESHY_ROSTER.size()==9,"nine approved NPC visual designs and roles")
+	check(game.sim.npcs.filter(func(npc):return npc.kind=="ship").size()==16,"original sixteen ship spawn points are retained")
+	for npc in game.sim.npcs:
+		if str(npc.kind)!="ship":continue
+		check(game.CONTENT.NPC_MESHY_ROSTER.any(func(entry):return str(entry.key)==str(npc.visual_key)),"NPC has a valid Meshy model key")
+		check(game._npc_ship_texture(npc) is Texture2D,"NPC has an imported 4-angle texture or safe fallback")
+		check(int(npc.hp)==int(npc.max_hp) and int(npc.shield)==int(npc.max_shield),"NPC health and shield initialize correctly")
 	for key in ["cannon","armor","hunter","navigation","logistics","tide","storm","salvage","blessing"]:
 		check(game.deck_icons.has(key) and game.deck_icons[key] is Texture2D,"original nautical SVG icon loads for "+key)
 	check(game.attack.has_method("_press_visual"),"combat orb has tap-feedback animation")

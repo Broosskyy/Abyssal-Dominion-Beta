@@ -1,4 +1,18 @@
 extends RefCounted
+## M3075 Meshy ship render pack: original textures, four mobile-friendly angles.
+const NPC_MESHY_ROSTER := [
+	{"key":"old_harbor_trader","name":"Küstenhändler","role":"Küstenhandel","hp":360,"shield":0,"speed":50.0,"power":15,"reward":45,"elite":false},
+	{"key":"merchant_brig_3002","name":"Versorgungsbrigg","role":"Nachschub","hp":420,"shield":0,"speed":52.0,"power":20,"reward":55,"elite":false},
+	{"key":"merchant_brig_2921","name":"Geleitbrigg","role":"Konvoischutz","hp":480,"shield":80,"speed":48.0,"power":24,"reward":65,"elite":false},
+	{"key":"merchant_brig_2912","name":"Schmugglerbrigg","role":"Schmuggler","hp":520,"shield":0,"speed":56.0,"power":26,"reward":70,"elite":false},
+	{"key":"weathered_voyager","name":"Fernsegler","role":"Fernhandel","hp":540,"shield":90,"speed":54.0,"power":25,"reward":75,"elite":false},
+	{"key":"weathered_junk","name":"Ostwind-Dschunke","role":"Spezialschiff","hp":590,"shield":100,"speed":49.0,"power":28,"reward":80,"elite":false},
+	{"key":"emerald_voyager","name":"Smaragdsegler","role":"Elite-Konvoi","hp":700,"shield":170,"speed":51.0,"power":34,"reward":105,"elite":true},
+	{"key":"midnight_mariner","name":"Nachtmariner","role":"Elite-Jäger","hp":850,"shield":230,"speed":54.0,"power":43,"reward":135,"elite":true},
+	{"key":"crimson_tide_galley","name":"Blutflut-Galeere","role":"Elite-Galeere","hp":1000,"shield":300,"speed":50.0,"power":50,"reward":155,"elite":true},
+]
+## Reuse existing sixteen fixed spawn IDs and locations.
+const NPC_MESHY_ASSIGNMENTS := [0,1,2,3,8,4,5,1,2,7,4,3,6,2,0,5]
 const MONSTER_COLUMNS := 4
 const MONSTER_ROWS := 10
 ## Visible hull sizes follow the ship design, independent of combat/elite rank.
