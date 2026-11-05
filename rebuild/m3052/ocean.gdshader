@@ -5,27 +5,27 @@ uniform vec2 camera_world=vec2(2100.,1450.);
 uniform vec2 viewport_size=vec2(1280.,720.);
 uniform float map_zoom=.96;
 uniform vec3 region_tint=vec3(.75,1.14,1.12);
+float water_hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float water_noise(vec2 p){
+ vec2 cell=floor(p);vec2 f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(water_hash(cell),water_hash(cell+vec2(1.,0.)),f.x),mix(water_hash(cell+vec2(0.,1.)),water_hash(cell+vec2(1.,1.)),f.x),f.y);
+}
 void fragment(){
  vec2 world=(UV-.5)*viewport_size/map_zoom+camera_world;
- // Finer than the old 400-unit tile, so the painted grain stays near the screen pixel.
- vec2 tile_uv=world/210.;
- vec2 texel=vec2(1.6/512.);
- vec3 grain=texture(sea_tile,tile_uv).rgb;
- vec3 soft=(texture(sea_tile,tile_uv+vec2(texel.x,0.)).rgb+texture(sea_tile,tile_uv-vec2(texel.x,0.)).rgb+texture(sea_tile,tile_uv+vec2(0.,texel.y)).rgb+texture(sea_tile,tile_uv-vec2(0.,texel.y)).rgb)*.25;
- grain=clamp(grain*1.65-soft*.65,0.,1.);
+ // Quiet, world-anchored water: broad depth variation and restrained surface light.
+ // Two differently scaled samples break up tiling without sharpened grain or sine stripes.
+ vec2 flow=vec2(TIME*.006,-TIME*.004);
+ float depth=water_noise(world/760.+flow*.17)*.6+water_noise(world/1430.-flow*.09+vec2(13.7,8.2))*.4;
  mat2 turn=mat2(vec2(.8,.6),vec2(-.6,.8));
- vec3 cross=texture(sea_tile,turn*world/480.+vec2(TIME*.007,.12+TIME*.004)).rgb;
- vec3 sea=mix(grain,cross,.2);
- sea=clamp((sea-.46)*1.45+.44,0.,1.);
- vec2 flow=vec2(TIME*.014,-TIME*.009);
- float swell=texture(wave_noise,world*.00135+flow).g;
- float ahead=texture(wave_noise,world*.00135+flow+vec2(.004,0.)).g;
- // A thin crest where the swell is rising, instead of a milky wash over the whole sea.
- float crest=smoothstep(.58,.78,swell)*smoothstep(0.,.07,ahead-swell);
- sea=mix(sea,sea*vec3(.55,.72,.9)+vec3(.02,.05,.08),smoothstep(.35,.7,1.-swell)*.45);
- sea+=vec3(.16,.24,.26)*crest;
- float streak=smoothstep(.97,.995,sin(dot(world,vec2(.05,.018))+swell*5.+TIME*.9));
- sea+=vec3(.2,.28,.3)*streak*crest;
- sea*=mix(vec3(.62,.82,1.),region_tint,.62);
+ vec3 surface=texture(sea_tile,world/640.+flow*.24).rgb;
+ vec3 crossing=texture(sea_tile,turn*world/1130.-flow*.16).rgb;
+ float detail=dot(mix(surface,crossing,.4),vec3(.2126,.7152,.0722));
+ vec3 sea=mix(vec3(.012,.088,.142),vec3(.025,.175,.228),depth);
+ sea+=(detail-.22)*vec3(.10,.22,.26);
+ // Existing directional wave art is only a faint, small-scale shimmer, never a broad band.
+ float ripple=texture(wave_noise,world/190.+flow).g;
+ sea+=vec3(.006,.012,.013)*(ripple-.5);
+ // The Caribbean stays teal; north and shadow waters retain their authored regional identity.
+ sea*=mix(vec3(1.),region_tint/vec3(.75,1.14,1.12),.45);
  COLOR=vec4(clamp(sea,0.,1.),1.);
 }

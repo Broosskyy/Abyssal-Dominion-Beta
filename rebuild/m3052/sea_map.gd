@@ -143,6 +143,10 @@ var hud_scale := 1.0
 var camera_pad: Control
 var target_cycle: Button
 var camera_pad_visible := true
+var plate_rects: Dictionary = {}
+var status_age := 0.0
+var equipment_strip: Control
+var ammo_previews: Dictionary = {}
 
 func _ready() -> void:
 	_use_uhd()
@@ -236,6 +240,7 @@ func _art(name: String) -> Texture2D:
 	return extra_icons[name] if extra_icons.has(name) else painted.get(name)
 
 func _process(delta: float) -> void:
+	status_age += delta
 	if modal_backdrop!=null:modal_backdrop.visible=modal.visible
 	if modal.visible:scroll_hint.queue_redraw()
 	if gallery_page>=0:
@@ -337,8 +342,7 @@ func _draw() -> void:
 	fleet.sort_custom(func(a,b):return a.pos.y < b.pos.y)
 	for actor: Dictionary in fleet:
 		if int(actor.hp)>0: _draw_actor(actor)
-	for actor: Dictionary in fleet:
-		if int(actor.hp)>0 and actor.get("kind","")=="tower":_nameplate(actor,actor.pos+Vector2(0,-96.0*_plate_scale() if sim.target==int(actor.id) else 16.0))
+	_draw_nameplates(fleet)
 	drawn_shots = 0
 	for shot in sim.shots:
 		if float(shot.age)<0: continue
@@ -481,82 +485,114 @@ func _draw_actor(actor: Dictionary) -> void:
 		var side=Vector2(-heading.y,heading.x)*4
 		draw_line(nose-heading*8+side,nose,CYAN,1.4,true)
 		draw_line(nose-heading*8-side,nose,CYAN,1.4,true)
-	var name_offset=68.0 if is_player and int(sim.player.skin)==26 else 47.0
-	_nameplate(actor,point+Vector2(0,name_offset))
+	if gallery_page>=0:_nameplate(actor,point+Vector2(0,28))
+
+func _plate_pixels() -> float:
+	return clampf(get_viewport_rect().size.y/720.0,1.0,1.35)
 
 func _plate_scale() -> float:
 	if gallery_page>=0 or camera==null:return 1.0
-	var grow=clampf(get_viewport_rect().size.y/720.0,1.0,1.7)
-	if grow<=1.001:return clampf(1.0/camera.zoom.x,1.0,1.6)
-	return grow*clampf(desired_zoom*grow/maxf(camera.zoom.x,0.05),1.0,1.6)
+	return _plate_pixels()/maxf(camera.zoom.x,0.05)
 
-## Nameplates keep a constant on-screen size: captain medallion, guild tag, hull and shield capsules, status icons.
+func _plate_title(actor: Dictionary) -> String:
+	var title=str(skins[int(sim.player.skin)].name) if int(actor.id)==0 else str(actor.name)
+	if int(actor.id)==0:
+		if not sim.guild.is_empty():title="[%s] " % sim.guild.tag+title
+		if sim.staff.shows_badge():title="[%s] " % sim.staff.badge()+title
+	elif actor.get("kind","")=="tower":title="[%s] " % sim.tower_tag()+title
+	# Keep the title inside its reserved rectangle, including guild and staff prefixes.
+	var shortened=false
+	while font.get_string_size(title+("…" if shortened else ""),HORIZONTAL_ALIGNMENT_LEFT,-1,12).x>140 and title.length()>1:
+		title=title.left(title.length()-1);shortened=true
+	return title+"…" if shortened else title
+
+func _actor_screen_bounds(actor: Dictionary) -> Rect2:
+	var length=_actor_visual_length(actor)
+	var point: Vector2=actor.pos
+	var transform=get_canvas_transform()
+	if actor.get("kind","")=="tower":return transform*Rect2(point-Vector2(38,76),Vector2(76,82))
+	if actor.get("kind","")=="monster":return transform*Rect2(point-Vector2(80,85),Vector2(160,105))
+	var player=int(actor.id)==0
+	var texture: Texture2D
+	var column=0
+	var flipped=false
+	if player and int(sim.player.skin)==26:
+		texture=_starter_texture(float(actor.hp),float(actor.max_hp))
+		column=int(direction_cache.get(0,0))
+	elif player and int(sim.player.skin)<10:
+		texture=ship_textures[int(sim.player.skin)];flipped=bool(facing_cache.get(0,false))
+	else:
+		texture=atlas_textures[int(sim.player.skin)-10] if player else atlas_textures[posmod(int(actor.art),atlas_textures.size())]
+		column=int(direction_cache.get(int(actor.id),0))
+	var frame: Dictionary=ship_frames[texture.resource_path.trim_prefix("res://")].frames[column]
+	return transform*VISUALS.world_rect(frame,point,length,flipped)
+
+## Draw hulls first, then lay out labels in screen space. Small ordinary NPC labels
+## may yield in a dense group; the captain and spyglass target reserve space first.
+func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
+	var requests: Array=[]
+	var occupied: Array=[]
+	var pixels=_plate_pixels()
+	var viewport=get_viewport_rect().grow(-6)
+	for control: Control in [chrome,chart_mini,quest_panel,target_panel,interact,camera_pad,attack,repair,ammo_selector,loadout_button,page_button,target_cycle,staff_pill,equipment_strip,buff_bar,status]:
+		if control.is_visible_in_tree():occupied.append(control.get_global_rect())
+	for button: Button in ammo_buttons+special_buttons:
+		if button.is_visible_in_tree():occupied.append(button.get_global_rect())
+	for button: Button in supply_buttons.values():
+		if button.is_visible_in_tree():occupied.append(button.get_global_rect())
+	for actor: Dictionary in fleet:
+		if int(actor.hp)<=0:continue
+		var hull=_actor_screen_bounds(actor)
+		if not viewport.intersects(hull):continue
+		occupied.append(hull.grow(3))
+		var width=maxf(80.0,font.get_string_size(_plate_title(actor),HORIZONTAL_ALIGNMENT_LEFT,-1,12).x+26)*pixels
+		var center: Vector2=get_canvas_transform()*actor.pos
+		var rect=Rect2(Vector2(center.x-width*.5,hull.end.y+7*pixels),Vector2(width,(40 if int(actor.id)==0 and sim.staff.hidden() else 29)*pixels))
+		var priority=0 if int(actor.id)==0 else (1 if int(actor.id)==sim.target else 2)
+		requests.append({"id":int(actor.id),"priority":priority,"rect":rect})
+	return VISUALS.layout_nameplates(requests,viewport,occupied)
+
+func _draw_nameplates(fleet: Array[Dictionary]) -> void:
+	plate_rects=_nameplate_layout(fleet)
+	var inverse=get_canvas_transform().affine_inverse()
+	var pixels=_plate_pixels()
+	for actor: Dictionary in fleet:
+		var id=int(actor.id)
+		if not plate_rects.has(id):continue
+		var rect: Rect2=plate_rects[id]
+		var hull=_actor_screen_bounds(actor)
+		var attachment=rect.get_center().clamp(hull.position,hull.end)
+		var caption=attachment.clamp(rect.position,rect.end)
+		if attachment.distance_to(caption)>38*pixels:
+			draw_line(inverse*attachment,inverse*caption,Color(.65,.78,.77,.28),pixels/maxf(camera.zoom.x,.05),true)
+		_nameplate(actor,inverse*(rect.position+Vector2(rect.size.x*.5,12*pixels)))
+
+## A short name, small rank mark and thin HP/shield bars. Exact values, deck slots
+## and consumable quantities belong to the edge HUD and ship window.
 func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
-	var is_player=int(actor.id)==0
+	var player=int(actor.id)==0
 	var tower=actor.get("kind","")=="tower"
 	var monster=actor.get("kind","")=="monster"
 	var elite=bool(actor.get("elite",false))
-	var hostile=not is_player and (bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) or (tower and not sim.tower_friendly()))
-	var hull_ratio=float(actor.hp)/maxf(1.0,float(actor.max_hp))
-	var max_shield=float(actor.get("max_shield",0))
-	var shield_ratio=float(actor.get("shield",0))/maxf(1.0,max_shield)
+	var hostile=not player and (bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) or (tower and not sim.tower_friendly()))
+	var color=Color("e8d0a1") if elite else Color("dce8e4")
+	if player:color=sim.staff.color() if sim.staff.shows_badge() else Color("d9f0e5")
+	elif hostile:color=Color("eab8a7")
+	elif monster:color=Color("c6b9d6")
+	var title=_plate_title(actor)
+	var text_width=font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,12).x
 	draw_set_transform(anchor,0,Vector2.ONE*_plate_scale())
-	if is_player:
-		var staff=sim.staff
-		var parts: Array=[]
-		if not sim.guild.is_empty():parts.append(["[%s] " % sim.guild.tag,Color("ffd27a")])
-		parts.append([str(skins[int(sim.player.skin)].name),staff.color() if staff.shows_badge() else CYAN])
-		var name_w=0.0
-		for part: Array in parts:name_w+=font.get_string_size(str(part[0]),HORIZONTAL_ALIGNMENT_LEFT,-1,15).x
-		var badge_w=SEA_MARKS.badge_width(staff.badge(),font,11)+6.0 if staff.shows_badge() else 0.0
-		var name_left=11.0-(name_w+badge_w)*.5
-		if staff.shows_badge():SEA_MARKS.staff_badge(self,Vector2(name_left,-5),staff.badge(),staff.color(),font,11)
-		if staff.hidden():_label(Vector2(11,-18),"GEIST" if staff.presence=="ghost" else "ZUSCHAUER",11,staff.color())
-		_label_parts(Vector2(name_left+badge_w+name_w*.5,0),parts,15)
-		_medallion(Vector2(-62,19),clampi(floori((sim.level-1)/4.0)+1,1,ROMAN.size()-1))
-		_plate_bar(Rect2(-46,6,114,14),hull_ratio,Color("4fbf5e"),"%s / %s" % [_thousands(int(actor.hp)),_thousands(int(actor.max_hp))],10)
-		_plate_bar(Rect2(-46,23,114,10),shield_ratio,Color("3d8fe0"),_thousands(int(actor.shield)),9)
-		var decks=SEA_MARKS.deck_entries(sim)
-		var gem_r=11.0
-		SEA_MARKS.gem_row(self,Vector2(11,50),gem_r,decks,font)
-		if sim.has_blessing():
-			var half=(decks.size()-1)*gem_r*2.05*.5
-			SEA_MARKS.blessing_crystal(self,Vector2(11+half+gem_r*2.15,50),14,painted.crystal_blessing,float(sim.buffs.blessing),CONTENT.BLESSING_SECONDS)
-		var states: Array[Texture2D]=[]
-		if sim.powder_on:states.append(painted.supply_powder)
-		if sim.plates_on:states.append(painted.supply_plates)
-		if sim.guild_island_held():states.append(painted.nav_guild)
-		if float(actor.slow)>0:states.append(icons.chain)
-		for i in states.size():
-			var center=Vector2(11+(float(i)-(states.size()-1)*.5)*19,76)
-			draw_circle(center,8.5,Color(0.02,0.06,0.08,.85))
-			draw_circle(center,8.5,Color("c7a15a"),false,1.0,true)
-			draw_texture_rect(states[i],Rect2(center-Vector2(7,7),Vector2(14,14)),false)
-	else:
-		var color=Color("e4b6ee") if monster else (Color("ff9d8a") if hostile else (Color("ffd98a") if elite else Color("f1e6cc")))
-		var health=Color("e0604c") if hostile else (Color("5fc46e") if tower else Color("e1c062"))
-		# Clustered fortress towers only name the one under the spyglass; the rest keep compact bars.
-		var named=not tower or sim.target==int(actor.id)
-		var half=46.0 if named else 28.0
-		var top=0.0
-		if named:
-			var parts: Array=[]
-			if tower:parts.append(["[%s] " % sim.tower_tag(),Color("9fe7a8") if sim.tower_friendly() else Color("ffb37a")])
-			parts.append([str(actor.name),color])
-			_label_parts(Vector2.ZERO,parts,14 if tower else 15)
-			top=6.0
-		_plate_bar(Rect2(-half,top,half*2,7),hull_ratio,health)
-		var below=top+14
-		if max_shield>0:
-			_plate_bar(Rect2(-half,top+9,half*2,4),shield_ratio,Color("3d8fe0"))
-			below=top+19
-		if not tower:
-			var tier=4 if monster else (3 if elite else 1)+mini(sim.map_id,CONTENT.REGION_COUNT-1)
-			if bool(actor.get("boss",false)):tier=5
-			var emblem=Color("d9a0ff") if monster else (Color("ffd27a") if elite else Color("8fbcf0"))
-			_rank_emblem(Vector2(0,below+8),clampi(tier,1,5),emblem)
-			below+=24
-		if float(actor.slow)>0:_label(Vector2(0,below+10),"VERLANGSAMT",11,Color("9fdbf4"))
+	_label(Vector2(8,0),title,12,color,2)
+	if not tower:
+		var tier=clampi(floori((sim.level-1)/4.0)+1,1,5) if player else (4 if monster else (3 if elite else 1))
+		_rank_emblem(Vector2(8-text_width*.5-12,-5),tier,Color("d5b77a") if player or elite else Color("8fa6b2"))
+	var width=72.0 if player or int(actor.id)==sim.target else 60.0
+	var hull_color=Color("d97660") if hostile else Color("61b967")
+	_plate_bar(Rect2(-width*.5,5,width,3),float(actor.hp)/maxf(1,float(actor.max_hp)),hull_color)
+	var shield=float(actor.get("max_shield",0))
+	if shield>0:_plate_bar(Rect2(-width*.5,11,width,2),float(actor.get("shield",0))/shield,Color("4d95be"))
+	if float(actor.get("slow",0))>0:draw_circle(Vector2(width*.5+5,7),2,Color("9fdbf4"))
+	if player and sim.staff.hidden():_label(Vector2(0,24),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",9,sim.staff.color(),2)
 	draw_set_transform(Vector2.ZERO)
 
 func _label_parts(point: Vector2,parts: Array,fontsize: int) -> void:
@@ -627,7 +663,7 @@ func _draw_sparkle(point: Vector2,seed: float) -> void:
 
 func _rank_emblem(center: Vector2,tier: int,tint: Color) -> void:
 	var dark=Color(0,0,0,.6)
-	var k=1.4
+	var k=.48
 	for side in [-1.0,1.0]:
 		for feather in 3:
 			var root=center+Vector2(side*6,-1+feather*2.6)*k
@@ -872,6 +908,8 @@ func _build_ui() -> void:
 	interact=_button(ui,"",_interact);interact.name="InteractButton"
 	buff_bar=Control.new();buff_bar.mouse_filter=Control.MOUSE_FILTER_IGNORE;buff_bar.name="BuffBar"
 	buff_bar.draw.connect(_draw_buffs);ui.add_child(buff_bar)
+	equipment_strip=Control.new();equipment_strip.mouse_filter=Control.MOUSE_FILTER_IGNORE;equipment_strip.name="EquipmentStrip"
+	equipment_strip.draw.connect(_draw_equipment_strip);ui.add_child(equipment_strip)
 	status=_text(ui,"",12,Color("e2ecee"));status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
 	status.clip_text=true
 	status.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -984,7 +1022,8 @@ func _layout() -> void:
 	var tx=card_h
 	_place(target_name,tx,3,column-tx-6,18);_place(target_hp,tx,22,column-tx-10,8);_place(target_numbers,tx,31,column-tx-6,card_h-33)
 	_place(interact,left,target_y+card_h+6,column,34)
-	_place(buff_bar,left,target_y+card_h+46,column,30)
+	_place(equipment_strip,left,target_y+card_h+46,column,24)
+	_place(buff_bar,left,target_y+card_h+74,column,26)
 	# Chart with corner controls, as on classic sea-chart clients.
 	var mw=136.0 if compact else 190.0
 	var mh=118.0 if compact else 160.0
@@ -1020,20 +1059,19 @@ func _layout() -> void:
 	var hot: Array[Button]=[target_cycle,ammo_selector,loadout_button,page_button]
 	var row_x=fx-orb-gap
 	for i in hot.size():_place(hot[hot.size()-1-i],row_x-(i+1)*(orb+gap),s.y-orb-10,orb,orb)
-	var pack=36.0 if compact else 44.0
-	var host_left=row_x-(hot.size()+1)*(orb+gap)
+	# Special rounds share the same grid as the utilities, instead of floating
+	# beside the captain in the middle of the water. Every slot has the same hit size.
+	var pack=orb
+	var special_x=target_cycle.position.x
+	var special_y=s.y-orb*2-gap-10
 	var left_limit=(pad+16.0) if camera_pad_visible else 12.0
-	var special_x=host_left-gap-pack*2.0
-	var special_y=s.y-orb-10.0-pack-gap
 	var show_specials=special_x>=left_limit and special_y>header+8.0
 	for i in special_buttons.size():
-		var slot=i%2
-		var line=int(i/2.0)
 		special_buttons[i].visible=show_specials
-		if show_specials:_place(special_buttons[i],special_x+slot*(pack+gap),special_y-line*(pack+gap),pack,pack)
+		if show_specials:_place(special_buttons[i],special_x+i*(pack+gap),special_y,pack,pack)
 	_apply_page()
-	var toast_w=minf(380.0,2.0*(ammo_buttons[1].position.x-s.x*.5)-16.0)
-	_place(status,(s.x-toast_w)*.5,s.y-orb-40,toast_w,24)
+	var toast_w=maxf(60.0,minf(380.0,s.x-2.0*(left+column+12)))
+	_place(status,(s.x-toast_w)*.5,header+3+(26.0 if staff_pill.visible else 0.0),toast_w,20 if compact else 24)
 	status.set_meta("room",toast_w)
 	var menu_size=viewport_size
 	var grow=clampf(viewport_size.y/720.0,1.0,1.7)
@@ -1112,6 +1150,9 @@ func _refresh_ui() -> void:
 	player_shield.max_value=maxf(1.0,float(sim.player.max_shield))
 	player_shield.value=sim.player.shield
 	shield_numbers.text="%s / %s" % [_thousands(int(sim.player.shield)),_thousands(int(sim.player.max_shield))]
+	equipment_strip.visible=not sim.decks.is_empty() or float(sim.buffs.tide_deck)>0
+	equipment_strip.queue_redraw()
+	buff_bar.visible=sim.has_blessing() or float(sim.buffs.tide_deck)>0 or sim.guild_island_held()
 	buff_bar.queue_redraw()
 	player_xp.max_value=maxi(1,sim.xp_required())
 	player_xp.value=sim.xp
@@ -1176,9 +1217,10 @@ func _refresh_ui() -> void:
 		staff_pill.text="%s%s · %s" % [staff.badge(),presence,CONTENT.STAFF_ENVIRONMENT]
 	if message_history.is_empty() or message_history.back()!=sim.message:
 		message_history.append(sim.message)
+		status_age=0.0
 		if message_history.size()>6:message_history.pop_front()
 	status.text="IM HAFEN · ABLEGEN zum Weiterfahren" if sim.docked else sim.message
-	status.visible=not status.text.is_empty()
+	status.visible=not status.text.is_empty() and (status_age<4.0 or sim.docked)
 	var toast_room: float=status.get_meta("room",status.size.x)
 	var toast_w=minf(toast_room,font.get_string_size(status.text,HORIZONTAL_ALIGNMENT_LEFT,-1,12).x+40)
 	status.position.x=ui.size.x*.5-toast_w*.5;status.size.x=toast_w
@@ -1266,6 +1308,20 @@ func _apply_page() -> void:
 	for i in 3:
 		ammo_buttons[i].visible=quick_page==0
 		supply_buttons[["repair_kit","shield_charge","plates"][i]].visible=quick_page==1
+
+## Mounted equipment belongs at the screen edge. Empty deck slots stay in the ship menu.
+func _draw_equipment_strip() -> void:
+	var entries=SEA_MARKS.deck_entries(sim)
+	var active: Array=[]
+	for entry: Dictionary in entries:
+		if bool(entry.get("lit",false)):active.append(entry)
+	if active.is_empty():return
+	var x=14.0
+	for entry: Dictionary in active:
+		SEA_MARKS.gem(equipment_strip,Vector2(x,12),8,entry.get("color",Color.WHITE),int(entry.get("tier",-1)),true,font)
+		x+=24
+	equipment_strip.draw_string_outline(font,Vector2(x+2,16),"DECKS",HORIZONTAL_ALIGNMENT_LEFT,-1,10,2,Color("06121a"))
+	equipment_strip.draw_string(font,Vector2(x+2,16),"DECKS",HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("c4b78d"))
 
 ## Active effects with remaining sea time; emergency cooldowns live on their own orbs.
 func _draw_buffs() -> void:
@@ -1557,7 +1613,7 @@ func _open_ship() -> void:
 	_action("SCHIFFSDESIGN WÄHLEN",func():_open_modal("Werft"),"normal",links)
 	_action("BEWAFFNUNG",func():_open_modal("Bewaffnung"),"normal",links)
 
-## The ship on its own stage, with the deck gems under the hull exactly as on the sea.
+## The ship window retains the detailed deck gems; the sea uses a compact edge strip.
 func _draw_ship_stage(stage: Control) -> void:
 	var w=stage.size.x;var h=stage.size.y
 	stage.draw_style_box(SKIN.card(),Rect2(Vector2.ZERO,stage.size))
@@ -1604,7 +1660,15 @@ func _draw_ship_stage(stage: Control) -> void:
 
 func _ammo_texture(index: int) -> Texture2D:
 	var key=str(AMMO_UI[index].icon)
-	return icons[key] if icons.has(key) else painted[key]
+	if icons.has(key):return icons[key]
+	if not ammo_previews.has(key):
+		# These four source images have a baked checkerboard outside the projectile.
+		# Sample only its opaque center; the HUD's circular UV mask supplies the rim.
+		var preview=AtlasTexture.new()
+		preview.atlas=painted[key]
+		preview.region=Rect2(Vector2(160,160),Vector2(192,192))
+		ammo_previews[key]=preview
+	return ammo_previews[key]
 
 func _open_ammo() -> void:
 	_section("KANONENKUGEL-AUSWAHL")

@@ -41,9 +41,11 @@ func _band(center: Vector2,radius: float) -> void:
 func _disc_texture(texture: Texture2D,rect: Rect2,center: Vector2,radius: float,tint: Color) -> void:
 	var points=PackedVector2Array()
 	var uvs=PackedVector2Array()
+	radius=minf(radius,minf(rect.size.x,rect.size.y)*.5)
+	center=rect.get_center()
 	for i in 40:
 		var angle=TAU*float(i)/40.0
-		var point=(center+Vector2(cos(angle),sin(angle))*radius).clamp(rect.position,rect.end)
+		var point=center+Vector2(cos(angle),sin(angle))*radius
 		points.append(point)
 		uvs.append((point-rect.position)/rect.size)
 	draw_polygon(points,PackedColorArray([tint]),uvs,texture)

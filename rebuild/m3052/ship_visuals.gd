@@ -71,3 +71,49 @@ static func impact_labels(events: Array,now: float) -> Array[Dictionary]:
 	for group: Dictionary in groups:
 		if now-float(group.time)<1.2:visible.append(group)
 	return visible
+
+## Place compact captions after hull drawing. The captain and selected target reserve
+## space first. Other captions yield when the water is too crowded or covered by HUD.
+## All rectangles are screen pixels, independent of camera zoom and HUD preferences.
+static func layout_nameplates(entries: Array,viewport: Rect2,obstacles: Array) -> Dictionary:
+	var ordered=entries.duplicate()
+	ordered.sort_custom(func(a,b):return int(a.priority)<int(b.priority) if a.priority!=b.priority else int(a.id)<int(b.id))
+	var occupied: Array=obstacles.duplicate()
+	var placed: Dictionary={}
+	for entry: Dictionary in ordered:
+		var original: Rect2=entry.rect
+		var gap=maxf(5.0,original.size.y*.2)
+		var stride=original.size.y+gap
+		var offsets=[Vector2.ZERO,Vector2(0,stride),Vector2(0,stride*2),Vector2(-original.size.x*.6,stride),Vector2(original.size.x*.6,stride),Vector2(0,-stride),Vector2(-original.size.x-gap,0),Vector2(original.size.x+gap,0),Vector2(0,stride*3),Vector2(0,-stride*2)]
+		if int(entry.priority)<2:
+			# Close hulls can fill the water beneath the captain on a short phone.
+			# Important plates may move above the sails; ordinary NPCs yield instead.
+			for row in range(2,8):
+				for side in [0.0,-.6,.6,-1.0,1.0]:
+					offsets.append(Vector2(side*(original.size.x+gap),-stride*row))
+					if row<5:offsets.append(Vector2(side*(original.size.x+gap),stride*row))
+		for offset: Vector2 in offsets:
+			var candidate=Rect2(original.position+offset,original.size)
+			if not viewport.encloses(candidate):continue
+			var clear=true
+			for blocked: Rect2 in occupied:
+				if candidate.grow(gap*.3).intersects(blocked):clear=false;break
+			if not clear:continue
+			placed[int(entry.id)]=candidate
+			occupied.append(candidate)
+			break
+		if int(entry.priority)<2 and not placed.has(int(entry.id)):
+			# Last resort for a tightly zoomed phone: search remaining free water,
+			# nearest first. This runs only when all nearby caption positions fail.
+			var fallback: Array[Rect2]=[]
+			for y in range(int(viewport.position.y),int(viewport.end.y-original.size.y),maxi(12,int(stride*.5))):
+				for x in range(int(viewport.position.x),int(viewport.end.x-original.size.x),maxi(20,int(original.size.x*.25))):
+					fallback.append(Rect2(Vector2(x,y),original.size))
+			fallback.sort_custom(func(a,b):return a.position.distance_squared_to(original.position)<b.position.distance_squared_to(original.position))
+			for candidate: Rect2 in fallback:
+				var clear=true
+				for blocked: Rect2 in occupied:
+					if candidate.grow(gap*.3).intersects(blocked):clear=false;break
+				if clear:
+					placed[int(entry.id)]=candidate;occupied.append(candidate);break
+	return placed
