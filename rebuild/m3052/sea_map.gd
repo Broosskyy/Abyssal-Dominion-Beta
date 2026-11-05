@@ -174,6 +174,8 @@ func _ready() -> void:
 	_load_display()
 	previous_region=sim.map_id
 	camera = Camera2D.new()
+	# Camera and ship-nameplate sampling must share the idle/render clock.
+	camera.process_callback=Camera2D.CAMERA2D_PROCESS_IDLE
 	camera.position = sim.player.pos
 	camera.zoom = Vector2.ONE*desired_zoom
 	add_child(camera)
@@ -278,6 +280,10 @@ func _process(delta: float) -> void:
 	pan=goal-sim.player.pos
 	camera.position = camera.position.lerp(goal,1.0-exp(-delta*5.0))
 	camera.zoom = camera.zoom.lerp(Vector2.ONE*_sharp_zoom(),1.0-exp(-delta*8.0))
+	# Commit this frame's camera transform before projecting screen-space labels.
+	# Calculating readouts later inside _draw() creates a one-frame delay.
+	camera.force_update_scroll()
+	_sync_plate_overlay()
 	ocean.set_shader_parameter("camera_world",camera.position)
 	ocean.set_shader_parameter("map_zoom",camera.zoom.x)
 	ocean.set_shader_parameter("viewport_size",get_viewport_rect().size)
@@ -362,7 +368,8 @@ func _draw() -> void:
 	fleet.sort_custom(func(a,b):return a.pos.y < b.pos.y)
 	for actor: Dictionary in fleet:
 		if int(actor.hp)>0: _draw_actor(actor)
-	_draw_nameplates(fleet)
+	# Name/HP/shield/decks are rendered in a screen-space CanvasLayer,
+	# already synced during _process(), never sourced from an old draw pass.
 	drawn_shots = 0
 	for shot in sim.shots:
 		if float(shot.age)<0: continue
@@ -631,12 +638,23 @@ func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 		placed[int(actor.id)]=Rect2(anchor-Vector2(width*.5,17*pixels),Vector2(width,(116 if player else 56)*pixels))
 	return placed
 
-## Compute world-to-viewport anchors, but paint the entire caption at native
-## screen resolution in a CanvasLayer. Text, bars and deck fittings must NEVER
-## inherit the camera's interpolated fractional zoom or HUD double scaling.
-func _draw_nameplates(fleet: Array[Dictionary]) -> void:
+## One layout snapshot per *process frame* directly after Camera2D is scrolled.
+## Never publish it asynchronously from the map's CanvasItem._draw() callback.
+func _sync_plate_overlay() -> void:
+	if plate_overlay==null or camera==null or gallery_page>=0:return
+	var screen=get_viewport_rect().size
+	var view=Rect2(camera.position-screen/camera.zoom*.5,screen/camera.zoom).grow(350)
+	var fleet: Array[Dictionary]=[sim.player]
+	for npc: Dictionary in sim.npcs:
+		if int(npc.hp)>0 and view.has_point(npc.pos):fleet.append(npc)
+	plate_fleet=fleet
 	plate_rects=_nameplate_layout(fleet)
+	plate_overlay.queue_redraw()
+
+## Kept as a simple explicit regression hook, not called from the map draw.
+func _draw_nameplates(fleet: Array[Dictionary]) -> void:
 	plate_fleet=fleet.duplicate()
+	plate_rects=_nameplate_layout(fleet)
 	if plate_overlay!=null:plate_overlay.queue_redraw()
 
 ## Readable, anchored name/HP/shield block; ten deck slots follow directly below.

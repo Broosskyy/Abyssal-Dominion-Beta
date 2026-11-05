@@ -1,8 +1,12 @@
 extends Control
-## A dedicated, unscaled screen canvas for ship labels and deck assembly.
-## Godot's Camera2D drives only the world-to-screen anchor, never the glyphs.
+## Native-pixel ship readouts. The world-to-screen projection is sampled once
+## during the host's _process(), AFTER the camera scroll has been applied.
+## This avoids render-callback one-frame lag at high zoom / while sailing.
 const SEA_MARKS=preload("res://sea_marks.gd")
 var host
+func _font_size(base: int) -> int:
+	return maxi(1,roundi(float(base)*float(host._plate_pixels())))
+
 func _draw() -> void:
 	if host==null or not is_instance_valid(host):return
 	if host.gallery_page>=0:return
@@ -16,19 +20,21 @@ func _draw() -> void:
 		var id=int(actor.id)
 		if not rects.has(id) or int(actor.hp)<=0:continue
 		var rect: Rect2=rects[id]
-		var center=rect.position+Vector2(rect.size.x*.5,17.0*host._plate_pixels())
-		# Pixel snapping prevents fractional camera movement from resampling fonts.
-		_draw_plate(actor,center.round())
+		var anchor=rect.position+Vector2(rect.size.x*.5,17.0*host._plate_pixels())
+		# All glyphs, frames and deck fittings are painted at 1:1 physical pixels.
+		_draw_plate(actor,anchor.round())
 
-func _caption(point: Vector2,value: String,fs: int,color: Color,outline: int=2) -> float:
+func _caption(point: Vector2,value: String,base_size: int,color: Color,outline: int=2) -> float:
 	var ink: Font=host.font
-	var text_width=ink.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
-	var left=point-Vector2(text_width*.5,0)
-	draw_string_outline(ink,left,value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,outline,Color(.01,.035,.05,color.a))
+	var fs=_font_size(base_size)
+	var width=ink.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
+	var left=Vector2(roundf(point.x-width*.5),roundf(point.y))
+	draw_string_outline(ink,left,value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,maxi(1,roundi(outline*host._plate_pixels())),Color(.01,.035,.05,color.a))
 	draw_string(ink,left,value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,color)
-	return text_width
+	return width
 
-func _gauge(rect: Rect2,ratio: float,ink: Color,flash: float=0.0) -> void:
+func _gauge(original: Rect2,ratio: float,ink: Color,flash: float=0.0) -> void:
+	var rect=Rect2(original.position.round(),Vector2(maxf(1.0,roundf(original.size.x)),maxf(1.0,roundf(original.size.y))))
 	draw_rect(rect.grow(1.0+flash*.6),Color("030b12").lerp(ink,flash*.25))
 	draw_rect(rect,Color("0a1620"))
 	var fill=Rect2(rect.position,Vector2(rect.size.x*clampf(ratio,0.0,1.0),rect.size.y))
@@ -37,15 +43,15 @@ func _gauge(rect: Rect2,ratio: float,ink: Color,flash: float=0.0) -> void:
 	draw_line(fill.position+Vector2(0,1),Vector2(fill.end.x,fill.position.y+1),ink.lightened(.22+flash*.25),1,true)
 	if flash>0.0:draw_rect(rect.grow(1.5),Color(ink,.16*flash),false,1.0,true)
 
-func _rank(center: Vector2,tier: int) -> void:
+func _rank(center: Vector2,tier: int,scale: float) -> void:
 	var tint=Color("d5b77a")
 	var dark=Color(0,0,0,.65)
-	var k=.6
+	var k=.6*scale
 	for side in [-1.0,1.0]:
 		for feather in 3:
 			var root=center+Vector2(side*6,-1+feather*2.6)*k
 			var tip=center+Vector2(side*(21-feather*4.5),-5+feather*2.2)*k
-			draw_line(root+Vector2(0,1.2),tip+Vector2(0,1.2),dark,(3.2-feather*.5)*k,true)
+			draw_line(root+Vector2(0,1.2)*k,tip+Vector2(0,1.2)*k,dark,(3.2-feather*.5)*k,true)
 			draw_line(root,tip,Color(tint,1.0-feather*.22),(2.4-feather*.45)*k,true)
 	for chevron in tier:
 		var y=-3.5+chevron*3.2
@@ -65,31 +71,31 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	if player:tint=sim.staff.color() if sim.staff.shows_badge() else Color("d9f0e5")
 	elif hostile:tint=Color("eab8a7")
 	elif monster:tint=Color("c6b9d6")
-	# Only one scale. Screen labels do not grow again inside _caption().
-	var scale=float(host._plate_pixels())
-	draw_set_transform(anchor,0,Vector2.ONE*scale)
+	# No draw_set_transform(...scale=1.45): subpixel GPU magnification
+	# made texts and thin HP/shield rules flicker while the camera moved.
+	var pixel_scale=float(host._plate_pixels())
+	draw_set_transform(anchor,0,Vector2.ONE)
 	var title: String=host._plate_title(actor)
-	var fs=16 if player else 14
-	var text_width=_caption(Vector2.ZERO,title,fs,tint)
+	var width=_caption(Vector2.ZERO,title,16 if player else 14,tint)
 	if host._plate_has_rank(actor):
 		var tier=clampi(floori((sim.level-1)/4.0)+1,1,5) if player else clampi(int(actor.get("pirate_rank",1)),1,5)
-		_rank(Vector2(-text_width*.5-22,-6),tier)
-	var label_id: String=host._plate_identity(actor)
-	if not label_id.is_empty():_caption(Vector2(0,13),label_id,8,Color(.72,.86,.88,.49),1)
-	var width=132.0 if player else (96.0 if int(actor.id)==sim.target else 84.0)
+		_rank(Vector2(-width*.5-23*pixel_scale,-6*pixel_scale),tier,pixel_scale)
+	var identity: String=host._plate_identity(actor)
+	if not identity.is_empty():_caption(Vector2(0,13*pixel_scale),identity,8,Color(.72,.86,.88,.49),1)
+	var bar_width=(132.0 if player else (96.0 if int(actor.id)==sim.target else 84.0))*pixel_scale
 	var hit_age=sim.clock-float(actor.get("last_hit",-100.0))
 	var flash=clampf(1.0-hit_age/.42,0.0,1.0)
 	var hp_ratio=float(actor.hp)/maxf(1.0,float(actor.max_hp))
 	if player:
-		_gauge(Rect2(-width*.5,24,width,7),hp_ratio,Color("49df24"),flash)
+		_gauge(Rect2(-bar_width*.5,24*pixel_scale,bar_width,7*pixel_scale),hp_ratio,Color("49df24"),flash)
 	else:
-		_gauge(Rect2(-width*.5,12,width,5),hp_ratio,Color("d97660") if hostile else Color("61b967"))
+		_gauge(Rect2(-bar_width*.5,12*pixel_scale,bar_width,5*pixel_scale),hp_ratio,Color("d97660") if hostile else Color("61b967"))
 	var max_shield=float(actor.get("max_shield",0))
 	if max_shield>0.0:
 		var ratio=float(actor.get("shield",0))/max_shield
-		if player:_gauge(Rect2(-width*.5,35,width,5),ratio,Color("409fdf"),flash)
-		else:_gauge(Rect2(-width*.5,22,width,3),ratio,Color("4d95be"))
-	if player:SEA_MARKS.deck_badge(self,Vector2(0,65),6,sim,float(host.elapsed))
-	if float(actor.get("slow",0.0))>0.0:draw_circle(Vector2(width*.5+6,14),2.5,Color("9fdbf4"))
-	if player and sim.staff.hidden():_caption(Vector2(0,-20),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color())
+		if player:_gauge(Rect2(-bar_width*.5,35*pixel_scale,bar_width,5*pixel_scale),ratio,Color("409fdf"),flash)
+		else:_gauge(Rect2(-bar_width*.5,22*pixel_scale,bar_width,3*pixel_scale),ratio,Color("4d95be"))
+	if player:SEA_MARKS.deck_badge(self,Vector2(0,65*pixel_scale),6.0*pixel_scale,sim,float(host.elapsed))
+	if float(actor.get("slow",0.0))>0.0:draw_circle(Vector2(bar_width*.5+6*pixel_scale,14*pixel_scale),2.5*pixel_scale,Color("9fdbf4"))
+	if player and sim.staff.hidden():_caption(Vector2(0,-20*pixel_scale),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color())
 	draw_set_transform(Vector2.ZERO)

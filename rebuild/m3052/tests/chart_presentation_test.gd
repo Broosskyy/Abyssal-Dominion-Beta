@@ -15,6 +15,7 @@ func run() -> void:
 	var sim=game.sim
 	check(game.plate_overlay!=null and game.plate_overlay.get_parent()==game.ui.get_parent(),"ship readouts use an independent screen-space CanvasLayer")
 	check(game.plate_overlay.scale==Vector2.ONE,"ship readouts do not inherit scaled HUD")
+	check(game.camera.process_callback==Camera2D.CAMERA2D_PROCESS_IDLE,"camera and screen-space readouts both update at frame rate")
 	sim.player.pos=Vector2(2400,1500);sim.player.path=[]
 	var close: Array[Dictionary]=[sim.player]
 	for i in 3:
@@ -68,6 +69,28 @@ func run() -> void:
 				check(not game._plate_has_rank(close[1]) and game._plate_has_rank(sim.player),"pirate rank is exclusive to players"+suffix)
 			check(game.ammo_selector.visible and game.supply_buttons.values().all(func(item):return item.visible),"single ammunition selector and supplies are visible at %s / profile %d" % [dimensions,profile])
 	check(sim.export_save()==before,"caption layout and HUD refresh preserve the captain save")
+	# Regression: zooming while sailing previously caused one-frame-late, blurred
+	# name/HP/shield/deck rendering. The projected layout is refreshed in _process
+	# and the font is drawn at an integer physical size, not zoom magnified.
+	for resolution in [Vector2i(844,390),Vector2i(2340,1080)]:
+		root.size=resolution;await process_frame
+		game._layout()
+		for zoom in [.8,1.4,2.35]:
+			game.camera.zoom=Vector2.ONE*zoom
+			var fixed_fs=game.plate_overlay._font_size(16)
+			var previous_anchor=Vector2.INF
+			for step in 8:
+				sim.player.pos+=Vector2(13.27,7.64)
+				game.camera.position=sim.player.pos
+				game.camera.force_update_scroll()
+				game._sync_plate_overlay()
+				check(game.plate_rects.has(0),"player plate always available while moving at zoom %.2f" % zoom)
+				var r: Rect2=game.plate_rects[0]
+				var anchor=(r.position+Vector2(r.size.x*.5,17*game._plate_pixels())).round()
+				if previous_anchor!=Vector2.INF:
+					check(anchor.is_equal_approx(previous_anchor),"locked camera keeps name/HP/shield/decks fixed on screen at zoom %.2f" % zoom)
+				check(game.plate_overlay._font_size(16)==fixed_fs,"font size never changes during camera movement or zoom interpolation")
+				previous_anchor=anchor
 	# Video 207270: no horizontal displacement for names as nearby ships
 	# approach, depart, cross the camera or become the selected target.
 	for camera_move in [Vector2.ZERO,Vector2(170,-90),Vector2(-180,130)]:
