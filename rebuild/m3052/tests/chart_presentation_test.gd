@@ -126,8 +126,8 @@ func run() -> void:
 			check(displayed.is_equal_approx(previous.lerp(latest,.5)),"render position interpolates 30 Hz movement between frames")
 			game.camera.position=displayed
 			game.camera.force_update_scroll()
-			var expected_center=get_viewport_rect().size*.5
-			var screen_ship=get_canvas_transform()*displayed
+			var expected_center=game.get_viewport_rect().size*.5
+			var screen_ship=game.get_canvas_transform()*displayed
 			var caption=game._plate_screen_anchor(sim.player)
 			check(screen_ship.distance_to(expected_center)<1.0,"smooth player ship is camera-centered while driving at high zoom")
 			check(absf(caption.x-screen_ship.x)<.1,"caption and animated ship share identical horizontal projection")
