@@ -1714,7 +1714,7 @@ func _draw_ship_stage(stage: Control) -> void:
 	for i in 4:
 		var radii=Vector2(w*(.16+.05*i),h*(.05+.018*i))
 		var ring=PackedVector2Array()
-		for j in 33:ring.append(center+Vector2(0,h*.15)+Vector2(cos(j*TAU/32+elapsed*.07))*radii)
+		for j in 33:ring.append(center+Vector2(0,h*.15)+Vector2(cos(j*TAU/32+elapsed*.07),sin(j*TAU/32+elapsed*.07))*radii)
 		stage.draw_polyline(ring,Color(.45,.9,.88,.12+.04*breathing-.02*i),1.4,true)
 	var tex: Texture2D=skin_previews[int(sim.player.skin)]
 	var box=Vector2(minf(w*.6,380.0),h*.52)
