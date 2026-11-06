@@ -480,7 +480,9 @@ func _run() -> void:
 		check(game.modal_scroll.scroll_vertical>0 and int(game.sim.player.skin)==skin_before,"dragging across a shipyard button scrolls and does not equip")
 		game.modal.hide();game._open_modal("Werft");await process_frame;await process_frame
 		for button: Button in game.modal_body.find_children("*","Button",true,false):
-			if "AUSRÜSTEN" in button.text:
+			if "AUSRÜSTEN" in button.text and not button.disabled:
+				game.modal_scroll.ensure_control_visible(button)
+				await process_frame
 				var tap_at: Vector2=button.get_global_rect().get_center()
 				var tap_mouse=InputEventMouseButton.new();tap_mouse.device=-1;tap_mouse.button_index=MOUSE_BUTTON_LEFT;tap_mouse.pressed=true;tap_mouse.position=tap_at
 				var tap_finger=InputEventScreenTouch.new();tap_finger.index=9;tap_finger.pressed=true;tap_finger.position=tap_at
