@@ -11,6 +11,11 @@ func caption_clears_hull(game, actor: Dictionary, anchor: Vector2) -> bool:
 		# A true 3D hull is projected from the water plane, not the 320px
 		# eight-way sprite fallback. Checking sprite bounds here would enforce
 		# the excessive screen gap that the M3084 player fix removes.
+		# The chart test pauses _process and changes camera zoom manually.
+		# Refresh the 3D owner and its orthographic camera before checking
+		# projection: otherwise bottom is from the PREVIOUS test viewport.
+		var sampled: Array[Dictionary]=[actor]
+		game.mesh_layer.sync_fleet(sampled,game.camera,game.get_viewport_rect().size)
 		var waterline: Vector2=game.get_canvas_transform()*game._visual_actor_pos(actor)
 		var bottom: float=game.mesh_layer.projected_hull_bottom(actor)
 		if bottom> -100000.0:
