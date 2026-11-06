@@ -168,6 +168,8 @@ var plate_rects: Dictionary = {}
 var plate_overlay: Control
 var mesh_layer
 var render_mode := "hybrid"
+# Independent from global camera graphics. Only black-green ship #29.
+var test_visual_style := "original"
 const TEST_SHIP_ROOT := "res://assets/player/test_ships/"
 # Mandatory exporter-visible resource links: real 8-view GLB renders and
 # shipyard previews. They must not silently fall back to the old sloop.
@@ -1199,6 +1201,7 @@ func _build_ui() -> void:
 	mesh_layer.host=self
 	layer.add_child(mesh_layer)
 	mesh_layer.set_render_mode(render_mode)
+	mesh_layer.set_player_style(test_visual_style)
 	render_mode=mesh_layer.mode
 	# Screen-space captain/NPC readouts, independent of all Camera2D zoom/pan.
 	plate_overlay=PLATE_OVERLAY.new()
@@ -2571,6 +2574,13 @@ func _open_display() -> void:
 		var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 		choice.disabled=render_mode==key or (key!="classic" and (mesh_layer==null or not mesh_layer.has_complete_fleet()))
 	_note("Beide 3D-Varianten nutzen dieselben echten GLB-Modelle und die bestehende Seekarten-Simulation. Inseln und Wasser bleiben zunächst 2D; der klassische Modus ist der Performance-Fallback.")
+	_section("M3088 · SCHATTENKRIEGSSCHIFF – STILTEST")
+	_note("Nur für das schwarz-grüne Testschiff (Werftplatz 29). Die Schiffgröße, Kamera, Bewegung und Kampfwerte bleiben gleich. In HYBRID oder 3D vergleichen:")
+	for style_option in [["original","A · ORIGINAL 3D / PBR"],["gameplay","B · GAMEPLAY-LOOK / RUHIGERE MATERIALIEN"],["sprite","C · ACHT RICHTUNGEN / 2,5D-SPRITES"]]:
+		var style_key: String=style_option[0]
+		var style_button=_action(str(style_option[1])+(" · AKTIV" if test_visual_style==style_key else ""),func():_set_test_visual_style(style_key),"tab_on" if test_visual_style==style_key else "normal")
+		style_button.disabled=test_visual_style==style_key
+	_note("B: Original-GLB mit weniger PBR-Glanz und Normalmap-Mikrodetails. C: echte acht aus demselben GLB gerenderte Bilder. Noch keine Polygonreduktion oder 16 Richtungen.")
 	_section("HUD-GRÖSSE")
 	for i in 3:
 		var index=i
@@ -2965,6 +2975,8 @@ func _load_display() -> void:
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
 	render_mode=str(data.get("render_mode","hybrid"))
 	if render_mode not in ["classic","hybrid","3d"]:render_mode="hybrid"
+	test_visual_style=str(data.get("test_visual_style","original"))
+	if test_visual_style not in ["original","gameplay","sprite"]:test_visual_style="original"
 
 func _cycle_render_mode() -> void:
 	var modes=["classic","hybrid","3d"]
@@ -2973,8 +2985,17 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode}))
+		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"test_visual_style":test_visual_style}))
 		file.close()
+
+func _set_test_visual_style(value: String) -> void:
+	if value not in ["original","gameplay","sprite"]:return
+	test_visual_style=value
+	if mesh_layer!=null:mesh_layer.set_player_style(value)
+	_persist_display_preferences()
+	if camera!=null:_sync_plate_overlay()
+	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal(modal_kind)
+	queue_redraw()
 
 func _set_render_mode(value: String) -> void:
 	render_mode=value if value in ["classic","hybrid","3d"] else "classic"
