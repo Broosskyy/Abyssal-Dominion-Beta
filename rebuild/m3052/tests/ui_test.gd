@@ -83,8 +83,8 @@ func _run() -> void:
 	game.mesh_layer.sync_fleet(isolated_player_fleet,game.camera,game.get_viewport_rect().size)
 	title_anchor=game._plate_screen_anchor(game.sim.player)
 	var actual_hull_bottom: float=game.mesh_layer.projected_hull_bottom(game.sim.player)
-	var offset: float=game.mesh_layer.stable_player_plate_drop(game.sim.player,game.camera.zoom.y,game._plate_pixels())
-	check(actual_hull_bottom>player_center.y-10.0 and absf(title_anchor.y-player_center.y-offset)<1.0,"M3093 captain plate uses model-specific stable offset")
+	var stable_plate_drop_3093: float=game.mesh_layer.stable_player_plate_drop(game.sim.player,game.camera.zoom.y,game._plate_pixels())
+	check(actual_hull_bottom>player_center.y-10.0 and absf(title_anchor.y-player_center.y-stable_plate_drop_3093)<1.0,"M3093 captain plate uses model-specific stable offset")
 	var saved_heading: Vector2=game.sim.player.heading
 	var first_anchor: Vector2=game._plate_screen_anchor(game.sim.player)
 	for bearing in [Vector2.UP,Vector2.DOWN,Vector2.LEFT,Vector2.RIGHT,Vector2(1,1).normalized(),Vector2(-1,-1).normalized()]:
