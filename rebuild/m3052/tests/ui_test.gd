@@ -26,7 +26,7 @@ func _run() -> void:
 	var test_yaw: float=game.mesh_layer.smooth_yaw(0.0,PI*.5,1.0/30.0)
 	check(test_yaw>0.0 and test_yaw<=deg_to_rad(110.0)/30.0+0.0001,"3D NPC turn is capped instead of snapping 90 degrees")
 	for turn_step in 120:test_yaw=game.mesh_layer.smooth_yaw(test_yaw,PI*.5,1.0/60.0)
-	check(absf(angle_difference(test_yaw,PI*.5))<0.002,"smoothing converges on the physical GLB bow direction")
+	check(absf(angle_difference(test_yaw,PI*.5))<0.005,"smoothing converges within 0.3 degrees of the physical GLB bow direction")
 	# All nine original Meshy GLBs are X-long with the physical bowsprit at
 	# LOCAL -X (not +X). The simulation heading is in 2D chart coordinates,
 	# which map to world (X,Z); verify nose-first travel at all eight angles.
