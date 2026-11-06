@@ -182,7 +182,10 @@ const TEST_SHIP_PREVIEWS := {
 	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr_preview.png")
 }
 const TEST_SHIP_KEYS := ["crimson_voyager","test_ship_2","base_basic_pbr"]
-const TEST_SHIP_LENGTHS := [132.0,178.0,190.0]
+# Comparable gameplay silhouettes: bigger test ships remain larger than
+# the starter, but no longer dominate half of the sea screen at close zoom.
+const TEST_SHIP_LENGTHS := [128.0,152.0,158.0]
+const NPC_VISUAL_SCALE := 0.90
 var test_ship_textures: Dictionary={}
 var plate_fleet: Array[Dictionary] = []
 ## Keep the maximum artwork extent stable across all rendered headings.
@@ -639,11 +642,11 @@ func _npc_ship_texture(actor: Dictionary) -> Texture2D:
 func _actor_visual_length(actor: Dictionary) -> float:
 	if int(actor.id)==0:
 		var skin=int(sim.player.skin)
-		if skin==26:return 132.0
+		if skin==26:return 128.0
 		if skin>=27 and skin<=29:return TEST_SHIP_LENGTHS[skin-27]
-		if skin>=10:return float(CONTENT.SHIP_LENGTHS[skin-10])
-		return 156.0
-	if actor.kind=="ship":return float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])
+		if skin>=10:return float(CONTENT.SHIP_LENGTHS[skin-10])*NPC_VISUAL_SCALE
+		return 140.0
+	if actor.kind=="ship":return float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
 	return 150.0
 
 func _draw_actor(actor: Dictionary) -> void:
@@ -662,12 +665,12 @@ func _draw_actor(actor: Dictionary) -> void:
 	# oversized opaque 2D oval beneath their hulls.
 	var mesh_ship=mesh_layer!=null and mesh_layer.can_render_actor(actor)
 	if mesh_ship:
-		# Flat 2D sea + 3D mesh: give the keel a subtle *rotated* contact
-		# shadow and a faint foamy water edge. The previous horizontal oval
-		# stayed still while the hull turned, making it appear to hover.
-		draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
-		_ellipse(Vector2.ZERO,Vector2(length*.36,length*.087),Color(0.005,0.027,0.04,0.24))
-		_ellipse_line(Vector2.ZERO,Vector2(length*.37,length*.092),Color(0.51,0.78,0.83,0.23),1.15)
+		# Water-contact footprint, not a glowing platform. Two translucent
+		# layers hug the keel; the wave/wake effects supply moving highlights.
+		draw_set_transform(point+Vector2(0,4),heading.angle(),Vector2.ONE)
+		_ellipse(Vector2.ZERO,Vector2(length*.315,length*.064),Color(.006,.035,.048,.25))
+		_ellipse(Vector2.ZERO,Vector2(length*.255,length*.045),Color(.002,.021,.036,.13))
+		_ellipse_line(Vector2.ZERO,Vector2(length*.332,length*.072),Color(.64,.88,.91,.105),1.0)
 		draw_set_transform(Vector2.ZERO)
 	else:
 		_ellipse(point+Vector2(0,4),Vector2(length*0.34,length*0.09),Color(0.0,0.02,0.04,0.34))

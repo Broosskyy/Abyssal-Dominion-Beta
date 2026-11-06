@@ -20,6 +20,8 @@ func _run() -> void:
 	await process_frame
 	check(game.ship_textures.size()==10 and game.atlas_textures.size()==16,"ten own ship designs and sixteen directional reference atlases loaded")
 	check(game.skins.size()==30,"27 original ship designs plus three playable GLB test ships are listed")
+	check(game.TEST_SHIP_LENGTHS==[128.0,152.0,158.0],"M3087 normalized player test hull silhouettes use three coherent size tiers")
+	check(game.NPC_VISUAL_SCALE>=0.85 and game.NPC_VISUAL_SCALE<=0.95,"M3087 original NPC vessels scale consistently instead of overpowering the chart")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
 	# Sea effects depend on actual movement, not a planned path or client FPS.
 	check(is_zero_approx(game.wake_motion_strength(0.0,165.0)),"M3086 moored ship does not generate artificial wake")

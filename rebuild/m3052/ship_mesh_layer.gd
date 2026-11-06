@@ -74,7 +74,7 @@ func _ready() -> void:
 	var sun=DirectionalLight3D.new()
 	sun.name="SeaSun"
 	sun.rotation_degrees=Vector3(-58,-38,0)
-	sun.light_energy=1.9
+	sun.light_energy=1.66
 	sun.shadow_enabled=false
 	stage.add_child(sun)
 	# Meshy baked albedo is dark. Add opposing soft fill to reveal the far
@@ -82,7 +82,7 @@ func _ready() -> void:
 	var fill_light=DirectionalLight3D.new()
 	fill_light.name="SeaSoftFill"
 	fill_light.rotation_degrees=Vector3(-55,135,0)
-	fill_light.light_energy=0.7
+	fill_light.light_energy=0.59
 	fill_light.shadow_enabled=false
 	stage.add_child(fill_light)
 	var ambience=WorldEnvironment.new()
@@ -90,7 +90,7 @@ func _ready() -> void:
 	environment.background_mode=Environment.BG_CLEAR_COLOR
 	environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color=Color(0.92,0.94,1.0)
-	environment.ambient_light_energy=1.25
+	environment.ambient_light_energy=1.09
 	ambience.environment=environment
 	stage.add_child(ambience)
 	for key: String in MODEL_INFO:
@@ -244,7 +244,7 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 	if not visible or chart_camera==null or stage==null:return
 	resize_view(screen)
 	var center: Vector2=chart_camera.position
-	var tilt=deg_to_rad(49.0 if mode=="3d" else 37.0) # Show sail faces in both hybrid and 3D modes.
+	var tilt=deg_to_rad(43.0 if mode=="3d" else 39.0) # Consistent gameplay silhouette in both ship-render modes.
 	var foreshortening=maxf(cos(tilt),0.1)
 	mesh_camera.size=screen.y/maxf(chart_camera.zoom.y,.05)
 	var altitude=950.0

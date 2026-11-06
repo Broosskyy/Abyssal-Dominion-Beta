@@ -20,11 +20,20 @@ void fragment(){
  vec3 surface=texture(sea_tile,world/640.+flow*.24).rgb;
  vec3 crossing=texture(sea_tile,turn*world/1130.-flow*.16).rgb;
  float detail=dot(mix(surface,crossing,.4),vec3(.2126,.7152,.0722));
- vec3 sea=mix(vec3(.025,.19,.32),vec3(.045,.31,.46),depth);
- sea+=(detail-.22)*vec3(.10,.22,.26);
- // Existing directional wave art is only a faint, small-scale shimmer, never a broad band.
- float ripple=texture(wave_noise,world/190.+flow).g;
- sea+=vec3(.006,.012,.013)*(ripple-.5);
+ // Deep blue water with structured but restrained surface variation.
+ // All sampling uses WORLD position to avoid texture sliding under the hulls.
+ vec3 sea=mix(vec3(.019,.148,.270),vec3(.035,.263,.404),depth);
+ sea+=(detail-.28)*vec3(.092,.166,.182);
+ // Two animated, intersecting small waves give water a surface rather than
+ // looking like a flat wallpaper. The broad underlying sea remains calm.
+ float wave_a=texture(wave_noise,world/240.+vec2(TIME*.013,-TIME*.006)).g;
+ float wave_b=texture(wave_noise,turn*world/405.-vec2(TIME*.006,TIME*.004)).r;
+ float crest=smoothstep(.64,.84,wave_a*.61+wave_b*.39);
+ float mid=smoothstep(.42,.75,wave_b);
+ sea+=vec3(.042,.071,.079)*crest+vec3(.006,.013,.019)*(mid-.35);
+ // Dark troughs reinforce the visible high-water crests without
+ // scattering bright noise over the whole screen on mobile.
+ sea-=vec3(.008,.014,.018)*(1.-depth);
  // The Caribbean stays teal; north and shadow waters retain their authored regional identity.
  sea*=mix(vec3(1.),region_tint/vec3(.75,1.14,1.12),.45);
  COLOR=vec4(clamp(sea,0.,1.),1.);
