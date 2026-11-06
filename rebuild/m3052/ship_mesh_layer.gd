@@ -56,45 +56,49 @@ var resolution_factor := 0.8
 # M3088 A/B/C player-only render profile. Original imported models remain intact.
 const PLAYER_STYLES := ["original","gameplay","shaded"]
 var player_style := "original"
-var saved_player_materials: Dictionary={}
-var stylized_surface_count := 0
+# M3093: only duplicate imported materials on live instances, never GLBs.
+var gameplay_double_sided_count := 0
 
 func set_player_style(value: String) -> void:
-	# Switching the variant changes the real PackedScene loaded on the next
-	# sync_fleet(), not only its material. Saved player ship and statistics stay.
 	player_style=value if value in PLAYER_STYLES else "original"
 
-func _restyle_black_green_owner(owner: Node3D) -> void:
+func _configure_gameplay_surfaces(owner: Node3D,key: String) -> void:
+	if key not in ["base_basic_gameplay_pbr","base_basic_gameplay_shaded"]:return
 	var pivot: Node3D=owner.get_node_or_null("OriginalAxisCorrection")
-	if pivot==null or pivot.get_child_count()==0:return
-	var pending: Array[Node]=[]
-	pending.append(pivot.get_child(0))
-	stylized_surface_count=0
-	while not pending.is_empty():
-		var current: Node=pending.pop_back()
-		for child: Node in current.get_children():pending.append(child)
+	if pivot==null:return
+	var remaining: Array[Node]=[pivot]
+	gameplay_double_sided_count=0
+	while not remaining.is_empty():
+		var current: Node=remaining.pop_back()
+		for child: Node in current.get_children():remaining.append(child)
 		if not current is MeshInstance3D:continue
-		var drawable: MeshInstance3D=current as MeshInstance3D
-		if drawable.mesh==null:continue
-		for surface in drawable.mesh.get_surface_count():
-			var material_key: String=str(drawable.get_instance_id())+":"+str(surface)
-			if not saved_player_materials.has(material_key):
-				saved_player_materials[material_key]=drawable.get_surface_override_material(surface)
-			var source: Material=saved_player_materials[material_key]
-			if source==null:source=drawable.mesh.surface_get_material(surface)
-			if player_style!="gameplay":
-				drawable.set_surface_override_material(surface,saved_player_materials[material_key])
-				continue
-			if source is StandardMaterial3D:
-				var flat: StandardMaterial3D=source.duplicate() as StandardMaterial3D
-				flat.roughness=maxf(flat.roughness,0.88)
-				flat.metallic=minf(flat.metallic,0.12)
-				flat.specular=0.20
-				flat.normal_enabled=false
-				drawable.set_surface_override_material(surface,flat)
-				stylized_surface_count+=1
-			else:
-				drawable.set_surface_override_material(surface,saved_player_materials[material_key])
+		var piece: MeshInstance3D=current as MeshInstance3D
+		if piece.mesh==null:continue
+		for surface in piece.mesh.get_surface_count():
+			var material: Material=piece.get_active_material(surface)
+			if not material is StandardMaterial3D:continue
+			var copy: StandardMaterial3D=material.duplicate() as StandardMaterial3D
+			# Two-sided cloth throughout continuous rotation. Source GLB has
+			# one material, so culling is disabled only for this player's copy.
+			copy.cull_mode=BaseMaterial3D.CULL_DISABLED
+			if key=="base_basic_gameplay_pbr" and copy.normal_enabled:
+				copy.normal_scale=minf(copy.normal_scale,0.70)
+			piece.set_surface_override_material(surface,copy)
+			gameplay_double_sided_count+=1
+
+# Stable player plate drop: circumscribed hull footprint projects to a
+# constant screen radius rather than an orientation-dependent AABB.
+func stable_player_plate_drop(actor: Dictionary,zoom: float,pixels: float) -> float:
+	var key: String=player_key_for_skin(int(actor.get("skin",-1)))
+	if not MODEL_INFO.has(key):return 52.0*pixels
+	var info: Array=MODEL_INFO[key]
+	var length: float=float(host._actor_visual_length(actor))
+	var beam: float=float(PLAYER_SOURCE_BEAMS.get(key,0.44))
+	var ratio: float=beam/maxf(float(info[0]),0.1)
+	var ground_radius: float=length*sqrt(0.25+ratio*ratio)
+	var tilt: float=deg_to_rad(43.0 if mode=="3d" else 39.0)
+	var depth: float=length*(float(info[2])/maxf(float(info[0]),0.1))*PLAYER_WATER_IMMERSION
+	return ground_radius*cos(tilt)*zoom+depth*sin(tilt)*zoom+12.0*pixels
 
 
 func _ready() -> void:
@@ -124,7 +128,7 @@ func _ready() -> void:
 	var sun=DirectionalLight3D.new()
 	sun.name="SeaSun"
 	sun.rotation_degrees=Vector3(-58,-38,0)
-	sun.light_energy=1.66
+	sun.light_energy=1.52
 	sun.shadow_enabled=false
 	stage.add_child(sun)
 	# Meshy baked albedo is dark. Add opposing soft fill to reveal the far
@@ -132,7 +136,7 @@ func _ready() -> void:
 	var fill_light=DirectionalLight3D.new()
 	fill_light.name="SeaSoftFill"
 	fill_light.rotation_degrees=Vector3(-55,135,0)
-	fill_light.light_energy=0.59
+	fill_light.light_energy=0.78
 	fill_light.shadow_enabled=false
 	stage.add_child(fill_light)
 	var ambience=WorldEnvironment.new()
@@ -140,7 +144,7 @@ func _ready() -> void:
 	environment.background_mode=Environment.BG_CLEAR_COLOR
 	environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color=Color(0.92,0.94,1.0)
-	environment.ambient_light_energy=1.09
+	environment.ambient_light_energy=1.14
 	ambience.environment=environment
 	stage.add_child(ambience)
 	for key: String in MODEL_INFO:
@@ -256,9 +260,8 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	model.position=Vector3(-float(info[3])*scale_factor,(-float(info[1])-float(info[2])*immersion)*scale_factor,-float(info[4])*scale_factor)
 	model_instances[int(actor.id)]=owner
 	model_instance_keys[int(actor.id)]=key
-	if int(actor.id)==0 and key=="base_basic_pbr":
-		saved_player_materials.clear()
-		_restyle_black_green_owner(owner)
+	if int(actor.id)==0:
+		_configure_gameplay_surfaces(owner,key)
 	return owner
 
 
