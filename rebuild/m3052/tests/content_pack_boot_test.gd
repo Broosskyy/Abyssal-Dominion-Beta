@@ -20,6 +20,13 @@ func _run() -> void:
 	var game=scene.instantiate();root.add_child(game);current_scene=game
 	await process_frame
 	check(game.sim.npcs.size()==17 and game.skins.size()==30,"game scripts, all 30 ship designs and scene dependencies instantiate from the pack")
+	# Critical end-to-end check: this scene was mounted from the standalone
+	# signed DATA ZIP, not directly from the GitHub source tree.
+	for skin_id in [27,28,29]:
+		var key: String=game.TEST_SHIP_KEYS[skin_id-27]
+		check(game.mesh_layer.has_test_ship(skin_id),"signed Android data pack includes playable full GLB: "+key)
+		check(game.test_ship_textures.has(key),"signed Android data pack includes genuine 8-view sprite: "+key)
+		check(game.skin_previews[skin_id]==game.TEST_SHIP_PREVIEWS[key],"signed Android data pack includes genuine preview: "+key)
 	var next_spec=JSON.parse_string(FileAccess.get_file_as_string("res://fixture.json"))
 	DirAccess.copy_absolute(ProjectSettings.globalize_path("res://fixture.zip"),ProjectSettings.globalize_path("user://content_a.zip"))
 	DirAccess.copy_absolute(ProjectSettings.globalize_path("res://fixture.zip"),ProjectSettings.globalize_path("user://content_b.zip"))

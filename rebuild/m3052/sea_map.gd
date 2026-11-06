@@ -163,6 +163,18 @@ var plate_overlay: Control
 var mesh_layer
 var render_mode := "hybrid"
 const TEST_SHIP_ROOT := "res://assets/player/test_ships/"
+# Mandatory exporter-visible resource links: real 8-view GLB renders and
+# shipyard previews. They must not silently fall back to the old sloop.
+const TEST_SHIP_SPRITES := {
+	"crimson_voyager":preload("res://assets/player/test_ships/crimson_voyager_eight.png"),
+	"test_ship_2":preload("res://assets/player/test_ships/test_ship_2_eight.png"),
+	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr_eight.png")
+}
+const TEST_SHIP_PREVIEWS := {
+	"crimson_voyager":preload("res://assets/player/test_ships/crimson_voyager_preview.png"),
+	"test_ship_2":preload("res://assets/player/test_ships/test_ship_2_preview.png"),
+	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr_preview.png")
+}
 const TEST_SHIP_KEYS := ["crimson_voyager","test_ship_2","base_basic_pbr"]
 const TEST_SHIP_LENGTHS := [132.0,178.0,190.0]
 var test_ship_textures: Dictionary={}
@@ -280,13 +292,10 @@ func _load_assets() -> void:
 	for i in TEST_SHIP_KEYS.size():
 		var key=TEST_SHIP_KEYS[i]
 		skins.append({"name":test_names[i],"mesh_key":key,"test_ship":i>0,"views":8})
-		var sprite_path=TEST_SHIP_ROOT+key+"_eight.png"
-		var preview_path=TEST_SHIP_ROOT+key+"_preview.png"
-		if ResourceLoader.exists(sprite_path):
-			var sprite: Texture2D=load(sprite_path)
-			if sprite!=null:test_ship_textures[key]=sprite
-		var display: Texture2D=load(preview_path) if ResourceLoader.exists(preview_path) else _ship_preview(starter_texture,5)
-		skin_previews.append(display)
+		var sprite: Texture2D=TEST_SHIP_SPRITES[key]
+		if sprite!=null:test_ship_textures[key]=sprite
+		var display: Texture2D=TEST_SHIP_PREVIEWS[key]
+		skin_previews.append(display if display!=null else _ship_preview(starter_texture,5))
 	for name in ["tropical","rock","snow","snow2"]:
 		island_textures[name] = load("res://assets/reference/islands/"+name+".png")
 	for name in ["cannonball","harpoon","chain","repair_chest","portal"]:

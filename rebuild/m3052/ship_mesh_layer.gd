@@ -5,6 +5,14 @@ extends TextureRect
 const MODEL_ROOT := "res://assets/npc/meshy/models/"
 const PLAYER_MODEL_ROOT := "res://assets/player/test_ships/"
 const TEST_SHIP_SKINS := {27:"crimson_voyager",28:"test_ship_2",29:"base_basic_pbr"}
+# Export-critical hard references. The three new models are played by users,
+# not the old NPC roster; string-based dynamic loading was insufficient to
+# make the exporter retain their converted GLTF scenes in the signed PCK.
+const PLAYER_TEST_SCENES := {
+	"crimson_voyager":preload("res://assets/player/test_ships/crimson_voyager.glb"),
+	"test_ship_2":preload("res://assets/player/test_ships/test_ship_2.glb"),
+	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr.glb")
+}
 const REQUIRED_NPC_KEYS := ["old_harbor_trader","merchant_brig_3002","merchant_brig_2921","merchant_brig_2912","weathered_voyager","weathered_junk","emerald_voyager","midnight_mariner","crimson_tide_galley"]
 ## Source Meshy glTF is already Y-UP. No -90-degree X rotation is needed.
 ## [hull length X, lowest Y, total Y height, X midpoint, Z midpoint].
@@ -81,10 +89,15 @@ func _ready() -> void:
 	ambience.environment=environment
 	stage.add_child(ambience)
 	for key: String in MODEL_INFO:
-		var optional_player: bool=key in TEST_SHIP_SKINS.values()
-		var path=(PLAYER_MODEL_ROOT if optional_player else MODEL_ROOT)+key+".glb"
+		if PLAYER_TEST_SCENES.has(key):
+			# A real scene preload is exported into the signed data pack.
+			var packed: PackedScene=PLAYER_TEST_SCENES[key]
+			if packed!=null:model_scenes[key]=packed
+			else:push_error("Player GLB not imported: "+key)
+			continue
+		var path=MODEL_ROOT+key+".glb"
 		if not ResourceLoader.exists(path):
-			if not optional_player:push_warning("3D ship model unavailable: "+path)
+			push_warning("3D NPC ship unavailable: "+path)
 			continue
 		var scene=load(path)
 		if scene is PackedScene:model_scenes[key]=scene

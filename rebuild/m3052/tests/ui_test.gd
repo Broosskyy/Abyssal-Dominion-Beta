@@ -22,15 +22,18 @@ func _run() -> void:
 	check(game.skins.size()==30,"27 original ship designs plus three playable GLB test ships are listed")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
 	check(str(game.skins[27].mesh_key)=="crimson_voyager" and str(game.skins[28].mesh_key)=="test_ship_2" and str(game.skins[29].mesh_key)=="base_basic_pbr","red starter and both boss test GLBs have dedicated shipyard slots")
-	if game.mesh_layer.has_test_ship(27):
-		check(game.mesh_layer.has_test_ship(28) and game.mesh_layer.has_test_ship(29),"signed test ship pack has all three playable GLBs")
-		var fresh=game.SIM.new()
-		check(int(fresh.player.skin)==27,"new captains begin on the red Crimson Voyager")
-		var fresh_save=fresh.export_save()
-		fresh.player.skin=29
-		check(fresh.restore_save(fresh.export_save()) and int(fresh.player.skin)==29,"large test ship survives captain save and restore")
-		fresh.player.skin=27
-		check(fresh.restore_save(fresh_save) and int(fresh.player.skin)==27,"red starter survives saving and loading")
+	for skin_id in [27,28,29]:
+		var key: String=game.TEST_SHIP_KEYS[skin_id-27]
+		check(game.mesh_layer.has_test_ship(skin_id),"M3083 player GLB is actually imported: "+key)
+		check(game.test_ship_textures.has(key),"M3083 genuine 8-direction sprite exported: "+key)
+		check(game.skin_previews[skin_id]!=null and game.skin_previews[skin_id]==game.TEST_SHIP_PREVIEWS[key],"M3083 genuine shipyard preview exported: "+key)
+	var fresh=game.SIM.new()
+	check(int(fresh.player.skin)==27,"new captains begin on the red Crimson Voyager")
+	var fresh_save=fresh.export_save()
+	fresh.player.skin=29
+	check(fresh.restore_save(fresh.export_save()) and int(fresh.player.skin)==29,"large test ship survives captain save and restore")
+	fresh.player.skin=27
+	check(fresh.restore_save(fresh_save) and int(fresh.player.skin)==27,"red starter survives saving and loading")
 	check(game.mesh_layer.mode in ["classic","hybrid","3d"],"game has a valid 2.5D or 3D mode")
 	# Turn rate is limited and converges smoothly across all heading changes.
 	var test_yaw: float=game.mesh_layer.smooth_yaw(0.0,PI*.5,1.0/30.0)
