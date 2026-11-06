@@ -22,6 +22,20 @@ func _run() -> void:
 	check(game.skins.size()==27,"all 27 ship designs including Small Starter are selectable")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
 	check(game.mesh_layer.mode in ["classic","hybrid","3d"],"game has a valid 2.5D or 3D mode")
+	# All nine original Meshy GLBs are X-long with the physical bowsprit at
+	# LOCAL -X (not +X). The simulation heading is in 2D chart coordinates,
+	# which map to world (X,Z); verify nose-first travel at all eight angles.
+	for key in game.mesh_layer.MODEL_INFO:
+		check(game.mesh_layer.model_scenes.has(key),"3D ship orientation contract includes "+key)
+	for course in [
+		Vector2.RIGHT,Vector2(1,1).normalized(),Vector2.DOWN,
+		Vector2(-1,1).normalized(),Vector2.LEFT,Vector2(-1,-1).normalized(),
+		Vector2.UP,Vector2(1,-1).normalized()
+	]:
+		var yaw: float=game.mesh_layer.yaw_for_heading(course)
+		var local_bow: Vector3=Vector3(-1,0,0).rotated(Vector3.UP,yaw)
+		var world_course:=Vector2(local_bow.x,local_bow.z).normalized()
+		check(world_course.distance_to(course)<0.001,"3D GLB physical bow matches simulated course "+str(course))
 	check(game.render_toggle is Button and game.render_toggle.visible,"graphics switch exists directly on the chart beside the minimap")
 	check(game.render_toggle.text.begins_with("GRAFIK"),"graphics switch shows its currently selected mode")
 	check(game._active_data_revision()>=0,"display menu reports exact active signed data revision")
