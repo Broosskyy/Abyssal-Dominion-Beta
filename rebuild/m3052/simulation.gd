@@ -117,12 +117,12 @@ func _init() -> void:
 		var name=str(spec.name) if meshy_ready else legacy_names[i]
 		npcs.append({"id":i+1,"name":name,"kind":"ship","pos":starts[i],
 			"home":starts[i],"heading":Vector2.LEFT,"path":[],"hp":hull,"max_hp":hull,
-			"shield":shield,"max_shield":shield,"speed":float(spec.speed) if meshy_ready else 48.0+float(i%3)*4.0,
+			"shield":shield,"max_shield":shield,"speed":float(spec.speed) if meshy_ready else 38.0+float(i%3)*3.0,
 			"power":int(spec.power) if meshy_ready else (36 if elite else 23),"reload":float(i%4)*.6,"repath":0.0,"state":"patrol",
 			"patrol":i%4,"aggressive":false,"slow":0.0,"respawn":0.0,
 			"reward":int(spec.reward) if meshy_ready else (110 if elite else 55),"art":i,"elite":elite,
-			"visual_key":str(spec.key),"view_count":4,"renderer":"sprite",
-			"navigation":"four_diagonal","last_hit":-100.0})
+			"visual_key":str(spec.key),"view_count":4,"renderer":"mesh" if meshy_ready else "sprite",
+			"navigation":"free" if meshy_ready else "four_diagonal","last_hit":-100.0})
 	npcs.append({"id": 100, "name": "Tiamat · Tiefenwächter", "kind": "monster", "pos": Vector2(2590, 1750),
 		"home": Vector2(2590, 1750), "heading": Vector2.LEFT, "path": [], "hp": 1650,
 		"max_hp": 1650, "shield": 0, "max_shield": 0, "speed": 28.0, "reload": 1.0, "repath": 0.0, "state": "patrol",
@@ -566,7 +566,7 @@ func npc_engages(npc: Dictionary) -> bool:
 	return npc.pos.distance_to(npc.home)<900 and npc.pos.distance_to(player.pos)<1000 and (bool(npc.aggressive) or (bool(CONTENT.MAPS[map_id].npc_hostile) and npc.pos.distance_to(player.pos)<380))
 
 func _patrol_path(npc: Dictionary) -> Array[Vector2]:
-	# Long diamond circuits match the authored diagonal views instead of tiny loops.
+	# Wide patrol circuits: real GLB hulls can sail direct courses rather than\n\t# injecting frequent diagonal turns solely for legacy four-view sprites.
 	var offsets=[Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT,Vector2.UP]
 	for radius in [520.0, 380.0]:
 		for attempt in 4:
@@ -613,7 +613,7 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 		npc.state = "attack" if distance < 390 else "approach"
 		if distance > 305 and float(npc.repath) <= 0:
 			npc.path = plan_actor_path(npc,player.pos)
-			npc.repath = 3.0
+			npc.repath = 4.5 # Avoid chasing a new moving destination every few frames.
 		elif distance <= 305:
 			npc.path = []
 		if distance < 420 and float(npc.reload) <= 0 and segment_free(npc.pos, player.pos):
@@ -627,7 +627,12 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 		if npc.path.is_empty() and float(npc.repath)<=0:
 			npc.path = _patrol_path(npc)
 			npc.repath = 9.0 if npc.path.is_empty() else 0.0
+	# Let a completed patrol breathe before starting an unrelated new course.
+	# A blocked route also gets a brief retry delay, preventing jitter loops.
+	var was_patrolling: bool=npc.state=="patrol" and not npc.path.is_empty()
 	_move(npc, delta)
+	if was_patrolling and npc.path.is_empty():
+		npc.repath=maxf(float(npc.repath),2.0)
 
 func _fire_player() -> void:
 	if docked or int(player.hp)<=0: return

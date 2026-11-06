@@ -9,6 +9,20 @@ func _initialize() -> void:
 	var sim=SIM.new()
 	check(sim.npcs.size()==17,"16 ship patrols and one monster exist")
 	var npc=sim.npcs[0]
+	check(str(npc.renderer)=="mesh" and str(npc.navigation)=="free","real GLB ships use unrestricted navigation rather than four-sprite zigzags")
+	check(float(npc.speed)<=40.0 and float(sim.npcs[8].speed)<=46.0,"normal and elite NPC speed is rebalanced")
+	var sample: Dictionary=npc.duplicate(true)
+	sample.pos=Vector2(400,400)
+	var free_goal:=Vector2(675,535)
+	check(sim.plan_actor_path(sample,free_goal)==sim.plan_path(sample.pos,free_goal),"GLB ships navigate directly without injected diagonal legs")
+	var rested: Dictionary=npc.duplicate(true)
+	rested.pos=Vector2(400,400)
+	rested.home=rested.pos
+	rested.path=[Vector2(403,400)]
+	rested.repath=0.0
+	rested.state="patrol"
+	sim._step_npc(rested,0.2)
+	check(rested.path.is_empty() and float(rested.repath)>=1.9,"patrol pauses briefly after a finished leg")
 	var initial: Vector2=npc.pos
 	sim.player.pos=Vector2(400,400)
 	for i in 60:sim.step(1.0/30.0)

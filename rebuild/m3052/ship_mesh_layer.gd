@@ -134,6 +134,15 @@ func yaw_for_heading(heading: Vector2) -> float:
 	if heading.length_squared()<0.000001:return 0.0
 	return wrapf(PI-heading.angle(),-PI,PI)
 
+# Keep GLB bows facing the movement vector without teleporting through 90/180
+# degree changes when the patrol route chooses a new leg.
+func smooth_yaw(current: float,desired: float,seconds: float) -> float:
+	var dt: float=clampf(seconds,0.0,0.05)
+	var remaining: float=angle_difference(current,desired)
+	var eased: float=remaining*clampf(dt*3.6,0.0,1.0)
+	var limited: float=deg_to_rad(110.0)*dt
+	return wrapf(current+clampf(eased,-limited,limited),-PI,PI)
+
 func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2) -> void:
 	if not visible or chart_camera==null or stage==null:return
 	resize_view(screen)
@@ -150,7 +159,8 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		var id=int(actor.id)
 		var key=str(actor.visual_key)
 		var node: Node3D=model_instances.get(id)
-		if node==null or model_instance_keys.get(id,"")!=key:
+		var newly_instanced: bool=node==null or model_instance_keys.get(id,"")!=key
+		if newly_instanced:
 			if node!=null:node.queue_free()
 			node=_create_ship(actor,key)
 		if node==null:continue
@@ -159,7 +169,10 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		# Only the mesh gets depth / perspective; taps and combat stay 2D.
 		node.position=Vector3(point.x,0,center.y+(point.y-center.y)/foreshortening)
 		var heading: Vector2=actor.heading
-		node.rotation.y=yaw_for_heading(heading) # Align the physical -X bowsprit, never the +X stern.
+		var desired_yaw: float=yaw_for_heading(heading)
+		# Spawn at correct nose direction; only subsequent turns are smoothed.
+		if newly_instanced:node.rotation.y=desired_yaw
+		else:node.rotation.y=smooth_yaw(node.rotation.y,desired_yaw,get_process_delta_time())
 		node.visible=true
 		kept[id]=true
 	for id: Variant in model_instances.keys():

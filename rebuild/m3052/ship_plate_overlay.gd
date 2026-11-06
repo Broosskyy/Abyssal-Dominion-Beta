@@ -71,12 +71,19 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	if player:tint=sim.staff.color() if sim.staff.shows_badge() else Color("d9f0e5")
 	elif hostile:tint=Color("eab8a7")
 	elif monster:tint=Color("c6b9d6")
+	# NPC names recede behind the captain's identity; the selected target
+	# stays easier to follow when multiple ships cross the same sea lane.
+	if not player:tint.a=0.87 if int(actor.id)==sim.target else 0.67
 	# No draw_set_transform(...scale=1.45): subpixel GPU magnification
 	# made texts and thin HP/shield rules flicker while the camera moved.
 	var pixel_scale=float(host._plate_pixels())
 	draw_set_transform(anchor,0,Vector2.ONE)
 	var title: String=host._plate_title(actor)
 	var width=_caption(Vector2.ZERO,title,16 if player else 14,tint)
+	if not player and not tower and not monster:
+		# Small category marker, separate from the name so long names are
+		# not truncated further by an inline [NPC] prefix.
+		_caption(Vector2(-width*.5-19.0*pixel_scale,0),"NPC",8,Color(.64,.78,.84,.59),1)
 	if host._plate_has_rank(actor):
 		var tier=clampi(floori((sim.level-1)/4.0)+1,1,5) if player else clampi(int(actor.get("pirate_rank",1)),1,5)
 		_rank(Vector2(-width*.5-23*pixel_scale,-6*pixel_scale),tier,pixel_scale)

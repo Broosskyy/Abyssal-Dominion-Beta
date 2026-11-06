@@ -22,6 +22,11 @@ func _run() -> void:
 	check(game.skins.size()==27,"all 27 ship designs including Small Starter are selectable")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
 	check(game.mesh_layer.mode in ["classic","hybrid","3d"],"game has a valid 2.5D or 3D mode")
+	# Turn rate is limited and converges smoothly across all heading changes.
+	var test_yaw: float=game.mesh_layer.smooth_yaw(0.0,PI*.5,1.0/30.0)
+	check(test_yaw>0.0 and test_yaw<=deg_to_rad(110.0)/30.0+0.0001,"3D NPC turn is capped instead of snapping 90 degrees")
+	for turn_step in 120:test_yaw=game.mesh_layer.smooth_yaw(test_yaw,PI*.5,1.0/60.0)
+	check(absf(angle_difference(test_yaw,PI*.5))<0.002,"smoothing converges on the physical GLB bow direction")
 	# All nine original Meshy GLBs are X-long with the physical bowsprit at
 	# LOCAL -X (not +X). The simulation heading is in 2D chart coordinates,
 	# which map to world (X,Z); verify nose-first travel at all eight angles.
