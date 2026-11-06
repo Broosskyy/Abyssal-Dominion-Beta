@@ -5,7 +5,7 @@ var failures: Array[String]=[]
 func check(value: bool,label: String) -> void:
 	checks+=1
 	if not value:failures.append(label)
-func caption_clears_hull(game: Node, actor: Dictionary, anchor: Vector2) -> bool:
+func caption_clears_hull(game, actor: Dictionary, anchor: Vector2) -> bool:
 	var pixels: float=game._plate_pixels()
 	if game.mesh_layer!=null and game.mesh_layer.can_render_actor(actor):
 		# A true 3D hull is projected from the water plane, not the 320px
