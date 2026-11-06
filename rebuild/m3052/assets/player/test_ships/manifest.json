@@ -27,7 +27,7 @@
   "test_ship_2": {
     "filename": "Meshy_AI_Test_ship_2_rodin_pbr_1106093709_texture.glb",
     "glb_sha256": "d4e8351735b777f35a2019dac1de519ab8b4fb70ee47bb4e626a8a923c2572db",
-    "file_mb": 12.0,
+    "file_mb": 12,
     "triangles": 30724,
     "bounds_min": [
       -0.43998104333877563,
@@ -42,7 +42,7 @@
     "length": 1.9547670483589172,
     "min_y": -0.5102599263191223,
     "height": 1.0209998488426208,
-    "x_mid": -4.9501657485961914e-05,
+    "x_mid": -0.000049501657485961914,
     "z_mid": 0.022532492876052856,
     "pre_yaw_degrees": 90,
     "visual_length": 178,
@@ -68,10 +68,60 @@
     "min_y": -0.8304669260978699,
     "height": 1.6610939502716064,
     "x_mid": -0.00023649632930755615,
-    "z_mid": 3.808736801147461e-05,
+    "z_mid": 0.00003808736801147461,
     "pre_yaw_degrees": 90,
     "visual_length": 190,
     "source_axis": "Z",
     "sprite_sha256": "09b5c158db5291acf54f77f2c9870fabad149c80e167d409fbf39428ab137e28"
+  },
+  "base_basic_gameplay_pbr": {
+    "filename": "user_uploaded_m3092_base_basic_pbr.glb",
+    "glb_sha256": "eb4aa16d28f3438e272f8cd689fb2dadaf6d4a79fed752fa71537408ee5a2be3",
+    "file_mb": 9.71,
+    "triangles": 5918,
+    "bounds_min": [
+      -0.61379355,
+      0,
+      -0.94798034
+    ],
+    "bounds_max": [
+      0.61310285,
+      1.46058404,
+      0.94883603
+    ],
+    "length": 1.89681637,
+    "min_y": 0,
+    "height": 1.46058404,
+    "x_mid": -0.00034535,
+    "z_mid": 0.00042785,
+    "pre_yaw_degrees": -90,
+    "visual_length": 158,
+    "source_axis": "Z",
+    "note": "M3092 independently loaded true 3D GLB, user-provided; old model preserved."
+  },
+  "base_basic_gameplay_shaded": {
+    "filename": "user_uploaded_m3092_base_basic_shaded.glb",
+    "glb_sha256": "223ab3d2f2951e9ff5cd093e5dc925a091fc91199bcb731cda6c8044d3932311",
+    "file_mb": 3.49,
+    "triangles": 5918,
+    "bounds_min": [
+      -0.61379355,
+      0,
+      -0.94798034
+    ],
+    "bounds_max": [
+      0.61310285,
+      1.46058404,
+      0.94883603
+    ],
+    "length": 1.89681637,
+    "min_y": 0,
+    "height": 1.46058404,
+    "x_mid": -0.00034535,
+    "z_mid": 0.00042785,
+    "pre_yaw_degrees": -90,
+    "visual_length": 158,
+    "source_axis": "Z",
+    "note": "M3092 independently loaded true 3D GLB, user-provided; old model preserved."
   }
 }

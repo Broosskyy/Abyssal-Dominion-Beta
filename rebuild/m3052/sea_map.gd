@@ -2574,13 +2574,13 @@ func _open_display() -> void:
 		var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 		choice.disabled=render_mode==key or (key!="classic" and (mesh_layer==null or not mesh_layer.has_complete_fleet()))
 	_note("Beide 3D-Varianten nutzen dieselben echten GLB-Modelle und die bestehende Seekarten-Simulation. Inseln und Wasser bleiben zunächst 2D; der klassische Modus ist der Performance-Fallback.")
-	_section("M3088 · SCHATTENKRIEGSSCHIFF – STILTEST")
-	_note("Nur für das schwarz-grüne Testschiff (Werftplatz 29). Die Schiffgröße, Kamera, Bewegung und Kampfwerte bleiben gleich. In HYBRID oder 3D vergleichen:")
-	for style_option in [["original","A · ORIGINAL 3D / PBR"],["gameplay","B · GAMEPLAY-LOOK / RUHIGERE MATERIALIEN"],["sprite","C · ACHT RICHTUNGEN / 2,5D-SPRITES"]]:
+	_section("M3092 · SCHATTENKRIEGSSCHIFF – ECHTE 3D-MODELLE")
+	_note("Nur für das schwarz-grüne Testschiff (Werftplatz 29). Drei echte GLB-Modelle bei gleichen Kampfwerten und gleicher Schiffsgröße. Nur in HYBRID oder 3D sichtbar:")
+	for style_option in [["original","A · BISHERIGES ORIGINAL-GLB"],["gameplay","B · NEUES GAMEPLAY-GLB / PBR"],["shaded","C · NEUES GAMEPLAY-GLB / SHADED"]]:
 		var style_key: String=style_option[0]
 		var style_button=_action(str(style_option[1])+(" · AKTIV" if test_visual_style==style_key else ""),func():_set_test_visual_style(style_key),"tab_on" if test_visual_style==style_key else "normal")
 		style_button.disabled=test_visual_style==style_key
-	_note("B: Original-GLB mit weniger PBR-Glanz und Normalmap-Mikrodetails. C: echte acht aus demselben GLB gerenderte Bilder. Noch keine Polygonreduktion oder 16 Richtungen.")
+	_note("B und C sind die neu hochgeladenen, voll drehbaren GLB-Modelle mit ca. 5.918 Dreiecken. A ist das bisherige große Test-GLB. Andere Schiffe und Spielstände bleiben unverändert.")
 	_section("HUD-GRÖSSE")
 	for i in 3:
 		var index=i
@@ -2976,7 +2976,8 @@ func _load_display() -> void:
 	render_mode=str(data.get("render_mode","hybrid"))
 	if render_mode not in ["classic","hybrid","3d"]:render_mode="hybrid"
 	test_visual_style=str(data.get("test_visual_style","original"))
-	if test_visual_style not in ["original","gameplay","sprite"]:test_visual_style="original"
+	if test_visual_style=="sprite":test_visual_style="shaded" # migration: old C becomes new real-3D C
+	if test_visual_style not in ["original","gameplay","shaded"]:test_visual_style="original"
 
 func _cycle_render_mode() -> void:
 	var modes=["classic","hybrid","3d"]
@@ -2989,7 +2990,7 @@ func _persist_display_preferences() -> void:
 		file.close()
 
 func _set_test_visual_style(value: String) -> void:
-	if value not in ["original","gameplay","sprite"]:return
+	if value not in ["original","gameplay","shaded"]:return
 	test_visual_style=value
 	if mesh_layer!=null:mesh_layer.set_player_style(value)
 	_persist_display_preferences()

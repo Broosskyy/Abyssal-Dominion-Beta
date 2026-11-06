@@ -23,23 +23,20 @@ func _run() -> void:
 	check(game.TEST_SHIP_LENGTHS==[128.0,152.0,158.0],"M3087 normalized player test hull silhouettes use three coherent size tiers")
 	check(game.NPC_VISUAL_SCALE>=0.85 and game.NPC_VISUAL_SCALE<=0.95,"M3087 original NPC vessels scale consistently instead of overpowering the chart")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
-	# Three-way visual comparison applies ONLY to the black-green skin.
+	# M3092: actual 3D model A/B/C comparison, not material-only or sprites.
 	var old_comparison_style: String=game.test_visual_style
 	var old_comparison_skin: int=int(game.sim.player.skin)
 	var old_comparison_mode: String=game.mesh_layer.mode
 	game.sim.player.skin=29
 	game.mesh_layer.set_render_mode("hybrid")
-	game.mesh_layer.set_player_style("original")
-	check(game.mesh_layer.can_render_actor(game.sim.player),"M3088 A: full original black-green GLB remains available")
 	var comparison_fleet: Array[Dictionary]=[game.sim.player]
-	game.mesh_layer.sync_fleet(comparison_fleet,game.camera,game.get_viewport_rect().size)
-	game.mesh_layer.set_player_style("gameplay")
-	check(game.mesh_layer.can_render_actor(game.sim.player),"M3088 B: gameplay profile is still the original GLB")
-	check(game.mesh_layer.stylized_surface_count>0,"M3088 B: material smoothing is actually applied to live mesh surfaces")
-	game.mesh_layer.set_player_style("sprite")
-	check(not game.mesh_layer.can_render_actor(game.sim.player),"M3088 C: eight-direction image replaces only the player 3D ship")
-	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"M3088 C: NPC 3D ships are unaffected by player's sprite setting")
-	check(int(game.sim.player.skin)==29,"M3088 visual profile changes no equipped ship or stats")
+	for variant in [["original","base_basic_pbr"],["gameplay","base_basic_gameplay_pbr"],["shaded","base_basic_gameplay_shaded"]]:
+		game.mesh_layer.set_player_style(str(variant[0]))
+		check(game.mesh_layer.can_render_actor(game.sim.player),"M3092 actual 3D model available: "+str(variant[0]))
+		game.mesh_layer.sync_fleet(comparison_fleet,game.camera,game.get_viewport_rect().size)
+		check(str(game.mesh_layer.model_instance_keys.get(0,""))==str(variant[1]),"M3092 real GLB scene selected: "+str(variant[1]))
+	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"M3092 NPC ships remain actual GLBs")
+	check(int(game.sim.player.skin)==29,"M3092 visual comparison never modifies equipped ship")
 	game.mesh_layer.set_player_style(old_comparison_style)
 	game.mesh_layer.set_render_mode(old_comparison_mode)
 	game.sim.player.skin=old_comparison_skin
@@ -63,7 +60,7 @@ func _run() -> void:
 	check(fresh.restore_save(fresh_save) and int(fresh.player.skin)==27,"red starter survives saving and loading")
 	# Verify real physical bow direction for both Z-long originals and red X-long
 	# starter, at all eight map bearings. This catches 180-degree import errors.
-	for model_key in ["crimson_voyager","test_ship_2","base_basic_pbr"]:
+	for model_key in ["crimson_voyager","test_ship_2","base_basic_pbr","base_basic_gameplay_pbr","base_basic_gameplay_shaded"]:
 		for course in [Vector2.RIGHT,Vector2(1,1).normalized(),Vector2.DOWN,Vector2(-1,1).normalized(),Vector2.LEFT,Vector2(-1,-1).normalized(),Vector2.UP,Vector2(1,-1).normalized()]:
 			check(game.mesh_layer.forward_for_model(model_key,course).distance_to(course)<0.001,"M3084 GLB physical prow points in the direction of travel: "+model_key+" "+str(course))
 	var slow_player_turn: float=game.mesh_layer.smooth_player_yaw(0.0,PI,1.0/60.0)

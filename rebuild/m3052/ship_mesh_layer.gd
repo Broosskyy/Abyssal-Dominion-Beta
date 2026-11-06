@@ -11,12 +11,16 @@ const TEST_SHIP_SKINS := {27:"crimson_voyager",28:"test_ship_2",29:"base_basic_p
 const PLAYER_TEST_SCENES := {
 	"crimson_voyager":preload("res://assets/player/test_ships/crimson_voyager.glb"),
 	"test_ship_2":preload("res://assets/player/test_ships/test_ship_2.glb"),
-	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr.glb")
+	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr.glb"),
+	"base_basic_gameplay_pbr":preload("res://assets/player/test_ships/base_basic_gameplay_pbr.glb"),
+	"base_basic_gameplay_shaded":preload("res://assets/player/test_ships/base_basic_gameplay_shaded.glb")
 }
 # Confirmed with orthographic renders of ORIGINAL GLB source geometry:
 # the red starter bows along -X; both big galleons bow along +Z.
 # A -90 deg local Y pivot maps +Z onto -X, like the original NPC fleet.
-const PLAYER_RAW_BOW := {"crimson_voyager":Vector3(-1,0,0),"test_ship_2":Vector3(0,0,1),"base_basic_pbr":Vector3(0,0,1)}
+const PLAYER_RAW_BOW := {"crimson_voyager":Vector3(-1,0,0),"test_ship_2":Vector3(0,0,1),"base_basic_pbr":Vector3(0,0,1),
+	"base_basic_gameplay_pbr":Vector3(0,0,1),
+	"base_basic_gameplay_shaded":Vector3(0,0,1)}
 const PLAYER_WATER_IMMERSION := 0.205
 const REQUIRED_NPC_KEYS := ["old_harbor_trader","merchant_brig_3002","merchant_brig_2921","merchant_brig_2912","weathered_voyager","weathered_junk","emerald_voyager","midnight_mariner","crimson_tide_galley"]
 ## Source Meshy glTF is already Y-UP. No -90-degree X rotation is needed.
@@ -35,7 +39,10 @@ const MODEL_INFO := {
 	# [longest horizontal dimension, minY, height, original centerX, centerZ, optional Y yaw]
 	"crimson_voyager":[1.902524,-0.830722,1.660758,-0.000502,-0.000408,0.0],
 	"test_ship_2":[1.954767,-0.510260,1.021000,-0.000050,0.022532,-90.0],
-	"base_basic_pbr":[1.999924,-0.830467,1.661094,-0.000236,0.000038,-90.0]
+	"base_basic_pbr":[1.999924,-0.830467,1.661094,-0.000236,0.000038,-90.0],
+	# Uploaded M3092 ~5,918-triangle GLBs. True source bounds, Y-up and +Z prow.
+	"base_basic_gameplay_pbr":[1.896816,0.0,1.460584,-0.000345,0.000428,-90.0],
+	"base_basic_gameplay_shaded":[1.896816,0.0,1.460584,-0.000345,0.000428,-90.0]
 }
 var host
 var stage: SubViewport
@@ -47,16 +54,15 @@ var model_instance_keys: Dictionary={}
 var mode := "classic"
 var resolution_factor := 0.8
 # M3088 A/B/C player-only render profile. Original imported models remain intact.
-const PLAYER_STYLES := ["original","gameplay","sprite"]
+const PLAYER_STYLES := ["original","gameplay","shaded"]
 var player_style := "original"
 var saved_player_materials: Dictionary={}
 var stylized_surface_count := 0
 
 func set_player_style(value: String) -> void:
+	# Switching the variant changes the real PackedScene loaded on the next
+	# sync_fleet(), not only its material. Saved player ship and statistics stay.
 	player_style=value if value in PLAYER_STYLES else "original"
-	var owner: Node3D=model_instances.get(0)
-	if owner!=null and is_instance_valid(owner) and model_instance_keys.get(0,"")=="base_basic_pbr":
-		_restyle_black_green_owner(owner)
 
 func _restyle_black_green_owner(owner: Node3D) -> void:
 	var pivot: Node3D=owner.get_node_or_null("OriginalAxisCorrection")
@@ -159,6 +165,9 @@ func has_complete_fleet() -> bool:
 	return true
 
 func player_key_for_skin(skin: int) -> String:
+	if skin==29:
+		if player_style=="gameplay":return "base_basic_gameplay_pbr"
+		if player_style=="shaded":return "base_basic_gameplay_shaded"
 	return str(TEST_SHIP_SKINS.get(skin,""))
 
 func has_test_ship(skin: int) -> bool:
@@ -175,13 +184,14 @@ func set_render_mode(requested: String) -> void:
 func can_render_actor(actor: Dictionary) -> bool:
 	if not visible:return false
 	if int(actor.get("id",-1))==0:
-		return not (int(actor.get("skin",-1))==29 and player_style=="sprite") and has_test_ship(int(actor.get("skin",-1)))
+		return has_test_ship(int(actor.get("skin",-1)))
 	return int(actor.get("id",0))>0 and str(actor.get("kind",""))=="ship" and model_scenes.has(str(actor.get("visual_key","")))
 
 # Lower-hull envelope from the source GLB bounds, not the eight-angle sprite.
 # Preserve the physical bow/oars and stern at every heading. The ship's
 # true projection changes with camera zoom and 3D yaw, so the label must too.
-const PLAYER_SOURCE_BEAMS := {"crimson_voyager":0.355,"test_ship_2":0.440,"base_basic_pbr":0.433}
+const PLAYER_SOURCE_BEAMS := {"crimson_voyager":0.355,"test_ship_2":0.440,"base_basic_pbr":0.433,
+	"base_basic_gameplay_pbr":0.614,"base_basic_gameplay_shaded":0.614}
 
 func projected_hull_bottom(actor: Dictionary) -> float:
 	if not can_render_actor(actor) or int(actor.get("id",-1))!=0:return -INF
