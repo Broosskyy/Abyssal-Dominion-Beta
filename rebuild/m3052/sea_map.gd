@@ -565,7 +565,13 @@ func _draw_actor(actor: Dictionary) -> void:
 	# oversized opaque 2D oval beneath their hulls.
 	var mesh_ship=mesh_layer!=null and mesh_layer.can_render_actor(actor)
 	if mesh_ship:
-		_ellipse(point+Vector2(0,3),Vector2(length*0.25,length*0.055),Color(0.0,0.02,0.04,0.10))
+		# Flat 2D sea + 3D mesh: give the keel a subtle *rotated* contact
+		# shadow and a faint foamy water edge. The previous horizontal oval
+		# stayed still while the hull turned, making it appear to hover.
+		draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
+		_ellipse(Vector2.ZERO,Vector2(length*.36,length*.087),Color(0.005,0.027,0.04,0.24))
+		_ellipse_line(Vector2.ZERO,Vector2(length*.37,length*.092),Color(0.51,0.78,0.83,0.23),1.15)
+		draw_set_transform(Vector2.ZERO)
 	else:
 		_ellipse(point+Vector2(0,4),Vector2(length*0.34,length*0.09),Color(0.0,0.02,0.04,0.34))
 	if is_player and sim.has_blessing():
@@ -731,6 +737,12 @@ func _plate_screen_anchor(actor: Dictionary) -> Vector2:
 	var pixels=_plate_pixels()
 	var point: Vector2=get_canvas_transform()*_visual_actor_pos(actor)
 	var player=int(actor.id)==0
+	# A true 3D hull is projected into its own viewport. Its 320px sprite
+	# bounds are NOT the actual waterline and produced a ~100px empty gap
+	# between the ship and its name. Anchor beside the projected keel.
+	if player and mesh_layer!=null and mesh_layer.can_render_actor(actor):
+		var tight_gap: float=clampf(_actor_visual_length(actor)*0.24,30.0,46.0)
+		return Vector2(point.x,point.y+tight_gap*pixels)
 	var minimum=point.y+(CAPTAIN_PLATE_OFFSET if player else OTHER_PLATE_OFFSET)*pixels
 	var clearance=(CAPTAIN_HULL_CLEARANCE if player else NPC_HULL_CLEARANCE)*pixels
 	var stable_bottom=point.y+_plate_stable_hull_drop(actor)*absf(get_canvas_transform().y.y)

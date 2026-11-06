@@ -13,6 +13,11 @@ const PLAYER_TEST_SCENES := {
 	"test_ship_2":preload("res://assets/player/test_ships/test_ship_2.glb"),
 	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr.glb")
 }
+# Confirmed with orthographic renders of ORIGINAL GLB source geometry:
+# the red starter bows along -X; both big galleons bow along +Z.
+# A -90 deg local Y pivot maps +Z onto -X, like the original NPC fleet.
+const PLAYER_RAW_BOW := {"crimson_voyager":Vector3(-1,0,0),"test_ship_2":Vector3(0,0,1),"base_basic_pbr":Vector3(0,0,1)}
+const PLAYER_WATER_IMMERSION := 0.205
 const REQUIRED_NPC_KEYS := ["old_harbor_trader","merchant_brig_3002","merchant_brig_2921","merchant_brig_2912","weathered_voyager","weathered_junk","emerald_voyager","midnight_mariner","crimson_tide_galley"]
 ## Source Meshy glTF is already Y-UP. No -90-degree X rotation is needed.
 ## [hull length X, lowest Y, total Y height, X midpoint, Z midpoint].
@@ -29,8 +34,8 @@ const MODEL_INFO := {
 	"crimson_tide_galley":[1.9017,-0.6453,1.2821,-0.0002,-0.0001],
 	# [longest horizontal dimension, minY, height, original centerX, centerZ, optional Y yaw]
 	"crimson_voyager":[1.902524,-0.830722,1.660758,-0.000502,-0.000408,0.0],
-	"test_ship_2":[1.954767,-0.510260,1.021000,-0.000050,0.022532,90.0],
-	"base_basic_pbr":[1.999924,-0.830467,1.661094,-0.000236,0.000038,90.0]
+	"test_ship_2":[1.954767,-0.510260,1.021000,-0.000050,0.022532,-90.0],
+	"base_basic_pbr":[1.999924,-0.830467,1.661094,-0.000236,0.000038,-90.0]
 }
 var host
 var stage: SubViewport
@@ -155,8 +160,11 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	var scale_factor=float(host._actor_visual_length(actor))/maxf(float(info[0]),0.1)
 	model.rotation_degrees=Vector3.ZERO # Original Meshy glTF already uses Y-up.
 	model.scale=Vector3.ONE*scale_factor
-	# Waterline intersects the low hull; sails remain above the sea plane.
-	model.position=Vector3(-float(info[3])*scale_factor,(-float(info[1])-float(info[2])*.13)*scale_factor,-float(info[4])*scale_factor)
+	# Pull the test ship keel a little deeper into the sea surface. Source
+	# bounds include the sails; sinking to the old 13% of total height made
+	# the player hull look detached from the flat 2D ocean underneath it.
+	var immersion: float=PLAYER_WATER_IMMERSION if int(actor.id)==0 else 0.13
+	model.position=Vector3(-float(info[3])*scale_factor,(-float(info[1])-float(info[2])*immersion)*scale_factor,-float(info[4])*scale_factor)
 	model_instances[int(actor.id)]=owner
 	model_instance_keys[int(actor.id)]=key
 	return owner
@@ -173,6 +181,24 @@ func yaw_for_heading(heading: Vector2) -> float:
 
 # Keep GLB bows facing the movement vector without teleporting through 90/180
 # degree changes when the patrol route chooses a new leg.
+# Faster helm follow-through for the human captain: the movement simulation
+# follows the requested course immediately, so a 110deg/s NPC turn would
+# leave the visual player ship sailing sideways for too long.
+func smooth_player_yaw(current: float,desired: float,seconds: float) -> float:
+	var dt: float=clampf(seconds,0.0,0.05)
+	var turn: float=angle_difference(current,desired)
+	var eased: float=turn*clampf(dt*11.0,0.0,1.0)
+	var limit: float=deg_to_rad(285.0)*dt
+	return wrapf(current+clampf(eased,-limit,limit),-PI,PI)
+
+# Debuggable per-model heading contract used by the automated test.
+func forward_for_model(key: String,heading: Vector2) -> Vector2:
+	if not PLAYER_RAW_BOW.has(key):return Vector2.ZERO
+	var local_bow: Vector3=PLAYER_RAW_BOW[key]
+	var normalized: Vector3=local_bow.rotated(Vector3.UP,deg_to_rad(float(MODEL_INFO[key][5])))
+	var world_bow: Vector3=normalized.rotated(Vector3.UP,yaw_for_heading(heading))
+	return Vector2(world_bow.x,world_bow.z).normalized()
+
 func smooth_yaw(current: float,desired: float,seconds: float) -> float:
 	var dt: float=clampf(seconds,0.0,0.05)
 	var remaining: float=angle_difference(current,desired)
@@ -209,7 +235,9 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		var desired_yaw: float=yaw_for_heading(heading)
 		# Spawn at correct nose direction; only subsequent turns are smoothed.
 		if newly_instanced:node.rotation.y=desired_yaw
-		else:node.rotation.y=smooth_yaw(node.rotation.y,desired_yaw,get_process_delta_time())
+		else:
+			var dt: float=get_process_delta_time()
+			node.rotation.y=smooth_player_yaw(node.rotation.y,desired_yaw,dt) if id==0 else smooth_yaw(node.rotation.y,desired_yaw,dt)
 		node.visible=true
 		kept[id]=true
 	for id: Variant in model_instances.keys():

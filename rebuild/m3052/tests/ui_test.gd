@@ -34,6 +34,22 @@ func _run() -> void:
 	check(fresh.restore_save(fresh.export_save()) and int(fresh.player.skin)==29,"large test ship survives captain save and restore")
 	fresh.player.skin=27
 	check(fresh.restore_save(fresh_save) and int(fresh.player.skin)==27,"red starter survives saving and loading")
+	# Verify real physical bow direction for both Z-long originals and red X-long
+	# starter, at all eight map bearings. This catches 180-degree import errors.
+	for model_key in ["crimson_voyager","test_ship_2","base_basic_pbr"]:
+		for course in [Vector2.RIGHT,Vector2(1,1).normalized(),Vector2.DOWN,Vector2(-1,1).normalized(),Vector2.LEFT,Vector2(-1,-1).normalized(),Vector2.UP,Vector2(1,-1).normalized()]:
+			check(game.mesh_layer.forward_for_model(model_key,course).distance_to(course)<0.001,"M3084 GLB physical prow points in the direction of travel: "+model_key+" "+str(course))
+	var slow_player_turn: float=game.mesh_layer.smooth_player_yaw(0.0,PI,1.0/60.0)
+	check(slow_player_turn>0.0 and slow_player_turn<=deg_to_rad(285.0)/60.0+0.001,"M3084 player ship steering is responsive but cannot instantly flip 180 degrees")
+	var mode_before_anchor: String=game.mesh_layer.mode
+	game.mesh_layer.set_render_mode("3d")
+	var skin_before_anchor: int=int(game.sim.player.skin)
+	game.sim.player.skin=29
+	var player_center: Vector2=game.get_canvas_transform()*game._visual_actor_pos(game.sim.player)
+	var title_anchor: Vector2=game._plate_screen_anchor(game.sim.player)
+	check(title_anchor.y>player_center.y and title_anchor.y-player_center.y<=47.0*game._plate_pixels(),"M3084 3D captain name stays close to the actual ship keel")
+	game.sim.player.skin=skin_before_anchor
+	game.mesh_layer.set_render_mode(mode_before_anchor)
 	check(game.mesh_layer.mode in ["classic","hybrid","3d"],"game has a valid 2.5D or 3D mode")
 	# Turn rate is limited and converges smoothly across all heading changes.
 	var test_yaw: float=game.mesh_layer.smooth_yaw(0.0,PI*.5,1.0/30.0)
