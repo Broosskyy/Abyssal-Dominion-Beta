@@ -124,6 +124,16 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	model_instance_keys[int(actor.id)]=key
 	return owner
 
+
+# VERIFIED AGAINST NINE FULL MESHY GLBS (Nov 2026):
+# Their bowsprits extend towards local -X, stern/cabins are towards +X.
+# Godot's world X/Z maps to the chart X/Y; rotating local -X by
+# (PI-heading.angle()) sends the *bow* into the simulated heading.
+# Never rotate the entire mesh on X or offset the movement / hit positions.
+static func yaw_for_heading(heading: Vector2) -> float:
+	if heading.length_squared()<0.000001:return 0.0
+	return wrapf(PI-heading.angle(),-PI,PI)
+
 func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2) -> void:
 	if not visible or chart_camera==null or stage==null:return
 	resize_view(screen)
@@ -149,7 +159,7 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		# Only the mesh gets depth / perspective; taps and combat stay 2D.
 		node.position=Vector3(point.x,0,center.y+(point.y-center.y)/foreshortening)
 		var heading: Vector2=actor.heading
-		node.rotation.y=-heading.angle() # Original hull length axis is +X.
+		node.rotation.y=yaw_for_heading(heading) # Align the physical -X bowsprit, never the +X stern.
 		node.visible=true
 		kept[id]=true
 	for id: Variant in model_instances.keys():
