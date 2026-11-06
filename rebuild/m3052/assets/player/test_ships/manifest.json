@@ -1,0 +1,77 @@
+{
+  "crimson_voyager": {
+    "filename": "Meshy_AI_Crimson_Voyager_1105202412_texture.glb",
+    "glb_sha256": "9e07b8d95eed9381985ffea9e746575abee465461d114f124eae9e33ca3d3375",
+    "file_mb": 16.96,
+    "triangles": 29513,
+    "bounds_min": [
+      -0.9517639875411987,
+      -0.8307219743728638,
+      -0.35497793555259705
+    ],
+    "bounds_max": [
+      0.950760006904602,
+      0.8300359845161438,
+      0.3541620373725891
+    ],
+    "length": 1.9025239944458008,
+    "min_y": -0.8307219743728638,
+    "height": 1.6607579588890076,
+    "x_mid": -0.0005019903182983398,
+    "z_mid": -0.0004079490900039673,
+    "pre_yaw_degrees": 0,
+    "visual_length": 132,
+    "source_axis": "X",
+    "sprite_sha256": "1c728d59b3b2c17d67dcc09ddb7d2b2ec00ce587d960abf8c359bb1fb057f9ac"
+  },
+  "test_ship_2": {
+    "filename": "Meshy_AI_Test_ship_2_rodin_pbr_1106093709_texture.glb",
+    "glb_sha256": "d4e8351735b777f35a2019dac1de519ab8b4fb70ee47bb4e626a8a923c2572db",
+    "file_mb": 12.0,
+    "triangles": 30724,
+    "bounds_min": [
+      -0.43998104333877563,
+      -0.5102599263191223,
+      -0.9548510313034058
+    ],
+    "bounds_max": [
+      0.4398820400238037,
+      0.5107399225234985,
+      0.9999160170555115
+    ],
+    "length": 1.9547670483589172,
+    "min_y": -0.5102599263191223,
+    "height": 1.0209998488426208,
+    "x_mid": -4.9501657485961914e-05,
+    "z_mid": 0.022532492876052856,
+    "pre_yaw_degrees": 90,
+    "visual_length": 178,
+    "source_axis": "Z",
+    "sprite_sha256": "db35418ec754cec154a6e3cc03d0e945d7ee1ef508be3fc9b6316a459633c53d"
+  },
+  "base_basic_pbr": {
+    "filename": "Meshy_AI_base_basic_pbr_1105201022_texture.glb",
+    "glb_sha256": "bc672495d28a794617fb8270e4f4d4248c6cc15019e70e986720ad24970faf83",
+    "file_mb": 11.4,
+    "triangles": 30795,
+    "bounds_min": [
+      -0.432328999042511,
+      -0.8304669260978699,
+      -0.9999239444732666
+    ],
+    "bounds_max": [
+      0.4318560063838959,
+      0.8306270241737366,
+      1.0000001192092896
+    ],
+    "length": 1.9999240636825562,
+    "min_y": -0.8304669260978699,
+    "height": 1.6610939502716064,
+    "x_mid": -0.00023649632930755615,
+    "z_mid": 3.808736801147461e-05,
+    "pre_yaw_degrees": 90,
+    "visual_length": 190,
+    "source_axis": "Z",
+    "sprite_sha256": "09b5c158db5291acf54f77f2c9870fabad149c80e167d409fbf39428ab137e28"
+  }
+}

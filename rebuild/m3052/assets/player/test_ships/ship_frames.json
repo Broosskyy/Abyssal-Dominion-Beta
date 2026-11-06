@@ -1,0 +1,393 @@
+{
+  "version": 1,
+  "source": "Actual textured GLB render, 8 headings, transparent background",
+  "entries": {
+    "assets/player/test_ships/crimson_voyager_eight.png": {
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 0,
+          "row": 0
+        },
+        {
+          "rect": [
+            320,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 1,
+          "row": 0
+        },
+        {
+          "rect": [
+            640,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 2,
+          "row": 0
+        },
+        {
+          "rect": [
+            960,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 3,
+          "row": 0
+        },
+        {
+          "rect": [
+            1280,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 4,
+          "row": 0
+        },
+        {
+          "rect": [
+            1600,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 5,
+          "row": 0
+        },
+        {
+          "rect": [
+            1920,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 6,
+          "row": 0
+        },
+        {
+          "rect": [
+            2240,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 7,
+          "row": 0
+        }
+      ],
+      "size": [
+        2560,
+        320
+      ],
+      "kind": "3d-derived-8-direction"
+    },
+    "assets/player/test_ships/test_ship_2_eight.png": {
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 0,
+          "row": 0
+        },
+        {
+          "rect": [
+            320,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 1,
+          "row": 0
+        },
+        {
+          "rect": [
+            640,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 2,
+          "row": 0
+        },
+        {
+          "rect": [
+            960,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 3,
+          "row": 0
+        },
+        {
+          "rect": [
+            1280,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 4,
+          "row": 0
+        },
+        {
+          "rect": [
+            1600,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 5,
+          "row": 0
+        },
+        {
+          "rect": [
+            1920,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 6,
+          "row": 0
+        },
+        {
+          "rect": [
+            2240,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 7,
+          "row": 0
+        }
+      ],
+      "size": [
+        2560,
+        320
+      ],
+      "kind": "3d-derived-8-direction"
+    },
+    "assets/player/test_ships/base_basic_pbr_eight.png": {
+      "frames": [
+        {
+          "rect": [
+            0,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 0,
+          "row": 0
+        },
+        {
+          "rect": [
+            320,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 1,
+          "row": 0
+        },
+        {
+          "rect": [
+            640,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 2,
+          "row": 0
+        },
+        {
+          "rect": [
+            960,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 3,
+          "row": 0
+        },
+        {
+          "rect": [
+            1280,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 4,
+          "row": 0
+        },
+        {
+          "rect": [
+            1600,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 5,
+          "row": 0
+        },
+        {
+          "rect": [
+            1920,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 6,
+          "row": 0
+        },
+        {
+          "rect": [
+            2240,
+            0,
+            320,
+            320
+          ],
+          "pivot": [
+            160,
+            181
+          ],
+          "reference_extent": 320,
+          "column": 7,
+          "row": 0
+        }
+      ],
+      "size": [
+        2560,
+        320
+      ],
+      "kind": "3d-derived-8-direction"
+    }
+  }
+}
