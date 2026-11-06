@@ -269,12 +269,13 @@ func _load_assets() -> void:
 	skin_previews.append(_ship_preview(starter_texture,5))
 	# These are additional playable skins, not new NPCs. The binary GLB, 8-view
 	# classic sprite and real 3D shipyard preview arrive together via the asset ZIP.
-	var test_frames=TEST_SHIP_ROOT+"ship_frames.json"
-	if FileAccess.file_exists(test_frames):
-		var parsed=JSON.parse_string(FileAccess.get_file_as_string(test_frames))
-		if parsed is Dictionary:
-			for source: String in parsed.get("entries",{}):
-				ship_frames[source]=parsed.entries[source]
+	# Embedded metadata avoids relying on non-resource JSON files being exported
+	# into an Android data pack. Every sprite atlas has 8 × 320px real GLB views.
+	for test_key in TEST_SHIP_KEYS:
+		var frames: Array=[]
+		for direction in 8:
+			frames.append({"rect":[direction*320,0,320,320],"pivot":[160,181],"reference_extent":320,"column":direction,"row":0})
+		ship_frames["assets/player/test_ships/"+test_key+"_eight.png"]={"frames":frames,"size":[2560,320],"kind":"3d-derived-8-direction"}
 	var test_names=["Crimson Voyager · Startschiff","TEST · Totenkopf-Galeere","TEST · Schattenkriegsschiff"]
 	for i in TEST_SHIP_KEYS.size():
 		var key=TEST_SHIP_KEYS[i]
