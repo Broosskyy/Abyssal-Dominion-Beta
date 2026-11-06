@@ -466,7 +466,7 @@ func _run() -> void:
 	var skin_before: int=int(game.sim.player.skin)
 	var yard_button: Button=null
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
-		if "AUSRÜSTEN" in button.text:yard_button=button;break
+		if "AUSRÜSTEN" in button.text and not button.disabled:yard_button=button;break
 	check(yard_button!=null,"shipyard still offers a design that is not equipped")
 	if yard_button!=null:
 		var origin: Vector2=yard_button.get_global_rect().get_center()

@@ -1913,10 +1913,15 @@ func _open_ammo() -> void:
 		modal_body.add_child(row);ammo_rows.append(row)
 
 func _open_shipyard() -> void:
-	_banner_card(painted.nav_shipyard,"SCHIFFSDESIGNS · %d KARTEN" % skins.size(),"Nach Namen sortiert. Das Design ändert nur das Aussehen; Rumpf, Kanonen und Decks bleiben.")
+	_banner_card(painted.nav_shipyard,"SCHIFFSDESIGNS · %d KARTEN" % skins.size(),"Die 3 kostenlosen GLB-Testschiffe stehen oben. Alte Schiffdesigns bleiben erhalten. Ausrüstung, HP, Kanonen und Decks werden nicht verändert.")
 	var order: Array[int]=[]
 	for i in skins.size():order.append(i)
-	order.sort_custom(func(a,b): return str(skins[a].name).naturalnocasecmp_to(str(skins[b].name))<0)
+	# Put starter and both free testing hulls first; sort old designs below.
+	order.sort_custom(func(a,b):
+		if (a>=27)!=(b>=27):return a>=27
+		if a>=27:return a<b
+		return str(skins[a].name).naturalnocasecmp_to(str(skins[b].name))<0
+	)
 	var grid=_grid(2)
 	for raw in order:
 		var index: int=raw
