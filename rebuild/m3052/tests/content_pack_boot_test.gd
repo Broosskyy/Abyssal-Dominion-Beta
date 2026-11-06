@@ -19,7 +19,7 @@ func _run() -> void:
 	check(scene!=null,"game scene loads from data pack")
 	var game=scene.instantiate();root.add_child(game);current_scene=game
 	await process_frame
-	check(game.sim.npcs.size()==17 and game.skins.size()==27,"game scripts, ship graphics and scene dependencies instantiate from the pack")
+	check(game.sim.npcs.size()==17 and game.skins.size()==30,"game scripts, all 30 ship designs and scene dependencies instantiate from the pack")
 	var next_spec=JSON.parse_string(FileAccess.get_file_as_string("res://fixture.json"))
 	DirAccess.copy_absolute(ProjectSettings.globalize_path("res://fixture.zip"),ProjectSettings.globalize_path("user://content_a.zip"))
 	DirAccess.copy_absolute(ProjectSettings.globalize_path("res://fixture.zip"),ProjectSettings.globalize_path("user://content_b.zip"))
