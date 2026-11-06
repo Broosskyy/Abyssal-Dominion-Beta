@@ -1,0 +1,313 @@
+{
+  "schema": 2,
+  "geometry_preserved": true,
+  "mesh_decimation": false,
+  "models": [
+    {
+      "file": "old_harbor_trader.glb",
+      "original": "Meshy_AI_Old_Harbor_Trader_1105202956_texture.glb",
+      "triangles": 29846,
+      "geometry_sha256": "730286800b91a4261a553eeb341efb95dfe70dae00d2b18fbbac2eb6af32cc36",
+      "bytes_before": 16291908,
+      "bytes_after": 3759772,
+      "textures": [
+        {
+          "slot": "normal",
+          "size": [
+            768,
+            768
+          ],
+          "bytes": 1062691
+        },
+        {
+          "slot": "albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "bytes": 575556
+        },
+        {
+          "slot": "pbr",
+          "size": [
+            512,
+            512
+          ],
+          "bytes": 355474
+        }
+      ]
+    },
+    {
+      "file": "merchant_brig_3002.glb",
+      "original": "Meshy_AI_Weathered_Merchant_Br_1105203002_texture.glb",
+      "triangles": 29954,
+      "geometry_sha256": "c7863f25619d45be5c4fafb8035bd699047a40b782de3e3b541a63d1956593b4",
+      "bytes_before": 16948740,
+      "bytes_after": 3905896,
+      "textures": [
+        {
+          "slot": "normal",
+          "size": [
+            768,
+            768
+          ],
+          "bytes": 1105095
+        },
+        {
+          "slot": "albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "bytes": 607197
+        },
+        {
+          "slot": "pbr",
+          "size": [
+            512,
+            512
+          ],
+          "bytes": 321560
+        }
+      ]
+    },
+    {
+      "file": "merchant_brig_2921.glb",
+      "original": "Meshy_AI_Weathered_Merchant_Br_1105202921_texture.glb",
+      "triangles": 30151,
+      "geometry_sha256": "3e369a701a2b3ccc6505de39f95c38689286eef2a1b60cf39e1b08ddf05ff5cb",
+      "bytes_before": 17056216,
+      "bytes_after": 3824364,
+      "textures": [
+        {
+          "slot": "normal",
+          "size": [
+            768,
+            768
+          ],
+          "bytes": 1093963
+        },
+        {
+          "slot": "albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "bytes": 587061
+        },
+        {
+          "slot": "pbr",
+          "size": [
+            512,
+            512
+          ],
+          "bytes": 357632
+        }
+      ]
+    },
+    {
+      "file": "merchant_brig_2912.glb",
+      "original": "Meshy_AI_Weathered_Merchant_Br_1105202912_texture.glb",
+      "triangles": 29563,
+      "geometry_sha256": "6c911772a591b79f21048dd183a05d18fcc0e68c02ab7ead33f58032112ba0ac",
+      "bytes_before": 16640392,
+      "bytes_after": 3769284,
+      "textures": [
+        {
+          "slot": "normal",
+          "size": [
+            768,
+            768
+          ],
+          "bytes": 1092661
+        },
+        {
+          "slot": "albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "bytes": 592794
+        },
+        {
+          "slot": "pbr",
+          "size": [
+            512,
+            512
+          ],
+          "bytes": 323664
+        }
+      ]
+    },
+    {
+      "file": "weathered_voyager.glb",
+      "original": "Meshy_AI_Weathered_Voyager_1105202906_texture.glb",
+      "triangles": 30173,
+      "geometry_sha256": "3de7e447289f9dce1e65dce78dd085b342edb590346fc2f0e18950fc0ffc241a",
+      "bytes_before": 16916112,
+      "bytes_after": 3857324,
+      "textures": [
+        {
+          "slot": "normal",
+          "size": [
+            768,
+            768
+          ],
+          "bytes": 1113231
+        },
+        {
+          "slot": "albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "bytes": 607406
+        },
+        {
+          "slot": "pbr",
+          "size": [
+            512,
+            512
+          ],
+          "bytes": 321632
+        }
+      ]
+    },
+    {
+      "file": "weathered_junk.glb",
+      "original": "Meshy_AI_Weathered_Junk_Ship_1105202938_texture.glb",
+      "triangles": 28952,
+      "geometry_sha256": "54adb0c689c7104ac02608b84e70e178e03587104f992c00cb492f404b01e267",
+      "bytes_before": 16378704,
+      "bytes_after": 3726880,
+      "textures": [
+        {
+          "slot": "normal",
+          "size": [
+            768,
+            768
+          ],
+          "bytes": 1098473
+        },
+        {
+          "slot": "albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "bytes": 587469
+        },
+        {
+          "slot": "pbr",
+          "size": [
+            512,
+            512
+          ],
+          "bytes": 289308
+        }
+      ]
+    },
+    {
+      "file": "emerald_voyager.glb",
+      "original": "Meshy_AI_Emerald_Voyager_1105202952_texture.glb",
+      "triangles": 30324,
+      "geometry_sha256": "a9d69444daead371ebc8262bbd139ac95d0ff8d41395f34338725af0fb8e4a9f",
+      "bytes_before": 16442024,
+      "bytes_after": 3579428,
+      "textures": [
+        {
+          "slot": "normal",
+          "size": [
+            768,
+            768
+          ],
+          "bytes": 1034199
+        },
+        {
+          "slot": "albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "bytes": 558250
+        },
+        {
+          "slot": "pbr",
+          "size": [
+            512,
+            512
+          ],
+          "bytes": 355631
+        }
+      ]
+    },
+    {
+      "file": "midnight_mariner.glb",
+      "original": "Meshy_AI_Midnight_Mariner_1105202902_texture.glb",
+      "triangles": 30200,
+      "geometry_sha256": "63488ccf28fe2c0331728a33bcee5ba8d620a2760cee65dfc8193265b9c67b32",
+      "bytes_before": 16462000,
+      "bytes_after": 3875768,
+      "textures": [
+        {
+          "slot": "normal",
+          "size": [
+            768,
+            768
+          ],
+          "bytes": 1086958
+        },
+        {
+          "slot": "albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "bytes": 580762
+        },
+        {
+          "slot": "pbr",
+          "size": [
+            512,
+            512
+          ],
+          "bytes": 344447
+        }
+      ]
+    },
+    {
+      "file": "crimson_tide_galley.glb",
+      "original": "Meshy_AI_Crimson_Tide_Galley_1105202947_texture.glb",
+      "triangles": 29491,
+      "geometry_sha256": "a8b6f0cd5ea007bf83dc7e2d824cee19c8f3099c3a18c5203ba6bd3ecec52e1a",
+      "bytes_before": 15942032,
+      "bytes_after": 3622888,
+      "textures": [
+        {
+          "slot": "normal",
+          "size": [
+            768,
+            768
+          ],
+          "bytes": 1033416
+        },
+        {
+          "slot": "albedo",
+          "size": [
+            1024,
+            1024
+          ],
+          "bytes": 572710
+        },
+        {
+          "slot": "pbr",
+          "size": [
+            512,
+            512
+          ],
+          "bytes": 318471
+        }
+      ]
+    }
+  ]
+}
