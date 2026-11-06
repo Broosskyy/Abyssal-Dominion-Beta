@@ -50,6 +50,12 @@ var accumulator := 0.0
 const SIMULATION_TICK := 1.0 / 30.0
 var visual_before: Dictionary = {}
 var visual_after: Dictionary = {}
+# Local visual-only water animation state; never written to saves or simulation.
+# Each entry stores recent interpolated positions and sampled movement speed.
+var wake_tracks: Dictionary = {}
+const WAKE_LIFETIME := 1.35
+const WAKE_SAMPLE_INTERVAL := 0.11
+
 var refresh_clock := 0.0
 var save_clock := 0.0
 var elapsed := 0.0
@@ -333,6 +339,96 @@ func _visual_actor_pos(actor: Dictionary) -> Vector2:
 	if current.distance_squared_to(latest)>.01 or previous.distance_to(latest)>200.0:return current
 	return previous.lerp(latest,clampf(accumulator/SIMULATION_TICK,0.0,1.0))
 
+# Ships must leave trails only while actually moving; using 'path' alone
+# painted foam even when a hull was blocked by islands or sitting in port.
+func wake_motion_strength(measured: float,cruising: float) -> float:
+	return clampf(measured/maxf(cruising,1.0),0.0,1.0)
+
+func _wake_speed_for(actor: Dictionary) -> float:
+	return float(wake_tracks.get(int(actor.get("id",-1)),{}).get("speed",0.0))
+
+func _wake_intensity_for(actor: Dictionary) -> float:
+	return wake_motion_strength(_wake_speed_for(actor),float(actor.get("speed",1.0)))
+
+func _update_wake_tracks(delta: float) -> void:
+	var alive: Dictionary={}
+	var boats: Array[Dictionary]=[sim.player]
+	for npc: Dictionary in sim.npcs:
+		if int(npc.hp)>0 and str(npc.get("kind","ship"))=="ship":boats.append(npc)
+	for actor: Dictionary in boats:
+		if int(actor.hp)<=0:continue
+		var id: int=int(actor.id)
+		alive[id]=true
+		var point: Vector2=_visual_actor_pos(actor)
+		if not wake_tracks.has(id):
+			wake_tracks[id]={"last":point,"speed":0.0,"points":[],"sample_time":elapsed}
+			continue
+		var state: Dictionary=wake_tracks[id]
+		var previous: Vector2=state.get("last",point)
+		var dist: float=point.distance_to(previous)
+		if dist>190.0:
+			# Teleport, map crossing and respawn must not create a giant wake.
+			wake_tracks[id]={"last":point,"speed":0.0,"points":[],"sample_time":elapsed}
+			continue
+		var nominal: float=maxf(float(actor.get("speed",40.0)),1.0)
+		var measured: float=minf(dist/maxf(delta,0.0001),nominal*1.6)
+		state["speed"]=lerpf(float(state.get("speed",0.0)),measured,clampf(delta*7.0,0.0,1.0))
+		state["last"]=point
+		var history: Array=state.get("points",[])
+		while not history.is_empty() and elapsed-float(history[0].time)>WAKE_LIFETIME:
+			history.pop_front()
+		if elapsed-float(state.get("sample_time",0.0))>=WAKE_SAMPLE_INTERVAL:
+			state["sample_time"]=elapsed
+			if not history.is_empty():
+				var displacement: Vector2=point-Vector2(history.back().pos)
+				if displacement.length()>2.0:
+					history.append({"pos":point,"time":elapsed,"course":displacement.normalized()})
+			elif measured>2.5:
+				var course: Vector2=Vector2(actor.get("heading",Vector2.RIGHT)).normalized()
+				history.append({"pos":point,"time":elapsed,"course":course})
+		while history.size()>16:history.pop_front()
+		state["points"]=history
+		wake_tracks[id]=state
+	for key in wake_tracks.keys():
+		if not alive.has(key):wake_tracks.erase(key)
+
+func _draw_wake(actor: Dictionary) -> void:
+	if str(actor.get("kind","ship"))!="ship":return
+	var state: Dictionary=wake_tracks.get(int(actor.id),{})
+	if state.is_empty():return
+	var intensity: float=_wake_intensity_for(actor)
+	var history: Array=state.get("points",[])
+	if history.is_empty():return
+	var length: float=_actor_visual_length(actor)
+	for sample in history:
+		var age: float=elapsed-float(sample.time)
+		if age<0.06 or age>WAKE_LIFETIME:continue
+		var fade: float=pow(1.0-age/WAKE_LIFETIME,1.5)*intensity
+		if fade<0.014:continue
+		var direction: Vector2=Vector2(sample.course).normalized()
+		if direction.length_squared()<0.1:continue
+		var cross: Vector2=Vector2(-direction.y,direction.x)
+		var back: Vector2=Vector2(sample.pos)-direction*length*.34
+		var spread: float=length*(.075+age*.10)
+		var scatter: float=sin(elapsed*7.0+age*11.0+float(actor.id))*(1.1+age*1.4)
+		for sign_value in [-1.0,1.0]:
+			var shore: Vector2=back+cross*(spread+scatter)*sign_value
+			var trailing: Vector2=shore-direction*(8.0+age*6.5)
+			draw_line(shore,trailing,Color(.73,.93,.96,.40*fade),1.65,true)
+			draw_circle(shore,1.2+age*.55,Color(.78,.97,1.0,.20*fade))
+
+func _draw_bow_spray(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
+	var intensity: float=_wake_intensity_for(actor)
+	if intensity<0.12 or heading.length_squared()<0.5:return
+	var forward: Vector2=heading.normalized()
+	var cross: Vector2=Vector2(-forward.y,forward.x)
+	var nose: Vector2=point+forward*(length*.38)
+	for side_value in [-1.0,1.0]:
+		var crest: Vector2=nose+cross*side_value*(length*.055)
+		var out: Vector2=crest-forward*length*.085+cross*side_value*length*.070
+		draw_line(crest,out,Color(.77,.97,1.0,.38*intensity),1.45,true)
+		draw_circle(out,1.8,Color(.83,.98,1.0,.28*intensity))
+
 func _process(delta: float) -> void:
 	status_age += delta
 	if modal_backdrop!=null:modal_backdrop.visible=modal.visible
@@ -347,7 +443,10 @@ func _process(delta: float) -> void:
 		sim.step(SIMULATION_TICK)
 		visual_after=_visual_snapshot()
 		accumulator -= SIMULATION_TICK
-	if previous_region!=sim.map_id:_sync_region()
+	if previous_region!=sim.map_id:
+		wake_tracks.clear()
+		_sync_region()
+	_update_wake_tracks(delta)
 	if loading_left>0:_advance_loading(delta)
 	if camera_pad.visible and not modal.visible:_pan_camera(camera_pad.value,delta)
 	var render_player: Vector2=_visual_actor_pos(sim.player)
@@ -445,6 +544,9 @@ func _draw() -> void:
 	for npc in sim.npcs:
 		if view.has_point(npc.pos): fleet.append(npc)
 	fleet.sort_custom(func(a,b):return a.pos.y < b.pos.y)
+	# Foam is rendered below each real GLB and sprite: 2D map still owns water.
+	for actor: Dictionary in fleet:
+		if int(actor.hp)>0:_draw_wake(actor)
 	for actor: Dictionary in fleet:
 		if int(actor.hp)>0: _draw_actor(actor)
 	# Name/HP/shield/decks are rendered in a screen-space CanvasLayer,
@@ -553,14 +655,9 @@ func _draw_actor(actor: Dictionary) -> void:
 	var point: Vector2=_visual_actor_pos(actor)
 	var heading: Vector2=actor.heading
 	var length=_actor_visual_length(actor)
-	if not actor.path.is_empty():
-		var side=Vector2(-heading.y,heading.x)
-		for j in 4:
-			var tail=point-heading*(24+float(j)*12)
-			var spread=8+float(j)*2
-			var foam=Color(0.62,0.86,0.87,(1.0-float(j)/4.0)*0.13)
-			draw_line(tail+side*spread,tail-heading*9+side*(spread+1.5),foam,1.1,true)
-			draw_line(tail-side*spread,tail-heading*9-side*(spread+1.5),foam,1.1,true)
+	# The old four always-on foam segments did not match ship speed.
+	# The sampled trail is drawn before the ship; bow spray follows its course.
+	_draw_bow_spray(actor,point,heading,length)
 	# Mesh ships are lit in their own SubViewport. Do not add the previous
 	# oversized opaque 2D oval beneath their hulls.
 	var mesh_ship=mesh_layer!=null and mesh_layer.can_render_actor(actor)

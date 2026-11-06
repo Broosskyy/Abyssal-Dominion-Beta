@@ -272,6 +272,22 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		else:
 			var dt: float=get_process_delta_time()
 			node.rotation.y=smooth_player_yaw(node.rotation.y,desired_yaw,dt) if id==0 else smooth_yaw(node.rotation.y,desired_yaw,dt)
+		# Subtle animated heave/roll: under one world unit so the real keel
+		# stays on the 2D sea plane. Larger hulls move more heavily.
+		var cruise: float=host._wake_intensity_for(actor)
+		var long_ship: bool=float(host._actor_visual_length(actor))>=175.0
+		var swell: float=0.27 if long_ship else 0.42
+		var clock: float=host.elapsed*1.55+float(id)*1.37
+		node.position.y=sin(clock)*swell*(.32+.68*cruise)
+		var axis: Node3D=node.get_node_or_null("OriginalAxisCorrection")
+		if axis!=null:
+			var base_yaw: float=deg_to_rad(float(MODEL_INFO[key][5])) if MODEL_INFO[key].size()>5 else 0.0
+			var bank: float=clampf(rad_to_deg(angle_difference(node.rotation.y,desired_yaw))*.035,-1.6,1.6)
+			axis.rotation=Vector3(
+				deg_to_rad(sin(clock*.78)*(.30+.40*cruise)),
+				base_yaw,
+				deg_to_rad(sin(clock+.65)*(.24+.36*cruise)+bank)
+			)
 		node.visible=true
 		kept[id]=true
 	for id: Variant in model_instances.keys():

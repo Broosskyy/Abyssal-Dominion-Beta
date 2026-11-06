@@ -21,6 +21,11 @@ func _run() -> void:
 	check(game.ship_textures.size()==10 and game.atlas_textures.size()==16,"ten own ship designs and sixteen directional reference atlases loaded")
 	check(game.skins.size()==30,"27 original ship designs plus three playable GLB test ships are listed")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
+	# Sea effects depend on actual movement, not a planned path or client FPS.
+	check(is_zero_approx(game.wake_motion_strength(0.0,165.0)),"M3086 moored ship does not generate artificial wake")
+	check(is_equal_approx(game.wake_motion_strength(82.5,165.0),.5),"M3086 keel foam responds smoothly to half speed")
+	check(is_equal_approx(game.wake_motion_strength(165.0,165.0),1.0),"M3086 cruising ship produces full-speed wake")
+	check(is_equal_approx(game.wake_motion_strength(400.0,165.0),1.0),"M3086 unusually fast telemetry cannot overbrighten wakes")
 	check(str(game.skins[27].mesh_key)=="crimson_voyager" and str(game.skins[28].mesh_key)=="test_ship_2" and str(game.skins[29].mesh_key)=="base_basic_pbr","red starter and both boss test GLBs have dedicated shipyard slots")
 	for skin_id in [27,28,29]:
 		var key: String=game.TEST_SHIP_KEYS[skin_id-27]
