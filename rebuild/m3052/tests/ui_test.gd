@@ -48,7 +48,8 @@ func _run() -> void:
 	var player_center: Vector2=game.get_canvas_transform()*game._visual_actor_pos(game.sim.player)
 	var title_anchor: Vector2=game._plate_screen_anchor(game.sim.player)
 	# The mesh must be synced before its real 3D silhouette is projected.
-	game.mesh_layer.sync_fleet([game.sim.player],game.camera,game.get_viewport_rect().size)
+	var isolated_player_fleet: Array[Dictionary]=[game.sim.player]
+	game.mesh_layer.sync_fleet(isolated_player_fleet,game.camera,game.get_viewport_rect().size)
 	title_anchor=game._plate_screen_anchor(game.sim.player)
 	var actual_hull_bottom: float=game.mesh_layer.projected_hull_bottom(game.sim.player)
 	check(actual_hull_bottom>player_center.y-10.0 and title_anchor.y>=actual_hull_bottom+16.0*game._plate_pixels() and title_anchor.y<=actual_hull_bottom+26.0*game._plate_pixels(),"M3085 captain name clears projected 3D hull rather than overlapping the stern and oars")
