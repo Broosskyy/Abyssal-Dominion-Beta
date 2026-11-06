@@ -25,7 +25,7 @@ func _run() -> void:
 	# All nine original Meshy GLBs are X-long with the physical bowsprit at
 	# LOCAL -X (not +X). The simulation heading is in 2D chart coordinates,
 	# which map to world (X,Z); verify nose-first travel at all eight angles.
-	for key in game.mesh_layer.MODEL_INFO:
+	for key in ["old_harbor_trader","merchant_brig_3002","merchant_brig_2921","merchant_brig_2912","weathered_voyager","weathered_junk","emerald_voyager","midnight_mariner","crimson_tide_galley"]:
 		check(game.mesh_layer.model_scenes.has(key),"3D ship orientation contract includes "+key)
 	for course in [
 		Vector2.RIGHT,Vector2(1,1).normalized(),Vector2.DOWN,
