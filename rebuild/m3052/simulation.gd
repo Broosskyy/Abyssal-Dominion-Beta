@@ -621,7 +621,11 @@ func _step_npc(npc: Dictionary, delta: float) -> void:
 			_launch(npc.id, 0, "harpoon" if npc.kind == "monster" else "cannon", roundi(power*float(CONTENT.MAPS[map_id].enemy_scale)), 2)
 			npc.reload = 3.2 if npc.kind == "monster" else 2.6
 	else:
-		if npc.state!="patrol":npc.path=[]
+		if npc.state!="patrol":
+			# A pursuit timer must not leave a harmless patroller frozen for
+			# several seconds after the captain docks or escapes combat.
+			npc.path=[]
+			npc.repath=0.0
 		npc.state = "patrol"
 		npc.aggressive = false
 		if npc.path.is_empty() and float(npc.repath)<=0:

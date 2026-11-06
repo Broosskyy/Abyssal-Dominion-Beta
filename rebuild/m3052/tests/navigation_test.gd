@@ -19,23 +19,33 @@ func _initialize() -> void:
 	var sim=SIM.new()
 	var body=sim.npcs[0];body.pos=Vector2(500,500)
 	var route=sim.plan_actor_path(body,Vector2(950,500))
-	check(route.size()>=4,"long cardinal goal becomes real alternating diagonals")
+	check(str(body.renderer)=="mesh" and route==sim.plan_path(body.pos,Vector2(950,500)) and route.size()==1,"full Meshy GLBs navigate freely instead of alternating artificial diagonals")
 	var before: Vector2=body.pos
 	var safe=true
 	for point: Vector2 in route:
 		safe=safe and sim.segment_free(before,point);before=point
-	check(safe,"every zigzag segment is checked against coastline geometry")
+	check(safe,"every GLB route segment remains coastline-safe")
 	body.path=route
-	var diagonal_motion=true
+	var stable_course=true
 	for _i in 160:
 		sim._move(body,0.1)
-		if not body.path.is_empty():diagonal_motion=diagonal_motion and absf(absf(body.heading.x)-absf(body.heading.y))<0.001
-	check(diagonal_motion and body.pos.distance_to(Vector2(950,500))<0.01,"actual movement preserves diagonal headings through waypoints without corner cutting")
+		if not body.path.is_empty():stable_course=stable_course and body.heading.dot(Vector2.RIGHT)>.999
+	check(stable_course and body.pos.distance_to(Vector2(950,500))<0.01,"free path sails directly toward the goal without artificial zigzags")
+	# Legacy four-angle sprites still retain the old detour algorithm.
 	body.pos=Vector2(500,500)
+	body.renderer="sprite";body.view_count=4
+	var fallback=sim.plan_actor_path(body,Vector2(950,500))
+	var diagonal_fallback=fallback.size()>=4
+	before=body.pos
+	for waypoint: Vector2 in fallback:
+		var leg: Vector2=waypoint-before
+		diagonal_fallback=diagonal_fallback and absf(absf(leg.x)-absf(leg.y))<0.01
+		before=waypoint
+	check(diagonal_fallback and before.distance_to(Vector2(950,500))<0.01,"actual four-view sprite fallback keeps diagonal headings")
+	body.renderer="mesh";body.view_count=4
+	check(sim.plan_actor_path(body,Vector2(950,500)).size()==1,"3D ship renderer never inherits sprite zigzag restriction")
 	body.view_count=8
 	check(sim.plan_actor_path(body,Vector2(950,500)).size()==1,"eight-view ships retain free straight navigation")
-	body.renderer="3d";body.view_count=4
-	check(sim.plan_actor_path(body,Vector2(950,500)).size()==1,"future 3D renderer does not inherit legacy zigzag restriction")
 	for map_index in [0,1,2]:
 		sim.configure_map(map_index)
 		sim.shots.clear()
