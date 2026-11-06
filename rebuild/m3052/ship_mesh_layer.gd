@@ -46,6 +46,50 @@ var model_instances: Dictionary={}
 var model_instance_keys: Dictionary={}
 var mode := "classic"
 var resolution_factor := 0.8
+# M3088 A/B/C player-only render profile. Original imported models remain intact.
+const PLAYER_STYLES := ["original","gameplay","sprite"]
+var player_style := "original"
+var saved_player_materials: Dictionary={}
+var stylized_surface_count := 0
+
+func set_player_style(value: String) -> void:
+	player_style=value if value in PLAYER_STYLES else "original"
+	var owner: Node3D=model_instances.get(0)
+	if owner!=null and is_instance_valid(owner) and model_instance_keys.get(0,"")=="base_basic_pbr":
+		_restyle_black_green_owner(owner)
+
+func _restyle_black_green_owner(owner: Node3D) -> void:
+	var pivot: Node3D=owner.get_node_or_null("OriginalAxisCorrection")
+	if pivot==null or pivot.get_child_count()==0:return
+	var pending: Array[Node]=[]
+	pending.append(pivot.get_child(0))
+	stylized_surface_count=0
+	while not pending.is_empty():
+		var current: Node=pending.pop_back()
+		for child: Node in current.get_children():pending.append(child)
+		if not current is MeshInstance3D:continue
+		var drawable: MeshInstance3D=current as MeshInstance3D
+		if drawable.mesh==null:continue
+		for surface in drawable.mesh.get_surface_count():
+			var material_key: String=str(drawable.get_instance_id())+":"+str(surface)
+			if not saved_player_materials.has(material_key):
+				saved_player_materials[material_key]=drawable.get_surface_override_material(surface)
+			var source: Material=saved_player_materials[material_key]
+			if source==null:source=drawable.mesh.surface_get_material(surface)
+			if player_style!="gameplay":
+				drawable.set_surface_override_material(surface,saved_player_materials[material_key])
+				continue
+			if source is StandardMaterial3D:
+				var flat: StandardMaterial3D=source.duplicate() as StandardMaterial3D
+				flat.roughness=maxf(flat.roughness,0.88)
+				flat.metallic=minf(flat.metallic,0.12)
+				flat.specular=0.20
+				flat.normal_enabled=false
+				drawable.set_surface_override_material(surface,flat)
+				stylized_surface_count+=1
+			else:
+				drawable.set_surface_override_material(surface,saved_player_materials[material_key])
+
 
 func _ready() -> void:
 	mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -130,7 +174,8 @@ func set_render_mode(requested: String) -> void:
 
 func can_render_actor(actor: Dictionary) -> bool:
 	if not visible:return false
-	if int(actor.get("id",-1))==0:return has_test_ship(int(actor.get("skin",-1)))
+	if int(actor.get("id",-1))==0:
+		return not (int(actor.get("skin",-1))==29 and player_style=="sprite") and has_test_ship(int(actor.get("skin",-1)))
 	return int(actor.get("id",0))>0 and str(actor.get("kind",""))=="ship" and model_scenes.has(str(actor.get("visual_key","")))
 
 # Lower-hull envelope from the source GLB bounds, not the eight-angle sprite.
@@ -201,6 +246,9 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	model.position=Vector3(-float(info[3])*scale_factor,(-float(info[1])-float(info[2])*immersion)*scale_factor,-float(info[4])*scale_factor)
 	model_instances[int(actor.id)]=owner
 	model_instance_keys[int(actor.id)]=key
+	if int(actor.id)==0 and key=="base_basic_pbr":
+		saved_player_materials.clear()
+		_restyle_black_green_owner(owner)
 	return owner
 
 
