@@ -39,7 +39,7 @@ func _ready() -> void:
 	stage.transparent_bg=true
 	stage.render_target_clear_mode=SubViewport.CLEAR_MODE_ALWAYS
 	stage.render_target_update_mode=SubViewport.UPDATE_DISABLED
-	stage.msaa_3d=Viewport.MSAA_2X
+	stage.msaa_3d=Viewport.MSAA_4X
 	add_child(stage)
 	world_root=Node3D.new()
 	world_root.name="Fleet3D"
@@ -54,15 +54,23 @@ func _ready() -> void:
 	var sun=DirectionalLight3D.new()
 	sun.name="SeaSun"
 	sun.rotation_degrees=Vector3(-58,-38,0)
-	sun.light_energy=1.25
+	sun.light_energy=1.9
 	sun.shadow_enabled=false
 	stage.add_child(sun)
+	# Meshy baked albedo is dark. Add opposing soft fill to reveal the far
+	# side of sails and masts instead of producing dark, wreck-like outlines.
+	var fill_light=DirectionalLight3D.new()
+	fill_light.name="SeaSoftFill"
+	fill_light.rotation_degrees=Vector3(-55,135,0)
+	fill_light.light_energy=0.7
+	fill_light.shadow_enabled=false
+	stage.add_child(fill_light)
 	var ambience=WorldEnvironment.new()
 	var environment=Environment.new()
 	environment.background_mode=Environment.BG_CLEAR_COLOR
 	environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color=Color(0.74,0.82,0.88)
-	environment.ambient_light_energy=0.75
+	environment.ambient_light_color=Color(0.92,0.94,1.0)
+	environment.ambient_light_energy=1.25
 	ambience.environment=environment
 	stage.add_child(ambience)
 	for key: String in MODEL_INFO:
@@ -93,7 +101,7 @@ func resize_view(screen: Vector2) -> void:
 	position=Vector2.ZERO
 	size=screen
 	if stage==null:return
-	var factor=0.90 if OS.has_feature("mobile") else 1.0
+	var factor=1.0 # Render at native screen resolution; source texture mips provide downsampling.
 	resolution_factor=factor
 	var wanted=Vector2i(maxi(64,roundi(screen.x*factor)),maxi(64,roundi(screen.y*factor)))
 	if stage.size!=wanted:stage.size=wanted
@@ -120,7 +128,7 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 	if not visible or chart_camera==null or stage==null:return
 	resize_view(screen)
 	var center: Vector2=chart_camera.position
-	var tilt=deg_to_rad(24.0) if mode=="3d" else 0.0
+	var tilt=deg_to_rad(49.0) if mode=="3d" else 0.0
 	var foreshortening=maxf(cos(tilt),0.1)
 	mesh_camera.size=screen.y/maxf(chart_camera.zoom.y,.05)
 	var altitude=950.0
