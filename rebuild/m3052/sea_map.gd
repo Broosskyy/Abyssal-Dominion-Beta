@@ -422,6 +422,30 @@ func _draw_wake(actor: Dictionary) -> void:
 			draw_line(shore,trailing,Color(.73,.93,.96,.40*fade),1.65,true)
 			draw_circle(shore,1.2+age*.55,Color(.78,.97,1.0,.20*fade))
 
+# Gentle side-water contact for actual 3D ships. The water is a 2D
+# chart surface behind the meshes, not a thick ring / glowing platform.
+func _draw_glb_waterline(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
+	if heading.length_squared()<0.5:return
+	var moving: float=_wake_intensity_for(actor)
+	var alpha: float=0.09+moving*0.28
+	var half_width: float=length*.087
+	draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
+	for side in [-1.0,1.0]:
+		var side_sign: float=side
+		var waterline: PackedVector2Array=PackedVector2Array()
+		for segment in 10:
+			var progress: float=float(segment)/9.0
+			var longitudinal: float=length*(-.36+.72*progress)
+			var taper: float=pow(maxf(0.0,1.0-pow(absf(progress*2.0-1.0),2.2)),.7)
+			var moving_foam: float=sin(elapsed*5.1-progress*15.0+side_sign)*moving*1.7
+			waterline.append(Vector2(longitudinal,side_sign*(half_width*taper+moving_foam)))
+		draw_polyline(waterline,Color(.68,.87,.93,alpha),1.2,true)
+		if moving>.2:
+			var bow: Vector2=Vector2(length*.29,side_sign*half_width*.67)
+			var spread: Vector2=Vector2(length*.16,-side_sign*length*.10)
+			draw_line(bow,bow+spread,Color(.78,.96,1.0,moving*.22),1.3,true)
+	draw_set_transform(Vector2.ZERO)
+
 func _draw_bow_spray(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
 	var intensity: float=_wake_intensity_for(actor)
 	if intensity<0.12 or heading.length_squared()<0.5:return
@@ -667,13 +691,11 @@ func _draw_actor(actor: Dictionary) -> void:
 	# oversized opaque 2D oval beneath their hulls.
 	var mesh_ship=mesh_layer!=null and mesh_layer.can_render_actor(actor)
 	if mesh_ship:
-		# Water-contact footprint, not a glowing platform. Two translucent
-		# layers hug the keel; the wave/wake effects supply moving highlights.
-		draw_set_transform(point+Vector2(0,4),heading.angle(),Vector2.ONE)
-		_ellipse(Vector2.ZERO,Vector2(length*.315,length*.064),Color(.006,.035,.048,.25))
-		_ellipse(Vector2.ZERO,Vector2(length*.255,length*.045),Color(.002,.021,.036,.13))
-		_ellipse_line(Vector2.ZERO,Vector2(length*.332,length*.072),Color(.64,.88,.91,.105),1.0)
+		# Small submerged-hull shadow and thin moving side foam.
+		draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
+		_ellipse(Vector2.ZERO,Vector2(length*.34,length*.065),Color(.002,.018,.03,.23))
 		draw_set_transform(Vector2.ZERO)
+		_draw_glb_waterline(actor,point,heading,length)
 	else:
 		_ellipse(point+Vector2(0,4),Vector2(length*0.34,length*0.09),Color(0.0,0.02,0.04,0.34))
 	if is_player and sim.has_blessing():
@@ -858,16 +880,11 @@ func _plate_screen_anchor(actor: Dictionary) -> Vector2:
 	var pixels=_plate_pixels()
 	var point: Vector2=get_canvas_transform()*_visual_actor_pos(actor)
 	var player=int(actor.id)==0
-	# A true 3D hull is projected into its own viewport. Its 320px sprite
-	# bounds are NOT the actual waterline and produced a ~100px empty gap
-	# between the ship and its name. Anchor beside the projected keel.
+	# The player 3D plate follows a constant hull envelope. Its position
+	# is independent of yaw while still tracking camera zoom every frame.
 	if player and mesh_layer!=null and mesh_layer.can_render_actor(actor):
-		var physical_bottom: float=mesh_layer.projected_hull_bottom(actor)
-		if physical_bottom>-100000.0:
-			# Text is baseline-aligned; ~17 physical pixels from the projected
-			# hull leaves a small visible gap above the name glyphs.
-			return Vector2(point.x,maxf(point.y+24.0*pixels,physical_bottom+18.0*pixels))
-		return Vector2(point.x,point.y+41.0*pixels)
+		var drop: float=mesh_layer.stable_player_plate_drop(actor,camera.zoom.y,pixels)
+		return Vector2(point.x,point.y+drop)
 	var minimum=point.y+(CAPTAIN_PLATE_OFFSET if player else OTHER_PLATE_OFFSET)*pixels
 	var clearance=(CAPTAIN_HULL_CLEARANCE if player else NPC_HULL_CLEARANCE)*pixels
 	var stable_bottom=point.y+_plate_stable_hull_drop(actor)*absf(get_canvas_transform().y.y)
