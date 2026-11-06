@@ -23,6 +23,26 @@ func _run() -> void:
 	check(game.TEST_SHIP_LENGTHS==[128.0,152.0,158.0],"M3087 normalized player test hull silhouettes use three coherent size tiers")
 	check(game.NPC_VISUAL_SCALE>=0.85 and game.NPC_VISUAL_SCALE<=0.95,"M3087 original NPC vessels scale consistently instead of overpowering the chart")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
+	# Three-way visual comparison applies ONLY to the black-green skin.
+	var old_comparison_style: String=game.test_visual_style
+	var old_comparison_skin: int=int(game.sim.player.skin)
+	var old_comparison_mode: String=game.mesh_layer.mode
+	game.sim.player.skin=29
+	game.mesh_layer.set_render_mode("hybrid")
+	game.mesh_layer.set_player_style("original")
+	check(game.mesh_layer.can_render_actor(game.sim.player),"M3088 A: full original black-green GLB remains available")
+	var comparison_fleet: Array[Dictionary]=[game.sim.player]
+	game.mesh_layer.sync_fleet(comparison_fleet,game.camera,game.get_viewport_rect().size)
+	game.mesh_layer.set_player_style("gameplay")
+	check(game.mesh_layer.can_render_actor(game.sim.player),"M3088 B: gameplay profile is still the original GLB")
+	check(game.mesh_layer.stylized_surface_count>0,"M3088 B: material smoothing is actually applied to live mesh surfaces")
+	game.mesh_layer.set_player_style("sprite")
+	check(not game.mesh_layer.can_render_actor(game.sim.player),"M3088 C: eight-direction image replaces only the player 3D ship")
+	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"M3088 C: NPC 3D ships are unaffected by player's sprite setting")
+	check(int(game.sim.player.skin)==29,"M3088 visual profile changes no equipped ship or stats")
+	game.mesh_layer.set_player_style(old_comparison_style)
+	game.mesh_layer.set_render_mode(old_comparison_mode)
+	game.sim.player.skin=old_comparison_skin
 	# Sea effects depend on actual movement, not a planned path or client FPS.
 	check(is_zero_approx(game.wake_motion_strength(0.0,165.0)),"M3086 moored ship does not generate artificial wake")
 	check(is_equal_approx(game.wake_motion_strength(82.5,165.0),.5),"M3086 keel foam responds smoothly to half speed")
