@@ -36,6 +36,13 @@ func _run() -> void:
 		game.mesh_layer.sync_fleet(comparison_fleet,game.camera,game.get_viewport_rect().size)
 		check(str(game.mesh_layer.model_instance_keys.get(0,""))==str(variant[1]),"M3092 real GLB scene selected: "+str(variant[1]))
 	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"M3092 NPC ships remain actual GLBs")
+	# M3093: uploaded PBR and shaded ships show both sides of thin sails.
+	for new_style in ["gameplay","shaded"]:
+		game.mesh_layer.set_player_style(new_style)
+		game.mesh_layer.sync_fleet(comparison_fleet,game.camera,game.get_viewport_rect().size)
+		check(game.mesh_layer.gameplay_double_sided_count>0,"M3093 double-sided imported material in real GLB: "+new_style)
+		var owner: Node3D=game.mesh_layer.model_instances.get(0)
+		check(owner!=null and owner.get_node_or_null("OriginalAxisCorrection")!=null,"M3093 per-instance render pivot retained: "+new_style)
 	check(int(game.sim.player.skin)==29,"M3092 visual comparison never modifies equipped ship")
 	game.mesh_layer.set_player_style(old_comparison_style)
 	game.mesh_layer.set_render_mode(old_comparison_mode)
@@ -76,7 +83,14 @@ func _run() -> void:
 	game.mesh_layer.sync_fleet(isolated_player_fleet,game.camera,game.get_viewport_rect().size)
 	title_anchor=game._plate_screen_anchor(game.sim.player)
 	var actual_hull_bottom: float=game.mesh_layer.projected_hull_bottom(game.sim.player)
-	check(actual_hull_bottom>player_center.y-10.0 and title_anchor.y>=actual_hull_bottom+16.0*game._plate_pixels() and title_anchor.y<=actual_hull_bottom+26.0*game._plate_pixels(),"M3085 captain name clears projected 3D hull rather than overlapping the stern and oars")
+	var offset: float=game.mesh_layer.stable_player_plate_drop(game.sim.player,game.camera.zoom.y,game._plate_pixels())
+	check(actual_hull_bottom>player_center.y-10.0 and absf(title_anchor.y-player_center.y-offset)<1.0,"M3093 captain plate uses model-specific stable offset")
+	var saved_heading: Vector2=game.sim.player.heading
+	var first_anchor: Vector2=game._plate_screen_anchor(game.sim.player)
+	for bearing in [Vector2.UP,Vector2.DOWN,Vector2.LEFT,Vector2.RIGHT,Vector2(1,1).normalized(),Vector2(-1,-1).normalized()]:
+		game.sim.player.heading=bearing
+		check(game._plate_screen_anchor(game.sim.player).distance_to(first_anchor)<1.0,"M3093 3D captain name never jumps between heading angles")
+	game.sim.player.heading=saved_heading
 	game.sim.player.skin=skin_before_anchor
 	game.mesh_layer.set_render_mode(mode_before_anchor)
 	check(game.mesh_layer.mode in ["classic","hybrid","3d"],"game has a valid 2.5D or 3D mode")
