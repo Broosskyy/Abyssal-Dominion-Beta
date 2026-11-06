@@ -3,6 +3,9 @@ extends TextureRect
 ## GLB meshes are not replaced by fake sprites. 2.5D / 3D use the same fleet,
 ## damage, collision, pathfinding, IDs, saves and nameplate screen anchors.
 const MODEL_ROOT := "res://assets/npc/meshy/models/"
+const PLAYER_MODEL_ROOT := "res://assets/player/test_ships/"
+const TEST_SHIP_SKINS := {27:"crimson_voyager",28:"test_ship_2",29:"base_basic_pbr"}
+const REQUIRED_NPC_KEYS := ["old_harbor_trader","merchant_brig_3002","merchant_brig_2921","merchant_brig_2912","weathered_voyager","weathered_junk","emerald_voyager","midnight_mariner","crimson_tide_galley"]
 ## Source Meshy glTF is already Y-UP. No -90-degree X rotation is needed.
 ## [hull length X, lowest Y, total Y height, X midpoint, Z midpoint].
 ## Measured from the nine complete ORIGINAL ~30k-triangle GLBs (not decimated assets).
@@ -15,7 +18,11 @@ const MODEL_INFO := {
 	"weathered_junk":[1.9014,-0.7706,1.5438,-0.0020,-0.0003],
 	"emerald_voyager":[1.9000,-0.7652,1.5336,0.0008,-0.0004],
 	"midnight_mariner":[1.9016,-0.7520,1.5024,-0.0001,-0.0030],
-	"crimson_tide_galley":[1.9017,-0.6453,1.2821,-0.0002,-0.0001]
+	"crimson_tide_galley":[1.9017,-0.6453,1.2821,-0.0002,-0.0001],
+	# [longest horizontal dimension, minY, height, original centerX, centerZ, optional Y yaw]
+	"crimson_voyager":[1.902524,-0.830722,1.660758,-0.000502,-0.000408,0.0],
+	"test_ship_2":[1.954767,-0.510260,1.021000,-0.000050,0.022532,90.0],
+	"base_basic_pbr":[1.999924,-0.830467,1.661094,-0.000236,0.000038,90.0]
 }
 var host
 var stage: SubViewport
@@ -74,9 +81,10 @@ func _ready() -> void:
 	ambience.environment=environment
 	stage.add_child(ambience)
 	for key: String in MODEL_INFO:
-		var path=MODEL_ROOT+key+".glb"
+		var optional_player: bool=key in TEST_SHIP_SKINS.values()
+		var path=(PLAYER_MODEL_ROOT if optional_player else MODEL_ROOT)+key+".glb"
 		if not ResourceLoader.exists(path):
-			push_warning("3D ship model unavailable: "+path)
+			if not optional_player:push_warning("3D ship model unavailable: "+path)
 			continue
 		var scene=load(path)
 		if scene is PackedScene:model_scenes[key]=scene
@@ -84,7 +92,15 @@ func _ready() -> void:
 	set_render_mode("classic")
 
 func has_complete_fleet() -> bool:
-	return model_scenes.size()==MODEL_INFO.size()
+	for key: String in REQUIRED_NPC_KEYS:
+		if not model_scenes.has(key):return false
+	return true
+
+func player_key_for_skin(skin: int) -> String:
+	return str(TEST_SHIP_SKINS.get(skin,""))
+
+func has_test_ship(skin: int) -> bool:
+	return model_scenes.has(player_key_for_skin(skin))
 
 func set_render_mode(requested: String) -> void:
 	mode=requested if requested in ["classic","hybrid","3d"] and (requested=="classic" or has_complete_fleet()) else "classic"
@@ -95,7 +111,9 @@ func set_render_mode(requested: String) -> void:
 		for item: Node3D in model_instances.values():item.visible=false
 
 func can_render_actor(actor: Dictionary) -> bool:
-	return visible and int(actor.get("id",0))>0 and str(actor.get("kind",""))=="ship" and model_scenes.has(str(actor.get("visual_key","")))
+	if not visible:return false
+	if int(actor.get("id",-1))==0:return has_test_ship(int(actor.get("skin",-1)))
+	return int(actor.get("id",0))>0 and str(actor.get("kind",""))=="ship" and model_scenes.has(str(actor.get("visual_key","")))
 
 func resize_view(screen: Vector2) -> void:
 	position=Vector2.ZERO
@@ -113,8 +131,14 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	var owner=Node3D.new()
 	owner.name="Ship3D_%s"%str(actor.id)
 	world_root.add_child(owner)
-	owner.add_child(model)
 	var info: Array=MODEL_INFO[key]
+	# Z-long test ships are rotated into the original -X-bow coordinate frame.
+	# Keep their own transform pivot independent of navigation/yaw.
+	var pivot=Node3D.new()
+	pivot.name="OriginalAxisCorrection"
+	pivot.rotation_degrees.y=float(info[5]) if info.size()>5 else 0.0
+	owner.add_child(pivot)
+	pivot.add_child(model)
 	var scale_factor=float(host._actor_visual_length(actor))/maxf(float(info[0]),0.1)
 	model.rotation_degrees=Vector3.ZERO # Original Meshy glTF already uses Y-up.
 	model.scale=Vector3.ONE*scale_factor
@@ -157,7 +181,7 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 	for actor: Dictionary in fleet:
 		if int(actor.get("hp",0))<=0 or not can_render_actor(actor):continue
 		var id=int(actor.id)
-		var key=str(actor.visual_key)
+		var key: String=player_key_for_skin(int(actor.get("skin",-1))) if id==0 else str(actor.get("visual_key",""))
 		var node: Node3D=model_instances.get(id)
 		var newly_instanced: bool=node==null or model_instance_keys.get(id,"")!=key
 		if newly_instanced:

@@ -19,8 +19,18 @@ func _run() -> void:
 	current_scene=game
 	await process_frame
 	check(game.ship_textures.size()==10 and game.atlas_textures.size()==16,"ten own ship designs and sixteen directional reference atlases loaded")
-	check(game.skins.size()==27,"all 27 ship designs including Small Starter are selectable")
+	check(game.skins.size()==30,"27 original ship designs plus three playable GLB test ships are listed")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
+	check(str(game.skins[27].mesh_key)=="crimson_voyager" and str(game.skins[28].mesh_key)=="test_ship_2" and str(game.skins[29].mesh_key)=="base_basic_pbr","red starter and both boss test GLBs have dedicated shipyard slots")
+	if game.mesh_layer.has_test_ship(27):
+		check(game.mesh_layer.has_test_ship(28) and game.mesh_layer.has_test_ship(29),"signed test ship pack has all three playable GLBs")
+		var fresh=game.SIM.new()
+		check(int(fresh.player.skin)==27,"new captains begin on the red Crimson Voyager")
+		var fresh_save=fresh.export_save()
+		fresh.player.skin=29
+		check(fresh.restore_save(fresh.export_save()) and int(fresh.player.skin)==29,"large test ship survives captain save and restore")
+		fresh.player.skin=27
+		check(fresh.restore_save(fresh_save) and int(fresh.player.skin)==27,"red starter survives saving and loading")
 	check(game.mesh_layer.mode in ["classic","hybrid","3d"],"game has a valid 2.5D or 3D mode")
 	# Turn rate is limited and converges smoothly across all heading changes.
 	var test_yaw: float=game.mesh_layer.smooth_yaw(0.0,PI*.5,1.0/30.0)
@@ -124,7 +134,7 @@ func _run() -> void:
 		var yard:=0
 		for button in game.modal_body.find_children("*","Button",true,false):
 			if "AUSRÜSTEN" in button.text or "AKTIV" in button.text:yard+=1
-		check(yard==27,"shipyard shows one card for every design")
+		check(yard==30,"shipyard shows one card for each original and new test design")
 		game.modal.hide()
 	root.size=Vector2i(1280,720)
 	await process_frame
