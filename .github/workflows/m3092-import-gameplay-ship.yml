@@ -1,0 +1,69 @@
+name: M3092 Import user-provided gameplay ship GLBs
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/m3092-import-gameplay-ship.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: m3092-user-ship-import
+  cancel-in-progress: false
+jobs:
+  import-two-ship-render-variants:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            .github/workflows/
+            rebuild/m3052/assets/player/test_ships/
+      - name: Download only the supplied archive and verify file hashes
+        shell: bash
+        env:
+          ASSET_ARCHIVE_URL: https://d2ol7oe51mr4n9.cloudfront.net/user_3LWZe0666PFFnQApXCXkCavaViS/ce495a41-cc82-453c-b33b-3253f62190fe.zip
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 --connect-timeout 20 --max-time 180 "$ASSET_ARCHIVE_URL" -o "$RUNNER_TEMP/m3092-ship.zip"
+          echo '627c98da9e8b48ad2d101916ab16196293350abb5b5d09c06fda172ec96a495b  '"$RUNNER_TEMP/m3092-ship.zip" | sha256sum -c -
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,struct,zipfile
+          dst=pathlib.Path('rebuild/m3052/assets/player/test_ships')
+          target={
+            'base_basic_pbr.glb':('base_basic_gameplay_pbr.glb','eb4aa16d28f3438e272f8cd689fb2dadaf6d4a79fed752fa71537408ee5a2be3'),
+            'base_basic_shaded.glb':('base_basic_gameplay_shaded.glb','223ab3d2f2951e9ff5cd093e5dc925a091fc91199bcb731cda6c8044d3932311'),
+            'texture_emissive.png':('base_basic_gameplay_emissive.png','c4b582c2fac1aec215e9aa9cef63b8d42246eaaf02839c881a0ae84a5df7b981'),
+          }
+          with zipfile.ZipFile(pathlib.Path(os.environ['RUNNER_TEMP'])/'m3092-ship.zip') as src:
+            assert not src.testzip(), 'ZIP CRC check failed'
+            assert set(src.namelist())==set(target), 'Unexpected archive contents'
+            for name,(new_name,digest) in target.items():
+              data=src.read(name)
+              assert hashlib.sha256(data).hexdigest()==digest, f'SHA256 mismatch: {name}'
+              if name.endswith('.glb'):
+                assert data[:4]==b'glTF' and struct.unpack_from('<I',data,8)[0]==len(data),f'Invalid GLB: {name}'
+                json_length,chunk_type=struct.unpack_from('<II',data,12)
+                assert chunk_type==0x4E4F534A
+                model=json.loads(data[20:20+json_length])
+                assert len(model.get('meshes',[]))==1 and len(model.get('materials',[]))==1
+                print('GLB VERIFIED',name,'bytes',len(data),'materials',len(model['materials']))
+              (dst/new_name).write_bytes(data)
+          print('M3092 ready: two genuine GLB versions, one emission texture; original remains untouched')
+          PY
+      - name: Commit test assets without replacing the old ship GLB
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --sparse -f rebuild/m3052/assets/player/test_ships/base_basic_gameplay_pbr.glb \
+            rebuild/m3052/assets/player/test_ships/base_basic_gameplay_shaded.glb \
+            rebuild/m3052/assets/player/test_ships/base_basic_gameplay_emissive.png
+          if git diff --cached --quiet; then echo 'No new GLBs'; exit 0; fi
+          git commit -m 'M3092 stage optimized test hull GLBs alongside original [skip ci]'
+          git -c pack.window=0 push origin HEAD:main
