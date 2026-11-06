@@ -1,0 +1,106 @@
+name: M3078 import restored Meshy GLB fleet
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/m3078-import-glbs.yml'
+      - 'Abyssal_Dominion_M3078_GLB_Modelle_Teil_1_von_2.zip'
+      - 'Abyssal_Dominion_M3078_GLB_Modelle_Teil_2_von_2.zip'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: m3078-model-import
+  cancel-in-progress: false
+
+jobs:
+  import-intact-ships:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout only importer inputs and model directory
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            .github/workflows/
+            rebuild/m3052/assets/npc/meshy/
+            rebuild/m3052/tools/validate_meshy_geometry.py
+            Abyssal_Dominion_M3078_GLB_Modelle_Teil_1_von_2.zip
+            Abyssal_Dominion_M3078_GLB_Modelle_Teil_2_von_2.zip
+          persist-credentials: true
+      - name: Extract exactly nine verified original-geometry ship GLBs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, pathlib, zipfile
+          root=pathlib.Path('rebuild/m3052/assets/npc/meshy')
+          models=root/'models'
+          models.mkdir(parents=True,exist_ok=True)
+          sha={
+            'crimson_tide_galley.glb':'010faf99311ebda11677586601b3c74fbadc504347a8e4ff4b2e9553af8b38ee',
+            'emerald_voyager.glb':'fd47b1ec5117c6c1b80f53c7932e8400e263ac9628210aa642318581d48776b2',
+            'weathered_voyager.glb':'e399dc6c17a0663867f7f267fc5275c3b8c74d75548dd245b9fb00fdc27c6511',
+            'merchant_brig_3002.glb':'96ec29f36cd3e89bd8cfce5b0168e19759639c7653f88c0a0685fe8ecc102757',
+            'old_harbor_trader.glb':'0047a0a6c97672da222c29d6a5c5cf1c3dfd7c6816ce658cf2a468c1d8990ad8',
+            'midnight_mariner.glb':'bf8b7b780453be14c55f50c05bc33c033942c9ff259879d9786b98be1e0ab67d',
+            'weathered_junk.glb':'d553e022aaf73160dd79b9bf5188e1443c489d8f3f2df36ae14ce17679260cb0',
+            'merchant_brig_2912.glb':'cea7ed72676d872484479e6dc2359830b099a1c65b7a9cfb953195b509f01727',
+            'merchant_brig_2921.glb':'2bbe5998d327a21180a6cec0c76f2336748b7c6bcf631499fa62b1d3efe64bc1',
+          }
+          found=set()
+          for part in (1,2):
+            archive=pathlib.Path(f'Abyssal_Dominion_M3078_GLB_Modelle_Teil_{part}_von_2.zip')
+            with zipfile.ZipFile(archive) as z:
+              bad=z.testzip()
+              if bad:raise ValueError(f'Archive CRC failed: {bad}')
+              for entry in z.namelist():
+                prefix='rebuild/m3052/assets/npc/meshy/models/'
+                if not entry.startswith(prefix) or not entry.endswith('.glb'):continue
+                name=entry[len(prefix):]
+                if name not in sha or name in found:raise ValueError(f'Unexpected/duplicate GLB: {entry}')
+                data=z.read(entry)
+                digest=hashlib.sha256(data).hexdigest()
+                if digest!=sha[name]:raise ValueError(f'GLB checksum mismatch: {name}')
+                (models/name).write_bytes(data)
+                found.add(name)
+              if part==1:
+                report='rebuild/m3052/assets/npc/meshy/geometry_validation.json'
+                if report not in z.namelist():raise ValueError('Missing geometry manifest')
+                (root/'geometry_validation.json').write_bytes(z.read(report))
+          if found!=set(sha):raise ValueError('Nine expected GLBs not present: '+str(set(sha)-found))
+          print('RESTORED',len(found),'GLBs; SHA-256 checks passed')
+          PY
+          python3 rebuild/m3052/tools/validate_meshy_geometry.py
+      - name: Commit active resource replacements to main
+        id: commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add rebuild/m3052/assets/npc/meshy/models/*.glb rebuild/m3052/assets/npc/meshy/geometry_validation.json
+          if git diff --cached --quiet; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'All nine GLBs were already restored.'
+            exit 0
+          fi
+          git commit -m 'M3078 restore verified full-geometry Meshy NPC GLB fleet'
+          git push origin HEAD:main
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - name: Request new signed game-data build
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run m3052.yml --ref main
+          echo 'Triggered normal signed content build; monitor Actions for result.'
