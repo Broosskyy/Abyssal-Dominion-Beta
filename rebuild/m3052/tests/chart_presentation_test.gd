@@ -5,6 +5,16 @@ var failures: Array[String]=[]
 func check(value: bool,label: String) -> void:
 	checks+=1
 	if not value:failures.append(label)
+func caption_clears_hull(game: Node, actor: Dictionary, anchor: Vector2) -> bool:
+	var pixels: float=game._plate_pixels()
+	if game.mesh_layer!=null and game.mesh_layer.can_render_actor(actor):
+		# A true 3D hull is projected from the water plane, not the 320px
+		# eight-way sprite fallback. Checking sprite bounds here would enforce
+		# the excessive screen gap that the M3084 player fix removes.
+		var waterline: Vector2=game.get_canvas_transform()*game._visual_actor_pos(actor)
+		var gap: float=anchor.y-waterline.y
+		return gap>=29.0*pixels and gap<=47.0*pixels
+	return anchor.y>=game._actor_screen_bounds(actor).end.y+game.CAPTAIN_HULL_CLEARANCE*pixels-.1
 func _initialize() -> void:call_deferred("run")
 func run() -> void:
 	root.content_scale_size=Vector2i.ZERO
@@ -59,7 +69,7 @@ func run() -> void:
 				check(stable,"captain block stays anchored while other hulls cross it"+suffix)
 				var anchor=own.position+Vector2(own.size.x*.5,17*game._plate_pixels())
 				check(anchor.is_equal_approx(game._plate_screen_anchor(sim.player)),"name, identity, health and decks share measured hull anchor"+suffix)
-				check(anchor.y>=game._actor_screen_bounds(sim.player).end.y+game.CAPTAIN_HULL_CLEARANCE*game._plate_pixels()-.1,"captain caption clears visible hull"+suffix)
+				check(caption_clears_hull(game,sim.player,anchor),"captain caption respects actual 2D/3D hull baseline"+suffix)
 				# Close collisions are permitted: a caption must never detach from its own hull.
 				for actor: Dictionary in close:
 					if not placed.has(int(actor.id)):continue
@@ -146,7 +156,7 @@ func run() -> void:
 		game.direction_cache[0]=VISUALS.heading_eight(heading,-1)
 		var hull=game._actor_screen_bounds(sim.player)
 		var anchor=game._plate_screen_anchor(sim.player)
-		check(anchor.y>=hull.end.y+game.CAPTAIN_HULL_CLEARANCE*game._plate_pixels()-.1,"all headings leave hull-to-caption air gap")
+		check(caption_clears_hull(game,sim.player,anchor),"all headings retain safe 2D/3D hull-to-caption baseline")
 		check(is_equal_approx(anchor.y,anchored_y),"ship name, ID, bars and decks never jump during rotation")
 	# A damaged sprite has exactly the same caption baseline as the intact ship.
 	var original_hp=int(sim.player.hp)
