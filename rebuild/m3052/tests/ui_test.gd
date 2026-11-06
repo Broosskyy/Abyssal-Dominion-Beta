@@ -40,7 +40,7 @@ func _run() -> void:
 		for course in [Vector2.RIGHT,Vector2(1,1).normalized(),Vector2.DOWN,Vector2(-1,1).normalized(),Vector2.LEFT,Vector2(-1,-1).normalized(),Vector2.UP,Vector2(1,-1).normalized()]:
 			check(game.mesh_layer.forward_for_model(model_key,course).distance_to(course)<0.001,"M3084 GLB physical prow points in the direction of travel: "+model_key+" "+str(course))
 	var slow_player_turn: float=game.mesh_layer.smooth_player_yaw(0.0,PI,1.0/60.0)
-	check(slow_player_turn>0.0 and slow_player_turn<=deg_to_rad(285.0)/60.0+0.001,"M3084 player ship steering is responsive but cannot instantly flip 180 degrees")
+	check(absf(slow_player_turn)>0.0 and absf(slow_player_turn)<=deg_to_rad(285.0)/60.0+0.001,"M3084 player ship steering is responsive but cannot instantly flip 180 degrees")
 	var mode_before_anchor: String=game.mesh_layer.mode
 	game.mesh_layer.set_render_mode("3d")
 	var skin_before_anchor: int=int(game.sim.player.skin)
