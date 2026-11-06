@@ -130,7 +130,7 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 # Godot's world X/Z maps to the chart X/Y; rotating local -X by
 # (PI-heading.angle()) sends the *bow* into the simulated heading.
 # Never rotate the entire mesh on X or offset the movement / hit positions.
-static func yaw_for_heading(heading: Vector2) -> float:
+func yaw_for_heading(heading: Vector2) -> float:
 	if heading.length_squared()<0.000001:return 0.0
 	return wrapf(PI-heading.angle(),-PI,PI)
 
