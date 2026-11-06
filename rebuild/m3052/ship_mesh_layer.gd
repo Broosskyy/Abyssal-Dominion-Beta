@@ -128,7 +128,7 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 	if not visible or chart_camera==null or stage==null:return
 	resize_view(screen)
 	var center: Vector2=chart_camera.position
-	var tilt=deg_to_rad(49.0) if mode=="3d" else 0.0
+	var tilt=deg_to_rad(49.0 if mode=="3d" else 37.0) # Show sail faces in both hybrid and 3D modes.
 	var foreshortening=maxf(cos(tilt),0.1)
 	mesh_camera.size=screen.y/maxf(chart_camera.zoom.y,.05)
 	var altitude=950.0
