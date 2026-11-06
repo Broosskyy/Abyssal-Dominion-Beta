@@ -1,3 +1,3 @@
 Content-only release: all Godot regression and signed-data-pack tests passed before publishing.
 Full renderer video captures run only with native bootstrap builds and are not required for data updates.
-Commit: 197e746b3380f5bef15ec28019363ab08a593504
+Commit: 2ddca418c454931064982d3e209ead26e4b186e8
