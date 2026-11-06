@@ -14,7 +14,13 @@ func caption_clears_hull(game, actor: Dictionary, anchor: Vector2) -> bool:
 		var waterline: Vector2=game.get_canvas_transform()*game._visual_actor_pos(actor)
 		var bottom: float=game.mesh_layer.projected_hull_bottom(actor)
 		if bottom> -100000.0:
-			return anchor.y>waterline.y and anchor.y>=bottom+16.0*pixels and anchor.y<=bottom+26.0*pixels
+			# M3093: captain labels use a fixed circumradius envelope so they
+			# do not jump while a broad ship turns. The previous <=26 px
+			# upper bound assumed a heading-dependent projected AABB, and
+			# is not valid for a heading-invariant anchor.
+			var safe_clearance: bool=anchor.y>waterline.y and anchor.y>=bottom+10.0*pixels
+			var stable_drop: float=game.mesh_layer.stable_player_plate_drop(actor,game.camera.zoom.y,pixels)
+			return safe_clearance and absf((anchor.y-waterline.y)-stable_drop)<1.1
 		var gap: float=anchor.y-waterline.y
 		return gap>=30.0*pixels and gap<=46.0*pixels
 	return anchor.y>=game._actor_screen_bounds(actor).end.y+game.CAPTAIN_HULL_CLEARANCE*pixels-.1
