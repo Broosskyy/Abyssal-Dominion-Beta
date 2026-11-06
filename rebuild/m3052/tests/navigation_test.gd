@@ -50,8 +50,11 @@ func _initialize() -> void:
 		sim.configure_map(map_index)
 		sim.shots.clear()
 		body=sim.npcs[0];sim.npcs.clear();sim.npcs.append(body)
-		# All three chart layouts must start this NPC in real navigable water.\n		# (700,500) clips a mirrored island collision margin in region 2.\n		body.pos=Vector2(640,500);body.home=body.pos;body.reload=0.0
-		check(not sim.blocked(body.pos),"patrol scenario starts outside coastline collision: "+str(map_index))\n		sim.player.pos=Vector2(500,500);sim.player.hp=sim.player.max_hp
+		# All three chart layouts must start this NPC in real navigable water.
+		# (700,500) clips a mirrored island collision margin in region 2.
+		body.pos=Vector2(640,500);body.home=body.pos;body.reload=0.0
+		check(not sim.blocked(body.pos),"patrol scenario starts outside coastline collision: "+str(map_index))
+		sim.player.pos=Vector2(500,500);sim.player.hp=sim.player.max_hp
 		sim.select(body.id)
 		for _i in 30:sim._step_npc(body,1.0/30.0)
 		check(sim.shots.is_empty() if map_index<2 else not sim.shots.is_empty(),"entry maps never attack on proximity or selection; hostile map still does: "+str(map_index))
