@@ -1,0 +1,68 @@
+name: M3082 import three playable GLB test ships
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'Abyssal_Dominion_M3082_Testschiffe_Teil_1_von_2.zip'
+      - 'Abyssal_Dominion_M3082_Testschiffe_Teil_2_von_2.zip'
+      - '.github/workflows/m3082-import-test-ships.yml'
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: m3082-player-model-import
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            .github/workflows/
+            rebuild/m3052/tools/import_m3082_test_ships.py
+            rebuild/m3052/assets/player/test_ships/
+            Abyssal_Dominion_M3082_Testschiffe_Teil_1_von_2.zip
+            Abyssal_Dominion_M3082_Testschiffe_Teil_2_von_2.zip
+      - name: Check upload completeness
+        id: ready
+        shell: bash
+        run: |
+          if [[ -f Abyssal_Dominion_M3082_Testschiffe_Teil_1_von_2.zip && -f Abyssal_Dominion_M3082_Testschiffe_Teil_2_von_2.zip ]]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'One of two archives is not uploaded yet; next archive upload triggers import.'
+          fi
+      - name: Verify and import GLB assets without decimation
+        if: steps.ready.outputs.ready == 'true'
+        run: python3 rebuild/m3052/tools/import_m3082_test_ships.py
+      - name: Commit real models and 8-way sprite previews to main
+        id: commit
+        if: steps.ready.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --sparse -f rebuild/m3052/assets/player/test_ships/*.glb rebuild/m3052/assets/player/test_ships/*.png rebuild/m3052/assets/player/test_ships/*.json
+          if git diff --cached --quiet; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'Test fleet is already complete on main.'
+            exit 0
+          fi
+          git commit -m 'M3082 activate full original playable GLB starter and two test galleons [skip ci]'
+          git -c pack.window=0 push origin HEAD:main
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - name: Build and publish signed M3082 game-data update
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run m3052.yml --ref main
+          echo 'Triggered signed data release from updated main.'
