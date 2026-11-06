@@ -133,6 +133,40 @@ func can_render_actor(actor: Dictionary) -> bool:
 	if int(actor.get("id",-1))==0:return has_test_ship(int(actor.get("skin",-1)))
 	return int(actor.get("id",0))>0 and str(actor.get("kind",""))=="ship" and model_scenes.has(str(actor.get("visual_key","")))
 
+# Lower-hull envelope from the source GLB bounds, not the eight-angle sprite.
+# Preserve the physical bow/oars and stern at every heading. The ship's
+# true projection changes with camera zoom and 3D yaw, so the label must too.
+const PLAYER_SOURCE_BEAMS := {"crimson_voyager":0.355,"test_ship_2":0.440,"base_basic_pbr":0.433}
+
+func projected_hull_bottom(actor: Dictionary) -> float:
+	if not can_render_actor(actor) or int(actor.get("id",-1))!=0:return -INF
+	var owner: Node3D=model_instances.get(0)
+	if owner==null or not is_instance_valid(owner):return -INF
+	var pivot: Node3D=owner.get_node_or_null("OriginalAxisCorrection")
+	if pivot==null or pivot.get_child_count()==0:return -INF
+	var model: Node3D=pivot.get_child(0) as Node3D
+	if model==null or mesh_camera==null:return -INF
+	var key: String=player_key_for_skin(int(actor.get("skin",-1)))
+	if not MODEL_INFO.has(key):return -INF
+	var info: Array=MODEL_INFO[key]
+	var z_long: bool=absf(float(info[5]))>1.0
+	var half_length: float=float(info[0])*.5
+	var half_beam: float=float(PLAYER_SOURCE_BEAMS.get(key,.44))
+	var origin_screen: Vector2=mesh_camera.unproject_position(owner.global_position)
+	var maximum: float=-INF
+	for along in [-1.0,0.0,1.0]:
+		for across in [-1.0,0.0,1.0]:
+			for height in [0.08,0.36]:
+				var px: float=float(info[3])+(across*half_beam if z_long else along*half_length)
+				var pz: float=float(info[4])+(along*half_length if z_long else across*half_beam)
+				var py: float=float(info[1])+float(info[2])*height
+				var projected: Vector2=mesh_camera.unproject_position(model.to_global(Vector3(px,py,pz)))
+				maximum=maxf(maximum,projected.y)
+	# Use the current 2D interpolated player center so the projected name
+	# stays pinned even if the 3D viewport/camera was synced one frame ago.
+	var screen_center: Vector2=host.get_canvas_transform()*host._visual_actor_pos(actor)
+	return screen_center.y+maximum-origin_screen.y
+
 func resize_view(screen: Vector2) -> void:
 	position=Vector2.ZERO
 	size=screen

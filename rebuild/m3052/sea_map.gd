@@ -576,12 +576,27 @@ func _draw_actor(actor: Dictionary) -> void:
 		_ellipse(point+Vector2(0,4),Vector2(length*0.34,length*0.09),Color(0.0,0.02,0.04,0.34))
 	if is_player and sim.has_blessing():
 		var blessing_pulse=.5+.5*sin(elapsed*3.2)
-		_ellipse(point+Vector2(0,2),Vector2(length*0.62,length*0.24),Color(0.62,0.38,1.0,.08+blessing_pulse*.06))
-		_ellipse_line(point+Vector2(0,2),Vector2(length*0.5,length*0.18),Color(0.86,0.72,1.0,.4),1.8)
+		if mesh_ship:
+			# A subtle directional aura replaces the oversized hovering disk.
+			draw_set_transform(point,heading.angle(),Vector2.ONE)
+			_ellipse(Vector2.ZERO,Vector2(length*.40,length*.115),Color(.58,.34,1.0,.035+blessing_pulse*.025))
+			_ellipse_line(Vector2.ZERO,Vector2(length*.42,length*.12),Color(.83,.69,1.0,.15),1.1)
+			draw_set_transform(Vector2.ZERO)
+		else:
+			_ellipse(point+Vector2(0,2),Vector2(length*0.62,length*0.24),Color(0.62,0.38,1.0,.08+blessing_pulse*.06))
+			_ellipse_line(point+Vector2(0,2),Vector2(length*0.5,length*0.18),Color(0.86,0.72,1.0,.4),1.8)
 	if sim.target==int(actor.id):
-		_ellipse_line(point,Vector2(length*0.44,length*0.16),Color("ed9d67"),2.0)
+		if mesh_ship:
+			draw_set_transform(point,heading.angle(),Vector2.ONE)
+			_ellipse_line(Vector2.ZERO,Vector2(length*.38,length*.11),Color("ed9d67",.65),1.25)
+			draw_set_transform(Vector2.ZERO)
+		else:_ellipse_line(point,Vector2(length*.44,length*.16),Color("ed9d67"),2.0)
 	if is_player:
-		_ellipse_line(point,Vector2(length*0.44,length*0.16),Color(0.37,0.84,0.83,0.4),1.1)
+		if mesh_ship:
+			draw_set_transform(point,heading.angle(),Vector2.ONE)
+			_ellipse_line(Vector2.ZERO,Vector2(length*.39,length*.105),Color(.37,.84,.83,.25),1.0)
+			draw_set_transform(Vector2.ZERO)
+		else:_ellipse_line(point,Vector2(length*.44,length*.16),Color(0.37,0.84,0.83,0.4),1.1)
 	var hull_alpha=0.45 if is_player and sim.staff.hidden() else 1.0
 	var monster = not is_player and actor.kind=="monster"
 	if monster:
@@ -619,7 +634,11 @@ func _draw_actor(actor: Dictionary) -> void:
 		_draw_ship_frame(tex,point,length,col,false,sin(elapsed*1.7+actor.id)*1.2,hull_alpha)
 	if is_player and sim.staff.shows_badge():
 		var pulse=.5+.5*sin(elapsed*4.0)
-		_ellipse_line(point,Vector2(length*0.52,length*0.2),Color(sim.staff.color(),.28+pulse*.35),2.4)
+		if mesh_ship:
+			draw_set_transform(point,heading.angle(),Vector2.ONE)
+			_ellipse_line(Vector2.ZERO,Vector2(length*.41,length*.115),Color(sim.staff.color(),.15+pulse*.16),1.3)
+			draw_set_transform(Vector2.ZERO)
+		else:_ellipse_line(point,Vector2(length*.52,length*.2),Color(sim.staff.color(),.28+pulse*.35),2.4)
 	if bool(actor.get("frozen",false)) or float(actor.get("ice",0.0))>0.0:
 		_ellipse_line(point,Vector2(length*0.5,length*0.19),Color("b7e7ff",.85),2.2)
 		draw_arc(point,length*0.28,0,TAU,28,Color("e8f7ff",.7),1.6,true)
@@ -741,8 +760,12 @@ func _plate_screen_anchor(actor: Dictionary) -> Vector2:
 	# bounds are NOT the actual waterline and produced a ~100px empty gap
 	# between the ship and its name. Anchor beside the projected keel.
 	if player and mesh_layer!=null and mesh_layer.can_render_actor(actor):
-		var tight_gap: float=clampf(_actor_visual_length(actor)*0.24,30.0,46.0)
-		return Vector2(point.x,point.y+tight_gap*pixels)
+		var physical_bottom: float=mesh_layer.projected_hull_bottom(actor)
+		if physical_bottom>-100000.0:
+			# Text is baseline-aligned; ~17 physical pixels from the projected
+			# hull leaves a small visible gap above the name glyphs.
+			return Vector2(point.x,maxf(point.y+24.0*pixels,physical_bottom+18.0*pixels))
+		return Vector2(point.x,point.y+41.0*pixels)
 	var minimum=point.y+(CAPTAIN_PLATE_OFFSET if player else OTHER_PLATE_OFFSET)*pixels
 	var clearance=(CAPTAIN_HULL_CLEARANCE if player else NPC_HULL_CLEARANCE)*pixels
 	var stable_bottom=point.y+_plate_stable_hull_drop(actor)*absf(get_canvas_transform().y.y)
@@ -775,8 +798,9 @@ func _sync_plate_overlay() -> void:
 	for npc: Dictionary in sim.npcs:
 		if int(npc.hp)>0 and view.has_point(_visual_actor_pos(npc)):fleet.append(npc)
 	plate_fleet=fleet
-	plate_rects=_nameplate_layout(fleet)
+	# Projection must use THIS frame's ship transforms before laying out labels.
 	if mesh_layer!=null:mesh_layer.sync_fleet(fleet,camera,get_viewport_rect().size)
+	plate_rects=_nameplate_layout(fleet)
 	plate_overlay.queue_redraw()
 
 ## Kept as a simple explicit regression hook, not called from the map draw.

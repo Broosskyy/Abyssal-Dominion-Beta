@@ -12,8 +12,11 @@ func caption_clears_hull(game, actor: Dictionary, anchor: Vector2) -> bool:
 		# eight-way sprite fallback. Checking sprite bounds here would enforce
 		# the excessive screen gap that the M3084 player fix removes.
 		var waterline: Vector2=game.get_canvas_transform()*game._visual_actor_pos(actor)
+		var bottom: float=game.mesh_layer.projected_hull_bottom(actor)
+		if bottom> -100000.0:
+			return anchor.y>waterline.y and anchor.y>=bottom+16.0*pixels and anchor.y<=bottom+26.0*pixels
 		var gap: float=anchor.y-waterline.y
-		return gap>=29.0*pixels and gap<=47.0*pixels
+		return gap>=30.0*pixels and gap<=46.0*pixels
 	return anchor.y>=game._actor_screen_bounds(actor).end.y+game.CAPTAIN_HULL_CLEARANCE*pixels-.1
 func _initialize() -> void:call_deferred("run")
 func run() -> void:

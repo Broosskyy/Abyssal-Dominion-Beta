@@ -47,7 +47,11 @@ func _run() -> void:
 	game.sim.player.skin=29
 	var player_center: Vector2=game.get_canvas_transform()*game._visual_actor_pos(game.sim.player)
 	var title_anchor: Vector2=game._plate_screen_anchor(game.sim.player)
-	check(title_anchor.y>player_center.y and title_anchor.y-player_center.y<=47.0*game._plate_pixels(),"M3084 3D captain name stays close to the actual ship keel")
+	# The mesh must be synced before its real 3D silhouette is projected.
+	game.mesh_layer.sync_fleet([game.sim.player],game.camera,game.get_viewport_rect().size)
+	title_anchor=game._plate_screen_anchor(game.sim.player)
+	var actual_hull_bottom: float=game.mesh_layer.projected_hull_bottom(game.sim.player)
+	check(actual_hull_bottom>player_center.y-10.0 and title_anchor.y>=actual_hull_bottom+16.0*game._plate_pixels() and title_anchor.y<=actual_hull_bottom+26.0*game._plate_pixels(),"M3085 captain name clears projected 3D hull rather than overlapping the stern and oars")
 	game.sim.player.skin=skin_before_anchor
 	game.mesh_layer.set_render_mode(mode_before_anchor)
 	check(game.mesh_layer.mode in ["classic","hybrid","3d"],"game has a valid 2.5D or 3D mode")
