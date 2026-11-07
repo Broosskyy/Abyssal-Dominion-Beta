@@ -19,13 +19,17 @@ func _run() -> void:
 	current_scene=game
 	await process_frame
 
-	check(game.skins.size()==2 and str(game.skins[0].name)=="Schattenkriegsschiff" and str(game.skins[1].name).contains("Elite-Design 1"),"two shipyard choices: shaded + Elite 1")
-	check(game.skin_previews.size()==2 and game.skin_previews.all(func(tex):return tex!=null),"shaded and Black Crown previews imported")
+	check(game.skins.size()==12 and str(game.skins[0].name)=="Schattenkriegsschiff" and str(game.skins[1].name).contains("Testmodell"),"original starter and original Black Crown test remain separate")
+	for level in range(1,11):
+		check(str(game.skins[level+1].name).contains("Elite-Schiff %02d" % level),"ten unique Elite V2 color entries in the Werft: "+str(level))
+	check(game.skin_previews.size()==12 and game.skin_previews.all(func(tex):return tex!=null),"12 actual model/texture preview images imported")
 	check(game.sim.player.skin==0,"M3099 new players start with only shaded ship")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"nine NPCs + shaded captain GLB load")
 	check(game.mesh_layer.model_scenes.size()==11,"nine NPC GLBs plus two player options load")
 	check(game.mesh_layer.has_player_ship() and game.mesh_layer.has_elite_1_ship(),"shaded and Black Crown can be player ships")
-	check(game.mesh_layer.player_key_for_skin(30)=="schattenkriegsschiff_shaded" and game.mesh_layer.player_key_for_skin(1)=="black_crown_corsair_elite_test","retired skins migrate and Elite 1 routes to own GLB")
+	check(game.mesh_layer.player_key_for_skin(30)=="schattenkriegsschiff_shaded" and game.mesh_layer.player_key_for_skin(1)=="black_crown_corsair_elite_test","retired skins migrate and original test routes to its GLB")
+	for i in range(2,12):
+		check(game.mesh_layer.player_key_for_skin(i)=="black_crown_corsair_elite_test" and game.mesh_layer.elite_texture_level(i)==i-1,"Elite skin %d shares original GLB and has unique material variant" % i)
 	check(game.mesh_layer._player_immersion("schattenkriegsschiff_shaded")==game.mesh_layer.GAMEPLAY_WATER_IMMERSION,"M3099 waterline retained")
 	check(game.mesh_layer.FLEET_CAMERA_TILT_DEGREES==40.0 and game.mesh_layer.FULL_3D_CAMERA_TILT_DEGREES>40.0,"M3099 2.5D and 3D camera variants are distinct")
 	var original_mode: String=game.mesh_layer.mode
@@ -45,7 +49,33 @@ func _run() -> void:
 		game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
 		check(game.mesh_layer.can_render_actor(game.sim.player),"Elite Design 1 renders in "+chosen_mode)
 		check(str(game.mesh_layer.model_instance_keys.get(0,""))=="black_crown_corsair_elite_test","Elite 1 actual 3D mesh active in "+chosen_mode)
-		check(game.mesh_layer.gameplay_double_sided_count>0,"Elite 1 real sail material is double-sided")
+		check(game.mesh_layer.gameplay_double_sided_count>0,"Corsair test original sail material is double-sided")
+	# The V2 palette changes only material overrides, NEVER physical hull geometry.
+	game.sim.player.skin=2
+	game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
+	check(str(game.mesh_layer.model_instance_keys.get(0,""))=="black_crown_corsair_elite_test" and int(game.mesh_layer.model_instance_skins.get(0,-1))==2,"Elite Obsidian uses exactly original Black Crown GLB")
+	var variant_owner: Node3D=game.mesh_layer.model_instances.get(0)
+	var variant_node: Node=variant_owner.get_node_or_null("OriginalAxisCorrection")
+	var nodes: Array[Node]=[variant_node]
+	var albedo_found:=false
+	while not nodes.is_empty():
+		var n: Node=nodes.pop_back()
+		if n==null:continue
+		for child: Node in n.get_children():nodes.append(child)
+		if n is MeshInstance3D:
+			var part: MeshInstance3D=n as MeshInstance3D
+			if part.mesh!=null:
+				for surface in range(part.mesh.get_surface_count()):
+					var mat: Material=part.get_surface_override_material(surface)
+					if mat is BaseMaterial3D and (mat as BaseMaterial3D).albedo_texture!=null:
+						albedo_found=albedo_found or str((mat as BaseMaterial3D).albedo_texture.resource_path).contains("Elite_01_Obsidian")
+	check(albedo_found,"Elite Obsidian truly overrides the imported 3D texture (not just the thumbnail)")
+	game.sim.player.skin=11
+	game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
+	check(int(game.mesh_layer.model_instance_skins.get(0,-1))==11 and str(game.mesh_layer.model_instance_keys.get(0,""))=="black_crown_corsair_elite_test","Elite Knochen switches back to same shared GLB with separate material instance")
+	game.sim.player.skin=1
+	game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
+	check(int(game.mesh_layer.model_instance_skins.get(0,-1))==1,"unmodified Corsair test model stays independently selectable")
 	# Schiffsbewegung is optional eye candy and must not remove the real GLB.
 	game._set_ship_visual_toggle("motion")
 	check(not game.ship_animations_enabled,"ship rocking setting can be disabled")
@@ -91,7 +121,12 @@ func _run() -> void:
 	elite_save.skin=1
 	check(migration.restore_save(elite_save) and migration.player.skin==1 and int(migration.export_save().schema)==5,"Elite 1 survives schema 5 guest save")
 	migration.player.skin=0
-	for old_id in [0,8,26,27,28,29,30]:
+	for level in range(2,12):
+		var new_save=migration.export_save()
+		new_save.skin=level
+		check(migration.restore_save(new_save) and int(migration.player.skin)==level,"Elite V2 material choice %d survives save" % level)
+	# Unsupported retired skins still resolve to the shaded original.
+	for old_id in [0,12,26,27,28,29,30]:
 		var old_save=migration.export_save()
 		old_save.skin=old_id
 		check(migration.restore_save(old_save) and int(migration.player.skin)==0,"M3099 retired skin %d maps to shaded ship"%old_id)
@@ -198,9 +233,10 @@ func _run() -> void:
 		game.modal.hide()
 		game._open_modal("Werft")
 		await process_frame
-		check(game.modal_scroll.size.y>100,"shipyard shows both captain designs at all sizes")
+		check(game.modal_scroll.size.y>100,"shipyard shows all twelve captain designs at all sizes")
 		check(game.modal_body.find_child("ShipDesignPreview1",true,false)!=null,"elite shipyard card has its own moving sea vignette")
 		check(game.modal_body.find_child("ShipDesignPreview0",true,false)!=null,"shaded ship card has distinct preview")
+		check(game.modal_body.find_child("ShipDesignPreview11",true,false)!=null,"tenth elite variant is visible in full Werft catalog")
 		var yard:=0
 		for button in game.modal_body.find_children("*","Button",true,false):
 			if "AUSRÜSTEN" in button.text or "AKTIV" in button.text:yard+=1
@@ -216,11 +252,14 @@ func _run() -> void:
 	var hp=int(game.sim.player.hp)
 	var gold=int(game.sim.player.gold)
 	var position: Vector2=game.sim.player.pos
-	game._equip(8)
+	game._equip(99)
 	check(int(game.sim.player.skin)==0 and int(game.sim.player.hp)==hp and int(game.sim.player.gold)==gold and game.sim.player.pos==position,"retired designs cannot be equipped or alter captain state")
 	game._equip(1)
 	check(int(game.sim.player.skin)==1 and int(game.sim.player.hp)==hp and int(game.sim.player.gold)==gold and game.sim.player.pos==position,"choosing Elite 1 retains captain health, wallet and navigation")
-	check(game._selection_ring_tint(game.sim.player)!=Color("62cce4") and is_equal_approx(game.ship_switch_pulse_at,game.elapsed),"elite design uses gold selection accents and an equip pulse")
+	check(game._selection_ring_tint(game.sim.player)!=Color("62cce4") and is_equal_approx(game.ship_switch_pulse_at,game.elapsed),"Corsair test uses gold selection accents and an equip pulse")
+	game._equip(8)
+	check(int(game.sim.player.skin)==8 and int(game.sim.player.gold)==gold and int(game.sim.player.hp)==hp,"Elite V2 Petrol can be equipped with no currency/HP changes")
+	check(game._selection_ring_tint(game.sim.player)!=Color("62cce4"),"Elite V2 hull has its own color-matched selection ring")
 	game._equip(0)
 	check(int(game.sim.player.skin)==0,"shipyard allows switching back to original shaded captain")
 	game.modal.hide()
@@ -250,7 +289,23 @@ func _run() -> void:
 			if kind in ["Hafen","Kessel","Gilde"]:await process_frame
 			check(game.modal.visible and game.modal_scroll.size.y>100,"new gameplay panel opens at %s: %s"%[dimensions,kind])
 			check(game.modal.get_global_rect().position.x>=0 and game.modal.get_global_rect().position.y>=0 and game.modal.get_global_rect().end.x<=dimensions.x+1 and game.modal.get_global_rect().end.y<=dimensions.y+1,"panel stays inside viewport: "+kind)
+			if kind!="Munition":
+				check(game.menu_fullscreen and game.modal.get_global_rect().size.x>=dimensions.x*.90 and game.modal.get_global_rect().size.y>=dimensions.y*.90,"full-screen experiment covers display safely for "+kind+" at "+str(dimensions))
+			else:
+				check(game.modal.get_global_rect().size.x<dimensions.x*.85,"combat ammunition retains compact popup instead of full page")
 			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
+	game.modal.hide()
+	# Layout mode is reversible via Settings and must persist across restarts.
+	root.size=Vector2i(1280,720)
+	await process_frame
+	game._layout()
+	game._open_modal("Anzeige")
+	game._toggle_fullscreen_menus()
+	check(not game.menu_fullscreen and game.modal.get_global_rect().size.x<1100,"compact classic panels remain available by user preference")
+	var layout_saved: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
+	check(layout_saved is Dictionary and not bool(layout_saved.get("menu_fullscreen",true)),"compact menu choice persists to local settings")
+	game._toggle_fullscreen_menus()
+	check(game.menu_fullscreen and game.modal.get_global_rect().size.x>=1200,"user can restore the immersive menu layout")
 	game.modal.hide()
 	game.sim.player.pos=game.sim.harbor
 	game.sim.player.last_hit=-100
@@ -542,7 +597,7 @@ func _run() -> void:
 	var choices:=0
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
 		if "AUSRÜSTEN" in button.text and not button.disabled:choices+=1
-	check(choices==1 and game.skins.size()==2,"only the alternate Elite 1 captain design is equipable")
+	check(choices==11 and game.skins.size()==12,"eleven unequipped choices remain clickable alongside active captain")
 	game.modal.hide()
 	# Staff tools, the world chart and the chart guide.
 	var map_before: int=game.sim.map_id
