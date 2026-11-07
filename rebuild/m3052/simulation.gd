@@ -21,9 +21,10 @@ const START := Vector2(2100, 1450)
 const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice", "fire", "poison", "shrapnel", "lightning", "holy", "shadow", "wind", "earth", "water", "cursed", "bleed", "necro", "gold", "crystal", "explosive", "arcane", "spectral", "lava", "light", "armor_piercing", "gas"]
 const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein", "Feuerkugeln geladen · Grafik-Beta", "Giftkugeln geladen · Grafik-Beta", "Schrapnellkugeln geladen · Grafik-Beta", "Blitzkugeln geladen · Grafik-Beta", "Heilige Kugeln geladen · Grafik-Beta", "Schattenkugeln geladen · Grafik-Beta", "Wirbelkugeln geladen · Grafik-Beta", "Erdkugeln geladen · Grafik-Beta", "Wasserkugeln geladen · Grafik-Beta", "Fluchkugeln geladen · Grafik-Beta", "Blutkugeln geladen · Grafik-Beta", "Nekrokugeln geladen · Grafik-Beta", "Goldkugeln geladen · Grafik-Beta", "Kristallkugeln geladen · Grafik-Beta", "Explosivkugeln geladen · Grafik-Beta", "Arkankugeln geladen · Grafik-Beta", "Geisterkugeln geladen · Grafik-Beta", "Lavakugeln geladen · Grafik-Beta", "Lichtkugeln geladen · Grafik-Beta", "Panzerbrecher geladen · Grafik-Beta", "Gaskugeln geladen · Grafik-Beta"]
 var player: Dictionary
-# All historical skin IDs (0–30) migrate to our single production shaded GLB.
-# Persist it as skin 0, without touching any progression/equipment/currency.
+# Retired historical skins 0-30 migrate to shaded ship (skin 0).
+# Only schema 5+ saves can select the new Elite-Design 1 (skin 1).
 const FINAL_PLAYER_SKIN := 0
+const ELITE_ONE_PLAYER_SKIN := 1
 ## Local captain identity until the server issues persistent multiplayer IDs.
 var captain_id := ""
 var npcs: Array[Dictionary] = []
@@ -127,18 +128,6 @@ func _init() -> void:
 			"reward":int(spec.reward) if meshy_ready else (110 if elite else 55),"art":i,"elite":elite,
 			"visual_key":str(spec.key),"view_count":4,"renderer":"mesh" if meshy_ready else "sprite",
 			"navigation":"free" if meshy_ready else "four_diagonal","last_hit":-100.0})
-	# Optional elite model test. No substitution of existing fleet or saved progress.
-	# When the original GLB is absent, normal builds and the updater remain unchanged.
-	if ResourceLoader.exists("res://assets/npc/meshy/models/black_crown_corsair_elite_test.glb"):
-		var crown_pos:=Vector2(2320,1180)
-		if blocked(crown_pos,64.0):crown_pos=Vector2(2140,1080)
-		npcs.append({"id":90,"name":"Black Crown Corsair · ELITE TEST","kind":"ship",
-			"pos":crown_pos,"home":crown_pos,"heading":Vector2.LEFT,"path":[],
-			"hp":1150,"max_hp":1150,"shield":320,"max_shield":320,"speed":44.0,"power":46,
-			"reload":0.0,"repath":0.0,"state":"patrol","patrol":2,"aggressive":false,
-			"slow":0.0,"respawn":0.0,"reward":120,"art":4,"elite":true,
-			"elite_test":true,"visual_key":"black_crown_corsair_elite_test",
-			"view_count":8,"renderer":"mesh","navigation":"free","last_hit":-100.0})
 	npcs.append({"id": 100, "name": "Tiamat · Tiefenwächter", "kind": "monster", "pos": Vector2(2590, 1750),
 		"home": Vector2(2590, 1750), "heading": Vector2.LEFT, "path": [], "hp": 1650,
 		"max_hp": 1650, "shield": 0, "max_shield": 0, "speed": 28.0, "reload": 1.0, "repath": 0.0, "state": "patrol",
@@ -1369,7 +1358,7 @@ func export_save() -> Dictionary:
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
-	return {"schema":4,"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	return {"schema":5,"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
@@ -1381,11 +1370,12 @@ func export_save() -> Dictionary:
 		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
-	if not int(data.get("schema",0)) in [1,2,3,4]: return false
+	if not int(data.get("schema",0)) in [1,2,3,4,5]: return false
 	var stored_id := str(data.get("captain_id","")).strip_edges().to_upper()
 	if stored_id.length()==12 and stored_id.is_valid_hex_number():captain_id=stored_id
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
-	player.skin=FINAL_PLAYER_SKIN # M3099: migrate every retired design to the final ship
+	# Never interpret old skin 1 from schema 1-4 as the new Elite-Design 1.
+	player.skin=ELITE_ONE_PLAYER_SKIN if int(data.get("schema",0))>=5 and int(data.get("skin",0))==ELITE_ONE_PLAYER_SKIN else FINAL_PLAYER_SKIN
 	ammo_mode=clampi(int(data.get("ammo_mode",0)),0,AMMO_NAMES.size()-1)
 	kills=maxi(0,int(data.get("kills",0)))
 	claimed=bool(data.get("claimed",false))
