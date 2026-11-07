@@ -19,7 +19,12 @@ func _run() -> void:
 	check(scene!=null,"game scene loads from data pack")
 	var game=scene.instantiate();root.add_child(game);current_scene=game
 	await process_frame
-	check(game.sim.npcs.size()==17 and game.skins.size()==2 and game.skin_previews.size()==2,"signed pack includes 16 patrol ships, shaded captain and Elite 1 Werft design")
+	check(game.sim.npcs.size()==17 and game.skins.size()==12 and game.skin_previews.size()==12,"signed pack includes 16 patrol ships and all twelve original/V2 player designs")
+	var all_elites:=true
+	for level in range(1,11):
+		all_elites=all_elites and ResourceLoader.exists("res://assets/elite_v2/previews/elite_%02d.png" % level)
+		all_elites=all_elites and ResourceLoader.exists("res://assets/elite_v2/textures/"+str(game.mesh_layer.ELITE_V2_TEXTURE_FILES[level-1]))
+	check(all_elites,"all 10 Elite V2 albedo textures and ten Werft portraits mount in signed data pack")
 	# Critical end-to-end check: this scene was mounted from the standalone
 	# signed DATA ZIP, not directly from the GitHub source tree.
 	check(game.mesh_layer.has_player_ship() and game.mesh_layer.has_elite_1_ship(),"signed pack contains both original shaded and Elite 1 GLBs")
