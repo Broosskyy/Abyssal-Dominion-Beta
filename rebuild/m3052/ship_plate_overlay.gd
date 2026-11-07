@@ -86,6 +86,18 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	draw_set_transform(anchor,0,Vector2.ONE)
 	var title: String=host._plate_title(actor)
 	var width=_caption(Vector2.ZERO,title,host._plate_title_size(actor),tint)
+	# Readable Seafight-like target focus: two small corner brackets, NOT
+	# a full opaque card. On-screen dimensions are native-pixel stable.
+	if not player and int(actor.id)==int(sim.target):
+		var focus_color: Color=host._selection_ring_tint(actor)
+		var gap: float=width*.5+8.0*pixel_scale
+		var extent: float=7.0*pixel_scale
+		for side in [-1.0,1.0]:
+			var x: float=side*gap
+			var elbow: Vector2=Vector2(x,-10.0*pixel_scale)
+			var next: Vector2=elbow+Vector2(side*extent,0)
+			draw_line(elbow,elbow+Vector2(0,extent),Color(focus_color,.84),maxf(1.0,1.3*pixel_scale),true)
+			draw_line(elbow,next,Color(focus_color,.84),maxf(1.0,1.3*pixel_scale),true)
 	if not player and not tower and not monster:
 		# Small category marker, separate from the name so long names are
 		# not truncated further by an inline [NPC] prefix.
