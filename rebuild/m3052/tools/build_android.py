@@ -94,6 +94,21 @@ def main():
     crown_preview = ROOT/'assets/player/black_crown_elite_1_preview.png'
     if hashlib.sha256(crown_preview.read_bytes()).hexdigest() != '48caf2662b1bb5412b7a4f545b4857d29bda69b1969de7e00dcd6d930dfa366c':
         raise RuntimeError('Elite Design 1 shipyard preview does not match source-model render')
+    # Check that the ten independently selectable Elite V2 albedos match
+    # the user's original archive. No extra mesh models are introduced.
+    palette = json.loads((ROOT/'assets/elite_v2/manifest.json').read_text())
+    if palette.get('source_glb_sha256') != 'add93320eaddcd84861ad483800ad0b6ea68f1a7b261fe8bab746e7b2021eb8a' or palette.get('geometry_duplicated') is not False:
+        raise RuntimeError('Elite V2 must preserve exactly one original Black Crown GLB')
+    variants = palette.get('variants', [])
+    if len(variants) != 10 or sorted(int(row.get('level', -1)) for row in variants) != list(range(1, 11)):
+        raise RuntimeError('Elite V2 needs all ten numbered texture variants')
+    for row in variants:
+        texture = ROOT/row['texture'].removeprefix('res://')
+        preview = ROOT/row['preview'].removeprefix('res://')
+        if hashlib.sha256(texture.read_bytes()).hexdigest() != row['sha256']:
+            raise RuntimeError('Elite V2 user texture differs from imported source: '+str(texture))
+        if not preview.is_file():
+            raise RuntimeError('Elite V2 source-rendered shipyard portrait missing: '+str(preview))
     catalog = json.loads((ROOT/'assets/provenance.json').read_text())
     assets = catalog['files']
     for row in assets + catalog.get('vector_ui', []):
@@ -187,7 +202,7 @@ def main():
               'mode': 'LOCAL_GUEST_SEA_CHART', 'public_server': False, 'milestone': 'M3059',
               'regions': 3, 'quest_chain': 7, 'equipment_categories': 4, 'equipment_tiers': 3,
               'source_commit': os.environ.get('GITHUB_SHA', 'local'),
-              'player_glb_variants': 1, 'npc_glb_models': 9, 'graphics_modes': ['hybrid','3d'], 'retired_sprite_atlases': 0})
+              'player_glb_models': 2, 'elite_material_variants': 10, 'player_ship_choices': 12, 'npc_glb_models': 9, 'graphics_modes': ['hybrid','3d'], 'retired_sprite_atlases': 0})
     output.with_suffix('.build.json').write_text(json.dumps(report, indent=2))
     print(json.dumps(report, indent=2))
 
