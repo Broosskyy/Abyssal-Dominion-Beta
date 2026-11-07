@@ -22,7 +22,7 @@ const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "
 const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein", "Feuerkugeln geladen · Grafik-Beta", "Giftkugeln geladen · Grafik-Beta", "Schrapnellkugeln geladen · Grafik-Beta", "Blitzkugeln geladen · Grafik-Beta", "Heilige Kugeln geladen · Grafik-Beta", "Schattenkugeln geladen · Grafik-Beta", "Wirbelkugeln geladen · Grafik-Beta", "Erdkugeln geladen · Grafik-Beta", "Wasserkugeln geladen · Grafik-Beta", "Fluchkugeln geladen · Grafik-Beta", "Blutkugeln geladen · Grafik-Beta", "Nekrokugeln geladen · Grafik-Beta", "Goldkugeln geladen · Grafik-Beta", "Kristallkugeln geladen · Grafik-Beta", "Explosivkugeln geladen · Grafik-Beta", "Arkankugeln geladen · Grafik-Beta", "Geisterkugeln geladen · Grafik-Beta", "Lavakugeln geladen · Grafik-Beta", "Lichtkugeln geladen · Grafik-Beta", "Panzerbrecher geladen · Grafik-Beta", "Gaskugeln geladen · Grafik-Beta"]
 var player: Dictionary
 # Retired historical skins 0-30 migrate to shaded ship (skin 0).
-# Only schema 5+ saves can select the new Elite-Design 1 (skin 1).
+# Only schema 5+ saves can select separate Corsair test skin 1 and ten new Elite color skins 2-11.
 const FINAL_PLAYER_SKIN := 0
 const ELITE_ONE_PLAYER_SKIN := 1
 ## Local captain identity until the server issues persistent multiplayer IDs.
@@ -1375,7 +1375,11 @@ func restore_save(data: Dictionary) -> bool:
 	if stored_id.length()==12 and stored_id.is_valid_hex_number():captain_id=stored_id
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
 	# Never interpret old skin 1 from schema 1-4 as the new Elite-Design 1.
-	player.skin=ELITE_ONE_PLAYER_SKIN if int(data.get("schema",0))>=5 and int(data.get("skin",0))==ELITE_ONE_PLAYER_SKIN else FINAL_PLAYER_SKIN
+	# Save schema 5 introduced separate Black Crown test skin 1.
+	# Skins 2-11 extend it with ten actual Elite V2 albedo variants.
+	# All retired skin IDs from older schemas remain migrated to skin 0.
+	var candidate_skin: int=int(data.get("skin",0))
+	player.skin=candidate_skin if int(data.get("schema",0))>=5 and candidate_skin>=1 and candidate_skin<=11 else FINAL_PLAYER_SKIN
 	ammo_mode=clampi(int(data.get("ammo_mode",0)),0,AMMO_NAMES.size()-1)
 	kills=maxi(0,int(data.get("kills",0)))
 	claimed=bool(data.get("claimed",false))
