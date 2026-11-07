@@ -11,3 +11,7 @@
 - `tests/ui_test.gd` prüft Werft, importiertes GLB, 8er-Atlas, Speicherstände, Richtungen und Moduswechsel.
 
 Das Modell ist ein Testschiff. Der endgültige optische Abgleich muss zusätzlich auf einem realen Android-Gerät erfolgen. Diese Änderung benötigt keinen neuen Android-Bootstrap, nur ein signiertes Datenupdate.
+
+## Regressionscheck
+
+Der anfänglich fehlgeschlagene M3097-Build prüfte noch einen fest codierten Werftkartenwert von 30. Die Werftkartenprüfung wurde auf die tatsächliche Anzahl der Designs umgestellt; der anschließende vollständige Godot-Datenbuild validiert die Änderung.
