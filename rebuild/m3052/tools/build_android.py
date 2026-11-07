@@ -73,15 +73,27 @@ def main():
     if [p.name for p in player_glbs] != ['schattenkriegsschiff_shaded.glb']:
         raise RuntimeError('Approved player fleet must contain exactly one shaded GLB: '+str(player_glbs))
     npc_glbs = sorted((ROOT/'assets/npc/meshy/models').glob('*.glb'))
-    if len(npc_glbs) != 9:
-        raise RuntimeError('All nine approved NPC GLBs are required')
+    expected_npc_names = {
+        'old_harbor_trader.glb', 'merchant_brig_3002.glb', 'merchant_brig_2921.glb',
+        'merchant_brig_2912.glb', 'weathered_voyager.glb', 'weathered_junk.glb',
+        'emerald_voyager.glb', 'midnight_mariner.glb', 'crimson_tide_galley.glb',
+        'black_crown_corsair_elite_test.glb',
+    }
+    if {p.name for p in npc_glbs} != expected_npc_names:
+        raise RuntimeError('Nine original NPC GLBs plus the one Elite 1 GLB are required: '+str(npc_glbs))
+    crown = ROOT/'assets/npc/meshy/models/black_crown_corsair_elite_test.glb'
+    if hashlib.sha256(crown.read_bytes()).hexdigest() != 'add93320eaddcd84861ad483800ad0b6ea68f1a7b261fe8bab746e7b2021eb8a':
+        raise RuntimeError('Original Elite Design 1 GLB has been altered')
     for retired in ['assets/user/ships','assets/fleet','assets/reference/ships',
                     'assets/generated/ships','assets/player/test_ships']:
         if (ROOT/retired).exists():
             raise RuntimeError('Retired ship assets still exist: '+retired)
     previews = sorted((ROOT/'assets/player').rglob('*.png'))
-    if [p.name for p in previews] != ['schattenkriegsschiff_preview.png']:
-        raise RuntimeError('Exactly one final shaded-ship yard preview is allowed')
+    if [p.name for p in previews] != ['black_crown_elite_1_preview.png','schattenkriegsschiff_preview.png']:
+        raise RuntimeError('Only the shaded captain and Black Crown Elite 1 previews are allowed')
+    crown_preview = ROOT/'assets/player/black_crown_elite_1_preview.png'
+    if hashlib.sha256(crown_preview.read_bytes()).hexdigest() != '48caf2662b1bb5412b7a4f545b4857d29bda69b1969de7e00dcd6d930dfa366c':
+        raise RuntimeError('Elite Design 1 shipyard preview does not match source-model render')
     catalog = json.loads((ROOT/'assets/provenance.json').read_text())
     assets = catalog['files']
     for row in assets + catalog.get('vector_ui', []):
