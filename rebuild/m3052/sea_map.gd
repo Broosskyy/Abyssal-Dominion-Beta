@@ -194,7 +194,14 @@ var vfx_intensity := 1.35
 # Independent from combat VFX: mobile users can disable mesh rocking and wakes.
 var ship_animations_enabled := true
 var wake_effects_enabled := true
-var menu_fullscreen := true # Tester: all full menu pages except anchored ammo picker.
+# Centered, device-proportional menu frames; legacy fullscreen choice is ignored.
+var menu_layout := "balanced"
+var double_tap_attack_enabled := true
+const DOUBLE_TAP_ATTACK_MS := 360
+const DOUBLE_TAP_ATTACK_RADIUS := 82.0
+var last_enemy_tap_id := -1
+var last_enemy_tap_ms := -10000
+var last_enemy_tap_screen := Vector2.ZERO
 var ship_switch_pulse_at := -100.0
 var journal_visible := true
 var hud_scale := 1.0
@@ -1298,6 +1305,14 @@ func _place(c: Control,x: float,y: float,w: float,h: float) -> void:
 	c.position=Vector2(x,y)
 	c.size=Vector2(maxf(w,1),maxf(h,1))
 
+# Reusable measurement helper; the ammunition picker is separately anchored.
+func _menu_layout_fractions(viewport: Vector2,layout: String) -> Vector2:
+	var portrait: bool=viewport.y>viewport.x*1.13
+	match layout:
+		"compact":return Vector2(.88,.68) if portrait else Vector2(.72,.74)
+		"large":return Vector2(.97,.89) if portrait else Vector2(.90,.91)
+		_:return Vector2(.94,.80) if portrait else Vector2(.82,.84)
+
 func _layout() -> void:
 	if ui==null:return
 	var viewport_size=get_viewport_rect().size
@@ -1402,11 +1417,11 @@ func _layout() -> void:
 	var menu_size=viewport_size
 	var grow=clampf(viewport_size.y/720.0,1.0,1.7)
 	modal.scale=Vector2.ONE*grow
-	var visual_w=minf(720.0*grow,menu_size.x-32.0)
-	var visual_h=minf(620.0*grow,menu_size.y-24.0)
-	if menu_fullscreen and modal_kind!="Munition":
-		visual_w=maxf(160.0,menu_size.x-16.0)
-		visual_h=maxf(160.0,menu_size.y-12.0)
+	# Leave a visible border of sea around the menu. Relative dimensions keep
+	# 720p phones, 1080p landscape and portrait devices proportionate.
+	var menu_ratios: Vector2=_menu_layout_fractions(menu_size,menu_layout)
+	var visual_w: float=minf(menu_size.x-24.0,menu_size.x*menu_ratios.x)
+	var visual_h: float=minf(menu_size.y-22.0,menu_size.y*menu_ratios.y)
 	var width=visual_w/grow
 	var height=visual_h/grow
 	_place(modal_backdrop,0,0,s.x,s.y)
@@ -2652,7 +2667,7 @@ func _open_chart_guide() -> void:
 	_section("MINIKARTE · LEGENDE")
 	_guide("legend")
 	_section("STEUERUNG AUF DER KARTE")
-	_note("Freies Wasser antippen: Kurs setzen. Schiff antippen: Ziel wählen, dann FEUER. Minikarte antippen: Kurs dorthin. Joystick links unten bewegt nur die Kamera, das Fadenkreuz holt sie zurück. Zwei Finger oder Mausrad: Zoom.")
+	_note("Freies Wasser: Kurs setzen. Gegner einmal antippen: anvisieren. Doppel-Tipp (optional): automatischen Angriff starten. Abwählen über ×/Esc. Minikarte: Kurs setzen. Joystick bewegt nur die Kamera. Zwei Finger oder Mausrad: Zoom.")
 
 func _guide(mode: String) -> void:
 	var diagram=CHART_GUIDE.new()
@@ -2688,10 +2703,18 @@ func _open_display() -> void:
 		var count_button=_action(str(amount)+(" ✓" if projectile_visual_count==amount else ""),func():_set_projectile_visual_count(selected_count),"tab_on" if projectile_visual_count==amount else "normal",projectile_choices)
 		count_button.disabled=projectile_visual_count==amount
 	_note("Standard: 3 · Leuchtkugeln wechseln zwischen Rot, Blau, Grün, Gold und Violett.",Color("bfcbdf"))
-	_section("FENSTERDARSTELLUNG · VOLLBILD-TEST")
-	var menu_grid=_grid(2)
-	_action("GANZSEITIG: "+("EIN" if menu_fullscreen else "AUS"),_toggle_fullscreen_menus,"tab_on" if menu_fullscreen else "normal",menu_grid)
-	_note("Alle Menü-/Tabseiten nutzen wahlweise nahezu den ganzen Bildschirm. Nur die Munitionsauswahl bleibt als schnelles Kampfmenü an der Kanone.",Color("a3c9cf"))
+	_section("KAMPFSTEUERUNG · ANTIPPEN")
+	_note("Einmal auf das Schiff: nur anvisieren. Zweimal schnell auf dasselbe Schiff: automatischer Angriff, wenn eingeschaltet. Ziel mit dem × im Gegnerfeld oder Esc aufheben.",Color("a3c9cf"))
+	var double_grid=_grid(2)
+	_action("DOPPELTIPP-ANGRIFF: "+("EIN" if double_tap_attack_enabled else "AUS"),_toggle_double_tap_attack,"tab_on" if double_tap_attack_enabled else "normal",double_grid)
+	_section("FENSTERGRÖSSE · ADAPTIV")
+	var menu_grid=_grid(3)
+	for option in [["compact","KOMPAKT"],["balanced","STANDARD"],["large","GROSS"]]:
+		var mode: String=str(option[0])
+		var selected: bool=menu_layout==mode
+		var menu_button=_action(str(option[1])+(" ✓" if selected else ""),func():_set_menu_layout(mode),"tab_on" if selected else "normal",menu_grid)
+		menu_button.disabled=selected
+	_note("Fenster zentriert mit sichtbarem Meeresrand. Breite und Höhe passen sich dem Bildschirm an; die Munitionsauswahl bleibt ein kleines Kampfmenü.",Color("a3c9cf"))
 	_section("SCHIFFE & SEEKARTE")
 	var ship_grid=_grid(2)
 	_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
@@ -3127,16 +3150,42 @@ func _enemy_at_screen(screen: Vector2) -> int:
 			candidate_id=int(npc.id)
 	return candidate_id
 
+func _reset_enemy_tap() -> void:
+	last_enemy_tap_id=-1
+	last_enemy_tap_ms=-10000
+	last_enemy_tap_screen=Vector2.ZERO
+
+func _handle_enemy_tap(enemy_id: int,screen: Vector2,timestamp_ms: int=-1) -> void:
+	if enemy_id<=0:return
+	var now_ms: int=timestamp_ms if timestamp_ms>=0 else Time.get_ticks_msec()
+	var same_double: bool=double_tap_attack_enabled and sim.target==enemy_id and last_enemy_tap_id==enemy_id and now_ms>=last_enemy_tap_ms and now_ms-last_enemy_tap_ms<=DOUBLE_TAP_ATTACK_MS and screen.distance_to(last_enemy_tap_screen)<=DOUBLE_TAP_ATTACK_RADIUS
+	if sim.target!=enemy_id:
+		# New target is selection-only, even if a different ship was firing.
+		sim.firing=false
+		sim.select(enemy_id)
+	if same_double:
+		# Never toggle firing OFF with a repeated tap. Existing reload,
+		# ammo, line of sight, docking and range rules remain untouched.
+		if not sim.firing and int(sim.player.hp)>0 and not sim.docked:
+			sim.firing=true
+			sim.repairing=false
+			sim.message="Doppeltipp · Angriff gestartet"
+		_reset_enemy_tap()
+	else:
+		last_enemy_tap_id=enemy_id
+		last_enemy_tap_ms=now_ms
+		last_enemy_tap_screen=screen
+	_refresh_ui()
+
 func _tap(screen: Vector2) -> void:
 	if modal.visible or loading_left>0:return
 	# Ships always win over nearby port and portal hitboxes, so tapping a
 	# visible enemy twice reliably selects then DESELECTS the same hull.
 	var clicked_enemy: int=_enemy_at_screen(screen)
 	if clicked_enemy>0:
-		if sim.target==clicked_enemy:sim.clear_target()
-		else:sim.select(clicked_enemy)
-		_refresh_ui()
+		_handle_enemy_tap(clicked_enemy,screen)
 		return
+	_reset_enemy_tap()
 	var point: Vector2=get_canvas_transform().affine_inverse()*screen
 	for portal in sim.portals:
 		if point.distance_to(portal.pos)<=maxf(85,45/camera.zoom.x):
@@ -3192,7 +3241,10 @@ func _load_display() -> void:
 	vfx_intensity=clampf(float(data.get("vfx_intensity",1.35)),.65,1.7)
 	ship_animations_enabled=bool(data.get("ship_animations_enabled",true))
 	wake_effects_enabled=bool(data.get("wake_effects_enabled",true))
-	menu_fullscreen=bool(data.get("menu_fullscreen",true))
+	# All old true/false fullscreen preferences migrate to balanced windows.
+	menu_layout=str(data.get("menu_layout","balanced"))
+	if not menu_layout in ["compact","balanced","large"]:menu_layout="balanced"
+	double_tap_attack_enabled=bool(data.get("double_tap_attack_enabled",true))
 
 func _cycle_render_mode() -> void:
 	_set_render_mode("3d" if render_mode=="hybrid" else "hybrid")
@@ -3200,15 +3252,23 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_fullscreen":menu_fullscreen}))
+		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"double_tap_attack_enabled":double_tap_attack_enabled}))
 		file.close()
 
-func _toggle_fullscreen_menus() -> void:
-	menu_fullscreen=not menu_fullscreen
+func _set_menu_layout(value: String) -> void:
+	if not value in ["compact","balanced","large"]:return
+	menu_layout=value
 	_persist_display_preferences()
 	_layout()
 	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal("Anzeige")
 	queue_redraw()
+
+func _toggle_double_tap_attack() -> void:
+	double_tap_attack_enabled=not double_tap_attack_enabled
+	_reset_enemy_tap()
+	_persist_display_preferences()
+	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal("Anzeige")
+	_refresh_ui()
 
 func _set_ship_visual_toggle(which: String) -> void:
 	if which=="motion":ship_animations_enabled=not ship_animations_enabled
@@ -3238,7 +3298,9 @@ func _reset_display_preferences() -> void:
 	vfx_intensity=1.35
 	ship_animations_enabled=true
 	wake_effects_enabled=true
-	menu_fullscreen=true
+	menu_layout="balanced"
+	double_tap_attack_enabled=true
+	_reset_enemy_tap()
 	_set_display(1,true)
 
 func _set_projectile_visual_count(requested: int) -> void:
@@ -3282,12 +3344,14 @@ func _recenter_camera() -> void:
 
 func _cancel_target() -> void:
 	if sim.target<=0:return
+	_reset_enemy_tap()
 	sim.clear_target()
 	portrait_target=-1
 	_refresh_ui()
 
 func _cycle_target() -> void:
 	if modal.visible:return
+	_reset_enemy_tap()
 	var candidates: Array[int]=[]
 	var viewport=get_viewport_rect().grow(-8)
 	for npc: Dictionary in sim.npcs:
