@@ -32,6 +32,8 @@ const MODEL_INFO := {
 	"emerald_voyager":[1.9000,-0.7652,1.5336,0.0008,-0.0004],
 	"midnight_mariner":[1.9016,-0.7520,1.5024,-0.0001,-0.0030],
 	"crimson_tide_galley":[1.9017,-0.6453,1.2821,-0.0002,-0.0001],
+	# Optional Black Crown Corsair Elite test; uploaded original Meshy GLB, Y-up, hull -X.
+	"black_crown_corsair_elite_test":[1.899175,-0.720195,1.454277,0.000195,-0.001028],
 	# 5,918-triangle source GLB, original Y-up, bow +Z, yaw -90°.
 	"schattenkriegsschiff_shaded":[1.896816,0.0,1.460584,-0.000345,0.000428,-90.0]
 }
