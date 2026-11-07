@@ -248,6 +248,13 @@ func _run() -> void:
 		check(game.modal_body.find_child("ShipDesignPreview1",true,false)!=null,"elite shipyard card has its own moving sea vignette")
 		check(game.modal_body.find_child("ShipDesignPreview0",true,false)!=null,"shaded ship card has distinct preview")
 		check(game.modal_body.find_child("ShipDesignPreview11",true,false)!=null,"tenth elite variant is visible in full Werft catalog")
+		check(game.SHIPYARD_SEA_TILE!=null and game.SHIPYARD_STUDIO_KEY!=null,"Werft previews share original game ocean artwork and shader-backed transparent albedo preview")
+		var original_art: TextureRect=game.modal_body.find_child("ShipDesignArtwork1",true,false) as TextureRect
+		var elite_art: TextureRect=game.modal_body.find_child("ShipDesignArtwork2",true,false) as TextureRect
+		var elite_ten_art: TextureRect=game.modal_body.find_child("ShipDesignArtwork11",true,false) as TextureRect
+		check(original_art!=null and original_art.material==null,"original Black Crown test portrait stays untouched without a chroma-key filter")
+		check(elite_art!=null and elite_art.material is ShaderMaterial and elite_ten_art!=null and elite_ten_art.material is ShaderMaterial,"first and tenth RGB elite thumbnails key out flat backgrounds to reveal moving water")
+		check(game.modal_body.find_child("ShipStatus2",true,false)!=null,"shipyard artwork status badge is above the ship portrait rather than painted behind it")
 		var yard:=0
 		for button in game.modal_body.find_children("*","Button",true,false):
 			if "AUSRÜSTEN" in button.text or "AKTIV" in button.text:yard+=1
