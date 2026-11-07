@@ -684,6 +684,9 @@ func _run() -> void:
 	check(game.sim.target==-1 and game.touch_points.is_empty(),"camera dragging over an enemy never toggles target")
 	game._recenter_camera()
 	# Rapid water taps must be independent move commands, not dropped taps.
+	# The enemy used for the previous touch/target test must be removed first,
+	# otherwise it legitimately catches taps at that same screen position.
+	game.sim.npcs.clear()
 	var saved_islands: Array[Dictionary]=game.sim.islands.duplicate(true)
 	var saved_portals: Array[Dictionary]=game.sim.portals.duplicate(true)
 	var saved_harbor: Vector2=game.sim.harbor
