@@ -1,0 +1,79 @@
+name: M3097 import Gemi11 as independent playable test ship
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/m3097-import-gemi11.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: m3097-gemi11-one-time-import
+  cancel-in-progress: false
+
+jobs:
+  import-gemi11:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            .github/scripts/
+            .github/workflows/
+            rebuild/m3052/
+      - name: Verify the exact uploaded Gemi11 GLB
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 --connect-timeout 20 --max-time 240 \
+            'https://d2ol7oe51mr4n9.cloudfront.net/user_3LWZe0666PFFnQApXCXkCavaViS/0cdc3c1d-ed79-49f9-9a60-7fb839cb3de8.glb' \
+            -o "$RUNNER_TEMP/gemi11_uv.glb"
+          echo "e7b25db9b5db8573564441c8d942ceca166ab0b8aaa1f27796a75f882e78ac4b  $RUNNER_TEMP/gemi11_uv.glb" | sha256sum -c -
+          test "$(stat -c %s "$RUNNER_TEMP/gemi11_uv.glb")" = 1223028
+      - name: Install headless GLB preview renderer
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libgl1 libegl1 libxrender1 libsm6
+          python3 -m pip install --disable-pip-version-check \
+            'numpy>=2,<3' 'trimesh>=4.10,<5' 'vtk>=9.5,<10' 'pillow>=11,<13'
+      - name: Generate 8 directions and add independent skin 30
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gemi11-stage"
+          cp "$RUNNER_TEMP/gemi11_uv.glb" "$RUNNER_TEMP/gemi11-stage/gemi11_uv.glb"
+          xvfb-run -a --server-args='-screen 0 1280x720x24' \
+            python3 .github/scripts/m3097_render_gemi11.py \
+              "$RUNNER_TEMP/gemi11_uv.glb" "$RUNNER_TEMP/gemi11-stage"
+          python3 .github/scripts/m3097_install_gemi11.py \
+            "$GITHUB_WORKSPACE" "$RUNNER_TEMP/gemi11-stage"
+          echo "e7b25db9b5db8573564441c8d942ceca166ab0b8aaa1f27796a75f882e78ac4b  rebuild/m3052/assets/player/test_ships/gemi11_uv.glb" | sha256sum -c -
+      - name: Commit new GLB, sprites, shipyard entry and regression test
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --sparse -f \
+            rebuild/m3052/assets/player/test_ships/gemi11_uv.glb \
+            rebuild/m3052/assets/player/test_ships/gemi11_uv_eight.png \
+            rebuild/m3052/assets/player/test_ships/gemi11_uv_preview.png \
+            rebuild/m3052/sea_map.gd \
+            rebuild/m3052/ship_mesh_layer.gd \
+            rebuild/m3052/simulation.gd \
+            rebuild/m3052/tests/ui_test.gd
+          git diff --cached --stat
+          if git diff --cached --quiet; then echo 'Already imported, no changes'; exit 0; fi
+          git commit -m 'feat(m3097): add separate Gemi11 UV test ship (skin 30)'
+          git fetch origin main
+          git rebase origin/main
+          git -c pack.window=0 push origin HEAD:main
