@@ -35,6 +35,15 @@ func _run() -> void:
 			check(float(sim.shots[0].age)==0.0 and float(sim.shots[1].age)<0 and float(sim.shots[2].age)<float(sim.shots[1].age),"80 ms stagger retained for "+weapon)
 	check(colors.size()==colors.duplicate().reduce(func(total,v):return total+(1 if colors.count(v)==1 else 0),0),"each selectable ammo has a distinct color profile")
 	check(FX.weapon_color("cannon",true)!=FX.weapon_color("cannon",false),"NPC shells remain visually distinguishable")
+	var afflicted={"id":44,"spotted":sim.clock+5.0,"ice":2.0,"slow":4.0,"slow_rate":0.38}
+	check(FX.active_statuses(afflicted,sim.clock)==["flare","ice"],"flare mark and ice aura coexist without duplicate slow effect")
+	afflicted.ice=0.0
+	check(FX.active_statuses(afflicted,sim.clock)==["flare","snow"],"snow debuff visibly replaces ended ice freeze")
+	afflicted.slow_rate=0.55
+	check(FX.active_statuses(afflicted,sim.clock)==["flare","chain"],"chain slow uses a distinct visual indicator")
+	afflicted.spotted=sim.clock-1.0
+	afflicted.slow=0.0
+	check(FX.active_statuses(afflicted,sim.clock).is_empty(),"expired statuses do not leave persistent VFX")
 	var game=load("res://sea_map.tscn").instantiate()
 	root.add_child(game);current_scene=game
 	await process_frame
