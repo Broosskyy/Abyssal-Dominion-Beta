@@ -275,7 +275,8 @@ func smooth_player_yaw(current: float,desired: float,seconds: float) -> float:
 func forward_for_model(key: String,heading: Vector2) -> Vector2:
 	if not PLAYER_RAW_BOW.has(key):return Vector2.ZERO
 	var local_bow: Vector3=PLAYER_RAW_BOW[key]
-	var normalized: Vector3=local_bow.rotated(Vector3.UP,deg_to_rad(float(MODEL_INFO[key][5])))
+	var yaw_offset: float=float(MODEL_INFO[key][5]) if MODEL_INFO[key].size()>5 else 0.0
+	var normalized: Vector3=local_bow.rotated(Vector3.UP,deg_to_rad(yaw_offset))
 	var world_bow: Vector3=normalized.rotated(Vector3.UP,yaw_for_heading(heading))
 	return Vector2(world_bow.x,world_bow.z).normalized()
 
