@@ -1,0 +1,33 @@
+name: M3106 - Import original user ammunition artwork
+on:
+  push:
+    paths:
+      - .github/workflows/m3106-ammo-art.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  atlas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Pillow
+        run: python -m pip install --quiet pillow
+      - name: Crop supplied artwork and make optimized in-game atlas
+        run: python rebuild/m3052/tools/build_ammo_reference_atlas.py
+      - name: Commit generated images into game assets
+        run: |
+          git config user.name "abyssal-asset-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add rebuild/m3052/assets/ui/ammo/user_ammo_atlas.webp rebuild/m3052/assets/ui/ammo/user_ammo_atlas.json
+          if ! git diff --cached --quiet; then
+            git commit -m "art(m3106): import 28 actual user ammo motifs into optimized WebP atlas"
+            git push origin HEAD:main
+          fi
