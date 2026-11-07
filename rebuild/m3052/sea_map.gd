@@ -672,9 +672,12 @@ func _selection_ring_tint(actor: Dictionary) -> Color:
 
 # Consistent on-screen line thickness across zoom 0.4x–2x, not the old
 # world-space strokes that disappeared at low zoom and bloated up close.
+func _ring_stroke_for_zoom(screen_pixels: float,zoom: float) -> float:
+	return clampf(screen_pixels/maxf(zoom,.1),.55,8.0)
+
 func _selection_ring_stroke(screen_pixels: float) -> float:
 	var zoom: float=camera.zoom.x if camera!=null else 1.0
-	return clampf(screen_pixels/maxf(zoom,.1),.55,8.0)
+	return _ring_stroke_for_zoom(screen_pixels,zoom)
 
 func _target_ring_pulse(at_seconds: float=0.0) -> float:
 	var age: float=at_seconds-ring_target_acquired_at
