@@ -1,0 +1,42 @@
+name: Import original Black Crown Corsair Elite 1 GLB
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-black-crown.yml'
+permissions:
+  contents: write
+concurrency:
+  group: abyssal-black-crown-import
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch uploaded original geometry and authentic 3D thumbnail
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p rebuild/m3052/assets/npc/meshy/models rebuild/m3052/assets/player
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 20 -o rebuild/m3052/assets/npc/meshy/models/black_crown_corsair_elite_test.glb 'https://d2ol7oe51mr4n9.cloudfront.net/user_3LWZe0666PFFnQApXCXkCavaViS/d09c632e-2cae-4e26-8d5d-c0b33afd01a7.glb'
+          printf '%s  %s\n' 'add93320eaddcd84861ad483800ad0b6ea68f1a7b261fe8bab746e7b2021eb8a' 'rebuild/m3052/assets/npc/meshy/models/black_crown_corsair_elite_test.glb' | sha256sum -c -
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 20 -o rebuild/m3052/assets/player/black_crown_elite_1_preview.png 'https://d2ol7oe51mr4n9.cloudfront.net/user_3LWZe0666PFFnQApXCXkCavaViS/331c8e7f-117c-4de6-9aae-0967d5964885.png'
+          printf '%s  %s\n' '48caf2662b1bb5412b7a4f545b4857d29bda69b1969de7e00dcd6d930dfa366c' 'rebuild/m3052/assets/player/black_crown_elite_1_preview.png' | sha256sum -c -
+      - name: Commit verified GLB and texture-rendered preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add rebuild/m3052/assets/npc/meshy/models/black_crown_corsair_elite_test.glb rebuild/m3052/assets/player/black_crown_elite_1_preview.png
+          if git diff --cached --quiet; then
+            echo 'Both assets already present and identical'
+            exit 0
+          fi
+          git commit -m 'Import full original Black Crown Corsair model and real 3D Werft preview'
+          git push origin HEAD:main
