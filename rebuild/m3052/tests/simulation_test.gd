@@ -115,7 +115,8 @@ func _initialize() -> void:
 	cancel_target_sim.select(marked)
 	cancel_target_sim.firing=true
 	cancel_target_sim.player.path=[Vector2(2300,1450)]
-	cancel_target_sim.shots=[{"source":0,"target":marked,"age":0.2,"pos":cancel_target_sim.player.pos}]
+	cancel_target_sim.shots.clear()
+	cancel_target_sim.shots.append({"source":0,"target":marked,"age":0.2,"pos":cancel_target_sim.player.pos})
 	var course_before: Array=cancel_target_sim.player.path.duplicate()
 	var volley_before: Array=cancel_target_sim.shots.duplicate(true)
 	var ammo_before: Array=cancel_target_sim.player.ammo.duplicate()
