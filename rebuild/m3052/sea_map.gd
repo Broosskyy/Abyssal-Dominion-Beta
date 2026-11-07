@@ -20,7 +20,7 @@ const CHART_GUIDE = preload("res://chart_guide.gd")
 const AMMO_CHOICE=preload("res://ammo_choice.gd")
 const COMBAT_FX=preload("res://combat_fx.gd")
 const SPRITE_FX=preload("res://sprite_fx.gd")
-const LEUCHT_ICON: Texture2D=preload("res://assets/ui/leuchtkugeln_five_colors.svg")
+const USER_AMMO_ATLAS: Texture2D=preload("res://assets/ui/ammo/user_ammo_atlas.webp")
 const CAPTAIN_PLATE_OFFSET := 62.0
 const OTHER_PLATE_OFFSET := 48.0
 const CAPTAIN_HULL_CLEARANCE := 34.0
@@ -1903,24 +1903,14 @@ func _draw_ship_stage(stage: Control) -> void:
 	_canvas_text(stage,Vector2(w*.5,h-12),"%d / 10 DECKS · GEZEITENDECK %s" % [mounted,_clock_text(float(sim.buffs.tide_deck)) if float(sim.buffs.tide_deck)>0 else "AUS"],12,Color("e2ecee"))
 
 func _ammo_texture(index: int) -> Texture2D:
-	# M3102: multicolour Leuchtkugeln, not the old single gold flare icon.
-	if index==3:return LEUCHT_ICON
-	var key=str(AMMO_UI[index].icon)
-	if index>=7:
-		if not ammo_previews.has(key):
-			var atlas:=AtlasTexture.new()
-			atlas.atlas=load("res://assets/ui/ammo/special_ammo_atlas.svg")
-			var cell: int=index-7
-			atlas.region=Rect2(Vector2(float(posmod(cell,7)*128),float(floori(cell/7.0)*128)),Vector2(128,128))
-			ammo_previews[key]=atlas
-		return ammo_previews[key]
-	if icons.has(key):return icons[key]
+	# M3106: original screenshots supplied by user, cropped to 28 distinct
+	# 96x96 selection portraits. Same exact images in the quick HUD and shop.
+	if index<0 or index>=AMMO_UI.size():return null
+	var key: String=str(AMMO_UI[index].icon)
 	if not ammo_previews.has(key):
-		# These four source images have a baked checkerboard outside the projectile.
-		# Sample only its opaque center; the HUD's circular UV mask supplies the rim.
-		var preview=AtlasTexture.new()
-		preview.atlas=painted[key]
-		preview.region=Rect2(Vector2(160,160),Vector2(192,192))
+		var preview:=AtlasTexture.new()
+		preview.atlas=USER_AMMO_ATLAS
+		preview.region=Rect2(Vector2(float(posmod(index,7)*96),float(floori(index/7.0)*96)),Vector2(96,96))
 		ammo_previews[key]=preview
 	return ammo_previews[key]
 

@@ -7,9 +7,11 @@ var checks:=0
 func check(ok: bool,label: String) -> void:
 	checks+=1
 	if not ok:failures.append(label)
+static func game_previews_expected() -> int:return SIM.AMMO_NAMES.size()
 func _initialize() -> void:call_deferred("_run")
 func _run() -> void:
 	check(FX.WEAPONS.size()==29,"28 selectable ammunition types plus tower mortar")
+	check(game_previews_expected()==28,"M3106 ammunition UI roster count")
 	check(SPRITE_FX.SHEET!=null and SPRITE_FX.SHEET.get_width()==1024 and SPRITE_FX.SHEET.get_height()==1024,"M3106 image atlas decodes as 1024x1024 transparent VFX")
 	check(SPRITE_FX.FRAME_COUNT==8 and SPRITE_FX.FAMILY_NAMES.size()==8,"M3106 eight distinct, animated VFX families")
 	check(SPRITE_FX.src_rect(7,7)==Rect2(896,896,128,128),"M3106 final sprite frame uses correct atlas UV")
@@ -78,7 +80,7 @@ func _run() -> void:
 	root.add_child(game);current_scene=game
 	await process_frame
 	game.set_process(false)
-	check(game._ammo_texture(3)==game.LEUCHT_ICON,"M3102 colorful 5-jewel Leuchtkugeln shown in ammunition picker")
+	check(game._ammo_texture(3) is AtlasTexture and game._ammo_texture(3).atlas==game.USER_AMMO_ATLAS,"M3106 original user-provided rainbow Leuchtkugeln shown in ammunition picker")
 	check(game.projectile_visual_count in [1,3,5,8],"M3102 restored visual count is supported")
 	game._set_projectile_visual_count(5)
 	check(game.projectile_visual_count==5,"M3102 five visible projectile mode settable")
@@ -128,7 +130,7 @@ func _run() -> void:
 		game.modal.hide()
 	for n in range(7,game.sim.AMMO_NAMES.size()):
 		var art: Texture2D=game._ammo_texture(n)
-		check(art is AtlasTexture and art.get_width()==128,"M3105 ammo %d has its own 128px cropped visual icon" % n)
+		check(art is AtlasTexture and art.get_width()==96 and art.atlas==game.USER_AMMO_ATLAS,"M3106 ammo %d uses the actual reference artwork from user" % n)
 	var legacy=SIM.new()
 	var old_save=legacy.export_save()
 	old_save.ammo=[15,16,17,18,19,20,21]

@@ -187,10 +187,9 @@ func run() -> void:
 		game._open_modal("Munition");game.ammo_rows[i+3].pressed.emit()
 		check(sim.ammo_mode==i+3,"special ammunition retains its real selection action %d" % i)
 		var preview: Texture2D=game._ammo_texture(i+3)
-		if i==0:
-			check(preview==game.LEUCHT_ICON and preview.get_width()>0,"M3102 Leuchtkugeln use original five-colour jewel art")
-		else:
-			check(preview is AtlasTexture and preview.region==Rect2(160,160,192,192),"remaining special ammunition excludes checkerboard %d" % i)
+		var n: int=i+3
+		var expected: Rect2=Rect2(Vector2(float(posmod(n,7)*96),float(floori(n/7.0)*96)),Vector2(96,96))
+		check(preview is AtlasTexture and preview.region==expected and preview.atlas==game.USER_AMMO_ATLAS,"M3106 special ammunition %d uses its own supplied artwork tile" % i)
 	game.status_age=5.0;game._refresh_ui()
 	check(not game.status.visible,"idle status disappears after four seconds")
 	sim.message="Kein Ziel im sichtbaren Bereich";game._refresh_ui()
