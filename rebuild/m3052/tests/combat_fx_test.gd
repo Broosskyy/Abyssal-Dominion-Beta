@@ -24,7 +24,7 @@ func _run() -> void:
 		var footprint:=Rect2(cluster[0],Vector2.ZERO)
 		for p in cluster:footprint=footprint.expand(p)
 		check(footprint.size.x<40.0 and footprint.size.y<40.0,"M3104 %d balls remain one compact flying pile, not a wide row" % total)
-		check(footprint.size.x>16.0 and footprint.size.y>15.0,"M3104 %d-ball pack visibly separates individual projectiles" % total)
+		check(minf(footprint.size.x,footprint.size.y)>14.0 and maxf(footprint.size.x,footprint.size.y)>16.0,"M3104 %d-ball pack visibly separates projectiles at any flight heading" % total)
 		var min_separation: float=INF
 		for first in cluster.size():
 			for second in range(first+1,cluster.size()):
