@@ -92,7 +92,28 @@ const AMMO_UI := [
 	{"name":"Leuchtkugeln","use":"Markiert das Ziel · Folgetreffer +15 %","icon":"ammo_flare"},
 	{"name":"Kürbismunition","use":"Splitter im Umkreis","icon":"ammo_pumpkin"},
 	{"name":"Schneemunition","use":"Starke Verlangsamung","icon":"ammo_snow"},
-	{"name":"Eismunition","use":"Friert das Ziel kurz ein","icon":"ammo_ice"}
+	{"name":"Eismunition","use":"Friert das Ziel kurz ein","icon":"ammo_ice"},
+	{"name":"Feuerkugeln","use":"Glut und Flammen · Grafik-Beta","icon":"fire"},
+	{"name":"Giftkugeln","use":"Giftnebel und Tropfen · Grafik-Beta","icon":"poison"},
+	{"name":"Schrapnellkugeln","use":"Metallsplitter · Grafik-Beta","icon":"shrapnel"},
+	{"name":"Blitzkugeln","use":"Elektrische Entladung · Grafik-Beta","icon":"lightning"},
+	{"name":"Heilige Kugeln","use":"Goldene Lichtstrahlen · Grafik-Beta","icon":"holy"},
+	{"name":"Schattenkugeln","use":"Violetter Schattensog · Grafik-Beta","icon":"shadow"},
+	{"name":"Wirbelkugeln","use":"Sturmwirbel · Grafik-Beta","icon":"wind"},
+	{"name":"Erdkugeln","use":"Steinsplitter und Staub · Grafik-Beta","icon":"earth"},
+	{"name":"Wasserkugeln","use":"Wasserfontänen · Grafik-Beta","icon":"water"},
+	{"name":"Fluchkugeln","use":"Fluchrunen · Grafik-Beta","icon":"cursed"},
+	{"name":"Blutkugeln","use":"Rote Energiesplitter · Grafik-Beta","icon":"bleed"},
+	{"name":"Nekrokugeln","use":"Nekrotische Geister · Grafik-Beta","icon":"necro"},
+	{"name":"Goldkugeln","use":"Goldene Lichtfunken · Grafik-Beta","icon":"gold"},
+	{"name":"Kristallkugeln","use":"Kristallsplitter · Grafik-Beta","icon":"crystal"},
+	{"name":"Explosivkugeln","use":"Explosion und Rauch · Grafik-Beta","icon":"explosive"},
+	{"name":"Arkankugeln","use":"Magischer Wirbel · Grafik-Beta","icon":"arcane"},
+	{"name":"Geisterkugeln","use":"Türkise Geisterflammen · Grafik-Beta","icon":"spectral"},
+	{"name":"Lavakugeln","use":"Lava und Glut · Grafik-Beta","icon":"lava"},
+	{"name":"Lichtkugeln","use":"Lichtstrahlen · Grafik-Beta","icon":"light"},
+	{"name":"Panzerbrecher","use":"Metallspitzen · Grafik-Beta","icon":"armor_piercing"},
+	{"name":"Gaskugeln","use":"Gaswolken · Grafik-Beta","icon":"gas"}
 ]
 var nav_buttons: Array[Button] = []
 var quest_panel: Panel
@@ -1420,7 +1441,7 @@ func _refresh_ui() -> void:
 	_set_orb(ammo_selector,_ammo_texture(sim.ammo_mode),_thousands(int(sim.player.ammo[sim.ammo_mode])),modal.visible and modal_kind=="Munition","MUNITION")
 	ammo_selector.set("ammo_marker",true)
 	ammo_selector.set("ammo_color",COMBAT_FX.weapon_color(str(sim.AMMO_NAMES[sim.ammo_mode])))
-	ammo_selector.set("state_label",["VOLL","KETTE","HARPUNE","LEUCHT","KÜRBIS","SCHNEE","EIS"][sim.ammo_mode])
+	ammo_selector.set("state_label",["VOLL","KETTE","HARPUNE","LEUCHT","KÜRBIS","SCHNEE","EIS"][sim.ammo_mode] if sim.ammo_mode<7 else "SPEZIAL")
 	_set_orb(target_cycle,painted.spyglass,"",false,"ZIEL")
 	_set_orb(loadout_button,extra_icons.cannon_0,"",modal.visible and modal_kind=="Bewaffnung","WAFFEN")
 	var staff=sim.staff
@@ -1884,6 +1905,9 @@ func _ammo_texture(index: int) -> Texture2D:
 	# M3102: multicolour Leuchtkugeln, not the old single gold flare icon.
 	if index==3:return LEUCHT_ICON
 	var key=str(AMMO_UI[index].icon)
+	if index>=7:
+		if not ammo_previews.has(key):ammo_previews[key]=load("res://assets/ui/ammo/"+key+".svg")
+		return ammo_previews[key]
 	if icons.has(key):return icons[key]
 	if not ammo_previews.has(key):
 		# These four source images have a baked checkerboard outside the projectile.
@@ -1951,7 +1975,7 @@ func _open_weapons() -> void:
 		var entry: Dictionary=AMMO_UI[i]
 		var column=_row(_ammo_texture(i),"%s · %d im Lager\n%d Schaden je Geschoss · %s" % [entry.name,sim.player.ammo[i],sim.weapon_damage(i),entry.use],48,CYAN if sim.ammo_mode==i else Color(0,0,0,0))
 		_row_button(column,"GELADEN" if sim.ammo_mode==i else "LADEN",func():sim.set_ammo(index);_refresh_ui();_open_modal("Bewaffnung"),sim.ammo_mode==i,"normal" if sim.ammo_mode==i else "primary")
-	_note("Vollkugeln, Ketten, Leucht, Kürbis, Schnee und Eis gegen Schiffe. Harpunen gegen Seeungeheuer. Leuchtkugeln markieren, Kürbisse splittern, Schnee bremst, Eis friert ein.")
+	_note("Sieben bewährte Munitionsarten mit ihren vorhandenen Effekten. 21 neue Spezialsorten sind bereits zum Anschauen und Feuern spielbar; ihre Werte und Sonderwirkungen sind vorläufig und werden später abgestimmt.")
 	_action("AUSRÜSTUNG & NACHSCHUB IM HAFEN",func():_open_modal("Hafen"))
 
 # --- Harbor, logbook and ranking -----------------------------------------------------------
@@ -1994,18 +2018,18 @@ func _open_harbor() -> void:
 			var index = i
 			var buy = _with_icon(_action(["150 Vollkugeln","60 Kettenkugeln","40 Harpunen"][i]+" · 30 Gold",func():sim.buy_ammo(index);_save_progress();_open_modal("Hafen");_refresh_ui(),"normal",ammo),icons[["cannonball","chain","harpoon"][i]])
 			buy.disabled=int(sim.player.gold)<30
-		_section("SONDERMUNITION · JE 12 FÜR 80 GOLD")
+		_section("SONDERMUNITION · GRAFIK-BETA · JE 80 GOLD")
 		var special_stock=_grid(2)
 		for i in range(3,AMMO_UI.size()):
 			var index=i
-			var buy=_action("12 %s · 80 GOLD" % AMMO_UI[i].name,func():sim.buy_ammo(index);_save_progress();_open_modal("Hafen");_refresh_ui(),"normal",special_stock)
+			var buy=_action("%d %s · 80 GOLD" % [sim.ammo_pack(i),AMMO_UI[i].name],func():sim.buy_ammo(index);_save_progress();_open_modal("Hafen");_refresh_ui(),"normal",special_stock)
 			buy.disabled=int(sim.player.gold)<80
 			_with_icon(buy,_ammo_texture(i))
 		_section("HAFENDIENSTE")
 		var services=_grid(2)
 		_with_icon(_action("DECKS & DECKWERFT",func():_open_modal("Decks"),"normal",services),painted.tide_deck)
 		_with_icon(_action("GEZEITENKESSEL",func():_open_modal("Kessel"),"normal",services),painted.nav_kessel)
-		_with_icon(_action("SCHIFFSDESIGN WÄHLEN · %d DESIGNS" % skins.size(),func():_open_modal("Werft"),"normal",services),painted.nav_shipyard)
+		_with_icon(_action("SCHATTENKRIEGSSCHIFF · WERFT",func():_open_modal("Werft"),"normal",services),painted.nav_shipyard)
 		_with_icon(_action("SEEKARTEN",func():_open_modal("Seekarten"),"normal",services),painted.nav_charts)
 		_primary("ABLEGEN",func():sim.depart();modal.hide();_save_progress();_refresh_ui())
 	if not sim.docked:
