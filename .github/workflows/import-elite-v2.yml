@@ -1,0 +1,45 @@
+name: Import ten Elite V2 shipyard textures
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-elite-v2.yml'
+permissions:
+  contents: write
+concurrency:
+  group: abyssal-elite-v2-import
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download exact user-supplied original Elite V2 archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-all-errors --connect-timeout 20 -o /tmp/abyssal_elite_v2.zip 'https://d2ol7oe51mr4n9.cloudfront.net/user_3LWZe0666PFFnQApXCXkCavaViS/a0167a1e-9995-4963-8266-786d6dee96bb.zip'
+          echo '4a1aca524bd58b4af2693e770750aab3491314ecbbccf6306651e85c4b2f28bd  /tmp/abyssal_elite_v2.zip' | sha256sum -c -
+      - name: Import ONLY ten mobile albedos and ten source-rendered shipyard previews
+        run: |
+          set -euo pipefail
+          python3 -m venv /tmp/abyssal-elite-venv
+          /tmp/abyssal-elite-venv/bin/python -m pip -q install Pillow
+          /tmp/abyssal-elite-venv/bin/python rebuild/m3052/tools/import_elite_v2.py /tmp/abyssal_elite_v2.zip
+      - name: Commit verified texture pack without copying the shared GLB
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add rebuild/m3052/assets/elite_v2/
+          if git diff --cached --quiet; then
+            echo 'Elite texture data already imported'
+            exit 0
+          fi
+          git commit -m 'Import ten distinct Elite V2 skins sharing original Black Crown GLB'
+          git push origin HEAD:main
