@@ -3,6 +3,31 @@ extends RefCounted
 ## Drawn in chart world coordinates, independent of the 2.5D/3D GLB renderer.
 ## Pure visual functions: never mutate HP, cooldowns, ammunition or target state.
 const WEAPONS := ["cannon","chain","harpoon","flare","pumpkin","snow","ice","mortar"]
+# M3102: one real hit can render a burst of several cosmetic orbs.
+const VISIBLE_COUNTS := [1,3,5,8]
+const RADIANT_COLORS := [Color("ff344f"),Color("2db5ff"),Color("56ef7c"),Color("ffdb54"),Color("bf58ff")]
+
+static func visual_count(requested: int) -> int:
+	return requested if requested in VISIBLE_COUNTS else 3
+
+static func radiant_color(shot_id: int,orb: int=0) -> Color:
+	return RADIANT_COLORS[posmod(shot_id+orb,RADIANT_COLORS.size())]
+
+static func orb_offset(shot: Dictionary,index: int,count: int,clock: float) -> Vector2:
+	var total: int=visual_count(count)
+	if total==1:return Vector2.ZERO
+	var direction: Vector2=Vector2(shot.get("pos",Vector2.ZERO))-Vector2(shot.get("start",Vector2.ZERO))
+	if direction.length_squared()<.1:direction=Vector2(shot.get("visual_heading",Vector2.RIGHT))
+	if direction.length_squared()<.001:direction=Vector2.RIGHT
+	direction=direction.normalized()
+	var side:=Vector2(-direction.y,direction.x)
+	var spread: float=9.5 if total<=3 else (8.0 if total<=5 else 6.5)
+	var lane: float=float(index)-float(total-1)*.5
+	# Small time-based spread makes the volley fan out in flight, not a static
+	# stack of cloned balls; the real collision trajectory remains untouched.
+	var travel: float=clampf(float(shot.get("traveled",0.0))/maxf(1.0,float(shot.get("distance",1.0))),0.0,1.0)
+	return side*lane*spread*(.67+.33*sin(travel*PI*.82)) + direction*(sin(clock*3.0+float(index)*2.1+float(int(shot.get("id",0))%5))*2.5)
+
 
 static func weapon_color(weapon: String, hostile: bool=false) -> Color:
 	match weapon:
@@ -40,19 +65,24 @@ static func _star(canvas: CanvasItem,at: Vector2,radius: float,color: Color,rota
 		var extent: float=radius if axis%2==0 else radius*0.55
 		canvas.draw_line(at-direction*extent,at+direction*extent,color,1.15,true)
 
-static func draw_projectile(canvas: CanvasItem,shot: Dictionary,clock: float) -> void:
+static func draw_projectile(canvas: CanvasItem,shot: Dictionary,clock: float,visible_orbs: int=3) -> void:
 	if float(shot.get("age",-1.0))<0.0:return
+	var n: int=visual_count(visible_orbs)
+	for orb in n:
+		_draw_one_projectile(canvas,shot,clock,orb_offset(shot,orb,n,clock),orb)
+
+static func _draw_one_projectile(canvas: CanvasItem,shot: Dictionary,clock: float,offset: Vector2,orb: int) -> void:
 	var weapon: String=str(shot.get("weapon","cannon"))
-	var pos: Vector2=projectile_center(shot)
+	var pos: Vector2=projectile_center(shot)+offset
 	var direction: Vector2=Vector2(shot.get("pos",Vector2.ZERO))-Vector2(shot.get("start",Vector2.ZERO))
 	if direction.length_squared()<1.0:direction=Vector2(shot.get("visual_heading",Vector2.RIGHT))
 	if direction.length_squared()<0.001:direction=Vector2.RIGHT
 	direction=direction.normalized()
 	var side:=Vector2(-direction.y,direction.x)
-	var seed: float=float(int(shot.get("id",0))%91)
+	var seed: float=float((int(shot.get("id",0))+orb*13)%91)
 	var phase: float=clock*12.0+seed
 	var hostile: bool=int(shot.get("source",0))!=0
-	var ink: Color=weapon_color(weapon,hostile)
+	var ink: Color=radiant_color(int(shot.get("id",0)),orb) if weapon=="flare" else weapon_color(weapon,hostile)
 	var speed_scale: float=1.0 if weapon=="harpoon" else 0.82
 	# Four to six translucent trail particles read as moving smoke or embers.
 	# They are deterministic per shot, bounded, and require no particle textures.
@@ -89,12 +119,18 @@ static func draw_projectile(canvas: CanvasItem,shot: Dictionary,clock: float) ->
 			canvas.draw_colored_polygon(tip,Color("e0f4dd"))
 			canvas.draw_line(back+side*4.5,back-side*4.5,Color("8bcdac"),1.7,true)
 		"flare":
+			# Leuchtkugeln: five jeweled colours, each with a metallic equator,
+			# moving facets, white specular centre and a matching light trail.
 			var pulse: float=0.5+0.5*sin(phase*1.5)
-			canvas.draw_circle(pos,10.5+pulse*2.0,Color("ff9836",.12))
-			canvas.draw_circle(pos,7.3,Color("ffca48",.22))
-			canvas.draw_circle(pos,4.2,Color("ff8a35"))
-			canvas.draw_circle(pos,2.2,Color("fff5b5"))
-			_star(canvas,pos,8.0+pulse*2.2,Color("fff2ae",.64),phase*.08)
+			canvas.draw_circle(pos,11.4+pulse*2.0,Color(ink,.13))
+			canvas.draw_circle(pos,7.7,Color(ink,.26))
+			canvas.draw_circle(pos,5.3,Color("12121a",.96))
+			canvas.draw_circle(pos,4.65,ink.darkened(.32))
+			canvas.draw_circle(pos+Vector2(-.9,-1.1),3.1,ink.lightened(.20))
+			canvas.draw_colored_polygon(PackedVector2Array([pos+Vector2(-2.9,-2.2),pos+Vector2(.1,-4.2),pos+Vector2(3.3,-.5),pos+Vector2(-.9,.1)]),Color(ink.lightened(.67),.66))
+			canvas.draw_arc(pos,4.75,.18,PI-.18,12,Color("eac77c",.83),1.35,true)
+			canvas.draw_circle(pos+Vector2(-1.8,-2.4),1.3,Color("ffffff",.82))
+			_star(canvas,pos,7.8+pulse*1.4,Color(ink.lightened(.75),.56),phase*.08)
 		"pumpkin":
 			canvas.draw_circle(pos,8.0,Color("ff7139",.14))
 			canvas.draw_circle(pos,5.0,Color("b84a1b"))
@@ -179,7 +215,12 @@ static func draw_impact(canvas: CanvasItem,event: Dictionary,age: float,clock: f
 		if j%2==0:canvas.draw_circle(trail,1.2+fade,Color(sparkle,.48*fade))
 	match weapon:
 		"flare":
-			if age<.55:_star(canvas,p-Vector2(0,9.0+age*16.0),13.0+age*19.0,Color("fff2a4",fade*.73),clock*.15)
+			# A five-colour flash echoes the jewel ammunition without changing
+			# the existing target-mark bonus or its duration.
+			for n in 5:
+				var angle: float=float(n)*TAU/5.0+age*2.0
+				var center: Vector2=p+Vector2(cos(angle)*(.8+age*29.0),sin(angle)*(.4+age*14.0))
+				_star(canvas,center,4.8+fade*4.0,Color(radiant_color(int(event.get("vfx_seed",0)),n),.64*fade),clock*.15)
 		"pumpkin":
 			for fragment in 5:
 				var a: float=float(fragment)*TAU/5.0+seed
@@ -236,11 +277,11 @@ static func draw_status(canvas: CanvasItem,actor: Dictionary,at: Vector2,now: fl
 		match state:
 			"flare":
 				var bright: float=.5+.5*sin(phase*2.2)
-				_ellipse(canvas,at,Vector2(half_width*.92,half_width*.37),Color("ffcf67",.25+.11*bright),1.6)
-				for spot in 4:
-					var a: float=phase*.4+float(spot)*TAU/4.0
+				for spot in 5:
+					var a: float=phase*.4+float(spot)*TAU/5.0
 					var glimmer:=at+Vector2(cos(a)*half_width*.86,sin(a)*half_width*.32)
-					_star(canvas,glimmer,3.8+1.5*bright,Color("fff0a0",.48+.24*bright),phase*.3)
+					var hue: Color=radiant_color(int(actor.get("id",0)),spot)
+					_star(canvas,glimmer,3.8+1.5*bright,Color(hue,.48+.24*bright),phase*.3)
 			"ice":
 				var frost: float=clampf(float(actor.get("ice",1.0))/3.2,.35,1.0)
 				_ellipse(canvas,at,Vector2(half_width*.95,half_width*.37),Color("9de8ff",.37*frost),1.55)
