@@ -21,6 +21,11 @@ const AMMO_CHOICE=preload("res://ammo_choice.gd")
 const COMBAT_FX=preload("res://combat_fx.gd")
 const SPRITE_FX=preload("res://sprite_fx.gd")
 const USER_AMMO_ATLAS: Texture2D=preload("res://assets/ui/ammo/user_ammo_atlas.webp")
+# Original reusable 2.5D island harbor with a transparent background;
+# the dock itself stays on navigable water on each normal region.
+const HARBOR_ISLAND: Texture2D=preload("res://assets/ports/island_harbor.svg")
+const HARBOR_DRAW_SIZE := Vector2(310,207)
+const HARBOR_DOCK_OFFSET := Vector2(259,143)
 const CAPTAIN_PLATE_OFFSET := 62.0
 const OTHER_PLATE_OFFSET := 48.0
 const CAPTAIN_HULL_CLEARANCE := 34.0
@@ -78,6 +83,7 @@ var xp_numbers: Label
 var player_hp: ProgressBar
 var player_numbers: Label
 var target_panel: Panel
+var target_clear: Button
 var target_name: Label
 var target_hp: ProgressBar
 var target_numbers: Label
@@ -278,7 +284,7 @@ func _load_assets() -> void:
 	for name in ["anchor","ship","book","compass","chest","gear","plus","minus","focus","arrow","target_cycle"]:hud_icons[name]=load("res://assets/ui/icons/"+name+".svg")
 	for key in ["cannon","armor","hunter","navigation","logistics","tide","storm","salvage","blessing"]:
 		deck_icons[key]=load("res://assets/ui/abyssal/"+key+".svg")
-	extra_icons.port_watchtower=load("res://assets/reference/landmarks/port_watchtower.png")
+	# The decorative watchtower on the first island was removed; harbors have their own real asset.
 	# Explicit selection: current production ship plus the original full-geometry Elite 1 test.
 	skins.append({"name":"Schattenkriegsschiff","mesh_key":"schattenkriegsschiff_shaded","views":0})
 	skin_previews.append(FINAL_SHIP_PREVIEW)
@@ -501,22 +507,16 @@ func _draw() -> void:
 		var dimensions = tex.get_size()*width/tex.get_width()
 		var point: Vector2 = island.pos
 		draw_texture_rect(tex,Rect2(point-dimensions*Vector2(0.5,0.65),dimensions),false)
-		if island.pos==sim.islands[0].pos:
-			var tower: Texture2D=extra_icons.port_watchtower
-			var tower_size=tower.get_size()*42.0/tower.get_width()
-			var foundation: Vector2=island.bounds.get_center()+Vector2(10,24)
-			draw_texture_rect(tower,Rect2(foundation-tower_size*Vector2(0.5,0.96),tower_size),false)
-		_map_island_label(Vector2(point.x,island.bounds.end.y+19),str(island.name))
+		# Only geometry: no island nameplates (internal navigation names remain
+		# available for testing and staff tools).
+		# The former fake watchtower on island 0 is deliberately gone.
 	# Planned route and tap marker remain visible without obscuring the sea.
-	# Docks and portals occupy water cells and are also marked on the minimap.
-	# Compact anchor replaces the oversized dock circle and upgrade-arrow placeholder.
-	if sim.has_harbor() and _landmark_label_visible(sim.harbor):
-		var anchor=sim.harbor
-		draw_circle(anchor-Vector2(0,23),6,GOLD,false,2.0,true)
-		draw_line(anchor-Vector2(0,17),anchor+Vector2(0,17),GOLD,2.5,true)
-		draw_line(anchor-Vector2(13,7),anchor+Vector2(13,-7),GOLD,2.0,true)
-		draw_arc(anchor+Vector2(0,1),23,0,PI,24,GOLD,2.5,true)
-		_label(sim.harbor+Vector2(0,100),"HAFEN · ANDOCKEN",13,GOLD)
+	# All normal regions display a dedicated compact island harbor.
+	# Transparent art is placed so the berth at (802,442) matches the
+	# exact navigable world coordinate used by can_dock() and staff tools.
+	# No decorative island collision is added across the ship's approach.
+	if sim.has_harbor() and view.has_point(sim.harbor):
+		_draw_island_harbor()
 	for sparkle in sim.sparkles:
 		if float(sparkle.respawn)>0 or not view.has_point(sparkle.pos):continue
 		_draw_sparkle(sparkle.pos,float(sparkle.id))
@@ -606,10 +606,16 @@ func _draw() -> void:
 		_label(group.pos+Vector2(0,-65-age*33-float(group.lane)*26),"−%d"%int(group.value),19,Color(1,0.65,0.33,1-age/1.2))
 
 ## Island labels stay subordinate to the ships and do not balloon with camera zoom.
-func _map_island_label(point: Vector2,label_text: String) -> void:
-	draw_set_transform(point,0,Vector2.ONE*_plate_scale()*.83)
-	_label(Vector2.ZERO,label_text,13,Color(GOLD,.79),2)
-	draw_set_transform(Vector2.ZERO)
+# Small, readable and tap-friendly harbor rather than a random anchor in sea.
+func _draw_island_harbor() -> void:
+	var berth: Vector2=sim.harbor
+	draw_texture_rect(HARBOR_ISLAND,Rect2(berth-HARBOR_DOCK_OFFSET,HARBOR_DRAW_SIZE),false)
+	var pulse: float=.5+.5*sin(elapsed*1.9)
+	# Directly centered on the docking coordinate, not the graphical islet.
+	draw_arc(berth,36.0,0,TAU,40,Color(GOLD,.30+.23*pulse),1.6,true)
+	if sim.player.pos.distance_to(berth)<410.0 and not sim.docked:
+		_label(berth+Vector2(0,78),"HAFEN · ANDOCKEN",12,Color(GOLD,.90))
+
 
 func _landmark_label_visible(point: Vector2) -> bool:
 	var bodies: Array=[sim.player]
@@ -1183,6 +1189,11 @@ func _build_ui() -> void:
 		readout.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;readout.vertical_alignment=VERTICAL_ALIGNMENT_CENTER;readout.clip_text=true
 		readout.add_theme_color_override("font_outline_color",Color("06121a"));readout.add_theme_constant_override("outline_size",3)
 	target_panel=_panel(ui)
+	target_clear=_button(target_panel,"×",_cancel_target,"danger")
+	target_clear.name="TargetClearButton"
+	target_clear.tooltip_text="Anvisieren abbrechen · ESC · Ziel erneut antippen"
+	target_clear.focus_mode=Control.FOCUS_NONE
+	target_clear.add_theme_font_size_override("font_size",18)
 	target_portrait=_portrait(target_panel)
 	target_panel.clip_contents=true
 	target_name=_text(target_panel,"",13);target_name.clip_text=true
@@ -1345,7 +1356,8 @@ func _layout() -> void:
 	_place(target_panel,left,target_y,column,card_h)
 	_place(target_portrait,6,6,card_h-12,card_h-12)
 	var tx=card_h
-	_place(target_name,tx,3,column-tx-6,18);_place(target_hp,tx,22,column-tx-10,8);_place(target_numbers,tx,31,column-tx-6,card_h-33)
+	_place(target_clear,column-35,2,29,25)
+	_place(target_name,tx,3,column-tx-42,18);_place(target_hp,tx,22,column-tx-10,8);_place(target_numbers,tx,31,column-tx-6,card_h-33)
 	_place(interact,left,target_y+card_h+6,column,34)
 	_place(buff_bar,left,target_y+card_h+46,column,26)
 	# Chart with corner controls, as on classic sea-chart clients.
@@ -3027,7 +3039,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode==KEY_TAB:_cycle_target();get_viewport().set_input_as_handled()
 		if event.keycode==KEY_SPACE:_toggle_fire()
-		if event.keycode==KEY_ESCAPE:modal.hide()
+		if event.keycode==KEY_ESCAPE:
+			if modal.visible:modal.hide()
+			elif sim.target>0:_cancel_target()
+			get_viewport().set_input_as_handled()
 		if event.keycode==KEY_R:sim.toggle_repair()
 		if event.keycode==KEY_1:sim.set_ammo(0)
 		if event.keycode==KEY_2:sim.set_ammo(1)
@@ -3060,7 +3075,8 @@ func _tap(screen: Vector2) -> void:
 		var d: float=point.distance_to(npc.pos-Vector2(0,25))
 		if d<distance:distance=d;nearest=int(npc.id)
 	if nearest>0:
-		sim.select(nearest)
+		if sim.target==nearest:sim.clear_target()
+		else:sim.select(nearest)
 	elif sim.staff.tap_teleport and sim.staff.can("teleport"):
 		sim.staff_teleport(sim.map_id,"",point)
 		_save_staff()
@@ -3186,6 +3202,12 @@ func _shift_camera(offset: Vector2) -> void:
 func _recenter_camera() -> void:
 	pan=Vector2.ZERO;camera_locked=true;camera_anchor=sim.player.pos
 	if camera_pad!=null:camera_pad.release()
+
+func _cancel_target() -> void:
+	if sim.target<=0:return
+	sim.clear_target()
+	portrait_target=-1
+	_refresh_ui()
 
 func _cycle_target() -> void:
 	if modal.visible:return
