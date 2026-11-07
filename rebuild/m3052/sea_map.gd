@@ -675,6 +675,57 @@ func _actor_visual_length(actor: Dictionary) -> float:
 	if actor.kind=="ship":return float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
 	return 150.0
 
+# M3095: classic sea-combat selection circles are flat chart overlays.
+# They stay centered on the WATER footprint while the GLB rotates freely.
+# No opaque selection platform and no duplicate 3D mesh.
+func _selection_ring_visible(actor: Dictionary) -> bool:
+	if int(actor.get("hp",0))<=0:return false
+	var id: int=int(actor.get("id",-1))
+	return id==0 or (id>0 and id==int(sim.target))
+
+func _selection_ring_radii(actor: Dictionary) -> Vector2:
+	if str(actor.get("kind",""))=="tower":return Vector2(48.0,20.0)
+	var length: float=_actor_visual_length(actor)
+	return Vector2(maxf(36.0,length*(0.55 if int(actor.id)==0 else 0.58)),
+		maxf(16.0,length*(0.235 if int(actor.id)==0 else 0.245)))
+
+func _selection_ring_tint(actor: Dictionary) -> Color:
+	if int(actor.id)==0:return Color("62cce4")
+	if str(actor.get("kind",""))=="tower":
+		return Color("d8b06d") if sim.tower_friendly() else Color("f47d62")
+	var hostile: bool=bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile)
+	return Color("f47d62") if hostile else Color("e6b869")
+
+func _selection_ring_arc(center: Vector2,radii: Vector2,start: float,span: float,tint: Color,width: float) -> void:
+	var points := PackedVector2Array()
+	for segment in 13:
+		var a: float=start+span*float(segment)/12.0
+		points.append(center+Vector2(cos(a)*radii.x,sin(a)*radii.y))
+	draw_polyline(points,tint,width,true)
+
+func _draw_ship_selection_ring(actor: Dictionary,point: Vector2) -> void:
+	if not _selection_ring_visible(actor):return
+	var enemy_selected: bool=int(actor.id)>0
+	var radii: Vector2=_selection_ring_radii(actor)
+	var tint: Color=_selection_ring_tint(actor)
+	var pulse: float=0.5+0.5*sin(elapsed*(3.1 if enemy_selected else 1.5))
+	# Two fine concentric water-level ellipses, like classic sea chart rings.
+	# The outer bloom is translucent, NOT a hovering disk.
+	_ellipse_line(point,radii*1.085,Color(tint,0.13+0.08*pulse),4.2)
+	_ellipse_line(point,radii,Color(tint,0.64+0.18*pulse),2.2 if enemy_selected else 1.9)
+	_ellipse_line(point,radii*0.91,Color(tint,0.18+0.05*pulse),1.0)
+	# Short illuminated quarter accents make the circle visible over dark sea
+	# without surrounding a whole boat with a thick glowing donut.
+	for quarter in 4:
+		var start: float=float(quarter)*TAU/4.0+elapsed*(0.37 if enemy_selected else 0.10)
+		_selection_ring_arc(point,radii,start,0.24,Color(tint,0.85),2.9 if enemy_selected else 2.35)
+	if enemy_selected:
+		# Four small tactical notches, never a permanently filled hitbox.
+		for quadrant in 4:
+			var a: float=float(quadrant)*PI*.5+PI*.25
+			var direction := Vector2(cos(a)*radii.x,sin(a)*radii.y)
+			draw_line(point+direction*1.08,point+direction*1.19,Color(tint,0.60+0.14*pulse),1.8,true)
+
 func _draw_actor(actor: Dictionary) -> void:
 	if float(actor.hp)<=0:return
 	if actor.get("kind","")=="tower":
@@ -691,13 +742,15 @@ func _draw_actor(actor: Dictionary) -> void:
 	# oversized opaque 2D oval beneath their hulls.
 	var mesh_ship=mesh_layer!=null and mesh_layer.can_render_actor(actor)
 	if mesh_ship:
-		# Small submerged-hull shadow and thin moving side foam.
+		# M3095: immerse the keel in a broad but very transparent 2D contact
+		# shadow and let wave crests sit at the outside of its actual hull.
 		draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
-		_ellipse(Vector2.ZERO,Vector2(length*.34,length*.09),Color(.002,.018,.03,.22))
+		_ellipse(Vector2.ZERO,Vector2(length*.34,length*.09),Color(.002,.018,.03,.25))
 		draw_set_transform(Vector2.ZERO)
 		_draw_glb_waterline(actor,point,heading,length)
 	else:
 		_ellipse(point+Vector2(0,4),Vector2(length*0.34,length*0.09),Color(0.0,0.02,0.04,0.34))
+	_draw_ship_selection_ring(actor,point)
 	if is_player and sim.has_blessing():
 		var blessing_pulse=.5+.5*sin(elapsed*3.2)
 		if mesh_ship:
@@ -709,18 +762,8 @@ func _draw_actor(actor: Dictionary) -> void:
 		else:
 			_ellipse(point+Vector2(0,2),Vector2(length*0.62,length*0.24),Color(0.62,0.38,1.0,.08+blessing_pulse*.06))
 			_ellipse_line(point+Vector2(0,2),Vector2(length*0.5,length*0.18),Color(0.86,0.72,1.0,.4),1.8)
-	if sim.target==int(actor.id):
-		if mesh_ship:
-			draw_set_transform(point,heading.angle(),Vector2.ONE)
-			_ellipse_line(Vector2.ZERO,Vector2(length*.38,length*.11),Color("ed9d67",.65),1.25)
-			draw_set_transform(Vector2.ZERO)
-		else:_ellipse_line(point,Vector2(length*.44,length*.16),Color("ed9d67"),2.0)
-	if is_player:
-		if mesh_ship:
-			draw_set_transform(point,heading.angle(),Vector2.ONE)
-			_ellipse_line(Vector2.ZERO,Vector2(length*.39,length*.105),Color(.37,.84,.83,.25),1.0)
-			draw_set_transform(Vector2.ZERO)
-		else:_ellipse_line(point,Vector2(length*.44,length*.16),Color(0.37,0.84,0.83,0.4),1.1)
+	# Selection markers were previously near-invisible, direction-dependent
+	# strokes. M3095 draws a single stable circle underneath any ship instead.
 	var hull_alpha=0.45 if is_player and sim.staff.hidden() else 1.0
 	var monster = not is_player and actor.kind=="monster"
 	if monster:
@@ -1023,7 +1066,7 @@ func _draw_tower(actor: Dictionary) -> void:
 	if sim.target==int(actor.id):
 		draw_arc(point,float(actor.range),0,TAU,96,Color(1,.55,.35,.2) if not sim.tower_friendly() else Color(.5,1,.6,.2),1.6,true)
 	_ellipse(point+Vector2(0,4),Vector2(30,10),Color(0,0,0,.3))
-	if sim.target==int(actor.id):_ellipse_line(point+Vector2(0,3),Vector2(38,14),Color("ed9d67"),2.0)
+	if sim.target==int(actor.id):_draw_ship_selection_ring(actor,point+Vector2(0,3))
 	var tex: Texture2D=painted.get("tower_"+str(actor.tower))
 	if tex!=null:
 		var dims=tex.get_size()*76.0/maxf(tex.get_width(),tex.get_height())

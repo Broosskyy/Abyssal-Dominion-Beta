@@ -49,6 +49,26 @@ func _run() -> void:
 	game.mesh_layer.set_player_style(old_comparison_style)
 	game.mesh_layer.set_render_mode(old_comparison_mode)
 	game.sim.player.skin=old_comparison_skin
+	# M3095 selection rings: the captain always has a cyan water-plane
+	# circle; only the actively selected, living NPC gets a tactical ring.
+	var player_radii: Vector2=game._selection_ring_radii(game.sim.player)
+	var npc_radii: Vector2=game._selection_ring_radii(game.sim.npcs[0])
+	check(player_radii.x>55.0 and player_radii.y>20.0 and player_radii.x>player_radii.y,
+		"M3095 captain's circle surrounds the vessel, not a tiny keel dot")
+	check(npc_radii.x>npc_radii.y and npc_radii.y>14.0,"M3095 target circle scales to NPC hull size")
+	check(game._selection_ring_visible(game.sim.player),"M3095 personal selection ring always visible on the chart")
+	var ring_target_before: int=game.sim.target
+	var ring_selected: Dictionary=game.sim.npcs[0]
+	game.sim.select(int(ring_selected.id))
+	check(game._selection_ring_visible(ring_selected),"M3095 selecting an NPC draws the ring immediately")
+	check(not game._selection_ring_visible(game.sim.npcs[1]),"M3095 unrelated NPCs never receive a target circle")
+	var saved_ring_hp: int=int(ring_selected.hp)
+	ring_selected.hp=0
+	check(not game._selection_ring_visible(ring_selected),"M3095 sunken target loses its circle")
+	ring_selected.hp=saved_ring_hp
+	game.sim.select(ring_target_before)
+	check(game.mesh_layer.FLEET_CAMERA_TILT_DEGREES==40.0 and game.mesh_layer.GAMEPLAY_WATER_IMMERSION>game.mesh_layer.PLAYER_WATER_IMMERSION,
+		"M3095 matching 3D/Hybrid angle and deeper optimized-gameplay keel")
 	# Sea effects depend on actual movement, not a planned path or client FPS.
 	check(is_zero_approx(game.wake_motion_strength(0.0,165.0)),"M3086 moored ship does not generate artificial wake")
 	check(is_equal_approx(game.wake_motion_strength(82.5,165.0),.5),"M3086 keel foam responds smoothly to half speed")

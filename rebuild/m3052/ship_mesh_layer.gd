@@ -22,6 +22,13 @@ const PLAYER_RAW_BOW := {"crimson_voyager":Vector3(-1,0,0),"test_ship_2":Vector3
 	"base_basic_gameplay_pbr":Vector3(0,0,1),
 	"base_basic_gameplay_shaded":Vector3(0,0,1)}
 const PLAYER_WATER_IMMERSION := 0.205
+const GAMEPLAY_WATER_IMMERSION := 0.23
+# Both actual GLB modes use the same stable oblique camera. Historically
+# hybrid 39° and 3d 43° made identical vessels suddenly change silhouette.
+const FLEET_CAMERA_TILT_DEGREES := 40.0
+
+func _player_immersion(key: String) -> float:
+	return GAMEPLAY_WATER_IMMERSION if key in ["base_basic_gameplay_pbr","base_basic_gameplay_shaded"] else PLAYER_WATER_IMMERSION
 const REQUIRED_NPC_KEYS := ["old_harbor_trader","merchant_brig_3002","merchant_brig_2921","merchant_brig_2912","weathered_voyager","weathered_junk","emerald_voyager","midnight_mariner","crimson_tide_galley"]
 ## Source Meshy glTF is already Y-UP. No -90-degree X rotation is needed.
 ## [hull length X, lowest Y, total Y height, X midpoint, Z midpoint].
@@ -96,9 +103,9 @@ func stable_player_plate_drop(actor: Dictionary,zoom: float,pixels: float) -> fl
 	var beam: float=float(PLAYER_CAPTION_HULL_BEAMS.get(key,PLAYER_SOURCE_BEAMS.get(key,0.44)))
 	var ratio: float=beam/maxf(float(info[0]),0.1)
 	var ground_radius: float=length*sqrt(0.25+ratio*ratio)
-	var tilt: float=deg_to_rad(43.0 if mode=="3d" else 39.0)
-	var depth: float=length*(float(info[2])/maxf(float(info[0]),0.1))*PLAYER_WATER_IMMERSION
-	var caption_padding: float=9.0 if PLAYER_CAPTION_HULL_BEAMS.has(key) else 12.0
+	var tilt: float=deg_to_rad(FLEET_CAMERA_TILT_DEGREES)
+	var depth: float=length*(float(info[2])/maxf(float(info[0]),0.1))*_player_immersion(key)
+	var caption_padding: float=7.5 if PLAYER_CAPTION_HULL_BEAMS.has(key) else 12.0
 	return ground_radius*cos(tilt)*zoom+depth*sin(tilt)*zoom+caption_padding*pixels
 
 
@@ -263,7 +270,7 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	# Pull the test ship keel a little deeper into the sea surface. Source
 	# bounds include the sails; sinking to the old 13% of total height made
 	# the player hull look detached from the flat 2D ocean underneath it.
-	var immersion: float=PLAYER_WATER_IMMERSION if int(actor.id)==0 else 0.13
+	var immersion: float=_player_immersion(key) if int(actor.id)==0 else 0.13
 	model.position=Vector3(-float(info[3])*scale_factor,(-float(info[1])-float(info[2])*immersion)*scale_factor,-float(info[4])*scale_factor)
 	model_instances[int(actor.id)]=owner
 	model_instance_keys[int(actor.id)]=key
@@ -312,7 +319,7 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 	if not visible or chart_camera==null or stage==null:return
 	resize_view(screen)
 	var center: Vector2=chart_camera.position
-	var tilt=deg_to_rad(43.0 if mode=="3d" else 39.0) # Consistent gameplay silhouette in both ship-render modes.
+	var tilt=deg_to_rad(FLEET_CAMERA_TILT_DEGREES) # Same camera angle for Hybrid and 3D; only ship rendering changes.
 	var foreshortening=maxf(cos(tilt),0.1)
 	mesh_camera.size=screen.y/maxf(chart_camera.zoom.y,.05)
 	var altitude=950.0
