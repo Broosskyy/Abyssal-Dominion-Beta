@@ -179,6 +179,10 @@ var projectile_visual_count := 3 # purely cosmetic per actual hit: 1, 3, 5 or 8
 const VFX_DEFAULT_FLAGS := {"enabled":true,"flight":true,"muzzle":true,"impact":true,"particles":true,"water":true,"flashes":true}
 var vfx_flags: Dictionary = VFX_DEFAULT_FLAGS.duplicate(true)
 var vfx_intensity := 1.35
+# Independent from combat VFX: mobile users can disable mesh rocking and wakes.
+var ship_animations_enabled := true
+var wake_effects_enabled := true
+var ship_switch_pulse_at := -100.0
 var journal_visible := true
 var hud_scale := 1.0
 var camera_pad: Control
@@ -358,7 +362,7 @@ func _update_wake_tracks(delta: float) -> void:
 		if not alive.has(key):wake_tracks.erase(key)
 
 func _draw_wake(actor: Dictionary) -> void:
-	if str(actor.get("kind","ship"))!="ship":return
+	if not wake_effects_enabled or str(actor.get("kind","ship"))!="ship":return
 	var state: Dictionary=wake_tracks.get(int(actor.id),{})
 	if state.is_empty():return
 	var intensity: float=_wake_intensity_for(actor)
@@ -386,7 +390,7 @@ func _draw_wake(actor: Dictionary) -> void:
 # the hidden narrow centerline under the 3D scene. No thick platform.
 func _draw_glb_waterline(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
 	if heading.length_squared()<0.5:return
-	var moving: float=_wake_intensity_for(actor)
+	var moving: float=_wake_intensity_for(actor) if wake_effects_enabled else 0.0
 	var alpha: float=0.17+moving*0.22
 	var half_width: float=length*.137
 	draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
@@ -407,6 +411,7 @@ func _draw_glb_waterline(actor: Dictionary,point: Vector2,heading: Vector2,lengt
 	draw_set_transform(Vector2.ZERO)
 
 func _draw_bow_spray(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
+	if not wake_effects_enabled:return
 	var intensity: float=_wake_intensity_for(actor)
 	if intensity<0.12 or heading.length_squared()<0.5:return
 	var forward: Vector2=heading.normalized()
@@ -634,7 +639,7 @@ func _selection_ring_radii(actor: Dictionary) -> Vector2:
 	return Vector2(maxf(36.0,length*0.58),maxf(16.0,length*0.245))
 
 func _selection_ring_tint(actor: Dictionary) -> Color:
-	if int(actor.id)==0:return Color("62cce4")
+	if int(actor.id)==0:return Color("efbf69") if int(actor.get("skin",0))==1 else Color("62cce4")
 	if str(actor.get("kind",""))=="tower":
 		return Color("d8b06d") if sim.tower_friendly() else Color("f47d62")
 	var hostile: bool=bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile)
@@ -658,6 +663,10 @@ func _draw_ship_selection_ring(actor: Dictionary,point: Vector2) -> void:
 	# The course, tap target and collision center remain exactly where they were.
 	if not enemy_selected and mesh_layer!=null and mesh_layer.can_render_actor(actor):
 		center.y+=_actor_visual_length(actor)*0.035
+	# Short water-borne pulse after choosing a ship; no combat or collision effect.
+	if not enemy_selected and elapsed-ship_switch_pulse_at>=0.0 and elapsed-ship_switch_pulse_at<1.15:
+		var phase: float=clampf((elapsed-ship_switch_pulse_at)/1.15,0.0,1.0)
+		_ellipse_line(center,radii*(1.05+phase*.8),Color(tint,(1.0-phase)*.58),2.5-phase*.7)
 	_ellipse_line(center,radii*1.055,Color(tint,0.09+0.06*pulse),3.0)
 	_ellipse_line(center,radii,Color(tint,0.64+0.14*pulse),2.0 if enemy_selected else 1.8)
 	_ellipse_line(center,radii*0.92,Color(tint,0.16+0.04*pulse),0.9)
@@ -860,7 +869,7 @@ func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
 	var elite=bool(actor.get("elite",false))
 	var hostile=not player and (bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) or (tower and not sim.tower_friendly()))
 	var color=Color("e8d0a1") if elite else Color("dce8e4")
-	if player:color=sim.staff.color() if sim.staff.shows_badge() else Color("d9f0e5")
+	if player:color=sim.staff.color() if sim.staff.shows_badge() else (Color("f2d4a0") if int(actor.get("skin",0))==1 else Color("d9f0e5"))
 	elif hostile:color=Color("eab8a7")
 	elif monster:color=Color("c6b9d6")
 	var title=_plate_title(actor)
@@ -1885,11 +1894,12 @@ func _draw_ship_stage(stage: Control) -> void:
 	stage.draw_polygon(PackedVector2Array([sea.position,Vector2(sea.end.x,sea.position.y),sea.end,Vector2(sea.position.x,sea.end.y)]),PackedColorArray([Color("0c2f3c"),Color("0c2f3c"),Color("06161d"),Color("06161d")]))
 	var center=Vector2(w*.5,h*.47)
 	var breathing=.5+.5*sin(elapsed*.9)
+	var design_accent: Color=GOLD if int(sim.player.skin)==1 else CYAN
 	for i in 4:
 		var radii=Vector2(w*(.16+.05*i),h*(.05+.018*i))
 		var ring=PackedVector2Array()
 		for j in 33:ring.append(center+Vector2(0,h*.15)+Vector2(cos(j*TAU/32+elapsed*.07),sin(j*TAU/32+elapsed*.07))*radii)
-		stage.draw_polyline(ring,Color(.45,.9,.88,.12+.04*breathing-.02*i),1.4,true)
+		stage.draw_polyline(ring,Color(design_accent,.11+.06*breathing-.02*i),1.4,true)
 	var tex: Texture2D=skin_previews[int(sim.player.skin)]
 	var box=Vector2(minf(w*.6,380.0),h*.52)
 	var k=minf(box.x/maxf(tex.get_width(),1),box.y/maxf(tex.get_height(),1))
@@ -1903,7 +1913,7 @@ func _draw_ship_stage(stage: Control) -> void:
 	var badge=SEA_MARKS.badge_width(staff.badge(),font,12)+8 if staff.shows_badge() else 0.0
 	var left=w*.5-(tw+badge)*.5
 	if staff.shows_badge():SEA_MARKS.staff_badge(stage,Vector2(left,22),staff.badge(),staff.color(),font,12)
-	_canvas_text(stage,Vector2(left+badge+tw*.5,28),title,17,staff.color() if staff.shows_badge() else CYAN)
+	_canvas_text(stage,Vector2(left+badge+tw*.5,28),title,17,staff.color() if staff.shows_badge() else design_accent)
 	var tier=clampi(floori((sim.level-1)/4.0)+1,1,ROMAN.size()-1)
 	stage.draw_circle(Vector2(34,34),18,Color("17303c"));stage.draw_arc(Vector2(34,34),18,0,TAU,28,Color("d8b46a"),2.0,true)
 	_canvas_text(stage,Vector2(34,39),ROMAN[tier],13,Color("ffe6a8"))
@@ -1944,35 +1954,66 @@ func _open_ammo() -> void:
 		row.pressed.connect(func():_choose_ammo(index))
 		modal_body.add_child(row);ammo_rows.append(row)
 
+# Drawn beneath the actual original-model preview: restrained sea and wake,
+# not a replacement/synthetic illustration of the uploaded Black Crown GLB.
+func _draw_shipyard_preview(frame: Control,index: int,chosen: bool,accent: Color) -> void:
+	var dimensions: Vector2=frame.size
+	if dimensions.x<35 or dimensions.y<35:return
+	var center: Vector2=Vector2(dimensions.x*.5,dimensions.y*.74)
+	var shimmer: float=0.5+0.5*sin(elapsed*1.35+float(index)*1.7)
+	frame.draw_rect(Rect2(Vector2(1,1),dimensions-Vector2(2,2)),Color("071b23",.32),true)
+	for wave in 4:
+		var radius: Vector2=Vector2(dimensions.x*(.16+float(wave)*.105),7.0+float(wave)*4.0)
+		var contour: PackedVector2Array=PackedVector2Array()
+		for step in 33:
+			var angle: float=float(step)*TAU/32.0
+			var slosh: float=sin(elapsed*1.9+float(wave)*1.2+angle*2.0)*1.8
+			contour.append(center+Vector2(cos(angle)*radius.x,sin(angle)*radius.y+slosh))
+		frame.draw_polyline(contour,Color(accent,(.08+.055*shimmer)*(1.0-float(wave)*.15)),1.1,true)
+	var status: String="AUSGERÜSTET" if chosen else ("ELITE · DESIGN 01" if index==1 else "BASISSCHIFF")
+	frame.draw_string(font,Vector2(16,25),status,HORIZONTAL_ALIGNMENT_LEFT,dimensions.x-32,12,Color(accent,.87))
+	if chosen:
+		frame.draw_arc(Vector2(dimensions.x-23,20),7,0,TAU,24,Color(accent,.65+.25*shimmer),1.6,true)
+		frame.draw_circle(Vector2(dimensions.x-23,20),2.4,Color(accent,.78))
+
 func _open_shipyard() -> void:
-	_banner_card(painted.nav_shipyard,"WERFT · SCHIFFSDESIGNS","Wähle dein Schiff: Schattenkriegsschiff oder Elite-Design 1. Der Wechsel ist zum Test kostenlos; Kanonen, Decks, Rumpf, Schild und Fortschritt bleiben unverändert.")
+	_banner_card(painted.nav_shipyard,"WERFT · SCHIFFSDESIGNS","Originale 3D-Schiffe · Kostenloser Design-Test. Auswahl jederzeit wechseln, ohne Kanonen, HP, Schild, Decks oder Fortschritt zu verändern.")
 	var grid=_grid(1)
 	for index in skins.size():
 		var choice: int=index
 		var chosen: bool=index==int(sim.player.skin)
 		var accent: Color=GOLD if index==1 else CYAN
 		var card=_card(accent,grid)
+		card.set_meta("ship_design_index",index)
 		var column=VBoxContainer.new()
 		column.add_theme_constant_override("separation",7)
 		column.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		card.add_child(column)
 		var frame=Panel.new()
-		frame.custom_minimum_size=Vector2(0,158)
+		frame.name="ShipDesignPreview%d" % index
+		frame.custom_minimum_size=Vector2(0,178)
 		frame.clip_contents=true
 		frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		frame.add_theme_stylebox_override("panel",SKIN.icon_frame(accent))
 		column.add_child(frame)
+		frame.draw.connect(func():_draw_shipyard_preview(frame,choice,chosen,accent))
+		_start_deck_motion(frame)
 		var preview=_portrait(frame)
 		preview.texture=skin_previews[index]
 		preview.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		preview.offset_left=8;preview.offset_top=8;preview.offset_right=-8;preview.offset_bottom=-8
+		preview.offset_left=8;preview.offset_top=6;preview.offset_right=-8;preview.offset_bottom=-5
 		var name: String=str(skins[index].name)
 		var model_ok: bool=mesh_layer!=null and mesh_layer.model_scenes.has(str(skins[index].mesh_key))
-		var label: String=name.to_upper()+"\n"+("AKTIV" if chosen else ("AUSRÜSTEN · KOSTENLOSER TEST" if model_ok else "3D-MODELL FEHLT"))
+		var hint: String="ELITE 01 · BLACK CROWN CORSAIR · ORIGINAL-GLB" if index==1 else "STANDARD · SCHATTENKRIEGSSCHIFF · SHADED"
+		var description=_text(column,hint,12,accent)
+		description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		var details=_text(column,"2,5D + 3D · Gleiche Kampfwerte · Eigene Silhouette",12,Color("c0d5d5"))
+		details.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		var label: String=name.to_upper()+"\n"+("AKTIV · AUSGERÜSTET" if chosen else ("AUSRÜSTEN · KOSTENLOSER TEST" if model_ok else "3D-MODELL FEHLT"))
 		var choose=_button(column,label,func():_equip(choice),"normal" if chosen else "primary")
 		choose.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-		choose.custom_minimum_size.y=54
-		choose.add_theme_font_size_override("font_size",12)
+		choose.custom_minimum_size.y=58
+		choose.add_theme_font_size_override("font_size",13)
 		choose.disabled=chosen or not model_ok
 	_section("MUNITIONSNACHSCHUB · JE 30 GOLD")
 	var stock=_grid(3)
@@ -2446,14 +2487,14 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Zwei Grafikmodi: 2,5D Hybrid oder 3D. Beide verwenden ausschließlich das Schattenkriegsschiff (Shaded) und die neun NPC-GLBs.")
-	_note("DATENUPDATE %d · GLB-MODELLE %d/10 · AKTIV: %s" % [_active_data_revision(),mesh_layer.model_scenes.size() if mesh_layer!=null else 0,render_mode.to_upper()],Color("97e0d5"))
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Zwei Grafikmodi: 2,5D Hybrid oder 3D. Beide unterstützen das Schattenkriegsschiff und Elite-Design 1 sowie neun NPC-GLBs.")
+	_note("DATENUPDATE %d · GLB-MODELLE %d/11 · AKTIV: %s" % [_active_data_revision(),mesh_layer.model_scenes.size() if mesh_layer!=null else 0,render_mode.to_upper()],Color("97e0d5"))
 	_section("GRAFIKMODUS")
 	for option in [["hybrid","2,5D / HYBRID"],["3d","3D"]]:
 		var key: String=str(option[0])
 		var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 		choice.disabled=render_mode==key or (mesh_layer==null or not mesh_layer.has_complete_fleet())
-	_note("Keine Classic-Sprites und keine A/B/C-Modelle. Spielmechanik und Seekarten bleiben gleich.")
+	_note("Zwei auswählbare Spieler-GLBs in der Werft; neun NPC-Modelle. Spielmechanik und Seekarten bleiben bei jedem Design gleich.")
 	_section("KAMPFEFFEKTE · SICHTBARE KUGELN PRO SCHUSS")
 	_note("Nur Darstellung: keine zusätzlichen Treffer, kein erhöhter Schaden und kein zusätzlicher Munitionsverbrauch.",Color("b2c9ca"))
 	var projectile_choices=_grid(4)
@@ -2462,6 +2503,11 @@ func _open_display() -> void:
 		var count_button=_action(str(amount)+(" ✓" if projectile_visual_count==amount else ""),func():_set_projectile_visual_count(selected_count),"tab_on" if projectile_visual_count==amount else "normal",projectile_choices)
 		count_button.disabled=projectile_visual_count==amount
 	_note("Standard: 3 · Leuchtkugeln wechseln zwischen Rot, Blau, Grün, Gold und Violett.",Color("bfcbdf"))
+	_section("SCHIFFE & SEEKARTE")
+	var ship_grid=_grid(2)
+	_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
+	_action("KIELWASSER: "+("EIN" if wake_effects_enabled else "AUS"),func():_set_ship_visual_toggle("wake"),"tab_on" if wake_effects_enabled else "normal",ship_grid)
+	_note("Schaukeln, Rollen und Wasserspuren lassen sich separat deaktivieren. Kurs, Kollision und Kampflogik bleiben unverändert.",Color("a3c9cf"))
 	_section("ANIMATIONEN & KAMPFEFFEKTE")
 	_note("Jede Einstellung ist rein optisch und wirkt sofort in 2,5D und 3D. Auch bei ausgeschalteten Effekten bleiben die echten Geschosse und Treffer sichtbar.",Color("a3c9cf"))
 	var effect_grid=_grid(2)
@@ -2492,7 +2538,7 @@ func _open_display() -> void:
 
 func _open_info() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
-	_note("Finale Flotte: Schattenkriegsschiff (Shaded) + 9 NPC-GLBs.",Color("9be4df"))
+	_note("Werft: Schattenkriegsschiff + Black Crown Corsair (Elite-Design 1). Dazu 9 NPC-GLBs.",Color("9be4df"))
 	var modes=_grid(2)
 	for option in [["hybrid","2,5D"],["3d","3D"]]:
 		var key: String=str(option[0])
@@ -2758,6 +2804,7 @@ func _equip(index: int) -> void:
 		_refresh_ui()
 		return
 	sim.player.skin=index
+	ship_switch_pulse_at=elapsed
 	sim.message=str(skins[index].name)+" aktiv"
 	_save_progress()
 	_open_modal("Werft")
@@ -2877,6 +2924,8 @@ func _load_display() -> void:
 		for key in VFX_DEFAULT_FLAGS:
 			if stored_flags.get(key) is bool:vfx_flags[key]=stored_flags[key]
 	vfx_intensity=clampf(float(data.get("vfx_intensity",1.35)),.65,1.7)
+	ship_animations_enabled=bool(data.get("ship_animations_enabled",true))
+	wake_effects_enabled=bool(data.get("wake_effects_enabled",true))
 
 func _cycle_render_mode() -> void:
 	_set_render_mode("3d" if render_mode=="hybrid" else "hybrid")
@@ -2884,8 +2933,16 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity}))
+		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled}))
 		file.close()
+
+func _set_ship_visual_toggle(which: String) -> void:
+	if which=="motion":ship_animations_enabled=not ship_animations_enabled
+	elif which=="wake":wake_effects_enabled=not wake_effects_enabled
+	else:return
+	_persist_display_preferences()
+	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal("Anzeige")
+	queue_redraw()
 
 func _set_vfx_flag(key: String) -> void:
 	if not VFX_DEFAULT_FLAGS.has(key):return
@@ -2905,6 +2962,8 @@ func _reset_display_preferences() -> void:
 	projectile_visual_count=3
 	vfx_flags=VFX_DEFAULT_FLAGS.duplicate(true)
 	vfx_intensity=1.35
+	ship_animations_enabled=true
+	wake_effects_enabled=true
 	_set_display(1,true)
 
 func _set_projectile_visual_count(requested: int) -> void:
