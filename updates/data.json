@@ -2,13 +2,13 @@
   "schema": 1,
   "channel": "test",
   "latest": {
-    "revision": 162,
+    "revision": 165,
     "abi": 1,
     "engine": "4.7.2.stable",
     "min_apk": 305901,
-    "bytes": 62363975,
-    "sha256": "bd833be49735680a15be47a22433b7cb15da70eaafe0b42ad596d8ebdd12aaf0",
-    "signature": "SfpjDV/uiui7AGeudJYV8uX9olCYBeSi/0fXGWQI0Ho9R7ZDNr7gRd/Q2529aW04ggDzjZqQaZIFDi0Z3SDwOILlzOTy2xijz5fR9OWQZQIVfBnlXP6YCY26J1bbXhMeYp7RuX7qWKyFo3bYB5xdCjxMZtDjN+jTj/uWQuX+NkItlcBfh5XFMULxwpYl/13wmOZ22jiLLWVHeJO/oEnyHd9Q3FhWPDI+LQfnFR5AQBEPz1z3x2LViOqEI7r08W/WQvspg18vrzFrNXo8HjVIKRx+1nJtDVLsj8pEKjO5/PAT3v+jouiBND4pllLmeH0hOhA9MnKQycO2HVISeu9g4Q==",
-    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-162/ABYSSAL_DATA_162.zip"
+    "bytes": 62363977,
+    "sha256": "b6838d6f7b04555974bfc39dc2a6826e0ff5bc1460f6b3aa2187df6761724e48",
+    "signature": "g66tMxfNSsDS2QyB78T4JM0OHpdc7Jbu+3cgTFq2wJKVB1EUYhk2plRMNdh3UhmUKBJtJeUOUC1DVOgZ0VQL2vZqhpTKXF6l/DyyPS4exMo/cUdHZy3oJsjvuNG23ZS2QCJCxNGYGiPWWERk7tGin9NXaVobgP9RwuWlNAN1c3oCYP9FJDL8XSDkoBh9e4/smtBiudyIggS7ZNVVBy1b6QC/jZ8Fb5TIYbE4IYcxWON5dMC9KdP3MkJJMghmwOY8km23rDRwhgZCM+gZmvvwI1ezJtZpNXIGtjg08aVKoV24lMoMQDKn1WtQSWznZzJ2/Y+cfpaeF0fLCkyxwnGNyw==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-165/ABYSSAL_DATA_165.zip"
   }
 }
