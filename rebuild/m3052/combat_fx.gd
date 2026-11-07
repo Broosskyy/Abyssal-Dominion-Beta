@@ -16,18 +16,32 @@ static func radiant_color(shot_id: int,orb: int=0) -> Color:
 static func orb_offset(shot: Dictionary,index: int,count: int,clock: float) -> Vector2:
 	var total: int=visual_count(count)
 	if total==1:return Vector2.ZERO
+	# M3103: a tight, triangular pile that flies together, not a straight
+	# broadside row or spreading fan. The first three form 1 above + 2 below.
+	# Higher detail modes add close-packed rows, not wider flight lanes.
+	var pile: Array[Vector2]=[]
+	match total:
+		3:
+			pile=[Vector2(0,-6.0),Vector2(-5.2,3.1),Vector2(5.2,3.1)]
+		5:
+			pile=[Vector2(0,-9.7),Vector2(-5.5,-1.3),Vector2(5.5,-1.3),
+				Vector2(-5.5,7.0),Vector2(5.5,7.0)]
+		8:
+			pile=[Vector2(-5.3,-11.4),Vector2(5.3,-11.4),
+				Vector2(-10.7,-2.5),Vector2(0,-2.5),Vector2(10.7,-2.5),
+				Vector2(-10.7,6.4),Vector2(0,6.4),Vector2(10.7,6.4)]
+	if index<0 or index>=pile.size():return Vector2.ZERO
 	var direction: Vector2=Vector2(shot.get("pos",Vector2.ZERO))-Vector2(shot.get("start",Vector2.ZERO))
 	if direction.length_squared()<.1:direction=Vector2(shot.get("visual_heading",Vector2.RIGHT))
 	if direction.length_squared()<.001:direction=Vector2.RIGHT
 	direction=direction.normalized()
 	var side:=Vector2(-direction.y,direction.x)
-	var spread: float=9.5 if total<=3 else (8.0 if total<=5 else 6.5)
-	var lane: float=float(index)-float(total-1)*.5
-	# Small time-based spread makes the volley fan out in flight, not a static
-	# stack of cloned balls; the real collision trajectory remains untouched.
-	var travel: float=clampf(float(shot.get("traveled",0.0))/maxf(1.0,float(shot.get("distance",1.0))),0.0,1.0)
-	return side*lane*spread*(.67+.33*sin(travel*PI*.82)) + direction*(sin(clock*3.0+float(index)*2.1+float(int(shot.get("id",0))%5))*2.5)
+	var place: Vector2=pile[index]
+	var shimmer: float=sin(clock*3.1+float(index)*2.3+float(int(shot.get("id",0))%13))*.35
+	return side*(place.x+shimmer)+direction*(place.y+shimmer*.45)
 
+static func _projectile_speed(weapon: String) -> float:
+	return 530.0 if weapon=="harpoon" else (380.0 if weapon=="mortar" else 470.0)
 
 static func weapon_color(weapon: String, hostile: bool=false) -> Color:
 	match weapon:
@@ -49,7 +63,17 @@ static func lift(weapon: String,progress: float) -> float:
 
 static func projectile_center(shot: Dictionary) -> Vector2:
 	var progress: float=clampf(float(shot.get("traveled",0.0))/maxf(1.0,float(shot.get("distance",1.0))),0.0,1.0)
-	return Vector2(shot.get("pos",Vector2.ZERO))-Vector2(0.0,lift(str(shot.get("weapon","cannon")),progress))
+	var center: Vector2=Vector2(shot.get("pos",Vector2.ZERO))-Vector2(0.0,lift(str(shot.get("weapon","cannon")),progress))
+	# Real salvos contain staggered physical shots. Re-align ONLY their
+	# appearance so the group stays together as one ammunition pile.
+	if int(shot.get("salvo_count",1))>1:
+		var heading: Vector2=Vector2(shot.get("visual_heading",Vector2.RIGHT))
+		if heading.length_squared()>.001:heading=heading.normalized()
+		else:heading=Vector2.RIGHT
+		var launch_offset: Vector2=Vector2(shot.get("start",Vector2.ZERO))-Vector2(shot.get("salvo_origin",Vector2(shot.get("start",Vector2.ZERO))))
+		center-=launch_offset
+		center+=heading*float(shot.get("salvo_index",0))*.08*_projectile_speed(str(shot.get("weapon","cannon")))
+	return center
 
 static func _ellipse(canvas: CanvasItem,at: Vector2,radii: Vector2,ink: Color,width: float) -> void:
 	var vertices:=PackedVector2Array()
