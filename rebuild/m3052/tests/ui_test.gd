@@ -207,6 +207,8 @@ func _run() -> void:
 	check(game.render_toggle is Button and game.render_toggle.visible,"graphics switch exists directly on the chart beside the minimap")
 	check(game.render_toggle.text.begins_with("GRAFIK"),"graphics switch shows its currently selected mode")
 	check(game._active_data_revision()>=0,"display menu reports exact active signed data revision")
+	check(game.HARBOR_ISLAND!=null and game.HARBOR_ISLAND.get_width()>0,"real island-harbor SVG imports as a transparent Godot texture")
+	check(game.target_clear!=null and game.target_clear.get_parent()==game.target_panel,"selected target panel includes an independent touch-sized cancellation button")
 	var before_mode: String=game.render_mode
 	game.mesh_layer.set_render_mode("hybrid")
 	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"hybrid 2.5D renders an actual GLB, not a directional image")
@@ -370,10 +372,19 @@ func _run() -> void:
 	game._toggle_fullscreen_menus()
 	check(game.menu_fullscreen and game.modal.get_global_rect().size.x>=1200,"user can restore the immersive menu layout")
 	game.modal.hide()
-	game.sim.player.pos=game.sim.harbor
+	# The port's visible water berth is also directly tappable on phones.
+	game.sim.configure_map(0)
+	game.sim.player.pos=game.sim.harbor+Vector2(310,0)
 	game.sim.player.last_hit=-100
-	game._interact()
-	check(game.sim.docked and game.modal_kind=="Hafen","harbor interaction opens actual docked equipment")
+	game.camera.position=game.sim.harbor
+	game.camera.force_update_scroll()
+	var dock_touch: Vector2=game.get_canvas_transform()*game.sim.harbor
+	game._tap(dock_touch)
+	check(not game.sim.player.path.is_empty() and game.sim.player.path.back().distance_to(game.sim.harbor)<1.0,"tapping graphical pier berth plots a real collision-free course")
+	game.sim.player.pos=game.sim.harbor
+	game.sim.player.path=[]
+	game._tap(dock_touch)
+	check(game.sim.docked and game.modal_kind=="Hafen","touching island harbor berth up close docks and opens the real harbor menus")
 	game.sim.player.gold=1000
 	game._open_modal("Hafen")
 	var castles_link=false
@@ -603,6 +614,22 @@ func _run() -> void:
 	check(game.sim.target==first_id and not game.sim.firing,"cycle selects first visible live ship and stops ongoing fire")
 	game.target_cycle.pressed.emit();check(game.sim.target==second_id,"cycle advances to the next visible ship")
 	game.target_cycle.pressed.emit();check(game.sim.target==first_id,"cycle wraps and skips sunk ships and targets behind HUD")
+	# Three independent ways to clear target, without course or ammo changes.
+	game.sim.firing=true
+	game.target_clear.pressed.emit()
+	check(game.sim.target==-1 and not game.sim.firing and not game.target_panel.visible,"cross button cancels selection, stops auto-fire and hides enemy panel")
+	game.sim.select(first_id)
+	game.camera.position=game.sim.player.pos
+	game.camera.force_update_scroll()
+	game._tap(game.get_canvas_transform()*(game.sim.npcs[0].pos-Vector2(0,25)))
+	check(game.sim.target==-1,"touching the selected enemy a second time cancels its target ring")
+	game.sim.select(first_id)
+	var esc=InputEventKey.new()
+	esc.keycode=KEY_ESCAPE
+	esc.pressed=true
+	game._unhandled_input(esc)
+	check(game.sim.target==-1 and not game.sim.firing,"Escape cancels selected enemy when no full-screen menu is open")
+	game.sim.select(first_id)
 	check(game.sim.player.pos==before_pos and game.sim.player.ammo==before_stock and game.sim.player.path.is_empty(),"target cycling consumes no ammunition and starts no pursuit")
 	game.sim.npcs.clear();game.target_cycle.pressed.emit()
 	check(game.sim.message=="Kein Ziel im sichtbaren Bereich","empty view gives clear feedback without a fake target")
