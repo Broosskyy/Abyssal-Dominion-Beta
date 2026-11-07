@@ -41,6 +41,8 @@ func _run() -> void:
 		game.mesh_layer.set_player_style(new_style)
 		game.mesh_layer.sync_fleet(comparison_fleet,game.camera,game.get_viewport_rect().size)
 		check(game.mesh_layer.gameplay_double_sided_count>0,"M3093 double-sided imported material in real GLB: "+new_style)
+		var reference_drop: float=game.mesh_layer.stable_player_plate_drop(game.sim.player,game.camera.zoom.y,game._plate_pixels())
+		check(reference_drop>20.0 and reference_drop<180.0,"M3094 player plate remains below hull and inside configured range: "+new_style)
 		var owner: Node3D=game.mesh_layer.model_instances.get(0)
 		check(owner!=null and owner.get_node_or_null("OriginalAxisCorrection")!=null,"M3093 per-instance render pivot retained: "+new_style)
 	check(int(game.sim.player.skin)==29,"M3092 visual comparison never modifies equipped ship")
