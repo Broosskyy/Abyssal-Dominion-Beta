@@ -5,7 +5,7 @@ extends TextureRect
 const MODEL_ROOT := "res://assets/npc/meshy/models/"
 const PLAYER_MODEL_ROOT := "res://assets/player/"
 const STERN_TAPER=preload("res://stern_hull_taper.gd")
-# Two approved player designs (shaded captain and Elite 1) plus nine NPC vessels.
+# Two original player models (shaded captain + Corsair) and 10 Corsair material variants; nine NPC GLBs.
 const PLAYER_SCENES := {
 	"schattenkriegsschiff_shaded":preload("res://assets/player/schattenkriegsschiff_shaded.glb"),
 	"black_crown_corsair_elite_test":preload("res://assets/npc/meshy/models/black_crown_corsair_elite_test.glb")
@@ -45,6 +45,7 @@ var mesh_camera: Camera3D
 var model_scenes: Dictionary={}
 var model_instances: Dictionary={}
 var model_instance_keys: Dictionary={}
+var model_instance_skins: Dictionary={}
 var mode := "hybrid"
 var resolution_factor := 0.8
 # M3099: preserve native shaded material, ensure back faces of sails are visible.
@@ -153,9 +154,53 @@ func has_complete_fleet() -> bool:
 		if not model_scenes.has(key):return false
 	return true
 
+const ELITE_V2_TEXTURE_FILES := [
+	"Elite_01_Obsidian_Albedo.png", "Elite_02_Bordeaux_Albedo.png",
+	"Elite_03_Tiefblau_Albedo.png", "Elite_04_Waldgruen_Albedo.png",
+	"Elite_05_Violett_Albedo.png", "Elite_06_Petrol_Albedo.png",
+	"Elite_07_Elfenbein_Albedo.png", "Elite_08_Stahlblau_Albedo.png",
+	"Elite_09_Karmesin_Albedo.png", "Elite_10_Knochen_Albedo.png"
+]
+const ELITE_V2_TEXTURE_ROOT := "res://assets/elite_v2/textures/"
+
 func player_key_for_skin(skin: int) -> String:
-	# Legacy saved skins are normalized by Simulation.restore_save (schema 5).
-	return "black_crown_corsair_elite_test" if skin==1 else "schattenkriegsschiff_shaded"
+	# Skin 0 is shaded, skin 1 retains the ORIGINAL Black Crown test model.
+	# Skins 2-11 use that EXACT SAME GLB, with one variant albedo at a time.
+	return "black_crown_corsair_elite_test" if skin>=1 and skin<=11 else "schattenkriegsschiff_shaded"
+
+func elite_texture_level(skin: int) -> int:
+	return skin-1 if skin>=2 and skin<=11 else 0
+
+func _apply_elite_texture(owner: Node3D,level: int) -> bool:
+	if level<1 or level>ELITE_V2_TEXTURE_FILES.size():return false
+	var path: String=ELITE_V2_TEXTURE_ROOT+str(ELITE_V2_TEXTURE_FILES[level-1])
+	if not ResourceLoader.exists(path):
+		push_error("Missing original Elite V2 albedo: "+path)
+		return false
+	var texture: Texture2D=load(path) as Texture2D
+	if texture==null:return false
+	var pivot: Node3D=owner.get_node_or_null("OriginalAxisCorrection")
+	if pivot==null:return false
+	var pending: Array[Node]=[pivot]
+	var changed:=0
+	while not pending.is_empty():
+		var node: Node=pending.pop_back()
+		for child: Node in node.get_children():pending.append(child)
+		if not node is MeshInstance3D:continue
+		var piece: MeshInstance3D=node as MeshInstance3D
+		if piece.mesh==null:continue
+		for surface in range(piece.mesh.get_surface_count()):
+			var original: Material=piece.get_active_material(surface)
+			if not original is BaseMaterial3D:continue
+			# Independent per-instance material override. Keep original normals,
+			# roughness, metalness and mesh/UV data without cloning the GLB.
+			var material: BaseMaterial3D=original.duplicate() as BaseMaterial3D
+			material.albedo_texture=texture
+			material.albedo_color=Color.WHITE
+			material.cull_mode=BaseMaterial3D.CULL_DISABLED
+			piece.set_surface_override_material(surface,material)
+			changed+=1
+	return changed>0
 
 func has_player_ship() -> bool:
 	return model_scenes.has("schattenkriegsschiff_shaded")
@@ -246,7 +291,10 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	model_instances[int(actor.id)]=owner
 	model_instance_keys[int(actor.id)]=key
 	if int(actor.id)==0:
+		model_instance_skins[int(actor.id)]=int(actor.get("skin",0))
 		_configure_gameplay_surfaces(owner,key)
+		if elite_texture_level(int(actor.get("skin",0)))>0:
+			_apply_elite_texture(owner,elite_texture_level(int(actor.get("skin",0))))
 	return owner
 
 
@@ -303,9 +351,14 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		var id=int(actor.id)
 		var key: String=player_key_for_skin(int(actor.get("skin",-1))) if id==0 else str(actor.get("visual_key",""))
 		var node: Node3D=model_instances.get(id)
-		var newly_instanced: bool=node==null or model_instance_keys.get(id,"")!=key
+		# A new Elite V2 color can reuse one mesh resource but requires a NEW
+		# material instance; keep exact skin ID separate from the shared GLB key.
+		var skin_changed: bool=id==0 and int(model_instance_skins.get(id,-1))!=int(actor.get("skin",0))
+		var newly_instanced: bool=node==null or model_instance_keys.get(id,"")!=key or skin_changed
 		if newly_instanced:
-			if node!=null:node.queue_free()
+			if node!=null:
+				node.visible=false
+				node.queue_free()
 			node=_create_ship(actor,key)
 		if node==null:continue
 		var point: Vector2=host._visual_actor_pos(actor)
@@ -344,3 +397,4 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		previous.queue_free()
 		model_instances.erase(id)
 		model_instance_keys.erase(id)
+		model_instance_skins.erase(id)
