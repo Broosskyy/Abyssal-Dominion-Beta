@@ -18,6 +18,7 @@ const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
 const AMMO_CHOICE=preload("res://ammo_choice.gd")
+const COMBAT_FX=preload("res://combat_fx.gd")
 const CAPTAIN_PLATE_OFFSET := 62.0
 const OTHER_PLATE_OFFSET := 48.0
 const CAPTAIN_HULL_CLEARANCE := 34.0
@@ -26,7 +27,6 @@ const PLATE_ID_BASELINE := 13.0
 const PLATE_HP_Y := 24.0
 const PLATE_SHIELD_Y := 35.0
 const PLATE_DECK_Y := 65.0
-const SHOT_COLORS := {"flare":Color("ffe27a"),"pumpkin":Color("ff8a2a"),"snow":Color("f4fbff"),"ice":Color("7fd4ff"),"chain":Color("d7e4ea"),"harpoon":Color("9fd0c8")}
 const USER_ROOT := "res://assets/user/"
 const SAVE := "user://captain_m3052.json"
 const HUD_SAVE := "user://display_m3052.json"
@@ -503,37 +503,23 @@ func _draw() -> void:
 		if int(actor.hp)>0: _draw_actor(actor)
 	# Name/HP/shield/decks are rendered in a screen-space CanvasLayer,
 	# already synced during _process(), never sourced from an old draw pass.
-	drawn_shots = 0
-	for shot in sim.shots:
-		if float(shot.age)<0: continue
-		drawn_shots += 1
-		var progress = clampf(float(shot.traveled)/float(shot.distance),0,1)
-		var mortar=shot.weapon=="mortar"
-		var p: Vector2 = shot.pos-Vector2(0,sin(progress*PI)*(110.0 if mortar else 28.0))
-		var victim = sim.actor(int(shot.target))
-		if victim.is_empty(): continue
-		var direction: Vector2=(victim.pos-shot.pos).normalized()
-		var color = Color("ffe0a2") if int(shot.source)==0 else Color("ff8c56")
-		if int(shot.source)==0:
-			color = SHOT_COLORS.get(str(shot.weapon), color)
-		if mortar:_ellipse(shot.pos,Vector2(7,3),Color(0,0,0,.28))
-		draw_line(p-direction*18,p,color,2.4,true)
-		draw_circle(p,(7.0 if mortar else 4.2),Color(0,0,0,0.5))
-		draw_circle(p,(5.0 if mortar else 2.7),color)
-		if str(shot.weapon) in ["chain","snow","ice","flare","pumpkin"]: draw_arc(p,6,0,TAU,12,color,1.4,true)
-		if shot.weapon=="harpoon": draw_line(p-direction*30,p,color,1.4,true)
-		if shot.weapon=="flare": draw_circle(p,9,Color(1,.9,.4,.35))
+	# Original M3100 missile silhouettes, contrails, sparks and shadow arcs.
+	# Both approved GLB modes share the same chart-space combat VFX layer.
+	drawn_shots=0
+	for shot: Dictionary in sim.shots:
+		if float(shot.get("age",-1.0))<0.0:continue
+		drawn_shots+=1
+		COMBAT_FX.draw_projectile(self,shot,sim.clock)
 	for event in sim.events:
 		var age: float = sim.clock-float(event.time)
 		if age>1.2: continue
 		var p: Vector2 = event.pos
 		if event.type=="impact":
-			var fade = maxf(0,1-age/0.6)
-			_ellipse_line(p,Vector2(12+age*45,8+age*22),Color(0.95,0.84,0.60,fade),2.3)
-		elif event.type=="muzzle" and age<0.35:
-			draw_circle(p,8+age*18,Color(1,0.73,0.3,(1-age/0.35)*0.65))
+			COMBAT_FX.draw_impact(self,event,age,sim.clock)
+		elif event.type=="muzzle":
+			COMBAT_FX.draw_muzzle(self,event,age,sim.clock)
 		elif event.type=="sunk":
-			_ellipse(p,Vector2(70*age+5,36*age+5),Color(0.38,0.55,0.56,(1-age/1.2)*0.4))
+			COMBAT_FX.draw_sinking(self,event,age)
 		elif event.type=="loot":
 			_label(p+Vector2(0,-30-age*45),"+%d GOLD"%int(event.value),19,Color(0.95,0.81,0.4,1-age/1.2))
 		elif event.type=="level":
@@ -1426,7 +1412,9 @@ func _refresh_ui() -> void:
 	ammo_selector.text="%s · %d" % [AMMO_UI[sim.ammo_mode].name,sim.player.ammo[sim.ammo_mode]]
 	ammo_selector.tooltip_text="%s · %s · antippen zum Wechseln" % [AMMO_UI[sim.ammo_mode].name,AMMO_UI[sim.ammo_mode].use]
 	_set_orb(ammo_selector,_ammo_texture(sim.ammo_mode),_thousands(int(sim.player.ammo[sim.ammo_mode])),modal.visible and modal_kind=="Munition","MUNITION")
-	ammo_selector.set("state_label","MUNITION")
+	ammo_selector.set("ammo_marker",true)
+	ammo_selector.set("ammo_color",COMBAT_FX.weapon_color(str(sim.AMMO_NAMES[sim.ammo_mode])))
+	ammo_selector.set("state_label",["VOLL","KETTE","HARPUNE","LEUCHT","KÜRBIS","SCHNEE","EIS"][sim.ammo_mode])
 	_set_orb(target_cycle,painted.spyglass,"",false,"ZIEL")
 	_set_orb(loadout_button,extra_icons.cannon_0,"",modal.visible and modal_kind=="Bewaffnung","WAFFEN")
 	var staff=sim.staff
@@ -1907,6 +1895,7 @@ func _open_ammo() -> void:
 		row.detail="%d Schaden · %s" % [sim.weapon_damage(i),AMMO_UI[i].use]
 		row.stock=_thousands(int(sim.player.ammo[i]))
 		row.loaded=sim.ammo_mode==i
+		row.accent=COMBAT_FX.weapon_color(str(sim.AMMO_NAMES[i]))
 		row.art=_ammo_texture(i)
 		row.text="%s · Vorrat %d · %s" % [AMMO_UI[i].name,sim.player.ammo[i],AMMO_UI[i].use]
 		row.tooltip_text=row.text
