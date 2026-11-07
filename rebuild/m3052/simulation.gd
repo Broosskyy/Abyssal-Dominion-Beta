@@ -266,13 +266,19 @@ func actor(id: int) -> Dictionary:
 		if int(npc.id) == id: return npc
 	return {}
 
+func clear_target() -> void:
+	# Stops fresh cannon salvos immediately. Already-fired projectiles keep
+	# their trajectory; navigation, pending portals and ammo are untouched.
+	target = -1
+	firing = false
+	message = "Zielauswahl aufgehoben"
+
 func select(id: int) -> void:
 	if id > 0 and not actor(id).is_empty() and int(actor(id).hp) > 0:
 		target = id
 		message = str(actor(id).name) + " anvisiert"
 	else:
-		target = -1
-		firing = false
+		clear_target()
 
 func set_ammo(index: int) -> void:
 	if index < 0 or index >= AMMO_NAMES.size(): return
@@ -1290,6 +1296,35 @@ func travel(destination: int) -> bool:
 	message = "%s erreicht · Karte %s" % [CONTENT.MAPS[map_id].name,CONTENT.MAPS[map_id].code]
 	return true
 
+# The collision JSON is authored from the true opaque island silhouettes;
+# snow and snow2 have more transparent margins than the tropical atlas.
+# Scale BOTH painted art and measured collision polygon by the same ratio.
+# This keeps similar-sized visible landmass across map art variations.
+func island_art_scale(art: String) -> float:
+	if not island_shapes.has(art):return 1.0
+	var points: Array=island_shapes[art].points
+	if points.is_empty():return 1.0
+	var lo: float=1.0
+	var hi: float=0.0
+	for pair: Array in points:
+		lo=minf(lo,float(pair[0]))
+		hi=maxf(hi,float(pair[0]))
+	return clampf(.70/maxf(.1,hi-lo),.95,1.15)
+
+func _harbor_site_for_map() -> Vector2:
+	# The same berth mirrors with its neighbouring coast on maps 1 and 2.
+	# A fallback location is chosen deterministically, not re-rolled on a
+	# revisit (which would break staff teleport, saves and the minimap).
+	var primary: Vector2=_map_point(Vector2(1920,1450))
+	for offset in [Vector2.ZERO,Vector2(0,-230),Vector2(240,0),Vector2(0,260),Vector2(-250,0),Vector2(300,210)]:
+		var candidate: Vector2=primary+offset
+		if not blocked(candidate,94.0) and candidate.distance_to(START)>165.0:
+			var safe:=true
+			for portal: Dictionary in portals:
+				if candidate.distance_to(portal.pos)<220.0:safe=false
+			if safe:return candidate
+	return primary
+
 func _map_point(point: Vector2) -> Vector2:
 	match map_id:
 		1, 4: return Vector2(WORLD.x - point.x,point.y)
@@ -1309,6 +1344,7 @@ func configure_map(destination: int) -> void:
 			var island: Dictionary = base_islands[CONTENT.BONUS_ISLANDS[i]].duplicate(true)
 			island.pos = _map_point(island.pos)
 			island.art = config.art[i]
+			island.width=float(base_islands[CONTENT.BONUS_ISLANDS[i]].width)*island_art_scale(str(config.art[i]))
 			island.name = CONTENT.BONUS_ISLAND_NAMES[tier][i]
 			islands.append(island)
 		npcs.clear()
@@ -1320,6 +1356,9 @@ func configure_map(destination: int) -> void:
 	for i in islands.size():
 		islands[i].pos = _map_point(base_islands[i].pos)
 		islands[i].art = config.art[i]
+		# Preserve the authored width, but normalize the *visible* footprint
+		# of each atlas and its land collision together.
+		islands[i].width=float(base_islands[i].width)*island_art_scale(str(config.art[i]))
 		if map_id > 0: islands[i].name = (["Eishafen","Frostbucht","Weißes Riff","Gletscherwacht","Eisbrecherbucht","Nordstern","Winterhafen","Frostzahn","Polarwacht"] if map_id == 1 else ["Nebelwacht","Schwarze Bucht","Totenriff","Schattenklippen","Korsarenfestung","Nachtwacht","Dämmerhafen","Drachenzahn","Knochenriff"])[i]
 	npcs = base_npcs.duplicate(true)
 	for npc in npcs:
@@ -1344,6 +1383,7 @@ func configure_map(destination: int) -> void:
 	portals.append({"pos":Vector2(4070,1600),"destination":(map_id + 1) % CONTENT.REGION_COUNT})
 	portals.append({"pos":Vector2(330,1600),"destination":(map_id + 2) % CONTENT.REGION_COUNT})
 	_build_grid()
+	harbor=_harbor_site_for_map()
 	if map_id == CONTENT.FORTRESS_MAP:
 		islands[CONTENT.FORTRESS_ISLAND].name = "Korsarenfestung"
 		if not restored: _add_fortress()
