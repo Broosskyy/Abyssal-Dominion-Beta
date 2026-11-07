@@ -146,6 +146,10 @@ var drag_start := Vector2.ZERO
 var dragging := false
 var last_mouse := Vector2.ZERO
 var touch_points: Dictionary = {}
+# Every touch tracks its own original position and drag/multitouch state.
+# Do not share a global "dragging" flag across unrelated fingers.
+var touch_starts: Dictionary = {}
+var touch_invalid: Dictionary = {}
 var hud_touches: Dictionary = {}
 var pinch_distance := 0.0
 var suppress_tap_until := 0
@@ -1356,8 +1360,8 @@ func _layout() -> void:
 	_place(target_panel,left,target_y,column,card_h)
 	_place(target_portrait,6,6,card_h-12,card_h-12)
 	var tx=card_h
-	_place(target_clear,column-35,2,29,25)
-	_place(target_name,tx,3,column-tx-42,18);_place(target_hp,tx,22,column-tx-10,8);_place(target_numbers,tx,31,column-tx-6,card_h-33)
+	_place(target_clear,column-48,2,42,34)
+	_place(target_name,tx,3,column-tx-56,18);_place(target_hp,tx,22,column-tx-10,8);_place(target_numbers,tx,31,column-tx-6,card_h-33)
 	_place(interact,left,target_y+card_h+6,column,34)
 	_place(buff_bar,left,target_y+card_h+46,column,26)
 	# Chart with corner controls, as on classic sea-chart clients.
@@ -2998,35 +3002,77 @@ func _equip(index: int) -> void:
 func _zoom(factor: float) -> void:
 	desired_zoom=clampf(desired_zoom*factor,0.5,1.4)
 
-func _unhandled_input(event: InputEvent) -> void:
+# Godot delivers _input BEFORE GUI consumption. The former sea-input path
+# used _unhandled_input exclusively, so HUD Control nodes could swallow
+# touch-down but not touch-up. Such orphaned releases silently lost taps.
+# World touches are claimed early; UI-origin touches still reach Buttons.
+func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch or event is InputEventScreenDrag:
+		_handle_world_touch(event)
+
+func _handle_world_touch(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		last_touch_ms=Time.get_ticks_msec()
 		if event.pressed:
-			if _hud_contains(event.position):hud_touches[event.index]=true;return
+			if _hud_contains(event.position):
+				hud_touches[event.index]=true
+				return # let the actual UI button/slider consume it
 			touch_points[event.index]=event.position
-			if touch_points.size()==1:drag_start=event.position;dragging=false
-			if touch_points.size()>1:suppress_tap_until=Time.get_ticks_msec()+400
+			touch_starts[event.index]=event.position
+			touch_invalid.erase(event.index)
+			if touch_points.size()==1:
+				drag_start=event.position
+				dragging=false
+				pinch_distance=0.0
+			else:
+				# A pinch can NEVER turn into a tap when one finger lifts.
+				for finger in touch_points:touch_invalid[finger]=true
+				var coordinates: Array=touch_points.values()
+				pinch_distance=coordinates[0].distance_to(coordinates[1])
+			get_viewport().set_input_as_handled()
 		else:
-			if hud_touches.has(event.index):hud_touches.erase(event.index);return
-			if touch_points.size()==1 and not dragging and Time.get_ticks_msec()>suppress_tap_until and not _hud_contains(event.position):
-				_tap(event.position)
+			if hud_touches.has(event.index):
+				hud_touches.erase(event.index)
+				return # no world release, even when dragged out of the HUD
+			if not touch_starts.has(event.index):
+				return # discard orphaned release without cancelling a course
+			var origin: Vector2=touch_starts[event.index]
+			var moved: float=origin.distance_to(event.position)
+			var can_tap: bool=touch_points.size()==1 and not touch_invalid.has(event.index) and moved<=25.0
 			touch_points.erase(event.index)
-			pinch_distance=0
-			suppress_tap_until=Time.get_ticks_msec()+180
-		get_viewport().set_input_as_handled()
+			touch_starts.erase(event.index)
+			touch_invalid.erase(event.index)
+			if touch_points.is_empty():
+				pinch_distance=0.0
+				dragging=false
+			# No global cooldown after an ordinary one-finger tap! The old
+			# +180 ms suppression broke rapid repeat-taps and target toggling.
+			if can_tap and Time.get_ticks_msec()>=suppress_tap_until and not _hud_contains(event.position):
+				_tap(event.position)
+			get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
 		if hud_touches.has(event.index):return
+		if not touch_points.has(event.index):return
 		touch_points[event.index]=event.position
 		if touch_points.size()>=2:
-			var values =touch_points.values()
-			var distance: float=values[0].distance_to(values[1])
-			if pinch_distance>0:_zoom(distance/pinch_distance)
+			for finger in touch_points:touch_invalid[finger]=true
+			var coords: Array=touch_points.values()
+			var distance: float=coords[0].distance_to(coords[1])
+			if pinch_distance>0.0 and distance>1.0:_zoom(distance/pinch_distance)
 			pinch_distance=distance
-			dragging=true
-		elif event.position.distance_to(drag_start)>20:
+		elif touch_starts.has(event.index) and event.position.distance_to(touch_starts[event.index])>25.0:
+			touch_invalid[event.index]=true
 			dragging=true
 			_shift_camera(-event.relative/camera.zoom)
+		elif touch_invalid.has(event.index):
+			_shift_camera(-event.relative/camera.zoom)
 		get_viewport().set_input_as_handled()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch or event is InputEventScreenDrag:
+		# Fallback for scripted tests and hardware that forwards unhandled
+		# touch events. Normally the _input path already claimed the gesture.
+		_handle_world_touch(event)
 	elif event is InputEventMouseButton:
 		if event.button_index==MOUSE_BUTTON_WHEEL_UP and event.pressed:_zoom(1.10)
 		elif event.button_index==MOUSE_BUTTON_WHEEL_DOWN and event.pressed:_zoom(1/1.10)
@@ -3062,15 +3108,40 @@ func _hud_contains(screen: Vector2) -> bool:
 		if control.is_visible_in_tree() and control.get_global_rect().has_point(screen):return true
 	return false
 
+# Ships have different projected hull lengths. Hit-test them directly in
+# screen pixels, otherwise zoom and off-center 3D sails make selection fail.
+func _enemy_at_screen(screen: Vector2) -> int:
+	var candidate_id: int=-1
+	var closest: float=INF
+	var canvas: Transform2D=get_canvas_transform()
+	var zoom: float=camera.zoom.x if camera!=null else 1.0
+	for npc: Dictionary in sim.npcs:
+		if float(npc.hp)<=0.0:continue
+		var projected: Vector2=canvas*(npc.pos-Vector2(0,25))
+		var length: float=_actor_visual_length(npc)
+		var radius: float=clampf(length*zoom*.57,78.0,116.0)
+		if str(npc.get("kind","ship"))=="tower":radius=clampf(radius,72.0,95.0)
+		var dist: float=screen.distance_to(projected)
+		if dist<=radius and dist<closest:
+			closest=dist
+			candidate_id=int(npc.id)
+	return candidate_id
+
 func _tap(screen: Vector2) -> void:
 	if modal.visible or loading_left>0:return
+	# Ships always win over nearby port and portal hitboxes, so tapping a
+	# visible enemy twice reliably selects then DESELECTS the same hull.
+	var clicked_enemy: int=_enemy_at_screen(screen)
+	if clicked_enemy>0:
+		if sim.target==clicked_enemy:sim.clear_target()
+		else:sim.select(clicked_enemy)
+		_refresh_ui()
+		return
 	var point: Vector2=get_canvas_transform().affine_inverse()*screen
 	for portal in sim.portals:
 		if point.distance_to(portal.pos)<=maxf(85,45/camera.zoom.x):
 			_navigate_region(int(portal.destination));return
-	# The berth is the small outlined water area at the end of the harbor pier.
-	# Tap it to sail toward the port; once in reach, tap again to dock.
-	# Never try navigating into the decorative rocky island itself.
+	# A graphic water berth is a deliberate, small interactive landmark.
 	if sim.has_harbor() and point.distance_to(sim.harbor)<=maxf(84.0,45.0/maxf(.1,camera.zoom.x)):
 		if sim.docked:
 			_open_modal("Hafen")
@@ -3083,16 +3154,7 @@ func _tap(screen: Vector2) -> void:
 			sim.message="Andocken erst 6 Sekunden nach dem letzten Treffer"
 		_refresh_ui()
 		return
-	var nearest =-1
-	var distance =82.0/camera.zoom.x
-	for npc in sim.npcs:
-		if int(npc.hp)<=0:continue
-		var d: float=point.distance_to(npc.pos-Vector2(0,25))
-		if d<distance:distance=d;nearest=int(npc.id)
-	if nearest>0:
-		if sim.target==nearest:sim.clear_target()
-		else:sim.select(nearest)
-	elif sim.staff.tap_teleport and sim.staff.can("teleport"):
+	if sim.staff.tap_teleport and sim.staff.can("teleport"):
 		sim.staff_teleport(sim.map_id,"",point)
 		_save_staff()
 	else:
