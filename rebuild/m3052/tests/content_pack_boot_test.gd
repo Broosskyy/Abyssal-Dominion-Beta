@@ -19,10 +19,10 @@ func _run() -> void:
 	check(scene!=null,"game scene loads from data pack")
 	var game=scene.instantiate();root.add_child(game);current_scene=game
 	await process_frame
-	check(game.sim.npcs.size()==17 and game.skins.size()==30,"game scripts, all 30 ship designs and scene dependencies instantiate from the pack")
+	check(game.sim.npcs.size()==17 and game.skins.size()==game.skin_previews.size() and game.skins.size()==31,"game scripts and all 31 ship designs instantiate from the signed pack")
 	# Critical end-to-end check: this scene was mounted from the standalone
 	# signed DATA ZIP, not directly from the GitHub source tree.
-	for skin_id in [27,28,29]:
+	for skin_id in [27,28,29,30]:
 		var key: String=game.TEST_SHIP_KEYS[skin_id-27]
 		check(game.mesh_layer.has_test_ship(skin_id),"signed Android data pack includes playable full GLB: "+key)
 		check(game.test_ship_textures.has(key),"signed Android data pack includes genuine 8-view sprite: "+key)
