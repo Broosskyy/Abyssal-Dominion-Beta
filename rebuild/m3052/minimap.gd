@@ -70,7 +70,13 @@ func _draw() -> void:
 		draw_circle(p,3.2,Color("a79edb"),false,1.2,true)
 	if simulation.has_harbor():
 		var port: Vector2=r.position+simulation.harbor/simulation.WORLD*r.size
-		draw_circle(port,3.0,Color("f4c56c"));draw_circle(port,3.0,Color("2a1a08"),false,1,true)
+		# A legible tiny harbor/berth silhouette, not another NPC dot.
+		draw_circle(port,5.7,Color("061d2a",.87))
+		draw_circle(port,5.7,Color("f4c56c"),false,1.1,true)
+		draw_line(port+Vector2(0,-3.2),port+Vector2(0,3.2),Color("f4d68e"),1.6,true)
+		draw_circle(port+Vector2(0,-3),1.3,Color("f4d68e"),false,1.1,true)
+		draw_arc(port+Vector2(0,1.2),2.8,0,PI,12,Color("f4d68e"),1.5,true)
+		draw_line(port-Vector2(3,0),port+Vector2(3,0),Color("f4d68e"),1.2,true)
 	var box=Rect2(r.position+(camera_world-view_world*.5)/simulation.WORLD*r.size,view_world/simulation.WORLD*r.size)
 	draw_rect(box.intersection(r),Color(.85,.95,1,.75),false,1)
 	var player: Vector2=r.position+simulation.player.pos/simulation.WORLD*r.size
