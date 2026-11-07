@@ -16,20 +16,21 @@ static func radiant_color(shot_id: int,orb: int=0) -> Color:
 static func orb_offset(shot: Dictionary,index: int,count: int,clock: float) -> Vector2:
 	var total: int=visual_count(count)
 	if total==1:return Vector2.ZERO
-	# M3103: a tight, triangular pile that flies together, not a straight
-	# broadside row or spreading fan. The first three form 1 above + 2 below.
-	# Higher detail modes add close-packed rows, not wider flight lanes.
+	# M3104: distinct marbles in a compact, staggered pile, not a row.
+	# Leave a visible air gap between the solid projectile silhouettes even
+	# while travelling at normal game zoom. The entire pile stays coherent.
 	var pile: Array[Vector2]=[]
 	match total:
 		3:
-			pile=[Vector2(0,-6.0),Vector2(-5.2,3.1),Vector2(5.2,3.1)]
+			# One up front and two behind, with space to read each sphere.
+			pile=[Vector2(0,-10.0),Vector2(-8.7,5.2),Vector2(8.7,5.2)]
 		5:
-			pile=[Vector2(0,-9.7),Vector2(-5.5,-1.3),Vector2(5.5,-1.3),
-				Vector2(-5.5,7.0),Vector2(5.5,7.0)]
+			pile=[Vector2(0,-16.0),Vector2(-9.0,-1.0),Vector2(9.0,-1.0),
+				Vector2(-9.0,14.0),Vector2(9.0,14.0)]
 		8:
-			pile=[Vector2(-5.3,-11.4),Vector2(5.3,-11.4),
-				Vector2(-10.7,-2.5),Vector2(0,-2.5),Vector2(10.7,-2.5),
-				Vector2(-10.7,6.4),Vector2(0,6.4),Vector2(10.7,6.4)]
+			pile=[Vector2(-9.0,-17.0),Vector2(9.0,-17.0),
+				Vector2(-18.0,-1.0),Vector2(0,-1.0),Vector2(18.0,-1.0),
+				Vector2(-18.0,15.0),Vector2(0,15.0),Vector2(18.0,15.0)]
 	if index<0 or index>=pile.size():return Vector2.ZERO
 	var direction: Vector2=Vector2(shot.get("pos",Vector2.ZERO))-Vector2(shot.get("start",Vector2.ZERO))
 	if direction.length_squared()<.1:direction=Vector2(shot.get("visual_heading",Vector2.RIGHT))
