@@ -63,6 +63,8 @@ var save_clock := 0.0
 var elapsed := 0.0
 var skins: Array[Dictionary] = []
 var skin_previews: Array[Texture2D] = []
+# Keep every option accessible, but let touch users browse just their type.
+var shipyard_filter := "all"
 var island_textures: Dictionary = {}
 var icons: Dictionary = {}
 var beast: Texture2D
@@ -2007,6 +2009,8 @@ func _start_shipyard_preview_motion(frames: Array[Control]) -> void:
 	timer.wait_time=.125
 	timer.autostart=true
 	timer.timeout.connect(func():
+		# No 8 FPS background work during gameplay or when animation is off.
+		if modal==null or not modal.visible or modal_kind!="Werft" or not ship_animations_enabled:return
 		for frame: Control in frames:
 			if is_instance_valid(frame) and frame.is_visible_in_tree():frame.queue_redraw()
 	)
@@ -2049,18 +2053,37 @@ func _add_shipyard_card(index: int,container: Node,frames: Array[Control]) -> vo
 	choose.add_theme_font_size_override("font_size",12)
 	choose.disabled=chosen or not model_ok
 
+func _set_shipyard_filter(value: String) -> void:
+	if not value in ["all","elite","original"]:return
+	if shipyard_filter==value:return
+	shipyard_filter=value
+	# A new filter must begin at its first card, not an old deep-scroll offset.
+	modal_scroll.restore(0)
+	if modal!=null and modal.visible and modal_kind=="Werft":_open_modal("Werft")
+
 func _open_shipyard() -> void:
 	_banner_card(painted.nav_shipyard,"WERFT · 10 ELITE-SCHIFFE","Zwei bestehende Designs bleiben erhalten. Elite 01–10 nutzen exakt dasselbe originale Black-Crown-GLB mit verschiedenen Texturen. Alle Designs kostenlos und jederzeit wechselbar; sämtliche Kampfwerte bleiben gleich.")
+	var current: int=clampi(int(sim.player.skin),0,skins.size()-1)
+	_note("AUSGERÜSTET · "+str(skins[current].name),_ship_design_accent(current))
+	# On compact phones a dozen cards take a lot of scrolling. These controls
+	# only filter the view; all 12 designs remain playable and saved unchanged.
+	var filters=_grid(3)
+	for entry in [["all","ALLE · 12"],["elite","ELITE · 10"],["original","STANDARD / TEST · 2"]]:
+		var key: String=str(entry[0])
+		var selected: bool=shipyard_filter==key
+		var button=_action(str(entry[1])+(" ✓" if selected else ""),func():_set_shipyard_filter(key),"tab_on" if selected else "normal",filters)
+		button.disabled=selected
 	var frames: Array[Control]=[]
-	_section("STANDARD & UNVERÄNDERTES TESTMODELL")
-	var original_cards=_grid(2)
-	for index in 2:_add_shipyard_card(index,original_cards,frames)
-	_section("ELITE-DESIGNS 01–10 · V2")
-	# Responsive full-screen catalog: three columns on large landscapes,
-	# two on normal phones, one on narrow screens.
-	var cols: int=3 if modal_scroll.size.x>=970 else (2 if modal_scroll.size.x>=565 else 1)
-	var elites=_grid(cols)
-	for index in range(2,12):_add_shipyard_card(index,elites,frames)
+	if shipyard_filter!="elite":
+		_section("STANDARD & UNVERÄNDERTES TESTMODELL")
+		var original_cards=_grid(2)
+		for index in 2:_add_shipyard_card(index,original_cards,frames)
+	if shipyard_filter!="original":
+		_section("ELITE-DESIGNS 01–10 · V2")
+		# Large landscapes use 3 columns, phones use 2 or 1.
+		var cols: int=3 if modal_scroll.size.x>=970 else (2 if modal_scroll.size.x>=565 else 1)
+		var elites=_grid(cols)
+		for index in range(2,12):_add_shipyard_card(index,elites,frames)
 	_start_shipyard_preview_motion(frames)
 	_section("MUNITIONSNACHSCHUB · JE 30 GOLD")
 	var stock=_grid(3)
