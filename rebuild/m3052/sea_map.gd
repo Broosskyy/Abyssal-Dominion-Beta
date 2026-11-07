@@ -541,7 +541,7 @@ func _draw() -> void:
 		COMBAT_FX.draw_projectile(self,shot,sim.clock,projectile_visual_count)
 	for event in sim.events:
 		var age: float = sim.clock-float(event.time)
-		if age>1.2: continue
+		if age>(1.8 if str(event.type)=="impact" else 1.2):continue
 		var p: Vector2 = event.pos
 		if event.type=="impact":
 			COMBAT_FX.draw_impact(self,event,age,sim.clock)
