@@ -127,6 +127,18 @@ func _init() -> void:
 			"reward":int(spec.reward) if meshy_ready else (110 if elite else 55),"art":i,"elite":elite,
 			"visual_key":str(spec.key),"view_count":4,"renderer":"mesh" if meshy_ready else "sprite",
 			"navigation":"free" if meshy_ready else "four_diagonal","last_hit":-100.0})
+	# Optional elite model test. No substitution of existing fleet or saved progress.
+	# When the original GLB is absent, normal builds and the updater remain unchanged.
+	if ResourceLoader.exists("res://assets/npc/meshy/models/black_crown_corsair_elite_test.glb"):
+		var crown_pos:=Vector2(2320,1180)
+		if blocked(crown_pos,64.0):crown_pos=Vector2(2140,1080)
+		npcs.append({"id":90,"name":"Black Crown Corsair · ELITE TEST","kind":"ship",
+			"pos":crown_pos,"home":crown_pos,"heading":Vector2.LEFT,"path":[],
+			"hp":1150,"max_hp":1150,"shield":320,"max_shield":320,"speed":44.0,"power":46,
+			"reload":0.0,"repath":0.0,"state":"patrol","patrol":2,"aggressive":false,
+			"slow":0.0,"respawn":0.0,"reward":120,"art":4,"elite":true,
+			"elite_test":true,"visual_key":"black_crown_corsair_elite_test",
+			"view_count":8,"renderer":"mesh","navigation":"free","last_hit":-100.0})
 	npcs.append({"id": 100, "name": "Tiamat · Tiefenwächter", "kind": "monster", "pos": Vector2(2590, 1750),
 		"home": Vector2(2590, 1750), "heading": Vector2.LEFT, "path": [], "hp": 1650,
 		"max_hp": 1650, "shield": 0, "max_shield": 0, "speed": 28.0, "reload": 1.0, "repath": 0.0, "state": "patrol",
