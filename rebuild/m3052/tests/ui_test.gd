@@ -108,6 +108,21 @@ func _run() -> void:
 	var expected_name: String=game._plate_title(game.sim.player)
 	check(expected_name.contains("Schattenkriegsschiff") and not expected_name.contains("TEST"),"M3099 captain has no test design title")
 	check(game._plate_title_size(game.sim.player)>=12,"M3099 captain title remains readable")
+	# The native-pixel HUD, not just the older chart drawing, must follow
+	# the selected original/Elite paint and size text at the actual font px.
+	check(game.plate_overlay!=null and game.plate_overlay.host==game,"native ship/HUD overlay remains linked to the scene")
+	check(game.plate_overlay._player_title_tint(game.sim.player)==Color("d9f0e5"),"standard captain nameplate keeps readable light ink")
+	game.sim.player.skin=2
+	check(game.plate_overlay._player_title_tint(game.sim.player)==game._ship_design_accent(2).lightened(.17),"Elite 01 native HUD name takes the selected ship color")
+	game.sim.player.skin=11
+	check(game.plate_overlay._player_title_tint(game.sim.player)==game._ship_design_accent(11).lightened(.17),"Elite 10 native HUD name follows own unique color")
+	game.sim.player.skin=0
+	game.plate_text_width_cache.clear()
+	var expected_font_px: int=maxi(16,roundi(16.0*game._plate_pixels()))
+	var measured_title_width: float=game._plate_text_width("Schattenkriegsschiff",16)
+	check(is_equal_approx(measured_title_width,game.font.get_string_size("Schattenkriegsschiff",HORIZONTAL_ALIGNMENT_LEFT,-1,expected_font_px).x),"HUD name sizing uses actual native overlay font pixels")
+	var cached_before: int=game.plate_text_width_cache.size()
+	check(is_equal_approx(game._plate_text_width("Schattenkriegsschiff",16),measured_title_width) and game.plate_text_width_cache.size()==cached_before,"repeat frame title measurements reuse the bounded mobile font cache")
 	var captain_ring: Vector2=game._selection_ring_radii(game.sim.player)
 	check(captain_ring.x>55.0 and captain_ring.y>20.0 and captain_ring.x>captain_ring.y,"M3099 player ring fits shaded hull")
 	check(game._selection_ring_visible(game.sim.player),"captain always receives water selection ring")
