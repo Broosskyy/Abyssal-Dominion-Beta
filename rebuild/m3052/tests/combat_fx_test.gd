@@ -19,9 +19,15 @@ func _run() -> void:
 	var sample_ball={"id":12,"pos":Vector2(620,500),"start":Vector2(500,500),"distance":240.0,"traveled":140.0,"visual_heading":Vector2.RIGHT}
 	check(FX.orb_offset(sample_ball,0,1,0.0)==Vector2.ZERO,"M3102 one-ball visual is exactly original flight path")
 	for total in [3,5,8]:
-		var left: Vector2=FX.orb_offset(sample_ball,0,total,1.0)
-		var right: Vector2=FX.orb_offset(sample_ball,total-1,total,1.0)
-		check(left.distance_to(right)>10.0,"M3102 multi-orb mode %d gives visible fan spread" % total)
+		var cluster: Array[Vector2]=[]
+		for orb in total:cluster.append(FX.orb_offset(sample_ball,orb,total,1.0))
+		var footprint:=Rect2(cluster[0],Vector2.ZERO)
+		for p in cluster:footprint=footprint.expand(p)
+		check(footprint.size.x<29.0 and footprint.size.y<29.0,"M3103 %d visible balls form a tight pile, never a broadside fan" % total)
+		check(footprint.size.x>8.0 and footprint.size.y>8.0,"M3103 %d-ball pack has 2D depth rather than a straight line" % total)
+		if total==3:
+			var corner: float=(cluster[1]-cluster[0]).cross(cluster[2]-cluster[0])
+			check(absf(corner)>30.0,"M3103 three balls form a stable compact triangle (one above two)")
 	var sim=SIM.new()
 	check(sim.AMMO_NAMES==FX.WEAPONS.slice(0,7),"effect profiles are mapped to actual game ammunition indices")
 	var colors: Array[String]=[]
@@ -83,6 +89,23 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	check(game.drawn_shots==7,"sea-map draw pass processes each real ammo VFX")
+	# A real three-ball broadside is ONE flying grouped cluster; gameplay still
+	# carries three individually damage-bearing, ammo-consuming projectiles.
+	game.sim.shots.clear()
+	game.sim._launch(0,int(enemy.id),"cannon",17,3)
+	var physical_group: int=int(game.sim.shots[0].salvo_group)
+	check(game.sim.shots.size()==3,"M3103 physical broadside still has three real projectiles")
+	var unique_ids: Dictionary={}
+	for projectile: Dictionary in game.sim.shots:
+		projectile.age=.25
+		unique_ids[int(projectile.id)]=true
+		check(int(projectile.salvo_group)==physical_group and int(projectile.salvo_count)==3,
+			"M3103 all three real projectiles belong to the same visual pile")
+	check(unique_ids.size()==3,"M3103 individual damage-carrying projectiles keep unique IDs")
+	game.queue_redraw()
+	await process_frame
+	await process_frame
+	check(game.drawn_shots==1,"M3103 three real shots are drawn as ONE compact Kugelhaufen")
 	game._refresh_ui()
 	for index in 7:
 		game.sim.ammo_mode=index
