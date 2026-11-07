@@ -1,4 +1,5 @@
 extends RefCounted
+const IMPACT_FX=preload("res://impact_fx.gd")
 ## M3100 — original, texture-free sea combat VFX for actual airborne munitions.
 ## Drawn in chart world coordinates, independent of the 2.5D/3D GLB renderer.
 ## Pure visual functions: never mutate HP, cooldowns, ammunition or target state.
@@ -295,7 +296,7 @@ static func draw_muzzle(canvas: CanvasItem,event: Dictionary,age: float,clock: f
 		canvas.draw_line(at,at+direction*(14.0+age*17.0),Color("ffe6b6",.55*fade),1.8,true)
 
 static func draw_impact(canvas: CanvasItem,event: Dictionary,age: float,clock: float) -> void:
-	if age<0.0 or age>=1.05:return
+	if age<0.0 or age>=1.8:return
 	var weapon: String=str(event.get("weapon","cannon"))
 	var p: Vector2=Vector2(event.get("pos",Vector2.ZERO))
 	var seed: float=float(int(event.get("vfx_seed",event.get("actor",0)))%23)
@@ -350,6 +351,7 @@ static func draw_impact(canvas: CanvasItem,event: Dictionary,age: float,clock: f
 			_ellipse(canvas,p,Vector2(15+age*42,7+age*22),Color("e5bc8e",.45*fade),2.0)
 		_:
 			pass
+	IMPACT_FX.draw(canvas,event,age,clock,weapon_color(weapon))
 
 static func _flake_burst(canvas: CanvasItem,p: Vector2,age: float,fade: float,hard: bool) -> void:
 	var tint: Color=Color("66dcff") if hard else Color("edffff")
