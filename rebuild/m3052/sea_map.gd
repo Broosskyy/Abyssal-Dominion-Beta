@@ -1909,11 +1909,18 @@ func _draw_ship_stage(stage: Control) -> void:
 	var name=str(skins[int(sim.player.skin)].name).to_upper()
 	var tag="[%s] " % sim.guild.tag if not sim.guild.is_empty() else ""
 	var title=tag+name
-	var tw=font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,17).x
+	var title_size:=17
 	var badge=SEA_MARKS.badge_width(staff.badge(),font,12)+8 if staff.shows_badge() else 0.0
-	var left=w*.5-(tw+badge)*.5
+	var tw=font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,title_size).x
+	# The longer Elite 1 name and guild tag must fit small Android ship panels.
+	while title_size>12 and tw+badge>w-88.0:
+		title_size-=1
+		tw=font.get_string_size(title,HORIZONTAL_ALIGNMENT_LEFT,-1,title_size).x
+	var left=maxf(48.0,w*.5-(tw+badge)*.5)
 	if staff.shows_badge():SEA_MARKS.staff_badge(stage,Vector2(left,22),staff.badge(),staff.color(),font,12)
-	_canvas_text(stage,Vector2(left+badge+tw*.5,28),title,17,staff.color() if staff.shows_badge() else design_accent)
+	_canvas_text(stage,Vector2(left+badge+tw*.5,28),title,title_size,staff.color() if staff.shows_badge() else design_accent)
+	if int(sim.player.skin)==1:
+		_canvas_text(stage,Vector2(w-70,58),"ELITE · 01",11,Color(GOLD,.82))
 	var tier=clampi(floori((sim.level-1)/4.0)+1,1,ROMAN.size()-1)
 	stage.draw_circle(Vector2(34,34),18,Color("17303c"));stage.draw_arc(Vector2(34,34),18,0,TAU,28,Color("d8b46a"),2.0,true)
 	_canvas_text(stage,Vector2(34,39),ROMAN[tier],13,Color("ffe6a8"))
@@ -2083,7 +2090,7 @@ func _open_harbor() -> void:
 		var services=_grid(2)
 		_with_icon(_action("DECKS & DECKWERFT",func():_open_modal("Decks"),"normal",services),painted.tide_deck)
 		_with_icon(_action("GEZEITENKESSEL",func():_open_modal("Kessel"),"normal",services),painted.nav_kessel)
-		_with_icon(_action("SCHATTENKRIEGSSCHIFF · WERFT",func():_open_modal("Werft"),"normal",services),painted.nav_shipyard)
+		_with_icon(_action("SCHIFFSDESIGNS · WERFT",func():_open_modal("Werft"),"normal",services),painted.nav_shipyard)
 		_with_icon(_action("SEEKARTEN",func():_open_modal("Seekarten"),"normal",services),painted.nav_charts)
 		_primary("ABLEGEN",func():sim.depart();modal.hide();_save_progress();_refresh_ui())
 	if not sim.docked:
