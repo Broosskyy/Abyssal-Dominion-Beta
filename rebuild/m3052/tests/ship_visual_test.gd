@@ -16,7 +16,9 @@ func _initialize() -> void:
 	var sample=[{"type":"impact","pos":Vector2.ZERO,"actor":4,"time":1.0,"value":31},{"type":"impact","pos":Vector2.ZERO,"actor":4,"time":1.08,"value":31}]
 	check(VISUALS.impact_labels(sample,1.2).size()==1,"impact labels group simultaneous volleys")
 	check(not VISUALS.landmark_label_visible(Vector2.ZERO,[{"hp":100,"pos":Vector2(0,50)}]),"captain suppresses overlapping landmark label")
-	check(ResourceLoader.exists("res://assets/player/schattenkriegsschiff_shaded.glb"),"only approved shaded player GLB is installed")
+	check(ResourceLoader.exists("res://assets/player/schattenkriegsschiff_shaded.glb"),"approved shaded captain GLB exists")
+	check(ResourceLoader.exists("res://assets/npc/meshy/models/black_crown_corsair_elite_test.glb"),"original Black Crown Corsair Elite 1 GLB exists")
+	check(ResourceLoader.exists("res://assets/player/black_crown_elite_1_preview.png"),"Elite 1 shipyard preview exists")
 	for old_path in ["res://assets/player/test_ships/base_basic_pbr.glb","res://assets/player/test_ships/gemi11_uv.glb","res://assets/generated/ships/starter_small_8_intact.png","res://assets/fleet/redkorsar.png"]:
 		check(not ResourceLoader.exists(old_path),"retired ship asset is not present: "+old_path)
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
