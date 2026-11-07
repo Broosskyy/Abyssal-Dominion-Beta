@@ -5,7 +5,7 @@ extends TextureRect
 const MODEL_ROOT := "res://assets/npc/meshy/models/"
 const PLAYER_MODEL_ROOT := "res://assets/player/test_ships/"
 const STERN_TAPER=preload("res://stern_hull_taper.gd")
-const TEST_SHIP_SKINS := {27:"crimson_voyager",28:"test_ship_2",29:"base_basic_pbr"}
+const TEST_SHIP_SKINS := {27:"crimson_voyager",28:"test_ship_2",29:"base_basic_pbr",30:"gemi11_uv"}
 # Export-critical hard references. The three new models are played by users,
 # not the old NPC roster; string-based dynamic loading was insufficient to
 # make the exporter retain their converted GLTF scenes in the signed PCK.
@@ -14,14 +14,15 @@ const PLAYER_TEST_SCENES := {
 	"test_ship_2":preload("res://assets/player/test_ships/test_ship_2.glb"),
 	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr.glb"),
 	"base_basic_gameplay_pbr":preload("res://assets/player/test_ships/base_basic_gameplay_pbr.glb"),
-	"base_basic_gameplay_shaded":preload("res://assets/player/test_ships/base_basic_gameplay_shaded.glb")
+	"base_basic_gameplay_shaded":preload("res://assets/player/test_ships/base_basic_gameplay_shaded.glb"),
+	"gemi11_uv":preload("res://assets/player/test_ships/gemi11_uv.glb")
 }
 # Confirmed with orthographic renders of ORIGINAL GLB source geometry:
 # the red starter bows along -X; both big galleons bow along +Z.
 # A -90 deg local Y pivot maps +Z onto -X, like the original NPC fleet.
 const PLAYER_RAW_BOW := {"crimson_voyager":Vector3(-1,0,0),"test_ship_2":Vector3(0,0,1),"base_basic_pbr":Vector3(0,0,1),
 	"base_basic_gameplay_pbr":Vector3(0,0,1),
-	"base_basic_gameplay_shaded":Vector3(0,0,1)}
+	"base_basic_gameplay_shaded":Vector3(0,0,1),"gemi11_uv":Vector3(0,0,1)}
 const PLAYER_WATER_IMMERSION := 0.205
 const GAMEPLAY_WATER_IMMERSION := 0.23
 # Both actual GLB modes use the same stable oblique camera. Historically
@@ -50,7 +51,9 @@ const MODEL_INFO := {
 	"base_basic_pbr":[1.999924,-0.830467,1.661094,-0.000236,0.000038,-90.0],
 	# Uploaded M3092 ~5,918-triangle GLBs. True source bounds, Y-up and +Z prow.
 	"base_basic_gameplay_pbr":[1.896816,0.0,1.460584,-0.000345,0.000428,-90.0],
-	"base_basic_gameplay_shaded":[1.896816,0.0,1.460584,-0.000345,0.000428,-90.0]
+	"base_basic_gameplay_shaded":[1.896816,0.0,1.460584,-0.000345,0.000428,-90.0],
+	# M3097 original GLB dimensions; local +Z prow, Y up.
+	"gemi11_uv":[36.973776,-0.753792,27.774979,0.043137,1.132746,-90.0]
 }
 var host
 var stage: SubViewport
@@ -204,12 +207,12 @@ func can_render_actor(actor: Dictionary) -> bool:
 # Preserve the physical bow/oars and stern at every heading. The ship's
 # true projection changes with camera zoom and 3D yaw, so the label must too.
 const PLAYER_SOURCE_BEAMS := {"crimson_voyager":0.355,"test_ship_2":0.440,"base_basic_pbr":0.433,
-	"base_basic_gameplay_pbr":0.614,"base_basic_gameplay_shaded":0.614}
+	"base_basic_gameplay_pbr":0.614,"base_basic_gameplay_shaded":0.614,"gemi11_uv":10.362028}
 # The ~0.614 GLB half-width includes all oars. Labels need the hull
 # envelope, NOT the distant tip of the oars: a ship's name is underneath
 # the keel rather than below its maximum side appendage.
 const PLAYER_CAPTION_HULL_BEAMS := {
-	"base_basic_gameplay_pbr":0.42,"base_basic_gameplay_shaded":0.42
+	"base_basic_gameplay_pbr":0.42,"base_basic_gameplay_shaded":0.42,"gemi11_uv":7.20
 }
 
 func projected_hull_bottom(actor: Dictionary) -> float:

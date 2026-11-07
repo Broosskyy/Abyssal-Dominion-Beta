@@ -176,17 +176,19 @@ const TEST_SHIP_ROOT := "res://assets/player/test_ships/"
 const TEST_SHIP_SPRITES := {
 	"crimson_voyager":preload("res://assets/player/test_ships/crimson_voyager_eight.png"),
 	"test_ship_2":preload("res://assets/player/test_ships/test_ship_2_eight.png"),
-	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr_eight.png")
+	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr_eight.png"),
+	"gemi11_uv":preload("res://assets/player/test_ships/gemi11_uv_eight.png")
 }
 const TEST_SHIP_PREVIEWS := {
 	"crimson_voyager":preload("res://assets/player/test_ships/crimson_voyager_preview.png"),
 	"test_ship_2":preload("res://assets/player/test_ships/test_ship_2_preview.png"),
-	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr_preview.png")
+	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr_preview.png"),
+	"gemi11_uv":preload("res://assets/player/test_ships/gemi11_uv_preview.png")
 }
-const TEST_SHIP_KEYS := ["crimson_voyager","test_ship_2","base_basic_pbr"]
+const TEST_SHIP_KEYS := ["crimson_voyager","test_ship_2","base_basic_pbr","gemi11_uv"]
 # Comparable gameplay silhouettes: bigger test ships remain larger than
 # the starter, but no longer dominate half of the sea screen at close zoom.
-const TEST_SHIP_LENGTHS := [128.0,152.0,158.0]
+const TEST_SHIP_LENGTHS := [128.0,152.0,158.0,154.0]
 const NPC_VISUAL_SCALE := 0.90
 var test_ship_textures: Dictionary={}
 var plate_fleet: Array[Dictionary] = []
@@ -299,7 +301,7 @@ func _load_assets() -> void:
 		for direction in 8:
 			frames.append({"rect":[direction*320,0,320,320],"pivot":[160,181],"reference_extent":320,"column":direction,"row":0})
 		ship_frames["assets/player/test_ships/"+test_key+"_eight.png"]={"frames":frames,"size":[2560,320],"kind":"3d-derived-8-direction"}
-	var test_names=["Crimson Voyager · Startschiff","TEST · Totenkopf-Galeere","TEST · Schattenkriegsschiff"]
+	var test_names=["Crimson Voyager · Startschiff","TEST · Totenkopf-Galeere","TEST · Schattenkriegsschiff","TEST 2 · Gemi11 UV korrigiert"]
 	for i in TEST_SHIP_KEYS.size():
 		var key=TEST_SHIP_KEYS[i]
 		skins.append({"name":test_names[i],"mesh_key":key,"test_ship":i>0,"views":8})
@@ -669,7 +671,7 @@ func _actor_visual_length(actor: Dictionary) -> float:
 	if int(actor.id)==0:
 		var skin=int(sim.player.skin)
 		if skin==26:return 128.0
-		if skin>=27 and skin<=29:return TEST_SHIP_LENGTHS[skin-27]
+		if skin>=27 and skin<=30:return TEST_SHIP_LENGTHS[skin-27]
 		if skin>=10:return float(CONTENT.SHIP_LENGTHS[skin-10])*NPC_VISUAL_SCALE
 		return 140.0
 	if actor.kind=="ship":return float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
@@ -2121,10 +2123,10 @@ func _open_ammo() -> void:
 		modal_body.add_child(row);ammo_rows.append(row)
 
 func _open_shipyard() -> void:
-	_banner_card(painted.nav_shipyard,"SCHIFFSDESIGNS · %d KARTEN" % skins.size(),"Die 3 kostenlosen GLB-Testschiffe stehen oben. Alte Schiffdesigns bleiben erhalten. Ausrüstung, HP, Kanonen und Decks werden nicht verändert.")
+	_banner_card(painted.nav_shipyard,"SCHIFFSDESIGNS · %d KARTEN" % skins.size(),"Die vier kostenlosen GLB-Testschiffe stehen oben, darunter Gemi11 als eigener Testplatz. Alte Schiffdesigns bleiben erhalten. Ausrüstung, HP, Kanonen und Decks werden nicht verändert.")
 	var order: Array[int]=[]
 	for i in skins.size():order.append(i)
-	# Put starter and both free testing hulls first; sort old designs below.
+	# Put all four GLB testing hulls first, without removing other designs.
 	order.sort_custom(func(a,b):
 		if (a>=27)!=(b>=27):return a>=27
 		if a>=27:return a<b

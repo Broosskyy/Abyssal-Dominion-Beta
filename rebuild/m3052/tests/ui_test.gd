@@ -19,8 +19,8 @@ func _run() -> void:
 	current_scene=game
 	await process_frame
 	check(game.ship_textures.size()==10 and game.atlas_textures.size()==16,"ten own ship designs and sixteen directional reference atlases loaded")
-	check(game.skins.size()==30,"27 original ship designs plus three playable GLB test ships are listed")
-	check(game.TEST_SHIP_LENGTHS==[128.0,152.0,158.0],"M3087 normalized player test hull silhouettes use three coherent size tiers")
+	check(game.skins.size()==31,"27 original designs plus four playable GLB ships, including Gemi11")
+	check(game.TEST_SHIP_LENGTHS==[128.0,152.0,158.0,154.0],"M3097 Gemi11 is independently sized without changing previous hulls")
 	check(game.NPC_VISUAL_SCALE>=0.85 and game.NPC_VISUAL_SCALE<=0.95,"M3087 original NPC vessels scale consistently instead of overpowering the chart")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
 	# M3092: actual 3D model A/B/C comparison, not material-only or sprites.
@@ -75,21 +75,32 @@ func _run() -> void:
 	check(is_equal_approx(game.wake_motion_strength(165.0,165.0),1.0),"M3086 cruising ship produces full-speed wake")
 	check(is_equal_approx(game.wake_motion_strength(400.0,165.0),1.0),"M3086 unusually fast telemetry cannot overbrighten wakes")
 	check(str(game.skins[27].mesh_key)=="crimson_voyager" and str(game.skins[28].mesh_key)=="test_ship_2" and str(game.skins[29].mesh_key)=="base_basic_pbr","red starter and both boss test GLBs have dedicated shipyard slots")
-	for skin_id in [27,28,29]:
+	for skin_id in [27,28,29,30]:
 		var key: String=game.TEST_SHIP_KEYS[skin_id-27]
 		check(game.mesh_layer.has_test_ship(skin_id),"M3083 player GLB is actually imported: "+key)
 		check(game.test_ship_textures.has(key),"M3083 genuine 8-direction sprite exported: "+key)
 		check(game.skin_previews[skin_id]!=null and game.skin_previews[skin_id]==game.TEST_SHIP_PREVIEWS[key],"M3083 genuine shipyard preview exported: "+key)
+	check(str(game.skins[30].mesh_key)=="gemi11_uv","M3097 Gemi11 occupies separate skin 30 in shipyard")
+	game.sim.player.skin=30
+	game.mesh_layer.set_render_mode("3d")
+	check(game.mesh_layer.can_render_actor(game.sim.player),"M3097 Gemi11 renders as real GLB in 3D")
+	var isolated_gemi11: Array[Dictionary]=[game.sim.player]
+	game.mesh_layer.sync_fleet(isolated_gemi11,game.camera,game.get_viewport_rect().size)
+	check(str(game.mesh_layer.model_instance_keys.get(0,""))=="gemi11_uv","M3097 Gemi11 GLB instance is independent")
+	game.mesh_layer.set_render_mode(old_comparison_mode)
+	game.sim.player.skin=old_comparison_skin
 	var fresh=game.SIM.new()
 	check(int(fresh.player.skin)==27,"new captains begin on the red Crimson Voyager")
 	var fresh_save=fresh.export_save()
 	fresh.player.skin=29
 	check(fresh.restore_save(fresh.export_save()) and int(fresh.player.skin)==29,"large test ship survives captain save and restore")
+	fresh.player.skin=30
+	check(fresh.restore_save(fresh.export_save()) and int(fresh.player.skin)==30,"M3097 Gemi11 skin persists across save/load")
 	fresh.player.skin=27
 	check(fresh.restore_save(fresh_save) and int(fresh.player.skin)==27,"red starter survives saving and loading")
 	# Verify real physical bow direction for both Z-long originals and red X-long
 	# starter, at all eight map bearings. This catches 180-degree import errors.
-	for model_key in ["crimson_voyager","test_ship_2","base_basic_pbr","base_basic_gameplay_pbr","base_basic_gameplay_shaded"]:
+	for model_key in ["crimson_voyager","test_ship_2","base_basic_pbr","base_basic_gameplay_pbr","base_basic_gameplay_shaded","gemi11_uv"]:
 		for course in [Vector2.RIGHT,Vector2(1,1).normalized(),Vector2.DOWN,Vector2(-1,1).normalized(),Vector2.LEFT,Vector2(-1,-1).normalized(),Vector2.UP,Vector2(1,-1).normalized()]:
 			check(game.mesh_layer.forward_for_model(model_key,course).distance_to(course)<0.001,"M3084 GLB physical prow points in the direction of travel: "+model_key+" "+str(course))
 	var slow_player_turn: float=game.mesh_layer.smooth_player_yaw(0.0,PI,1.0/60.0)

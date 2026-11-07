@@ -24,7 +24,7 @@ var player: Dictionary
 # Existing save files keep their selected ship. On a fresh install with the
 # complete test fleet the red Crimson Voyager is the default beginner hull.
 const RED_STARTER_GLB := "res://assets/player/test_ships/crimson_voyager.glb"
-const TEST_SKIN_MAX := 29
+const TEST_SKIN_MAX := 30
 ## Local captain identity until the server issues persistent multiplayer IDs.
 var captain_id := ""
 var npcs: Array[Dictionary] = []
