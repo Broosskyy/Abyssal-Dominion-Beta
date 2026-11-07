@@ -7,9 +7,10 @@ const PLAYER_MODEL_ROOT := "res://assets/player/"
 const STERN_TAPER=preload("res://stern_hull_taper.gd")
 # One production player GLB and nine approved 3D NPC vessels. No test variants.
 const PLAYER_SCENES := {
-	"schattenkriegsschiff_shaded":preload("res://assets/player/schattenkriegsschiff_shaded.glb")
+	"schattenkriegsschiff_shaded":preload("res://assets/player/schattenkriegsschiff_shaded.glb"),
+	"black_crown_corsair_elite_test":preload("res://assets/npc/meshy/models/black_crown_corsair_elite_test.glb")
 }
-const PLAYER_RAW_BOW := {"schattenkriegsschiff_shaded":Vector3(0,0,1)}
+const PLAYER_RAW_BOW := {"schattenkriegsschiff_shaded":Vector3(0,0,1), "black_crown_corsair_elite_test":Vector3(-1,0,0)}
 const GAMEPLAY_WATER_IMMERSION := 0.23
 const PLAYER_WATER_IMMERSION := 0.205
 const FLEET_CAMERA_TILT_DEGREES := 40.0
@@ -50,7 +51,7 @@ var resolution_factor := 0.8
 var gameplay_double_sided_count := 0
 
 func _configure_gameplay_surfaces(owner: Node3D,key: String) -> void:
-	if key!="schattenkriegsschiff_shaded":return
+	if not PLAYER_SCENES.has(key):return
 	var pivot: Node3D=owner.get_node_or_null("OriginalAxisCorrection")
 	if pivot==null:return
 	var pending: Array[Node]=[pivot]
@@ -152,12 +153,15 @@ func has_complete_fleet() -> bool:
 		if not model_scenes.has(key):return false
 	return true
 
-func player_key_for_skin(_skin: int) -> String:
-	# Old stored skin IDs are canonicalized to zero in Simulation.restore_save.
-	return "schattenkriegsschiff_shaded"
+func player_key_for_skin(skin: int) -> String:
+	# Legacy saved skins are normalized by Simulation.restore_save (schema 5).
+	return "black_crown_corsair_elite_test" if skin==1 else "schattenkriegsschiff_shaded"
 
 func has_player_ship() -> bool:
 	return model_scenes.has("schattenkriegsschiff_shaded")
+
+func has_elite_1_ship() -> bool:
+	return model_scenes.has("black_crown_corsair_elite_test")
 
 func set_render_mode(requested: String) -> void:
 	mode=requested if requested in ["hybrid","3d"] else "hybrid"
@@ -166,14 +170,14 @@ func set_render_mode(requested: String) -> void:
 
 func can_render_actor(actor: Dictionary) -> bool:
 	if not visible:return false
-	if int(actor.get("id",-1))==0:return has_player_ship()
+	if int(actor.get("id",-1))==0:return model_scenes.has(player_key_for_skin(int(actor.get("skin",-1))))
 	return int(actor.get("id",0))>0 and str(actor.get("kind",""))=="ship" and model_scenes.has(str(actor.get("visual_key","")))
 
 # Lower-hull envelope from the source GLB bounds, not the eight-angle sprite.
 # Preserve the physical bow/oars and stern at every heading. The ship's
 # true projection changes with camera zoom and 3D yaw, so the label must too.
-const PLAYER_SOURCE_BEAMS := {"schattenkriegsschiff_shaded":0.614}
-const PLAYER_CAPTION_HULL_BEAMS := {"schattenkriegsschiff_shaded":0.42}
+const PLAYER_SOURCE_BEAMS := {"schattenkriegsschiff_shaded":0.614,"black_crown_corsair_elite_test":0.337433}
+const PLAYER_CAPTION_HULL_BEAMS := {"schattenkriegsschiff_shaded":0.42,"black_crown_corsair_elite_test":0.337433}
 
 func projected_hull_bottom(actor: Dictionary) -> float:
 	if not can_render_actor(actor) or int(actor.get("id",-1))!=0:return -INF
