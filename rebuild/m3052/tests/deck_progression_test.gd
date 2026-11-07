@@ -41,7 +41,7 @@ func _initialize() -> void:
 	sim.add_special_deck("storm_deck",600);sim.add_special_deck("salvage_deck",900);sim.add_tide_deck(1200)
 	var saved=JSON.parse_string(JSON.stringify(sim.export_save()))
 	var restored=SIM.new()
-	check(saved.schema==4 and restored.restore_save(saved),"ten-slot save schema round-trips")
+	check(saved.schema==5 and restored.restore_save(saved),"ten-slot save and selected ship schema 5 round-trip")
 	check(restored.decks==sim.decks and restored.deck_slots==sim.deck_slots,"all ten individual decks and their materials survive reload")
 	check(restored.buffs.storm_deck==600 and restored.buffs.salvage_deck==900 and restored.buffs.tide_deck==1200,"surrounding special-deck timers survive reload")
 	# Existing data-50 saves keep their first two slots, material indices and wallet.
