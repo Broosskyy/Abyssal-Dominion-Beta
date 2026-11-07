@@ -10,6 +10,8 @@ var state_label=""
 var hero:=false
 var pager:=false
 var badge_alert:=false
+var ammo_marker:=false
+var ammo_color: Color=Color("e2be83")
 const GOLD=Color("c7a15a")
 var motion_time:=0.0
 var press_reaction:=0.0
@@ -20,7 +22,7 @@ func _process(delta: float) -> void:
 	motion_time=fposmod(motion_time+delta,TAU*64.0)
 	if press_reaction>0.0:press_reaction=maxf(0.0,press_reaction-delta*3.7)
 	# Idle controls do not redraw; active/cooling controls receive gentle motion.
-	if press_reaction>0.0 or latched or (hero and cooldown>0.0):queue_redraw()
+	if press_reaction>0.0 or latched or ammo_marker or (hero and cooldown>0.0):queue_redraw()
 func _ready() -> void:
 	focus_mode=Control.FOCUS_NONE
 	clip_text=true
@@ -125,6 +127,11 @@ func _draw() -> void:
 	var center=Vector2(size.x*.5,size.y*.5)
 	var radius=diameter*.5-2
 	_bezel(center,radius,gold)
+	if ammo_marker:
+		# A slim color-coded ring preserves the bronze Seafight-like HUD bezel.
+		var flicker: float=.5+.5*sin(motion_time*1.8)
+		draw_arc(center,radius-2.4,PI*1.12,PI*1.88,26,Color(ammo_color,.56+.18*flicker),2.2,true)
+		draw_circle(center+Vector2(0,-radius+4.6),2.4,Color(ammo_color,.72+.22*flicker))
 	if press_reaction>0.0:draw_arc(center,radius*.95+(1.0-press_reaction)*3.0,0,TAU,36,Color("ffe6a8",press_reaction*.65),1.5,true)
 	var labelled=not quantity.is_empty() or not caption.is_empty()
 	if art!=null:
