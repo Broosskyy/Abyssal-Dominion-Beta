@@ -5,7 +5,7 @@ extends TextureRect
 const MODEL_ROOT := "res://assets/npc/meshy/models/"
 const PLAYER_MODEL_ROOT := "res://assets/player/"
 const STERN_TAPER=preload("res://stern_hull_taper.gd")
-# One production player GLB and nine approved 3D NPC vessels. No test variants.
+# Two approved player designs (shaded captain and Elite 1) plus nine NPC vessels.
 const PLAYER_SCENES := {
 	"schattenkriegsschiff_shaded":preload("res://assets/player/schattenkriegsschiff_shaded.glb"),
 	"black_crown_corsair_elite_test":preload("res://assets/npc/meshy/models/black_crown_corsair_elite_test.glb")
@@ -325,15 +325,16 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		var long_ship: bool=float(host._actor_visual_length(actor))>=175.0
 		var swell: float=0.27 if long_ship else 0.42
 		var clock: float=host.elapsed*1.55+float(id)*1.37
-		node.position.y=sin(clock)*swell*(.32+.68*cruise)
+		var motion: bool=host.ship_animations_enabled
+		node.position.y=sin(clock)*swell*(.32+.68*cruise) if motion else 0.0
 		var axis: Node3D=node.get_node_or_null("OriginalAxisCorrection")
 		if axis!=null:
 			var base_yaw: float=deg_to_rad(float(MODEL_INFO[key][5])) if MODEL_INFO[key].size()>5 else 0.0
-			var bank: float=clampf(rad_to_deg(angle_difference(node.rotation.y,desired_yaw))*.035,-1.6,1.6)
+			var bank: float=clampf(rad_to_deg(angle_difference(node.rotation.y,desired_yaw))*.035,-1.6,1.6) if motion else 0.0
 			axis.rotation=Vector3(
-				deg_to_rad(sin(clock*.78)*(.30+.40*cruise)),
+				deg_to_rad(sin(clock*.78)*(.30+.40*cruise)) if motion else 0.0,
 				base_yaw,
-				deg_to_rad(sin(clock+.65)*(.24+.36*cruise)+bank)
+				deg_to_rad(sin(clock+.65)*(.24+.36*cruise)+bank) if motion else 0.0
 			)
 		node.visible=true
 		kept[id]=true
