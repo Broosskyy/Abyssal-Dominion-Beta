@@ -508,8 +508,14 @@ func _draw() -> void:
 	# Original M3100 missile silhouettes, contrails, sparks and shadow arcs.
 	# Both approved GLB modes share the same chart-space combat VFX layer.
 	drawn_shots=0
+	# One compact flying Kugelhaufen per salvo. A three-hit broadside does
+	# NOT produce three separate rows or three duplicate bundles.
+	var rendered_salvos: Dictionary={}
 	for shot: Dictionary in sim.shots:
 		if float(shot.get("age",-1.0))<0.0:continue
+		var salvo_key: int=int(shot.get("salvo_group",shot.get("id",-1)))
+		if rendered_salvos.has(salvo_key):continue
+		rendered_salvos[salvo_key]=true
 		drawn_shots+=1
 		COMBAT_FX.draw_projectile(self,shot,sim.clock,projectile_visual_count)
 	for event in sim.events:
