@@ -46,6 +46,19 @@ func _run() -> void:
 		check(game.mesh_layer.can_render_actor(game.sim.player),"Elite Design 1 renders in "+chosen_mode)
 		check(str(game.mesh_layer.model_instance_keys.get(0,""))=="black_crown_corsair_elite_test","Elite 1 actual 3D mesh active in "+chosen_mode)
 		check(game.mesh_layer.gameplay_double_sided_count>0,"Elite 1 real sail material is double-sided")
+	# Schiffsbewegung is optional eye candy and must not remove the real GLB.
+	game._set_ship_visual_toggle("motion")
+	check(not game.ship_animations_enabled,"ship rocking setting can be disabled")
+	game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
+	var ship_still: Node3D=game.mesh_layer.model_instances.get(0)
+	var axis_still: Node3D=ship_still.get_node_or_null("OriginalAxisCorrection")
+	check(is_zero_approx(ship_still.position.y) and axis_still!=null and is_zero_approx(axis_still.rotation.x) and is_zero_approx(axis_still.rotation.z),"animation setting disables GLB heave and roll without hiding hull")
+	game._set_ship_visual_toggle("motion")
+	game._set_ship_visual_toggle("wake")
+	check(not game.wake_effects_enabled and game._selection_ring_visible(game.sim.player),"wake setting does not disable targeting ring")
+	var saved_visuals: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
+	check(saved_visuals is Dictionary and not bool(saved_visuals.get("wake_effects_enabled",true)) and bool(saved_visuals.get("ship_animations_enabled",false)),"ship animation and wake choices persist")
+	game._set_ship_visual_toggle("wake")
 	game.sim.player.skin=0
 	game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
 	game.mesh_layer.set_render_mode("classic")
@@ -186,6 +199,8 @@ func _run() -> void:
 		game._open_modal("Werft")
 		await process_frame
 		check(game.modal_scroll.size.y>100,"shipyard shows both captain designs at all sizes")
+		check(game.modal_body.find_child("ShipDesignPreview1",true,false)!=null,"elite shipyard card has its own moving sea vignette")
+		check(game.modal_body.find_child("ShipDesignPreview0",true,false)!=null,"shaded ship card has distinct preview")
 		var yard:=0
 		for button in game.modal_body.find_children("*","Button",true,false):
 			if "AUSRÜSTEN" in button.text or "AKTIV" in button.text:yard+=1
@@ -205,6 +220,7 @@ func _run() -> void:
 	check(int(game.sim.player.skin)==0 and int(game.sim.player.hp)==hp and int(game.sim.player.gold)==gold and game.sim.player.pos==position,"retired designs cannot be equipped or alter captain state")
 	game._equip(1)
 	check(int(game.sim.player.skin)==1 and int(game.sim.player.hp)==hp and int(game.sim.player.gold)==gold and game.sim.player.pos==position,"choosing Elite 1 retains captain health, wallet and navigation")
+	check(game._selection_ring_tint(game.sim.player)!=Color("62cce4") and is_equal_approx(game.ship_switch_pulse_at,game.elapsed),"elite design uses gold selection accents and an equip pulse")
 	game._equip(0)
 	check(int(game.sim.player.skin)==0,"shipyard allows switching back to original shaded captain")
 	game.modal.hide()
