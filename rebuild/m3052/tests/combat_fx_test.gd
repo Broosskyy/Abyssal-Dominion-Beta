@@ -23,11 +23,16 @@ func _run() -> void:
 		for orb in total:cluster.append(FX.orb_offset(sample_ball,orb,total,1.0))
 		var footprint:=Rect2(cluster[0],Vector2.ZERO)
 		for p in cluster:footprint=footprint.expand(p)
-		check(footprint.size.x<29.0 and footprint.size.y<29.0,"M3103 %d visible balls form a tight pile, never a broadside fan" % total)
-		check(footprint.size.x>8.0 and footprint.size.y>8.0,"M3103 %d-ball pack has 2D depth rather than a straight line" % total)
+		check(footprint.size.x<40.0 and footprint.size.y<40.0,"M3104 %d balls remain one compact flying pile, not a wide row" % total)
+		check(footprint.size.x>16.0 and footprint.size.y>15.0,"M3104 %d-ball pack visibly separates individual projectiles" % total)
+		var min_separation: float=INF
+		for first in cluster.size():
+			for second in range(first+1,cluster.size()):
+				min_separation=minf(min_separation,cluster[first].distance_to(cluster[second]))
+		check(min_separation>=14.0,"M3104 %d-ball pack has clear gaps between adjacent spheres" % total)
 		if total==3:
 			var corner: float=(cluster[1]-cluster[0]).cross(cluster[2]-cluster[0])
-			check(absf(corner)>30.0,"M3103 three balls form a stable compact triangle (one above two)")
+			check(absf(corner)>200.0,"M3104 three balls form a spacious triangle, not overlapping or lining up")
 	var sim=SIM.new()
 	check(sim.AMMO_NAMES==FX.WEAPONS.slice(0,7),"effect profiles are mapped to actual game ammunition indices")
 	var colors: Array[String]=[]
