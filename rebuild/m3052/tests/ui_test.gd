@@ -19,13 +19,13 @@ func _run() -> void:
 	current_scene=game
 	await process_frame
 
-	check(game.skins.size()==1 and str(game.skins[0].name)=="Schattenkriegsschiff","M3099 single approved ship in shipyard")
-	check(game.skin_previews.size()==1 and game.skin_previews[0]!=null,"M3099 single preview retained")
+	check(game.skins.size()==2 and str(game.skins[0].name)=="Schattenkriegsschiff" and str(game.skins[1].name).contains("Elite-Design 1"),"two shipyard choices: shaded + Elite 1")
+	check(game.skin_previews.size()==2 and game.skin_previews.all(func(tex):return tex!=null),"shaded and Black Crown previews imported")
 	check(game.sim.player.skin==0,"M3099 new players start with only shaded ship")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"nine NPCs + shaded captain GLB load")
-	check(game.mesh_layer.model_scenes.size()==10,"M3099 exactly ten real GLBs are registered")
-	check(game.mesh_layer.has_player_ship(),"M3099 shaded GLB is the only captain")
-	check(game.mesh_layer.player_key_for_skin(30)=="schattenkriegsschiff_shaded","M3099 retired IDs resolve to the shaded model")
+	check(game.mesh_layer.model_scenes.size()==11,"nine NPC GLBs plus two player options load")
+	check(game.mesh_layer.has_player_ship() and game.mesh_layer.has_elite_1_ship(),"shaded and Black Crown can be player ships")
+	check(game.mesh_layer.player_key_for_skin(30)=="schattenkriegsschiff_shaded" and game.mesh_layer.player_key_for_skin(1)=="black_crown_corsair_elite_test","retired skins migrate and Elite 1 routes to own GLB")
 	check(game.mesh_layer._player_immersion("schattenkriegsschiff_shaded")==game.mesh_layer.GAMEPLAY_WATER_IMMERSION,"M3099 waterline retained")
 	check(game.mesh_layer.FLEET_CAMERA_TILT_DEGREES==40.0 and game.mesh_layer.FULL_3D_CAMERA_TILT_DEGREES>40.0,"M3099 2.5D and 3D camera variants are distinct")
 	var original_mode: String=game.mesh_layer.mode
@@ -38,6 +38,16 @@ func _run() -> void:
 		check(game.mesh_layer.gameplay_double_sided_count>0,"M3099 shaded sails are rendered on both sides")
 		var stable: float=game.mesh_layer.stable_player_plate_drop(game.sim.player,game.camera.zoom.y,game._plate_pixels())
 		check(stable>18.0 and stable<190.0,"M3099 readable 3D captain name anchor in "+chosen_mode)
+	# A real GLB must render bow-first and retain anchors in both supported modes.
+	game.sim.player.skin=1
+	for chosen_mode in ["hybrid","3d"]:
+		game.mesh_layer.set_render_mode(chosen_mode)
+		game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
+		check(game.mesh_layer.can_render_actor(game.sim.player),"Elite Design 1 renders in "+chosen_mode)
+		check(str(game.mesh_layer.model_instance_keys.get(0,""))=="black_crown_corsair_elite_test","Elite 1 actual 3D mesh active in "+chosen_mode)
+		check(game.mesh_layer.gameplay_double_sided_count>0,"Elite 1 real sail material is double-sided")
+	game.sim.player.skin=0
+	game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
 	game.mesh_layer.set_render_mode("classic")
 	check(game.mesh_layer.mode=="hybrid","M3099 legacy classic mode migrates to 2.5D")
 	game.mesh_layer.set_render_mode(original_mode)
@@ -60,12 +70,21 @@ func _run() -> void:
 	before_legacy.skin=30
 	before_legacy.gold=787
 	check(migration.restore_save(before_legacy) and migration.player.skin==0 and int(migration.player.gold)==787,"M3099 old captain skin migrates without losing gold")
+	var old_skin_one=migration.export_save()
+	old_skin_one.schema=4
+	old_skin_one.skin=1
+	check(migration.restore_save(old_skin_one) and migration.player.skin==0,"old schema 4 skin 1 is not mistaken for new Elite 1")
+	var elite_save=migration.export_save()
+	elite_save.skin=1
+	check(migration.restore_save(elite_save) and migration.player.skin==1 and int(migration.export_save().schema)==5,"Elite 1 survives schema 5 guest save")
+	migration.player.skin=0
 	for old_id in [0,8,26,27,28,29,30]:
 		var old_save=migration.export_save()
 		old_save.skin=old_id
 		check(migration.restore_save(old_save) and int(migration.player.skin)==0,"M3099 retired skin %d maps to shaded ship"%old_id)
 	for course in [Vector2.UP,Vector2.DOWN,Vector2.LEFT,Vector2.RIGHT,Vector2(1,1).normalized(),Vector2(-1,-1).normalized()]:
 		check(game.mesh_layer.forward_for_model("schattenkriegsschiff_shaded",course).distance_to(course)<.001,"M3099 shaded bow orientation "+str(course))
+		check(game.mesh_layer.forward_for_model("black_crown_corsair_elite_test",course).distance_to(course)<.001,"Elite 1 X-axis bow orientation "+str(course))
 	var player_center: Vector2=game.get_canvas_transform()*game._visual_actor_pos(game.sim.player)
 	var plate_anchor: Vector2=game._plate_screen_anchor(game.sim.player)
 	check(plate_anchor.y>player_center.y,"M3099 captain labels remain below real hull")
@@ -166,11 +185,11 @@ func _run() -> void:
 		game.modal.hide()
 		game._open_modal("Werft")
 		await process_frame
-		check(game.modal_scroll.size.y>100,"shipyard displays its one approved design at all sizes")
+		check(game.modal_scroll.size.y>100,"shipyard shows both captain designs at all sizes")
 		var yard:=0
 		for button in game.modal_body.find_children("*","Button",true,false):
 			if "AUSRÜSTEN" in button.text or "AKTIV" in button.text:yard+=1
-		check(yard==game.skins.size(),"shipyard shows one card for every available design")
+		check(yard==game.skins.size(),"shipyard shows one card for each selectable captain design")
 		game.modal.hide()
 	root.size=Vector2i(1280,720)
 	await process_frame
@@ -184,6 +203,10 @@ func _run() -> void:
 	var position: Vector2=game.sim.player.pos
 	game._equip(8)
 	check(int(game.sim.player.skin)==0 and int(game.sim.player.hp)==hp and int(game.sim.player.gold)==gold and game.sim.player.pos==position,"retired designs cannot be equipped or alter captain state")
+	game._equip(1)
+	check(int(game.sim.player.skin)==1 and int(game.sim.player.hp)==hp and int(game.sim.player.gold)==gold and game.sim.player.pos==position,"choosing Elite 1 retains captain health, wallet and navigation")
+	game._equip(0)
+	check(int(game.sim.player.skin)==0,"shipyard allows switching back to original shaded captain")
 	game.modal.hide()
 	game.sim.select(2)
 	game._toggle_fire()
@@ -497,13 +520,13 @@ func _run() -> void:
 	check(game.camera_pad.value.x>.9,"owning finger remains captured when dragged outside the joystick")
 	routed.pressed=false;routed.position=routed_drag.position;root.push_input(routed,true);await process_frame
 	check(game.camera_pad.value==Vector2.ZERO and game.sim.player.path.is_empty(),"outside release stops camera input without leaking a sailing command")
-	# A single approved design is displayed, with no switchable ship cards.
+	# Two explicit designs are shown, with only the unselected card actionable.
 	root.size=Vector2i(1280,720);await process_frame;game._layout();game.modal.hide()
 	game._open_modal("Werft");await process_frame
 	var choices:=0
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
 		if "AUSRÜSTEN" in button.text and not button.disabled:choices+=1
-	check(choices==0 and game.skins.size()==1,"M3099 no hidden or clickable legacy ship choice remains")
+	check(choices==1 and game.skins.size()==2,"only the alternate Elite 1 captain design is equipable")
 	game.modal.hide()
 	# Staff tools, the world chart and the chart guide.
 	var map_before: int=game.sim.map_id
