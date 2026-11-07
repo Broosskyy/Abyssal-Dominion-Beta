@@ -18,8 +18,8 @@ const BASE_CANNON_SLOTS := 10
 const MAX_CANNONS := 40
 const BASE_RELOAD := 1.65
 const START := Vector2(2100, 1450)
-const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice"]
-const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein"]
+const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice", "fire", "poison", "shrapnel", "lightning", "holy", "shadow", "wind", "earth", "water", "cursed", "bleed", "necro", "gold", "crystal", "explosive", "arcane", "spectral", "lava", "light", "armor_piercing", "gas"]
+const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein", "Feuerkugeln geladen · Grafik-Beta", "Giftkugeln geladen · Grafik-Beta", "Schrapnellkugeln geladen · Grafik-Beta", "Blitzkugeln geladen · Grafik-Beta", "Heilige Kugeln geladen · Grafik-Beta", "Schattenkugeln geladen · Grafik-Beta", "Wirbelkugeln geladen · Grafik-Beta", "Erdkugeln geladen · Grafik-Beta", "Wasserkugeln geladen · Grafik-Beta", "Fluchkugeln geladen · Grafik-Beta", "Blutkugeln geladen · Grafik-Beta", "Nekrokugeln geladen · Grafik-Beta", "Goldkugeln geladen · Grafik-Beta", "Kristallkugeln geladen · Grafik-Beta", "Explosivkugeln geladen · Grafik-Beta", "Arkankugeln geladen · Grafik-Beta", "Geisterkugeln geladen · Grafik-Beta", "Lavakugeln geladen · Grafik-Beta", "Lichtkugeln geladen · Grafik-Beta", "Panzerbrecher geladen · Grafik-Beta", "Gaskugeln geladen · Grafik-Beta"]
 var player: Dictionary
 # All historical skin IDs (0–30) migrate to our single production shaded GLB.
 # Persist it as skin 0, without touching any progression/equipment/currency.
@@ -88,7 +88,7 @@ func _init() -> void:
 	var fresh_skin: int=FINAL_PLAYER_SKIN
 	player = {"id": 0, "pos": START, "heading": Vector2(-1, 0), "path": [], "hp": PLAYER_HP,
 		"max_hp": PLAYER_HP, "shield": PLAYER_SHIELD, "max_shield": PLAYER_SHIELD, "speed": PLAYER_SPEED,
-		"reload": 0.0, "gold": 240, "ammo": [600, 120, 100, 40, 24, 40, 24], "cannons": BASE_CANNON_SLOTS, "skin": fresh_skin,
+		"reload": 0.0, "gold": 240, "ammo": [600, 120, 100, 40, 24, 40, 24, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12], "cannons": BASE_CANNON_SLOTS, "skin": fresh_skin,
 		"last_hit": -100.0, "respawn": 0.0, "slow": 0.0}
 	islands = [
 		{"pos": Vector2(1530, 1250), "radius": 145.0, "art": "tropical", "width": 490.0, "name": "Port Azur"},
@@ -1133,12 +1133,16 @@ func claim_quest() -> bool:
 func buy_ammo(index: int) -> bool:
 	if index < 0 or index >= AMMO_NAMES.size() or int(player.hp) <= 0: return false
 	var price = 30 if index < 3 else 80
-	var pack = [150, 60, 40, 12, 8, 12, 8][index]
+	var pack = ammo_pack(index)
 	if int(player.gold) < price: return false
 	player.gold -= price
 	player.ammo[index] += pack
 	message = "Munitionsvorrat aufgefüllt"
 	return true
+
+func ammo_pack(index: int) -> int:
+	if index<0 or index>=AMMO_NAMES.size():return 0
+	return [150,60,40,12,8,12,8][index] if index<7 else 12
 
 func xp_required() -> int:
 	return 100 + (level - 1) * 70
@@ -1169,7 +1173,7 @@ func quest_progress() -> int:
 
 func weapon_damage(mode: int) -> int:
 	if mode >= 3:
-		var special: float = 31.0 * [0.75, 1.2, 0.8, 0.95][mode - 3]
+		var special: float = 31.0 * ([0.75, 1.2, 0.8, 0.95][mode-3] if mode<7 else 1.0) # M3105 visual-first test ammo: neutral placeholder value
 		special *= float(equipped_cannons()) / float(BASE_CANNON_SLOTS)
 		if has_blessing(): special *= 1.15
 		return roundi(special)
