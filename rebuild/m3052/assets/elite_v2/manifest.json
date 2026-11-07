@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "source_glb_sha256": "add93320eaddcd84861ad483800ad0b6ea68f1a7b261fe8bab746e7b2021eb8a",
+  "geometry_duplicated": false,
+  "mobile_albedo_size": 1024,
+  "variants": [
+    {
+      "level": 1,
+      "name": "Obsidian",
+      "texture": "res://assets/elite_v2/textures/Elite_01_Obsidian_Albedo.png",
+      "preview": "res://assets/elite_v2/previews/elite_01.png",
+      "sha256": "9eb2768d55c5c9dc56443f6b66ebc99ed9cdbc79803ad27bd354227a454a74f6"
+    },
+    {
+      "level": 2,
+      "name": "Bordeaux",
+      "texture": "res://assets/elite_v2/textures/Elite_02_Bordeaux_Albedo.png",
+      "preview": "res://assets/elite_v2/previews/elite_02.png",
+      "sha256": "2eb7013c0744e96e9c4141ee02f2cfe03c6adeea8b3b644035d38798baca8b4f"
+    },
+    {
+      "level": 3,
+      "name": "Tiefblau",
+      "texture": "res://assets/elite_v2/textures/Elite_03_Tiefblau_Albedo.png",
+      "preview": "res://assets/elite_v2/previews/elite_03.png",
+      "sha256": "ff377bcba9ec932d94b1bf20921854aef0b3fb4f2e54ca7d1bc2a1d5d69e6a0f"
+    },
+    {
+      "level": 4,
+      "name": "Waldgruen",
+      "texture": "res://assets/elite_v2/textures/Elite_04_Waldgruen_Albedo.png",
+      "preview": "res://assets/elite_v2/previews/elite_04.png",
+      "sha256": "1455eb31171a03770ced40e0785eb1aee8035fa56a70ff1ba25a3cca6d0aee6a"
+    },
+    {
+      "level": 5,
+      "name": "Violett",
+      "texture": "res://assets/elite_v2/textures/Elite_05_Violett_Albedo.png",
+      "preview": "res://assets/elite_v2/previews/elite_05.png",
+      "sha256": "08097ac67fe4fbfff8e5dc9ea1d504cef6b46e38fc4c531459f3a4857329e087"
+    },
+    {
+      "level": 6,
+      "name": "Petrol",
+      "texture": "res://assets/elite_v2/textures/Elite_06_Petrol_Albedo.png",
+      "preview": "res://assets/elite_v2/previews/elite_06.png",
+      "sha256": "bc7ba613b85d92533aa50884d35d608ce3122553c10667273be2a344df09f781"
+    },
+    {
+      "level": 7,
+      "name": "Elfenbein",
+      "texture": "res://assets/elite_v2/textures/Elite_07_Elfenbein_Albedo.png",
+      "preview": "res://assets/elite_v2/previews/elite_07.png",
+      "sha256": "fe9257dec3767bd8ac14e593ab55a0affaec2bb78a4fa720fdf5ec3d70aa3eef"
+    },
+    {
+      "level": 8,
+      "name": "Stahlblau",
+      "texture": "res://assets/elite_v2/textures/Elite_08_Stahlblau_Albedo.png",
+      "preview": "res://assets/elite_v2/previews/elite_08.png",
+      "sha256": "1ff51b63356bd40d8c8597deeb848579f2a210b0a9ca63d1321dbbda43b22fe1"
+    },
+    {
+      "level": 9,
+      "name": "Karmesin",
+      "texture": "res://assets/elite_v2/textures/Elite_09_Karmesin_Albedo.png",
+      "preview": "res://assets/elite_v2/previews/elite_09.png",
+      "sha256": "649b6f1e31b16cbed1ca87ae32fce614c84ab292b8e7b261be512df1fb7c490e"
+    },
+    {
+      "level": 10,
+      "name": "Knochen",
+      "texture": "res://assets/elite_v2/textures/Elite_10_Knochen_Albedo.png",
+      "preview": "res://assets/elite_v2/previews/elite_10.png",
+      "sha256": "921fe87e53df5d4ca511d07be5a5684783801706eb3b1b179128a3d60bfe2d65"
+    }
+  ]
+}
