@@ -51,9 +51,12 @@ func _run() -> void:
 		check(str(game.mesh_layer.model_instance_keys.get(0,""))=="black_crown_corsair_elite_test","Elite 1 actual 3D mesh active in "+chosen_mode)
 		check(game.mesh_layer.gameplay_double_sided_count>0,"Corsair test original sail material is double-sided")
 	# The V2 palette changes only material overrides, NEVER physical hull geometry.
+	var original_corsair_owner: Node3D=game.mesh_layer.model_instances.get(0)
+	var corsair_yaw: float=original_corsair_owner.rotation.y
 	game.sim.player.skin=2
 	game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
 	check(str(game.mesh_layer.model_instance_keys.get(0,""))=="black_crown_corsair_elite_test" and int(game.mesh_layer.model_instance_skins.get(0,-1))==2,"Elite Obsidian uses exactly original Black Crown GLB")
+	check(game.mesh_layer.model_instances.get(0)==original_corsair_owner and is_equal_approx(original_corsair_owner.rotation.y,corsair_yaw),"changing only paint preserves player mesh instance and helm yaw")
 	var variant_owner: Node3D=game.mesh_layer.model_instances.get(0)
 	var variant_node: Node=variant_owner.get_node_or_null("OriginalAxisCorrection")
 	var nodes: Array[Node]=[variant_node]
@@ -70,12 +73,20 @@ func _run() -> void:
 					if mat is BaseMaterial3D and (mat as BaseMaterial3D).albedo_texture!=null:
 						albedo_found=albedo_found or str((mat as BaseMaterial3D).albedo_texture.resource_path).contains("Elite_01_Obsidian")
 	check(albedo_found,"Elite Obsidian truly overrides the imported 3D texture (not just the thumbnail)")
-	game.sim.player.skin=11
-	game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
-	check(int(game.mesh_layer.model_instance_skins.get(0,-1))==11 and str(game.mesh_layer.model_instance_keys.get(0,""))=="black_crown_corsair_elite_test","Elite Knochen switches back to same shared GLB with separate material instance")
+	# Every authored V2 paint must be switchable in place on the SAME hull.
+	for color_skin in range(2,12):
+		game.sim.player.skin=color_skin
+		game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
+		check(int(game.mesh_layer.model_instance_skins.get(0,-1))==color_skin and game.mesh_layer.model_instances.get(0)==original_corsair_owner,"Elite paint %d switches without model respawn" % (color_skin-1))
+	check(int(game.mesh_layer.model_instance_skins.get(0,-1))==11 and str(game.mesh_layer.model_instance_keys.get(0,""))=="black_crown_corsair_elite_test","Elite Knochen uses original shared GLB with unique surface material")
 	game.sim.player.skin=1
 	game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
-	check(int(game.mesh_layer.model_instance_skins.get(0,-1))==1,"unmodified Corsair test model stays independently selectable")
+	check(int(game.mesh_layer.model_instance_skins.get(0,-1))==1 and game.mesh_layer.model_instances.get(0)==original_corsair_owner,"unmodified Corsair test returns without rebuilding hull")
+	var restored_materials:=true
+	for entry: Dictionary in original_corsair_owner.get_meta("original_player_surfaces",[]):
+		var mesh: MeshInstance3D=entry.get("piece") as MeshInstance3D
+		restored_materials=restored_materials and mesh!=null and mesh.get_surface_override_material(int(entry.surface))==entry.material
+	check(restored_materials,"original Black Crown test finish restores EXACT source materials after Elite 01-10")
 	# Schiffsbewegung is optional eye candy and must not remove the real GLB.
 	game._set_ship_visual_toggle("motion")
 	check(not game.ship_animations_enabled,"ship rocking setting can be disabled")
@@ -244,7 +255,19 @@ func _run() -> void:
 		game.modal.hide()
 	root.size=Vector2i(1280,720)
 	await process_frame
-	game._layout();game._open_modal("Hafen")
+	game._layout();game._open_modal("Werft")
+	await process_frame
+	check(game.shipyard_filter=="all" and game.modal_body.find_child("ShipDesignPreview11",true,false)!=null,"full Werft defaults to all twelve designs")
+	game._set_shipyard_filter("elite")
+	await process_frame
+	check(game.shipyard_filter=="elite" and game.modal_body.find_child("ShipDesignPreview1",true,false)==null and game.modal_body.find_child("ShipDesignPreview11",true,false)!=null,"Elite-only tab hides starter/test but keeps all ten textures")
+	game._set_shipyard_filter("original")
+	await process_frame
+	check(game.shipyard_filter=="original" and game.modal_body.find_child("ShipDesignPreview1",true,false)!=null and game.modal_body.find_child("ShipDesignPreview11",true,false)==null,"originals tab shows independent test and starter")
+	game._set_shipyard_filter("all")
+	await process_frame
+	check(game.shipyard_filter=="all" and game.modal_body.find_child("ShipDesignPreview0",true,false)!=null and game.modal_body.find_child("ShipDesignPreview11",true,false)!=null,"all-tab restores complete shipyard")
+	game._open_modal("Hafen")
 	check(game.modal_scroll.position.x>=18 and game.modal_scroll.get_rect().end.y<=game.modal.size.y-18,"menu has an inset safe scroll area")
 	game.sim.player.pos=game.sim.portals[0].pos
 	check(not game._landmark_label_visible(game.sim.player.pos),"actual portal suppresses overlapping caption beneath captain name")
