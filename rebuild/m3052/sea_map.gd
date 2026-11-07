@@ -3047,7 +3047,7 @@ func _handle_world_touch(event: InputEvent) -> void:
 				dragging=false
 			# No global cooldown after an ordinary one-finger tap! The old
 			# +180 ms suppression broke rapid repeat-taps and target toggling.
-			if can_tap and Time.get_ticks_msec()>=suppress_tap_until and not _hud_contains(event.position):
+			if can_tap and not _hud_contains(event.position):
 				_tap(event.position)
 			get_viewport().set_input_as_handled()
 	elif event is InputEventScreenDrag:
@@ -3076,7 +3076,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton:
 		if event.button_index==MOUSE_BUTTON_WHEEL_UP and event.pressed:_zoom(1.10)
 		elif event.button_index==MOUSE_BUTTON_WHEEL_DOWN and event.pressed:_zoom(1/1.10)
-		elif event.button_index==MOUSE_BUTTON_LEFT and event.pressed and Time.get_ticks_msec()-last_touch_ms>350:
+		elif event.button_index==MOUSE_BUTTON_LEFT and event.pressed and Time.get_ticks_msec()-last_touch_ms>350 and Time.get_ticks_msec()>=suppress_tap_until:
 			_tap(event.position)
 		elif event.button_index==MOUSE_BUTTON_RIGHT:
 			dragging=event.pressed
