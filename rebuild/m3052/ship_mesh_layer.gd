@@ -190,7 +190,7 @@ func projected_hull_bottom(actor: Dictionary) -> float:
 	var key: String=player_key_for_skin(int(actor.get("skin",-1)))
 	if not MODEL_INFO.has(key):return -INF
 	var info: Array=MODEL_INFO[key]
-	var z_long: bool=absf(float(info[5]))>1.0
+	var z_long: bool=info.size()>5 and absf(float(info[5]))>1.0
 	var half_length: float=float(info[0])*.5
 	var half_beam: float=float(PLAYER_SOURCE_BEAMS.get(key,.44))
 	var origin_screen: Vector2=mesh_camera.unproject_position(owner.global_position)
