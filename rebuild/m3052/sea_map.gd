@@ -190,6 +190,7 @@ var mesh_layer
 var render_mode := "hybrid"
 # One approved shaded GLB with two camera modes.
 const FINAL_SHIP_PREVIEW: Texture2D=preload("res://assets/player/schattenkriegsschiff_preview.png")
+const ELITE_ONE_SHIP_PREVIEW: Texture2D=preload("res://assets/player/black_crown_elite_1_preview.png")
 const FINAL_SHIP_LENGTH := 158.0
 const NPC_VISUAL_SCALE := 0.90
 var plate_fleet: Array[Dictionary] = []
@@ -261,9 +262,11 @@ func _load_assets() -> void:
 	for key in ["cannon","armor","hunter","navigation","logistics","tide","storm","salvage","blessing"]:
 		deck_icons[key]=load("res://assets/ui/abyssal/"+key+".svg")
 	extra_icons.port_watchtower=load("res://assets/reference/landmarks/port_watchtower.png")
-	# The only player ship. No legacy sprite atlas or test-art loading.
+	# Explicit selection: current production ship plus the original full-geometry Elite 1 test.
 	skins.append({"name":"Schattenkriegsschiff","mesh_key":"schattenkriegsschiff_shaded","views":0})
 	skin_previews.append(FINAL_SHIP_PREVIEW)
+	skins.append({"name":"Elite-Design 1 · Black Crown Corsair","mesh_key":"black_crown_corsair_elite_test","views":0})
+	skin_previews.append(ELITE_ONE_SHIP_PREVIEW)
 	for name in ["tropical","rock","snow","snow2"]:
 		island_textures[name] = load("res://assets/reference/islands/"+name+".png")
 	for name in ["cannonball","harpoon","chain","repair_chest","portal"]:
@@ -607,8 +610,8 @@ func _npc_ship_texture(_actor: Dictionary) -> Texture2D:
 	return painted.nav_ship
 
 func _actor_visual_length(actor: Dictionary) -> float:
+	if int(actor.id)==0:return 180.0 if int(actor.get("skin",0))==1 else FINAL_SHIP_LENGTH
 	if str(actor.get("visual_key",""))=="black_crown_corsair_elite_test":return 180.0
-	if int(actor.id)==0:return FINAL_SHIP_LENGTH
 	if actor.kind=="ship":return float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
 	return 150.0
 
@@ -1942,34 +1945,39 @@ func _open_ammo() -> void:
 		modal_body.add_child(row);ammo_rows.append(row)
 
 func _open_shipyard() -> void:
-	_banner_card(painted.nav_shipyard,"WERFT · SCHATTENKRIEGSSCHIFF","Ein festgelegtes Design: Schattenkriegsschiff, SHADED. Alle alten Schiffdesigns und Testvarianten wurden entfernt.")
+	_banner_card(painted.nav_shipyard,"WERFT · SCHIFFSDESIGNS","Wähle dein Schiff: Schattenkriegsschiff oder Elite-Design 1. Der Wechsel ist zum Test kostenlos; Kanonen, Decks, Rumpf, Schild und Fortschritt bleiben unverändert.")
 	var grid=_grid(1)
-	var card=_card(CYAN,grid)
-	var column=VBoxContainer.new()
-	column.add_theme_constant_override("separation",6)
-	column.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	card.add_child(column)
-	var frame=Panel.new()
-	frame.custom_minimum_size=Vector2(0,118)
-	frame.clip_contents=true
-	frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	frame.add_theme_stylebox_override("panel",SKIN.icon_frame(CYAN))
-	column.add_child(frame)
-	var preview=_portrait(frame)
-	preview.texture=FINAL_SHIP_PREVIEW
-	preview.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	preview.offset_left=6;preview.offset_top=6;preview.offset_right=-6;preview.offset_bottom=-6
-	var ship_ok: bool=mesh_layer!=null and mesh_layer.has_player_ship()
-	var label="SCHATTENKRIEGSSCHIFF · SHADED\n"+("AKTIV" if ship_ok else "3D-MODELL FEHLT")
-	var choose=_button(column,label,func():_equip(0),"normal")
-	choose.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	choose.custom_minimum_size.y=46
-	choose.add_theme_font_size_override("font_size",12)
-	choose.disabled=true
+	for index in skins.size():
+		var choice: int=index
+		var chosen: bool=index==int(sim.player.skin)
+		var accent: Color=GOLD if index==1 else CYAN
+		var card=_card(accent,grid)
+		var column=VBoxContainer.new()
+		column.add_theme_constant_override("separation",7)
+		column.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		card.add_child(column)
+		var frame=Panel.new()
+		frame.custom_minimum_size=Vector2(0,158)
+		frame.clip_contents=true
+		frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		frame.add_theme_stylebox_override("panel",SKIN.icon_frame(accent))
+		column.add_child(frame)
+		var preview=_portrait(frame)
+		preview.texture=skin_previews[index]
+		preview.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		preview.offset_left=8;preview.offset_top=8;preview.offset_right=-8;preview.offset_bottom=-8
+		var name: String=str(skins[index].name)
+		var model_ok: bool=mesh_layer!=null and mesh_layer.model_scenes.has(str(skins[index].mesh_key))
+		var label: String=name.to_upper()+"\n"+("AKTIV" if chosen else ("AUSRÜSTEN · KOSTENLOSER TEST" if model_ok else "3D-MODELL FEHLT"))
+		var choose=_button(column,label,func():_equip(choice),"normal" if chosen else "primary")
+		choose.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		choose.custom_minimum_size.y=54
+		choose.add_theme_font_size_override("font_size",12)
+		choose.disabled=chosen or not model_ok
 	_section("MUNITIONSNACHSCHUB · JE 30 GOLD")
 	var stock=_grid(3)
 	for i in 3:
-		var index =i
+		var index=i
 		var b =_action(["150 Vollkugeln","60 Kettenkugeln","40 Harpunen"][i]+" · 30 Gold",func():sim.buy_ammo(index);_save_progress();_refresh_ui(),"normal",stock)
 		_with_icon(b,icons[["cannonball","chain","harpoon"][i]])
 
@@ -2744,9 +2752,13 @@ func _interact() -> void:
 	_refresh_ui()
 
 func _equip(index: int) -> void:
-	if index!=0:return
-	sim.player.skin=0
-	sim.message="Schattenkriegsschiff · SHADED aktiv"
+	if index<0 or index>=skins.size():return
+	if mesh_layer==null or not mesh_layer.model_scenes.has(str(skins[index].mesh_key)):
+		sim.message="3D-Modell noch nicht verfügbar"
+		_refresh_ui()
+		return
+	sim.player.skin=index
+	sim.message=str(skins[index].name)+" aktiv"
 	_save_progress()
 	_open_modal("Werft")
 	_refresh_ui()
