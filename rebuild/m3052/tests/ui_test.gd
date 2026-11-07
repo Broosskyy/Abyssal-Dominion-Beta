@@ -267,9 +267,10 @@ func _run() -> void:
 	await process_frame;await process_frame
 	game.modal_scroll.scroll_vertical=300
 	await process_frame
+	var expected_yard_scroll: int=game.modal_scroll.scroll_vertical
 	game._open_modal("Werft")
 	await process_frame;await process_frame
-	check(game.modal_scroll.scroll_vertical>=299,"refreshing visible shipyard preserves the current scroll position")
+	check(game.modal_scroll.scroll_vertical==expected_yard_scroll,"refreshing compact one-design shipyard preserves its actual scroll position")
 	game.modal.hide();game._open_modal("Werft")
 	await process_frame;await process_frame
 	check(game.modal_scroll.scroll_vertical==0,"reopening a closed menu starts at its beginning")
