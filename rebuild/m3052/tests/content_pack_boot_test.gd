@@ -19,11 +19,11 @@ func _run() -> void:
 	check(scene!=null,"game scene loads from data pack")
 	var game=scene.instantiate();root.add_child(game);current_scene=game
 	await process_frame
-	check(game.sim.npcs.size()==17 and game.skins.size()==1 and game.skin_previews.size()==1,"signed data pack contains only shaded captain and nine NPC models")
+	check(game.sim.npcs.size()==17 and game.skins.size()==2 and game.skin_previews.size()==2,"signed pack includes 16 patrol ships, shaded captain and Elite 1 Werft design")
 	# Critical end-to-end check: this scene was mounted from the standalone
 	# signed DATA ZIP, not directly from the GitHub source tree.
-	check(game.mesh_layer.has_player_ship(),"signed pack contains actual shaded GLB")
-	check(game.mesh_layer.model_scenes.size()==10,"only approved 10 ship GLBs in runtime")
+	check(game.mesh_layer.has_player_ship() and game.mesh_layer.has_elite_1_ship(),"signed pack contains both original shaded and Elite 1 GLBs")
+	check(game.mesh_layer.model_scenes.size()==11,"original nine NPC plus two selectable player GLBs in runtime")
 	check(not ResourceLoader.exists("res://assets/player/test_ships/gemi11_uv.glb"),"signed pack excludes retired Gemi11")
 	var next_spec=JSON.parse_string(FileAccess.get_file_as_string("res://fixture.json"))
 	DirAccess.copy_absolute(ProjectSettings.globalize_path("res://fixture.zip"),ProjectSettings.globalize_path("user://content_a.zip"))
