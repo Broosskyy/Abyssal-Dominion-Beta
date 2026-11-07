@@ -200,6 +200,8 @@ const ELITE_V2_NAMES := ["Obsidian","Bordeaux","Tiefblau","Waldgrün","Violett",
 const ELITE_V2_ACCENTS := [Color("caa668"),Color("ce7b8f"),Color("669dd7"),Color("6bb28a"),Color("b392dc"),Color("5fc3b0"),Color("e1cda0"),Color("87aeda"),Color("e06f70"),Color("d5c9b5")]
 const FINAL_SHIP_PREVIEW: Texture2D=preload("res://assets/player/schattenkriegsschiff_preview.png")
 const ELITE_ONE_SHIP_PREVIEW: Texture2D=preload("res://assets/player/black_crown_elite_1_preview.png")
+const SHIPYARD_SEA_TILE: Texture2D=preload("res://assets/ui/painted/sea_tile.png")
+const SHIPYARD_STUDIO_KEY: Shader=preload("res://shipyard_preview_key.gdshader")
 const FINAL_SHIP_LENGTH := 158.0
 const NPC_VISUAL_SCALE := 0.90
 var plate_fleet: Array[Dictionary] = []
@@ -1982,25 +1984,70 @@ func _open_ammo() -> void:
 
 # Drawn beneath the actual original-model preview: restrained sea and wake,
 # not a replacement/synthetic illustration of the uploaded Black Crown GLB.
+# Real sea art, a navy-to-turquoise undersea gradient, drifting wavelets and
+# low foamy wake live BEHIND each ORIGINAL ship portrait, not on top of sails.
+# For V2 RGB source renders, the per-TextureRect chroma key reveals this layer.
 func _draw_shipyard_preview(frame: Control,index: int,chosen: bool,accent: Color) -> void:
 	var dimensions: Vector2=frame.size
-	if dimensions.x<35 or dimensions.y<35:return
-	var center: Vector2=Vector2(dimensions.x*.5,dimensions.y*.74)
-	var shimmer: float=0.5+0.5*sin(elapsed*1.35+float(index)*1.7)
-	frame.draw_rect(Rect2(Vector2(1,1),dimensions-Vector2(2,2)),Color("071b23",.32),true)
-	for wave in 4:
-		var radius: Vector2=Vector2(dimensions.x*(.16+float(wave)*.105),7.0+float(wave)*4.0)
-		var contour: PackedVector2Array=PackedVector2Array()
-		for step in 33:
-			var angle: float=float(step)*TAU/32.0
-			var slosh: float=sin(elapsed*1.9+float(wave)*1.2+angle*2.0)*1.8
-			contour.append(center+Vector2(cos(angle)*radius.x,sin(angle)*radius.y+slosh))
-		frame.draw_polyline(contour,Color(accent,(.08+.055*shimmer)*(1.0-float(wave)*.15)),1.1,true)
-	var status: String="AUSGERÜSTET" if chosen else ("ELITE · %02d" % (index-1) if index>=2 else ("ORIGINAL · TEST" if index==1 else "BASISSCHIFF"))
-	frame.draw_string(font,Vector2(16,25),status,HORIZONTAL_ALIGNMENT_LEFT,dimensions.x-32,12,Color(accent,.87))
+	if dimensions.x<35.0 or dimensions.y<35.0:return
+	var w: float=dimensions.x
+	var h: float=dimensions.y
+	var inset: float=5.0
+	var clock: float=elapsed if ship_animations_enabled else 0.0
+	var shimmer: float=.5+.5*sin(clock*.86+float(index)*1.12)
+	# The SAME painted ocean source as the game map, with a readable warm
+	# studio-light gradient; leave frame borders unobscured.
+	var ocean_area=Rect2(Vector2(inset,inset),Vector2(w-inset*2.0,h-inset*2.0))
+	frame.draw_polygon(PackedVector2Array([
+		Vector2(inset,inset),Vector2(w-inset,inset),
+		Vector2(w-inset,h-inset),Vector2(inset,h-inset)
+	]),PackedColorArray([
+		Color("0b2937"),Color("0b3b49"),
+		Color("105b65"),Color("073240")
+	]))
+	frame.draw_texture_rect(SHIPYARD_SEA_TILE,ocean_area,false,Color(.65,.95,.96,.19))
+	# Broad, nearly transparent water contours; subtle enough to avoid
+	# competing with the authentic gilded rigging and sail graphics.
+	for band in 10:
+		var line: PackedVector2Array=PackedVector2Array()
+		var band_y: float=h*(.08+float(band)*.091)
+		var phase: float=clock*.69+float(index)*.71+float(band)*.63
+		for step in 20:
+			var px: float=inset+(w-2.0*inset)*float(step)/19.0
+			var py: float=band_y+sin(float(step)*.43+phase)*2.2+cos(float(step)*.91-phase*.67)*.75
+			line.append(Vector2(px,py))
+		frame.draw_polyline(line,Color(.68,.93,.97,.085+.045*shimmer),1.15,true)
+	# Ship's soft contact shadow and refracted ellipse, under the actual hull.
+	var center: Vector2=Vector2(w*.49,h*.73)
+	var shadow: PackedVector2Array=PackedVector2Array()
+	var contact: PackedVector2Array=PackedVector2Array()
+	for sample in 33:
+		var angle: float=float(sample)*TAU/32.0
+		var unit: Vector2=Vector2(cos(angle),sin(angle))
+		shadow.append(center+unit*Vector2(w*.255,h*.088))
+		contact.append(center+unit*Vector2(w*.32,h*.124))
+	frame.draw_colored_polygon(shadow,Color(.005,.045,.068,.33))
+	frame.draw_polyline(contact,Color(.77,.96,.93,.17+.04*shimmer),1.2,true)
+	# Moving broken foam on either side; never cover the ship foreground.
+	for side in [-1.0,1.0]:
+		var side_val: float=side
+		var start_point: Vector2=center+Vector2(-w*.10,side_val*h*.07)
+		var wake_points: PackedVector2Array=PackedVector2Array()
+		for step in 15:
+			var progress: float=float(step)/14.0
+			wake_points.append(start_point+Vector2(-w*.19*progress,side_val*h*.068*progress+sin(progress*11.0-clock*1.85+side_val)*1.2))
+		frame.draw_polyline(wake_points,Color(.81,.98,1.0,.15+.04*shimmer),1.2,true)
+	# Per-design colored glints are restrained and remain within the water.
+	for glint in 8:
+		var seed: float=float(index*17+glint*29)
+		var px: float=inset+10.0+fposmod(seed*11.7+clock*(3.0+float(glint%3)),maxf(1.0,w-inset*2.0-25.0))
+		var py: float=h*(.18+float(glint)*.085)+sin(clock*.8+seed)*2.0
+		var a: float=.095+.085*(.5+.5*sin(clock*1.7+seed))
+		frame.draw_line(Vector2(px,py),Vector2(px+6.0+float(glint%3)*2.0,py),Color(accent,a),.95,true)
 	if chosen:
-		frame.draw_arc(Vector2(dimensions.x-23,20),7,0,TAU,24,Color(accent,.65+.25*shimmer),1.6,true)
-		frame.draw_circle(Vector2(dimensions.x-23,20),2.4,Color(accent,.78))
+		var activated: float=.65+.16*sin(clock*1.4)
+		frame.draw_arc(Vector2(w-22.0,21.0),8.0,0.0,TAU,24,Color(accent,activated),1.8,true)
+		frame.draw_circle(Vector2(w-22.0,21.0),2.8,Color(accent,.88))
 
 func _start_shipyard_preview_motion(frames: Array[Control]) -> void:
 	# One modest 8 FPS timer for ALL twelve cards, not twelve separate timers.
@@ -2036,9 +2083,23 @@ func _add_shipyard_card(index: int,container: Node,frames: Array[Control]) -> vo
 	frame.draw.connect(func():_draw_shipyard_preview(frame,choice,chosen,accent))
 	frames.append(frame)
 	var preview=_portrait(frame)
+	preview.name="ShipDesignArtwork%d" % index
 	preview.texture=skin_previews[index]
+	# The ten mobile preview renders were exported on opaque #1c1c24.
+	# Remove ONLY that background with a small shader, keeping the real
+	# ship foreground untouched, so the seawater is visible behind it.
+	if index>=2:
+		var key_material=ShaderMaterial.new()
+		key_material.shader=SHIPYARD_STUDIO_KEY
+		preview.material=key_material
 	preview.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	preview.offset_left=6;preview.offset_top=6;preview.offset_right=-6;preview.offset_bottom=-6
+	var status_text: String="AUSGERÜSTET" if chosen else ("ELITE · %02d" % (index-1) if index>=2 else ("ORIGINAL · TEST" if index==1 else "BASISSCHIFF"))
+	var badge=_text(frame,status_text,12,accent.lightened(.16))
+	badge.name="ShipStatus%d" % index
+	badge.position=Vector2(14,12)
+	badge.add_theme_color_override("font_outline_color",Color("06161b"))
+	badge.add_theme_constant_override("outline_size",4)
 	var model_ok: bool=mesh_layer!=null and mesh_layer.model_scenes.has(str(skins[index].mesh_key))
 	if index>=2:model_ok=model_ok and ResourceLoader.exists("res://assets/elite_v2/textures/"+str(mesh_layer.ELITE_V2_TEXTURE_FILES[index-2]))
 	var hint: String="ELITE %02d · %s" % [index-1,ELITE_V2_NAMES[index-2].to_upper()] if index>=2 else ("BLACK CROWN · ORIGINAL-TEST" if index==1 else "SCHATTENKRIEGSSCHIFF · STANDARD")
