@@ -79,7 +79,7 @@ static func apply_to_scene(model: Node3D) -> int:
 				arrays[Mesh.ARRAY_NORMAL] = normals
 			if has_tangents:
 				arrays[Mesh.ARRAY_TANGENT] = tangents
-			adjusted.add_surface_from_arrays(source.surface_get_primitive_type(surface), arrays, [], source.surface_get_lods(surface))
+			adjusted.add_surface_from_arrays(source.surface_get_primitive_type(surface), arrays, [], {})
 			adjusted.surface_set_material(surface, source.surface_get_material(surface))
 		piece.mesh = adjusted
 		changed += 1
