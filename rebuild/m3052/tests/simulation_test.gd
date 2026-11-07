@@ -108,6 +108,22 @@ func _initialize() -> void:
 	gold=int(sim.player.gold)
 	ammo=int(sim.player.ammo[0])
 	check(sim.buy_ammo(0) and int(sim.player.gold)==gold-30 and int(sim.player.ammo[0])==ammo+150,"ammo purchase conserves wallet and stock")
+	# Undo selection independently of movement and the already launched
+	# projectile queue. Never consume ammunition just by deselecting.
+	var cancel_target_sim=SIM.new()
+	var marked: int=int(cancel_target_sim.npcs[0].id)
+	cancel_target_sim.select(marked)
+	cancel_target_sim.firing=true
+	cancel_target_sim.player.path=[Vector2(2300,1450)]
+	cancel_target_sim.shots=[{"source":0,"target":marked,"age":0.2,"pos":cancel_target_sim.player.pos}]
+	var course_before: Array=cancel_target_sim.player.path.duplicate()
+	var volley_before: Array=cancel_target_sim.shots.duplicate(true)
+	var ammo_before: Array=cancel_target_sim.player.ammo.duplicate()
+	cancel_target_sim.clear_target()
+	check(cancel_target_sim.target==-1 and not cancel_target_sim.firing and cancel_target_sim.message=="Zielauswahl aufgehoben","manually cancel selected ship and stop future volleys")
+	check(cancel_target_sim.player.path==course_before and cancel_target_sim.shots==volley_before and cancel_target_sim.player.ammo==ammo_before,"canceling a target preserves course, spent projectiles and ammunition")
+	cancel_target_sim.select(marked)
+	check(cancel_target_sim.target==marked,"an enemy can be selected again after cancellation")
 	sim=SIM.new()
 	var invariant=true
 	for i in 1800:
