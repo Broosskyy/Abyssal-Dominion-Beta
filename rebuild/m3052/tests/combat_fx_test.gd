@@ -8,7 +8,7 @@ func check(ok: bool,label: String) -> void:
 	if not ok:failures.append(label)
 func _initialize() -> void:call_deferred("_run")
 func _run() -> void:
-	check(FX.WEAPONS.size()==8,"7 selectable ammunition types plus tower mortar")
+	check(FX.WEAPONS.size()==29,"28 selectable ammunition types plus tower mortar")
 	check(FX.VISIBLE_COUNTS==[1,3,5,8],"M3102 approved visible projectile selections are stable")
 	for wanted in [1,3,5,8]:
 		check(FX.visual_count(wanted)==wanted,"M3102 visible-orb mode %d supported" % wanted)
@@ -34,7 +34,7 @@ func _run() -> void:
 			var corner: float=(cluster[1]-cluster[0]).cross(cluster[2]-cluster[0])
 			check(absf(corner)>200.0,"M3104 three balls form a spacious triangle, not overlapping or lining up")
 	var sim=SIM.new()
-	check(sim.AMMO_NAMES==FX.WEAPONS.slice(0,7),"effect profiles are mapped to actual game ammunition indices")
+	check(sim.AMMO_NAMES==FX.WEAPONS.slice(0,sim.AMMO_NAMES.size()),"all 28 effects are mapped to actual game ammunition indices")
 	var colors: Array[String]=[]
 	var target: Dictionary=sim.npcs[0]
 	sim.player.pos=Vector2(500,500)
@@ -85,7 +85,7 @@ func _run() -> void:
 	game.sim.player.pos=Vector2(2200,1600)
 	var enemy: Dictionary=game.sim.npcs[0]
 	enemy.pos=Vector2(2420,1600)
-	for n in 7:
+	for n in game.sim.AMMO_NAMES.size():
 		game.sim._launch(0,int(enemy.id),str(game.sim.AMMO_NAMES[n]),10,1)
 	game.sim.clock=1.0
 	for projectile: Dictionary in game.sim.shots:projectile.age=.14
@@ -93,7 +93,7 @@ func _run() -> void:
 	game.queue_redraw()
 	await process_frame
 	await process_frame
-	check(game.drawn_shots==7,"sea-map draw pass processes each real ammo VFX")
+	check(game.drawn_shots==game.sim.AMMO_NAMES.size(),"sea-map draws each of the 28 original missile types")
 	# A real three-ball broadside is ONE flying grouped cluster; gameplay still
 	# carries three individually damage-bearing, ammo-consuming projectiles.
 	game.sim.shots.clear()
@@ -112,14 +112,21 @@ func _run() -> void:
 	await process_frame
 	check(game.drawn_shots==1,"M3103 three real shots are drawn as ONE compact Kugelhaufen")
 	game._refresh_ui()
-	for index in 7:
+	for index in game.sim.AMMO_NAMES.size():
 		game.sim.ammo_mode=index
 		game._refresh_ui()
 		check(bool(game.ammo_selector.get("ammo_marker")),"M3100 color-coded combat HUD enabled")
 		check(Color(game.ammo_selector.get("ammo_color"))==FX.weapon_color(str(game.sim.AMMO_NAMES[index])),"HUD accent matches projectile profile "+str(index))
 		game._open_modal("Munition")
-		check(game.ammo_rows.size()==7 and Color(game.ammo_rows[index].accent)==FX.weapon_color(str(game.sim.AMMO_NAMES[index])),"popover row accent matches flight FX "+str(index))
+		check(game.ammo_rows.size()==game.sim.AMMO_NAMES.size() and Color(game.ammo_rows[index].accent)==FX.weapon_color(str(game.sim.AMMO_NAMES[index])),"popover row accent matches flight FX "+str(index))
 		game.modal.hide()
+	for n in range(7,game.sim.AMMO_NAMES.size()):
+		var art: Texture2D=game._ammo_texture(n)
+		check(art is AtlasTexture and art.get_width()==128,"M3105 ammo %d has its own 128px cropped visual icon" % n)
+	var legacy=SIM.new()
+	var old_save=legacy.export_save()
+	old_save.ammo=[15,16,17,18,19,20,21]
+	check(legacy.restore_save(old_save) and legacy.player.ammo.size()==game.sim.AMMO_NAMES.size() and int(legacy.player.ammo[0])==15 and int(legacy.player.ammo[27])==12,"M3105 legacy 7-ammo saves migrate without loss and grant test stock for new types")
 	game.queue_free()
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)

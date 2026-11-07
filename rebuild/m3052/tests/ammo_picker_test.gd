@@ -12,7 +12,7 @@ func run() -> void:
 	await process_frame
 	game.set_process(false);game.elapsed=2.0
 	var sim=game.sim
-	sim.player.path=[];sim.player.ammo=[100,100,100,100,100,100,100]
+	sim.player.path=[];sim.player.ammo.resize(sim.AMMO_NAMES.size());sim.player.ammo.fill(100)
 	var stock: Array=sim.player.ammo.duplicate();var wallet=int(sim.player.gold)
 	check(game.find_children("SpecialAmmo*","Button",true,false).is_empty(),"four separate special-ammunition buttons are absent")
 	check(game.find_children("Ammo0","Button",true,false).is_empty() and game.find_children("PageButton","Button",true,false).is_empty(),"one selector replaces the old quick slots and page control")
@@ -23,7 +23,7 @@ func run() -> void:
 			game.ammo_selector.pressed.emit()
 			for _i in 4:await process_frame
 			var rect=game.modal.get_global_rect()
-			check(game.modal.visible and game.modal.plain and game.ammo_rows.size()==7,"selector opens a plain seven-sort list at %s / %d" % [dimensions,profile])
+			check(game.modal.visible and game.modal.plain and game.ammo_rows.size()==sim.AMMO_NAMES.size(),"selector opens the entire ammunition roster at %s / %d" % [dimensions,profile])
 			check(Rect2(Vector2.ZERO,Vector2(dimensions)).encloses(rect) and rect.position.y>=game.chrome.get_global_rect().end.y,"ammunition list fits below the header on %s / %d" % [dimensions,profile])
 			check(rect.end.y<game.ammo_selector.get_global_rect().position.y and game.modal_backdrop.color.a==0,"list is anchored above the button without darkening the sea")
 			var controls: Array=[game.attack,game.repair,game.ammo_selector,game.target_cycle,game.loadout_button,game.chart_mini,game.camera_pad]
@@ -33,7 +33,7 @@ func run() -> void:
 				for j in range(i+1,controls.size()):clear=clear and not controls[i].get_global_rect().intersects(controls[j].get_global_rect())
 			check(clear,"single-selector combat layout has independent controls at %s / %d" % [dimensions,profile])
 			game._close_ammo()
-	for index in 7:
+	for index in sim.AMMO_NAMES.size():
 		game.ammo_selector.pressed.emit()
 		check(game.ammo_rows[index].get_meta("ammo_index")==index,"list includes ammunition sort %d" % index)
 		game.ammo_rows[index].pressed.emit()
