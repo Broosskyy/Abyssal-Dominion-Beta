@@ -229,7 +229,7 @@ func _run() -> void:
 		var yard:=0
 		for button in game.modal_body.find_children("*","Button",true,false):
 			if "AUSRÜSTEN" in button.text or "AKTIV" in button.text:yard+=1
-		check(yard==30,"shipyard shows one card for each original and new test design")
+		check(yard==game.skins.size(),"shipyard shows one card for every available design")
 		game.modal.hide()
 	root.size=Vector2i(1280,720)
 	await process_frame
