@@ -693,13 +693,21 @@ func _launch(source_id: int, target_id: int, weapon: String, damage: int, count:
 	var source = actor(source_id)
 	var destination = actor(target_id)
 	if source.is_empty() or destination.is_empty(): return
+	# Flight metadata is presentation-only. Damage, speed, shot spread, range
+	# and 80 ms salvo staggering stay exactly as before M3100.
+	var visual_heading: Vector2=(destination.pos-source.pos).normalized()
+	if visual_heading.length_squared()<0.001:visual_heading=Vector2.RIGHT
 	for i in count:
 		next_id += 1
 		var start: Vector2 = source.pos + Vector2(0, (float(i) - float(count - 1) * 0.5) * 13)
 		shots.append({"id": next_id, "source": source_id, "target": target_id, "pos": start,
 			"start": start, "damage": damage, "weapon": weapon, "age": -float(i) * 0.08,
-			"distance": maxf(1, start.distance_to(destination.pos)), "traveled": 0.0})
+			"distance": maxf(1, start.distance_to(destination.pos)), "traveled": 0.0,
+			"visual_heading": visual_heading, "salvo_index": i})
 	_event("muzzle", source.pos, count, source_id)
+	if not events.is_empty():
+		events.back()["weapon"]=weapon
+		events.back()["heading"]=visual_heading
 
 func _step_shots(delta: float) -> void:
 	for i in range(shots.size() - 1, -1, -1):
@@ -766,7 +774,9 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 	else:
 		victim.last_hit = clock
 	_event("impact", victim.pos, dealt, victim.id)
-	if not events.is_empty(): events.back()["weapon"] = str(shot.weapon)
+	if not events.is_empty():
+		events.back()["weapon"]=str(shot.weapon)
+		events.back()["vfx_seed"]=int(shot.id)
 	if int(victim.hp) == 0:
 		victim.path = []
 		victim.respawn = 8.0 if int(victim.id) == 0 else (90.0 if victim.kind == "tower" else 48.0)
