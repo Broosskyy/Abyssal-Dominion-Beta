@@ -52,13 +52,13 @@ func _run() -> void:
 	game._refresh_ui()
 	if maneuver:
 		game.sim.npcs.clear()
-		game.sim.player.skin=26
+		game.sim.player.skin=0
 		game.sim.player.pos=game.sim.START
 		game.camera.position=game.sim.player.pos
 		game.sim.course(game.sim.START+Vector2(240,0))
 	if damage:
 		game.sim.npcs.clear()
-		game.sim.player.skin=26
+		game.sim.player.skin=0
 		game.sim.player.pos=game.sim.START
 		game.sim.player.heading=Vector2.RIGHT
 		game.sim.player.path=[]

@@ -67,6 +67,21 @@ def main():
         z.writestr('fixture.bin',b'Z'*1000000)
     fixture_spec=data_spec(fixture/'content.zip',fixture_info,args.signing_key)
     (fixture/'content_spec.json').write_text(json.dumps(fixture_spec))
+    # M3099 fail-closed cleanup: no retired player models, sprite atlases or
+    # additional skins can silently re-enter a published signed data pack.
+    player_glbs = sorted((ROOT/'assets/player').rglob('*.glb'))
+    if [p.name for p in player_glbs] != ['schattenkriegsschiff_shaded.glb']:
+        raise RuntimeError('Approved player fleet must contain exactly one shaded GLB: '+str(player_glbs))
+    npc_glbs = sorted((ROOT/'assets/npc/meshy/models').glob('*.glb'))
+    if len(npc_glbs) != 9:
+        raise RuntimeError('All nine approved NPC GLBs are required')
+    for retired in ['assets/user/ships','assets/fleet','assets/reference/ships',
+                    'assets/generated/ships','assets/player/test_ships']:
+        if (ROOT/retired).exists():
+            raise RuntimeError('Retired ship assets still exist: '+retired)
+    previews = sorted((ROOT/'assets/player').rglob('*.png'))
+    if [p.name for p in previews] != ['schattenkriegsschiff_preview.png']:
+        raise RuntimeError('Exactly one final shaded-ship yard preview is allowed')
     catalog = json.loads((ROOT/'assets/provenance.json').read_text())
     assets = catalog['files']
     for row in assets + catalog.get('vector_ui', []):
@@ -131,9 +146,6 @@ def main():
             if symbol not in dex: raise RuntimeError('Native updater absent from APK: '+str(symbol))
         if z.read('assets/updater/config.json') != (ROOT/'updater/config.json').read_bytes():
             raise RuntimeError('Updater configuration missing or changed')
-        geometry_path = 'assets/assets/visuals/ship_frames.json'
-        if geometry_path not in z.namelist() or z.read(geometry_path) != (ROOT/'assets/visuals/ship_frames.json').read_bytes():
-            raise RuntimeError('Measured sprite geometry missing or different in APK')
         for row in assets:
             mapping = 'assets/'+row['path']+'.import'
             if mapping not in z.namelist():
@@ -163,7 +175,7 @@ def main():
               'mode': 'LOCAL_GUEST_SEA_CHART', 'public_server': False, 'milestone': 'M3059',
               'regions': 3, 'quest_chain': 7, 'equipment_categories': 4, 'equipment_tiers': 3,
               'source_commit': os.environ.get('GITHUB_SHA', 'local'),
-              'measured_ship_sources': 28, 'measured_ship_frames': 90, 'eight_direction_designs': 1, 'starter_states': ['intact','damaged'], 'starter_damage_hp_ratio': 0.35})
+              'player_glb_variants': 1, 'npc_glb_models': 9, 'graphics_modes': ['hybrid','3d'], 'retired_sprite_atlases': 0})
     output.with_suffix('.build.json').write_text(json.dumps(report, indent=2))
     print(json.dumps(report, indent=2))
 

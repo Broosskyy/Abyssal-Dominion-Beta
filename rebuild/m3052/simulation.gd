@@ -21,10 +21,9 @@ const START := Vector2(2100, 1450)
 const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice"]
 const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein"]
 var player: Dictionary
-# Existing save files keep their selected ship. On a fresh install with the
-# complete test fleet the red Crimson Voyager is the default beginner hull.
-const RED_STARTER_GLB := "res://assets/player/test_ships/crimson_voyager.glb"
-const TEST_SKIN_MAX := 30
+# All historical skin IDs (0–30) migrate to our single production shaded GLB.
+# Persist it as skin 0, without touching any progression/equipment/currency.
+const FINAL_PLAYER_SKIN := 0
 ## Local captain identity until the server issues persistent multiplayer IDs.
 var captain_id := ""
 var npcs: Array[Dictionary] = []
@@ -86,7 +85,7 @@ var message := "Seekarte antippen: Kurs setzen · Schiff antippen: Ziel wählen"
 func _init() -> void:
 	captain_id = Crypto.new().generate_random_bytes(6).hex_encode().to_upper()
 	rng.seed = 3060
-	var fresh_skin: int=27 if ResourceLoader.exists(RED_STARTER_GLB) else 26
+	var fresh_skin: int=FINAL_PLAYER_SKIN
 	player = {"id": 0, "pos": START, "heading": Vector2(-1, 0), "path": [], "hp": PLAYER_HP,
 		"max_hp": PLAYER_HP, "shield": PLAYER_SHIELD, "max_shield": PLAYER_SHIELD, "speed": PLAYER_SPEED,
 		"reload": 0.0, "gold": 240, "ammo": [600, 120, 100, 40, 24, 40, 24], "cannons": BASE_CANNON_SLOTS, "skin": fresh_skin,
@@ -1356,7 +1355,7 @@ func restore_save(data: Dictionary) -> bool:
 	var stored_id := str(data.get("captain_id","")).strip_edges().to_upper()
 	if stored_id.length()==12 and stored_id.is_valid_hex_number():captain_id=stored_id
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
-	player.skin=clampi(int(data.get("skin",27 if ResourceLoader.exists(RED_STARTER_GLB) else 26)),0,TEST_SKIN_MAX)
+	player.skin=FINAL_PLAYER_SKIN # M3099: migrate every retired design to the final ship
 	ammo_mode=clampi(int(data.get("ammo_mode",0)),0,AMMO_NAMES.size()-1)
 	kills=maxi(0,int(data.get("kills",0)))
 	claimed=bool(data.get("claimed",false))

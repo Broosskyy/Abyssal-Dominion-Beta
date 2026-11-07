@@ -13,7 +13,7 @@ func _run() -> void:
 	game.set_process(false)
 	game.sim.npcs.clear();game.sim.drops.clear()
 	game.sim.level=4
-	game.sim.player.skin=26
+	game.sim.player.skin=0
 	game.sim.player.hp=game.sim.player.max_hp
 	game.camera.zoom=Vector2.ONE*1.2
 	game.elapsed=2.0

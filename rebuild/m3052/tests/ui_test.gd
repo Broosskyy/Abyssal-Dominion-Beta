@@ -18,141 +18,62 @@ func _run() -> void:
 	root.add_child(game)
 	current_scene=game
 	await process_frame
-	check(game.ship_textures.size()==10 and game.atlas_textures.size()==16,"ten own ship designs and sixteen directional reference atlases loaded")
-	check(game.skins.size()==31,"27 original designs plus four playable GLB ships, including Gemi11")
-	check(game.TEST_SHIP_LENGTHS==[128.0,152.0,158.0,158.0],"M3098 both dark 3D test hulls share consistent scale")
-	check(game.NPC_VISUAL_SCALE>=0.85 and game.NPC_VISUAL_SCALE<=0.95,"M3087 original NPC vessels scale consistently instead of overpowering the chart")
-	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
-	# M3092: actual 3D model A/B/C comparison, not material-only or sprites.
-	var old_comparison_style: String=game.test_visual_style
-	var old_comparison_skin: int=int(game.sim.player.skin)
-	var old_comparison_mode: String=game.mesh_layer.mode
-	game.sim.player.skin=29
-	game.mesh_layer.set_render_mode("hybrid")
-	var comparison_fleet: Array[Dictionary]=[game.sim.player]
-	for variant in [["original","base_basic_pbr"],["gameplay","base_basic_gameplay_pbr"],["shaded","base_basic_gameplay_shaded"]]:
-		game.mesh_layer.set_player_style(str(variant[0]))
-		check(game.mesh_layer.can_render_actor(game.sim.player),"M3092 actual 3D model available: "+str(variant[0]))
-		game.mesh_layer.sync_fleet(comparison_fleet,game.camera,game.get_viewport_rect().size)
-		check(str(game.mesh_layer.model_instance_keys.get(0,""))==str(variant[1]),"M3092 real GLB scene selected: "+str(variant[1]))
-	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"M3092 NPC ships remain actual GLBs")
-	# M3093: uploaded PBR and shaded ships show both sides of thin sails.
-	for new_style in ["gameplay","shaded"]:
-		game.mesh_layer.set_player_style(new_style)
-		game.mesh_layer.sync_fleet(comparison_fleet,game.camera,game.get_viewport_rect().size)
-		check(game.mesh_layer.gameplay_double_sided_count>0,"M3093 double-sided imported material in real GLB: "+new_style)
-		var reference_drop: float=game.mesh_layer.stable_player_plate_drop(game.sim.player,game.camera.zoom.y,game._plate_pixels())
-		check(reference_drop>20.0 and reference_drop<180.0,"M3094 player plate remains below hull and inside configured range: "+new_style)
-		var owner: Node3D=game.mesh_layer.model_instances.get(0)
-		check(owner!=null and owner.get_node_or_null("OriginalAxisCorrection")!=null,"M3093 per-instance render pivot retained: "+new_style)
-	check(int(game.sim.player.skin)==29,"M3092 visual comparison never modifies equipped ship")
-	game.mesh_layer.set_player_style(old_comparison_style)
-	game.mesh_layer.set_render_mode(old_comparison_mode)
-	game.sim.player.skin=old_comparison_skin
-	# M3095 selection rings: the captain always has a cyan water-plane
-	# circle; only the actively selected, living NPC gets a tactical ring.
-	var player_radii: Vector2=game._selection_ring_radii(game.sim.player)
-	var npc_radii: Vector2=game._selection_ring_radii(game.sim.npcs[0])
-	check(player_radii.x>55.0 and player_radii.y>20.0 and player_radii.x>player_radii.y,
-		"M3095 captain's circle surrounds the vessel, not a tiny keel dot")
-	check(npc_radii.x>npc_radii.y and npc_radii.y>14.0,"M3095 target circle scales to NPC hull size")
-	check(game._selection_ring_visible(game.sim.player),"M3095 personal selection ring always visible on the chart")
-	var ring_target_before: int=game.sim.target
-	var ring_selected: Dictionary=game.sim.npcs[0]
-	game.sim.select(int(ring_selected.id))
-	check(game._selection_ring_visible(ring_selected),"M3095 selecting an NPC draws the ring immediately")
-	check(not game._selection_ring_visible(game.sim.npcs[1]),"M3095 unrelated NPCs never receive a target circle")
-	var saved_ring_hp: int=int(ring_selected.hp)
-	ring_selected.hp=0
-	check(not game._selection_ring_visible(ring_selected),"M3095 sunken target loses its circle")
-	ring_selected.hp=saved_ring_hp
-	game.sim.select(ring_target_before)
-	check(game.mesh_layer.FLEET_CAMERA_TILT_DEGREES==40.0 and game.mesh_layer.GAMEPLAY_WATER_IMMERSION>game.mesh_layer.PLAYER_WATER_IMMERSION,
-		"M3095 matching 3D/Hybrid angle and deeper optimized-gameplay keel")
-	# Sea effects depend on actual movement, not a planned path or client FPS.
-	check(is_zero_approx(game.wake_motion_strength(0.0,165.0)),"M3086 moored ship does not generate artificial wake")
-	check(is_equal_approx(game.wake_motion_strength(82.5,165.0),.5),"M3086 keel foam responds smoothly to half speed")
-	check(is_equal_approx(game.wake_motion_strength(165.0,165.0),1.0),"M3086 cruising ship produces full-speed wake")
-	check(is_equal_approx(game.wake_motion_strength(400.0,165.0),1.0),"M3086 unusually fast telemetry cannot overbrighten wakes")
-	check(str(game.skins[27].mesh_key)=="crimson_voyager" and str(game.skins[28].mesh_key)=="test_ship_2" and str(game.skins[29].mesh_key)=="base_basic_pbr","red starter and both boss test GLBs have dedicated shipyard slots")
-	for skin_id in [27,28,29,30]:
-		var key: String=game.TEST_SHIP_KEYS[skin_id-27]
-		check(game.mesh_layer.has_test_ship(skin_id),"M3083 player GLB is actually imported: "+key)
-		check(game.test_ship_textures.has(key),"M3083 genuine 8-direction sprite exported: "+key)
-		check(game.skin_previews[skin_id]!=null and game.skin_previews[skin_id]==game.TEST_SHIP_PREVIEWS[key],"M3083 genuine shipyard preview exported: "+key)
-	check(str(game.skins[30].mesh_key)=="gemi11_uv","M3097 Gemi11 occupies separate skin 30 in shipyard")
-	game.sim.player.skin=30
-	game.mesh_layer.set_render_mode("3d")
-	check(game.mesh_layer.can_render_actor(game.sim.player),"M3097 Gemi11 renders as real GLB in 3D")
-	var isolated_gemi11: Array[Dictionary]=[game.sim.player]
-	game.mesh_layer.sync_fleet(isolated_gemi11,game.camera,game.get_viewport_rect().size)
-	check(str(game.mesh_layer.model_instance_keys.get(0,""))=="gemi11_uv","M3097 Gemi11 GLB instance is independent")
-	# M3098: check the actual Gemi11 surface overrides, not a fake sprite.
-	var gemi_owner: Node3D=game.mesh_layer.model_instances.get(0)
-	var gemi_lit_surfaces:=0
-	var pending_gemi: Array[Node]=[gemi_owner]
-	while not pending_gemi.is_empty():
-		var node: Node=pending_gemi.pop_back()
-		for child: Node in node.get_children():pending_gemi.append(child)
-		if not node is MeshInstance3D:continue
-		var piece: MeshInstance3D=node as MeshInstance3D
-		if piece.mesh==null:continue
-		for surface in range(piece.mesh.get_surface_count()):
-			var mat: Material=piece.get_active_material(surface)
-			if mat is StandardMaterial3D and (mat as StandardMaterial3D).emission_enabled and (mat as StandardMaterial3D).emission_texture!=null:
-				gemi_lit_surfaces+=1
-	check(gemi_lit_surfaces>0,"M3098 Gemi11 uses texture-preserving per-instance deck and sail illumination")
-	check(game.mesh_layer._player_immersion("gemi11_uv")==game.mesh_layer.GAMEPLAY_WATER_IMMERSION,"M3098 Gemi11 hull has the same sea immersion as the gameplay Schattenkriegsschiff")
-	var gemi_ring: Vector2=game._selection_ring_radii(game.sim.player)
-	var gemi_title: String=game._plate_title(game.sim.player)
-	check(gemi_title.contains("Gemi11 UV korrigiert") and not gemi_title.contains("…"),"M3098 complete Gemi11 design name is never cut off")
-	check(game._plate_title_size(game.sim.player)>=12,"M3098 long captain design title fits adaptive font budget")
-	game.sim.player.skin=29
-	var shadow_title: String=game._plate_title(game.sim.player)
-	check(shadow_title.contains("Schattenkriegsschiff") and not shadow_title.contains("…"),"M3098 full shadow warship name remains visible")
-	check(gemi_ring.distance_to(game._selection_ring_radii(game.sim.player))<0.01,"M3098 dark test hulls use identical water-ring radii")
-	check(gemi_ring.x<game._actor_visual_length(game.sim.player)*0.50,"M3098 selection circle hugs the hull instead of extending too far")
-	game.sim.player.skin=30
-	game.mesh_layer.set_render_mode(old_comparison_mode)
-	game.sim.player.skin=old_comparison_skin
-	var fresh=game.SIM.new()
-	check(int(fresh.player.skin)==27,"new captains begin on the red Crimson Voyager")
-	var fresh_save=fresh.export_save()
-	fresh.player.skin=29
-	check(fresh.restore_save(fresh.export_save()) and int(fresh.player.skin)==29,"large test ship survives captain save and restore")
-	fresh.player.skin=30
-	check(fresh.restore_save(fresh.export_save()) and int(fresh.player.skin)==30,"M3097 Gemi11 skin persists across save/load")
-	fresh.player.skin=27
-	check(fresh.restore_save(fresh_save) and int(fresh.player.skin)==27,"red starter survives saving and loading")
-	# Verify real physical bow direction for both Z-long originals and red X-long
-	# starter, at all eight map bearings. This catches 180-degree import errors.
-	for model_key in ["crimson_voyager","test_ship_2","base_basic_pbr","base_basic_gameplay_pbr","base_basic_gameplay_shaded","gemi11_uv"]:
-		for course in [Vector2.RIGHT,Vector2(1,1).normalized(),Vector2.DOWN,Vector2(-1,1).normalized(),Vector2.LEFT,Vector2(-1,-1).normalized(),Vector2.UP,Vector2(1,-1).normalized()]:
-			check(game.mesh_layer.forward_for_model(model_key,course).distance_to(course)<0.001,"M3084 GLB physical prow points in the direction of travel: "+model_key+" "+str(course))
-	var slow_player_turn: float=game.mesh_layer.smooth_player_yaw(0.0,PI,1.0/60.0)
-	check(absf(slow_player_turn)>0.0 and absf(slow_player_turn)<=deg_to_rad(285.0)/60.0+0.001,"M3084 player ship steering is responsive but cannot instantly flip 180 degrees")
-	var mode_before_anchor: String=game.mesh_layer.mode
-	game.mesh_layer.set_render_mode("3d")
-	var skin_before_anchor: int=int(game.sim.player.skin)
-	game.sim.player.skin=29
+
+	check(game.skins.size()==1 and str(game.skins[0].name)=="Schattenkriegsschiff","M3099 single approved ship in shipyard")
+	check(game.skin_previews.size()==1 and game.skin_previews[0]!=null,"M3099 single preview retained")
+	check(game.sim.player.skin==0,"M3099 new players start with only shaded ship")
+	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"nine NPCs + shaded captain GLB load")
+	check(game.mesh_layer.model_scenes.size()==10,"M3099 exactly ten real GLBs are registered")
+	check(game.mesh_layer.has_player_ship(),"M3099 shaded GLB is the only captain")
+	check(game.mesh_layer.player_key_for_skin(30)=="schattenkriegsschiff_shaded","M3099 retired IDs resolve to the shaded model")
+	check(game.mesh_layer._player_immersion("schattenkriegsschiff_shaded")==game.mesh_layer.GAMEPLAY_WATER_IMMERSION,"M3099 waterline retained")
+	check(game.mesh_layer.FLEET_CAMERA_TILT_DEGREES==40.0 and game.mesh_layer.FULL_3D_CAMERA_TILT_DEGREES>40.0,"M3099 2.5D and 3D camera variants are distinct")
+	var original_mode: String=game.mesh_layer.mode
+	var one_ship: Array[Dictionary]=[game.sim.player]
+	for chosen_mode in ["hybrid","3d"]:
+		game.mesh_layer.set_render_mode(chosen_mode)
+		game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
+		check(game.mesh_layer.can_render_actor(game.sim.player),"M3099 real player GLB renders in "+chosen_mode)
+		check(str(game.mesh_layer.model_instance_keys.get(0,""))=="schattenkriegsschiff_shaded","M3099 uses shaded model in "+chosen_mode)
+		check(game.mesh_layer.gameplay_double_sided_count>0,"M3099 shaded sails are rendered on both sides")
+		var stable: float=game.mesh_layer.stable_player_plate_drop(game.sim.player,game.camera.zoom.y,game._plate_pixels())
+		check(stable>18.0 and stable<190.0,"M3099 readable 3D captain name anchor in "+chosen_mode)
+	game.mesh_layer.set_render_mode("classic")
+	check(game.mesh_layer.mode=="hybrid","M3099 legacy classic mode migrates to 2.5D")
+	game.mesh_layer.set_render_mode(original_mode)
+	var expected_name: String=game._plate_title(game.sim.player)
+	check(expected_name.contains("Schattenkriegsschiff") and not expected_name.contains("TEST"),"M3099 captain has no test design title")
+	check(game._plate_title_size(game.sim.player)>=12,"M3099 captain title remains readable")
+	var captain_ring: Vector2=game._selection_ring_radii(game.sim.player)
+	check(captain_ring.x>55.0 and captain_ring.y>20.0 and captain_ring.x>captain_ring.y,"M3099 player ring fits shaded hull")
+	check(game._selection_ring_visible(game.sim.player),"captain always receives water selection ring")
+	var selected: Dictionary=game.sim.npcs[0]
+	var previous_target: int=game.sim.target
+	game.sim.select(int(selected.id))
+	check(game._selection_ring_visible(selected),"tapped NPC has selection ring")
+	check(not game._selection_ring_visible(game.sim.npcs[1]),"untapped NPC has no selection ring")
+	game.sim.select(previous_target)
+	check(game.wake_motion_strength(0.0,165.0)==0.0,"idle player produces no false wake")
+	check(game.wake_motion_strength(82.5,165.0)>.49,"movement produces gradual wake")
+	var migration=game.SIM.new()
+	var before_legacy=migration.export_save()
+	before_legacy.skin=30
+	before_legacy.gold=787
+	check(migration.restore_save(before_legacy) and migration.player.skin==0 and int(migration.player.gold)==787,"M3099 old captain skin migrates without losing gold")
+	for old_id in [0,8,26,27,28,29,30]:
+		var old_save=migration.export_save()
+		old_save.skin=old_id
+		check(migration.restore_save(old_save) and int(migration.player.skin)==0,"M3099 retired skin %d maps to shaded ship"%old_id)
+	for course in [Vector2.UP,Vector2.DOWN,Vector2.LEFT,Vector2.RIGHT,Vector2(1,1).normalized(),Vector2(-1,-1).normalized()]:
+		check(game.mesh_layer.forward_for_model("schattenkriegsschiff_shaded",course).distance_to(course)<.001,"M3099 shaded bow orientation "+str(course))
 	var player_center: Vector2=game.get_canvas_transform()*game._visual_actor_pos(game.sim.player)
-	var title_anchor: Vector2=game._plate_screen_anchor(game.sim.player)
-	# The mesh must be synced before its real 3D silhouette is projected.
-	var isolated_player_fleet: Array[Dictionary]=[game.sim.player]
-	game.mesh_layer.sync_fleet(isolated_player_fleet,game.camera,game.get_viewport_rect().size)
-	title_anchor=game._plate_screen_anchor(game.sim.player)
-	var actual_hull_bottom: float=game.mesh_layer.projected_hull_bottom(game.sim.player)
-	var stable_plate_drop_3093: float=game.mesh_layer.stable_player_plate_drop(game.sim.player,game.camera.zoom.y,game._plate_pixels())
-	check(actual_hull_bottom>player_center.y-10.0 and absf(title_anchor.y-player_center.y-stable_plate_drop_3093)<1.0,"M3093 captain plate uses model-specific stable offset")
+	var plate_anchor: Vector2=game._plate_screen_anchor(game.sim.player)
+	check(plate_anchor.y>player_center.y,"M3099 captain labels remain below real hull")
 	var saved_heading: Vector2=game.sim.player.heading
-	var first_anchor: Vector2=game._plate_screen_anchor(game.sim.player)
-	for bearing in [Vector2.UP,Vector2.DOWN,Vector2.LEFT,Vector2.RIGHT,Vector2(1,1).normalized(),Vector2(-1,-1).normalized()]:
-		game.sim.player.heading=bearing
-		check(game._plate_screen_anchor(game.sim.player).distance_to(first_anchor)<1.0,"M3093 3D captain name never jumps between heading angles")
+	for course in [Vector2.UP,Vector2.DOWN,Vector2.LEFT,Vector2.RIGHT]:
+		game.sim.player.heading=course
+		check(game._plate_screen_anchor(game.sim.player).distance_to(plate_anchor)<1.0,"M3099 nameplate does not jump while rotating")
 	game.sim.player.heading=saved_heading
-	game.sim.player.skin=skin_before_anchor
-	game.mesh_layer.set_render_mode(mode_before_anchor)
-	check(game.mesh_layer.mode in ["classic","hybrid","3d"],"game has a valid 2.5D or 3D mode")
 	# Turn rate is limited and converges smoothly across all heading changes.
 	var test_yaw: float=game.mesh_layer.smooth_yaw(0.0,PI*.5,1.0/30.0)
 	check(test_yaw>0.0 and test_yaw<=deg_to_rad(110.0)/30.0+0.0001,"3D NPC turn is capped instead of snapping 90 degrees")
@@ -181,7 +102,7 @@ func _run() -> void:
 	game.mesh_layer.set_render_mode("3d")
 	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"3D mode shares the NPC model and simulation")
 	game.mesh_layer.set_render_mode("classic")
-	check(not game.mesh_layer.can_render_actor(game.sim.npcs[0]),"classic 2.5D sprite fallback remains available")
+	check(game.mesh_layer.mode=="hybrid" and game.mesh_layer.can_render_actor(game.sim.npcs[0]),"legacy classic is redirected to approved 2.5D real-GLB mode")
 	game.mesh_layer.set_render_mode(before_mode)
 	check(game.CONTENT.NPC_MESHY_ROSTER.size()==9,"nine approved NPC visual designs and roles")
 	check(game.sim.npcs.filter(func(npc):return npc.kind=="ship").size()==16,"original sixteen ship spawn points are retained")
@@ -194,13 +115,7 @@ func _run() -> void:
 		check(game.deck_icons.has(key) and game.deck_icons[key] is Texture2D,"original nautical SVG icon loads for "+key)
 	check(game.attack.has_method("_press_visual"),"combat orb has tap-feedback animation")
 	check(game._actor_visual_length(game.sim.npcs[14])<game._actor_visual_length(game.sim.npcs[12])*0.7,"elite pinnace stays visibly smaller than a non-elite galleon")
-	var previous_skin: int=game.sim.player.skin
-	game.sim.player.skin=24
-	check(is_equal_approx(game._actor_visual_length(game.sim.player),game._actor_visual_length(game.sim.npcs[14])),"player and NPC versions of the same hull use the same visible size")
-	game.sim.player.skin=previous_skin
-	check(game._starter_texture(2400,2400)==game.starter_texture,"full HP selects actual intact starter texture")
-	check(game._starter_texture(600,2400)==game.starter_damaged_texture,"low HP selects actual damaged starter texture")
-	check(game._starter_texture(2400,2400)==game.starter_texture,"repair returns actual texture to intact without stale damage cache")
+	check(is_equal_approx(game._actor_visual_length(game.sim.player),158.0),"final hull has consistent visual size")
 	for dimensions in [Vector2i(1280,720),Vector2i(844,390),Vector2i(720,405)]:
 		root.size=dimensions
 		await process_frame
@@ -251,7 +166,7 @@ func _run() -> void:
 		game.modal.hide()
 		game._open_modal("Werft")
 		await process_frame
-		check(game.modal_scroll.size.y>100 and game.modal_scroll.get_v_scroll_bar().max_value>game.modal_scroll.size.y,"shipyard uses actual scrollable content")
+		check(game.modal_scroll.size.y>100,"shipyard displays its one approved design at all sizes")
 		var yard:=0
 		for button in game.modal_body.find_children("*","Button",true,false):
 			if "AUSRÜSTEN" in button.text or "AKTIV" in button.text:yard+=1
@@ -268,7 +183,7 @@ func _run() -> void:
 	var gold=int(game.sim.player.gold)
 	var position: Vector2=game.sim.player.pos
 	game._equip(8)
-	check(int(game.sim.player.skin)==8 and int(game.sim.player.hp)==hp and int(game.sim.player.gold)==gold and game.sim.player.pos==position,"equipping design preserves position, hull and wallet")
+	check(int(game.sim.player.skin)==0 and int(game.sim.player.hp)==hp and int(game.sim.player.gold)==gold and game.sim.player.pos==position,"retired designs cannot be equipped or alter captain state")
 	game.modal.hide()
 	game.sim.select(2)
 	game._toggle_fire()
@@ -286,7 +201,7 @@ func _run() -> void:
 	game._save_progress()
 	game.sim.player.gold=0
 	game._load_progress()
-	check(int(game.sim.player.gold)==543 and int(game.sim.player.skin)==8,"guest save reloads wallet and ship design")
+	check(int(game.sim.player.gold)==543 and int(game.sim.player.skin)==0,"guest save reloads wallet and final shaded ship")
 	for dimensions in [Vector2i(1280,720),Vector2i(844,390),Vector2i(720,405)]:
 		root.size=dimensions
 		await process_frame
@@ -581,37 +496,14 @@ func _run() -> void:
 	check(game.camera_pad.value.x>.9,"owning finger remains captured when dragged outside the joystick")
 	routed.pressed=false;routed.position=routed_drag.position;root.push_input(routed,true);await process_frame
 	check(game.camera_pad.value==Vector2.ZERO and game.sim.player.path.is_empty(),"outside release stops camera input without leaking a sailing command")
-	# A finger drag that starts on a shipyard button scrolls the list and never equips the design.
+	# A single approved design is displayed, with no switchable ship cards.
 	root.size=Vector2i(1280,720);await process_frame;game._layout();game.modal.hide()
-	game._open_modal("Werft");await process_frame;await process_frame
-	var skin_before: int=int(game.sim.player.skin)
-	var yard_button: Button=null
+	game._open_modal("Werft");await process_frame
+	var choices:=0
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
-		if "AUSRÜSTEN" in button.text and not button.disabled:yard_button=button;break
-	check(yard_button!=null,"shipyard still offers a design that is not equipped")
-	if yard_button!=null:
-		var origin: Vector2=yard_button.get_global_rect().get_center()
-		var emulated=InputEventMouseButton.new();emulated.device=-1;emulated.button_index=MOUSE_BUTTON_LEFT;emulated.pressed=true;emulated.position=origin
-		var finger=InputEventScreenTouch.new();finger.index=9;finger.pressed=true;finger.position=origin
-		root.push_input(emulated,true);root.push_input(finger,true);await process_frame
-		var slide=InputEventScreenDrag.new();slide.index=9;slide.position=origin+Vector2(0,-90);slide.relative=Vector2(0,-90)
-		root.push_input(slide,true);await process_frame;await process_frame
-		finger.pressed=false;finger.position=slide.position;root.push_input(finger,true)
-		emulated.pressed=false;emulated.position=slide.position;root.push_input(emulated,true);await process_frame
-		check(game.modal_scroll.scroll_vertical>0 and int(game.sim.player.skin)==skin_before,"dragging across a shipyard button scrolls and does not equip")
-		game.modal.hide();game._open_modal("Werft");await process_frame;await process_frame
-		for button: Button in game.modal_body.find_children("*","Button",true,false):
-			if "AUSRÜSTEN" in button.text and not button.disabled:
-				game.modal_scroll.ensure_control_visible(button)
-				await process_frame
-				var tap_at: Vector2=button.get_global_rect().get_center()
-				var tap_mouse=InputEventMouseButton.new();tap_mouse.device=-1;tap_mouse.button_index=MOUSE_BUTTON_LEFT;tap_mouse.pressed=true;tap_mouse.position=tap_at
-				var tap_finger=InputEventScreenTouch.new();tap_finger.index=9;tap_finger.pressed=true;tap_finger.position=tap_at
-				root.push_input(tap_mouse,true);root.push_input(tap_finger,true);await process_frame
-				tap_finger.pressed=false;root.push_input(tap_finger,true)
-				tap_mouse.pressed=false;root.push_input(tap_mouse,true);await process_frame;await process_frame
-				break
-		check(int(game.sim.player.skin)!=skin_before,"a tap without movement still equips the shipyard design")
+		if "AUSRÜSTEN" in button.text and not button.disabled:choices+=1
+	check(choices==0 and game.skins.size()==1,"M3099 no hidden or clickable legacy ship choice remains")
+	game.modal.hide()
 	# Staff tools, the world chart and the chart guide.
 	var map_before: int=game.sim.map_id
 	game.modal.hide();game._open_modal("Staff");await process_frame

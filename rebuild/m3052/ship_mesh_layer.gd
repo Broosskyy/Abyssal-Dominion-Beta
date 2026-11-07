@@ -3,38 +3,25 @@ extends TextureRect
 ## GLB meshes are not replaced by fake sprites. 2.5D / 3D use the same fleet,
 ## damage, collision, pathfinding, IDs, saves and nameplate screen anchors.
 const MODEL_ROOT := "res://assets/npc/meshy/models/"
-const PLAYER_MODEL_ROOT := "res://assets/player/test_ships/"
+const PLAYER_MODEL_ROOT := "res://assets/player/"
 const STERN_TAPER=preload("res://stern_hull_taper.gd")
-const TEST_SHIP_SKINS := {27:"crimson_voyager",28:"test_ship_2",29:"base_basic_pbr",30:"gemi11_uv"}
-# Export-critical hard references. The three new models are played by users,
-# not the old NPC roster; string-based dynamic loading was insufficient to
-# make the exporter retain their converted GLTF scenes in the signed PCK.
-const PLAYER_TEST_SCENES := {
-	"crimson_voyager":preload("res://assets/player/test_ships/crimson_voyager.glb"),
-	"test_ship_2":preload("res://assets/player/test_ships/test_ship_2.glb"),
-	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr.glb"),
-	"base_basic_gameplay_pbr":preload("res://assets/player/test_ships/base_basic_gameplay_pbr.glb"),
-	"base_basic_gameplay_shaded":preload("res://assets/player/test_ships/base_basic_gameplay_shaded.glb"),
-	"gemi11_uv":preload("res://assets/player/test_ships/gemi11_uv.glb")
+# One production player GLB and nine approved 3D NPC vessels. No test variants.
+const PLAYER_SCENES := {
+	"schattenkriegsschiff_shaded":preload("res://assets/player/schattenkriegsschiff_shaded.glb")
 }
-# Confirmed with orthographic renders of ORIGINAL GLB source geometry:
-# the red starter bows along -X; both big galleons bow along +Z.
-# A -90 deg local Y pivot maps +Z onto -X, like the original NPC fleet.
-const PLAYER_RAW_BOW := {"crimson_voyager":Vector3(-1,0,0),"test_ship_2":Vector3(0,0,1),"base_basic_pbr":Vector3(0,0,1),
-	"base_basic_gameplay_pbr":Vector3(0,0,1),
-	"base_basic_gameplay_shaded":Vector3(0,0,1),"gemi11_uv":Vector3(0,0,1)}
-const PLAYER_WATER_IMMERSION := 0.205
+const PLAYER_RAW_BOW := {"schattenkriegsschiff_shaded":Vector3(0,0,1)}
 const GAMEPLAY_WATER_IMMERSION := 0.23
-# Both actual GLB modes use the same stable oblique camera. Historically
-# hybrid 39° and 3d 43° made identical vessels suddenly change silhouette.
+const PLAYER_WATER_IMMERSION := 0.205
 const FLEET_CAMERA_TILT_DEGREES := 40.0
+const FULL_3D_CAMERA_TILT_DEGREES := 48.0
+
+func _fleet_tilt() -> float:
+	return FULL_3D_CAMERA_TILT_DEGREES if mode=="3d" else FLEET_CAMERA_TILT_DEGREES
 
 func _player_immersion(key: String) -> float:
-	return GAMEPLAY_WATER_IMMERSION if key in ["base_basic_gameplay_pbr","base_basic_gameplay_shaded","gemi11_uv"] else PLAYER_WATER_IMMERSION
+	return GAMEPLAY_WATER_IMMERSION if key=="schattenkriegsschiff_shaded" else PLAYER_WATER_IMMERSION
+
 const REQUIRED_NPC_KEYS := ["old_harbor_trader","merchant_brig_3002","merchant_brig_2921","merchant_brig_2912","weathered_voyager","weathered_junk","emerald_voyager","midnight_mariner","crimson_tide_galley"]
-## Source Meshy glTF is already Y-UP. No -90-degree X rotation is needed.
-## [hull length X, lowest Y, total Y height, X midpoint, Z midpoint].
-## Measured from the nine complete ORIGINAL ~30k-triangle GLBs (not decimated assets).
 const MODEL_INFO := {
 	"old_harbor_trader":[1.9042,-0.9302,1.8281,-0.0009,0.0031],
 	"merchant_brig_3002":[1.9012,-0.6511,1.3133,-0.0011,-0.0005],
@@ -45,15 +32,8 @@ const MODEL_INFO := {
 	"emerald_voyager":[1.9000,-0.7652,1.5336,0.0008,-0.0004],
 	"midnight_mariner":[1.9016,-0.7520,1.5024,-0.0001,-0.0030],
 	"crimson_tide_galley":[1.9017,-0.6453,1.2821,-0.0002,-0.0001],
-	# [longest horizontal dimension, minY, height, original centerX, centerZ, optional Y yaw]
-	"crimson_voyager":[1.902524,-0.830722,1.660758,-0.000502,-0.000408,0.0],
-	"test_ship_2":[1.954767,-0.510260,1.021000,-0.000050,0.022532,-90.0],
-	"base_basic_pbr":[1.999924,-0.830467,1.661094,-0.000236,0.000038,-90.0],
-	# Uploaded M3092 ~5,918-triangle GLBs. True source bounds, Y-up and +Z prow.
-	"base_basic_gameplay_pbr":[1.896816,0.0,1.460584,-0.000345,0.000428,-90.0],
-	"base_basic_gameplay_shaded":[1.896816,0.0,1.460584,-0.000345,0.000428,-90.0],
-	# M3097 original GLB dimensions; local +Z prow, Y up.
-	"gemi11_uv":[36.973776,-0.753792,27.774979,0.043137,1.132746,-90.0]
+	# 5,918-triangle source GLB, original Y-up, bow +Z, yaw -90°.
+	"schattenkriegsschiff_shaded":[1.896816,0.0,1.460584,-0.000345,0.000428,-90.0]
 }
 var host
 var stage: SubViewport
@@ -62,47 +42,28 @@ var mesh_camera: Camera3D
 var model_scenes: Dictionary={}
 var model_instances: Dictionary={}
 var model_instance_keys: Dictionary={}
-var mode := "classic"
+var mode := "hybrid"
 var resolution_factor := 0.8
-# M3088 A/B/C player-only render profile. Original imported models remain intact.
-const PLAYER_STYLES := ["original","gameplay","shaded"]
-var player_style := "original"
-# M3093: only duplicate imported materials on live instances, never GLBs.
+# M3099: preserve native shaded material, ensure back faces of sails are visible.
 var gameplay_double_sided_count := 0
 
-func set_player_style(value: String) -> void:
-	player_style=value if value in PLAYER_STYLES else "original"
-
 func _configure_gameplay_surfaces(owner: Node3D,key: String) -> void:
-	if key not in ["base_basic_pbr","base_basic_gameplay_pbr","base_basic_gameplay_shaded","gemi11_uv"]:return
+	if key!="schattenkriegsschiff_shaded":return
 	var pivot: Node3D=owner.get_node_or_null("OriginalAxisCorrection")
 	if pivot==null:return
-	var remaining: Array[Node]=[pivot]
+	var pending: Array[Node]=[pivot]
 	gameplay_double_sided_count=0
-	while not remaining.is_empty():
-		var current: Node=remaining.pop_back()
-		for child: Node in current.get_children():remaining.append(child)
-		if not current is MeshInstance3D:continue
-		var piece: MeshInstance3D=current as MeshInstance3D
+	while not pending.is_empty():
+		var node: Node=pending.pop_back()
+		for child: Node in node.get_children():pending.append(child)
+		if not node is MeshInstance3D:continue
+		var piece: MeshInstance3D=node as MeshInstance3D
 		if piece.mesh==null:continue
-		for surface in piece.mesh.get_surface_count():
+		for surface in range(piece.mesh.get_surface_count()):
 			var material: Material=piece.get_active_material(surface)
 			if not material is StandardMaterial3D:continue
 			var copy: StandardMaterial3D=material.duplicate() as StandardMaterial3D
-			# Two-sided cloth throughout continuous rotation. Source GLB has
-			# one material, so culling is disabled only for this player's copy.
 			copy.cull_mode=BaseMaterial3D.CULL_DISABLED
-			if key=="base_basic_gameplay_pbr" and copy.normal_enabled:
-				copy.normal_scale=minf(copy.normal_scale,0.70)
-			# M3098: the source UV texture on Gemi11 is intentionally almost
-			# black; a gentle albedo-based self-fill reveals deck/sail details
-			# without baking new images, modifying UVs or brightening all NPCs.
-			# Apply a subtler lift to the original Schattenkriegsschiff PBR.
-			if key in ["gemi11_uv","base_basic_pbr"] and copy.albedo_texture!=null:
-				copy.emission_enabled=true
-				copy.emission_texture=copy.albedo_texture
-				copy.emission=Color(0.76,0.83,0.89)
-				copy.emission_energy_multiplier=0.44 if key=="gemi11_uv" else 0.17
 			piece.set_surface_override_material(surface,copy)
 			gameplay_double_sided_count+=1
 
@@ -116,7 +77,7 @@ func stable_player_plate_drop(actor: Dictionary,zoom: float,pixels: float) -> fl
 	var beam: float=float(PLAYER_CAPTION_HULL_BEAMS.get(key,PLAYER_SOURCE_BEAMS.get(key,0.44)))
 	var ratio: float=beam/maxf(float(info[0]),0.1)
 	var ground_radius: float=length*sqrt(0.25+ratio*ratio)
-	var tilt: float=deg_to_rad(FLEET_CAMERA_TILT_DEGREES)
+	var tilt: float=deg_to_rad(_fleet_tilt())
 	var depth: float=length*(float(info[2])/maxf(float(info[0]),0.1))*_player_immersion(key)
 	var caption_padding: float=7.5 if PLAYER_CAPTION_HULL_BEAMS.has(key) else 12.0
 	return ground_radius*cos(tilt)*zoom+depth*sin(tilt)*zoom+caption_padding*pixels
@@ -169,9 +130,9 @@ func _ready() -> void:
 	ambience.environment=environment
 	stage.add_child(ambience)
 	for key: String in MODEL_INFO:
-		if PLAYER_TEST_SCENES.has(key):
+		if PLAYER_SCENES.has(key):
 			# A real scene preload is exported into the signed data pack.
-			var packed: PackedScene=PLAYER_TEST_SCENES[key]
+			var packed: PackedScene=PLAYER_SCENES[key]
 			if packed!=null:model_scenes[key]=packed
 			else:push_error("Player GLB not imported: "+key)
 			continue
@@ -182,47 +143,35 @@ func _ready() -> void:
 		var scene=load(path)
 		if scene is PackedScene:model_scenes[key]=scene
 	texture=stage.get_texture()
-	set_render_mode("classic")
+	set_render_mode("hybrid")
 
 func has_complete_fleet() -> bool:
 	for key: String in REQUIRED_NPC_KEYS:
 		if not model_scenes.has(key):return false
 	return true
 
-func player_key_for_skin(skin: int) -> String:
-	if skin==29:
-		if player_style=="gameplay":return "base_basic_gameplay_pbr"
-		if player_style=="shaded":return "base_basic_gameplay_shaded"
-	return str(TEST_SHIP_SKINS.get(skin,""))
+func player_key_for_skin(_skin: int) -> String:
+	# Old stored skin IDs are canonicalized to zero in Simulation.restore_save.
+	return "schattenkriegsschiff_shaded"
 
-func has_test_ship(skin: int) -> bool:
-	return model_scenes.has(player_key_for_skin(skin))
+func has_player_ship() -> bool:
+	return model_scenes.has("schattenkriegsschiff_shaded")
 
 func set_render_mode(requested: String) -> void:
-	mode=requested if requested in ["classic","hybrid","3d"] and (requested=="classic" or has_complete_fleet()) else "classic"
-	visible=mode!="classic"
-	if stage!=null:
-		stage.render_target_update_mode=SubViewport.UPDATE_ALWAYS if visible else SubViewport.UPDATE_DISABLED
-	if not visible:
-		for item: Node3D in model_instances.values():item.visible=false
+	mode=requested if requested in ["hybrid","3d"] else "hybrid"
+	visible=true
+	if stage!=null:stage.render_target_update_mode=SubViewport.UPDATE_ALWAYS
 
 func can_render_actor(actor: Dictionary) -> bool:
 	if not visible:return false
-	if int(actor.get("id",-1))==0:
-		return has_test_ship(int(actor.get("skin",-1)))
+	if int(actor.get("id",-1))==0:return has_player_ship()
 	return int(actor.get("id",0))>0 and str(actor.get("kind",""))=="ship" and model_scenes.has(str(actor.get("visual_key","")))
 
 # Lower-hull envelope from the source GLB bounds, not the eight-angle sprite.
 # Preserve the physical bow/oars and stern at every heading. The ship's
 # true projection changes with camera zoom and 3D yaw, so the label must too.
-const PLAYER_SOURCE_BEAMS := {"crimson_voyager":0.355,"test_ship_2":0.440,"base_basic_pbr":0.433,
-	"base_basic_gameplay_pbr":0.614,"base_basic_gameplay_shaded":0.614,"gemi11_uv":10.362028}
-# The ~0.614 GLB half-width includes all oars. Labels need the hull
-# envelope, NOT the distant tip of the oars: a ship's name is underneath
-# the keel rather than below its maximum side appendage.
-const PLAYER_CAPTION_HULL_BEAMS := {
-	"base_basic_gameplay_pbr":0.42,"base_basic_gameplay_shaded":0.42,"gemi11_uv":7.20
-}
+const PLAYER_SOURCE_BEAMS := {"schattenkriegsschiff_shaded":0.614}
+const PLAYER_CAPTION_HULL_BEAMS := {"schattenkriegsschiff_shaded":0.42}
 
 func projected_hull_bottom(actor: Dictionary) -> float:
 	if not can_render_actor(actor) or int(actor.get("id",-1))!=0:return -INF
@@ -278,7 +227,7 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	owner.add_child(pivot)
 	pivot.add_child(model)
 	# Keep original GLBs untouched; taper only the actual B/C player hull instances.
-	if key in ["base_basic_gameplay_pbr","base_basic_gameplay_shaded"] and int(actor.id)==0:
+	if key=="schattenkriegsschiff_shaded" and int(actor.id)==0:
 		STERN_TAPER.apply_to_scene(model)
 	var scale_factor=float(host._actor_visual_length(actor))/maxf(float(info[0]),0.1)
 	model.rotation_degrees=Vector3.ZERO # Original Meshy glTF already uses Y-up.
@@ -335,7 +284,7 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 	if not visible or chart_camera==null or stage==null:return
 	resize_view(screen)
 	var center: Vector2=chart_camera.position
-	var tilt=deg_to_rad(FLEET_CAMERA_TILT_DEGREES) # Same camera angle for Hybrid and 3D; only ship rendering changes.
+	var tilt=deg_to_rad(_fleet_tilt()) # Hybrid: 40°, full 3D: 48°, same GLB and navigation.
 	var foreshortening=maxf(cos(tilt),0.1)
 	mesh_camera.size=screen.y/maxf(chart_camera.zoom.y,.05)
 	var altitude=950.0

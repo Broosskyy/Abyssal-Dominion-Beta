@@ -60,9 +60,7 @@ var refresh_clock := 0.0
 var save_clock := 0.0
 var elapsed := 0.0
 var skins: Array[Dictionary] = []
-var ship_textures: Array[Texture2D] = []
 var skin_previews: Array[Texture2D] = []
-var atlas_textures: Array[Texture2D] = []
 var island_textures: Dictionary = {}
 var icons: Dictionary = {}
 var beast: Texture2D
@@ -126,12 +124,6 @@ var interact: Button
 var player_xp: ProgressBar
 var extra_icons: Dictionary = {}
 var modal_backdrop: ColorRect
-var ship_frames: Dictionary = {}
-var npc_meshy_textures: Dictionary = {}
-var starter_texture: Texture2D
-var starter_damaged_texture: Texture2D
-var facing_cache: Dictionary = {}
-var direction_cache: Dictionary = {}
 var gallery_page := -1
 var loadout_button: Button
 var target_portrait: TextureRect
@@ -168,32 +160,12 @@ var plate_rects: Dictionary = {}
 var plate_overlay: Control
 var mesh_layer
 var render_mode := "hybrid"
-# Independent from global camera graphics. Only black-green ship #29.
-var test_visual_style := "original"
-const TEST_SHIP_ROOT := "res://assets/player/test_ships/"
-# Mandatory exporter-visible resource links: real 8-view GLB renders and
-# shipyard previews. They must not silently fall back to the old sloop.
-const TEST_SHIP_SPRITES := {
-	"crimson_voyager":preload("res://assets/player/test_ships/crimson_voyager_eight.png"),
-	"test_ship_2":preload("res://assets/player/test_ships/test_ship_2_eight.png"),
-	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr_eight.png"),
-	"gemi11_uv":preload("res://assets/player/test_ships/gemi11_uv_eight.png")
-}
-const TEST_SHIP_PREVIEWS := {
-	"crimson_voyager":preload("res://assets/player/test_ships/crimson_voyager_preview.png"),
-	"test_ship_2":preload("res://assets/player/test_ships/test_ship_2_preview.png"),
-	"base_basic_pbr":preload("res://assets/player/test_ships/base_basic_pbr_preview.png"),
-	"gemi11_uv":preload("res://assets/player/test_ships/gemi11_uv_preview.png")
-}
-const TEST_SHIP_KEYS := ["crimson_voyager","test_ship_2","base_basic_pbr","gemi11_uv"]
-# Comparable gameplay silhouettes: bigger test ships remain larger than
-# the starter, but no longer dominate half of the sea screen at close zoom.
-const TEST_SHIP_LENGTHS := [128.0,152.0,158.0,158.0]
+# One approved shaded GLB with two camera modes.
+const FINAL_SHIP_PREVIEW: Texture2D=preload("res://assets/player/schattenkriegsschiff_preview.png")
+const FINAL_SHIP_LENGTH := 158.0
 const NPC_VISUAL_SCALE := 0.90
-var test_ship_textures: Dictionary={}
 var plate_fleet: Array[Dictionary] = []
 ## Keep the maximum artwork extent stable across all rendered headings.
-var plate_hull_drop_cache: Dictionary = {}
 var status_age := 0.0
 var ammo_previews: Dictionary = {}
 
@@ -261,54 +233,9 @@ func _load_assets() -> void:
 	for key in ["cannon","armor","hunter","navigation","logistics","tide","storm","salvage","blessing"]:
 		deck_icons[key]=load("res://assets/ui/abyssal/"+key+".svg")
 	extra_icons.port_watchtower=load("res://assets/reference/landmarks/port_watchtower.png")
-	ship_frames=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/ship_frames.json")).entries
-	# Load optional textured four-angle Mes​hy sprites. Missing PNGs retain legacy art.
-	var meshy_index="res://assets/npc/meshy/ship_frames.json"
-	if FileAccess.file_exists(meshy_index):
-		var pack_frames=JSON.parse_string(FileAccess.get_file_as_string(meshy_index))
-		if pack_frames is Dictionary:
-			for resource: String in pack_frames.get("entries",{}):
-				var resource_path="res://"+resource
-				if ResourceLoader.exists(resource_path):
-					var png: Texture2D=load(resource_path)
-					if png!=null:
-						var key=resource.get_file().get_basename()
-						npc_meshy_textures[key]=png
-						ship_frames[resource]=pack_frames.entries[resource]
-	var pack: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(USER_ROOT+"pack.json"))
-	for item: Dictionary in pack.ship_catalog:
-		skins.append(item)
-		ship_textures.append(load(USER_ROOT+str(item.path)))
-		skin_previews.append(_ship_preview(ship_textures.back(),0))
-	for name in ["redkorsar","elite2","elite3","elite4","elite5","elite6","elite7","elite9","elite10","boneship","burningdutchman1","blackbeardspirates"]:
-		atlas_textures.append(load("res://assets/fleet/"+str(name)+".png"))
-	for name in ["elite8","warship","pinnace","flyingdutchman"]:
-		atlas_textures.append(load("res://assets/reference/ships/"+str(name)+".png"))
-	var hull_names = ["Roter Korsar","Jadebrigg","Kupfersegler","Küstenfregatte","Goldene Armada","Eisfregatte","Schattensegler","Admiralswache","Elite-Galeone","Knochenschiff","Brennender Holländer","Schwarzbart","Königsgaleone","Kriegsschiff","Schmuggler","Fliegender Holländer"]
-	for i in atlas_textures.size():
-		skins.append({"name":hull_names[i],"directional":true,"atlas":i})
-		skin_previews.append(_ship_preview(atlas_textures[i],0))
-	starter_texture=load("res://assets/generated/ships/starter_small_8_intact.png")
-	starter_damaged_texture=load("res://assets/generated/ships/starter_small_8_damaged.png")
-	skins.append({"name":"Küstenschaluppe","asset_id":"SHIP-STARTER-001","views":8})
-	skin_previews.append(_ship_preview(starter_texture,5))
-	# These are additional playable skins, not new NPCs. The binary GLB, 8-view
-	# classic sprite and real 3D shipyard preview arrive together via the asset ZIP.
-	# Embedded metadata avoids relying on non-resource JSON files being exported
-	# into an Android data pack. Every sprite atlas has 8 × 320px real GLB views.
-	for test_key in TEST_SHIP_KEYS:
-		var frames: Array=[]
-		for direction in 8:
-			frames.append({"rect":[direction*320,0,320,320],"pivot":[160,181],"reference_extent":320,"column":direction,"row":0})
-		ship_frames["assets/player/test_ships/"+test_key+"_eight.png"]={"frames":frames,"size":[2560,320],"kind":"3d-derived-8-direction"}
-	var test_names=["Crimson Voyager · Startschiff","TEST · Totenkopf-Galeere","TEST · Schattenkriegsschiff","TEST 2 · Gemi11 UV korrigiert"]
-	for i in TEST_SHIP_KEYS.size():
-		var key=TEST_SHIP_KEYS[i]
-		skins.append({"name":test_names[i],"mesh_key":key,"test_ship":i>0,"views":8})
-		var sprite: Texture2D=TEST_SHIP_SPRITES[key]
-		if sprite!=null:test_ship_textures[key]=sprite
-		var display: Texture2D=TEST_SHIP_PREVIEWS[key]
-		skin_previews.append(display if display!=null else _ship_preview(starter_texture,5))
+	# The only player ship. No legacy sprite atlas or test-art loading.
+	skins.append({"name":"Schattenkriegsschiff","mesh_key":"schattenkriegsschiff_shaded","views":0})
+	skin_previews.append(FINAL_SHIP_PREVIEW)
 	for name in ["tropical","rock","snow","snow2"]:
 		island_textures[name] = load("res://assets/reference/islands/"+name+".png")
 	for name in ["cannonball","harpoon","chain","repair_chest","portal"]:
@@ -464,9 +391,6 @@ func _process(delta: float) -> void:
 	status_age += delta
 	if modal_backdrop!=null:modal_backdrop.visible=modal.visible
 	if modal.visible:scroll_hint.queue_redraw()
-	if gallery_page>=0:
-		queue_redraw()
-		return
 	elapsed += delta
 	accumulator = minf(accumulator+delta,0.2)
 	while accumulator >= SIMULATION_TICK:
@@ -513,9 +437,6 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	if camera == null: return
-	if gallery_page>=0:
-		_draw_ship_gallery()
-		return
 	var view = Rect2(camera.position-get_viewport_rect().size/camera.zoom*0.5,get_viewport_rect().size/camera.zoom).grow(350)
 	# Projected art is drawn on the same 2D chart as movement and collision.
 	for island in sim.islands:
@@ -659,21 +580,12 @@ func _draw_portal_marker(point: Vector2,locked: bool) -> void:
 		var inner=point+Vector2(cos(angle)*70,sin(angle)*28)
 		draw_line(inner,tip,color,2.2,true)
 
-func _starter_texture(hp: float,max_hp: float) -> Texture2D:
-	return starter_damaged_texture if VISUALS.damage_state(hp,max_hp)==1 else starter_texture
-
-func _npc_ship_texture(actor: Dictionary) -> Texture2D:
-	var key=str(actor.get("visual_key",""))
-	if npc_meshy_textures.has(key):return npc_meshy_textures[key]
-	return atlas_textures[posmod(int(actor.art),atlas_textures.size())]
+func _npc_ship_texture(_actor: Dictionary) -> Texture2D:
+	# NPCs are 3D-only; a nautical UI icon replaces obsolete sprite portraits.
+	return painted.nav_ship
 
 func _actor_visual_length(actor: Dictionary) -> float:
-	if int(actor.id)==0:
-		var skin=int(sim.player.skin)
-		if skin==26:return 128.0
-		if skin>=27 and skin<=30:return TEST_SHIP_LENGTHS[skin-27]
-		if skin>=10:return float(CONTENT.SHIP_LENGTHS[skin-10])*NPC_VISUAL_SCALE
-		return 140.0
+	if int(actor.id)==0:return FINAL_SHIP_LENGTH
 	if actor.kind=="ship":return float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
 	return 150.0
 
@@ -776,35 +688,9 @@ func _draw_actor(actor: Dictionary) -> void:
 		var col = posmod(roundi((heading.angle()+PI*0.25)/TAU*4),4)
 		var row = int(elapsed*6)%CONTENT.MONSTER_ROWS
 		_draw_atlas(beast,point,210.0,col,row,CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS)
-	elif mesh_ship:
-		# Player and NPC 3D meshes share the same SubViewport in Hybrid/3D.
+	elif not mesh_ship:
+		# Do not resurrect a removed legacy sprite if a GLB fails to import.
 		pass
-	elif is_player and int(sim.player.skin)>=27:
-		var key: String=TEST_SHIP_KEYS[int(sim.player.skin)-27]
-		var texture: Texture2D=test_ship_textures.get(key)
-		if texture!=null and ship_frames.has(texture.resource_path.trim_prefix("res://")):
-			var column=VISUALS.heading_eight(heading,int(direction_cache.get(0,-1)))
-			direction_cache[0]=column
-			_draw_ship_frame(texture,point,length,column,false,0.0,hull_alpha)
-		else:
-			# Signed updates may temporarily contain code before the model pack.
-			var col=VISUALS.heading_eight(heading,int(direction_cache.get(0,-1)))
-			direction_cache[0]=col
-			_draw_ship_frame(_starter_texture(float(actor.hp),float(actor.max_hp)),point,132.0,col,false,0.0,hull_alpha)
-	elif is_player and int(sim.player.skin)==26:
-		var col=VISUALS.heading_eight(heading,int(direction_cache.get(int(actor.id),-1)))
-		direction_cache[int(actor.id)]=col
-		_draw_ship_frame(_starter_texture(float(actor.hp),float(actor.max_hp)),point,length,col,false,sin(elapsed*1.7+actor.id)*1.2,hull_alpha)
-	elif is_player and int(sim.player.skin)<10:
-		var tex=ship_textures[int(sim.player.skin)]
-		var flipped=VISUALS.facing_right(heading,bool(facing_cache.get(int(actor.id),false)))
-		facing_cache[int(actor.id)]=flipped
-		_draw_ship_frame(tex,point,length,0,flipped,sin(elapsed*1.7+actor.id)*1.2,hull_alpha)
-	else:
-		var tex = atlas_textures[int(sim.player.skin)-10] if is_player else _npc_ship_texture(actor)
-		var col=VISUALS.heading_column(heading,int(direction_cache.get(int(actor.id),-1)))
-		direction_cache[int(actor.id)]=col
-		_draw_ship_frame(tex,point,length,col,false,sin(elapsed*1.7+actor.id)*1.2,hull_alpha)
 	if is_player and sim.staff.shows_badge():
 		var pulse=.5+.5*sin(elapsed*4.0)
 		if mesh_ship:
@@ -875,67 +761,17 @@ func _plate_has_rank(actor: Dictionary) -> bool:
 	return int(actor.id)==0 or bool(actor.get("is_player",false))
 
 func _actor_screen_bounds(actor: Dictionary) -> Rect2:
-	var length=_actor_visual_length(actor)
+	var length: float=_actor_visual_length(actor)
 	var point: Vector2=_visual_actor_pos(actor)
 	var transform=get_canvas_transform()
 	if actor.get("kind","")=="tower":return transform*Rect2(point-Vector2(38,76),Vector2(76,82))
 	if actor.get("kind","")=="monster":return transform*Rect2(point-Vector2(80,85),Vector2(160,105))
-	var player=int(actor.id)==0
-	var texture: Texture2D
-	var column=0
-	var flipped=false
-	if player and int(sim.player.skin)>=27:
-		var key: String=TEST_SHIP_KEYS[int(sim.player.skin)-27]
-		texture=test_ship_textures.get(key,starter_texture)
-		if not ship_frames.has(texture.resource_path.trim_prefix("res://")):texture=starter_texture
-		column=VISUALS.heading_eight(actor.heading)
-	elif player and int(sim.player.skin)==26:
-		texture=_starter_texture(float(actor.hp),float(actor.max_hp))
-		column=int(direction_cache.get(0,0))
-	elif player and int(sim.player.skin)<10:
-		texture=ship_textures[int(sim.player.skin)];flipped=bool(facing_cache.get(0,false))
-	else:
-		texture=atlas_textures[int(sim.player.skin)-10] if player else _npc_ship_texture(actor)
-		column=int(direction_cache.get(int(actor.id),0))
-	var frame: Dictionary=ship_frames[texture.resource_path.trim_prefix("res://")].frames[column]
-	return transform*VISUALS.world_rect(frame,point,length,flipped)
+	return transform*Rect2(point-Vector2(length*0.42,length*0.36),Vector2(length*0.84,length*0.72))
 
-## A heading-dependent sprite bounding box makes names/decks jump every time
-## a ship turns (especially the eight-view starter). Measure *all* frames once
-## and reserve a single constant bottom extent for each ship texture/size.
-## This also covers the starter's intact/damaged appearance without jumping.
 func _plate_stable_hull_drop(actor: Dictionary) -> float:
-	var kind=str(actor.get("kind","ship"))
-	if kind=="tower":return 6.0
-	if kind=="monster":return 72.0
-	var player=int(actor.id)==0
-	var length=_actor_visual_length(actor)
-	var sources: Array[Texture2D]=[]
-	if player and int(sim.player.skin)>=27:
-		var key: String=TEST_SHIP_KEYS[int(sim.player.skin)-27]
-		var tex: Texture2D=test_ship_textures.get(key,starter_texture)
-		sources.append(tex if ship_frames.has(tex.resource_path.trim_prefix("res://")) else starter_texture)
-	elif player and int(sim.player.skin)==26:
-		sources.append(starter_texture)
-		sources.append(starter_damaged_texture)
-	elif player and int(sim.player.skin)<10:
-		sources.append(ship_textures[int(sim.player.skin)])
-	else:
-		sources.append(atlas_textures[int(sim.player.skin)-10] if player else _npc_ship_texture(actor))
-	var result=0.0
-	for texture: Texture2D in sources:
-		if texture==null:continue
-		var resource=texture.resource_path.trim_prefix("res://")
-		var key=resource+"|"+str(length)
-		if not plate_hull_drop_cache.has(key):
-			var extent=0.0
-			if ship_frames.has(resource):
-				for frame: Dictionary in ship_frames[resource].frames:
-					var bounds: Rect2=VISUALS.world_rect(frame,Vector2.ZERO,length,false)
-					extent=maxf(extent,bounds.end.y)
-			plate_hull_drop_cache[key]=extent
-		result=maxf(result,float(plate_hull_drop_cache[key]))
-	return result
+	if str(actor.get("kind",""))=="tower":return 6.0
+	if str(actor.get("kind",""))=="monster":return 72.0
+	return _actor_visual_length(actor)*0.34
 
 ## The screen offset is constant for each design, independent of heading and
 ## camera motion. Nearby ships never influence the captain's position.
@@ -1129,68 +965,7 @@ func _draw_atlas(tex: Texture2D,point: Vector2,width: float,col: int,row: int,co
 	var dims = cell*width/cell.x
 	draw_texture_rect_region(tex,Rect2(point-dims*Vector2(0.5,0.68),dims),Rect2(Vector2(col,row)*cell,cell))
 
-func _ship_preview(texture: Texture2D,column: int) -> AtlasTexture:
-	var frame: Dictionary=ship_frames[texture.resource_path.trim_prefix("res://")].frames[column]
-	var r: Array=frame.rect
-	var preview=AtlasTexture.new()
-	preview.atlas=texture
-	preview.region=Rect2(r[0],r[1],r[2],r[3])
-	return preview
-
-func _draw_ship_frame(texture: Texture2D,point: Vector2,length: float,column: int,flipped: bool,bob: float,alpha: float=1.0) -> void:
-	var frame: Dictionary=ship_frames[texture.resource_path.trim_prefix("res://")].frames[column]
-	var geometry: Dictionary=VISUALS.geometry(frame,length)
-	# Positive source/destination rectangles; reflection is around the measured hull anchor.
-	draw_set_transform(point+Vector2(0,bob),0,Vector2(-1,1) if flipped else Vector2.ONE)
-	draw_texture_rect_region(texture,geometry.destination,geometry.source,Color(1,1,1,alpha))
-	draw_set_transform(Vector2.ZERO)
-
-func _draw_ship_gallery() -> void:
-	if gallery_page in [3,4]:
-		_draw_starter_gallery(gallery_page==4)
-		return
-	var first=0 if gallery_page==0 else 10+(gallery_page-1)*8
-	var last=10 if gallery_page==0 else mini(first+8,skins.size())
-	var before=sim.player.duplicate(true)
-	var directions=[Vector2(1,-1),Vector2(-1,-1),Vector2(-1,1),Vector2(1,1)]
-	_label(Vector2(640,26),"M3056 · ORIGINAL RUNTIME RENDERER · WATERLINE ANCHORS",20,GOLD)
-	for c in 4:_label(Vector2(320+c*240,59),["NORDOST","NORDWEST","SÜDWEST","SÜDOST"][c],14,CYAN)
-	for skin in range(first,last):
-		var y=216.0+float(skin-first)*200.0
-		_label(Vector2(100,y-18),str(skins[skin].name),13,GOLD)
-		_label(Vector2(100,y+5),"Einzelbild / Spiegelung" if skin<10 else "4 echte Atlasansichten",10,CYAN)
-		draw_line(Vector2(14,y+78),Vector2(1266,y+78),Color(0.3,0.5,0.6,0.2))
-		for c in 4:
-			var ground=Vector2(320+c*240,y)
-			sim.player.skin=skin
-			sim.player.pos=ground
-			sim.player.heading=directions[c].normalized()
-			sim.player.path=[]
-			_draw_actor(sim.player)
-			draw_line(ground-Vector2(4,0),ground+Vector2(4,0),Color("ffae66"),1)
-			draw_line(ground-Vector2(0,4),ground+Vector2(0,4),Color("ffae66"),1)
-	sim.player=before
-
-func _draw_starter_gallery(damaged: bool=false) -> void:
-	var before=sim.player.duplicate(true)
-	var headings=[Vector2.UP,Vector2(1,-1),Vector2.RIGHT,Vector2(1,1),Vector2.DOWN,Vector2(-1,1),Vector2.LEFT,Vector2(-1,-1)]
-	var labels=["NORD","NORDOST","OST","SÜDOST","SÜD","SÜDWEST","WEST","NORDWEST"]
-	_label(Vector2(640,38),"M3056 · SMALL STARTER · "+("8 BESCHÄDIGTE ANSICHTEN" if damaged else "8 INTAKTE ANSICHTEN"),21,GOLD)
-	_label(Vector2(640,70),"Laufzeit-Renderer · feste Vergrößerung · orange = Wasserlinienanker",13,CYAN)
-	for i in 8:
-		var ground=Vector2(200+(i%4)*290,300+int(i/4)*370)
-		_label(ground-Vector2(0,180),labels[i],16,CYAN)
-		sim.player.skin=26
-		sim.player.hp=float(sim.player.max_hp)*(0.25 if damaged else 1.0)
-		sim.player.pos=ground
-		sim.player.heading=headings[i].normalized()
-		sim.player.path=[]
-		direction_cache.erase(0)
-		_draw_actor(sim.player)
-		draw_line(ground-Vector2(6,0),ground+Vector2(6,0),Color("ffae66"),1)
-		draw_line(ground-Vector2(0,6),ground+Vector2(0,6),Color("ffae66"),1)
-	sim.player=before
-	direction_cache.erase(0)
+# Legacy direction atlases and multi-design galleries were deleted.
 
 func _ellipse(point: Vector2,radii: Vector2,color: Color) -> void:
 	var vertices = PackedVector2Array()
@@ -1282,7 +1057,6 @@ func _build_ui() -> void:
 	mesh_layer.host=self
 	layer.add_child(mesh_layer)
 	mesh_layer.set_render_mode(render_mode)
-	mesh_layer.set_player_style(test_visual_style)
 	render_mode=mesh_layer.mode
 	# Screen-space captain/NPC readouts, independent of all Camera2D zoom/pan.
 	plate_overlay=PLATE_OVERLAY.new()
@@ -1347,7 +1121,7 @@ func _build_ui() -> void:
 	# Directly reachable beside the minimap: no hidden submenu or scrolling.
 	render_toggle=_button(ui,"GRAFIK: 2,5D / 3D",_cycle_render_mode,"normal")
 	render_toggle.name="GraphicsModeToggle"
-	render_toggle.tooltip_text="Zwischen klassischer Seekarte, 2,5D mit GLB und 3D-Schiffen wechseln"
+	render_toggle.tooltip_text="2,5D Hybrid oder 3D – beide mit echten GLB-Schiffen"
 	render_toggle.add_theme_font_size_override("font_size",10)
 	attack=_orb(ui,"Feuer ein/aus",extra_icons.cannon_action,_toggle_fire,"FEUER");attack.name="FireButton"
 	attack.set("hero",true)
@@ -1575,7 +1349,7 @@ func _thousands(value: int) -> String:
 func _refresh_ui() -> void:
 	if gold_label==null:return
 	if render_toggle!=null:
-		render_toggle.text={"classic":"GRAFIK 2,5D","hybrid":"GRAFIK HYBRID","3d":"GRAFIK 3D"}.get(render_mode,"GRAFIK")
+		render_toggle.text={"hybrid":"GRAFIK 2,5D","3d":"GRAFIK 3D"}.get(render_mode,"GRAFIK 2,5D")
 		render_toggle.disabled=mesh_layer==null or not mesh_layer.has_complete_fleet()
 	var today=Time.get_date_string_from_system()
 	var quest_ready=not sim.current_quest().is_empty() and sim.quest_progress()>=int(sim.current_quest().goal)
@@ -1622,7 +1396,7 @@ func _refresh_ui() -> void:
 				preview.region=Rect2(Vector2.ZERO,beast.get_size()/Vector2(CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS))
 				target_portrait.texture=preview
 			elif selected.kind=="tower":target_portrait.texture=painted["tower_"+str(selected.tower)]
-			else:target_portrait.texture=_ship_preview(_npc_ship_texture(selected),0)
+			else:target_portrait.texture=_npc_ship_texture(selected)
 		target_name.text=("[%s] " % sim.tower_tag() if selected.kind=="tower" else "")+str(selected.name)
 		target_hp.max_value=selected.max_hp
 		target_hp.value=selected.hp
@@ -2142,39 +1916,30 @@ func _open_ammo() -> void:
 		modal_body.add_child(row);ammo_rows.append(row)
 
 func _open_shipyard() -> void:
-	_banner_card(painted.nav_shipyard,"SCHIFFSDESIGNS · %d KARTEN" % skins.size(),"Die vier kostenlosen GLB-Testschiffe stehen oben, darunter Gemi11 als eigener Testplatz. Alte Schiffdesigns bleiben erhalten. Ausrüstung, HP, Kanonen und Decks werden nicht verändert.")
-	var order: Array[int]=[]
-	for i in skins.size():order.append(i)
-	# Put all four GLB testing hulls first, without removing other designs.
-	order.sort_custom(func(a,b):
-		if (a>=27)!=(b>=27):return a>=27
-		if a>=27:return a<b
-		return str(skins[a].name).naturalnocasecmp_to(str(skins[b].name))<0
-	)
-	var grid=_grid(2)
-	for raw in order:
-		var index: int=raw
-		var equipped=int(sim.player.skin)==index
-		var card=_card(CYAN if equipped else Color(0,0,0,0),grid)
-		var column=VBoxContainer.new();column.add_theme_constant_override("separation",6);column.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_child(column)
-		var frame=Panel.new()
-		frame.custom_minimum_size=Vector2(0,104)
-		frame.clip_contents=true
-		frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
-		var frame_style=SKIN.icon_frame(CYAN if equipped else Color("6b5634"))
-		frame.add_theme_stylebox_override("panel",frame_style)
-		column.add_child(frame)
-		var preview=_portrait(frame)
-		preview.texture=skin_previews[index]
-		preview.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		preview.offset_left=6;preview.offset_top=6;preview.offset_right=-6;preview.offset_bottom=-6
-		var missing_glb: bool=index>=27 and (mesh_layer==null or not mesh_layer.has_test_ship(index))
-		var action_text="\nAKTIV" if equipped else ("\nAUSRÜSTEN · GLB FEHLT" if missing_glb else "\nAUSRÜSTEN")
-		var choose=_button(column,str(skins[index].name)+action_text,func():_equip(index),"normal" if equipped else "primary")
-		choose.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-		choose.custom_minimum_size.y=46
-		choose.add_theme_font_size_override("font_size",12)
-		choose.disabled=equipped or missing_glb
+	_banner_card(painted.nav_shipyard,"WERFT · SCHATTENKRIEGSSCHIFF","Ein festgelegtes Design: Schattenkriegsschiff, SHADED. Alle alten Schiffdesigns und Testvarianten wurden entfernt.")
+	var grid=_grid(1)
+	var card=_card(CYAN,grid)
+	var column=VBoxContainer.new()
+	column.add_theme_constant_override("separation",6)
+	column.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	card.add_child(column)
+	var frame=Panel.new()
+	frame.custom_minimum_size=Vector2(0,118)
+	frame.clip_contents=true
+	frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	frame.add_theme_stylebox_override("panel",SKIN.icon_frame(CYAN))
+	column.add_child(frame)
+	var preview=_portrait(frame)
+	preview.texture=FINAL_SHIP_PREVIEW
+	preview.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	preview.offset_left=6;preview.offset_top=6;preview.offset_right=-6;preview.offset_bottom=-6
+	var ship_ok: bool=mesh_layer!=null and mesh_layer.has_player_ship()
+	var label="SCHATTENKRIEGSSCHIFF · SHADED\n"+("AKTIV" if ship_ok else "3D-MODELL FEHLT")
+	var choose=_button(column,label,func():_equip(0),"normal")
+	choose.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	choose.custom_minimum_size.y=46
+	choose.add_theme_font_size_override("font_size",12)
+	choose.disabled=true
 	_section("MUNITIONSNACHSCHUB · JE 30 GOLD")
 	var stock=_grid(3)
 	for i in 3:
@@ -2647,21 +2412,14 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"DEINE SEEKARTE · DEINE OBERFLÄCHE","GRAFIKANSICHT direkt unter der Minikarte umschalten oder hier eine Ansicht wählen. Die Einstellung bleibt auf diesem Gerät gespeichert.")
-	_note("DATENUPDATE %d · 3D-MODELLE %d/9 · AKTIV: %s" % [_active_data_revision(),mesh_layer.model_scenes.size() if mesh_layer!=null else 0,render_mode.to_upper()],Color("97e0d5"))
-	_section("GRAFIKANSICHT")
-	for option in [["classic","2,5D KLASSISCH · Sprite-Schiffe"],["hybrid","2,5D HYBRID · echte GLB-Schiffe"],["3d","3D SCHIFFE · geneigte 3D-Kamera"]]:
-		var key=str(option[0])
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Zwei Grafikmodi: 2,5D Hybrid oder 3D. Beide verwenden ausschließlich das Schattenkriegsschiff (Shaded) und die neun NPC-GLBs.")
+	_note("DATENUPDATE %d · GLB-MODELLE %d/10 · AKTIV: %s" % [_active_data_revision(),mesh_layer.model_scenes.size() if mesh_layer!=null else 0,render_mode.to_upper()],Color("97e0d5"))
+	_section("GRAFIKMODUS")
+	for option in [["hybrid","2,5D / HYBRID"],["3d","3D"]]:
+		var key: String=str(option[0])
 		var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
-		choice.disabled=render_mode==key or (key!="classic" and (mesh_layer==null or not mesh_layer.has_complete_fleet()))
-	_note("Beide 3D-Varianten nutzen dieselben echten GLB-Modelle und die bestehende Seekarten-Simulation. Inseln und Wasser bleiben zunächst 2D; der klassische Modus ist der Performance-Fallback.")
-	_section("M3092 · SCHATTENKRIEGSSCHIFF – ECHTE 3D-MODELLE")
-	_note("Nur für das schwarz-grüne Testschiff (Werftplatz 29). Drei echte GLB-Modelle bei gleichen Kampfwerten und gleicher Schiffsgröße. Nur in HYBRID oder 3D sichtbar:")
-	for style_option in [["original","A · BISHERIGES ORIGINAL-GLB"],["gameplay","B · NEUES GAMEPLAY-GLB / PBR"],["shaded","C · NEUES GAMEPLAY-GLB / SHADED"]]:
-		var style_key: String=style_option[0]
-		var style_button=_action(str(style_option[1])+(" · AKTIV" if test_visual_style==style_key else ""),func():_set_test_visual_style(style_key),"tab_on" if test_visual_style==style_key else "normal")
-		style_button.disabled=test_visual_style==style_key
-	_note("B und C sind die neu hochgeladenen, voll drehbaren GLB-Modelle mit ca. 5.918 Dreiecken. A ist das bisherige große Test-GLB. Andere Schiffe und Spielstände bleiben unverändert.")
+		choice.disabled=render_mode==key or (mesh_layer==null or not mesh_layer.has_complete_fleet())
+	_note("Keine Classic-Sprites und keine A/B/C-Modelle. Spielmechanik und Seekarten bleiben gleich.")
 	_section("HUD-GRÖSSE")
 	for i in 3:
 		var index=i
@@ -2675,13 +2433,13 @@ func _open_display() -> void:
 	_action("STANDARD WIEDERHERSTELLEN",func():camera_pad_visible=true;_set_display(1,true))
 
 func _open_info() -> void:
-	_section("GRAFIKANSICHT · DATENUPDATE %d" % _active_data_revision())
-	_note("Der Umschalter liegt jetzt auch direkt unter der Minikarte. Installierte GLB-Modelle: %d/9." % (mesh_layer.model_scenes.size() if mesh_layer!=null else 0),Color("9be4df"))
-	var modes=_grid(3)
-	for option in [["classic","2,5D"],["hybrid","HYBRID"],["3d","3D"]]:
-		var key=str(option[0])
+	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
+	_note("Finale Flotte: Schattenkriegsschiff (Shaded) + 9 NPC-GLBs.",Color("9be4df"))
+	var modes=_grid(2)
+	for option in [["hybrid","2,5D"],["3d","3D"]]:
+		var key: String=str(option[0])
 		var button=_action(str(option[1])+(" ✓" if key==render_mode else ""),func():_set_render_mode(key),"tab_on" if key==render_mode else "normal",modes)
-		button.disabled=key==render_mode or (key!="classic" and (mesh_layer==null or not mesh_layer.has_complete_fleet()))
+		button.disabled=key==render_mode or (mesh_layer==null or not mesh_layer.has_complete_fleet())
 	var links=_grid(2)
 	_with_icon(_action("SEEKARTEN",func():_open_modal("Seekarten"),"normal",links),painted.nav_charts)
 	_with_icon(_action("KARTEN-ANLEITUNG",func():modal_tab["Seekarten"]="ANLEITUNG";_open_modal("Seekarten"),"normal",links),extra_icons.world_chart)
@@ -2936,13 +2694,9 @@ func _interact() -> void:
 	_refresh_ui()
 
 func _equip(index: int) -> void:
-	if index<0 or index>=skins.size():return
-	if index>=27 and (mesh_layer==null or not mesh_layer.has_test_ship(index)):
-		sim.message="Dieses Testschiff wird nach dem GLB-Datenupdate verfügbar."
-		_refresh_ui()
-		return
-	sim.player.skin=index
-	sim.message="Schiffsdesign ausgerüstet: "+str(skins[index].name)
+	if index!=0:return
+	sim.player.skin=0
+	sim.message="Schattenkriegsschiff · SHADED aktiv"
 	_save_progress()
 	_open_modal("Werft")
 	_refresh_ui()
@@ -3054,33 +2808,19 @@ func _load_display() -> void:
 	hud_size=clampi(int(data.get("hud_size",1)),0,2)
 	journal_visible=bool(data.get("journal_visible",true))
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
-	render_mode=str(data.get("render_mode","hybrid"))
-	if render_mode not in ["classic","hybrid","3d"]:render_mode="hybrid"
-	test_visual_style=str(data.get("test_visual_style","original"))
-	if test_visual_style=="sprite":test_visual_style="shaded" # migration: old C becomes new real-3D C
-	if test_visual_style not in ["original","gameplay","shaded"]:test_visual_style="original"
+	render_mode="3d" if str(data.get("render_mode","hybrid"))=="3d" else "hybrid"
 
 func _cycle_render_mode() -> void:
-	var modes=["classic","hybrid","3d"]
-	_set_render_mode(modes[(modes.find(render_mode)+1)%modes.size()])
+	_set_render_mode("3d" if render_mode=="hybrid" else "hybrid")
 
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"test_visual_style":test_visual_style}))
+		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode}))
 		file.close()
 
-func _set_test_visual_style(value: String) -> void:
-	if value not in ["original","gameplay","shaded"]:return
-	test_visual_style=value
-	if mesh_layer!=null:mesh_layer.set_player_style(value)
-	_persist_display_preferences()
-	if camera!=null:_sync_plate_overlay()
-	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal(modal_kind)
-	queue_redraw()
-
 func _set_render_mode(value: String) -> void:
-	render_mode=value if value in ["classic","hybrid","3d"] else "classic"
+	render_mode=value if value in ["hybrid","3d"] else "hybrid"
 	if mesh_layer!=null:
 		mesh_layer.set_render_mode(render_mode)
 		render_mode=mesh_layer.mode

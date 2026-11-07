@@ -129,12 +129,12 @@ func _initialize() -> void:
 	check(restored.docked and restored.player.pos==sim.player.pos and int(restored.player.gold)==int(sim.player.gold),"docking, wallet and position survive reload")
 	var starter_save=sim.export_save()
 	starter_save["skin"]=26
-	check(restored.restore_save(starter_save) and int(restored.player.skin)==26,"new Small Starter survives save and restore without clamping to an old design")
+	check(restored.restore_save(starter_save) and int(restored.player.skin)==0,"retired starter skin is migrated to shaded ship")
 	var extra_save: Dictionary=starter_save.duplicate(true)
 	extra_save["skin"]=29
-	check(restored.restore_save(extra_save) and int(restored.player.skin)==29,"new 3D test ship skin 29 persists through the same captain save")
+	check(restored.restore_save(extra_save) and int(restored.player.skin)==0,"old 3D test skin 29 migrates to shaded ship")
 	var legacy={"schema":1,"gold":543,"ammo":[50,20,10],"skin":8,"kills":3,"claimed":true}
-	check(restored.restore_save(legacy) and int(restored.player.gold)==543 and int(restored.player.skin)==8 and restored.quest_index==1,"M3052 legacy wallet, design and claimed quest migrate")
+	check(restored.restore_save(legacy) and int(restored.player.gold)==543 and int(restored.player.skin)==0 and restored.quest_index==1,"M3052 legacy wallet, design and claimed quest migrate")
 	check(not restored.restore_save({"schema":999}),"unsupported saves are rejected")
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))

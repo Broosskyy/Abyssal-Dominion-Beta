@@ -1,6 +1,6 @@
 extends SceneTree
 const TAPER = preload("res://stern_hull_taper.gd")
-const FILES = ["base_basic_gameplay_pbr.glb", "base_basic_gameplay_shaded.glb"]
+const FILES = ["schattenkriegsschiff_shaded.glb"]
 var failures: Array[String] = []
 var checks: int = 0
 
@@ -18,7 +18,7 @@ func _initialize() -> void:
 	check(TAPER.tapered_point(Vector3(0.40, 1.0, -0.92)).is_equal_approx(Vector3(0.40, 1.0, -0.92)), "sails and upper rigging stay untouched")
 	check(TAPER.beam_scale(Vector3(0.2, 0.2, -0.40)) > 0.86, "stern blends gradually into midships")
 	for filename in FILES:
-		var packed: PackedScene = load("res://assets/player/test_ships/" + filename)
+		var packed: PackedScene = load("res://assets/player/" + filename)
 		check(packed != null, filename + " loads")
 		if packed == null:
 			continue
