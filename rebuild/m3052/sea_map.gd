@@ -1906,7 +1906,12 @@ func _ammo_texture(index: int) -> Texture2D:
 	if index==3:return LEUCHT_ICON
 	var key=str(AMMO_UI[index].icon)
 	if index>=7:
-		if not ammo_previews.has(key):ammo_previews[key]=load("res://assets/ui/ammo/"+key+".svg")
+		if not ammo_previews.has(key):
+			var atlas:=AtlasTexture.new()
+			atlas.atlas=load("res://assets/ui/ammo/special_ammo_atlas.svg")
+			var cell: int=index-7
+			atlas.region=Rect2(Vector2(float(posmod(cell,7)*128),float(floori(cell/7.0)*128)),Vector2(128,128))
+			ammo_previews[key]=atlas
 		return ammo_previews[key]
 	if icons.has(key):return icons[key]
 	if not ammo_previews.has(key):
