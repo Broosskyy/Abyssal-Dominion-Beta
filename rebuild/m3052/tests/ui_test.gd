@@ -631,6 +631,85 @@ func _run() -> void:
 	check(game.sim.target==-1 and not game.sim.firing,"Escape cancels selected enemy when no full-screen menu is open")
 	game.sim.select(first_id)
 	check(game.sim.player.pos==before_pos and game.sim.player.ammo==before_stock and game.sim.player.path.is_empty(),"target cycling consumes no ammunition and starts no pursuit")
+	# Android regression: two successive touch gestures on the SAME ship
+	# must select/deselect immediately, with no artificial 180 ms gap.
+	game.modal.hide()
+	game.loading_left=0.0
+	game.suppress_tap_until=0
+	var tap_screen: Vector2=game.get_viewport_rect().size*.5
+	check(not game._hud_contains(tap_screen),"center-of-water Android tap is not blocked by a HUD control")
+	var visible_ship_world: Vector2=game.get_canvas_transform().affine_inverse()*tap_screen+Vector2(0,25)
+	game.sim.npcs[0].pos=visible_ship_world
+	game.sim.npcs[1].pos=visible_ship_world+Vector2(360,200)
+	game.sim.select(-1)
+	game.sim.player.path=[]
+	var tap_down=InputEventScreenTouch.new()
+	tap_down.index=31
+	tap_down.position=tap_screen
+	tap_down.pressed=true
+	var tap_up=InputEventScreenTouch.new()
+	tap_up.index=31
+	tap_up.position=tap_screen
+	tap_up.pressed=false
+	game._input(tap_down)
+	game._input(tap_up)
+	check(game.sim.target==first_id,"Android world-input touch selects projected 3D ship")
+	game._input(tap_down)
+	game._input(tap_up)
+	check(game.sim.target==-1 and not game.sim.firing,"immediate second Android touch deselects without 180 ms lockout")
+	check(game.touch_points.is_empty() and game.touch_starts.is_empty() and game.touch_invalid.is_empty(),"single-finger touch tracking is fully cleared after release")
+	# Multi-touch/drag gestures must never masquerade as a ship tap.
+	var other_down=InputEventScreenTouch.new()
+	other_down.index=32
+	other_down.position=tap_screen+Vector2(80,20)
+	other_down.pressed=true
+	var other_up=InputEventScreenTouch.new()
+	other_up.index=32
+	other_up.position=other_down.position
+	other_up.pressed=false
+	game._input(tap_down)
+	game._input(other_down)
+	game._input(other_up)
+	game._input(tap_up)
+	check(game.sim.target==-1 and game.touch_points.is_empty(),"lifting a two-finger pinch does not select a ship accidentally")
+	var drag_event=InputEventScreenDrag.new()
+	drag_event.index=31
+	drag_event.position=tap_screen+Vector2(45,0)
+	drag_event.relative=Vector2(45,0)
+	game._input(tap_down)
+	game._input(drag_event)
+	tap_up.position=drag_event.position
+	game._input(tap_up)
+	tap_up.position=tap_screen
+	check(game.sim.target==-1 and game.touch_points.is_empty(),"camera dragging over an enemy never toggles target")
+	game._recenter_camera()
+	# Rapid water taps must be independent move commands, not dropped taps.
+	var saved_islands: Array[Dictionary]=game.sim.islands.duplicate(true)
+	var saved_portals: Array[Dictionary]=game.sim.portals.duplicate(true)
+	var saved_harbor: Vector2=game.sim.harbor
+	game.sim.islands.clear()
+	game.sim.portals.clear()
+	game.sim.harbor=Vector2(3950,2900)
+	game.camera.position=game.sim.player.pos
+	game.camera.force_update_scroll()
+	var course_point: Vector2=game.get_canvas_transform().affine_inverse()*tap_screen
+	game.sim.player.pos=course_point+Vector2(190,0)
+	game._input(tap_down)
+	game._input(tap_up)
+	check(not game.sim.player.path.is_empty() and game.sim.player.path.back().distance_to(course_point)<2,"Android first tap on open water sets destination")
+	var next_screen: Vector2=tap_screen+Vector2(48,-40)
+	tap_down.position=next_screen
+	tap_up.position=next_screen
+	game._input(tap_down)
+	game._input(tap_up)
+	var other_course: Vector2=game.get_canvas_transform().affine_inverse()*next_screen
+	check(not game.sim.player.path.is_empty() and game.sim.player.path.back().distance_to(other_course)<2,"consecutive quick water taps update destination without timing suppression")
+	game.sim.player.pos=before_pos
+	game.sim.player.path=[]
+	game.sim.harbor=saved_harbor
+	game.sim.portals=saved_portals
+	game.sim.islands=saved_islands
+	game._recenter_camera()
 	game.sim.npcs.clear();game.target_cycle.pressed.emit()
 	check(game.sim.message=="Kein Ziel im sichtbaren Bereich","empty view gives clear feedback without a fake target")
 	root.size=Vector2i(720,405);await process_frame;game._layout()
