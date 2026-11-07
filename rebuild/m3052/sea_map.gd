@@ -684,11 +684,9 @@ func _draw_actor(actor: Dictionary) -> void:
 			_ellipse_line(Vector2.ZERO,Vector2(length*.41,length*.115),Color(sim.staff.color(),.15+pulse*.16),1.3)
 			draw_set_transform(Vector2.ZERO)
 		else:_ellipse_line(point,Vector2(length*.52,length*.2),Color(sim.staff.color(),.28+pulse*.35),2.4)
-	if bool(actor.get("frozen",false)) or float(actor.get("ice",0.0))>0.0:
-		_ellipse_line(point,Vector2(length*0.5,length*0.19),Color("b7e7ff",.85),2.2)
-		draw_arc(point,length*0.28,0,TAU,28,Color("e8f7ff",.7),1.6,true)
-	if float(actor.get("spotted",0.0))>sim.clock:
-		draw_circle(point-Vector2(0,length*0.35),8,Color("ffe27a",.85))
+	# Persisting but subtle status VFX: flares mark targets, frozen hulls get
+	# crystalline water contact, and slowed vessels show snow or chain wisps.
+	COMBAT_FX.draw_status(self,actor,point,sim.clock,length)
 	if is_player or sim.target==int(actor.id):
 		var nose=point+heading*length*0.38
 		var side=Vector2(-heading.y,heading.x)*4
