@@ -2,7 +2,7 @@ extends RefCounted
 ## M3100 — original, texture-free sea combat VFX for actual airborne munitions.
 ## Drawn in chart world coordinates, independent of the 2.5D/3D GLB renderer.
 ## Pure visual functions: never mutate HP, cooldowns, ammunition or target state.
-const WEAPONS := ["cannon","chain","harpoon","flare","pumpkin","snow","ice","mortar"]
+const WEAPONS := ["cannon","chain","harpoon","flare","pumpkin","snow","ice","fire","poison","shrapnel","lightning","holy","shadow","wind","earth","water","cursed","bleed","necro","gold","crystal","explosive","arcane","spectral","lava","light","armor_piercing","gas","mortar"]
 # M3102: one real hit can render a burst of several cosmetic orbs.
 const VISIBLE_COUNTS := [1,3,5,8]
 const RADIANT_COLORS := [Color("ff344f"),Color("2db5ff"),Color("56ef7c"),Color("ffdb54"),Color("bf58ff")]
@@ -54,6 +54,27 @@ static func weapon_color(weapon: String, hostile: bool=false) -> Color:
 		"snow":return Color("ebfaff")
 		"ice":return Color("62dfff")
 		"mortar":return Color("f0ad79")
+		"fire":return Color("ff6a29")
+		"poison":return Color("75ff36")
+		"shrapnel":return Color("c7d1d6")
+		"lightning":return Color("3fb7ff")
+		"holy":return Color("ffe9a8")
+		"shadow":return Color("a05ce9")
+		"wind":return Color("dcf7ff")
+		"earth":return Color("c49b6b")
+		"water":return Color("69daff")
+		"cursed":return Color("d877fc")
+		"bleed":return Color("ff485b")
+		"necro":return Color("85f89e")
+		"gold":return Color("ffe171")
+		"crystal":return Color("b775ff")
+		"explosive":return Color("ff9a49")
+		"arcane":return Color("d29bff")
+		"spectral":return Color("62f1df")
+		"lava":return Color("ff641e")
+		"light":return Color("fff2b8")
+		"armor_piercing":return Color("cbd7df")
+		"gas":return Color("b2ee62")
 	return Color("e2be83")
 
 static func lift(weapon: String,progress: float) -> float:
@@ -117,11 +138,11 @@ static func _draw_one_projectile(canvas: CanvasItem,shot: Dictionary,clock: floa
 		var behind: Vector2=pos-direction*(step*6.2*speed_scale)
 		behind+=side*sin(phase*.65+step*1.43)*(1.4+step*.24)
 		var falloff: float=1.0-step/float(trail_count+1)
-		var tail: Color=ink if weapon in ["flare","pumpkin","ice","snow"] else Color("9ba9aa")
+		var tail: Color=ink if weapon in ["flare","pumpkin","ice","snow","fire","lava","poison","lightning","holy","shadow","wind","water","cursed","bleed","necro","gold","crystal","explosive","arcane","spectral","light","gas"] else Color("9ba9aa")
 		if weapon=="harpoon":tail=Color("a9bdad")
 		if weapon=="chain":tail=Color("7d9a9b")
 		canvas.draw_circle(behind,1.25+step*.37,Color(tail,.09+.23*falloff))
-		if t%2==0 and weapon in ["flare","pumpkin","ice","snow"]:
+		if t%2==0 and weapon in ["flare","pumpkin","ice","snow","fire","lava","poison","lightning","holy","shadow","wind","water","cursed","bleed","necro","gold","crystal","explosive","arcane","spectral","light","gas"]:
 			canvas.draw_circle(behind+side*(2.0+sin(phase+step)*1.5),.75+falloff,Color(ink,.34*falloff))
 	var shoulder: Vector2=pos-direction*11.0
 	canvas.draw_line(shoulder,pos,Color(ink,.46),2.2,true)
@@ -178,6 +199,8 @@ static func _draw_one_projectile(canvas: CanvasItem,shot: Dictionary,clock: floa
 			canvas.draw_colored_polygon(crystal,Color("4ebbd9"))
 			canvas.draw_line(pos-direction*5.0,pos+direction*6.0,Color("e4ffff"),1.55,true)
 			canvas.draw_line(pos+side*3.0,pos+direction*5.0,Color("b6efff"),.9,true)
+		"fire","poison","shrapnel","lightning","holy","shadow","wind","earth","water","cursed","bleed","necro","gold","crystal","explosive","arcane","spectral","lava","light","armor_piercing","gas":
+			_draw_special_projectile(canvas,pos,direction,weapon,ink,phase)
 		"mortar":
 			_ellipse(canvas,Vector2(shot.get("pos",pos)),Vector2(8.0,3.3),Color(0,0,0,.26),1.1)
 			canvas.draw_circle(pos,7.6,Color("19222c"))
@@ -190,6 +213,66 @@ static func _draw_one_projectile(canvas: CanvasItem,shot: Dictionary,clock: floa
 	# A faint shadow follows the visible arc, not the hit logic.
 	if weapon in ["flare","pumpkin","snow","ice"]:
 		canvas.draw_circle(pos-direction*5.0,2.3,Color(ink,.14))
+
+static func _draw_special_projectile(canvas: CanvasItem,p: Vector2,dir: Vector2,weapon: String,ink: Color,phase: float) -> void:
+	# M3105: readable metallic/elemental spheres, distinguishable at game zoom.
+	var side:=Vector2(-dir.y,dir.x)
+	var energy: bool=weapon not in ["earth","shrapnel","armor_piercing"]
+	if energy:
+		canvas.draw_circle(p,11.5,Color(ink,.16))
+		canvas.draw_circle(p,8.8,Color(ink,.15))
+	canvas.draw_circle(p,6.7,Color("091821"))
+	canvas.draw_circle(p,5.9,Color(ink.darkened(.62)))
+	canvas.draw_circle(p+Vector2(-1.3,-1.4),4.5,Color(ink,.85))
+	canvas.draw_circle(p-Vector2(1.8,2.6),1.55,Color("ffffff",.75))
+	match weapon:
+		"shrapnel","armor_piercing":
+			for i in 5:
+				var a: float=phase*.12+float(i)*TAU/5.0
+				var axis:=Vector2(cos(a),sin(a))
+				var tip: Vector2=p+axis*(10.0 if weapon=="shrapnel" else 12.0)
+				canvas.draw_colored_polygon(PackedVector2Array([tip,p+axis*3.0+Vector2(-axis.y,axis.x)*2.5,p+axis*3.0-Vector2(-axis.y,axis.x)*2.5]),Color("dce0db"))
+			if weapon=="armor_piercing":
+				canvas.draw_line(p-dir*4,p+dir*14,Color("eff5ee"),3.0,true)
+				canvas.draw_line(p+dir*14,p+dir*18,Color("ffffff"),1.0,true)
+		"crystal","cursed","arcane":
+			var diamond:=PackedVector2Array([p-dir*6.0,p-side*4.5,p+dir*7.5,p+side*4.5])
+			canvas.draw_colored_polygon(diamond,Color(ink.lightened(.45),.83))
+			canvas.draw_line(p-dir*5.0,p+dir*5.0,Color("ffffff",.75),1.1,true)
+			if weapon in ["cursed","arcane"]:
+				canvas.draw_arc(p,9.1,phase*.25,phase*.25+PI*1.35,17,Color(ink,.64),1.4,true)
+		"wind","water","shadow":
+			for swirl in 2:
+				var a: float=phase*.28+float(swirl)*PI
+				canvas.draw_arc(p,7.6,a,a+PI*.8,15,Color(ink.lightened(.5),.9),1.8,true)
+		"fire","lava","explosive":
+			var flame: Vector2=p-dir*(9.0+3.0*sin(phase))
+			canvas.draw_line(p,flame,Color("ff9d3c",.91),3.8,true)
+			canvas.draw_circle(flame,2.8,Color("ffe8a4",.87))
+		"poison","gas":
+			for bubble in 3:
+				var a: float=phase*.35+float(bubble)*TAU/3.0
+				canvas.draw_circle(p+Vector2(cos(a),sin(a))*8.0,2.0,Color(ink,.66))
+		"lightning":
+			canvas.draw_line(p+side*8.0,p-dir*2.0,Color("faffff"),1.3,true)
+			canvas.draw_line(p-dir*2.0,p-side*7.5,Color(ink.lightened(.65)),1.7,true)
+		"holy","light","gold":
+			_star(canvas,p,10.0,Color("fff5db",.75),phase*.12)
+			if weapon=="gold":canvas.draw_arc(p,5.5,0,TAU,15,Color("ffe9ab"),1.8,true)
+		"necro","spectral":
+			canvas.draw_circle(p-dir*1.4-side*1.9,1.35,Color("0d2434"))
+			canvas.draw_circle(p-dir*1.4+side*1.9,1.35,Color("0d2434"))
+			canvas.draw_line(p-dir*1.5,p+dir*3.3,Color("caffee"),.85,true)
+		"bleed":
+			canvas.draw_line(p-dir*4.0,p+dir*4.0,Color("ffdee0"),1.3,true)
+			canvas.draw_circle(p+side*3.6,1.9,Color("ffcebd"))
+		"earth":
+			for stone in 4:
+				var a: float=float(stone)*TAU/4.0+phase*.04
+				var v:=Vector2(cos(a),sin(a))
+				canvas.draw_line(p,p+v*4.6,Color("ecdbad",.81),1.3,true)
+		_:
+			pass
 
 static func draw_muzzle(canvas: CanvasItem,event: Dictionary,age: float,clock: float) -> void:
 	if age<0.0 or age>=0.42:return
