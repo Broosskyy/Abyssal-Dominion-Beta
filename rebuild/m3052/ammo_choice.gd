@@ -5,6 +5,7 @@ var title:=""
 var detail:=""
 var stock:=""
 var loaded:=false
+var accent: Color=Color("80e3dc")
 var highlight_clock:=0.0
 var press_feedback:=0.0
 func _process(delta: float) -> void:
@@ -42,14 +43,24 @@ func _draw() -> void:
 		var shimmer=.5+.5*sin(highlight_clock*1.9)
 		draw_rect(Rect2(2,2,3,size.y-4),Color("f5d78d",.65+.35*shimmer))
 		draw_line(Vector2(8,4),Vector2(size.x-8,4),Color("ffe9b7",.15+.22*shimmer),1.0,true)
-	if press_feedback>0:draw_rect(Rect2(Vector2(5,5),size-Vector2(10,10)),Color("f8e2a8",.55*press_feedback),false,1.5,true)
+	if press_feedback>0:draw_rect(Rect2(Vector2(5,5),size-Vector2(10,10)),Color(accent,.62*press_feedback),false,1.5,true)
+	# M3100: the color rail and miniature energy indicator identify each
+	# ammunition type even on the small Android popover.
+	var glint: float=.55+.45*sin(highlight_clock*2.2)
+	draw_rect(Rect2(3,7,2.5,size.y-14),Color(accent,.80 if loaded else .36))
+	draw_line(Vector2(8,size.y-4),Vector2(minf(size.x-8.0,82.0),size.y-4),Color(accent,.50 if loaded else .24),1.0,true)
+	if loaded:
+		var center: Vector2=Vector2(size.x-18,18)
+		draw_circle(center,10.0,Color(accent,.10+.07*glint))
+		draw_arc(center,6.8,-PI*.5,-PI*.5+TAU*.77,18,Color(accent,.7+.2*glint),1.5,true)
+		draw_circle(center,2.1,Color(accent,.85))
 	var icon=Rect2(8,8,50,50)
 	draw_rect(icon.grow(2),Color("0a1118"))
-	draw_rect(icon.grow(1),Color("b69a61"),false,1.0)
+	draw_rect(icon.grow(1),Color(accent,.78) if loaded else Color("b69a61"),false,1.0)
 	draw_rect(icon,Color("0c2630"))
 	if art!=null:draw_texture_rect(art,icon.grow(-3),false)
 	var width=font.get_string_size(stock,HORIZONTAL_ALIGNMENT_LEFT,-1,11).x
 	_ink(font,stock,Vector2(icon.get_center().x-width*.5,size.y-6),11,Color("f2deb0"))
 	_ink(font,title,Vector2(70,22),15,Color("fff0c8") if loaded else Color("d9dedc"))
 	_ink(font,detail,Vector2(70,43),11,Color("bfced0"))
-	if loaded:_ink(font,"GELADEN",Vector2(70,61),10,Color("f1cb77"))
+	if loaded:_ink(font,"GELADEN",Vector2(70,61),10,accent.lightened(.30))
