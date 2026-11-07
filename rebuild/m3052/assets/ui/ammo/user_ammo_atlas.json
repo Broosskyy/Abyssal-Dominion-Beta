@@ -1,0 +1,43 @@
+{
+  "origin": "user-provided original image collages, cropped for in-game UI",
+  "files": [
+    "166946.png",
+    "166943.png",
+    "167949.png",
+    "167950.png"
+  ],
+  "columns": 7,
+  "rows": 4,
+  "cell": 96,
+  "order": [
+    "cannon",
+    "chain",
+    "harpoon",
+    "flare",
+    "pumpkin",
+    "snow",
+    "ice",
+    "fire",
+    "poison",
+    "shrapnel",
+    "lightning",
+    "holy",
+    "shadow",
+    "wind",
+    "earth",
+    "water",
+    "cursed",
+    "bleed",
+    "necro",
+    "gold",
+    "crystal",
+    "explosive",
+    "arcane",
+    "spectral",
+    "lava",
+    "light",
+    "armor_piercing",
+    "gas"
+  ],
+  "no_generated_replacement_art": true
+}
