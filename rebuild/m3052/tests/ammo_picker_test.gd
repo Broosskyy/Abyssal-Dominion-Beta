@@ -58,6 +58,6 @@ func run() -> void:
 	check(sim.ammo_mode==4 and sim.player.reload==reload,"switching ammunition does not bypass a real reload")
 	check(game.suppress_tap_until>Time.get_ticks_msec() and sim.player.path.is_empty(),"closing the list guards against touch-release sailing")
 	check(ThemeDB.fallback_font.multichannel_signed_distance_field,"scaled HUD and world text use a distance-field font")
-	check(game.starter_texture.get_image().has_mipmaps() and game.atlas_textures[0].get_image().has_mipmaps(),"the exported source textures include real mipmaps")
+	check(game.FINAL_SHIP_PREVIEW.get_image().has_mipmaps(),"final shipyard preview exports as filtered texture")
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)

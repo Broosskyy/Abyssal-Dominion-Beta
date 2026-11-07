@@ -182,7 +182,6 @@ func run() -> void:
 	var npc_y=game._plate_screen_anchor(npc).y
 	for heading in [Vector2.UP,Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT]:
 		npc.heading=heading
-		game.direction_cache[int(npc.id)]=VISUALS.heading_column(heading,-1)
 		check(is_equal_approx(game._plate_screen_anchor(npc).y,npc_y),"NPC caption remains attached across all directions")
 	for i in 4:
 		game._open_modal("Munition");game.ammo_rows[i+3].pressed.emit()
