@@ -23,7 +23,7 @@ func _ready() -> void:
 	for state in ["font_color","font_hover_color","font_pressed_color","font_hover_pressed_color","font_disabled_color"]:add_theme_color_override(state,Color.TRANSPARENT)
 	button_down.connect(_on_press_visual)
 func _ink(font: Font,value: String,point: Vector2,fs: int,color: Color) -> void:
-	if point.x>=70:
+	if point.x>=90:
 		var room=size.x-point.x-8
 		if font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x>room:
 			while value.length()>1 and font.get_string_size(value+"…",HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x>room:value=value.left(value.length()-1)
@@ -54,13 +54,13 @@ func _draw() -> void:
 		draw_circle(center,10.0,Color(accent,.10+.07*glint))
 		draw_arc(center,6.8,-PI*.5,-PI*.5+TAU*.77,18,Color(accent,.7+.2*glint),1.5,true)
 		draw_circle(center,2.1,Color(accent,.85))
-	var icon=Rect2(8,8,50,50)
+	var icon=Rect2(10,9,66,66)
 	draw_rect(icon.grow(2),Color("0a1118"))
 	draw_rect(icon.grow(1),Color(accent,.78) if loaded else Color("b69a61"),false,1.0)
 	draw_rect(icon,Color("0c2630"))
 	if art!=null:draw_texture_rect(art,icon.grow(-3),false)
-	var width=font.get_string_size(stock,HORIZONTAL_ALIGNMENT_LEFT,-1,11).x
-	_ink(font,stock,Vector2(icon.get_center().x-width*.5,size.y-6),11,Color("f2deb0"))
-	_ink(font,title,Vector2(70,22),15,Color("fff0c8") if loaded else Color("d9dedc"))
-	_ink(font,detail,Vector2(70,43),11,Color("bfced0"))
-	if loaded:_ink(font,"GELADEN",Vector2(70,61),10,accent.lightened(.30))
+	var width=font.get_string_size(stock,HORIZONTAL_ALIGNMENT_LEFT,-1,12).x
+	_ink(font,stock,Vector2(icon.get_center().x-width*.5,size.y-7),12,Color("f2deb0"))
+	_ink(font,title,Vector2(91,29),18,Color("fff0c8") if loaded else Color("d9dedc"))
+	_ink(font,detail,Vector2(91,55),13,Color("bfced0"))
+	if loaded:_ink(font,"GELADEN",Vector2(91,79),12,accent.lightened(.30))
