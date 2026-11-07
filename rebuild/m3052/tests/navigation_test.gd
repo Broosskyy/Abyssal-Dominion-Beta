@@ -71,6 +71,29 @@ func _initialize() -> void:
 		check(body.pos.distance_to(patrol_start)>50,"patrol continues while captain is docked on region "+str(map_index))
 		check(sim.player.hp==dock_hp and sim.shots.is_empty() and not body.aggressive,"docking suppresses hostile and retaliatory fire on region "+str(map_index))
 		sim.docked=false
+	# Every normal region needs a stable, free-water berth adjacent to its
+	# mirrored coast; decorative island harbor must NEVER block boarding.
+	var port_sites: Array[Vector2]=[]
+	for port_map in [0,1,2]:
+		sim.configure_map(port_map)
+		var berth: Vector2=sim.harbor
+		port_sites.append(berth)
+		check(sim.has_harbor() and not sim.blocked(berth,94.0) and not sim.on_land(berth),"island-harbor berth stays navigable and out of coastal collision on map "+str(port_map))
+		check(sim._harbor_site_for_map()==berth,"berth does not reroll during map visits: "+str(port_map))
+		sim.player.pos=berth
+		sim.player.hp=sim.player.max_hp
+		sim.player.last_hit=-100.0
+		sim.docked=false
+		check(sim.can_dock() and sim.dock(),"working docking and original port gameplay on sea map "+str(port_map))
+		sim.depart()
+		check(not sim.docked,"harbor departure restores sailing on map "+str(port_map))
+		for i in sim.islands.size():
+			var island: Dictionary=sim.islands[i]
+			var expected_width: float=float(sim.base_islands[i].width)*sim.island_art_scale(str(island.art))
+			check(absf(float(island.width)-expected_width)<.1,"island artwork and land collisions use normalized visible width on map "+str(port_map)+" island "+str(i))
+	check(port_sites[0]!=port_sites[1] and port_sites[0]!=port_sites[2] and port_sites[1]!=port_sites[2],"normal maps have distinct repeatable coastal harbors")
+	sim.configure_map(3)
+	check(not sim.has_harbor(),"bonus wave map has no standard island-harbor berth")
 	sim=SIM.new()
 	body=sim.npcs[0];body.pos=Vector2(500,500);body.home=body.pos;body.patrol=0
 	var patrol=sim._patrol_path(body)
