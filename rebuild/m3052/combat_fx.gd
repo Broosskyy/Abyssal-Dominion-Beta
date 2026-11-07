@@ -154,7 +154,7 @@ static func draw_impact(canvas: CanvasItem,event: Dictionary,age: float,clock: f
 	if age<0.0 or age>=1.05:return
 	var weapon: String=str(event.get("weapon","cannon"))
 	var p: Vector2=Vector2(event.get("pos",Vector2.ZERO))
-	var seed: float=float(int(event.get("actor",0))%17)
+	var seed: float=float(int(event.get("vfx_seed",event.get("actor",0)))%23)
 	var impact_color: Color=weapon_color(weapon)
 	var fade: float=pow(maxf(0.0,1.0-age/1.05),1.25)
 	var spread: float=1.0+age*3.2
@@ -186,9 +186,9 @@ static func draw_impact(canvas: CanvasItem,event: Dictionary,age: float,clock: f
 				var offset:=Vector2(cos(a),sin(a)*.55)*(9.0+age*61.0)
 				canvas.draw_circle(p+offset-Vector2(0,age*15.0),2.6*fade,Color("ff8d36",.87*fade))
 		"snow":
-			forflake(canvas,p,age,fade,false)
+			_flake_burst(canvas,p,age,fade,false)
 		"ice":
-			forflake(canvas,p,age,fade,true)
+			_flake_burst(canvas,p,age,fade,true)
 		"chain":
 			_ellipse(canvas,p,Vector2(7+age*24,4+age*12),Color("b2c9d1",.48*fade),1.4)
 		"harpoon":
@@ -202,7 +202,7 @@ static func draw_impact(canvas: CanvasItem,event: Dictionary,age: float,clock: f
 		_:
 			pass
 
-static func forflake(canvas: CanvasItem,p: Vector2,age: float,fade: float,hard: bool) -> void:
+static func _flake_burst(canvas: CanvasItem,p: Vector2,age: float,fade: float,hard: bool) -> void:
 	var tint: Color=Color("66dcff") if hard else Color("edffff")
 	var spokes: int=6 if hard else 5
 	for j in spokes:
