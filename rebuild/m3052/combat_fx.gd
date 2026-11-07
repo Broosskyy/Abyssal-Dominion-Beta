@@ -216,6 +216,53 @@ static func _flake_burst(canvas: CanvasItem,p: Vector2,age: float,fade: float,ha
 		else:
 			_star(canvas,center,3.0+fade*2.0,Color(tint,.72*fade),theta)
 
+static func active_statuses(actor: Dictionary,now: float) -> Array[String]:
+	var statuses: Array[String]=[]
+	if float(actor.get("spotted",0.0))>now:statuses.append("flare")
+	if bool(actor.get("frozen",false)) or float(actor.get("ice",0.0))>0.0:
+		statuses.append("ice")
+	elif float(actor.get("slow",0.0))>0.0:
+		statuses.append("snow" if float(actor.get("slow_rate",1.0))<0.45 else "chain")
+	return statuses
+
+static func draw_status(canvas: CanvasItem,actor: Dictionary,at: Vector2,now: float,hull_length: float) -> void:
+	# These are peripheral, translucent world-space cues, so they cannot cover
+	# hull texture, enemy HP, selected target, the player's decks or combat HUD.
+	var states: Array[String]=active_statuses(actor,now)
+	if states.is_empty():return
+	var phase: float=now*2.4+float(int(actor.get("id",0))%11)
+	var half_width: float=hull_length*.39
+	for state in states:
+		match state:
+			"flare":
+				var bright: float=.5+.5*sin(phase*2.2)
+				_ellipse(canvas,at,Vector2(half_width*.92,half_width*.37),Color("ffcf67",.25+.11*bright),1.6)
+				for spot in 4:
+					var a: float=phase*.4+float(spot)*TAU/4.0
+					var glimmer:=at+Vector2(cos(a)*half_width*.86,sin(a)*half_width*.32)
+					_star(canvas,glimmer,3.8+1.5*bright,Color("fff0a0",.48+.24*bright),phase*.3)
+			"ice":
+				var frost: float=clampf(float(actor.get("ice",1.0))/3.2,.35,1.0)
+				_ellipse(canvas,at,Vector2(half_width*.95,half_width*.37),Color("9de8ff",.37*frost),1.55)
+				for shard in 7:
+					var a: float=float(shard)*TAU/7.0+phase*.12
+					var pos:=at+Vector2(cos(a)*half_width*.86,sin(a)*half_width*.31)
+					var v:=Vector2(cos(a),sin(a))
+					var cross:=Vector2(-v.y,v.x)
+					canvas.draw_colored_polygon(PackedVector2Array([pos+v*(4.0+frost*2.0),pos+cross*1.9,pos-v*2.9,pos-cross*1.9]),Color("b4f5ff",.58*frost))
+			"snow":
+				_ellipse(canvas,at,Vector2(half_width*.89,half_width*.34),Color("d5f5ff",.23),1.2)
+				for flake in 5:
+					var a: float=float(flake)*TAU/5.0+phase*.24
+					var pos:=at+Vector2(cos(a)*half_width*.83,sin(a)*half_width*.34)-Vector2(0,4.0+3.0*sin(phase+float(flake)))
+					_star(canvas,pos,3.0,Color("f0ffff",.53),a)
+			"chain":
+				_ellipse(canvas,at,Vector2(half_width*.83,half_width*.32),Color("b3cfda",.22),1.2)
+				for coil in 4:
+					var a: float=phase*.24+float(coil)*TAU/4.0
+					var pos:=at+Vector2(cos(a)*half_width*.8,sin(a)*half_width*.3)
+					canvas.draw_arc(pos,3.0,a,a+PI*1.5,10,Color("c9e4e6",.39),1.0,true)
+
 static func draw_sinking(canvas: CanvasItem,event: Dictionary,age: float) -> void:
 	if age<0.0 or age>=1.2:return
 	var p: Vector2=Vector2(event.get("pos",Vector2.ZERO))
