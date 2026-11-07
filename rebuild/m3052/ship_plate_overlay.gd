@@ -68,7 +68,10 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	var elite=bool(actor.get("elite",false))
 	var hostile=not player and (bool(actor.get("aggressive",false)) or bool(host.CONTENT.MAPS[sim.map_id].npc_hostile) or (tower and not sim.tower_friendly()))
 	var tint=Color("e8d0a1") if elite else Color("dce8e4")
-	if player:tint=sim.staff.color() if sim.staff.shows_badge() else Color("d9f0e5")
+	if player:
+		# Native-pixel overlay is the actual gameplay nameplate: match the
+		# selected design in the Werft (not just the legacy map-draw hook).
+		tint=sim.staff.color() if sim.staff.shows_badge() else (Color("d9f0e5") if int(actor.get("skin",0))==0 else host._ship_design_accent(int(actor.get("skin",0))).lightened(.17))
 	elif hostile:tint=Color("eab8a7")
 	elif monster:tint=Color("c6b9d6")
 	# NPC names recede behind the captain's identity; the selected target
@@ -102,7 +105,10 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 		var ratio=float(actor.get("shield",0))/max_shield
 		if player:_gauge(Rect2(-bar_width*.5,35*pixel_scale,bar_width,5*pixel_scale),ratio,Color("409fdf"),flash)
 		else:_gauge(Rect2(-bar_width*.5,22*pixel_scale,bar_width,3*pixel_scale),ratio,Color("4d95be"))
-	if player:SEA_MARKS.deck_badge(self,Vector2(0,65*pixel_scale),6.0*pixel_scale,sim,float(host.elapsed))
+	if player:
+		# Keep ten deck slots physically aligned under shield, regardless
+		# of ship yaw or which Corsair material was chosen.
+		SEA_MARKS.deck_badge(self,Vector2(0,65*pixel_scale),6.0*pixel_scale,sim,float(host.elapsed))
 	if float(actor.get("slow",0.0))>0.0:draw_circle(Vector2(bar_width*.5+6*pixel_scale,14*pixel_scale),2.5*pixel_scale,Color("9fdbf4"))
 	if player and sim.staff.hidden():_caption(Vector2(0,-20*pixel_scale),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color())
 	draw_set_transform(Vector2.ZERO)
