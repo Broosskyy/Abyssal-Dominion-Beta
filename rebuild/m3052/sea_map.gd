@@ -392,7 +392,7 @@ func _draw_glb_waterline(actor: Dictionary,point: Vector2,heading: Vector2,lengt
 	if heading.length_squared()<0.5:return
 	var moving: float=_wake_intensity_for(actor) if wake_effects_enabled else 0.0
 	var alpha: float=0.17+moving*0.22
-	var half_width: float=length*.137
+	var half_width: float=length*(.175 if int(actor.get("id",-1))==0 and int(actor.get("skin",0))==1 else .137)
 	draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
 	for side in [-1.0,1.0]:
 		var side_sign: float=side
