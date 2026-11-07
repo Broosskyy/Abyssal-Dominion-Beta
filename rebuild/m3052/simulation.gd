@@ -776,7 +776,7 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 	_event("impact", victim.pos, dealt, victim.id)
 	if not events.is_empty():
 		events.back()["weapon"]=str(shot.weapon)
-		events.back()["vfx_seed"]=int(shot.id)
+		events.back()["vfx_seed"]=int(shot.get("id",int(victim.id))) # synthetic admin/test hits have no projectile ID
 	if int(victim.hp) == 0:
 		victim.path = []
 		victim.respawn = 8.0 if int(victim.id) == 0 else (90.0 if victim.kind == "tower" else 48.0)
