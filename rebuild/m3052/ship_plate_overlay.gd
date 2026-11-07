@@ -60,6 +60,12 @@ func _rank(center: Vector2,tier: int,scale: float) -> void:
 		draw_polyline(arm,tint.lightened(.35),1.6*k,true)
 	draw_circle(center+Vector2(0,-6.5)*k,2.0*k,tint.lightened(.5))
 
+func _player_title_tint(actor: Dictionary) -> Color:
+	# Pure presentation decision; testable without screenshot/OCR.
+	if host.sim.staff.shows_badge():return host.sim.staff.color()
+	var skin: int=int(actor.get("skin",0))
+	return Color("d9f0e5") if skin==0 else host._ship_design_accent(skin).lightened(.17)
+
 func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	var sim=host.sim
 	var player=int(actor.id)==0
@@ -68,10 +74,7 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	var elite=bool(actor.get("elite",false))
 	var hostile=not player and (bool(actor.get("aggressive",false)) or bool(host.CONTENT.MAPS[sim.map_id].npc_hostile) or (tower and not sim.tower_friendly()))
 	var tint=Color("e8d0a1") if elite else Color("dce8e4")
-	if player:
-		# Native-pixel overlay is the actual gameplay nameplate: match the
-		# selected design in the Werft (not just the legacy map-draw hook).
-		tint=sim.staff.color() if sim.staff.shows_badge() else (Color("d9f0e5") if int(actor.get("skin",0))==0 else host._ship_design_accent(int(actor.get("skin",0))).lightened(.17))
+	if player:tint=_player_title_tint(actor)
 	elif hostile:tint=Color("eab8a7")
 	elif monster:tint=Color("c6b9d6")
 	# NPC names recede behind the captain's identity; the selected target
