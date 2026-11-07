@@ -607,6 +607,7 @@ func _npc_ship_texture(_actor: Dictionary) -> Texture2D:
 	return painted.nav_ship
 
 func _actor_visual_length(actor: Dictionary) -> float:
+	if str(actor.get("visual_key",""))=="black_crown_corsair_elite_test":return 180.0
 	if int(actor.id)==0:return FINAL_SHIP_LENGTH
 	if actor.kind=="ship":return float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
 	return 150.0
