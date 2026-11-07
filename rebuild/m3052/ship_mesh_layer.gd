@@ -93,12 +93,13 @@ func stable_player_plate_drop(actor: Dictionary,zoom: float,pixels: float) -> fl
 	if not MODEL_INFO.has(key):return 52.0*pixels
 	var info: Array=MODEL_INFO[key]
 	var length: float=float(host._actor_visual_length(actor))
-	var beam: float=float(PLAYER_SOURCE_BEAMS.get(key,0.44))
+	var beam: float=float(PLAYER_CAPTION_HULL_BEAMS.get(key,PLAYER_SOURCE_BEAMS.get(key,0.44)))
 	var ratio: float=beam/maxf(float(info[0]),0.1)
 	var ground_radius: float=length*sqrt(0.25+ratio*ratio)
 	var tilt: float=deg_to_rad(43.0 if mode=="3d" else 39.0)
 	var depth: float=length*(float(info[2])/maxf(float(info[0]),0.1))*PLAYER_WATER_IMMERSION
-	return ground_radius*cos(tilt)*zoom+depth*sin(tilt)*zoom+12.0*pixels
+	var caption_padding: float=9.0 if PLAYER_CAPTION_HULL_BEAMS.has(key) else 12.0
+	return ground_radius*cos(tilt)*zoom+depth*sin(tilt)*zoom+caption_padding*pixels
 
 
 func _ready() -> void:
@@ -196,6 +197,12 @@ func can_render_actor(actor: Dictionary) -> bool:
 # true projection changes with camera zoom and 3D yaw, so the label must too.
 const PLAYER_SOURCE_BEAMS := {"crimson_voyager":0.355,"test_ship_2":0.440,"base_basic_pbr":0.433,
 	"base_basic_gameplay_pbr":0.614,"base_basic_gameplay_shaded":0.614}
+# The ~0.614 GLB half-width includes all oars. Labels need the hull
+# envelope, NOT the distant tip of the oars: a ship's name is underneath
+# the keel rather than below its maximum side appendage.
+const PLAYER_CAPTION_HULL_BEAMS := {
+	"base_basic_gameplay_pbr":0.42,"base_basic_gameplay_shaded":0.42
+}
 
 func projected_hull_bottom(actor: Dictionary) -> float:
 	if not can_render_actor(actor) or int(actor.get("id",-1))!=0:return -INF
