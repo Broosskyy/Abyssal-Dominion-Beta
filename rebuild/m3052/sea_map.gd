@@ -175,6 +175,10 @@ var guild_tag_input: LineEdit
 var previous_region := -1
 var hud_size := 1 # 0 compact, 1 comfortable, 2 large
 var projectile_visual_count := 3 # purely cosmetic per actual hit: 1, 3, 5 or 8
+# M3107: user-local presentation switches. Gameplay always runs unchanged.
+const VFX_DEFAULT_FLAGS := {"enabled":true,"flight":true,"muzzle":true,"impact":true,"particles":true,"water":true,"flashes":true}
+var vfx_flags: Dictionary = VFX_DEFAULT_FLAGS.duplicate(true)
+var vfx_intensity := 1.35
 var journal_visible := true
 var hud_scale := 1.0
 var camera_pad: Control
@@ -539,15 +543,17 @@ func _draw() -> void:
 		if rendered_salvos.has(salvo_key):continue
 		rendered_salvos[salvo_key]=true
 		drawn_shots+=1
-		COMBAT_FX.draw_projectile(self,shot,sim.clock,projectile_visual_count)
+		COMBAT_FX.draw_projectile(self,shot,sim.clock,projectile_visual_count,bool(vfx_flags.enabled) and bool(vfx_flags.flight),vfx_intensity,bool(vfx_flags.particles))
 	for event in sim.events:
 		var age: float = sim.clock-float(event.time)
 		if age>(1.8 if str(event.type)=="impact" else 1.2):continue
 		var p: Vector2 = event.pos
 		if event.type=="impact":
-			SPRITE_FX.draw_impact(self,event,age)
+			if bool(vfx_flags.enabled) and bool(vfx_flags.impact):
+				SPRITE_FX.draw_impact(self,event,age,vfx_intensity,bool(vfx_flags.particles),bool(vfx_flags.water),bool(vfx_flags.flashes))
 		elif event.type=="muzzle":
-			SPRITE_FX.draw_muzzle(self,event,age)
+			if bool(vfx_flags.enabled) and bool(vfx_flags.muzzle):
+				SPRITE_FX.draw_muzzle(self,event,age,vfx_intensity,bool(vfx_flags.particles),bool(vfx_flags.flashes))
 		elif event.type=="sunk":
 			COMBAT_FX.draw_sinking(self,event,age)
 		elif event.type=="loot":
@@ -1320,14 +1326,16 @@ func _layout() -> void:
 	_place(modal_backdrop,0,0,s.x,s.y)
 	if modal_kind=="Munition":
 		var button_rect=ammo_selector.get_global_rect()
-		visual_w=minf(400.0*grow,menu_size.x-24.0)
+		# M3107: 30% wider picker for 96px atlas artwork and large touch rows.
+		# Always remain above the combat orb and below the top HUD on small phones.
+		visual_w=minf(520.0*grow,menu_size.x-24.0)
 		var bottom=button_rect.position.y-10.0
 		var top_limit=chrome.get_global_rect().end.y+10.0
-		visual_h=minf(566.0*grow,maxf(160.0,bottom-top_limit))
+		visual_h=minf(650.0*grow,maxf(160.0,bottom-top_limit))
 		width=visual_w/grow;height=visual_h/grow
 		_place(modal,clampf(button_rect.end.x-visual_w,12.0,menu_size.x-visual_w-12.0),bottom-visual_h,width,height)
 	else:_place(modal,(menu_size.x-visual_w)*.5,(menu_size.y-visual_h)*.5,width,height)
-	var head=34.0 if modal_kind=="Munition" else (46.0 if height<420 else 52.0)
+	var head=42.0 if modal_kind=="Munition" else (46.0 if height<420 else 52.0)
 	modal.header=head
 	var title_w=width-62 if modal_kind=="Munition" else clampf(font.get_string_size(modal_title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,21).x+70,200,width-170)
 	modal.ribbon=Rect2(10,3,title_w,head-6) if modal_kind=="Munition" else Rect2((width-title_w)*.5,8,title_w,head-14)
@@ -1589,7 +1597,7 @@ func _open_modal(kind: String) -> void:
 	modal_kind=kind
 	modal.plain=kind=="Munition"
 	modal_backdrop.color=Color(0,0,0,0) if kind=="Munition" else Color(0.002,0.009,0.018,0.77)
-	modal_title.add_theme_font_size_override("font_size",15 if kind=="Munition" else 21)
+	modal_title.add_theme_font_size_override("font_size",18 if kind=="Munition" else 21)
 	modal_title.add_theme_constant_override("outline_size",2 if kind=="Munition" else 5)
 	modal_close.add_theme_font_size_override("font_size",20 if kind=="Munition" else 26)
 	if kind=="Munition":
@@ -1599,7 +1607,7 @@ func _open_modal(kind: String) -> void:
 	else:SKIN.dress(modal_close,"close",20.0)
 	modal_title.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if kind=="Munition" else HORIZONTAL_ALIGNMENT_CENTER
 	modal_title.text=str(MODAL_TITLES.get(kind,kind)).to_upper()
-	modal_body.add_theme_constant_override("separation",3 if kind=="Munition" else 10)
+	modal_body.add_theme_constant_override("separation",5 if kind=="Munition" else 10)
 	for child in modal_body.get_children():
 		modal_body.remove_child(child)
 		child.queue_free()
@@ -1628,7 +1636,7 @@ func _open_modal(kind: String) -> void:
 	modal_body.queue_sort()
 	modal.show()
 	modal_backdrop.show()
-	modal_scroll.restore(sim.ammo_mode*77 if kind=="Munition" else scroll_position)
+	modal_scroll.restore(sim.ammo_mode*99 if kind=="Munition" else scroll_position)
 
 func _build_tabs(kind: String) -> void:
 	for child in modal_tabs.get_children():
@@ -1928,7 +1936,7 @@ func _open_ammo() -> void:
 		row.text="%s · Vorrat %d · %s" % [AMMO_UI[i].name,sim.player.ammo[i],AMMO_UI[i].use]
 		row.tooltip_text=row.text
 		row.set_meta("ammo_index",i);row.name="AmmoChoice%d" % i
-		row.custom_minimum_size=Vector2(0,74);row.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		row.custom_minimum_size=Vector2(0,94);row.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		row.pressed.connect(func():_choose_ammo(index))
 		modal_body.add_child(row);ammo_rows.append(row)
 
@@ -2445,6 +2453,22 @@ func _open_display() -> void:
 		var count_button=_action(str(amount)+(" ✓" if projectile_visual_count==amount else ""),func():_set_projectile_visual_count(selected_count),"tab_on" if projectile_visual_count==amount else "normal",projectile_choices)
 		count_button.disabled=projectile_visual_count==amount
 	_note("Standard: 3 · Leuchtkugeln wechseln zwischen Rot, Blau, Grün, Gold und Violett.",Color("bfcbdf"))
+	_section("ANIMATIONEN & KAMPFEFFEKTE")
+	_note("Jede Einstellung ist rein optisch und wirkt sofort in 2,5D und 3D. Auch bei ausgeschalteten Effekten bleiben die echten Geschosse und Treffer sichtbar.",Color("a3c9cf"))
+	var effect_grid=_grid(2)
+	for option in [["enabled","ALLE EFFEKTE"],["flight","FLUGSPUREN"],["muzzle","MÜNDUNGSBLITZE"],["impact","TREFFERANIMATIONEN"],["particles","PARTIKEL & TRÜMMER"],["water","WASSERFONTÄNEN"],["flashes","LICHTBLITZE"]]:
+		var key: String=str(option[0])
+		var active: bool=bool(vfx_flags.get(key,true))
+		var fx_button=_action(str(option[1])+(": "+("EIN" if active else "AUS")),func():_set_vfx_flag(key),"tab_on" if active else "normal",effect_grid)
+		fx_button.tooltip_text="Nur Optik · Schaden, Munition und Nachladen bleiben unverändert"
+	_section("INTENSITÄT")
+	var intensity_grid=_grid(4)
+	for option in [[.65,"LEICHT"],[1.0,"NORMAL"],[1.35,"INTENSIV"],[1.7,"EXTREM"]]:
+		var amount: float=float(option[0])
+		var selected: bool=is_equal_approx(vfx_intensity,amount)
+		var choice=_action(str(option[1])+(" ✓" if selected else ""),func():_set_vfx_intensity(amount),"tab_on" if selected else "normal",intensity_grid)
+		choice.disabled=selected
+	_note("Intensiv ist der Standard. Leicht reduziert Zeichnung und Partikel auf schwächeren Smartphones; Extrem liefert stärkere Treffer und sichtbare Folgewellen.",Color("bfcbdf"))
 	_section("HUD-GRÖSSE")
 	for i in 3:
 		var index=i
@@ -2455,7 +2479,7 @@ func _open_display() -> void:
 	_action("AUFTRAGSLEISTE: "+("EIN" if journal_visible else "AUS"),func():_set_display(hud_size,not journal_visible),"normal",toggles)
 	_action("JOYSTICK: "+("EIN" if camera_pad_visible else "AUS"),func():camera_pad_visible=not camera_pad_visible;_set_display(hud_size,journal_visible),"normal",toggles)
 	_note("Die Auftragsleiste oben links öffnet das Logbuch. Der Joystick bewegt nur die Kamera: Seekarte erkunden, das Schiff hält seinen Kurs. Gefahren wird per Antippen. Fadenkreuz an der Karte: zurück zum Schiff. Fernrohr: nächstes sichtbares Ziel.")
-	_action("STANDARD WIEDERHERSTELLEN",func():camera_pad_visible=true;projectile_visual_count=3;_set_display(1,true))
+	_action("STANDARD WIEDERHERSTELLEN",_reset_display_preferences)
 
 func _open_info() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
@@ -2835,6 +2859,11 @@ func _load_display() -> void:
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
 	render_mode="3d" if str(data.get("render_mode","hybrid"))=="3d" else "hybrid"
 	projectile_visual_count=COMBAT_FX.visual_count(int(data.get("projectile_visual_count",3)))
+	var stored_flags: Variant=data.get("vfx_flags",{})
+	if stored_flags is Dictionary:
+		for key in VFX_DEFAULT_FLAGS:
+			if stored_flags.get(key) is bool:vfx_flags[key]=stored_flags[key]
+	vfx_intensity=clampf(float(data.get("vfx_intensity",1.35)),.65,1.7)
 
 func _cycle_render_mode() -> void:
 	_set_render_mode("3d" if render_mode=="hybrid" else "hybrid")
@@ -2842,8 +2871,28 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count}))
+		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity}))
 		file.close()
+
+func _set_vfx_flag(key: String) -> void:
+	if not VFX_DEFAULT_FLAGS.has(key):return
+	vfx_flags[key]=not bool(vfx_flags.get(key,true))
+	_persist_display_preferences()
+	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal("Anzeige")
+	queue_redraw()
+
+func _set_vfx_intensity(amount: float) -> void:
+	vfx_intensity=clampf(amount,.65,1.7)
+	_persist_display_preferences()
+	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal("Anzeige")
+	queue_redraw()
+
+func _reset_display_preferences() -> void:
+	camera_pad_visible=true
+	projectile_visual_count=3
+	vfx_flags=VFX_DEFAULT_FLAGS.duplicate(true)
+	vfx_intensity=1.35
+	_set_display(1,true)
 
 func _set_projectile_visual_count(requested: int) -> void:
 	projectile_visual_count=COMBAT_FX.visual_count(requested)
