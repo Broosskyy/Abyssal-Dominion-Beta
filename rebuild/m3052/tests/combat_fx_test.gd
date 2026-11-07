@@ -17,6 +17,10 @@ func _run() -> void:
 	check(SPRITE_FX.src_rect(7,7)==Rect2(896,896,128,128),"M3106 final sprite frame uses correct atlas UV")
 	check(SPRITE_FX.animated_frame(0.0)==0 and SPRITE_FX.animated_frame(1.55)==7,"M3106 animated impact actually advances frames")
 	check(SPRITE_FX.family_for_weapon("ice")!=SPRITE_FX.family_for_weapon("fire") and SPRITE_FX.family_for_weapon("lightning")!=SPRITE_FX.family_for_weapon("poison"),"M3106 ice/fire/lightning/poison have distinct animated artwork")
+	check(SPRITE_FX.UNIQUE_SIGNATURES.size()==FX.WEAPONS.size(),"M3107 unique effect choreography catalog covers all 29 projectiles")
+	for signature_id in FX.WEAPONS.size():
+		check(SPRITE_FX.signature_index(str(FX.WEAPONS[signature_id]))==signature_id,"M3107 distinct motion signature for "+str(FX.WEAPONS[signature_id]))
+
 	check(FX.VISIBLE_COUNTS==[1,3,5,8],"M3102 approved visible projectile selections are stable")
 	for wanted in [1,3,5,8]:
 		check(FX.visual_count(wanted)==wanted,"M3102 visible-orb mode %d supported" % wanted)
@@ -82,6 +86,18 @@ func _run() -> void:
 	game.set_process(false)
 	check(game._ammo_texture(3) is AtlasTexture and game._ammo_texture(3).atlas==game.USER_AMMO_ATLAS,"M3106 original user-provided rainbow Leuchtkugeln shown in ammunition picker")
 	check(game.projectile_visual_count in [1,3,5,8],"M3102 restored visual count is supported")
+	check(bool(game.vfx_flags.enabled) and bool(game.vfx_flags.flight) and bool(game.vfx_flags.muzzle) and bool(game.vfx_flags.impact),"M3107 animation switches start enabled")
+	check(game.vfx_intensity>=.65 and game.vfx_intensity<=1.7,"M3107 visual-only intensity in permitted range")
+	game._set_vfx_flag("flight")
+	check(not bool(game.vfx_flags.flight),"M3107 flight sprite overlay can be disabled independently")
+	var fx_save: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
+	check(fx_save is Dictionary and not bool(fx_save.get("vfx_flags",{}).get("flight",true)),"M3107 flight setting persists")
+	game._set_vfx_flag("flight")
+	game._set_vfx_intensity(1.7)
+	check(is_equal_approx(game.vfx_intensity,1.7),"M3107 extreme effect intensity selectable")
+	game._reset_display_preferences()
+	check(is_equal_approx(game.vfx_intensity,1.35) and bool(game.vfx_flags.flight) and bool(game.vfx_flags.water),"M3107 visual defaults restore")
+
 	game._set_projectile_visual_count(5)
 	check(game.projectile_visual_count==5,"M3102 five visible projectile mode settable")
 	var display_save: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
@@ -127,6 +143,7 @@ func _run() -> void:
 		check(Color(game.ammo_selector.get("ammo_color"))==FX.weapon_color(str(game.sim.AMMO_NAMES[index])),"HUD accent matches projectile profile "+str(index))
 		game._open_modal("Munition")
 		check(game.ammo_rows.size()==game.sim.AMMO_NAMES.size() and Color(game.ammo_rows[index].accent)==FX.weapon_color(str(game.sim.AMMO_NAMES[index])),"popover row accent matches flight FX "+str(index))
+		check(game.ammo_rows[index].custom_minimum_size.y>=90.0,"M3107 taller touch and atlas rows "+str(index))
 		game.modal.hide()
 	for n in range(7,game.sim.AMMO_NAMES.size()):
 		var art: Texture2D=game._ammo_texture(n)
