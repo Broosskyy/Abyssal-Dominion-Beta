@@ -126,6 +126,24 @@ func _run() -> void:
 	var captain_ring: Vector2=game._selection_ring_radii(game.sim.player)
 	check(captain_ring.x>55.0 and captain_ring.y>20.0 and captain_ring.x>captain_ring.y,"M3099 player ring fits shaded hull")
 	check(game._selection_ring_visible(game.sim.player),"captain always receives water selection ring")
+	# Rings are chart-space but their strokes should stay ~2 physical
+	# pixels across both near and far zoom levels.
+	for zoom_value in [.5,1.0,2.0,2.5]:
+		var stroke: float=game._ring_stroke_for_zoom(2.0,zoom_value)
+		check(absf(stroke*zoom_value-2.0)<.01,"reticle maintains 2 screen pixels at zoom "+str(zoom_value))
+	var ring_before: Vector2=game._selection_ring_radii(game.sim.player)
+	var old_heading: Vector2=game.sim.player.heading
+	game.sim.player.heading=Vector2.LEFT
+	check(game._selection_ring_radii(game.sim.player)==ring_before,"player targeting ring does not wobble with heading")
+	game.sim.player.heading=old_heading
+	var old_ring_target: int=game.ring_last_target
+	var old_acquired_at: float=game.ring_target_acquired_at
+	game.ring_last_target=4
+	game.ring_target_acquired_at=7.0
+	check(is_equal_approx(game._target_ring_pulse(7.0),1.0),"target reacquisition ripple begins at full intensity")
+	check(game._target_ring_pulse(7.4)>0.0 and game._target_ring_pulse(7.4)<1.0 and game._target_ring_pulse(8.0)==0.0,"target ripple expires without leaving permanent visual effects")
+	game.ring_last_target=old_ring_target
+	game.ring_target_acquired_at=old_acquired_at
 	var selected: Dictionary=game.sim.npcs[0]
 	var previous_target: int=game.sim.target
 	game.sim.select(int(selected.id))
