@@ -195,6 +195,9 @@ var plate_rects: Dictionary = {}
 # The same names and font sizes are measured every frame at sea; cache widths
 # for mobile CPU savings. Invalidate by actual font pixel size in the key.
 var plate_text_width_cache: Dictionary = {}
+# Pure cosmetic target reacquisition pulse, never a new gameplay target.
+var ring_last_target := -1
+var ring_target_acquired_at := -100.0
 var plate_overlay: Control
 var mesh_layer
 var render_mode := "hybrid"
@@ -447,6 +450,9 @@ func _process(delta: float) -> void:
 		sim.step(SIMULATION_TICK)
 		visual_after=_visual_snapshot()
 		accumulator -= SIMULATION_TICK
+	if ring_last_target!=int(sim.target):
+		ring_last_target=int(sim.target)
+		ring_target_acquired_at=elapsed if ring_last_target>0 else -100.0
 	if previous_region!=sim.map_id:
 		wake_tracks.clear()
 		_sync_region()
@@ -664,6 +670,17 @@ func _selection_ring_tint(actor: Dictionary) -> Color:
 	var hostile: bool=bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile)
 	return Color("f47d62") if hostile else Color("e6b869")
 
+# Consistent on-screen line thickness across zoom 0.4x–2x, not the old
+# world-space strokes that disappeared at low zoom and bloated up close.
+func _selection_ring_stroke(screen_pixels: float) -> float:
+	var zoom: float=camera.zoom.x if camera!=null else 1.0
+	return clampf(screen_pixels/maxf(zoom,.1),.55,8.0)
+
+func _target_ring_pulse(at_seconds: float=0.0) -> float:
+	var age: float=at_seconds-ring_target_acquired_at
+	if ring_last_target<=0 or age<0.0 or age>=.85:return 0.0
+	return pow(1.0-age/.85,1.35)
+
 func _selection_ring_arc(center: Vector2,radii: Vector2,start: float,span: float,tint: Color,width: float) -> void:
 	var points := PackedVector2Array()
 	for segment in 13:
@@ -685,18 +702,24 @@ func _draw_ship_selection_ring(actor: Dictionary,point: Vector2) -> void:
 	# Short water-borne pulse after choosing a ship; no combat or collision effect.
 	if not enemy_selected and elapsed-ship_switch_pulse_at>=0.0 and elapsed-ship_switch_pulse_at<1.15:
 		var phase: float=clampf((elapsed-ship_switch_pulse_at)/1.15,0.0,1.0)
-		_ellipse_line(center,radii*(1.05+phase*.8),Color(tint,(1.0-phase)*.58),2.5-phase*.7)
-	_ellipse_line(center,radii*1.055,Color(tint,0.09+0.06*pulse),3.0)
-	_ellipse_line(center,radii,Color(tint,0.64+0.14*pulse),2.0 if enemy_selected else 1.8)
-	_ellipse_line(center,radii*0.92,Color(tint,0.16+0.04*pulse),0.9)
+		_ellipse_line(center,radii*(1.05+phase*.8),Color(tint,(1.0-phase)*.58),_selection_ring_stroke(2.5-phase*.7))
+	_ellipse_line(center,radii*1.055,Color(tint,0.09+0.06*pulse),_selection_ring_stroke(3.0))
+	_ellipse_line(center,radii,Color(tint,0.64+0.14*pulse),_selection_ring_stroke(2.0 if enemy_selected else 1.8))
+	_ellipse_line(center,radii*0.92,Color(tint,0.16+0.04*pulse),_selection_ring_stroke(.9))
 	for quarter in 4:
 		var start: float=float(quarter)*TAU/4.0+elapsed*(0.37 if enemy_selected else 0.10)
-		_selection_ring_arc(center,radii,start,0.24,Color(tint,0.83),2.6 if enemy_selected else 2.15)
+		_selection_ring_arc(center,radii,start,0.24,Color(tint,0.83),_selection_ring_stroke(2.6 if enemy_selected else 2.15))
 	if enemy_selected:
+		# Distinct focus ticks for the currently targeted vessel. They are
+		# chart overlays, never a platform or a collision-size change.
+		var acquired: float=_target_ring_pulse(elapsed)
+		if acquired>0.0:
+			var focus_radii: Vector2=radii*(1.08+.37*(1.0-acquired))
+			_ellipse_line(center,focus_radii,Color(tint,.45*acquired),_selection_ring_stroke(2.2))
 		for quadrant in 4:
 			var a: float=float(quadrant)*PI*.5+PI*.25
 			var direction := Vector2(cos(a)*radii.x,sin(a)*radii.y)
-			draw_line(center+direction*1.08,center+direction*1.19,Color(tint,0.60+0.14*pulse),1.8,true)
+			draw_line(center+direction*1.08,center+direction*1.19,Color(tint,0.60+0.14*pulse),_selection_ring_stroke(1.8),true)
 
 func _draw_actor(actor: Dictionary) -> void:
 	if float(actor.hp)<=0:return
