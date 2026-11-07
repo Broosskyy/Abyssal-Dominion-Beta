@@ -3068,6 +3068,21 @@ func _tap(screen: Vector2) -> void:
 	for portal in sim.portals:
 		if point.distance_to(portal.pos)<=maxf(85,45/camera.zoom.x):
 			_navigate_region(int(portal.destination));return
+	# The berth is the small outlined water area at the end of the harbor pier.
+	# Tap it to sail toward the port; once in reach, tap again to dock.
+	# Never try navigating into the decorative rocky island itself.
+	if sim.has_harbor() and point.distance_to(sim.harbor)<=maxf(84.0,45.0/maxf(.1,camera.zoom.x)):
+		if sim.docked:
+			_open_modal("Hafen")
+		elif sim.can_dock():
+			sim.dock()
+			_open_modal("Hafen")
+		elif sim.player.pos.distance_to(sim.harbor)>160.0:
+			if sim.course(sim.harbor):sim.message="Kurs zum Inselhafen gesetzt · am Steg andocken"
+		else:
+			sim.message="Andocken erst 6 Sekunden nach dem letzten Treffer"
+		_refresh_ui()
+		return
 	var nearest =-1
 	var distance =82.0/camera.zoom.x
 	for npc in sim.npcs:
