@@ -4,6 +4,7 @@ extends TextureRect
 ## damage, collision, pathfinding, IDs, saves and nameplate screen anchors.
 const MODEL_ROOT := "res://assets/npc/meshy/models/"
 const PLAYER_MODEL_ROOT := "res://assets/player/test_ships/"
+const STERN_TAPER=preload("res://stern_hull_taper.gd")
 const TEST_SHIP_SKINS := {27:"crimson_voyager",28:"test_ship_2",29:"base_basic_pbr"}
 # Export-critical hard references. The three new models are played by users,
 # not the old NPC roster; string-based dynamic loading was insufficient to
@@ -264,6 +265,9 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	pivot.rotation_degrees.y=float(info[5]) if info.size()>5 else 0.0
 	owner.add_child(pivot)
 	pivot.add_child(model)
+	# Keep original GLBs untouched; taper only the actual B/C player hull instances.
+	if key in ["base_basic_gameplay_pbr","base_basic_gameplay_shaded"] and int(actor.id)==0:
+		STERN_TAPER.apply_to_scene(model)
 	var scale_factor=float(host._actor_visual_length(actor))/maxf(float(info[0]),0.1)
 	model.rotation_degrees=Vector3.ZERO # Original Meshy glTF already uses Y-up.
 	model.scale=Vector3.ONE*scale_factor
