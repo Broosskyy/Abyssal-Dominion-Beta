@@ -19,6 +19,7 @@ const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
 const AMMO_CHOICE=preload("res://ammo_choice.gd")
 const COMBAT_FX=preload("res://combat_fx.gd")
+const LEUCHT_ICON: Texture2D=preload("res://assets/ui/leuchtkugeln_five_colors.svg")
 const CAPTAIN_PLATE_OFFSET := 62.0
 const OTHER_PLATE_OFFSET := 48.0
 const CAPTAIN_HULL_CLEARANCE := 34.0
@@ -151,6 +152,7 @@ var guild_name_input: LineEdit
 var guild_tag_input: LineEdit
 var previous_region := -1
 var hud_size := 1 # 0 compact, 1 comfortable, 2 large
+var projectile_visual_count := 3 # purely cosmetic per actual hit: 1, 3, 5 or 8
 var journal_visible := true
 var hud_scale := 1.0
 var camera_pad: Control
@@ -509,7 +511,7 @@ func _draw() -> void:
 	for shot: Dictionary in sim.shots:
 		if float(shot.get("age",-1.0))<0.0:continue
 		drawn_shots+=1
-		COMBAT_FX.draw_projectile(self,shot,sim.clock)
+		COMBAT_FX.draw_projectile(self,shot,sim.clock,projectile_visual_count)
 	for event in sim.events:
 		var age: float = sim.clock-float(event.time)
 		if age>1.2: continue
@@ -1873,6 +1875,8 @@ func _draw_ship_stage(stage: Control) -> void:
 	_canvas_text(stage,Vector2(w*.5,h-12),"%d / 10 DECKS · GEZEITENDECK %s" % [mounted,_clock_text(float(sim.buffs.tide_deck)) if float(sim.buffs.tide_deck)>0 else "AUS"],12,Color("e2ecee"))
 
 func _ammo_texture(index: int) -> Texture2D:
+	# M3102: multicolour Leuchtkugeln, not the old single gold flare icon.
+	if index==3:return LEUCHT_ICON
 	var key=str(AMMO_UI[index].icon)
 	if icons.has(key):return icons[key]
 	if not ammo_previews.has(key):
@@ -2407,6 +2411,14 @@ func _open_display() -> void:
 		var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 		choice.disabled=render_mode==key or (mesh_layer==null or not mesh_layer.has_complete_fleet())
 	_note("Keine Classic-Sprites und keine A/B/C-Modelle. Spielmechanik und Seekarten bleiben gleich.")
+	_section("KAMPFEFFEKTE · SICHTBARE KUGELN PRO SCHUSS")
+	_note("Nur Darstellung: keine zusätzlichen Treffer, kein erhöhter Schaden und kein zusätzlicher Munitionsverbrauch.",Color("b2c9ca"))
+	var projectile_choices=_grid(4)
+	for amount in [1,3,5,8]:
+		var selected_count: int=amount
+		var count_button=_action(str(amount)+(" ✓" if projectile_visual_count==amount else ""),func():_set_projectile_visual_count(selected_count),"tab_on" if projectile_visual_count==amount else "normal",projectile_choices)
+		count_button.disabled=projectile_visual_count==amount
+	_note("Standard: 3 · Leuchtkugeln wechseln zwischen Rot, Blau, Grün, Gold und Violett.",Color("bfcbdf"))
 	_section("HUD-GRÖSSE")
 	for i in 3:
 		var index=i
@@ -2417,7 +2429,7 @@ func _open_display() -> void:
 	_action("AUFTRAGSLEISTE: "+("EIN" if journal_visible else "AUS"),func():_set_display(hud_size,not journal_visible),"normal",toggles)
 	_action("JOYSTICK: "+("EIN" if camera_pad_visible else "AUS"),func():camera_pad_visible=not camera_pad_visible;_set_display(hud_size,journal_visible),"normal",toggles)
 	_note("Die Auftragsleiste oben links öffnet das Logbuch. Der Joystick bewegt nur die Kamera: Seekarte erkunden, das Schiff hält seinen Kurs. Gefahren wird per Antippen. Fadenkreuz an der Karte: zurück zum Schiff. Fernrohr: nächstes sichtbares Ziel.")
-	_action("STANDARD WIEDERHERSTELLEN",func():camera_pad_visible=true;_set_display(1,true))
+	_action("STANDARD WIEDERHERSTELLEN",func():camera_pad_visible=true;projectile_visual_count=3;_set_display(1,true))
 
 func _open_info() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
@@ -2796,6 +2808,7 @@ func _load_display() -> void:
 	journal_visible=bool(data.get("journal_visible",true))
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
 	render_mode="3d" if str(data.get("render_mode","hybrid"))=="3d" else "hybrid"
+	projectile_visual_count=COMBAT_FX.visual_count(int(data.get("projectile_visual_count",3)))
 
 func _cycle_render_mode() -> void:
 	_set_render_mode("3d" if render_mode=="hybrid" else "hybrid")
@@ -2803,8 +2816,14 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode}))
+		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count}))
 		file.close()
+
+func _set_projectile_visual_count(requested: int) -> void:
+	projectile_visual_count=COMBAT_FX.visual_count(requested)
+	_persist_display_preferences()
+	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal("Anzeige")
+	queue_redraw()
 
 func _set_render_mode(value: String) -> void:
 	render_mode=value if value in ["hybrid","3d"] else "hybrid"
