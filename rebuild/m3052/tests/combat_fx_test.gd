@@ -9,6 +9,19 @@ func check(ok: bool,label: String) -> void:
 func _initialize() -> void:call_deferred("_run")
 func _run() -> void:
 	check(FX.WEAPONS.size()==8,"7 selectable ammunition types plus tower mortar")
+	check(FX.VISIBLE_COUNTS==[1,3,5,8],"M3102 approved visible projectile selections are stable")
+	for wanted in [1,3,5,8]:
+		check(FX.visual_count(wanted)==wanted,"M3102 visible-orb mode %d supported" % wanted)
+	check(FX.visual_count(4)==3 and FX.visual_count(-1)==3,"M3102 unsupported settings gracefully use default 3")
+	check(FX.RADIANT_COLORS.size()==5,"M3102 five different rainbow Leuchtkugel jewel types")
+	for color_id in 5:
+		check(FX.radiant_color(0,color_id)!=FX.radiant_color(0,(color_id+1)%5),"M3102 distinct radiant colour %d" % color_id)
+	var sample_ball={"id":12,"pos":Vector2(620,500),"start":Vector2(500,500),"distance":240.0,"traveled":140.0,"visual_heading":Vector2.RIGHT}
+	check(FX.orb_offset(sample_ball,0,1,0.0)==Vector2.ZERO,"M3102 one-ball visual is exactly original flight path")
+	for total in [3,5,8]:
+		var left: Vector2=FX.orb_offset(sample_ball,0,total,1.0)
+		var right: Vector2=FX.orb_offset(sample_ball,total-1,total,1.0)
+		check(left.distance_to(right)>10.0,"M3102 multi-orb mode %d gives visible fan spread" % total)
 	var sim=SIM.new()
 	check(sim.AMMO_NAMES==FX.WEAPONS.slice(0,7),"effect profiles are mapped to actual game ammunition indices")
 	var colors: Array[String]=[]
@@ -48,6 +61,14 @@ func _run() -> void:
 	root.add_child(game);current_scene=game
 	await process_frame
 	game.set_process(false)
+	check(game._ammo_texture(3)==game.LEUCHT_ICON,"M3102 colorful 5-jewel Leuchtkugeln shown in ammunition picker")
+	check(game.projectile_visual_count in [1,3,5,8],"M3102 restored visual count is supported")
+	game._set_projectile_visual_count(5)
+	check(game.projectile_visual_count==5,"M3102 five visible projectile mode settable")
+	var display_save: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
+	check(display_save is Dictionary and int(display_save.get("projectile_visual_count",0))==5,"M3102 visible-projectile option persists across app restarts")
+	game._set_projectile_visual_count(3)
+	check(game.projectile_visual_count==3,"M3102 reset visual projectile mode works")
 	game.sim.shots.clear()
 	game.sim.events.clear()
 	game.sim.player.pos=Vector2(2200,1600)
