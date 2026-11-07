@@ -114,7 +114,7 @@ replace(name,
     '\tgame.sim.player.skin=30\n'
     '\tgame.mesh_layer.set_render_mode("3d")\n'
     '\tcheck(game.mesh_layer.can_render_actor(game.sim.player),"M3097 Gemi11 renders as real GLB in 3D")\n'
-    '\tgame.mesh_layer.sync_fleet([game.sim.player],game.camera,game.get_viewport_rect().size)\n'
+    '\tvar isolated_gemi11: Array[Dictionary]=[game.sim.player]\n'\n    '\tgame.mesh_layer.sync_fleet(isolated_gemi11,game.camera,game.get_viewport_rect().size)\n'
     '\tcheck(str(game.mesh_layer.model_instance_keys.get(0,""))=="gemi11_uv","M3097 Gemi11 GLB instance is independent")\n'
     '\tgame.mesh_layer.set_render_mode(old_comparison_mode)\n'
     '\tgame.sim.player.skin=old_comparison_skin\n'
