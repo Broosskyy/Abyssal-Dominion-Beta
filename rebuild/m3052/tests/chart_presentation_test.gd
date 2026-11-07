@@ -167,7 +167,6 @@ func run() -> void:
 	var anchored_y=game._plate_screen_anchor(sim.player).y
 	for heading in [Vector2.UP,Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT,Vector2(1,1).normalized(),Vector2(-1,-1).normalized()]:
 		sim.player.heading=heading
-		game.direction_cache[0]=VISUALS.heading_eight(heading,-1)
 		var hull=game._actor_screen_bounds(sim.player)
 		var anchor=game._plate_screen_anchor(sim.player)
 		check(caption_clears_hull(game,sim.player,anchor),"all headings retain safe 2D/3D hull-to-caption baseline")
