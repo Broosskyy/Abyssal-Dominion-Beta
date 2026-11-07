@@ -192,6 +192,9 @@ var camera_pad: Control
 var target_cycle: Button
 var camera_pad_visible := true
 var plate_rects: Dictionary = {}
+# The same names and font sizes are measured every frame at sea; cache widths
+# for mobile CPU savings. Invalidate by actual font pixel size in the key.
+var plate_text_width_cache: Dictionary = {}
 var plate_overlay: Control
 var mesh_layer
 var render_mode := "hybrid"
@@ -755,8 +758,9 @@ func _draw_actor(actor: Dictionary) -> void:
 	if is_player or sim.target==int(actor.id):
 		var nose=point+heading*length*0.38
 		var side=Vector2(-heading.y,heading.x)*4
-		draw_line(nose-heading*8+side,nose,CYAN,1.4,true)
-		draw_line(nose-heading*8-side,nose,CYAN,1.4,true)
+		var course_tint: Color=_selection_ring_tint(actor)
+		draw_line(nose-heading*8+side,nose,course_tint,1.4,true)
+		draw_line(nose-heading*8-side,nose,course_tint,1.4,true)
 	if gallery_page>=0:_nameplate(actor,point+Vector2(0,28))
 
 func _plate_pixels() -> float:
@@ -769,9 +773,17 @@ func _plate_scale() -> float:
 ## Use the same effective font pixels as _label(), including high-DPI zoom.
 ## Otherwise the rank emblem can overlap the measured player name.
 func _plate_text_width(value: String,size: int) -> float:
-	var grow=1.0 if gallery_page>=0 or camera==null else clampf(get_viewport_rect().size.y/720.0,1.0,1.7)
-	var actual=maxi(size,roundi(float(size)*grow))
-	return font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual).x
+	# The native plate overlay actually renders at _plate_pixels(), which is
+	# capped at 1.45. Using the old 1.7 factor for layout made captions and
+	# rank emblems drift apart at high resolution.
+	var grow: float=1.0 if gallery_page>=0 or camera==null else _plate_pixels()
+	var actual: int=maxi(size,roundi(float(size)*grow))
+	var cache_key: String="%d|%s" % [actual,value]
+	if plate_text_width_cache.has(cache_key):return float(plate_text_width_cache[cache_key])
+	var width: float=font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual).x
+	if plate_text_width_cache.size()>255:plate_text_width_cache.clear()
+	plate_text_width_cache[cache_key]=width
+	return width
 
 func _plate_identity(actor: Dictionary) -> String:
 	if int(actor.id)==0:return "ID: "+sim.captain_id
