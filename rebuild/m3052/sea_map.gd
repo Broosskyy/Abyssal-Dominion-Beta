@@ -422,13 +422,13 @@ func _draw_wake(actor: Dictionary) -> void:
 			draw_line(shore,trailing,Color(.73,.93,.96,.40*fade),1.65,true)
 			draw_circle(shore,1.2+age*.55,Color(.78,.97,1.0,.20*fade))
 
-# Gentle side-water contact for actual 3D ships. The water is a 2D
-# chart surface behind the meshes, not a thick ring / glowing platform.
+# M3094: wave contact reaches the actual dark hull's outer edge, not
+# the hidden narrow centerline under the 3D scene. No thick platform.
 func _draw_glb_waterline(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
 	if heading.length_squared()<0.5:return
 	var moving: float=_wake_intensity_for(actor)
-	var alpha: float=0.09+moving*0.28
-	var half_width: float=length*.087
+	var alpha: float=0.17+moving*0.22
+	var half_width: float=length*.137
 	draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
 	for side in [-1.0,1.0]:
 		var side_sign: float=side
@@ -439,11 +439,11 @@ func _draw_glb_waterline(actor: Dictionary,point: Vector2,heading: Vector2,lengt
 			var taper: float=pow(maxf(0.0,1.0-pow(absf(progress*2.0-1.0),2.2)),.7)
 			var moving_foam: float=sin(elapsed*5.1-progress*15.0+side_sign)*moving*1.7
 			waterline.append(Vector2(longitudinal,side_sign*(half_width*taper+moving_foam)))
-		draw_polyline(waterline,Color(.68,.87,.93,alpha),1.2,true)
+		draw_polyline(waterline,Color(.68,.87,.93,alpha),1.45,true)
 		if moving>.2:
 			var bow: Vector2=Vector2(length*.29,side_sign*half_width*.67)
 			var spread: Vector2=Vector2(length*.16,-side_sign*length*.10)
-			draw_line(bow,bow+spread,Color(.78,.96,1.0,moving*.22),1.3,true)
+			draw_line(bow,bow+spread,Color(.78,.96,1.0,moving*.27),1.35,true)
 	draw_set_transform(Vector2.ZERO)
 
 func _draw_bow_spray(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
@@ -693,7 +693,7 @@ func _draw_actor(actor: Dictionary) -> void:
 	if mesh_ship:
 		# Small submerged-hull shadow and thin moving side foam.
 		draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
-		_ellipse(Vector2.ZERO,Vector2(length*.34,length*.065),Color(.002,.018,.03,.23))
+		_ellipse(Vector2.ZERO,Vector2(length*.34,length*.09),Color(.002,.018,.03,.22))
 		draw_set_transform(Vector2.ZERO)
 		_draw_glb_waterline(actor,point,heading,length)
 	else:
