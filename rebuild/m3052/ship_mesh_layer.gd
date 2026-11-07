@@ -57,6 +57,7 @@ func _configure_gameplay_surfaces(owner: Node3D,key: String) -> void:
 	if pivot==null:return
 	var pending: Array[Node]=[pivot]
 	gameplay_double_sided_count=0
+	var original_surfaces: Array[Dictionary]=[]
 	while not pending.is_empty():
 		var node: Node=pending.pop_back()
 		for child: Node in node.get_children():pending.append(child)
@@ -69,7 +70,11 @@ func _configure_gameplay_surfaces(owner: Node3D,key: String) -> void:
 			var copy: StandardMaterial3D=material.duplicate() as StandardMaterial3D
 			copy.cull_mode=BaseMaterial3D.CULL_DISABLED
 			piece.set_surface_override_material(surface,copy)
+			# Keep source finish once, so returning to the unmodified test model
+			# never inherits the previous elite paint, metallic or roughness.
+			original_surfaces.append({"piece":piece,"surface":surface,"material":copy})
 			gameplay_double_sided_count+=1
+	owner.set_meta("original_player_surfaces",original_surfaces)
 
 # Stable player plate drop: circumscribed hull footprint projects to a
 # constant screen radius rather than an orientation-dependent AABB.
@@ -172,34 +177,35 @@ func elite_texture_level(skin: int) -> int:
 	return skin-1 if skin>=2 and skin<=11 else 0
 
 func _apply_elite_texture(owner: Node3D,level: int) -> bool:
-	if level<1 or level>ELITE_V2_TEXTURE_FILES.size():return false
-	var path: String=ELITE_V2_TEXTURE_ROOT+str(ELITE_V2_TEXTURE_FILES[level-1])
-	if not ResourceLoader.exists(path):
-		push_error("Missing original Elite V2 albedo: "+path)
-		return false
-	var texture: Texture2D=load(path) as Texture2D
-	if texture==null:return false
-	var pivot: Node3D=owner.get_node_or_null("OriginalAxisCorrection")
-	if pivot==null:return false
-	var pending: Array[Node]=[pivot]
+	# Only the albedo changes; NEVER re-instantiate the 3D hull for a paint
+	# switch. Keeps helm yaw, heave, pitch and expensive mesh/texture uploads.
+	if level<0 or level>ELITE_V2_TEXTURE_FILES.size():return false
+	var texture: Texture2D
+	if level>0:
+		var path: String=ELITE_V2_TEXTURE_ROOT+str(ELITE_V2_TEXTURE_FILES[level-1])
+		if not ResourceLoader.exists(path):
+			push_error("Missing original Elite V2 albedo: "+path)
+			return false
+		texture=load(path) as Texture2D
+		if texture==null:return false
+	var originals: Array=owner.get_meta("original_player_surfaces",[])
+	if originals.is_empty():return false
 	var changed:=0
-	while not pending.is_empty():
-		var node: Node=pending.pop_back()
-		for child: Node in node.get_children():pending.append(child)
-		if not node is MeshInstance3D:continue
-		var piece: MeshInstance3D=node as MeshInstance3D
-		if piece.mesh==null:continue
-		for surface in range(piece.mesh.get_surface_count()):
-			var original: Material=piece.get_active_material(surface)
-			if not original is BaseMaterial3D:continue
-			# Independent per-instance material override. Keep original normals,
-			# roughness, metalness and mesh/UV data without cloning the GLB.
-			var material: BaseMaterial3D=original.duplicate() as BaseMaterial3D
-			material.albedo_texture=texture
-			material.albedo_color=Color.WHITE
-			material.cull_mode=BaseMaterial3D.CULL_DISABLED
-			piece.set_surface_override_material(surface,material)
-			changed+=1
+	for entry: Dictionary in originals:
+		var piece: MeshInstance3D=entry.get("piece") as MeshInstance3D
+		var source: StandardMaterial3D=entry.get("material") as StandardMaterial3D
+		if piece==null or not is_instance_valid(piece) or source==null:continue
+		var surface: int=int(entry.get("surface",-1))
+		if surface<0:continue
+		if level==0:
+			# The original Black Crown TEST keeps the literal baked GLB finish.
+			piece.set_surface_override_material(surface,source)
+		else:
+			var colored: StandardMaterial3D=source.duplicate() as StandardMaterial3D
+			colored.albedo_texture=texture
+			colored.albedo_color=Color.WHITE
+			piece.set_surface_override_material(surface,colored)
+		changed+=1
 	return changed>0
 
 func has_player_ship() -> bool:
@@ -351,15 +357,21 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		var id=int(actor.id)
 		var key: String=player_key_for_skin(int(actor.get("skin",-1))) if id==0 else str(actor.get("visual_key",""))
 		var node: Node3D=model_instances.get(id)
-		# A new Elite V2 color can reuse one mesh resource but requires a NEW
-		# material instance; keep exact skin ID separate from the shared GLB key.
 		var skin_changed: bool=id==0 and int(model_instance_skins.get(id,-1))!=int(actor.get("skin",0))
-		var newly_instanced: bool=node==null or model_instance_keys.get(id,"")!=key or skin_changed
+		# A mesh is recreated only when changing actual hull types (starter vs
+		# Corsair), never when swapping Corsair textures 01–10 or original.
+		var newly_instanced: bool=node==null or model_instance_keys.get(id,"")!=key
 		if newly_instanced:
 			if node!=null:
 				node.visible=false
 				node.queue_free()
 			node=_create_ship(actor,key)
+		elif skin_changed and id==0:
+			var next_skin: int=int(actor.get("skin",0))
+			if _apply_elite_texture(node,elite_texture_level(next_skin)):
+				model_instance_skins[id]=next_skin
+			else:
+				push_error("Unable to switch Corsair albedo without re-instancing the ship")
 		if node==null:continue
 		var point: Vector2=host._visual_actor_pos(actor)
 		# Project ground-plane centers onto the exact 2D chart positions.
