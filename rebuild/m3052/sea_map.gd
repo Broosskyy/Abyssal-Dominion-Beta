@@ -19,6 +19,7 @@ const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
 const AMMO_CHOICE=preload("res://ammo_choice.gd")
 const COMBAT_FX=preload("res://combat_fx.gd")
+const SPRITE_FX=preload("res://sprite_fx.gd")
 const LEUCHT_ICON: Texture2D=preload("res://assets/ui/leuchtkugeln_five_colors.svg")
 const CAPTAIN_PLATE_OFFSET := 62.0
 const OTHER_PLATE_OFFSET := 48.0
@@ -544,9 +545,9 @@ func _draw() -> void:
 		if age>(1.8 if str(event.type)=="impact" else 1.2):continue
 		var p: Vector2 = event.pos
 		if event.type=="impact":
-			COMBAT_FX.draw_impact(self,event,age,sim.clock)
+			SPRITE_FX.draw_impact(self,event,age)
 		elif event.type=="muzzle":
-			COMBAT_FX.draw_muzzle(self,event,age,sim.clock)
+			SPRITE_FX.draw_muzzle(self,event,age)
 		elif event.type=="sunk":
 			COMBAT_FX.draw_sinking(self,event,age)
 		elif event.type=="loot":

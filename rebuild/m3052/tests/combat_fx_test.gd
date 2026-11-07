@@ -1,6 +1,7 @@
 extends SceneTree
 const FX=preload("res://combat_fx.gd")
 const SIM=preload("res://simulation.gd")
+const SPRITE_FX=preload("res://sprite_fx.gd")
 var failures: Array[String]=[]
 var checks:=0
 func check(ok: bool,label: String) -> void:
@@ -9,6 +10,11 @@ func check(ok: bool,label: String) -> void:
 func _initialize() -> void:call_deferred("_run")
 func _run() -> void:
 	check(FX.WEAPONS.size()==29,"28 selectable ammunition types plus tower mortar")
+	check(SPRITE_FX.SHEET!=null and SPRITE_FX.SHEET.get_width()==1024 and SPRITE_FX.SHEET.get_height()==1024,"M3106 image atlas decodes as 1024x1024 transparent VFX")
+	check(SPRITE_FX.FRAME_COUNT==8 and SPRITE_FX.FAMILY_NAMES.size()==8,"M3106 eight distinct, animated VFX families")
+	check(SPRITE_FX.src_rect(7,7)==Rect2(896,896,128,128),"M3106 final sprite frame uses correct atlas UV")
+	check(SPRITE_FX.animated_frame(0.0)==0 and SPRITE_FX.animated_frame(1.55)==7,"M3106 animated impact actually advances frames")
+	check(SPRITE_FX.family_for_weapon("ice")!=SPRITE_FX.family_for_weapon("fire") and SPRITE_FX.family_for_weapon("lightning")!=SPRITE_FX.family_for_weapon("poison"),"M3106 ice/fire/lightning/poison have distinct animated artwork")
 	check(FX.VISIBLE_COUNTS==[1,3,5,8],"M3102 approved visible projectile selections are stable")
 	for wanted in [1,3,5,8]:
 		check(FX.visual_count(wanted)==wanted,"M3102 visible-orb mode %d supported" % wanted)

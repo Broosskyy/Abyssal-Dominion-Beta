@@ -1,5 +1,6 @@
 extends RefCounted
 const IMPACT_FX=preload("res://impact_fx.gd")
+const SPRITE_FX=preload("res://sprite_fx.gd")
 ## M3100 — original, texture-free sea combat VFX for actual airborne munitions.
 ## Drawn in chart world coordinates, independent of the 2.5D/3D GLB renderer.
 ## Pure visual functions: never mutate HP, cooldowns, ammunition or target state.
@@ -130,23 +131,8 @@ static func _draw_one_projectile(canvas: CanvasItem,shot: Dictionary,clock: floa
 	var phase: float=clock*12.0+seed
 	var hostile: bool=int(shot.get("source",0))!=0
 	var ink: Color=radiant_color(int(shot.get("id",0)),orb) if weapon=="flare" else weapon_color(weapon,hostile)
-	var speed_scale: float=1.0 if weapon=="harpoon" else 0.82
-	# Four to six translucent trail particles read as moving smoke or embers.
-	# They are deterministic per shot, bounded, and require no particle textures.
-	var trail_count: int=4 if weapon=="harpoon" else 6
-	for t in trail_count:
-		var step: float=float(t)+1.0
-		var behind: Vector2=pos-direction*(step*6.2*speed_scale)
-		behind+=side*sin(phase*.65+step*1.43)*(1.4+step*.24)
-		var falloff: float=1.0-step/float(trail_count+1)
-		var tail: Color=ink if weapon in ["flare","pumpkin","ice","snow","fire","lava","poison","lightning","holy","shadow","wind","water","cursed","bleed","necro","gold","crystal","explosive","arcane","spectral","light","gas"] else Color("9ba9aa")
-		if weapon=="harpoon":tail=Color("a9bdad")
-		if weapon=="chain":tail=Color("7d9a9b")
-		canvas.draw_circle(behind,1.25+step*.37,Color(tail,.09+.23*falloff))
-		if t%2==0 and weapon in ["flare","pumpkin","ice","snow","fire","lava","poison","lightning","holy","shadow","wind","water","cursed","bleed","necro","gold","crystal","explosive","arcane","spectral","light","gas"]:
-			canvas.draw_circle(behind+side*(2.0+sin(phase+step)*1.5),.75+falloff,Color(ink,.34*falloff))
-	var shoulder: Vector2=pos-direction*11.0
-	canvas.draw_line(shoulder,pos,Color(ink,.46),2.2,true)
+	# Layer changing transparent artwork beneath the detailed projectile model.
+	SPRITE_FX.draw_flight(canvas,pos,direction,weapon,clock,int(shot.get("id",0))+orb*17)
 	match weapon:
 		"chain":
 			var spin: float=clock*17.0+seed
