@@ -113,13 +113,13 @@ static func _star(canvas: CanvasItem,at: Vector2,radius: float,color: Color,rota
 		var extent: float=radius if axis%2==0 else radius*0.55
 		canvas.draw_line(at-direction*extent,at+direction*extent,color,1.15,true)
 
-static func draw_projectile(canvas: CanvasItem,shot: Dictionary,clock: float,visible_orbs: int=3) -> void:
+static func draw_projectile(canvas: CanvasItem,shot: Dictionary,clock: float,visible_orbs: int=3,flight_fx: bool=true,intensity: float=1.0,particles: bool=true) -> void:
 	if float(shot.get("age",-1.0))<0.0:return
 	var n: int=visual_count(visible_orbs)
 	for orb in n:
-		_draw_one_projectile(canvas,shot,clock,orb_offset(shot,orb,n,clock),orb)
+		_draw_one_projectile(canvas,shot,clock,orb_offset(shot,orb,n,clock),orb,flight_fx,intensity,particles)
 
-static func _draw_one_projectile(canvas: CanvasItem,shot: Dictionary,clock: float,offset: Vector2,orb: int) -> void:
+static func _draw_one_projectile(canvas: CanvasItem,shot: Dictionary,clock: float,offset: Vector2,orb: int,flight_fx: bool=true,intensity: float=1.0,particles: bool=true) -> void:
 	var weapon: String=str(shot.get("weapon","cannon"))
 	var pos: Vector2=projectile_center(shot)+offset
 	var direction: Vector2=Vector2(shot.get("pos",Vector2.ZERO))-Vector2(shot.get("start",Vector2.ZERO))
@@ -132,7 +132,8 @@ static func _draw_one_projectile(canvas: CanvasItem,shot: Dictionary,clock: floa
 	var hostile: bool=int(shot.get("source",0))!=0
 	var ink: Color=radiant_color(int(shot.get("id",0)),orb) if weapon=="flare" else weapon_color(weapon,hostile)
 	# Layer changing transparent artwork beneath the detailed projectile model.
-	SPRITE_FX.draw_flight(canvas,pos,direction,weapon,clock,int(shot.get("id",0))+orb*17)
+	if flight_fx:
+		SPRITE_FX.draw_flight(canvas,pos,direction,weapon,clock,int(shot.get("id",0))+orb*17,intensity,particles)
 	match weapon:
 		"chain":
 			var spin: float=clock*17.0+seed
