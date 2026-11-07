@@ -188,7 +188,7 @@ const TEST_SHIP_PREVIEWS := {
 const TEST_SHIP_KEYS := ["crimson_voyager","test_ship_2","base_basic_pbr","gemi11_uv"]
 # Comparable gameplay silhouettes: bigger test ships remain larger than
 # the starter, but no longer dominate half of the sea screen at close zoom.
-const TEST_SHIP_LENGTHS := [128.0,152.0,158.0,154.0]
+const TEST_SHIP_LENGTHS := [128.0,152.0,158.0,158.0]
 const NPC_VISUAL_SCALE := 0.90
 var test_ship_textures: Dictionary={}
 var plate_fleet: Array[Dictionary] = []
@@ -688,8 +688,12 @@ func _selection_ring_visible(actor: Dictionary) -> bool:
 func _selection_ring_radii(actor: Dictionary) -> Vector2:
 	if str(actor.get("kind",""))=="tower":return Vector2(48.0,20.0)
 	var length: float=_actor_visual_length(actor)
-	return Vector2(maxf(36.0,length*(0.55 if int(actor.id)==0 else 0.58)),
-		maxf(16.0,length*(0.235 if int(actor.id)==0 else 0.245)))
+	# M3098: water contact should hug the two large test hulls instead of
+	# forming the wide neon oval seen in the Android M3097 comparison.
+	# Both test models use the same visual length and therefore the same ring.
+	if int(actor.get("id",-1))==0:
+		return Vector2(maxf(36.0,length*0.44),maxf(16.0,length*0.185))
+	return Vector2(maxf(36.0,length*0.58),maxf(16.0,length*0.245))
 
 func _selection_ring_tint(actor: Dictionary) -> Color:
 	if int(actor.id)==0:return Color("62cce4")
@@ -711,22 +715,22 @@ func _draw_ship_selection_ring(actor: Dictionary,point: Vector2) -> void:
 	var radii: Vector2=_selection_ring_radii(actor)
 	var tint: Color=_selection_ring_tint(actor)
 	var pulse: float=0.5+0.5*sin(elapsed*(3.1 if enemy_selected else 1.5))
-	# Two fine concentric water-level ellipses, like classic sea chart rings.
-	# The outer bloom is translucent, NOT a hovering disk.
-	_ellipse_line(point,radii*1.085,Color(tint,0.13+0.08*pulse),4.2)
-	_ellipse_line(point,radii,Color(tint,0.64+0.18*pulse),2.2 if enemy_selected else 1.9)
-	_ellipse_line(point,radii*0.91,Color(tint,0.18+0.05*pulse),1.0)
-	# Short illuminated quarter accents make the circle visible over dark sea
-	# without surrounding a whole boat with a thick glowing donut.
+	var center: Vector2=point
+	# Only the visible 3D captain ring shifts toward the hull's water contact.
+	# The course, tap target and collision center remain exactly where they were.
+	if not enemy_selected and mesh_layer!=null and mesh_layer.can_render_actor(actor):
+		center.y+=_actor_visual_length(actor)*0.035
+	_ellipse_line(center,radii*1.055,Color(tint,0.09+0.06*pulse),3.0)
+	_ellipse_line(center,radii,Color(tint,0.64+0.14*pulse),2.0 if enemy_selected else 1.8)
+	_ellipse_line(center,radii*0.92,Color(tint,0.16+0.04*pulse),0.9)
 	for quarter in 4:
 		var start: float=float(quarter)*TAU/4.0+elapsed*(0.37 if enemy_selected else 0.10)
-		_selection_ring_arc(point,radii,start,0.24,Color(tint,0.85),2.9 if enemy_selected else 2.35)
+		_selection_ring_arc(center,radii,start,0.24,Color(tint,0.83),2.6 if enemy_selected else 2.15)
 	if enemy_selected:
-		# Four small tactical notches, never a permanently filled hitbox.
 		for quadrant in 4:
 			var a: float=float(quadrant)*PI*.5+PI*.25
 			var direction := Vector2(cos(a)*radii.x,sin(a)*radii.y)
-			draw_line(point+direction*1.08,point+direction*1.19,Color(tint,0.60+0.14*pulse),1.8,true)
+			draw_line(center+direction*1.08,center+direction*1.19,Color(tint,0.60+0.14*pulse),1.8,true)
 
 func _draw_actor(actor: Dictionary) -> void:
 	if float(actor.hp)<=0:return
@@ -846,11 +850,25 @@ func _plate_title(actor: Dictionary) -> String:
 		if not sim.guild.is_empty():title="[%s] " % sim.guild.tag+title
 		if sim.staff.shows_badge():title="[%s] " % sim.staff.badge()+title
 	elif actor.get("kind","")=="tower":title="[%s] " % sim.tower_tag()+title
-	# Keep the title inside its reserved rectangle, including guild and staff prefixes.
+	# The captain's full ship design is important: never abbreviate it to
+	# TEST 2 · G… or TEST · Sc… even when guild/staff badges are present.
+	# NPC names still observe their compact, separate label budget.
+	if int(actor.id)==0:return title
 	var shortened=false
-	while _plate_text_width(title+("…" if shortened else ""),title_size)>210 and title.length()>1:
+	while _plate_text_width(title+("…" if shortened else ""),title_size)>210*_plate_pixels() and title.length()>1:
 		title=title.left(title.length()-1);shortened=true
 	return title+"…" if shortened else title
+
+func _plate_title_size(actor: Dictionary) -> int:
+	if int(actor.id)!=0:return 14
+	var result:=16
+	var title: String=_plate_title(actor)
+	# Full name has priority, but long guild/staff prefixes should not
+	# dominate the combat view on narrow phone screens.
+	var limit: float=minf(430.0*_plate_pixels(),get_viewport_rect().size.x*0.84)
+	while result>12 and _plate_text_width(title,result)>limit:
+		result-=1
+	return result
 
 func _plate_has_rank(actor: Dictionary) -> bool:
 	# An NPC rank/elite tier is NOT a player's pirate rank.
@@ -947,7 +965,8 @@ func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 		var point: Vector2=get_canvas_transform()*_visual_actor_pos(actor)
 		if not get_viewport_rect().grow(180*pixels).has_point(point):continue
 		var player=int(actor.id)==0
-		var width=maxf(188.0 if player else 154.0,_plate_text_width(_plate_title(actor),16 if player else 14)+58.0)*pixels
+		var width=maxf((188.0 if player else 154.0)*pixels,
+			_plate_text_width(_plate_title(actor),_plate_title_size(actor))+58.0*pixels)
 		var anchor=_plate_screen_anchor(actor)
 		placed[int(actor.id)]=Rect2(anchor-Vector2(width*.5,17*pixels),Vector2(width,(116 if player else 56)*pixels))
 	return placed
@@ -985,7 +1004,7 @@ func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
 	elif hostile:color=Color("eab8a7")
 	elif monster:color=Color("c6b9d6")
 	var title=_plate_title(actor)
-	var title_size=16 if player else 14
+	var title_size=_plate_title_size(actor)
 	var text_width=_plate_text_width(title,title_size)
 	draw_set_transform(anchor,0,Vector2.ONE*_plate_scale())
 	_label(Vector2(0,0),title,title_size,color,2)

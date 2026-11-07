@@ -79,7 +79,7 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	var pixel_scale=float(host._plate_pixels())
 	draw_set_transform(anchor,0,Vector2.ONE)
 	var title: String=host._plate_title(actor)
-	var width=_caption(Vector2.ZERO,title,16 if player else 14,tint)
+	var width=_caption(Vector2.ZERO,title,host._plate_title_size(actor),tint)
 	if not player and not tower and not monster:
 		# Small category marker, separate from the name so long names are
 		# not truncated further by an inline [NPC] prefix.

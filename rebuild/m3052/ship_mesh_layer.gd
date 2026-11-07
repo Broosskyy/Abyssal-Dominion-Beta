@@ -30,7 +30,7 @@ const GAMEPLAY_WATER_IMMERSION := 0.23
 const FLEET_CAMERA_TILT_DEGREES := 40.0
 
 func _player_immersion(key: String) -> float:
-	return GAMEPLAY_WATER_IMMERSION if key in ["base_basic_gameplay_pbr","base_basic_gameplay_shaded"] else PLAYER_WATER_IMMERSION
+	return GAMEPLAY_WATER_IMMERSION if key in ["base_basic_gameplay_pbr","base_basic_gameplay_shaded","gemi11_uv"] else PLAYER_WATER_IMMERSION
 const REQUIRED_NPC_KEYS := ["old_harbor_trader","merchant_brig_3002","merchant_brig_2921","merchant_brig_2912","weathered_voyager","weathered_junk","emerald_voyager","midnight_mariner","crimson_tide_galley"]
 ## Source Meshy glTF is already Y-UP. No -90-degree X rotation is needed.
 ## [hull length X, lowest Y, total Y height, X midpoint, Z midpoint].
@@ -74,7 +74,7 @@ func set_player_style(value: String) -> void:
 	player_style=value if value in PLAYER_STYLES else "original"
 
 func _configure_gameplay_surfaces(owner: Node3D,key: String) -> void:
-	if key not in ["base_basic_gameplay_pbr","base_basic_gameplay_shaded"]:return
+	if key not in ["base_basic_pbr","base_basic_gameplay_pbr","base_basic_gameplay_shaded","gemi11_uv"]:return
 	var pivot: Node3D=owner.get_node_or_null("OriginalAxisCorrection")
 	if pivot==null:return
 	var remaining: Array[Node]=[pivot]
@@ -94,6 +94,15 @@ func _configure_gameplay_surfaces(owner: Node3D,key: String) -> void:
 			copy.cull_mode=BaseMaterial3D.CULL_DISABLED
 			if key=="base_basic_gameplay_pbr" and copy.normal_enabled:
 				copy.normal_scale=minf(copy.normal_scale,0.70)
+			# M3098: the source UV texture on Gemi11 is intentionally almost
+			# black; a gentle albedo-based self-fill reveals deck/sail details
+			# without baking new images, modifying UVs or brightening all NPCs.
+			# Apply a subtler lift to the original Schattenkriegsschiff PBR.
+			if key in ["gemi11_uv","base_basic_pbr"] and copy.albedo_texture!=null:
+				copy.emission_enabled=true
+				copy.emission_texture=copy.albedo_texture
+				copy.emission=Color(0.76,0.83,0.89)
+				copy.emission_energy_multiplier=0.44 if key=="gemi11_uv" else 0.17
 			piece.set_surface_override_material(surface,copy)
 			gameplay_double_sided_count+=1
 

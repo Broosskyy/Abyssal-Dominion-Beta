@@ -20,7 +20,7 @@ func _run() -> void:
 	await process_frame
 	check(game.ship_textures.size()==10 and game.atlas_textures.size()==16,"ten own ship designs and sixteen directional reference atlases loaded")
 	check(game.skins.size()==31,"27 original designs plus four playable GLB ships, including Gemi11")
-	check(game.TEST_SHIP_LENGTHS==[128.0,152.0,158.0,154.0],"M3097 Gemi11 is independently sized without changing previous hulls")
+	check(game.TEST_SHIP_LENGTHS==[128.0,152.0,158.0,158.0],"M3098 both dark 3D test hulls share consistent scale")
 	check(game.NPC_VISUAL_SCALE>=0.85 and game.NPC_VISUAL_SCALE<=0.95,"M3087 original NPC vessels scale consistently instead of overpowering the chart")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"all nine actual Meshy GLB PackedScenes import and instantiate")
 	# M3092: actual 3D model A/B/C comparison, not material-only or sprites.
@@ -87,6 +87,32 @@ func _run() -> void:
 	var isolated_gemi11: Array[Dictionary]=[game.sim.player]
 	game.mesh_layer.sync_fleet(isolated_gemi11,game.camera,game.get_viewport_rect().size)
 	check(str(game.mesh_layer.model_instance_keys.get(0,""))=="gemi11_uv","M3097 Gemi11 GLB instance is independent")
+	# M3098: check the actual Gemi11 surface overrides, not a fake sprite.
+	var gemi_owner: Node3D=game.mesh_layer.model_instances.get(0)
+	var gemi_lit_surfaces:=0
+	var pending_gemi: Array[Node]=[gemi_owner]
+	while not pending_gemi.is_empty():
+		var node: Node=pending_gemi.pop_back()
+		for child: Node in node.get_children():pending_gemi.append(child)
+		if not node is MeshInstance3D:continue
+		var piece: MeshInstance3D=node as MeshInstance3D
+		if piece.mesh==null:continue
+		for surface in range(piece.mesh.get_surface_count()):
+			var mat: Material=piece.get_active_material(surface)
+			if mat is StandardMaterial3D and (mat as StandardMaterial3D).emission_enabled and (mat as StandardMaterial3D).emission_texture!=null:
+				gemi_lit_surfaces+=1
+	check(gemi_lit_surfaces>0,"M3098 Gemi11 uses texture-preserving per-instance deck and sail illumination")
+	check(game.mesh_layer._player_immersion("gemi11_uv")==game.mesh_layer.GAMEPLAY_WATER_IMMERSION,"M3098 Gemi11 hull has the same sea immersion as the gameplay Schattenkriegsschiff")
+	var gemi_ring: Vector2=game._selection_ring_radii(game.sim.player)
+	var gemi_title: String=game._plate_title(game.sim.player)
+	check(gemi_title.contains("Gemi11 UV korrigiert") and not gemi_title.contains("…"),"M3098 complete Gemi11 design name is never cut off")
+	check(game._plate_title_size(game.sim.player)>=12,"M3098 long captain design title fits adaptive font budget")
+	game.sim.player.skin=29
+	var shadow_title: String=game._plate_title(game.sim.player)
+	check(shadow_title.contains("Schattenkriegsschiff") and not shadow_title.contains("…"),"M3098 full shadow warship name remains visible")
+	check(gemi_ring.distance_to(game._selection_ring_radii(game.sim.player))<0.01,"M3098 dark test hulls use identical water-ring radii")
+	check(gemi_ring.x<game._actor_visual_length(game.sim.player)*0.50,"M3098 selection circle hugs the hull instead of extending too far")
+	game.sim.player.skin=30
 	game.mesh_layer.set_render_mode(old_comparison_mode)
 	game.sim.player.skin=old_comparison_skin
 	var fresh=game.SIM.new()
