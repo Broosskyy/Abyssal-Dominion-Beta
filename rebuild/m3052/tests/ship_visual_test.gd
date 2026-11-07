@@ -19,6 +19,8 @@ func _initialize() -> void:
 	check(ResourceLoader.exists("res://assets/player/schattenkriegsschiff_shaded.glb"),"approved shaded captain GLB exists")
 	check(ResourceLoader.exists("res://assets/npc/meshy/models/black_crown_corsair_elite_test.glb"),"original Black Crown Corsair Elite 1 GLB exists")
 	check(ResourceLoader.exists("res://assets/player/black_crown_elite_1_preview.png"),"Elite 1 shipyard preview exists")
+	for level in range(1,11):
+		check(ResourceLoader.exists("res://assets/elite_v2/previews/elite_%02d.png" % level),"Elite V2 preview exists: "+str(level))
 	for old_path in ["res://assets/player/test_ships/base_basic_pbr.glb","res://assets/player/test_ships/gemi11_uv.glb","res://assets/generated/ships/starter_small_8_intact.png","res://assets/fleet/redkorsar.png"]:
 		check(not ResourceLoader.exists(old_path),"retired ship asset is not present: "+old_path)
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
