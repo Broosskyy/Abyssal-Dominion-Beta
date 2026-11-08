@@ -164,6 +164,38 @@ func _lobby_card(parent: Node,icon: Texture2D,title: String,description: String,
 	button.disabled=not enabled
 	content.add_child(button)
 
+func _home_navigation() -> void:
+	# The historical sea-game news tabs become a swipeable mobile header,
+	# never tiny buttons packed across a portrait screen.
+	var bar=ScrollContainer.new()
+	bar.name="LobbyTopNavigation"
+	bar.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_AUTO
+	bar.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+	bar.custom_minimum_size.y=56
+	bar.follow_focus=true
+	body.add_child(bar)
+	var row=HBoxContainer.new()
+	row.add_theme_constant_override("separation",7)
+	bar.add_child(row)
+	for entry in [
+		["STARTSEITE","home",true],["LOGBUCH","Logbuch",false],
+		["POST · SPÄTER","post",true],["NEUIGKEITEN","news",false],
+		["FREUNDE","friends",false],["KONTO","settings",false]
+	]:
+		var target: String=str(entry[1])
+		var inactive: bool=bool(entry[2])
+		var button=Button.new()
+		button.text=str(entry[0])
+		button.name="LobbyNav_"+target
+		button.custom_minimum_size=Vector2(138,50)
+		button.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
+		SKIN.dress(button,"normal",14)
+		button.disabled=inactive
+		button.pressed.connect(func():
+			if target in ["news","friends","settings"]:_show(target)
+			else:_sail_to(target))
+		row.add_child(button)
+
 func _home_dashboard() -> void:
 	_label("KAPITÄNSHAFEN · ABYSSAL DOMINION",true)
 	_label("WILLKOMMEN ZURÜCK · "+sim.captain_name.to_upper())
@@ -175,6 +207,7 @@ func _home_dashboard() -> void:
 	_stat_chip(resources,"GOLD",_thousands(int(sim.player.gold)))
 	_stat_chip(resources,"KAPITÄNSSTUFE",str(sim.level))
 	_stat_chip(resources,"KARTE",str(sim.CONTENT.MAPS[sim.map_id].code))
+	_home_navigation()
 	var preview=PanelContainer.new()
 	preview.add_theme_stylebox_override("panel",SKIN.card())
 	body.add_child(preview)
@@ -300,7 +333,7 @@ func _friends_dashboard() -> void:
 	var hero=GridContainer.new()
 	hero.columns=1
 	body.add_child(hero)
-	_lobby_card(hero,GUILD_ART,"DEIN EINLADUNGSCODE",code if not code.is_empty() else "Noch kein gültiger Spielercode","CODE ÜBERNEHMEN",func():_copy_invite())
+	_lobby_card(hero,GUILD_ART,"DEIN EINLADUNGSCODE",code if not code.is_empty() else "Noch kein gültiger Spielercode","EINLADUNG KOPIEREN",func():_copy_invite())
 	var copy=_button("EINLADUNGSTEXT KOPIEREN",_copy_invite,true)
 	copy.name="CopyInviteButton"
 	copy.disabled=code.is_empty()
