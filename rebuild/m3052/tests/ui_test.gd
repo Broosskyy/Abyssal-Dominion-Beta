@@ -163,7 +163,7 @@ func _run() -> void:
 	check(migration.restore_save(old_skin_one) and migration.player.skin==0,"old schema 4 skin 1 is not mistaken for new Elite 1")
 	var elite_save=migration.export_save()
 	elite_save.skin=1
-	check(migration.restore_save(elite_save) and migration.player.skin==1 and int(migration.export_save().schema)==7,"Elite 1 survives schema 7 guest save")
+	check(migration.restore_save(elite_save) and migration.player.skin==1 and int(migration.export_save().schema)==8,"Elite 1 survives schema 8 guest save")
 	migration.player.skin=0
 	for level in range(2,12):
 		var new_save=migration.export_save()
