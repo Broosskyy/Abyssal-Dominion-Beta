@@ -114,6 +114,33 @@ func _run() -> void:
 	full._tick_timers(2.0)
 	check(full.guild_owner_tag(2)==CONTENT.FORTRESS_TAG and not full.guild_island_held(),"expired local island ownership cannot display a stale guild badge")
 	check(float(full.guild_holdings["2"].remaining)==0.0,"expired local ownership clears the cached world map timer")
+	# Master §378: a guild never loses its permanent home base when a
+	# contested world fortress expires, and vault transfers never mint gold.
+	var home=SIM.new()
+	home.player.gold=9000
+	check(not home.guild_deposit(100) and not home.guild_upgrade_home(),"guild home requires founded guild")
+	check(home.found_guild("Ankerwacht","ANK") and home.guild_home_tier()==1 and home.guild_treasury_capacity()==10000,"founding creates tier-one independent home anchorage")
+	var wallet_before: int=int(home.player.gold)
+	check(home.guild_deposit(2000) and int(home.guild_home.treasury)==2000 and int(home.player.gold)==wallet_before-2000,"vault deposit transfers gold exactly once")
+	check(not home.guild_deposit(10000) and int(home.guild_home.treasury)==2000,"vault rejects deposits over capacity or wallet")
+	check(home.guild_home_upgrade_cost()==2000 and home.guild_upgrade_home() and home.guild_home_tier()==2 and int(home.guild_home.treasury)==0,"guild base upgrades from vault without generating gold")
+	check(int(home.player.gold)==wallet_before-2000 and home.guild_treasury_capacity()==25000,"home expansion cannot steal or duplicate captain gold")
+	check(home.guild_deposit(500) and home.guild_withdraw(100) and int(home.guild_home.treasury)==400 and int(home.player.gold)==wallet_before-2000-500+100,"vault supports balanced withdrawals")
+	check(not home.guild_withdraw(500) and not home.guild_deposit(-100) and not home.guild_upgrade_home(),"vault rejects invalid transfers and unaffordable expansions")
+	var home_saved: Dictionary=JSON.parse_string(JSON.stringify(home.export_save()))
+	var home_reload=SIM.new()
+	check(home_reload.restore_save(home_saved) and home_reload.guild_home_tier()==2 and int(home_reload.guild_home.treasury)==400,"home tier and vault survive JSON save reload")
+	home_reload.configure_map(CONTENT.FORTRESS_MAP)
+	home_reload.fortress_hold=1.0
+	home_reload._tick_timers(2.0)
+	check(home_reload.guild_home_tier()==2 and int(home_reload.guild_home.treasury)==400 and not home_reload.tower_friendly(),"world fortress expiry never destroys personal guild anchorage")
+	var legacy_home_save: Dictionary=home_saved.duplicate(true)
+	legacy_home_save.erase("guild_home")
+	var legacy_home=SIM.new()
+	check(legacy_home.restore_save(legacy_home_save) and legacy_home.guild_home_tier()==1 and int(legacy_home.guild_home.treasury)==0,"legacy schema-eight guild save gains a safe tier-one home")
+	legacy_home_save["guild_home"]={"tier":999,"treasury":99999999}
+	check(legacy_home.restore_save(legacy_home_save) and legacy_home.guild_home_tier()==5 and int(legacy_home.guild_home.treasury)==500000,"corrupt or modded guild base values clamp to tier and capacity")
+	check(home_reload.leave_guild() and home_reload.guild_home_tier()==0 and int(home_reload.guild_home.treasury)==0,"dissolving local guild clears home and vault")
 	var piece_test=SIM.new()
 	piece_test.fragments=5
 	check(piece_test.assign_bonus_piece(0) and piece_test.bonus_pieces[0]==1 and piece_test.fragments==4,"map segment assignment consumes only one collected fragment")

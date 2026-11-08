@@ -1832,7 +1832,7 @@ func _clock_text(seconds: float) -> String:
 	var minutes=floori((total%3600)/60.0)
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
-const MODAL_TABS := {"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
+const MODAL_TABS := {"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
 const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
@@ -2742,6 +2742,41 @@ func _line_edit(placeholder: String,limit: int) -> LineEdit:
 	modal_body.add_child(field)
 	return field
 
+func _open_guild_home() -> void:
+	var tier: int=sim.guild_home_tier()
+	var tier_name: String=str(CONTENT.GUILD_HOME_TIERS[tier-1])
+	var treasury: int=int(sim.guild_home.get("treasury",0))
+	var capacity: int=sim.guild_treasury_capacity()
+	var upgrade_cost: int=sim.guild_home_upgrade_cost()
+	_section("DAUERHAFTE GILDENHEIMAT · STUFE %d/5" % tier)
+	_row(painted.nav_guild,"[%s] %s · %s\nUnabhängig von eroberten Weltinseln" % [sim.guild.tag,sim.guild.name,tier_name],60,Color("b9dcce"))
+	_note("Diese Heimatbasis bleibt auch erhalten, wenn deine Gilde die umkämpfte Korsarenfestung verliert. Das ist die eigene lokale Basis gemäß Masterkonzept V3.8; eine befahrbare instanzierte 3D-/2,5D-Insel und Online-Mitgliederrechte werden separat umgesetzt.")
+	_section("GILDENKASSE · %s / %s GOLD" % [_thousands(treasury),_thousands(capacity)])
+	_note("Einzahlungen und Auszahlungen verschieben vorhandenes Gold zwischen deinem Kapitän und der Gildenkasse. Es wird kein Gold erzeugt. Erweiterungen werden aus der Kasse bezahlt.",Color("b0cdcf"))
+	var cash=_grid(2)
+	for value in [100,500,2000]:
+		var amount: int=value
+		var deposit=_action("+ %s GOLD EINZAHLEN" % _thousands(amount),func():
+			sim.guild_deposit(amount)
+			_save_progress();_open_modal("Gilde");_refresh_ui(),"normal",cash)
+		deposit.disabled=int(sim.player.gold)<amount or treasury+amount>capacity
+		var withdraw=_action("− %s GOLD ENTNEHMEN" % _thousands(amount),func():
+			sim.guild_withdraw(amount)
+			_save_progress();_open_modal("Gilde");_refresh_ui(),"normal",cash)
+		withdraw.disabled=treasury<amount or int(sim.player.gold)+amount>99999999
+	_section("AUSBAU DER HEIMATBASIS")
+	if upgrade_cost>0:
+		var next_name: String=str(CONTENT.GUILD_HOME_TIERS[tier])
+		var upgrade=_primary("AUF STUFE %d · %s · %s GOLD" % [tier+1,next_name,_thousands(upgrade_cost)],func():
+			sim.guild_upgrade_home()
+			_save_progress();_open_modal("Gilde");_refresh_ui())
+		upgrade.disabled=treasury<upgrade_cost
+		_note("Neuer Gildenkassen-Höchstbetrag: %s Gold. Ausbaukosten und Stufenwerte sind Beta-Balancing." % _thousands(int(CONTENT.GUILD_HOME_TREASURY_CAPS[tier])),Color("9dd9c6"))
+	else:
+		_info("MAXIMALE BASISSTUFE ERREICHT · Souveräne Festung")
+	_note("Einrichtungen des Masterplans: Gildenhalle, Lagerhaus, Werft, Arsenal, Leuchtturm, Marktsteg, Jägerloge und Kriegsraum. Weitere Gebäudefunktionen und Mitgliederrechte sind noch nicht freigeschaltet.",Color("819da0"))
+	_action("ZUR WELTINSEL & BELAGERUNG",func():_switch_tab("Gilde","WELTINSEL"))
+	
 func _open_guild() -> void:
 	_banner_card(painted.nav_guild,"GILDE · LOKALE VORSCHAU","Gilden laufen in dieser Version lokal auf deinem Gerät. Mitglieder, Gildenchat und Gildenkriege kommen mit dem Online-Server.")
 	if sim.guild.is_empty():
@@ -2754,7 +2789,13 @@ func _open_guild() -> void:
 			_save_progress();_open_modal("Gilde");_refresh_ui()),painted.gold_coins)
 		found.disabled=int(sim.player.gold)<CONTENT.GUILD_COST
 	else:
+		if _tab("Gilde")=="HEIMATBASIS":
+			_open_guild_home()
+			return
 		_row(painted.nav_guild,"[%s] %s\nAnführer: du (lokal)" % [sim.guild.tag,sim.guild.name],48,Color("ffd27a"))
+	if _tab("Gilde")=="HEIMATBASIS":
+		_note("Gründe eine Gilde, um eine eigene dauerhafte Heimatbasis, Ausbaustufen und die Gildenkasse freizuschalten.")
+		return
 	_section("GILDENINSEL · KORSARENFESTUNG")
 	var status: Array[Dictionary]=sim.guild_tower_status()
 	var state: String=""

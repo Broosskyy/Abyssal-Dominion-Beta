@@ -3,10 +3,74 @@ extends RefCounted
 ## Static helpers operating on the sea simulation passed as `s`.
 const CONTENT = preload("res://content.gd")
 
+# This home anchorage is owned by the local guild independent of every
+# competitive world-island siege. It is NOT an MMO ownership claim.
+static func default_home() -> Dictionary:
+	return {"tier":1,"treasury":0}
+
+static func treasury_capacity(tier: int) -> int:
+	return int(CONTENT.GUILD_HOME_TREASURY_CAPS[clampi(tier,1,CONTENT.GUILD_HOME_TIERS.size())-1])
+
+static func normalize_home(raw: Variant) -> Dictionary:
+	var home: Dictionary=default_home()
+	if raw is Dictionary:
+		home["tier"]=clampi(int(raw.get("tier",1)),1,CONTENT.GUILD_HOME_TIERS.size())
+		home["treasury"]=clampi(int(raw.get("treasury",0)),0,treasury_capacity(int(home.tier)))
+	return home
+
+static func deposit_home(s,amount: int) -> bool:
+	if s.guild.is_empty() or amount<=0:return false
+	if amount>int(s.player.gold):
+		s.message="Nicht genug Gold für die Gildenkasse"
+		return false
+	var remaining: int=treasury_capacity(int(s.guild_home.tier))-int(s.guild_home.treasury)
+	if amount>remaining:
+		s.message="Gildenkasse voll · maximal noch %d Gold" % maxi(0,remaining)
+		return false
+	s.player.gold-=amount
+	s.guild_home["treasury"]=int(s.guild_home.treasury)+amount
+	s.message="%d Gold in die Gildenkasse eingezahlt" % amount
+	return true
+
+static func withdraw_home(s,amount: int) -> bool:
+	if s.guild.is_empty() or amount<=0:return false
+	if amount>int(s.guild_home.treasury):
+		s.message="Nicht genug Gold in der Gildenkasse"
+		return false
+	# The player's wallet and the guild vault must obey their save limits.
+	if amount>99999999-int(s.player.gold):
+		s.message="Goldlimit des Kapitäns erreicht"
+		return false
+	s.guild_home["treasury"]=int(s.guild_home.treasury)-amount
+	s.player.gold+=amount
+	s.message="%d Gold aus der Gildenkasse entnommen" % amount
+	return true
+
+static func next_home_cost(s) -> int:
+	if s.guild.is_empty():return 0
+	var tier: int=clampi(int(s.guild_home.get("tier",1)),1,CONTENT.GUILD_HOME_TIERS.size())
+	if tier>=CONTENT.GUILD_HOME_TIERS.size():return 0
+	return int(CONTENT.GUILD_HOME_UPGRADE_COSTS[tier-1])
+
+static func upgrade_home(s) -> bool:
+	if s.guild.is_empty():return false
+	var cost: int=next_home_cost(s)
+	if cost<=0:
+		s.message="Gildenbasis bereits auf höchster Stufe"
+		return false
+	if int(s.guild_home.treasury)<cost:
+		s.message="Für den Ausbau fehlen %d Gold in der Gildenkasse" % (cost-int(s.guild_home.treasury))
+		return false
+	s.guild_home["treasury"]=int(s.guild_home.treasury)-cost
+	s.guild_home["tier"]=int(s.guild_home.tier)+1
+	s.message="Heimatbasis: Stufe %d · %s freigeschaltet" % [int(s.guild_home.tier),str(CONTENT.GUILD_HOME_TIERS[int(s.guild_home.tier)-1])]
+	return true
+
 static func leave_guild(s) -> bool:
 	if s.guild.is_empty(): return false
 	s.message = "Gilde [%s] aufgelöst" % s.guild.tag
 	s.guild = {}
+	s.guild_home=default_home()
 	s.guild_holdings.clear()
 	s.fortress_hold = 0.0
 	return true
