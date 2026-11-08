@@ -36,6 +36,7 @@ var server_field: LineEdit
 var chart_chapter := 0
 var chart_pick := 0
 var featured_index := 0
+var home_landscape := false
 var featured_seconds := 0.0
 var featured_image: TextureRect
 var featured_title: Label
@@ -86,6 +87,12 @@ func _layout() -> void:
 	panel.scale=Vector2.ONE*ui_scale
 	var dimensions: Vector2=viewport_size/ui_scale
 	var wide: bool=dimensions.x>dimensions.y*1.35
+	# Rebuild the feature from side-by-side landscape to stacked portrait.
+	# Keeping the old HBox on rotation forces the 370px artwork and copy
+	# to expand the whole panel past the screen's safe area.
+	if page=="home" and is_instance_valid(featured_image) and home_landscape!=wide:
+		_show("home")
+		return
 	var dashboard: bool=page in ["home","rewards","friends","maps","guild","profile"]
 	if dashboard:
 		panel.size=Vector2(minf(1180.0,dimensions.x-28.0),minf(780.0,dimensions.y-36.0) if wide else minf(950.0,dimensions.y-40.0))
@@ -221,7 +228,8 @@ func _show_home() -> void:
 	hero.add_theme_stylebox_override("panel",SKIN.card(Color("d9b16c")))
 	hero.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	body.add_child(hero)
-	var wide: bool=get_viewport_rect().size.x>get_viewport_rect().size.y*1.3
+	var wide: bool=get_viewport_rect().size.x>get_viewport_rect().size.y*1.35
+	home_landscape=wide
 	var content: BoxContainer=HBoxContainer.new() if wide else VBoxContainer.new()
 	content.add_theme_constant_override("separation",12)
 	hero.add_child(content)
