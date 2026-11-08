@@ -1294,7 +1294,7 @@ func _build_ui() -> void:
 	gold_label=_text(chrome,"",15,Color("ffe2a0"))
 	kills_label=_text(chrome,"",12,Color("eadfc6"))
 	for label in [gold_label,kills_label]:label.clip_text=true;label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
-	var nav_items=[["Schiff","nav_ship","Schiff"],["Werft","nav_shipyard","Werft"],["Hafen","nav_harbor","Hafen"],["Logbuch","nav_quests","Logbuch"],["Bonus","nav_bonus","Bonuskarten"],["Kessel","nav_kessel","Kessel"],["Gilde","nav_guild","Gilde"],["Rang","nav_ranking","Rangliste"],["Menü","nav_menu","Spielinfo"]]
+	var nav_items=[["Schiff","nav_ship","Schiff"],["Werft","nav_shipyard","Werft"],["Hafen","nav_harbor","Hafen"],["Logbuch","nav_quests","Logbuch"],["Bonus","nav_bonus","Bonuskarten"],["Kessel","nav_kessel","Kessel"],["Gilde","nav_guild","Gilde"],["Markt","gold_coins","Markt"],["Menü","nav_menu","Spielinfo"]]
 	for item in nav_items:
 		var kind: String=item[2]
 		var button=_orb(chrome,str(item[0]),painted[item[1]],func():_open_modal(kind),str(item[0]),true)
@@ -2128,7 +2128,7 @@ func _open_ship() -> void:
 	var stats=_grid(2)
 	_stat(stats,"FAHRT","%d Knoten" % roundi(float(sim.player.speed)),painted.helm_wheel)
 	_stat(stats,"NACHLADEN","%s s" % ("%.2f" % sim.reload_time()).replace(".",","),painted.spyglass)
-	_stat(stats,"KANONEN","%d feuern · %d an Bord · %d Plätze" % [sim.equipped_cannons(),sim.player.cannons,sim.cannon_slots()],extra_icons.cannon_0)
+	_stat(stats,"KANONEN","%d feuern · %d montiert · %d im Lager" % [sim.equipped_cannons(),sim.mounted_cannons,sim.cannon_storage()],extra_icons.cannon_0)
 	_stat(stats,"BREITSEITE","%d Schaden je Kugel" % sim.weapon_damage(0),icons.cannonball)
 	_section("DECKS")
 	for slot in CONTENT.DECK_SLOT_COUNT:
@@ -2147,6 +2147,7 @@ func _open_ship() -> void:
 	_action("DECKS VERWALTEN",func():_open_modal("Decks"),"normal",links)
 	_action("KASTELLE",func():_open_modal("Kastelle"),"normal",links)
 	_action("SCHIFFSDESIGN WÄHLEN",func():_open_modal("Werft"),"normal",links)
+	_action("KANONENMONTAGE",func():_switch_tab("Werft","KANONEN"),"normal",links)
 	_action("BEWAFFNUNG",func():_open_modal("Bewaffnung"),"normal",links)
 
 ## The ship window retains the detailed deck gems; the sea uses a compact edge strip.
@@ -2435,14 +2436,22 @@ func _open_cannon_fitment() -> void:
 	_action("KANONENDECKS",func():_open_modal("Decks"),"normal",links)
 
 func _open_weapons() -> void:
-	_banner_card(extra_icons.cannon_0,"BEWAFFNUNG · KANONEN & HARPUNEN","Bugkastell Stufe %d · Jagdkastell Stufe %d\n%d von %d Kanonen feuern · Breitseite: 3 Geschosse · Nachladen: %s Sekunden" % [sim.upgrades.cannon,sim.upgrades.harpoon,sim.equipped_cannons(),sim.player.cannons,("%.2f" % sim.reload_time()).replace(".",",")])
-	for i in AMMO_UI.size():
-		var index=i
-		var entry: Dictionary=AMMO_UI[i]
-		var column=_row(_ammo_texture(i),"%s · %d im Lager\n%d Schaden je Geschoss · %s" % [entry.name,sim.player.ammo[i],sim.weapon_damage(i),entry.use],48,CYAN if sim.ammo_mode==i else Color(0,0,0,0))
-		_row_button(column,"GELADEN" if sim.ammo_mode==i else "LADEN",func():sim.set_ammo(index);_refresh_ui();_open_modal("Bewaffnung"),sim.ammo_mode==i,"normal" if sim.ammo_mode==i else "primary")
-	_note("Sieben bewährte Munitionsarten mit ihren vorhandenen Effekten. 21 neue Spezialsorten sind bereits zum Anschauen und Feuern spielbar; ihre Werte und Sonderwirkungen sind vorläufig und werden später abgestimmt.")
-	_action("AUSRÜSTUNG & NACHSCHUB IM HAFEN",func():_open_modal("Hafen"))
+	_banner_card(extra_icons.cannon_0,"BEWAFFNUNG · SCHIFFSARSENAL","Geschütze, Munition und Kampfbereitschaft sind getrennte Systeme. Die Werft montiert Kanonen, der Markt verkauft Kugeln und Items; das Munitionsmenü lädt die gewünschte Sorte.")
+	var overview=_grid(2)
+	_stat(overview,"GESCHÜTZE","%d/%d aktiv" % [sim.equipped_cannons(),sim.cannon_slots()],extra_icons.cannon_0)
+	_stat(overview,"ARSENAL","%d Kanonen im Lager" % sim.cannon_storage(),extra_icons.cannon_1)
+	_stat(overview,"FEUERKRAFT","%d Schaden pro Geschoss" % sim.weapon_damage(sim.ammo_mode),icons.cannonball)
+	_stat(overview,"NACHLADEN","%.2f Sekunden" % sim.reload_time(),painted.spyglass)
+	_section("GELADENE MUNITION")
+	var index: int=sim.ammo_mode
+	_row(_ammo_texture(index),"%s · %d Geschosse im Lager\nVerwendung: %s" % [AMMO_UI[index].name,int(sim.player.ammo[index]),str(AMMO_UI[index].use)],54,Color("b99a66"))
+	var actions=_grid(2)
+	_action("KANONEN MONTIEREN",func():_switch_tab("Werft","KANONEN"),"normal",actions)
+	_action("MUNITION AUSWÄHLEN",func():_open_modal("Munition"),"normal",actions)
+	_action("MUNITION KAUFEN",func():_switch_tab("Markt","MUNITION"),"normal",actions)
+	_action("KASTELLE & TALENTE",func():_open_modal("Kastelle"),"normal",actions)
+	_note("Die zahlreichen Sondermunitionen sind weiter im separaten Munitionsmenü vorhanden. Ihre Beta-Werte und Effekte werden später balanciert.")
+
 
 # Marketplace is a real GOLD economy. There is deliberately no pretend
 # online auction, no credit-card form, and no fake premium transaction.
@@ -3872,6 +3881,11 @@ func _open_info() -> void:
 	for entry in [["Seekarten","WELTKARTE"],["Events","HALLOWEEN & COLUMBUS"],["Monster","SEEUNGEHEUER"],["Gilde","GILDE & INSELN"]]:
 		var destination: String=entry[0]
 		_action(entry[1],func():_open_modal(destination),"normal",world)
+	_section("HANDEL & VERBESSERUNGEN")
+	var trading=_grid(2)
+	for entry in [["Markt","MARKTPLATZ"],["Werft","SCHIFFSWERFT"],["Bewaffnung","ARSENAL"],["Kastelle","KASTELLE & TALENTE"],["Premium-Shop","KRONEN-SHOP"],["Battle Pass","SAISONPASS"]]:
+		var destination: String=str(entry[0])
+		_action(str(entry[1]),func():_open_modal(destination),"normal",trading)
 	_section("AUSRÜSTUNG & STEUERUNG")
 	var settings=_grid(2)
 	for entry in [["Schnellzugriff","SCHNELLLEISTEN BELEGEN"],["Verbrauch","VERBRAUCHSGEGENSTÄNDE"],["Anzeige","GRAFIK & STEUERUNG"],["Hilfe","SPIELANLEITUNG"],["Kastelle","KASTELLE"],["Staff","STAFF-ZUGANG"]]:
