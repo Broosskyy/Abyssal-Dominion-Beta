@@ -1010,6 +1010,7 @@ func _run() -> void:
 	lobby._show("home")
 	await process_frame
 	check(lobby.body.find_child("LobbyHero",true,false)!=null and lobby.body.find_child("SailButton",true,false)!=null,"captain home page has cinematic hero and unmistakable sailing entry")
+	check(lobby.body.find_child("LobbyTopNavigation",true,false)!=null and lobby.body.find_child("LobbyNav_friends",true,false)!=null,"hub contains scrollable top navigation for friends/news/logbook")
 	check(lobby.panel.get_global_rect().end.x<=1281 and lobby.panel.get_global_rect().size.x>500,"landscape lobby stays within viewport with generous readable width")
 	lobby._show("rewards")
 	var preview: int=0
