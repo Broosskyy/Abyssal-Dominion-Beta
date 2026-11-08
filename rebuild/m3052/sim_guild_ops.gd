@@ -30,8 +30,7 @@ static func _add_fortress(s) -> void:
 	var center: Vector2 = island.bounds.get_center()
 	for i in CONTENT.TOWERS.size():
 		var config: Dictionary = CONTENT.TOWERS[i]
-		var point: Vector2 = center + config.offset * island.bounds.size
-		while not s.on_land(point) and point.distance_to(center) > 8: point = point.move_toward(center, 8.0)
+		var point: Vector2 = _tower_point(s,island,center + config.offset * island.bounds.size)
 		var tier: int=int(s.tower_levels[i])
 		var hp: int=roundi(float(config.hp)*(1.0+.35*(tier-1)))
 		var shield = roundi(float(hp) * 0.3)
@@ -41,6 +40,23 @@ static func _add_fortress(s) -> void:
 			"state": "guard", "patrol": 0, "aggressive": false, "slow": 0.0, "respawn": 0.0, "reward": 0,
 			"art": i, "elite": true, "range": config.range, "damage": roundi(float(config.damage)*(1.0+.2*(tier-1))), "shots": config.shots,
 			"rate": config.reload, "last_hit": -100.0})
+
+static func _tower_point(s,island: Dictionary,desired: Vector2) -> Vector2:
+	# Regional coast silhouettes differ. Choose separated land sites instead of
+	# pulling every off-coast emplacement toward the same island center.
+	var best: Vector2=island.bounds.get_center()
+	var score: float=INF
+	for row in range(1,20):
+		for column in range(1,20):
+			var point: Vector2=island.bounds.position+island.bounds.size*Vector2(column/20.0,row/20.0)
+			if not Geometry2D.is_point_in_polygon(point,island.outline):continue
+			var separated:=true
+			for npc: Dictionary in s.npcs:
+				if str(npc.kind)=="tower" and point.distance_to(npc.pos)<100.0:separated=false;break
+			if not separated:continue
+			var distance: float=point.distance_squared_to(desired)
+			if distance<score:score=distance;best=point
+	return best
 
 static func towers_alive(s) -> int:
 	var alive = 0

@@ -90,6 +90,7 @@ func _initialize() -> void:
 		for i in sim.islands.size():
 			var island: Dictionary=sim.islands[i]
 			var expected_width: float=float(sim.base_islands[i].width)*sim.island_art_scale(str(island.art))
+			if sim.CONTENT.has_guild_island(port_map) and i==sim.CONTENT.FORTRESS_ISLAND:expected_width*=sim.CONTENT.GUILD_ISLAND_SCALE
 			check(absf(float(island.width)-expected_width)<.1,"island artwork and land collisions use normalized visible width on map "+str(port_map)+" island "+str(i))
 	check(port_sites[0]!=port_sites[1] and port_sites[0]!=port_sites[2] and port_sites[1]!=port_sites[2],"normal maps have distinct repeatable coastal harbors")
 	sim.configure_map(3)

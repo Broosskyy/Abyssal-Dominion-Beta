@@ -196,17 +196,31 @@ const BONUS_WAVES := [
 ## Kristallsegen: one major blessing at a time, counted in sea time.
 const BLESSING_SECONDS := 900.0
 const TIDE_DECK_CAP := 14400.0
-## Guild fortress on the Schattengewässer: four tower roles around Korsarenfestung.
+## Ten independent emplacements; the first four IDs retain legacy upgrade roles.
 const FORTRESS_MAP := 2
 const FORTRESS_ISLAND := 4
 const FORTRESS_TAG := "KRF"
 const FORTRESS_HOLD := 1800.0
+const GUILD_ISLAND_SCALE := 2.05
 const TOWERS := [
-	{"kind":"cannon", "name":"Kanonenturm", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.32,-0.24)},
-	{"kind":"mortar", "name":"Mörserturm", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.32,-0.24)},
-	{"kind":"chain", "name":"Kettenturm", "hp":1150, "range":440.0, "damage":22, "shots":2, "reload":3.2, "offset":Vector2(-0.31,0.19)},
-	{"kind":"guardian", "name":"Wächterturm", "hp":1900, "range":390.0, "damage":28, "shots":2, "reload":2.2, "offset":Vector2(0.31,0.19)}
+	{"kind":"cannon", "name":"Kanonenturm I", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.32,-0.04)},
+	{"kind":"mortar", "name":"Mörserturm I", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.28,-0.08)},
+	{"kind":"chain", "name":"Kettenturm I", "hp":1150, "range":440.0, "damage":22, "shots":2, "reload":3.2, "offset":Vector2(-0.25,0.22)},
+	{"kind":"guardian", "name":"Wächterturm", "hp":1900, "range":390.0, "damage":28, "shots":2, "reload":2.2, "offset":Vector2(0.05,0.10)},
+	{"kind":"cannon", "name":"Kanonenturm II", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.18,-0.24)},
+	{"kind":"mortar", "name":"Mörserturm II", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.02,-0.28)},
+	{"kind":"chain", "name":"Kettenturm II", "hp":1150, "range":440.0, "damage":22, "shots":2, "reload":3.2, "offset":Vector2(0.22,-0.30)},
+	{"kind":"cannon", "name":"Kanonenturm III", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(0.33,0.17)},
+	{"kind":"mortar", "name":"Mörserturm III", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.13,0.33)},
+	{"kind":"cannon", "name":"Kanonenturm IV", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.08,0.37)}
 ]
+
+static func normalized_tower_levels(raw: Variant=null) -> Array:
+	var levels: Array=[]
+	for i in TOWERS.size():
+		levels.append(clampi(int(raw[i]),1,5) if raw is Array and i<raw.size() else 1)
+	return levels
+
 const GUILD_COST := 300
 ## Staff: roles carry permission lists, never hard-coded powers. Online, the server issues and
 ## verifies roles; this test build unlocks them with local codes stored only as SHA-256 hashes.

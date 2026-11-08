@@ -74,7 +74,7 @@ var captain_name := "Kapitän"
 var battle_points := 0 # Awarded only by an authoritative PvP server, never NPC kills.
 var rewards := preload("res://reward_ledger.gd").new()
 var guild_holdings: Dictionary={}
-var tower_levels := [1,1,1,1]
+var tower_levels: Array = CONTENT.normalized_tower_levels()
 var guild: Dictionary = {}
 var fortress_conquests := 0
 var fortress_hold := 0.0
@@ -294,6 +294,7 @@ func clear_target() -> void:
 
 func select(id: int) -> void:
 	if id > 0 and not actor(id).is_empty() and int(actor(id).hp) > 0:
+		if target != id:firing = false
 		target = id
 		message = str(actor(id).name) + " anvisiert"
 	else:
@@ -1377,7 +1378,7 @@ func configure_map(destination: int) -> void:
 	var config = CONTENT.MAPS[map_id]
 	var holding: Dictionary=guild_holdings.get(str(map_id),{})
 	fortress_hold=float(holding.get("remaining",0.0))
-	tower_levels=holding.get("levels",[1,1,1,1]).duplicate()
+	tower_levels=CONTENT.normalized_tower_levels(holding.get("levels"))
 	portals.clear()
 	if bool(config.get("bonus", false)):
 		var tier := map_id - CONTENT.REGION_COUNT
@@ -1427,8 +1428,11 @@ func configure_map(destination: int) -> void:
 	var neighbors: Array[int]=CONTENT.sea_neighbors(map_id)
 	for i in neighbors.size():portals.append({"pos":exits[i],"destination":neighbors[i]})
 	if CONTENT.has_guild_island(map_id):
-		islands[CONTENT.FORTRESS_ISLAND].art="guild_island"
-		islands[CONTENT.FORTRESS_ISLAND].width=float(base_islands[CONTENT.FORTRESS_ISLAND].width)*island_art_scale("guild_island")
+		# Restore the familiar regional island beneath independent animated towers.
+		# The oversized static castle plate from update 243 hid the actual defenses.
+		var fortress: Dictionary=islands[CONTENT.FORTRESS_ISLAND]
+		fortress.art="rock" # Broad classic coast leaves room for ten distinct defenses.
+		fortress.width=float(base_islands[CONTENT.FORTRESS_ISLAND].width)*island_art_scale(str(fortress.art))*CONTENT.GUILD_ISLAND_SCALE
 	_build_grid()
 	harbor=_harbor_site_for_map()
 	var primary_port: Vector2=harbor
@@ -1476,9 +1480,7 @@ func restore_save(data: Dictionary) -> bool:
 	if captain_name.is_empty():captain_name="Kapitän"
 	battle_points=maxi(0,int(data.get("battle_points",0)))
 	rewards.restore(data.get("rewards",{}))
-	var stored_levels: Variant=data.get("tower_levels",[1,1,1,1])
-	if stored_levels is Array and stored_levels.size()==4:
-		for i in 4:tower_levels[i]=clampi(int(stored_levels[i]),1,5)
+	tower_levels=CONTENT.normalized_tower_levels(data.get("tower_levels"))
 	var stored_id := str(data.get("captain_id","")).strip_edges().to_upper()
 	if stored_id.length()==12 and stored_id.is_valid_hex_number():captain_id=stored_id
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
@@ -1555,10 +1557,7 @@ func restore_save(data: Dictionary) -> bool:
 			if not str(key).is_valid_int() or not CONTENT.has_guild_island(int(key)):continue
 			var entry: Variant=saved_holdings[key]
 			if not entry is Dictionary:continue
-			var levels: Array=[1,1,1,1]
-			var raw: Variant=entry.get("levels",[])
-			if raw is Array and raw.size()==4:
-				for i in 4:levels[i]=clampi(int(raw[i]),1,5)
+			var levels: Array=CONTENT.normalized_tower_levels(entry.get("levels"))
 			guild_holdings[str(key)]={"remaining":clampf(float(entry.get("remaining",0)),0,CONTENT.FORTRESS_HOLD),"levels":levels}
 	if not guild.is_empty() and not guild_holdings.has(str(CONTENT.FORTRESS_MAP)) and float(data.get("fortress_hold",0))>0:
 		guild_holdings[str(CONTENT.FORTRESS_MAP)]={"remaining":clampf(float(data.get("fortress_hold",0)),0,CONTENT.FORTRESS_HOLD),"levels":tower_levels.duplicate()}
@@ -1588,7 +1587,7 @@ func restore_save(data: Dictionary) -> bool:
 
 
 func upgrade_guild_tower(index: int) -> bool:
-	if not tower_friendly() or not CONTENT.has_guild_island(map_id) or index<0 or index>=4:return false
+	if not tower_friendly() or not CONTENT.has_guild_island(map_id) or index<0 or index>=CONTENT.TOWERS.size():return false
 	var tier: int=int(tower_levels[index])
 	var cost: int=300*tier*tier
 	if tier>=5 or int(player.gold)<cost:return false
@@ -1598,6 +1597,7 @@ func upgrade_guild_tower(index: int) -> bool:
 			var config: Dictionary=CONTENT.TOWERS[index]
 			actor.max_hp=roundi(float(config.hp)*(1.0+.35*tier));actor.hp=actor.max_hp
 			actor.damage=roundi(float(config.damage)*(1.0+.2*tier));actor.tower_level=tier+1
+			actor.max_shield=roundi(float(actor.max_hp)*.3);actor.shield=actor.max_shield
 	message="%s auf Stufe %d ausgebaut" % [CONTENT.TOWERS[index].name,tier+1]
 	return true
 

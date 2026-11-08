@@ -28,7 +28,6 @@ const TOWER_TEXTURES := {
 	"mortar":preload("res://assets/world_v2/tower_mortar.png"),
 	"chain":preload("res://assets/world_v2/tower_chain.png"),
 	"guardian":preload("res://assets/world_v2/tower_guardian.png")}
-const GUILD_ISLAND: Texture2D=preload("res://assets/world_v2/guild_island.png")
 const HARBOR_ISLAND: Texture2D=preload("res://assets/world_v2/island_harbor.png")
 const HARBOR_DRAW_SIZE := SIM.HARBOR_SIZE
 const HARBOR_DOCK_OFFSET := SIM.HARBOR_OFFSET
@@ -204,6 +203,7 @@ var wake_effects_enabled := true
 # Centered, device-proportional menu frames; legacy fullscreen choice is ignored.
 var menu_layout := "balanced"
 var double_tap_attack_enabled := true
+const DOUBLE_TAP_MIN_MS := 70
 const DOUBLE_TAP_ATTACK_MS := 360
 const DOUBLE_TAP_ATTACK_RADIUS := 82.0
 var last_enemy_tap_id := -1
@@ -520,11 +520,12 @@ func _draw() -> void:
 	# Projected art is drawn on the same 2D chart as movement and collision.
 	for island in sim.islands:
 		if not view.has_point(island.pos): continue
-		var tex: Texture2D = GUILD_ISLAND if str(island.art)=="guild_island" else island_textures[island.art]
+		var tex: Texture2D = island_textures[island.art]
 		var width: float = island.width
 		var dimensions = tex.get_size()*width/tex.get_width()
 		var point: Vector2 = island.pos
 		draw_texture_rect(tex,Rect2(point-dimensions*Vector2(0.5,0.65),dimensions),false)
+		_draw_coastal_surf(island)
 		# Only geometry: no island nameplates (internal navigation names remain
 		# available for testing and staff tools).
 		# The former fake watchtower on island 0 is deliberately gone.
@@ -625,6 +626,20 @@ func _draw() -> void:
 
 ## Island labels stay subordinate to the ships and do not balloon with camera zoom.
 # Small, readable and tap-friendly harbor rather than a random anchor in sea.
+# Surface effects follow the authored coast; land and collision never oscillate.
+func _draw_coastal_surf(island: Dictionary) -> void:
+	if not wake_effects_enabled:return
+	var outline: PackedVector2Array=island.outline
+	var center: Vector2=island.bounds.get_center()
+	var water_edge: float=island.bounds.position.y+island.bounds.size.y*.66
+	for i in range(0,outline.size(),3):
+		var a: Vector2=outline[i]
+		var b: Vector2=outline[(i+3)%outline.size()]
+		if minf(a.y,b.y)<water_edge:continue
+		var phase: float=fposmod(elapsed*.32+float(i)*.071,1.0)
+		var offset: Vector2=((a+b)*.5-center).normalized()*(3.0+phase*12.0)
+		draw_line(a+offset,b+offset,Color(.68,.88,.88,sin(phase*PI)*.24),1.4,true)
+
 func _draw_island_harbor() -> void:
 	var berth: Vector2=sim.harbor
 	draw_texture_rect(HARBOR_ISLAND,Rect2(berth-HARBOR_DOCK_OFFSET,HARBOR_DRAW_SIZE),false)
@@ -1040,8 +1055,22 @@ func _draw_tower(actor: Dictionary) -> void:
 	if tex!=null:
 		var dims=tex.get_size()*(88.0+float(actor.get("tower_level",1))*7.0)/maxf(tex.get_width(),tex.get_height())
 		draw_texture_rect(tex,Rect2(point-dims*Vector2(0.5,0.9),dims),false)
-	if float(actor.reload)>float(actor.rate)-.25 and str(actor.get("state",""))=="attack":
-		draw_circle(point-Vector2(0,56),6,Color(1,.75,.35,.6))
+	# Reuse the tower art as a rigid base, with independent wind and gun VFX.
+	if ship_animations_enabled:
+		var top: Vector2=point+Vector2(-19,-70-float(actor.get("tower_level",1))*3)
+		var tint: Color=Color("d7ae57") if sim.tower_friendly() else Color("9f3931")
+		draw_line(top,top+Vector2(0,-21),Color("66554a"),1.6,true)
+		var flutter: float=sin(elapsed*4.0+float(actor.id)*.8)*2.4
+		draw_colored_polygon(PackedVector2Array([top+Vector2(0,-21),top+Vector2(17,-19+flutter),top+Vector2(14,-11+flutter*.5),top+Vector2(0,-12)]),tint)
+		var glow: float=.65+.25*sin(elapsed*6.2+float(actor.id))
+		draw_circle(point+Vector2(-10,-21),2.0,Color(1,.67,.23,glow))
+	var shot_age: float=float(actor.rate)-float(actor.reload)
+	if str(actor.get("state",""))=="attack" and shot_age>=0.0 and shot_age<.85 and bool(vfx_flags.get("muzzle",true)) and bool(vfx_flags.get("enabled",true)):
+		var mouth: Vector2=point-Vector2(0,56)
+		if shot_age<.16:draw_circle(mouth,8.0*(1.0-shot_age/.16),Color(1,.79,.37,.8))
+		for puff in 3:
+			var drift: Vector2=Vector2(shot_age*17+float(puff)*4,-shot_age*26-float(puff)*3)
+			draw_circle(mouth+drift,3.0+shot_age*8,Color(.54,.57,.57,(1.0-shot_age/.85)*.24))
 
 func _draw_sparkle(point: Vector2,seed: float) -> void:
 	var pulse=0.5+0.5*sin(elapsed*3.2+seed)
@@ -2597,7 +2626,7 @@ func _open_guild() -> void:
 	else:
 		_row(painted.nav_guild,"[%s] %s\nAnführer: du (lokal)" % [sim.guild.tag,sim.guild.name],48,Color("ffd27a"))
 	_section("GILDENINSEL · KORSARENFESTUNG")
-	var towers=_grid(4)
+	var towers=_grid(2)
 	for config: Dictionary in CONTENT.TOWERS:
 		var card=_card(Color(0,0,0,0),towers)
 		var column=VBoxContainer.new();column.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_child(column)
@@ -2608,7 +2637,7 @@ func _open_guild() -> void:
 	elif CONTENT.has_guild_island(sim.map_id):state="Gehalten von [%s] · %d von %d Türmen stehen" % [CONTENT.FORTRESS_TAG,sim.towers_alive(),CONTENT.TOWERS.size()]
 	else:state="Schattengewässer %s · ab Lv. %d · gehalten von [%s]" % [CONTENT.MAPS[CONTENT.FORTRESS_MAP].code,CONTENT.MAPS[CONTENT.FORTRESS_MAP].level,CONTENT.FORTRESS_TAG]
 	_info(state)
-	_note("Kanonenturm: Doppelschuss · Mörserturm: weite Bögen · Kettenturm: bremst · Wächterturm: lädt die Schilde der anderen Türme. Zerstöre alle vier für +900 Gold, +3 Essenz und +2 Fragmente. Mit Gilde hältst du die Insel 30 Minuten.")
+	_note("Kanonenturm: Doppelschuss · Mörserturm: weite Bögen · Kettenturm: bremst · Wächterturm: lädt die Schilde der anderen Türme. Zerstöre alle zehn für +900 Gold, +3 Essenz und +2 Fragmente. Mit Gilde hältst du die Insel 30 Minuten.")
 	_note("Eroberungen %d · zerstörte Türme %d" % [sim.fortress_conquests,sim.tower_kills],Color("ffd27a"))
 	if CONTENT.has_guild_island(sim.map_id):
 		var course=_primary("KURS ZUR FESTUNG",func():
@@ -2621,7 +2650,7 @@ func _open_guild() -> void:
 		travel.disabled=sim.docked or sim.in_bonus_map() or sim.level<int(CONTENT.MAPS[CONTENT.FORTRESS_MAP].level)
 	if sim.tower_friendly() and CONTENT.has_guild_island(sim.map_id):
 		_section("GILDENTÜRME AUSBAUEN · MAXIMAL STUFE 5")
-		for i in 4:
+		for i in CONTENT.TOWERS.size():
 			var tower_index: int=i
 			var tier: int=int(sim.tower_levels[i])
 			var cost: int=300*tier*tier
@@ -2670,7 +2699,7 @@ func _chart_details(index: int) -> void:
 		for neighbor in CONTENT.sea_neighbors(index):exits.append(str(CONTENT.MAPS[neighbor].code))
 		lines.append("Hafen: ja · Portale: "+", ".join(exits))
 		lines.append("16 Patrouillen, davon Elite-Schiffe · Seeungeheuer Tiamat · Gegnerstärke ×%s" % str(region.enemy_scale).replace(".",","))
-		if CONTENT.has_guild_island(index):lines.append("Korsarenfestung mit vier Türmen · Gildeninsel")
+		if CONTENT.has_guild_island(index):lines.append("Korsarenfestung mit zehn Türmen · Gildeninsel")
 	var column=_row(extra_icons.world_chart,"\n".join(lines),64,Color("a02818") if hostile else Color("2f6b3a"))
 	var line=HBoxContainer.new();line.add_theme_constant_override("separation",6);column.add_child(line)
 	if bonus:
@@ -2812,7 +2841,7 @@ func _open_info() -> void:
 	_section("RUMPF, SCHILD & SCHNELLLEISTE")
 	_note("Der Schild fängt Treffer zuerst ab und lädt sich 8 Sekunden nach dem letzten Treffer wieder auf. REP repariert den Rumpf ohne Gegenstand.\nPulver schaltet +40 % Salvenschaden ein und verbraucht nur bei einer gültigen Salve. Der Pfeilknopf wechselt zu Notreparatur, Schildladung und Panzerplatten.",Color("e2ecee"))
 	_section("HAFEN, KESSEL, BONUSKARTEN, GILDE")
-	_note("HAFEN: Trockendock, Vorräte, Kanonen, Decks und Kastelle.\nKESSEL: Gezeitenessenz einwerfen, offene Preistabelle, Meilensteine bei 10, 25, 50 und 100.\nBONUSKARTEN: Fragmente zu Schriftrollen zusammensetzen, fünf Wellen mit Checkpoint.\nGILDE: Kürzel vor dem Schiffsnamen, Korsarenfestung mit vier Türmen in den Schattengewässern.",Color("e2ecee"))
+	_note("HAFEN: Trockendock, Vorräte, Kanonen, Decks und Kastelle.\nKESSEL: Gezeitenessenz einwerfen, offene Preistabelle, Meilensteine bei 10, 25, 50 und 100.\nBONUSKARTEN: Fragmente zu Schriftrollen zusammensetzen, fünf Wellen mit Checkpoint.\nGILDE: Kürzel vor dem Schiffsnamen, Korsarenfestung mit zehn Türmen in den Schattengewässern.",Color("e2ecee"))
 	_section("TASTEN & GESTEN")
 	_note("Zwei Finger / Mausrad / Plus und Minus an der Karte: Zoom. Joystick links unten oder Ziehen / rechte Maustaste: Kamera. Fernrohr / Tab: nächstes Ziel. Tasten 1 bis 3 Munition, 8 Leucht, 9 Kürbis, 0 Schnee, Minus Eis, 4 bis 7 Gegenstände, Q Schnellleiste.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",Color("bac7c7"))
 
@@ -3142,6 +3171,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		# touch events. Normally the _input path already claimed the gesture.
 		_handle_world_touch(event)
 	elif event is InputEventMouseButton:
+		# Touch gestures are owned by _input; Android also emits a synthetic mouse.
+		if event.device==InputEvent.DEVICE_ID_EMULATION:return
 		if event.button_index==MOUSE_BUTTON_WHEEL_UP and event.pressed:_zoom(1.10)
 		elif event.button_index==MOUSE_BUTTON_WHEEL_DOWN and event.pressed:_zoom(1/1.10)
 		elif event.button_index==MOUSE_BUTTON_LEFT and event.pressed and Time.get_ticks_msec()-last_touch_ms>350 and Time.get_ticks_msec()>=suppress_tap_until:
@@ -3203,7 +3234,7 @@ func _reset_enemy_tap() -> void:
 func _handle_enemy_tap(enemy_id: int,screen: Vector2,timestamp_ms: int=-1) -> void:
 	if enemy_id<=0:return
 	var now_ms: int=timestamp_ms if timestamp_ms>=0 else Time.get_ticks_msec()
-	var same_double: bool=double_tap_attack_enabled and sim.target==enemy_id and last_enemy_tap_id==enemy_id and now_ms>=last_enemy_tap_ms and now_ms-last_enemy_tap_ms<=DOUBLE_TAP_ATTACK_MS and screen.distance_to(last_enemy_tap_screen)<=DOUBLE_TAP_ATTACK_RADIUS
+	var same_double: bool=double_tap_attack_enabled and sim.target==enemy_id and last_enemy_tap_id==enemy_id and now_ms-last_enemy_tap_ms>=DOUBLE_TAP_MIN_MS and now_ms-last_enemy_tap_ms<=DOUBLE_TAP_ATTACK_MS and screen.distance_to(last_enemy_tap_screen)<=DOUBLE_TAP_ATTACK_RADIUS
 	if sim.target!=enemy_id:
 		# New target is selection-only, even if a different ship was firing.
 		sim.firing=false
@@ -3225,7 +3256,7 @@ func _handle_enemy_tap(enemy_id: int,screen: Vector2,timestamp_ms: int=-1) -> vo
 func _tap(screen: Vector2) -> void:
 	if modal.visible or loading_left>0:return
 	# Ships always win over nearby port and portal hitboxes, so tapping a
-	# visible enemy twice reliably selects then DESELECTS the same hull.
+	# visible enemy selects it; a deliberate double-tap may start fire.
 	var clicked_enemy: int=_enemy_at_screen(screen)
 	if clicked_enemy>0:
 		_handle_enemy_tap(clicked_enemy,screen)

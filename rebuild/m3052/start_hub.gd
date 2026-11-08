@@ -6,6 +6,8 @@ const SKIN=preload("res://ui_skin.gd")
 const SAVE="user://captain_m3052.json"
 const CONFIG="user://connection.json"
 const ART=preload("res://assets/world_v2/frontier_splash.png")
+var sea_time := 0.0
+var backdrop: TextureRect
 var sim=SIM.new()
 var network: Node
 var panel: PanelContainer
@@ -20,6 +22,13 @@ var username: LineEdit
 var server_field: LineEdit
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	backdrop=TextureRect.new();backdrop.name="LivingHarbor"
+	backdrop.texture=ART;backdrop.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	backdrop.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	backdrop.mouse_filter=Control.MOUSE_FILTER_IGNORE;backdrop.show_behind_parent=true
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var sea=ShaderMaterial.new();sea.shader=preload("res://harbor_backdrop.gdshader");backdrop.material=sea
+	add_child(backdrop)
 	if FileAccess.file_exists(SAVE):
 		var value: Variant=JSON.parse_string(FileAccess.get_file_as_string(SAVE))
 		if value is Dictionary:sim.restore_save(value)
@@ -38,6 +47,10 @@ func _ready() -> void:
 	_show(page);_layout()
 	var boot=get_tree().root.get_node_or_null("DataBoot")
 	if boot!=null:boot.mark_healthy()
+func _process(delta: float) -> void:
+	sea_time+=delta
+	if backdrop!=null:backdrop.material.set_shader_parameter("sea_time",sea_time)
+
 func _layout() -> void:
 	var viewport_size: Vector2=get_viewport_rect().size
 	var ui_scale: float=clampf(minf(viewport_size.x,viewport_size.y)/600.0,1.0,1.8)
@@ -50,10 +63,7 @@ func _layout() -> void:
 	queue_redraw()
 func _draw() -> void:
 	var dimensions: Vector2=get_viewport_rect().size
-	var cover: float=maxf(dimensions.x/ART.get_width(),dimensions.y/ART.get_height())
-	var image_size: Vector2=ART.get_size()*cover
-	draw_texture_rect(ART,Rect2((dimensions-image_size)*.5,image_size),false)
-	draw_rect(Rect2(Vector2.ZERO,dimensions),Color(.005,.02,.04,.25))
+
 	if dimensions.x>920 and dimensions.x>dimensions.y*1.35:
 		var font: Font=ThemeDB.fallback_font
 		var fs: int=clampi(roundi(dimensions.x*.028),26,52)
@@ -129,7 +139,7 @@ func _show(next: String) -> void:
 		"guild":
 			_label("GILDE & GILDENINSEL",true)
 			_label("[%s] %s" % [sim.guild.get("tag","–"),sim.guild.get("name","Noch keine Gilde")])
-			_label("Die Korsarenfestung auf 3/1 ist eroberbar: alle vier Türme zerstören, mit deiner Gilde halten und jeden Turm bis Stufe 5 ausbauen. Verwaltung und Inselkampf findest du auf See unter Gilde.")
+			_label("Die Korsarenfestung auf 3/1 ist eroberbar: alle zehn Türme zerstören, mit deiner Gilde halten und jeden Turm bis Stufe 5 ausbauen. Verwaltung und Inselkampf findest du auf See unter Gilde.")
 			_back()
 		"settings":
 			_label("EINSTELLUNGEN & KONTO",true)

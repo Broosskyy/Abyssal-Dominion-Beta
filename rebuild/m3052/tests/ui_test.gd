@@ -642,6 +642,12 @@ func _run() -> void:
 	game._reset_enemy_tap()
 	game._handle_enemy_tap(first_id,intended_enemy,10000)
 	check(game.sim.target==first_id and not game.sim.firing,"single tap immediately selects ship without firing")
+	game._handle_enemy_tap(first_id,intended_enemy,10001)
+	check(not game.sim.firing,"duplicate delivery of one tap cannot arm fire")
+	var emulated=InputEventMouseButton.new();emulated.device=InputEvent.DEVICE_ID_EMULATION
+	emulated.button_index=MOUSE_BUTTON_LEFT;emulated.pressed=true;emulated.position=intended_enemy
+	game._unhandled_input(emulated)
+	check(not game.sim.firing,"Android synthetic mouse does not count as a second gesture")
 	game._handle_enemy_tap(first_id,intended_enemy+Vector2(8,4),10210)
 	check(game.sim.target==first_id and game.sim.firing,"double-tap selected ship enables attack without second target selection")
 	game._cancel_target()
@@ -659,6 +665,8 @@ func _run() -> void:
 	game._handle_enemy_tap(first_id,intended_enemy,19000)
 	game._handle_enemy_tap(first_id,intended_enemy+Vector2(160,0),19200)
 	check(not game.sim.firing,"far-separated taps do not accidentally trigger double-tap combat")
+	game.sim.firing=true;game.sim.select(second_id)
+	check(game.sim.target==second_id and not game.sim.firing,"direct simulation target switch also disarms attack")
 	game.sim.select(first_id)
 	var esc=InputEventKey.new()
 	esc.keycode=KEY_ESCAPE
@@ -691,7 +699,11 @@ func _run() -> void:
 	tap_up.pressed=false
 	game._input(tap_down)
 	game._input(tap_up)
-	check(game.sim.target==first_id,"Android world-input touch selects projected 3D ship")
+	check(game.sim.target==first_id and not game.sim.firing,"one Android touch selects projected 3D ship without firing")
+	# Real distinct taps are separated in time; replay a duplicate immediately first.
+	game._input(tap_down);game._input(tap_up)
+	check(not game.sim.firing,"replayed duplicate touch delivery cannot start fire")
+	game.last_enemy_tap_ms-=100
 	game._input(tap_down)
 	game._input(tap_up)
 	check(game.sim.target==first_id and game.sim.firing,"immediate second Android touch starts auto-fire without accidental deselection")

@@ -15,6 +15,7 @@ func _run() -> void:
 	await shot("01_welcome_landscape")
 	hub._show("auth");await shot("02_login")
 	hub._enter_home();await shot("03_home")
+	hub._process(1.0);await shot("03b_home_water_motion")
 	hub._show("rewards");await shot("04_rewards")
 	root.size=Vector2i(844,390);await process_frame;hub._show("home");await shot("05_home_small_phone")
 	root.size=Vector2i(1080,2340);await process_frame;hub._show("welcome");await shot("06_welcome_portrait")
@@ -30,8 +31,9 @@ func _run() -> void:
 	game.sim.configure_map(2);game.sim.fortress_hold=100;game.modal.hide();game.modal_backdrop.hide();game._refresh_ui();game.chart_mini.queue_redraw()
 	game.camera.position=game.sim.fortress_island().bounds.get_center();game.camera.force_update_scroll();game._sync_plate_overlay();game.queue_redraw()
 	await shot("11_guild_island")
+	game.elapsed=1.0;game.queue_redraw();await shot("11b_guild_island_motion")
 	game._open_modal("Gilde");await shot("12_tower_upgrades")
 	root.size=Vector2i(844,390);await process_frame;game._open_modal("Verbrauch");await shot("13_consumables_small_phone")
 	root.size=Vector2i(1080,2340);await process_frame;game._open_modal("Profil");await shot("14_profile_portrait")
 	game.queue_free();await process_frame
-	print(JSON.stringify({"status":"CAPTURED","count":14,"renderer":RenderingServer.get_video_adapter_name()}));quit()
+	print(JSON.stringify({"status":"CAPTURED","count":16,"renderer":RenderingServer.get_video_adapter_name()}));quit()

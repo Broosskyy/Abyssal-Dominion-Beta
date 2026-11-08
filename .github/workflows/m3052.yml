@@ -138,13 +138,17 @@ jobs:
           done
           ffmpeg -y -hide_banner -loglevel error -framerate 20 -i releases/M3059/captures/damage/motion_%03d.png -c:v libx264 -crf 28 -pix_fmt yuv420p releases/M3059/captures/damage/health_state_change.mp4
           rm releases/M3059/captures/damage/motion_*.png
-      - name: Record headless regression evidence for signed content-only updates
+      - name: Capture compact renderer evidence for signed content-only updates
         if: steps.plan.outputs.shell_needed == 'false'
+        timeout-minutes: 3
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p releases/M3059/captures
-          printf 'Content-only release: all Godot regression and signed-data-pack tests passed before publishing.\nFull renderer video captures run only with native bootstrap builds and are not required for data updates.\nCommit: %s\n' "$GITHUB_SHA" > releases/M3059/captures/content_validation.log
+          XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a --server-args='-screen 0 2340x1080x24' /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/frontier_capture.gd -- --out="$GITHUB_WORKSPACE/releases/M3059/captures/frontier_capture" > releases/M3059/captures/frontier_capture.log 2>&1
+          cat releases/M3059/captures/frontier_capture.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' releases/M3059/captures/frontier_capture.log; then exit 1; fi
+          printf 'Content-only release: all Godot regression and signed-data-pack tests passed. Sixteen actual renderer views include two animation phase pairs.\nCommit: %s\n' "$GITHUB_SHA" > releases/M3059/captures/content_validation.log
       - uses: actions/upload-artifact@v4
         with:
           name: Abyssal-Dominion-M3059-${{ github.run_number }}

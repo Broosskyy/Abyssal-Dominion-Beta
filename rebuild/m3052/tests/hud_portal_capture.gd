@@ -144,7 +144,7 @@ func _deck_reference(game: Node,output: String) -> void:
 func _systems(game: Node,output: String) -> Dictionary:
 	var sim=game.sim
 	root.size=Vector2i(1280,720)
-	# Korsarenfestung with its four towers, first held by the corsairs, then by the captain's guild.
+	# Korsarenfestung with its ten towers, first held by the corsairs, then by the captain's guild.
 	sim.level=6;sim.player.hp=sim.player.max_hp;sim.player.last_hit=-100;sim.docked=false
 	sim.configure_map(2);game.previous_region=2
 	var island: Dictionary=sim.fortress_island()
@@ -212,4 +212,4 @@ func _systems(game: Node,output: String) -> Dictionary:
 	await _shot(game,output,"kessel-throw-1280x720")
 	var shown: bool=game.sim.staff.shows_badge() and game.staff_pill.visible and game.modal_body.get_node_or_null("KesselStage")!=null and game.modal_body.get_node_or_null("KesselStage").busy()
 	sim.staff_sign_out(true);game.modal.hide();game.modal_backdrop.hide()
-	return {"ok":towers.size()==4 and held and started and bonus_map==3 and wave>0 and shown,"towers":towers.size(),"guild_held":held,"bonus_started":started,"wave_ships":wave,"staff_badge":shown}
+	return {"ok":towers.size()==10 and held and started and bonus_map==3 and wave>0 and shown,"towers":towers.size(),"guild_held":held,"bonus_started":started,"wave_ships":wave,"staff_badge":shown}

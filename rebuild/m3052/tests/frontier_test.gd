@@ -24,7 +24,13 @@ func _run() -> void:
 				check(index in CONTENT.sea_neighbors(int(exit.destination)),"bidirectional exit "+str(map.code))
 				check(not s.plan_path(s.START,exit.pos).is_empty(),"coast-safe portal "+str(map.code))
 			if CONTENT.has_guild_island(index):
-				check(s.npcs.filter(func(npc):return npc.kind=="tower").size()==4,"four modular towers "+str(map.code))
+				var towers: Array=s.npcs.filter(func(npc):return npc.kind=="tower")
+				check(towers.size()==10,"ten modular towers "+str(map.code))
+				check(s.fortress_island().width>700,"larger fortress footprint "+str(map.code))
+				for tower: Dictionary in towers:
+					check(s.on_land(tower.pos),"tower stands on enlarged land "+str(tower.id))
+					for other: Dictionary in towers:
+						if int(tower.id)<int(other.id):check(tower.pos.distance_to(other.pos)>80,"distinct usable tower positions %s/%s on %s" % [tower.id,other.id,map.code])
 	for origin: int in CONTENT.SEA_MAP_IDS:
 		var at: int=origin
 		for _step in 42:
@@ -61,6 +67,15 @@ func _run() -> void:
 	s.configure_map(CONTENT.sea_index(4,2));check(not s.tower_friendly(),"ownership never leaks into another guild island")
 	check(not s.upgrade_guild_tower(0),"another held island cannot authorize enemy upgrades")
 	s.configure_map(2);check(s.tower_levels[0]==2 and s.tower_friendly(),"return restores that island's upgrade and owner")
+	# Legacy four-tower saves preserve each old role and append six level-one slots.
+	var legacy: Dictionary=s.export_save()
+	legacy.guild_holdings["2"].levels=[2,3,4,5]
+	var migrated=SIM.new();check(migrated.restore_save(legacy),"four-tower guest save loads")
+	check(migrated.tower_levels==[2,3,4,5,1,1,1,1,1,1],"four old upgrades retained with six new slots")
+	migrated.player.gold=999999
+	check(migrated.upgrade_guild_tower(9) and migrated.tower_levels[9]==2,"tenth tower has independent upgrade")
+	var full=SIM.new();check(full.restore_save(JSON.parse_string(JSON.stringify(migrated.export_save()))) and full.tower_levels==migrated.tower_levels,"all ten upgrades survive JSON save reload")
+	check(not full.upgrade_guild_tower(10),"tower index beyond ten is rejected")
 	var ledger=LEDGER.new();ledger.restore({"last_seen":100000,"high_water":100000},200000)
 	check(ledger.pending_seconds==28800,"AFK cap is eight hours")
 	var wallet: int=s.player.gold
