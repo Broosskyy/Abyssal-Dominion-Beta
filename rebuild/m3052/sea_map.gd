@@ -2447,61 +2447,59 @@ func _open_weapons() -> void:
 # --- Harbor, logbook and ranking -----------------------------------------------------------
 
 func _open_harbor() -> void:
-	var name="PORT AZUR" if sim.map_id==0 else "HAFEN"
+	var name: String="PORT AZUR" if sim.map_id==0 else "HAFEN"
 	if not sim.has_harbor():
-		_banner_card(painted.nav_harbor,"KEIN HAFEN AUF BONUSKARTEN","Über BONUSKARTE VERLASSEN kehrst du zurück; die aktuelle Welle bleibt gespeichert.")
+		_banner_card(painted.nav_harbor,"BONUSKARTE · KEIN HAFEN","Kehre über BONUSKARTE VERLASSEN zum normalen Seegebiet zurück.")
 	elif not sim.docked:
-		_banner_card(painted.nav_harbor,"%s · AUSRÜSTUNG & VERSORGUNG" % name,"Fahre zum goldenen Hafensymbol und docke an. Dein Schiff liegt dort geschützt; die Patrouillen fahren weiter. Distanz: %d m." % roundi(sim.player.pos.distance_to(sim.harbor)))
-		var go=_grid(2)
-		_primary("KURS ZUM HAFEN",func():sim.course(sim.harbor);modal.hide(),go)
-		var dock_button = _action("ANDOCKEN",func():
+		_banner_card(painted.nav_harbor,"%s · EINLAUFEN" % name,"Fahre an den goldenen Hafenanleger. Entfernung: %d m. Während des Andockens ist dein Schiff geschützt." % roundi(sim.player.pos.distance_to(sim.harbor)))
+		var navigation=_grid(2)
+		_primary("KURS ZUM HAFEN",func():sim.course(sim.harbor);modal.hide(),navigation)
+		var dock_button=_action("ANDOCKEN",func():
 			if sim.dock():_save_progress();_open_modal("Hafen")
-			_refresh_ui(),"normal",go)
+			_refresh_ui(),"normal",navigation)
 		dock_button.disabled=not sim.can_dock()
 	else:
-		_banner_card(painted.nav_harbor,"%s · AUSRÜSTUNG & VERSORGUNG" % name,"Kapitänsstufe %d · %s Gold · Rumpf %s / %s" % [sim.level,_thousands(int(sim.player.gold)),_thousands(int(sim.player.hp)),_thousands(int(sim.player.max_hp))])
-		_section("TROCKENDOCK & KASTELLE")
-		var yard=_grid(2)
-		var repair_cost = sim.harbor_repair_cost()
-		var repair_button = _with_icon(_action("TROCKENDOCK · %d Gold" % repair_cost,func():sim.harbor_repair();_save_progress();_open_modal("Hafen");_refresh_ui(),"normal",yard),painted.gold_coins)
-		repair_button.disabled=repair_cost<=0 or int(sim.player.gold)<repair_cost
-		var built=0
-		for key in CONTENT.UPGRADE_KEYS:built+=int(sim.upgrades[key])
-		_with_icon(_action("KASTELLE · %d / %d STUFEN" % [built,CONTENT.UPGRADE_KEYS.size()*CONTENT.CASTLE_MAX],func():_open_modal("Kastelle"),"normal",yard),painted.nav_castles)
-		_section("VORRÄTE")
-		var supplies=_grid(2)
-		for key: String in CONTENT.SUPPLY_KEYS:
-			var supply=key
-			var config: Dictionary=CONTENT.SUPPLIES[key]
-			var buy=_with_icon(_action("%d× %s · %d Gold" % [config.pack,config.name,config.price],func():sim.buy_supply(supply);_save_progress();_open_modal("Hafen");_refresh_ui(),"normal",supplies),_supply_icon(key))
-			buy.disabled=int(sim.player.gold)<int(config.price)
-		_section("KANONEN · %d AN BORD · %d PLÄTZE" % [sim.player.cannons,sim.cannon_slots()])
-		var cannons=_with_icon(_action("2 KANONEN · %d Gold" % sim.cannon_price() if int(sim.player.cannons)<sim.MAX_CANNONS else "KANONENDECK VOLL",func():sim.buy_cannons();_save_progress();_open_modal("Hafen");_refresh_ui()),extra_icons.cannon_1)
-		cannons.disabled=int(sim.player.cannons)>=sim.MAX_CANNONS or int(sim.player.gold)<sim.cannon_price()
-		_section("MUNITIONSNACHSCHUB")
-		var ammo=_grid(3)
-		for i in 3:
-			var index = i
-			var buy = _with_icon(_action(["150 Vollkugeln","60 Kettenkugeln","40 Harpunen"][i]+" · 30 Gold",func():sim.buy_ammo(index);_save_progress();_open_modal("Hafen");_refresh_ui(),"normal",ammo),icons[["cannonball","chain","harpoon"][i]])
-			buy.disabled=int(sim.player.gold)<30
-		_section("SONDERMUNITION · GRAFIK-BETA · JE 80 GOLD")
-		var special_stock=_grid(2)
-		for i in range(3,AMMO_UI.size()):
-			var index=i
-			var buy=_action("%d %s · 80 GOLD" % [sim.ammo_pack(i),AMMO_UI[i].name],func():sim.buy_ammo(index);_save_progress();_open_modal("Hafen");_refresh_ui(),"normal",special_stock)
-			buy.disabled=int(sim.player.gold)<80
-			_with_icon(buy,_ammo_texture(i))
-		_section("HAFENDIENSTE")
-		var services=_grid(2)
-		_with_icon(_action("DECKS & DECKWERFT",func():_open_modal("Decks"),"normal",services),painted.tide_deck)
-		_with_icon(_action("GEZEITENKESSEL",func():_open_modal("Kessel"),"normal",services),painted.nav_kessel)
-		_with_icon(_action("SCHIFFSDESIGNS · WERFT",func():_open_modal("Werft"),"normal",services),painted.nav_shipyard)
-		_with_icon(_action("SEEKARTEN",func():_open_modal("Seekarten"),"normal",services),painted.nav_charts)
+		_banner_card(painted.nav_harbor,"%s · DEIN HAFEN" % name,"Kapitänsstufe %d · %s Gold · Rumpf %s/%s" % [sim.level,_thousands(int(sim.player.gold)),_thousands(int(sim.player.hp)),_thousands(int(sim.player.max_hp))])
+		match _tab("Hafen"):
+			"DOCK":
+				_section("TROCKENDOCK & REPARATUREN")
+				var repairs=_grid(2)
+				var cost: int=sim.harbor_repair_cost()
+				var repair=_with_icon(_action("RUMPF REPARIEREN · %d GOLD" % cost,func():
+					sim.harbor_repair();_save_progress();_open_modal("Hafen");_refresh_ui(),"normal",repairs),painted.gold_coins)
+				repair.disabled=cost<=0 or int(sim.player.gold)<cost
+				var castles=0
+				for key: String in CONTENT.UPGRADE_KEYS:castles+=int(sim.upgrades[key])
+				_with_icon(_action("KASTELLE · %d/%d STUFEN" % [castles,CONTENT.UPGRADE_KEYS.size()*CONTENT.CASTLE_MAX],func():_open_modal("Kastelle"),"normal",repairs),painted.nav_castles)
+				_section("WERFT & ARSENAL")
+				var fitment=_grid(2)
+				_stat(fitment,"KANONEN","%d montiert · %d im Lager" % [sim.equipped_cannons(),sim.cannon_storage()],extra_icons.cannon_0)
+				_stat(fitment,"DECKS","%d von 10 montiert" % (CONTENT.DECK_SLOT_COUNT-sim.deck_slots.count(-1)),painted.tide_deck)
+				var links=_grid(2)
+				_action("KANONEN MONTIEREN",func():_switch_tab("Werft","KANONEN"),"normal",links)
+				_action("SCHIFFSDESIGNS",func():_switch_tab("Werft","SCHIFFE"),"normal",links)
+				"VORRÄTE":
+				_section("VERSORGUNG & VERBRAUCHSGÜTER")
+				for key: String in CONTENT.SUPPLY_KEYS:
+					var config: Dictionary=CONTENT.SUPPLIES[key]
+					_row(_supply_icon(key),"%s · %d im Lager" % [str(config.name),int(sim.supplies[key])],40)
+				var supply_links=_grid(2)
+				_action("ITEMS KAUFEN",func():_switch_tab("Markt","ITEMS"),"normal",supply_links)
+				_action("MUNITION KAUFEN",func():_switch_tab("Markt","MUNITION"),"normal",supply_links)
+				"DIENSTE":
+				_section("HAFENDIENSTE & VERWALTUNG")
+				var services=_grid(2)
+				for item in [["Markt","MARKTPLATZ"],["Decks","DECKS & DECKWERFT"],["Kessel","GEZEITENKESSEL"],["Bonuskarten","BONUSKARTEN"],["Kastelle","KASTELLE & TALENTE"],["Werft","WERFT"],["Premium-Shop","KRONEN-SHOP"],["Battle Pass","SAISONPASS"]]:
+					var dest: String=str(item[0])
+					_action(str(item[1]),func():_open_modal(dest),"normal",services)
+					_note("Marktkäufe sind derzeit nur mit im Spiel verdientem Gold möglich. Echtgeldzahlungen und die Premium-Freischaltung sind deaktiviert.")
+			_:
+				_note("Wähle oben DOCK, VORRÄTE oder DIENSTE.",Color("bac7c7"))
 		_primary("ABLEGEN",func():sim.depart();modal.hide();_save_progress();_refresh_ui())
 	if not sim.docked:
 		var more=_grid(2)
 		_action("KASTELLE ANSEHEN",func():_open_modal("Kastelle"),"normal",more)
-		_action("SEEKARTEN",func():_open_modal("Seekarten"),"normal",more)
+		_action("MARKT ANSEHEN",func():_open_modal("Markt"),"normal",more)
 	_action("UPDATES PRÜFEN",func():
 		_save_progress()
 		get_tree().set_meta("abyssal_manual_update",true)
