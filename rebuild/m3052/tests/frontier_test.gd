@@ -64,6 +64,11 @@ func _run() -> void:
 	s._hit({"source":int(s.npcs[0].id),"weapon":"cannon","damage":100},s.player)
 	check(int(s.player.hp)==930,"smoke reduces an actual incoming impact by thirty percent")
 	s.configure_map(2);s.player.gold=10000;s.found_guild("Tiefseewacht","TSW");s.fortress_hold=100
+	var turret: Dictionary=s.npcs.filter(func(npc):return npc.kind=="tower")[0]
+	var turret_face: Vector2=s._projectile_target(turret)
+	check(turret_face.y<float(turret.pos.y)-40,"shells target masonry above the tower footprint")
+	s._hit({"source":0,"id":916,"weapon":"cannon","damage":40},turret)
+	check(not s.events.is_empty() and bool(s.events.back().get("structure",false)) and Vector2(s.events.back().pos)==turret_face,"tower hits emit masonry impact with exact visual target")
 	check(s.upgrade_guild_tower(0) and s.tower_levels[0]==2,"owner can upgrade a tower")
 	var hp: int=0
 	for npc in s.npcs:
