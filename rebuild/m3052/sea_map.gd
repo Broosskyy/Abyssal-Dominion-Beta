@@ -3804,7 +3804,7 @@ func _open_monsters() -> void:
 	_section("SEEUNGEHEUER · HARPUNENJAGD")
 	_note("Alle vier Monster werden anhand ihrer tatsächlichen Position auf der aktuellen Seekarte angezeigt. Anvisieren startet keinen Angriff. HINFAHREN hält Abstand für die Harpunenjagd; FEUER musst du anschließend selbst auslösen.")
 	var specs: Array[Dictionary]=[{"key":"tiamat","name":"Tiamat · Tiefenwächter","hp":1650,"reward":240}]
-	for entry: Dictionary in expansion.MONSTERS:specs.append(entry)
+	for entry: Dictionary in preload("res://sea_expansion.gd").MONSTERS:specs.append(entry)
 	var living: int=0
 	for spec: Dictionary in specs:
 		var key: String=str(spec.key)
