@@ -229,6 +229,12 @@ static func normalized_tower_levels(raw: Variant=null) -> Array:
 	return levels
 
 const GUILD_COST := 300
+# Masterkonzept V3.8 §378–380: every guild retains a persistent home
+# anchorage, independent of conquerable temporary world fortresses.
+# Beta economy values are preliminary; online authority belongs server-side.
+const GUILD_HOME_TIERS := ["Ankerplatz","Außenposten","Gildenhafen","Festungshafen","Souveräne Festung"]
+const GUILD_HOME_UPGRADE_COSTS := [2000,6000,16000,50000]
+const GUILD_HOME_TREASURY_CAPS := [10000,25000,60000,150000,500000]
 ## Staff: roles carry permission lists, never hard-coded powers. Online, the server issues and
 ## verifies roles; this test build unlocks them with local codes stored only as SHA-256 hashes.
 const STAFF_ENVIRONMENT := "TEST · LOKAL"
