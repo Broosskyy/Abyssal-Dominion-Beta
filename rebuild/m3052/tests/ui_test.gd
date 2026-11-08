@@ -463,6 +463,21 @@ func _run() -> void:
 	check(throw_one!=null and throw_one.disabled,"cauldron throw stays disabled without essence")
 	game._interact()
 	check(not game.sim.docked and not game.modal.visible,"departure interaction closes harbor and resumes sea")
+	game._open_modal("Hafen")
+	check(game.modal_tabs.get_child_count()==2,"harbor is reduced to two dock-specific tabs")
+	game.sim.player.gold=1000
+	game._switch_tab("Markt","ITEMS")
+	var portable_purchase: Button=game.modal_body.find_child("MarketItem_powder",true,false) as Button
+	var powder_at_sea: int=int(game.sim.supplies.powder)
+	check(portable_purchase!=null and not portable_purchase.disabled,"portable market items are actually clickable without docking")
+	if portable_purchase!=null:portable_purchase.pressed.emit()
+	check(int(game.sim.supplies.powder)==powder_at_sea+10 and not game.sim.docked,"remote market purchase credits the actual inventory")
+	game.sim.level=3
+	game._switch_tab("Kastelle","TALENTE")
+	var talent_button: Button=game.modal_body.find_child("Talent_gunnery",true,false) as Button
+	check(talent_button!=null and not talent_button.disabled,"talent assignment is accessible on open sea")
+	if talent_button!=null:talent_button.pressed.emit()
+	check(int(game.sim.talents.gunnery)==1 and not game.sim.docked,"portable talent allocation commits without traveling to harbor")
 	game.sim.kills=3
 	game._open_modal("Logbuch")
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
