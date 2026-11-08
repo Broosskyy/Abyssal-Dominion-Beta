@@ -2543,7 +2543,7 @@ func _open_harbor() -> void:
 				var links=_grid(2)
 				_action("KANONEN MONTIEREN",func():_switch_tab("Werft","KANONEN"),"normal",links)
 				_action("SCHIFFSDESIGNS",func():_switch_tab("Werft","SCHIFFE"),"normal",links)
-				"VORRÄTE":
+			"VORRÄTE":
 				_section("VERSORGUNG & VERBRAUCHSGÜTER")
 				for key: String in CONTENT.SUPPLY_KEYS:
 					var config: Dictionary=CONTENT.SUPPLIES[key]
@@ -2551,13 +2551,13 @@ func _open_harbor() -> void:
 				var supply_links=_grid(2)
 				_action("ITEMS KAUFEN",func():_switch_tab("Markt","ITEMS"),"normal",supply_links)
 				_action("MUNITION KAUFEN",func():_switch_tab("Markt","MUNITION"),"normal",supply_links)
-				"DIENSTE":
+			"DIENSTE":
 				_section("HAFENDIENSTE & VERWALTUNG")
 				var services=_grid(2)
 				for item in [["Markt","MARKTPLATZ"],["Decks","DECKS & DECKWERFT"],["Kessel","GEZEITENKESSEL"],["Bonuskarten","BONUSKARTEN"],["Kastelle","KASTELLE & TALENTE"],["Werft","WERFT"],["Premium-Shop","KRONEN-SHOP"],["Battle Pass","SAISONPASS"]]:
 					var dest: String=str(item[0])
 					_action(str(item[1]),func():_open_modal(dest),"normal",services)
-					_note("Marktkäufe sind derzeit nur mit im Spiel verdientem Gold möglich. Echtgeldzahlungen und die Premium-Freischaltung sind deaktiviert.")
+				_note("Marktkäufe sind derzeit nur mit im Spiel verdientem Gold möglich. Echtgeldzahlungen und die Premium-Freischaltung sind deaktiviert.")
 			_:
 				_note("Wähle oben DOCK, VORRÄTE oder DIENSTE.",Color("bac7c7"))
 		_primary("ABLEGEN",func():sim.depart();modal.hide();_save_progress();_refresh_ui())
