@@ -208,6 +208,9 @@ func _show_home() -> void:
 		val.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	var summary=_hint(body,"%s · Stufe %d · Seekarte %s  |  %s" % [sim.captain_name,sim.level,sim.CONTENT.MAPS[sim.map_id].code,"Online-Konto" if not network.account.is_empty() else "Lokale Beta"],14)
 	summary.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	var start_action=_button("JETZT SPIELEN · ZUR SEEKARTE",_sail,true)
+	start_action.name="SailButton"
+	start_action.custom_minimum_size.y=54
 	var shortcuts=_dashboard_grid(5)
 	for entry in [["STARTSEITE","home"],["LOGBUCH","logbook"],["FREUNDE","friends"],["PROFIL","profile"],["KONTO","settings"]]:
 		var destination: String=str(entry[1])
@@ -245,7 +248,7 @@ func _show_home() -> void:
 	featured_position.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	featured_position.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
 	_dashboard_button(nav,"WEITER ›",func():_featured_shift(1))
-	_dashboard_button(copy,"JETZT SPIELEN",_sail,true).name="SailButton"
+	_dashboard_button(copy,"ABENTEUER STARTEN",_sail,true).name="HeroSailButton"
 	_featured_shift(0)
 	if sim.rewards.daily_available():
 		_hint(body,"TAGESBONUS BEREIT · Deine nächste Belohnung wartet.",14,Color("a5e1c1"))
