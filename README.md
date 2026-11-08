@@ -1,5 +1,7 @@
 # Abyssal Dominion
 
+**Android updater repair: [305903 / 0.305.9-test.3](rebuild/m3052/docs/UPDATER_RECOVERY.md).** Install the signed recovery APK over the existing app; captain saves are retained. It includes the current game and a separate verified download fallback.
+
 **Current gameplay build: [Frontier expansion — captain harbor and forty seas](rebuild/m3052/docs/FRONTIER_AFTER_DATA_242.md).** Open `rebuild/m3052/project.godot` in Godot 4.7.2. The expansion requires Android `0.305.9-test.2` (code `305902`) once for the illustrated updater → welcome/login → captain harbor → sea flow. The bootstrap APK is published as a [GitHub release](https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases); subsequent compatible game changes ship as signed `data-N` releases without a new APK. Package `com.abyssaldominion.rebuild`, signing identity and existing guest progress are retained. The account/map-room sandbox under `server/` prepares crossplay; public online combat is not deployed.
 
 ## Repository layout

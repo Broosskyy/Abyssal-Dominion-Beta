@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <external-files-path name="abyssal_updates" path="abyssal_apk_updater/" />
+    <files-path name="abyssal_internal_updates" path="abyssal_apk_updater/" />
+    <files-path name="abyssal_internal_userdata_updates" path="app_userdata/Abyssal Dominion M3059/abyssal_apk_updater/" />
 </paths>

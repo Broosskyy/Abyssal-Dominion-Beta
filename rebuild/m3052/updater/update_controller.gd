@@ -1,7 +1,12 @@
 extends Node
 const MODEL=preload("res://updater/update_model.gd")
+const TRANSFER=preload("res://updater/direct_transfer.gd")
 const PENDING="user://abyssal_update_pending.json"
 signal changed
+var foreground_transfer=false
+var fallback_reason=""
+var direct: Node
+var paused_for=0.0
 var state="idle"
 var message="Updates werden geprüft"
 var progress=0.0
@@ -17,11 +22,15 @@ func _ready() -> void:
 	if native==null and OS.get_name()=="Android" and Engine.has_singleton("AbyssalApkInstaller"):
 		native=Engine.get_singleton("AbyssalApkInstaller")
 	request=HTTPRequest.new()
-	request.timeout=8.0
+	request.timeout=15.0
 	request.body_size_limit=131072
 	request.use_threads=true
 	add_child(request)
 	request.request_completed.connect(_manifest_complete)
+	direct=TRANSFER.new();add_child(direct)
+	direct.changed.connect(_direct_progress)
+	direct.finished.connect(_direct_complete)
+	direct.failed.connect(_direct_failed)
 	set_process(true)
 
 func set_status(next: String,text: String) -> void:
@@ -58,6 +67,12 @@ func _resume() -> bool:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(PENDING))
 		return false
 	spec=cached
+	var local_path: String="user://abyssal_apk_updater/update_direct.apk"
+	if FileAccess.file_exists(local_path):
+		var candidate=FileAccess.open(local_path,FileAccess.READ)
+		if candidate!=null:
+			var size_bytes: int=candidate.get_length();candidate.close()
+			if size_bytes==int(spec.bytes):foreground_transfer=true;_verify_download(ProjectSettings.globalize_path(local_path));return true
 	var current=JSON.parse_string(str(native.call("queryBackgroundApk")))
 	if not current is Dictionary or current.get("status") in ["missing","failed","size_mismatch","query_failed"]:return false
 	if int(current.get("version",-1))!=int(spec.version_code):return false
@@ -72,7 +87,8 @@ func download() -> void:
 	if file==null:set_status("error","Update konnte nicht vorbereitet werden.");return
 	file.store_string(JSON.stringify(spec));file.close()
 	var result=str(native.call("enqueueBackgroundApk",str(spec.url),int(spec.version_code),str(spec.sha256),int(spec.bytes)))
-	if result not in ["queued","active"]:set_status("error","Download konnte nicht gestartet werden. Bitte erneut versuchen.");return
+	if result not in ["queued","active"]:_start_fallback("Android-Start: "+result);return
+	foreground_transfer=false;paused_for=0
 	set_status("downloading","Update wird im Hintergrund heruntergeladen …")
 	poll_elapsed=1.0
 
@@ -81,12 +97,18 @@ func _process(delta: float) -> void:
 		var valid=worker.wait_to_finish()
 		worker=null
 		if not valid:
-			native.call("discardBackgroundApk")
+			native.call("discardBackgroundApk");direct.cleanup();foreground_transfer=false
 			set_status("error","Update-Datei ist unvollständig oder beschädigt. Bitte erneut laden.")
 		else:
+			foreground_transfer=false
 			progress=1.0
 			set_status("ready","Update geprüft. Android-Installation wird geöffnet …")
 			install()
+	if foreground_transfer:return
+	if state=="paused":
+		paused_for+=delta
+		if paused_for>30:_start_fallback("Android-Download bleibt pausiert");return
+	else:paused_for=0
 	if state not in ["downloading","paused"] or native==null:return
 	poll_elapsed+=delta
 	if poll_elapsed<0.5:return
@@ -101,13 +123,8 @@ func _apply_native_state(data: Dictionary) -> void:
 	match str(data.get("status","")):
 		"pending","running":set_status("downloading","Update lädt · %d %%"%roundi(progress*100))
 		"paused":set_status("paused","Download pausiert. Android setzt ihn bei Verbindung fort.")
-		"complete":
-			verified_path=str(data.get("path",""))
-			set_status("verifying","Heruntergeladenes Update wird geprüft …")
-			worker=Thread.new()
-			var error=worker.start(MODEL.verify_file.bind(spec.duplicate(true),verified_path))
-			if error!=OK:worker=null;set_status("error","Update-Prüfung konnte nicht gestartet werden.")
-		_:set_status("error","Download unterbrochen. Du kannst ihn erneut starten.")
+		"complete":_verify_download(str(data.get("path","")))
+		_:_start_fallback(TRANSFER.native_reason(data))
 
 func install() -> void:
 	if native==null or state not in ["ready","permission"]:return
@@ -124,3 +141,27 @@ func _exit_tree() -> void:
 func _notification(what: int) -> void:
 	if what==MainLoop.NOTIFICATION_APPLICATION_RESUMED and state=="installing":
 		set_status("ready","Installation noch offen. Du kannst sie fortsetzen oder spielen.")
+
+func _start_fallback(reason: String) -> void:
+	if foreground_transfer or direct==null:return
+	native.call("discardBackgroundApk")
+	foreground_transfer=true;fallback_reason=reason
+	set_status("downloading",reason+" · Ersatzdownload startet. App bitte offen lassen.")
+	if not direct.start(str(spec.url),"user://abyssal_apk_updater/update_direct.apk",int(spec.bytes)):_direct_failed("Direktdownload konnte nicht gestartet werden")
+
+func _direct_progress() -> void:
+	if not foreground_transfer or not direct.active:return
+	progress=direct.progress
+	set_status("downloading","App-Direktdownload · %d %% · Versuch %d/3 · App offen lassen" % [roundi(progress*100),direct.attempt])
+
+func _direct_complete(path: String) -> void:_verify_download(path)
+
+func _direct_failed(reason: String) -> void:
+	foreground_transfer=false
+	set_status("error",fallback_reason+" · "+reason)
+
+func _verify_download(path: String) -> void:
+	verified_path=ProjectSettings.globalize_path(path)
+	set_status("verifying","Heruntergeladenes Update wird geprüft …")
+	worker=Thread.new()
+	if worker.start(MODEL.verify_file.bind(spec.duplicate(true),verified_path))!=OK:worker=null;foreground_transfer=false;set_status("error","Update-Prüfung konnte nicht gestartet werden.")

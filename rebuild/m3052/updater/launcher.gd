@@ -43,12 +43,12 @@ func _ready() -> void:
 func _layout() -> void:
 	var s=get_viewport_rect().size
 	var width=minf(540,s.x-32)
-	panel.size=Vector2(width,minf(410,s.y-24))
+	panel.size=Vector2(width,minf(434,s.y-24))
 	panel.position=(s-panel.size)*0.5
-	box.position=Vector2(24,(panel.size.y-318)/2)
-	box.size=Vector2(panel.size.x-48,318)
+	box.position=Vector2(24,(panel.size.y-342)/2)
+	box.size=Vector2(panel.size.x-48,342)
 	# Fixed slots avoid Container minimum-height feedback from wrapped labels.
-	var slots=[Vector2(0,32),Vector2(36,24),Vector2(70,52),Vector2(132,16),Vector2(164,48),Vector2(222,48),Vector2(282,36)]
+	var slots=[Vector2(0,32),Vector2(36,24),Vector2(70,76),Vector2(156,16),Vector2(188,48),Vector2(246,48),Vector2(306,36)]
 	for i in box.get_child_count():
 		var widget=box.get_child(i) as Control
 		widget.position=Vector2(0,slots[i].x)
@@ -57,6 +57,7 @@ func _layout() -> void:
 func _refresh() -> void:
 	var boot=get_tree().root.get_node_or_null("DataBoot")
 	if boot!=null:version_label.text="App "+str(ProjectSettings.get_setting("application/config/version",""))+" · Daten "+str(boot.active_revision)
+	if boot!=null and int(content.spec.get("revision",0))>boot.active_revision:version_label.text+=" → "+str(content.spec.revision)
 	if not content_started and updater.state in ["current","offline"]:
 		content_started=true;content.check();return
 	var current=content if content_started else updater
@@ -68,6 +69,9 @@ func _refresh() -> void:
 	action.text="Installation fortsetzen" if state in ["ready","permission"] else ("Update herunterladen" if state=="available" else ("Erneut herunterladen" if state=="error" and not current.spec.is_empty() else "Updates prüfen"))
 	if state=="restart":action.text="App schließen"
 	play.text="STARTSEITE · Download läuft weiter" if state in ["downloading","paused"] else "ZUR STARTSEITE"
+	var direct_active: bool=bool(current.foreground_transfer) and state in ["downloading","verifying"]
+	play.disabled=direct_active
+	if direct_active:play.text="DOWNLOAD LÄUFT · APP OFFEN LASSEN"
 	if autostart and state in ["current","offline","unsupported"] and content_started and not countdown:
 		countdown=true
 		await get_tree().create_timer(1.2).timeout
