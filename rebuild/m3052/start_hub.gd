@@ -254,7 +254,7 @@ func _show_home() -> void:
 		_hint(body,"TAGESBONUS BEREIT · Deine nächste Belohnung wartet.",14,Color("a5e1c1"))
 	else:
 		_hint(body,"Tagesbonus bereits geholt · neue Belohnung ab 00:00 UTC.",13)
-	_label("DEINE HAFENAKTIONEN",true)
+	_label("DEINE SPIELBEREICHE",true)
 	var actions=_dashboard_grid(3)
 	_dashboard_card(actions,"TÄGLICHE BELOHNUNG","7-Tage-Serie · AFK-Beute",func():_show("rewards"),DAILY_CHEST)
 	_dashboard_card(actions,"FREUNDE EINLADEN","Beta mit anderen Piraten teilen",func():_show("friends"),NEWS_CHART)
@@ -262,6 +262,16 @@ func _show_home() -> void:
 	_dashboard_card(actions,"GILDE & INSEL","Heimatbasis und Belagerungen",func():_show("guild"),NEWS_HARBOR)
 	_dashboard_card(actions,"SPIELERPROFIL","Name, Rang und Battle Points",func():_show("profile"),ART)
 	_dashboard_card(actions,"EINSTELLUNGEN","Verbindung und Updater",func():_show("settings"),NEWS_KESSEL)
+	# The lobby can open the actual in-sea commerce/upgrade screens directly.
+	# No duplicate market inventory or separate shadow captain save is made.
+	_label("SCHIFF, HANDEL & FORTSCHRITT",true)
+	var equipment=_dashboard_grid(3)
+	_dashboard_card(equipment,"SCHIFFSWERFT","Schiffdesigns und Kanonenmontage",func():_sail_menu("Werft"),NEWS_HARBOR)
+	_dashboard_card(equipment,"MARKTPLATZ","Munition, Kanonen und Items",func():_sail_menu("Markt"),NEWS_CHART)
+	_dashboard_card(equipment,"DECKS & LAGER","Gold- und Elite-Decks verwalten",func():_sail_menu("Decks"),DAILY_CHEST)
+	_dashboard_card(equipment,"KASTELLE & TALENTE","Schiffsausbau und Talentpunkte",func():_sail_menu("Kastelle"),ART)
+	_dashboard_card(equipment,"BONUSKARTEN","Fragmente und Wellen",func():_sail_menu("Bonuskarten"),NEWS_CHART)
+	_dashboard_card(equipment,"SAISONPASS","Freie Belohnungen abholen",func():_sail_menu("Battle Pass"),DAILY_CHEST)
 
 func _coins(value: int) -> String:
 	var digits: String=str(maxi(0,value))
@@ -440,6 +450,12 @@ func _enter_home() -> void:
 	get_tree().set_meta("abyssal_entered",true);_show("home")
 func _sail() -> void:
 	_save();get_tree().change_scene_to_file("res://sea_map.tscn")
+
+func _sail_menu(kind: String) -> void:
+	# Consume once in sea_map._ready(); avoids parallel lobby market
+	# systems that could desynchronize the captain's gold or inventory.
+	get_tree().set_meta("abyssal_start_modal",kind)
+	_sail()
 func _save() -> void:
 	var file=FileAccess.open(SAVE,FileAccess.WRITE)
 	if file!=null:file.store_string(JSON.stringify(sim.export_save()))
