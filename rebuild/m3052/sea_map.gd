@@ -808,8 +808,30 @@ func _draw_ship_selection_ring(actor: Dictionary,point: Vector2) -> void:
 			var direction := Vector2(cos(a)*radii.x,sin(a)*radii.y)
 			draw_line(center+direction*1.08,center+direction*1.19,Color(tint,0.60+0.14*pulse),_selection_ring_stroke(1.8),true)
 
+# Destroyed emplacements leave visible rubble rather than vanishing into an
+# intact backdrop. No extra art or collision is added to the sea entrance.
+func _draw_ruined_tower(actor: Dictionary) -> void:
+	var point: Vector2=Vector2(actor.pos)
+	var seed: float=float(int(actor.id))
+	_ellipse(point+Vector2(0,3),Vector2(32,13),Color("100e0d"))
+	for piece in 9:
+		var angle: float=float(piece)*TAU/9.0+seed*.031
+		var distance: float=10.0+float(piece%4)*4.8
+		var origin: Vector2=point+Vector2(cos(angle)*distance,sin(angle)*distance*.44)
+		var height: float=5.0+float((piece*3)%5)*1.8
+		var chips:=PackedVector2Array([origin+Vector2(-5,2),origin+Vector2(-2,-height),origin+Vector2(3,-height*.68),origin+Vector2(6,2)])
+		draw_colored_polygon(chips,Color("77736a") if piece%3==0 else Color("514c44"))
+		draw_line(origin+Vector2(-2,-height),origin+Vector2(3,-height*.68),Color("a89d89",.65),1.0,true)
+	if ship_animations_enabled and float(actor.get("respawn",0.0))>0.0:
+		for plume in 3:
+			var life: float=fmod(elapsed*.45+float(plume)*.33+seed*.015,1.0)
+			var drift: Vector2=Vector2(sin(elapsed+float(plume)*2.3)*7.0-life*4.0,-15.0-life*35.0)
+			draw_circle(point+drift,3.0+life*7.0,Color("6d655e",.14*(1.0-life)))
+
 func _draw_actor(actor: Dictionary) -> void:
-	if float(actor.hp)<=0:return
+	if float(actor.hp)<=0:
+		if str(actor.get("kind",""))=="tower":_draw_ruined_tower(actor)
+		return
 	if actor.get("kind","")=="tower":
 		_draw_tower(actor)
 		return
