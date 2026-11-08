@@ -3498,7 +3498,10 @@ func _load_display() -> void:
 	# All old true/false fullscreen preferences migrate to balanced windows.
 	menu_layout=str(data.get("menu_layout","balanced"))
 	if not menu_layout in ["compact","balanced","large"]:menu_layout="balanced"
-	double_tap_attack_enabled=bool(data.get("double_tap_attack_enabled",false))
+	# Earlier builds silently enabled double-tap attack by default and stored
+	# that value with unrelated HUD preferences. Treat pre-v2 settings as
+	# unconfirmed: keep combat safe until the captain explicitly opts in.
+	double_tap_attack_enabled=bool(data.get("double_tap_attack_enabled",false)) if int(data.get("combat_input_revision",0))>=2 else false
 	quick_pages=preload("res://sea_expansion.gd").normalize_quick(data.get("quick_pages",[]))
 	quick_page=clampi(int(data.get("quick_page",0)),0,2)
 
@@ -3508,7 +3511,7 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"double_tap_attack_enabled":double_tap_attack_enabled}))
+		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
 		file.close()
 
 func _set_menu_layout(value: String) -> void:
