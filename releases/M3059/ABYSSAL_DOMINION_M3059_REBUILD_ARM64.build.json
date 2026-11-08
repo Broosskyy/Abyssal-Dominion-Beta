@@ -1,7 +1,7 @@
 {
   "engine": "4.7.2.stable.official.ed1daf0bf",
   "milestone": "M3059",
-  "source_commit": "6013c0395b258d37468a2cbec75a051a9e651541",
+  "source_commit": "b61b4ee3e903b122050ff6fe1f1e2a656c3de932",
   "bootstrap_sha256": "8e97bafe54793eb72410248af725c99324486557bf48c5040cc7a27025c88fde",
   "tests": [
     {
@@ -18,7 +18,7 @@
     },
     {
       "test": "frontier_test",
-      "checks": 1752,
+      "checks": 2322,
       "failures": [],
       "status": "PASS"
     },
@@ -111,44 +111,16 @@
     }
   ],
   "data": {
-    "revision": 251,
+    "revision": 257,
     "abi": 1,
     "engine": "4.7.2.stable",
     "min_apk": 305903,
-    "bytes": 124533751,
-    "sha256": "aa45d20ed027f569a5ed2bec33cc69ae1ed00f43832580a3ff6854246393a848",
-    "signature": "PAeLd5pA3CutWfa8uYoF4mYCOUP5Xo9RxSoeyUsJvEl/qU/SuffGyEGCTEO5Y4SzgFNX9iheWS+Yct0OfVO3Hl777RPtibX9T4Hvzr4SA6aB1X+Z3q7Zh1Omtjfpo9vJ2J8DCqOmpH1EWY6c3sKh8rodJ/aiN4iQv0qg+fEuOB0Dz4Lx/WQyqsduzPbQySxFC/6dVBbch07Xelm/D15VYURq4dt3FAVyTfHvBP9p/SVs670JJpwankKe2ONUQJf7xFzgxQjLupyAJi897hZNwaA1Fk+Ew9+9aoujHJtiJIcNKSGs62g21jFmZ8HsmLOEZqJsKWmbkxlVxXlTmaMICw==",
-    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-251/ABYSSAL_DATA_251.zip"
+    "bytes": 124696660,
+    "sha256": "cfbc555f8999b31884281ccf1b6e82136c5f1e01e210b329d38da374b463ec26",
+    "signature": "FMKvmv2rYmdzPFzrhfWFHzQERPVO2PhANfHtywfowePCkZu43UAfbVXbHJcjQf7MmxVX0kebnIArU9pxwHPwZqognDoubM882tkWXOfVtXEPo7sWha9BChSOIEQsYkLjLKr//7wueQ/dB1+L6RAxlLAYwwPm+vCvbh5KVEMCoi0opXBPYJD8uieWoOBM2/OPa/JV2vDmqhBZX79umucDoc9iOnuPeWD5Y895xz7e6Fisc0IBNXUzF+ETkmP7ivrhLRNqiX05elOLF+bFApBxIU8S8LoIuXta2yhTEJitRHtm31HDj20y+i7AsW2be1qVi4wBfraIHqtZvB0215TSNw==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-257/ABYSSAL_DATA_257.zip"
   },
   "audited_pngs": 44,
   "physical_android_test": "NOT_PERFORMED",
-  "apk_built": true,
-  "apk": "ABYSSAL_DOMINION_M3059_REBUILD_ARM64.apk",
-  "sha256": "cf50f2b60bb4bc503c9b7bad663cdf5cdf97dfbeba22229fe3f791b8cbf74147",
-  "bytes": 205240411,
-  "signature": "PASS",
-  "certificate_sha256": "278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b",
-  "version_code": 305903,
-  "package": "com.abyssaldominion.rebuild",
-  "updater_native": true,
-  "update_distribution": "GITHUB_RELEASES_MANIFEST_PUBLISHED_LAST",
-  "alignment_16k": "PASS",
-  "mode": "LOCAL_GUEST_SEA_CHART",
-  "public_server": false,
-  "regions": 40,
-  "bonus_regions": 3,
-  "guild_islands": 19,
-  "save_schema": 7,
-  "quest_chain": 7,
-  "equipment_categories": 4,
-  "equipment_tiers": 3,
-  "player_glb_models": 2,
-  "elite_material_variants": 10,
-  "player_ship_choices": 12,
-  "npc_glb_models": 9,
-  "graphics_modes": [
-    "hybrid",
-    "3d"
-  ],
-  "retired_sprite_atlases": 0
+  "apk_built": false
 }
