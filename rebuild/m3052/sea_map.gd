@@ -672,8 +672,21 @@ func _draw_coastal_surf(island: Dictionary) -> void:
 
 func _draw_island_harbor() -> void:
 	var berth: Vector2=sim.harbor
-	draw_texture_rect(HARBOR_ISLAND,Rect2(berth-HARBOR_DOCK_OFFSET,HARBOR_DRAW_SIZE),false)
 	var pulse: float=.5+.5*sin(elapsed*1.9)
+	if CONTENT.has_guild_island(sim.map_id):
+		# The guild berth belongs to the inner water basin: NO independent
+		# harbor island texture or shore collider can obstruct its entrance.
+		var ink: Color=Color("80e0d0") if sim.tower_friendly() else Color("ebbc75")
+		draw_circle(berth,25.0,Color(ink,.055+.04*pulse))
+		draw_arc(berth,29.0+2.0*pulse,0,TAU,40,Color(ink,.30+.24*pulse),1.7,true)
+		draw_line(berth+Vector2(0,-15),berth+Vector2(0,13),Color(ink,.68),1.7,true)
+		draw_arc(berth+Vector2(0,5),8.0,0,PI,20,Color(ink,.70),2.0,true)
+		# Only the small docking UI is drawn here. The entire approach,
+		# including the entrance mouth, remains unobstructed water.
+		if sim.player.pos.distance_to(berth)<410.0 and not sim.docked and _landmark_label_visible(berth+Vector2(0,62)):
+			_label(berth+Vector2(0,62),"GILDENHAFEN · ANDOCKEN",12,Color(ink,.92))
+		return
+	draw_texture_rect(HARBOR_ISLAND,Rect2(berth-HARBOR_DOCK_OFFSET,HARBOR_DRAW_SIZE),false)
 	# Directly centered on the docking coordinate, not the graphical islet.
 	draw_arc(berth,36.0,0,TAU,40,Color(GOLD,.30+.23*pulse),1.6,true)
 	if sim.player.pos.distance_to(berth)<410.0 and not sim.docked and _landmark_label_visible(berth+Vector2(0,78)):
