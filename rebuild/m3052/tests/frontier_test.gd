@@ -25,8 +25,13 @@ func _run() -> void:
 				check(not s.plan_path(s.START,exit.pos).is_empty(),"coast-safe portal "+str(map.code))
 			if CONTENT.has_guild_island(index):
 				var towers: Array=s.npcs.filter(func(npc):return npc.kind=="tower")
-				check(towers.size()==10,"ten modular towers "+str(map.code))
-				check(s.fortress_island().width>700,"larger fortress footprint "+str(map.code))
+				check(towers.size()==12,"twelve modular towers "+str(map.code))
+				check(s.fortress_island().width>900,"purpose-built larger fortress footprint "+str(map.code))
+				var fortress: Dictionary=s.fortress_island()
+				var basin: Vector2=fortress.bounds.position+fortress.bounds.size*Vector2(.5,.72)
+				var mouth: Vector2=fortress.bounds.position+fortress.bounds.size*Vector2(.5,.96)
+				check(not s.on_land(basin) and not s.blocked(basin,15),"guild inner harbor navigable "+str(map.code))
+				check(not s.on_land(mouth) and not s.blocked(mouth,15),"guild entrance open to sea "+str(map.code))
 				for tower: Dictionary in towers:
 					check(s.on_land(tower.pos),"tower stands on enlarged land "+str(tower.id))
 					for other: Dictionary in towers:
@@ -71,11 +76,16 @@ func _run() -> void:
 	var legacy: Dictionary=s.export_save()
 	legacy.guild_holdings["2"].levels=[2,3,4,5]
 	var migrated=SIM.new();check(migrated.restore_save(legacy),"four-tower guest save loads")
-	check(migrated.tower_levels==[2,3,4,5,1,1,1,1,1,1],"four old upgrades retained with six new slots")
+	check(migrated.tower_levels==[2,3,4,5,1,1,1,1,1,1,1,1],"four old upgrades retained with eight new slots")
 	migrated.player.gold=999999
-	check(migrated.upgrade_guild_tower(9) and migrated.tower_levels[9]==2,"tenth tower has independent upgrade")
-	var full=SIM.new();check(full.restore_save(JSON.parse_string(JSON.stringify(migrated.export_save()))) and full.tower_levels==migrated.tower_levels,"all ten upgrades survive JSON save reload")
-	check(not full.upgrade_guild_tower(10),"tower index beyond ten is rejected")
+	check(migrated.upgrade_guild_tower(11) and migrated.tower_levels[11]==2,"twelfth tower has independent upgrade")
+	var full=SIM.new();check(full.restore_save(JSON.parse_string(JSON.stringify(migrated.export_save()))) and full.tower_levels==migrated.tower_levels,"all twelve upgrades survive JSON save reload")
+	check(not full.upgrade_guild_tower(12),"tower index beyond twelve is rejected")
+	var piece_test=SIM.new()
+	piece_test.fragments=5
+	check(piece_test.assign_bonus_piece(0) and piece_test.bonus_pieces[0]==1 and piece_test.fragments==4,"map segment assignment consumes only one collected fragment")
+	check(piece_test.restore_save(JSON.parse_string(JSON.stringify(piece_test.export_save()))) and piece_test.bonus_pieces[0]==1,"assigned bonus segments survive save reload")
+	check(piece_test.craft_scroll(0) and piece_test.scrolls[0]==1 and piece_test.fragments==0 and piece_test.bonus_pieces[0]==0,"mixed existing and allocated map pieces craft scroll exactly once")
 	var ledger=LEDGER.new();ledger.restore({"last_seen":100000,"high_water":100000},200000)
 	check(ledger.pending_seconds==28800,"AFK cap is eight hours")
 	var wallet: int=s.player.gold
@@ -95,6 +105,11 @@ func _run() -> void:
 		game._open_modal("Seekarten");await process_frame
 		check(game.modal_body.find_child("WorldChart",true,false)!=null,"forty-map chart opens")
 		var chart=game.modal_body.find_child("WorldChart",true,false)
+		check(game.target_clear.z_index>game.target_numbers.z_index,"target cancel button owns the top drawing layer")
+		chart.chapter=-1
+		check(chart.visible_nodes()==CONTENT.SEA_MAP_IDS,"complete world atlas exposes forty maps without changing pages")
+		for index: int in CONTENT.SEA_MAP_IDS:
+			check(chart.node_at(chart.node_point(index))==index,"overview tap hitbox "+str(index))
 		var catalog: Array=[]
 		for chapter in 4:
 			chart.chapter=chapter
