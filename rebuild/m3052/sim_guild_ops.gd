@@ -55,6 +55,7 @@ static func tower_status(s) -> Array[Dictionary]:
 			"max_hp":maxi(1,int(actor.get("max_hp",spec.hp))),
 			"shield":maxi(0,int(actor.get("shield",0))),
 			"alive":not actor.is_empty() and int(actor.get("hp",0))>0,
+			"siege_locked":not actor.is_empty() and int(actor.get("hp",0))<=0 and not s.guild.is_empty() and not s.tower_friendly(),
 			"respawn":maxf(0.0,float(actor.get("respawn",0.0)))
 		})
 	return status
