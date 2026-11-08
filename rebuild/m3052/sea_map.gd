@@ -2593,11 +2593,59 @@ func _open_ranking() -> void:
 
 # --- Castles, decks, cauldron, bonus maps and guild -------------------------------------------
 
-func _upgrade_row(key: String) -> void:
+func _open_castles() -> void:
+	if _tab("Kastelle")=="TALENTE":
+		_banner_card(painted.nav_castles,"TALENTE · DEIN KAPITÄN","Erhalte pro Kapitänsstufe einen Talentpunkt. Drei eigenständige Fachgebiete verbessern deine echten Kampf- und Schiffswerte. Kastelle werden separat mit Gold ausgebaut.")
+		_section("FREIE TALENTPUNKTE · %d" % sim.talent_points_available())
+		for key: String in CONTENT.TALENT_KEYS:
+			var talent_key: String=key
+			var config: Dictionary=CONTENT.TALENTS[key]
+			var stage: int=int(sim.talents[key])
+			var column=_row(_art(str(config.icon)),"%s · %s\nSTUFE %d/%d · %s" % [str(config.name).to_upper(),str(config.role),stage,CONTENT.TALENT_MAX,str(config.effect)],60,Color("d5b779") if stage>0 else Color("435864"))
+			var progress=_text(column,"FORTSCHRITT  "+"◆".repeat(stage)+"◇".repeat(CONTENT.TALENT_MAX-stage),13,Color("f8d58e"))
+			progress.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+			var learn=_row_button(column,"TALENTPUNKT VERGEBEN" if stage<CONTENT.TALENT_MAX else "MAXIMALE TALENTSTUFE",func():
+				sim.learn_talent(talent_key)
+				_save_progress();_open_modal("Kastelle");_refresh_ui(),not sim.docked or stage>=CONTENT.TALENT_MAX or sim.talent_points_available()<=0,"primary")
+			learn.name="Talent_"+key
+		if not sim.docked:_note("Talentpunkte werden angedockt im Hafen vergeben; die Übersicht bleibt auf See verfügbar.",Color("e1b979"))
+		return
+	_banner_card(painted.nav_castles,"KASTELLE · DAUERHAFTE SCHIFFSVERBESSERUNGEN","Sechs Kastelle mit je %d Stufen. Neue Stufen werden mit dem Kapitänslevel freigeschaltet. Aktuell ausbaubar bis Stufe %d; die angezeigten Werte wirken direkt im Spiel." % [CONTENT.CASTLE_MAX,sim.castle_cap()])
+	if not sim.docked:_note("Kastelle werden ausschließlich im Hafen ausgebaut.",Color("e1b979"))
+	var total: int=0
+	for key: String in CONTENT.UPGRADE_KEYS:total+=int(sim.upgrades[key])
+	_section("AUSBAUSTAND · %d/%d" % [total,CONTENT.UPGRADE_KEYS.size()*CONTENT.CASTLE_MAX])
+	var upgrades=_grid(2)
+	for key: String in CONTENT.UPGRADE_KEYS:_upgrade_row(key,upgrades)
+	_action("ZU DEN TALENTEN · %d PUNKTE FREI" % sim.talent_points_available(),func():_switch_tab("Kastelle","TALENTE"))
+
+func _open_battle_pass() -> void:
+	_banner_card(painted.nav_bonus,"SAISONPASS · FREIE BETA-SAISON","Belohnungen basieren auf echten NPC-Siegen, Monsterjagden, Bergungen und abgeschlossenen Bonuskarten. Keine Echtgeldkäufe, keine Premium-Freischaltung auf diesem Gerät.")
+	var current: int=sim.battle_pass_progress()
+	_section("SAISONFORTSCHRITT · %d PUNKTE" % current)
+	for i in CONTENT.BATTLE_PASS_FREE.size():
+		var index: int=i
+		var tier: Dictionary=CONTENT.BATTLE_PASS_FREE[i]
+		var claimed: bool=sim.battle_pass_claimed.has(i)
+		var unlocked: bool=current>=int(tier.need)
+		var label: String="STUFE %d · %s\nAb %d Fortschritt · %d Gold · %d Essenz" % [i+1,str(tier.name),int(tier.need),int(tier.gold),int(tier.essence)]
+		var card=_row(painted.reward_chest,label,50,Color("4d8667") if claimed else (Color("b58d56") if unlocked else Color("47525a")))
+		var state: String="ABGEHOLT" if claimed else ("KOSTENLOS ABHOLEN" if unlocked else "NOCH GESPERRT")
+		var claim=_row_button(card,state,func():
+			sim.claim_battle_pass_free(index)
+			_save_progress();_open_modal("Battle Pass");_refresh_ui(),claimed or not unlocked,"primary" if unlocked else "normal")
+		claim.name="FreePassClaim"+str(i)
+	_section("PREMIUM-STRECKE")
+	_note("Eine zweite Belohnungsreihe für Kronen wird erst mit serverseitigem Konto, sicherer Bezahlbestätigung und einem verbindlichen Saisonzeitraum aktiviert. Hier gibt es weder versteckte Käufe noch leere Premium-Buttons.")
+	var preview=_action("PREMIUM-FREISCHALTUNG · NICHT VERFÜGBAR",func():pass)
+	preview.disabled=true
+	_action("KRONEN-SHOP ANSEHEN",func():_open_modal("Premium-Shop"))
+
+func _upgrade_row(key: String,parent: Node=null) -> void:
 	var config: Dictionary=CONTENT.UPGRADES[key]
 	var art_key = key+"_%d" % mini(2,int(sim.upgrades[key])) if key in ["cannon","harpoon"] else str(config.icon)
 	var stage=int(sim.upgrades[key])
-	var column=_row(_art(art_key),"%s · %s · Stufe %d/%d\n%s" % [config.name,config.role,stage,CONTENT.CASTLE_MAX,config.effect],68,Color("c9a35e") if stage>0 else Color(0,0,0,0))
+	var column=_row(_art(art_key),"%s · %s · Stufe %d/%d\n%s" % [config.name,config.role,stage,CONTENT.CASTLE_MAX,config.effect],58,Color("c9a35e") if stage>0 else Color(0,0,0,0),parent)
 	var pips=Control.new();pips.custom_minimum_size=Vector2(0,12);pips.mouse_filter=Control.MOUSE_FILTER_IGNORE;column.add_child(pips)
 	pips.draw.connect(func():
 		for i in CONTENT.CASTLE_MAX:
