@@ -2514,9 +2514,9 @@ func _open_premium_shop() -> void:
 func _open_harbor() -> void:
 	var name: String="PORT AZUR" if sim.map_id==0 else "HAFEN"
 	if not sim.has_harbor():
-		_banner_card(painted.nav_harbor,"BONUSKARTE · KEIN HAFEN","Kehre über BONUSKARTE VERLASSEN zum normalen Seegebiet zurück.")
+		_banner_card(painted.nav_harbor,"BONUSKARTE · KEIN HAFEN","Du bist in einer Bonuskarteninstanz. Über BONUSKARTE VERLASSEN kehrst du zum normalen Seegebiet zurück.")
 	elif not sim.docked:
-		_banner_card(painted.nav_harbor,"%s · EINLAUFEN" % name,"Fahre an den goldenen Hafenanleger. Entfernung: %d m. Während des Andockens ist dein Schiff geschützt." % roundi(sim.player.pos.distance_to(sim.harbor)))
+		_banner_card(painted.nav_harbor,"%s · EINLAUFEN" % name,"Zum Schutz, zur Reparatur und für stationäre Hafendienste kannst du am goldenen Anleger festmachen. Entfernung: %d m." % roundi(sim.player.pos.distance_to(sim.harbor)))
 		var navigation=_grid(2)
 		_primary("KURS ZUM HAFEN",func():sim.course(sim.harbor);modal.hide(),navigation)
 		var dock_button=_action("ANDOCKEN",func():
@@ -2524,47 +2524,30 @@ func _open_harbor() -> void:
 			_refresh_ui(),"normal",navigation)
 		dock_button.disabled=not sim.can_dock()
 	else:
-		_banner_card(painted.nav_harbor,"%s · DEIN HAFEN" % name,"Kapitänsstufe %d · %s Gold · Rumpf %s/%s" % [sim.level,_thousands(int(sim.player.gold)),_thousands(int(sim.player.hp)),_thousands(int(sim.player.max_hp))])
+		_banner_card(painted.nav_harbor,"%s · ANKERPLATZ" % name,"Im geschützten Hafen kannst du reparieren, Kastelle ausbauen und stationäre Dienste benutzen. Handel und Schiffsausrüstung funktionieren auch außerhalb des Hafens.")
 		match _tab("Hafen"):
 			"DOCK":
 				_section("TROCKENDOCK & REPARATUREN")
-				var repairs=_grid(2)
 				var cost: int=sim.harbor_repair_cost()
 				var repair=_with_icon(_action("RUMPF REPARIEREN · %d GOLD" % cost,func():
-					sim.harbor_repair();_save_progress();_open_modal("Hafen");_refresh_ui(),"normal",repairs),painted.gold_coins)
+					sim.harbor_repair();_save_progress();_open_modal("Hafen");_refresh_ui()),painted.gold_coins)
 				repair.disabled=cost<=0 or int(sim.player.gold)<cost
-				var castles=0
+				_section("STATIONÄRE AUSBAUTEN · VORLÄUFIG")
+				var castles: int=0
 				for key: String in CONTENT.UPGRADE_KEYS:castles+=int(sim.upgrades[key])
-				_with_icon(_action("KASTELLE · %d/%d STUFEN" % [castles,CONTENT.UPGRADE_KEYS.size()*CONTENT.CASTLE_MAX],func():_open_modal("Kastelle"),"normal",repairs),painted.nav_castles)
-				_section("WERFT & ARSENAL")
-				var fitment=_grid(2)
-				_stat(fitment,"KANONEN","%d montiert · %d im Lager" % [sim.equipped_cannons(),sim.cannon_storage()],extra_icons.cannon_0)
-				_stat(fitment,"DECKS","%d von 10 montiert" % (CONTENT.DECK_SLOT_COUNT-sim.deck_slots.count(-1)),painted.tide_deck)
-				var links=_grid(2)
-				_action("KANONEN MONTIEREN",func():_switch_tab("Werft","KANONEN"),"normal",links)
-				_action("SCHIFFSDESIGNS",func():_switch_tab("Werft","SCHIFFE"),"normal",links)
-			"VORRÄTE":
-				_section("VERSORGUNG & VERBRAUCHSGÜTER")
-				for key: String in CONTENT.SUPPLY_KEYS:
-					var config: Dictionary=CONTENT.SUPPLIES[key]
-					_row(_supply_icon(key),"%s · %d im Lager" % [str(config.name),int(sim.supplies[key])],40)
-				var supply_links=_grid(2)
-				_action("ITEMS KAUFEN",func():_switch_tab("Markt","ITEMS"),"normal",supply_links)
-				_action("MUNITION KAUFEN",func():_switch_tab("Markt","MUNITION"),"normal",supply_links)
+				_with_icon(_action("KASTELLE · %d/%d STUFEN" % [castles,CONTENT.UPGRADE_KEYS.size()*CONTENT.CASTLE_MAX],func():_open_modal("Kastelle")),painted.nav_castles)
+				_note("Die Hafenzuordnung der Kastelle ist vorläufig. Talente lassen sich bereits auf See verteilen.")
 			"DIENSTE":
-				_section("HAFENDIENSTE & VERWALTUNG")
+				_section("HAFENDIENSTE")
 				var services=_grid(2)
-				for item in [["Markt","MARKTPLATZ"],["Decks","DECKS & DECKWERFT"],["Kessel","GEZEITENKESSEL"],["Bonuskarten","BONUSKARTEN"],["Kastelle","KASTELLE & TALENTE"],["Werft","WERFT"],["Premium-Shop","KRONEN-SHOP"],["Battle Pass","SAISONPASS"]]:
-					var dest: String=str(item[0])
-					_action(str(item[1]),func():_open_modal(dest),"normal",services)
-				_note("Marktkäufe sind derzeit nur mit im Spiel verdientem Gold möglich. Echtgeldzahlungen und die Premium-Freischaltung sind deaktiviert.")
+				_with_icon(_action("GEZEITENKESSEL",func():_open_modal("Kessel"),"normal",services),painted.nav_kessel)
+				_with_icon(_action("DECKWERFT & DECKS",func():_open_modal("Decks"),"normal",services),painted.tide_deck)
+				_note("Weitere Hafengebäude und Dienstleistungen bestimmen wir später. Markt, Items, Schiffe, Kanonen und Talente sind unabhängig vom Andocken erreichbar.")
 			_:
-				_note("Wähle oben DOCK, VORRÄTE oder DIENSTE.",Color("bac7c7"))
+				_note("Wähle DOCK oder DIENSTE.",Color("bac7c7"))
 		_primary("ABLEGEN",func():sim.depart();modal.hide();_save_progress();_refresh_ui())
 	if not sim.docked:
-		var more=_grid(2)
-		_action("KASTELLE ANSEHEN",func():_open_modal("Kastelle"),"normal",more)
-		_action("MARKT ANSEHEN",func():_open_modal("Markt"),"normal",more)
+		_note("Der Markt, die Werft und die Talentübersicht sind auch ohne Hafen erreichbar. Öffne dafür die jeweiligen Menüs.",Color("9bd6bd"))
 	_action("UPDATES PRÜFEN",func():
 		_save_progress()
 		get_tree().set_meta("abyssal_manual_update",true)
