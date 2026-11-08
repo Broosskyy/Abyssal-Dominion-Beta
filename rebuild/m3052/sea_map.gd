@@ -2774,7 +2774,10 @@ func _open_charts() -> void:
 func _chart_details(index: int) -> void:
 	var staff=sim.staff
 	if index==WORLD_CHART.FORTRESS_NODE:
-		var column=_row(painted.tower_guardian,"KORSARENFESTUNG · IN %s %s\nGehalten von [%s] · %d Türme · ab Lv. %d" % [CONTENT.MAPS[CONTENT.FORTRESS_MAP].code,CONTENT.MAPS[CONTENT.FORTRESS_MAP].name,sim.tower_tag(),CONTENT.TOWERS.size(),CONTENT.MAPS[CONTENT.FORTRESS_MAP].level],64,Color("ff6a4d"))
+		var holding: Dictionary=sim.guild_holdings.get(str(CONTENT.FORTRESS_MAP),{})
+		var held: bool=not sim.guild.is_empty() and float(holding.get("remaining",0))>0.0
+		var owner: String=str(sim.guild.get("tag","")) if held else CONTENT.FORTRESS_TAG
+		var column=_row(painted.tower_guardian,"KORSARENFESTUNG · IN %s %s\nGehalten von [%s] · %d Türme · ab Lv. %d" % [CONTENT.MAPS[CONTENT.FORTRESS_MAP].code,CONTENT.MAPS[CONTENT.FORTRESS_MAP].name,owner,CONTENT.TOWERS.size(),CONTENT.MAPS[CONTENT.FORTRESS_MAP].level],64,Color("ff6a4d"))
 		var line=HBoxContainer.new();line.add_theme_constant_override("separation",6);column.add_child(line)
 		_row_button(line,"GILDE & FESTUNG",func():_open_modal("Gilde"))
 		if staff.active():_row_button(line,"STAFF-TELEPORT",func():_staff(func():sim.staff_teleport(CONTENT.FORTRESS_MAP,"fortress"),true),not staff.can("map" if not CONTENT.has_guild_island(sim.map_id) else "teleport"),"staff")
@@ -2794,7 +2797,10 @@ func _chart_details(index: int) -> void:
 		for neighbor in CONTENT.sea_neighbors(index):exits.append(str(CONTENT.MAPS[neighbor].code))
 		lines.append("Hafen: ja · Portale: "+", ".join(exits))
 		lines.append("16 Patrouillen, davon Elite-Schiffe · Seeungeheuer Tiamat · Gegnerstärke ×%s" % str(region.enemy_scale).replace(".",","))
-		if CONTENT.has_guild_island(index):lines.append("Korsarenfestung mit zwölf Türmen · Gildeninsel")
+		if CONTENT.has_guild_island(index):
+			var island_holding: Dictionary=sim.guild_holdings.get(str(index),{})
+			var island_owned: bool=not sim.guild.is_empty() and float(island_holding.get("remaining",0))>0.0
+			lines.append("Gildeninsel mit 12 Türmen · Eigentümer [%s]" % (str(sim.guild.get("tag","")) if island_owned else CONTENT.FORTRESS_TAG))
 	var column=_row(extra_icons.world_chart,"\n".join(lines),64,Color("a02818") if hostile else Color("2f6b3a"))
 	var line=HBoxContainer.new();line.add_theme_constant_override("separation",6);column.add_child(line)
 	if bonus:
