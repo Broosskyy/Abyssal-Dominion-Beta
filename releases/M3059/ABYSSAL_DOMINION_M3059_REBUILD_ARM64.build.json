@@ -1,7 +1,7 @@
 {
   "engine": "4.7.2.stable.official.ed1daf0bf",
   "milestone": "M3059",
-  "source_commit": "fb82e487548bcf57e57391670227a7e57c1e3773",
+  "source_commit": "960146a7146771af9fb908da5762e9a6ed3e13fc",
   "bootstrap_sha256": "8e97bafe54793eb72410248af725c99324486557bf48c5040cc7a27025c88fde",
   "tests": [
     {
@@ -12,7 +12,7 @@
     },
     {
       "test": "expansion_test",
-      "checks": 103,
+      "checks": 109,
       "failures": [],
       "status": "PASS"
     },
@@ -60,7 +60,7 @@
     },
     {
       "test": "ui_test",
-      "checks": 1819,
+      "checks": 1823,
       "failures": [],
       "status": "PASS"
     },
@@ -111,14 +111,14 @@
     }
   ],
   "data": {
-    "revision": 262,
+    "revision": 263,
     "abi": 1,
     "engine": "4.7.2.stable",
     "min_apk": 305903,
-    "bytes": 124706942,
-    "sha256": "32a91b898f64891713857f5f31e490ec924d940e8614e5ce2f7c9e1615f9ec94",
-    "signature": "Liyk3juVNXWThkMRnKk/CEDPPI7EwIg13rXiEyQud1uP8KaivWdQpTjgvuE1sukkhSGxFt+oLC6SqSoAne5H3GKDeI4W0vSvVTLiZEmvyXCAOIz9oqkdrnEvTVOBYFEihnxirNORtYDO0xC0curci6N+w4mc+RsYsnvRF4ZtbjFA5sNmqicQfRuUr5ExA6idb4R+M/BSB36Fs8caZCQi1OPbRG9tldvMGwnDsQqCnB5U/QRAprhkirlYqOQ6fSCk12kl87xHT2u6TpOdL+QLFsYetqtr5m9eCKMmONDxRuRGalrY88mlcqykMYwWPCA/KrLrXTDCw4KtUkcfM27guw==",
-    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-262/ABYSSAL_DATA_262.zip"
+    "bytes": 124710062,
+    "sha256": "42988b2603ef377a97e19f064c83d3a7ae1fa472a25ead6594ef86b7c14fe69b",
+    "signature": "Ddk0jSNkmkxr2MopSo3lRwEcn/kGv7xrZiE7T47UPmo9ilpG7kJQswOFSRAt7J5vcohL+nk1ueSA4K8ru+Dgjo0dru8A7p0YRiAGLwD+aktQS5sEpV7nbfkhpQsVkoR01DFvWf+xPyvUQWp+CKXKFqEQOmvKh4y3vAQcYydtzi+qKLJaH6rGRgXyoK/RPPpLQ1XB/zcKKg0m/rkYOD1Oz8Upqi0m1LuXzoTp0iDrx2IVwqsBDNtMUFZ4eBeoyHdCMeHSFiMWtbtjKcxxVtg4zf+jNlCJ5W3z4dDR4qDJcRN2Bqk32SLXGgotQ4sijAgIzWp4fVNBWcx5CdwSKSo+og==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-263/ABYSSAL_DATA_263.zip"
   },
   "audited_pngs": 44,
   "physical_android_test": "NOT_PERFORMED",
