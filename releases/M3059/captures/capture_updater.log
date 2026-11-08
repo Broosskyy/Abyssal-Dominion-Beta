@@ -3,7 +3,7 @@ WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by 
      at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
 OpenGL API 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.4 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 20.1.2, 256 bits)
 
-{"fixture":"checking","panel":"[P: (152.0, 12.0), S: (540.0, 366.0)]","play":"[P: (176.0, 258.0), S: (492.0, 48.0)]"}
-{"fixture":"downloading","panel":"[P: (152.0, 12.0), S: (540.0, 366.0)]","play":"[P: (176.0, 258.0), S: (492.0, 48.0)]"}
-{"fixture":"permission","panel":"[P: (152.0, 12.0), S: (540.0, 366.0)]","play":"[P: (176.0, 258.0), S: (492.0, 48.0)]"}
+{"fixture":"checking","panel":"[P: (152.0, 12.0), S: (540.0, 366.0)]","play":"[P: (176.0, 270.0), S: (492.0, 48.0)]"}
+{"fixture":"downloading","panel":"[P: (152.0, 12.0), S: (540.0, 366.0)]","play":"[P: (176.0, 270.0), S: (492.0, 48.0)]"}
+{"fixture":"permission","panel":"[P: (152.0, 12.0), S: (540.0, 366.0)]","play":"[P: (176.0, 270.0), S: (492.0, 48.0)]"}
 {"fixture_states":true,"network":"simulated","scene":"updater/launcher.tscn","status":"CAPTURED"}
