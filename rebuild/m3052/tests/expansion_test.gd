@@ -52,6 +52,36 @@ func run() -> void:
 		check(not game.quick_bar.get_global_rect().intersects(game.ammo_selector.get_global_rect()),"quickbar leaves ammunition clear")
 	game._set_shipyard_filter("event");game._open_modal("Werft");await process_frame
 	check(game.modal_body.find_children("ShipDesignPreview*","Panel",true,false).size()==2,"event shipyard filter shows only two seasonal designs")
+	# PvE hunting is a real live roster: Tiamat included, no dead target
+	# can be selected and buttons never enable automatic combat.
+	game._open_modal("Monster");await process_frame
+	var hunt_text: String=""
+	var hunt_buttons: Array[Button]=[]
+	for label: Label in game.modal_body.find_children("*","Label",true,false):hunt_text+=label.text+" "
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text=="ANVISIEREN":hunt_buttons.append(button)
+	check(hunt_text.contains("Tiamat") and hunt_text.contains("Kraken") and hunt_text.contains("Nerissa") and hunt_text.contains("Karapax") and hunt_buttons.size()==4,"all four real living monsters appear in hunt menu")
+	game.sim.firing=false
+	game._hunt_monster(100)
+	check(game.sim.target==100 and not game.sim.firing,"hunt selection targets Tiamat without firing automatically")
+	game.sim.actor(100).hp=0
+	game._open_modal("Monster");await process_frame
+	var disabled_hunt: bool=false
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.text=="ANVISIEREN" and button.disabled:disabled_hunt=true
+	check(disabled_hunt,"dead monsters cannot be selected through hunt menu")
+	game.sim.clear_target()
+	game._hunt_monster(100)
+	check(game.sim.target==-1 and not game.sim.firing,"expired monster selection never fires")
+	# Invalid bonus start must not undock or spend an existing map scroll.
+	game.sim.configure_map(0)
+	game.sim.level=1;game.sim.docked=true;game.sim.scrolls[0]=1;game.sim.player.last_hit=-100
+	game._open_modal("Bonuskarten")
+	game._start_bonus(0)
+	check(game.sim.docked and game.sim.map_id==0 and game.sim.scrolls[0]==1 and game.sim.message.contains("Kapitänsstufe"),"invalid bonus start stays docked and preserves entry scroll")
+	game.sim.level=2
+	game._start_bonus(0)
+	check(not game.sim.docked and game.sim.in_bonus_map() and game.sim.scrolls[0]==0,"valid bonus start departs and spends one scroll")
 	game.quick_pages[1][0]="skyfire";game.quick_page=1;game._persist_display_preferences();game.quick_pages=EXTRA.QUICK_DEFAULT.duplicate(true);game._load_display()
 	check(game.quick_pages[1][0]=="skyfire" and game.quick_page==1,"custom quick slots and active page survive preferences reload")
 	var fleet: Array[Dictionary]=[game.sim.player]
