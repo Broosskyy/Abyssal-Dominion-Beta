@@ -348,7 +348,7 @@ func _run() -> void:
 		root.size=dimensions
 		await process_frame
 		game._layout()
-		for kind in ["Hafen","Logbuch","Seekarten","Kessel","Bonuskarten","Gilde","Kastelle","Decks","Schiff","Munition"]:
+		for kind in ["Hafen","Logbuch","Seekarten","Kessel","Bonuskarten","Gilde","Kastelle","Decks","Schiff","Munition","Markt","Premium-Shop","Battle Pass"]:
 			game._open_modal(kind)
 			if kind in ["Hafen","Kessel","Gilde"]:await process_frame
 			check(game.modal.visible and game.modal_scroll.size.y>100,"new gameplay panel opens at %s: %s"%[dimensions,kind])
@@ -420,12 +420,36 @@ func _run() -> void:
 			upgraded=true
 			break
 	check(upgraded and int(game.sim.upgrades.cannon)==1 and int(game.sim.player.gold)==850,"castle UI purchases real Bugkastell upgrade")
-	game._open_modal("Hafen")
+	game._switch_tab("Markt","ITEMS")
 	var stocked=false
 	var powder_before=int(game.sim.supplies.powder)
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
-		if button.text.begins_with("10× Schwarzpulver"):button.pressed.emit();stocked=true;break
-	check(stocked and int(game.sim.supplies.powder)==powder_before+10 and int(game.sim.player.gold)==790,"harbor UI buys a real pack of black powder")
+		if button.name=="MarketItem_powder":button.pressed.emit();stocked=true;break
+	check(stocked and int(game.sim.supplies.powder)==powder_before+10 and int(game.sim.player.gold)==790 and game.modal_kind=="Markt","market UI buys real supplies using gold, not the shipyard")
+	game._open_modal("Werft")
+	check(game._tab("Werft")=="SCHIFFE","shipyard defaults to ship designs")
+	var unwanted_ammo: bool=false
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if "150 Vollkugeln" in button.text or "60 Kettenkugeln" in button.text:unwanted_ammo=true
+	check(not unwanted_ammo,"no cannonball replenishment buttons in shipyard")
+	game._switch_tab("Werft","KANONEN")
+	check(game.modal_kind=="Werft" and game._tab("Werft")=="KANONEN","shipyard switches to real ship cannon installation panel")
+	game._open_modal("Markt")
+	check(game._tab("Markt")=="ITEMS","market retains chosen category when navigating back")
+	game._open_modal("Premium-Shop")
+	var all_locked: bool=true
+	var payment_count: int=0
+	for button: Button in game.modal_body.find_children("*","Button",true,false):
+		if button.name=="DisabledPayment":
+			payment_count+=1
+			all_locked=all_locked and button.disabled
+	check(payment_count==4 and all_locked,"premium products are visibly unavailable and cannot take real payments")
+	game._open_modal("Battle Pass")
+	check(game.modal_body.find_child("FreePassClaim0",true,false)!=null,"free season progress and rewards have separate playable panel")
+	game._open_modal("Kastelle")
+	game._switch_tab("Kastelle","TALENTE")
+	check(game.modal_body.find_child("Talent_gunnery",true,false)!=null and game.modal_body.find_child("Talent_armor",true,false)!=null and game.modal_body.find_child("Talent_navigation",true,false)!=null,"all three real talent trees are present in the upgrades menu")
+	game._switch_tab("Kastelle","KASTELLE")
 	game.sim.essence=6;game.kessel_log.clear()
 	game._open_modal("Kessel")
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
