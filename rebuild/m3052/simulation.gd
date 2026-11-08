@@ -1653,7 +1653,7 @@ func restore_save(data: Dictionary) -> bool:
 		for key in CONTENT.UPGRADE_KEYS:upgrades[key]=clampi(int(saved_upgrades.get(key,0)),0,CONTENT.CASTLE_MAX)
 	player.cannons=clampi(int(data.get("cannons",BASE_CANNON_SLOTS)),BASE_CANNON_SLOTS,MAX_CANNONS)
 	# Unmodified older player files had all available guns auto-mounted.
-	mounted_cannons=clampi(int(data.get("mounted_cannons",mini(int(player.cannons),cannon_slots()))),0,int(player.cannons))
+	mounted_cannons=clampi(int(data.get("mounted_cannons",int(player.cannons))),0,int(player.cannons))
 	var saved_supplies: Variant=data.get("supplies",{})
 	if saved_supplies is Dictionary:
 		for key in CONTENT.SUPPLY_KEYS:supplies[key]=clampi(int(saved_supplies.get(key,supplies[key])),0,99999)
