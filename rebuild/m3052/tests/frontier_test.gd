@@ -77,6 +77,9 @@ func _run() -> void:
 	check(int(s.player.hp)==930,"smoke reduces an actual incoming impact by thirty percent")
 	s.configure_map(2);s.player.gold=10000;s.found_guild("Tiefseewacht","TSW");s.fortress_hold=100
 	var turret: Dictionary=s.npcs.filter(func(npc):return npc.kind=="tower")[0]
+	check(s.guild_holding_remaining(2)==100.0 and s.guild_owner_tag(2)=="TSW","guild owner uses current map's live countdown")
+	var tower_board: Array[Dictionary]=s.guild_tower_status()
+	check(tower_board.size()==12 and bool(tower_board[0].alive) and int(tower_board[0].hp)==int(turret.hp),"siege board reports all twelve towers with live HP")
 	var turret_face: Vector2=s._projectile_target(turret)
 	check(turret_face.y<float(turret.pos.y)-40,"shells target masonry above the tower footprint")
 	s._hit({"source":0,"id":916,"weapon":"cannon","damage":40},turret)
@@ -86,6 +89,13 @@ func _run() -> void:
 	for npc in s.npcs:
 		if int(npc.id)==400:hp=int(npc.max_hp)
 	check(hp>int(CONTENT.TOWERS[0].hp),"tower upgrade raises actual combat HP")
+	check(int(s.guild_tower_status()[0].level)==2,"siege board follows the upgraded turret level")
+	var restored_hp: int=int(turret.hp)
+	turret.hp=0
+	turret.respawn=24.0
+	check(not bool(s.guild_tower_status()[0].alive) and int(s.guild_tower_status()[0].respawn)==24,"destroyed turrets show the actual rebuilding countdown")
+	turret.hp=restored_hp
+	turret.respawn=0.0
 	s.configure_map(CONTENT.sea_index(4,2));check(not s.tower_friendly(),"ownership never leaks into another guild island")
 	check(not s.upgrade_guild_tower(0),"another held island cannot authorize enemy upgrades")
 	s.configure_map(2);check(s.tower_levels[0]==2 and s.tower_friendly(),"return restores that island's upgrade and owner")
@@ -98,6 +108,12 @@ func _run() -> void:
 	check(migrated.upgrade_guild_tower(11) and migrated.tower_levels[11]==2,"twelfth tower has independent upgrade")
 	var full=SIM.new();check(full.restore_save(JSON.parse_string(JSON.stringify(migrated.export_save()))) and full.tower_levels==migrated.tower_levels,"all twelve upgrades survive JSON save reload")
 	check(not full.upgrade_guild_tower(12),"tower index beyond twelve is rejected")
+	check(full.guild_owner_tag(2)=="TSW","reloaded owner badge shows the current guild")
+	full.guild_holdings["2"]["remaining"]=100.0
+	full.fortress_hold=1.0
+	full._tick_timers(2.0)
+	check(full.guild_owner_tag(2)==CONTENT.FORTRESS_TAG and not full.guild_island_held(),"expired local island ownership cannot display a stale guild badge")
+	check(float(full.guild_holdings["2"].remaining)==0.0,"expired local ownership clears the cached world map timer")
 	var piece_test=SIM.new()
 	piece_test.fragments=5
 	check(piece_test.assign_bonus_piece(0) and piece_test.bonus_pieces[0]==1 and piece_test.fragments==4,"map segment assignment consumes only one collected fragment")
