@@ -79,7 +79,8 @@ func _initialize() -> void:
 		var berth: Vector2=sim.harbor
 		port_sites.append(berth)
 		check(sim.has_harbor() and not sim.blocked(berth,36.0) and not sim.on_land(berth),"island-harbor berth stays navigable and out of coastal collision on map "+str(port_map))
-		check(sim._harbor_site_for_map()==berth,"berth does not reroll during map visits: "+str(port_map))
+		var expected_berth: Vector2=Vector2(sim.guild_harbor_waypoints().berth) if sim.CONTENT.has_guild_island(port_map) else sim._harbor_site_for_map()
+		check(expected_berth==berth,"berth does not reroll during map visits: "+str(port_map))
 		sim.player.pos=berth
 		sim.player.hp=sim.player.max_hp
 		sim.player.last_hit=-100.0
