@@ -58,7 +58,7 @@ def main():
     java = Path(os.environ['JAVA_HOME'])
     output = args.output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
-    release_info={'revision':args.revision,'abi':1,'engine':'4.7.2.stable','min_apk':305901}
+    release_info={'revision':args.revision,'abi':1,'engine':'4.7.2.stable','min_apk':305902}
     (ROOT/'assets/content_version.json').write_text(json.dumps(release_info))
     fixture=ROOT/'tests/fixtures'; fixture.mkdir(parents=True,exist_ok=True)
     fixture_info=dict(release_info,revision=args.revision+1)
@@ -132,7 +132,7 @@ def main():
     if prepare_texture_quality(ROOT):
         checked([engine, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.texture-quality.log'))
     results = []
-    for name in ['simulation_test', 'progression_test', 'seafight_systems_test', 'ship_visual_test', 'stern_hull_taper_test', 'combat_fx_test', 'ui_test', 'updater_test', 'navigation_test', 'chart_presentation_test', 'deck_progression_test', 'ammo_picker_test', 'content_update_test']:
+    for name in ['frontier_test', 'simulation_test', 'progression_test', 'seafight_systems_test', 'ship_visual_test', 'stern_hull_taper_test', 'combat_fx_test', 'ui_test', 'updater_test', 'navigation_test', 'chart_presentation_test', 'deck_progression_test', 'ammo_picker_test', 'content_update_test']:
         with tempfile.TemporaryDirectory() as user_data:
             env = dict(os.environ, XDG_DATA_HOME=user_data)
             log = checked([engine, '--headless', '--path', str(ROOT), '--quit-after', '120',
@@ -194,13 +194,13 @@ def main():
     subprocess.run([str(bt/'zipalign'), '-c', '-P', '16', '4', str(output)], check=True)
     manifest = subprocess.check_output([str(bt/'aapt'), 'dump', 'badging', str(output)], text=True)
     output.with_suffix('.manifest.txt').write_text(manifest)
-    if "name='com.abyssaldominion.rebuild' versionCode='305901' versionName='0.305.9-test.1'" not in manifest:
+    if "name='com.abyssaldominion.rebuild' versionCode='305902' versionName='0.305.9-test.2'" not in manifest:
         raise RuntimeError('Unexpected Android identity')
     report.update({'engine': version, 'apk': output.name, 'sha256': hashlib.sha256(output.read_bytes()).hexdigest(),
               'bytes': output.stat().st_size, 'tests': results, 'audited_pngs': len(assets),
-              'signature': 'PASS', 'certificate_sha256': certificate, 'version_code': 305901, 'package': 'com.abyssaldominion.rebuild', 'updater_native': True, 'update_distribution': 'GITHUB_RELEASES_MANIFEST_PUBLISHED_LAST', 'alignment_16k': 'PASS', 'physical_android_test': 'NOT_PERFORMED',
+              'signature': 'PASS', 'certificate_sha256': certificate, 'version_code': 305902, 'package': 'com.abyssaldominion.rebuild', 'updater_native': True, 'update_distribution': 'GITHUB_RELEASES_MANIFEST_PUBLISHED_LAST', 'alignment_16k': 'PASS', 'physical_android_test': 'NOT_PERFORMED',
               'mode': 'LOCAL_GUEST_SEA_CHART', 'public_server': False, 'milestone': 'M3059',
-              'regions': 3, 'quest_chain': 7, 'equipment_categories': 4, 'equipment_tiers': 3,
+              'regions': 40, 'bonus_regions': 3, 'guild_islands': 19, 'save_schema': 6, 'quest_chain': 7, 'equipment_categories': 4, 'equipment_tiers': 3,
               'source_commit': os.environ.get('GITHUB_SHA', 'local'),
               'player_glb_models': 2, 'elite_material_variants': 10, 'player_ship_choices': 12, 'npc_glb_models': 9, 'graphics_modes': ['hybrid','3d'], 'retired_sprite_atlases': 0})
     output.with_suffix('.build.json').write_text(json.dumps(report, indent=2))

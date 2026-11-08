@@ -706,6 +706,66 @@
       "bytes": 462313,
       "sha256": "51da465df73a4728cbd4a80f07722b77c34d422856a6d603d45f2e05ae392f76",
       "source": "Original painted ice round icon generated for Abyssal Dominion M3061; not taken from a third-party game"
+    },
+    {
+      "path": "assets/world_v2/frontier_splash.png",
+      "sha256": "d51e882204c217e5315d12aea15f8711fbc78b9cf528021c5b4a6e15848cd684",
+      "source": "Original Abyssal Dominion generation 2026-11-08"
+    },
+    {
+      "path": "assets/world_v2/tower_cannon.png",
+      "sha256": "71cf00f863dc28be3de47beab82d419469d553a561ddf78b972671d8bc503481",
+      "source": "Original Abyssal Dominion generation 2026-11-08"
+    },
+    {
+      "path": "assets/world_v2/guild_island.png",
+      "sha256": "f68b6de8616bf288f313b1f12949856f40613b7b3df58f1c225743154a0b43e9",
+      "source": "Original Abyssal Dominion generation 2026-11-08"
+    },
+    {
+      "path": "assets/world_v2/tower_chain.png",
+      "sha256": "49f096e1d2883e2183ee2a7a2a6d62b4722f6c4d2eabe4e80816a3a253e16120",
+      "source": "Original Abyssal Dominion generation 2026-11-08"
+    },
+    {
+      "path": "assets/world_v2/guild_towers.png",
+      "sha256": "fb2586875931cf55a33705f7858511ffe7d3dfd0dc15ca86d2cc8f5d6b203015",
+      "source": "Original Abyssal Dominion generation 2026-11-08"
+    },
+    {
+      "path": "assets/world_v2/island_harbor.png",
+      "sha256": "0e6e4eb92eefe3db412f4d462c595bf559a6f12d1a8e797cbac37c51ec544291",
+      "source": "Original Abyssal Dominion generation 2026-11-08"
+    },
+    {
+      "path": "assets/world_v2/tower_mortar.png",
+      "sha256": "055aa09c2e3456aeb787a3715bcb238b5ff3e38fac42daf281eb405900dfb84d",
+      "source": "Original Abyssal Dominion generation 2026-11-08"
+    },
+    {
+      "path": "assets/world_v2/tower_guardian.png",
+      "sha256": "b362c2d48e65fc054e0a5ba2e80c834bb82a49a56e443d981edcc3595e4cadfa",
+      "source": "Original Abyssal Dominion generation 2026-11-08"
+    },
+    {
+      "path": "assets/ui/abyssal/supply_wind.svg",
+      "sha256": "69a7c21da03e328c1764a4c4c7d33a627ef7685f7c344979cc84a643d4cbe036",
+      "source": "Original native vector icon 2026-11-08"
+    },
+    {
+      "path": "assets/ui/abyssal/supply_smoke.svg",
+      "sha256": "45413e69b6490c5bfdaaf96de71532e673d1afe1602a0c11f8304c5f9ed5aeab",
+      "source": "Original native vector icon 2026-11-08"
+    },
+    {
+      "path": "assets/ui/abyssal/supply_rum.svg",
+      "sha256": "585a1ebd7ebc0e476742b7a610db85bcb20b0d2b043fbd127bcb4537c39480db",
+      "source": "Original native vector icon 2026-11-08"
+    },
+    {
+      "path": "assets/ui/abyssal/supply_charm.svg",
+      "sha256": "d65917271292324e4ef086f61458a74fbb5400f764af4223d6008527a4c5bdc9",
+      "source": "Original native vector icon 2026-11-08"
     }
   ]
 }

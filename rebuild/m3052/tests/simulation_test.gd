@@ -27,8 +27,8 @@ func _initialize() -> void:
 	sim.player.pos=Vector2(400,400)
 	for i in 60:sim.step(1.0/30.0)
 	check(npc.pos.distance_to(initial)>30,"patrol moves in the actual simulation")
-	var left: Vector2=sim.islands[0].pos-Vector2(330,0)
-	var right: Vector2=sim.islands[0].pos+Vector2(330,0)
+	var left: Vector2=sim.islands[1].pos-Vector2(330,0)
+	var right: Vector2=sim.islands[1].pos+Vector2(330,0)
 	var route=sim.plan_path(left,right)
 	check(not route.is_empty(),"route around island exists")
 	var before=left

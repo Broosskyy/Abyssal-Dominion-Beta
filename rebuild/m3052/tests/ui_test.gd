@@ -106,7 +106,7 @@ func _run() -> void:
 	check(game.mesh_layer.mode=="hybrid","M3099 legacy classic mode migrates to 2.5D")
 	game.mesh_layer.set_render_mode(original_mode)
 	var expected_name: String=game._plate_title(game.sim.player)
-	check(expected_name.contains("Schattenkriegsschiff") and not expected_name.contains("TEST"),"M3099 captain has no test design title")
+	check(expected_name.contains(game.sim.captain_name) and not expected_name.contains("TEST"),"captain displays player identity instead of selected hull design")
 	check(game._plate_title_size(game.sim.player)>=12,"M3099 captain title remains readable")
 	# The native-pixel HUD, not just the older chart drawing, must follow
 	# the selected original/Elite paint and size text at the actual font px.
@@ -163,7 +163,7 @@ func _run() -> void:
 	check(migration.restore_save(old_skin_one) and migration.player.skin==0,"old schema 4 skin 1 is not mistaken for new Elite 1")
 	var elite_save=migration.export_save()
 	elite_save.skin=1
-	check(migration.restore_save(elite_save) and migration.player.skin==1 and int(migration.export_save().schema)==5,"Elite 1 survives schema 5 guest save")
+	check(migration.restore_save(elite_save) and migration.player.skin==1 and int(migration.export_save().schema)==6,"Elite 1 survives schema 6 guest save")
 	migration.player.skin=0
 	for level in range(2,12):
 		var new_save=migration.export_save()
@@ -239,9 +239,7 @@ func _run() -> void:
 		for nav: Button in game.nav_buttons:
 			check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
 			check(nav.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and nav.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x,"navigation stays between wallet and captain meters at "+str(dimensions))
-		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.settings_button,game.render_toggle,game.interact,game.loadout_button,game.ammo_selector,game.camera_pad,game.target_cycle,game.supply_buttons.powder]
-		for item: Button in game.supply_buttons.values():
-			if item not in controls:controls.append(item)
+		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.settings_button,game.render_toggle,game.interact,game.loadout_button,game.ammo_selector,game.camera_pad,game.target_cycle,game.supply_selector]
 		for control: Control in controls:
 			var rect=control.get_global_rect()
 			check(rect.position.x>=0 and rect.position.y>=0 and rect.end.x<=dimensions.x+1 and rect.end.y<=dimensions.y+1,"touch control inside viewport %s"%dimensions)
@@ -260,7 +258,7 @@ func _run() -> void:
 		check(game.target_portrait.texture!=null,"selected NPC shows its actual ship portrait")
 		var hub: Vector2=game.attack.get_global_rect().get_center()
 		var ring=true
-		for orb: Control in [game.ammo_selector,game.repair,game.supply_buttons.powder,game.supply_buttons.repair_kit,game.supply_buttons.shield_charge,game.supply_buttons.plates]:
+		for orb: Control in [game.ammo_selector,game.repair,game.supply_selector]:
 			var offset: Vector2=orb.get_global_rect().get_center()-hub
 			ring=ring and offset.length()<game.attack.get_global_rect().size.x*1.65
 		check(game.attack.get_global_rect().position.x>dimensions.x*.7 and ring,"cannon stays bottom-right with ammunition and repair within thumb reach")
@@ -268,7 +266,7 @@ func _run() -> void:
 		check(str(game.attack.get("art").resource_path).ends_with("cannon_action.png") and game.attack.get("hero"),"fire control uses the dedicated cannon graphic")
 		check(game.player_hp.get_parent()==game.chrome and game.player_xp.get_parent()==game.chrome and game.player_shield.get_parent()==game.chrome,"captain experience, hull and shield meters sit in the top bar")
 		check(game.player_shield.get_global_rect().position.y>=game.player_hp.get_global_rect().end.y-1 and game.player_shield.get_global_rect().end.y<=game.chrome.get_global_rect().end.y+1,"shield meter stacks below hull inside the top bar at "+str(dimensions))
-		check(game.supply_buttons.values().all(func(item):return item.visible),"all supplies stay directly available beside the single ammunition selector")
+		check(game.supply_selector.visible and game.supply_buttons.values().all(func(item):return not item.visible),"one consumable selector replaces persistent supply orbs")
 		check(game.chart_mini.get_global_rect().encloses(Rect2(game.zoom_in.get_global_rect().get_center(),Vector2.ONE)) and game.chart_mini.get_global_rect().encloses(Rect2(game.settings_button.get_global_rect().get_center(),Vector2.ONE)),"map controls sit on the chart frame corners")
 		var details=game.target_numbers.get_rect()
 		var card=game.target_panel.size
@@ -542,9 +540,7 @@ func _run() -> void:
 			for button: Button in game.modal_body.find_children("*","Button",true,false):
 				check(button.get_global_rect().end.x<=game.modal_scroll.get_global_rect().end.x+1,"display option stays inside the scaled scroll viewport")
 			game.modal.hide()
-			var touch: Array=[game.attack,game.repair,game.ammo_selector,game.center_button,game.settings_button,game.zoom_in,game.zoom_out,game.loadout_button,game.camera_pad,game.target_cycle,game.supply_buttons.powder]
-			for item: Button in game.supply_buttons.values():
-				if item not in touch:touch.append(item)
+			var touch: Array=[game.attack,game.repair,game.ammo_selector,game.center_button,game.settings_button,game.zoom_in,game.zoom_out,game.loadout_button,game.camera_pad,game.target_cycle,game.supply_selector]
 			for control: Control in touch:
 				var bounds=control.get_global_rect()
 				check(bounds.position.x>=0 and bounds.position.y>=0 and bounds.end.x<=dimensions.x+1 and bounds.end.y<=dimensions.y+1,"scaled touch target remains inside viewport")
@@ -555,7 +551,7 @@ func _run() -> void:
 	game._set_display(2,false)
 	game.hud_size=0;game.journal_visible=true;game._load_display();game._layout()
 	check(game.hud_size==2 and not game.quest_panel.visible,"HUD size and journal visibility survive reload")
-	check(game.sim.export_save()==captain_before,"display choices preserve all captain progress")
+	check(stable_progress(game.sim.export_save())==stable_progress(captain_before),"display choices preserve all captain progress")
 	game.set_process(true)
 	game._set_display(1,true);game.modal.hide()
 	root.size=Vector2i(1560,720);await process_frame;game._layout()
@@ -769,14 +765,14 @@ func _run() -> void:
 	check(game.sim.powder_on and int(game.sim.supplies.powder)==4 and game.supply_buttons.powder.get("latched"),"powder orb toggles black powder without spending it")
 	game.supply_buttons.powder.pressed.emit()
 	check(not game.sim.powder_on,"powder orb switches black powder off again")
-	check(game.supply_buttons.repair_kit.visible and game.ammo_selector.visible,"emergency repair and ammunition remain directly available")
+	check(game.supply_selector.visible and game.ammo_selector.visible,"consumable and ammunition menus remain directly available")
 	var kits=int(game.sim.supplies.repair_kit)
 	game.supply_buttons.repair_kit.pressed.emit()
 	check(int(game.sim.supplies.repair_kit)==kits-1 and int(game.sim.player.hp)>1200 and float(game.sim.cooldowns.repair_kit)>0 and game.supply_buttons.repair_kit.get("cooldown")>0,"emergency repair heals once and shows its own cooldown")
 	game.repair.pressed.emit()
 	check(int(game.sim.supplies.repair_kit)==kits-1,"basic repair never consumes an emergency item")
 	game.sim.repairing=false
-	check(game.ammo_selector.visible and game.supply_buttons.repair_kit.visible,"using supplies does not hide the ammunition selector")
+	check(game.ammo_selector.visible and game.supply_selector.visible,"using supplies does not hide the ammunition selector")
 	# Guild founding and the bonus map run entirely through the menus.
 	game.sim.player.gold=1000;game._open_modal("Gilde")
 	game.guild_name_input.text="Sturmkrone";game.guild_tag_input.text="skr"
@@ -829,7 +825,7 @@ func _run() -> void:
 	await process_frame
 	var jumped=false
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
-		if button.text.begins_with("2-1") and not button.disabled:button.pressed.emit();jumped=true;break
+		if button.text.begins_with("2/1") and not button.disabled:button.pressed.emit();jumped=true;break
 	await process_frame
 	check(jumped and game.sim.map_id==1,"staff teleport changes the sea from the map list")
 	game._advance_loading(5.0)
@@ -855,3 +851,10 @@ func _run() -> void:
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)
 
+
+# UI choices preserve gameplay. A save also advances its wall-clock AFK checkpoint.
+func stable_progress(value: Dictionary) -> Dictionary:
+	var result: Dictionary=value.duplicate(true)
+	if result.has("rewards"):
+		result.rewards.erase("last_seen");result.rewards.erase("high_water")
+	return result

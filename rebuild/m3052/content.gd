@@ -22,14 +22,85 @@ const SHIP_LENGTHS := [144.0,136.0,136.0,144.0,156.0,144.0,144.0,156.0,156.0,144
 ## Authored gameplay data, separate from simulation and presentation.
 ## Regions 0-2 are linked by portals. Bonus maps are separate instances opened with a scroll.
 const MAPS := [
-	{"name":"Karibische See", "code":"1-1", "level":1, "art":["tropical","rock","tropical","tropical","rock","tropical","tropical","rock","tropical"], "tint":Color(0.75,1.14,1.12), "npc_hostile":false, "enemy_scale":1.0},
-	{"name":"Nordmeer", "code":"2-1", "level":2, "art":["snow2","snow","snow2","snow","rock","snow2","snow","rock","snow2"], "tint":Color(0.78,0.98,1.32), "npc_hostile":false, "enemy_scale":1.5},
-	{"name":"Schattengewässer", "code":"3-1", "level":4, "art":["rock","rock","snow2","rock","rock","snow","rock","rock","snow2"], "tint":Color(0.90,0.68,1.02), "npc_hostile":true, "enemy_scale":2.2},
+	{"name":"Karibische See", "code":"1/1", "tier":1, "lane":1, "level":1, "art":["tropical","rock","tropical","tropical","rock","tropical","tropical","rock","tropical"], "tint":Color(0.75,1.14,1.12), "npc_hostile":false, "enemy_scale":1.0},
+	{"name":"Nordmeer", "code":"2/1", "tier":2, "lane":1, "level":2, "art":["snow2","snow","snow2","snow","rock","snow2","snow","rock","snow2"], "tint":Color(0.78,0.98,1.32), "npc_hostile":false, "enemy_scale":1.5},
+	{"name":"Schattengewässer", "code":"3/1", "tier":3, "lane":1, "level":4, "art":["rock","rock","snow2","rock","rock","snow","rock","rock","snow2"], "tint":Color(0.90,0.68,1.02), "npc_hostile":true, "enemy_scale":2.2},
 	{"name":"Bronzeriff", "code":"B-1", "level":2, "art":["tropical","rock","tropical","rock","tropical"], "tint":Color(1.08,0.96,0.80), "npc_hostile":true, "enemy_scale":1.2, "bonus":true},
 	{"name":"Silberbucht", "code":"B-2", "level":5, "art":["snow2","rock","snow","rock","snow2"], "tint":Color(0.92,1.04,1.18), "npc_hostile":true, "enemy_scale":1.9, "bonus":true},
-	{"name":"Goldene Lagune", "code":"B-3", "level":8, "art":["tropical","tropical","rock","tropical","rock"], "tint":Color(1.16,1.02,0.72), "npc_hostile":true, "enemy_scale":2.8, "bonus":true}
+	{"name":"Goldene Lagune", "code":"B-3", "level":8, "art":["tropical","tropical","rock","tropical","rock"], "tint":Color(1.16,1.02,0.72), "npc_hostile":true, "enemy_scale":2.8, "bonus":true},
+	{"name":"Freibeuterküste", "code":"1/2", "level":1, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.85,0.92,1.20), "npc_hostile":false, "enemy_scale":1.12, "tier":1, "lane":2},
+	{"name":"Freibeuterküste", "code":"2/2", "level":2, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.93,0.79,1.06), "npc_hostile":false, "enemy_scale":1.42, "tier":2, "lane":2},
+	{"name":"Freibeuterküste", "code":"3/2", "level":3, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.75,1.10,1.12), "npc_hostile":false, "enemy_scale":1.72, "tier":3, "lane":2},
+	{"name":"Freibeuterküste", "code":"4/1", "level":4, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":1.90, "tier":4, "lane":1},
+	{"name":"Freibeuterküste", "code":"4/2", "level":4, "art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":2.02, "tier":4, "lane":2},
+	{"name":"Nebelpassage", "code":"5/1", "level":5, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":2.20, "tier":5, "lane":1},
+	{"name":"Nebelpassage", "code":"5/2", "level":5, "art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":2.32, "tier":5, "lane":2},
+	{"name":"Nebelpassage", "code":"6/1", "level":6, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.75,1.10,1.12), "npc_hostile":true, "enemy_scale":2.50, "tier":6, "lane":1},
+	{"name":"Nebelpassage", "code":"6/2", "level":6, "art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"], "tint":Color(0.75,1.10,1.12), "npc_hostile":true, "enemy_scale":2.62, "tier":6, "lane":2},
+	{"name":"Nebelpassage", "code":"7/1", "level":7, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":2.80, "tier":7, "lane":1},
+	{"name":"Nebelpassage", "code":"7/2", "level":7, "art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":2.92, "tier":7, "lane":2},
+	{"name":"Nebelpassage", "code":"8/1", "level":8, "art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":3.10, "tier":8, "lane":1},
+	{"name":"Nebelpassage", "code":"8/2", "level":8, "art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":3.22, "tier":8, "lane":2},
+	{"name":"Korallenmeer", "code":"9/1", "level":9, "art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"], "tint":Color(0.75,1.10,1.12), "npc_hostile":true, "enemy_scale":3.40, "tier":9, "lane":1},
+	{"name":"Korallenmeer", "code":"9/2", "level":9, "art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"], "tint":Color(0.75,1.10,1.12), "npc_hostile":true, "enemy_scale":3.52, "tier":9, "lane":2},
+	{"name":"Korallenmeer", "code":"10/1", "level":10, "art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":3.70, "tier":10, "lane":1},
+	{"name":"Korallenmeer", "code":"10/2", "level":10, "art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":3.82, "tier":10, "lane":2},
+	{"name":"Korallenmeer", "code":"11/1", "level":11, "art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":4.00, "tier":11, "lane":1},
+	{"name":"Korallenmeer", "code":"11/2", "level":11, "art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":4.12, "tier":11, "lane":2},
+	{"name":"Korallenmeer", "code":"12/1", "level":12, "art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"], "tint":Color(0.75,1.10,1.12), "npc_hostile":true, "enemy_scale":4.30, "tier":12, "lane":1},
+	{"name":"Korallenmeer", "code":"12/2", "level":12, "art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"], "tint":Color(0.75,1.10,1.12), "npc_hostile":true, "enemy_scale":4.42, "tier":12, "lane":2},
+	{"name":"Sturmsee", "code":"13/1", "level":13, "art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":4.60, "tier":13, "lane":1},
+	{"name":"Sturmsee", "code":"13/2", "level":13, "art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":4.72, "tier":13, "lane":2},
+	{"name":"Sturmsee", "code":"14/1", "level":14, "art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":4.90, "tier":14, "lane":1},
+	{"name":"Sturmsee", "code":"14/2", "level":14, "art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":5.02, "tier":14, "lane":2},
+	{"name":"Sturmsee", "code":"15/1", "level":15, "art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"], "tint":Color(0.75,1.10,1.12), "npc_hostile":true, "enemy_scale":5.20, "tier":15, "lane":1},
+	{"name":"Sturmsee", "code":"15/2", "level":15, "art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"], "tint":Color(0.75,1.10,1.12), "npc_hostile":true, "enemy_scale":5.32, "tier":15, "lane":2},
+	{"name":"Sturmsee", "code":"16/1", "level":16, "art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":5.50, "tier":16, "lane":1},
+	{"name":"Sturmsee", "code":"16/2", "level":16, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":5.62, "tier":16, "lane":2},
+	{"name":"Tiefenreich", "code":"17/1", "level":17, "art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":5.80, "tier":17, "lane":1},
+	{"name":"Tiefenreich", "code":"17/2", "level":17, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":5.92, "tier":17, "lane":2},
+	{"name":"Tiefenreich", "code":"18/1", "level":18, "art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"], "tint":Color(0.75,1.10,1.12), "npc_hostile":true, "enemy_scale":6.10, "tier":18, "lane":1},
+	{"name":"Tiefenreich", "code":"18/2", "level":18, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.75,1.10,1.12), "npc_hostile":true, "enemy_scale":6.22, "tier":18, "lane":2},
+	{"name":"Tiefenreich", "code":"19/1", "level":19, "art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":6.40, "tier":19, "lane":1},
+	{"name":"Tiefenreich", "code":"19/2", "level":19, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":6.52, "tier":19, "lane":2},
+	{"name":"Tiefenreich", "code":"20/1", "level":20, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":6.70, "tier":20, "lane":1},
+	{"name":"Tiefenreich", "code":"20/2", "level":20, "art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":6.82, "tier":20, "lane":2}
 ]
+# The original bonus ids 3..5 are deliberately reserved forever.
 const REGION_COUNT := 3
+const SEA_MAP_IDS := [0, 6, 1, 7, 2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42]
+const SEA_MAP_COUNT := 40
+
+static func sea_index(tier: int,lane: int) -> int:
+	if tier<1 or tier>20 or lane<1 or lane>2:return -1
+	return int(SEA_MAP_IDS[(tier-1)*2+lane-1])
+
+static func sea_neighbors(index: int) -> Array[int]:
+	if not index in SEA_MAP_IDS:return []
+	var config: Dictionary=MAPS[index]
+	var tier: int=int(config.get("tier",index+1))
+	var lane: int=int(config.get("lane",1))
+	var result: Array[int]=[]
+	# East/west progress through the same lane; north crosses to the paired sea.
+	if tier<20:result.append(sea_index(tier+1,lane))
+	if tier>1:result.append(sea_index(tier-1,lane))
+	result.append(sea_index(tier,3-lane))
+	return result
+
+static func next_sea_on_route(origin: int,destination: int) -> int:
+	if not origin in SEA_MAP_IDS or not destination in SEA_MAP_IDS:return -1
+	var queue: Array[int]=[origin]
+	var previous: Dictionary={origin:-1}
+	while not queue.is_empty():
+		var at: int=queue.pop_front()
+		if at==destination:break
+		for neighbor in sea_neighbors(at):
+			if not previous.has(neighbor):previous[neighbor]=at;queue.append(neighbor)
+	if not previous.has(destination) or origin==destination:return -1
+	var step: int=destination
+	while int(previous[step])!=origin:step=int(previous[step])
+	return step
+
 const BONUS_ISLANDS := [0,2,3,6,7]
 const BONUS_ISLAND_NAMES := [["Bronzefels","Muschelbank","Kupferklippe","Sandwacht","Rostriff"],["Silberfels","Perlenbank","Nebelklippe","Mondwacht","Eisriff"],["Goldfels","Kronenbank","Sonnenklippe","Schatzwacht","Bernsteinriff"]]
 ## Kastelle: permanent harbor investments. Levels 1-3 keep the original equipment effects.
@@ -54,12 +125,16 @@ const QUESTS := [
 	{"name":"Herr der Meere", "description":"Versenke insgesamt 20 Gegner", "stat":"kills", "goal":20, "gold":800, "xp":400, "essence":5}
 ]
 ## Consumable ship supplies. Toggles are spent only by a valid salvo or a received hit.
-const SUPPLY_KEYS := ["powder","plates","repair_kit","shield_charge"]
+const SUPPLY_KEYS := ["powder","plates","repair_kit","shield_charge","wind_draught","smoke_bomb","cleansing_rum","salvage_charm"]
 const SUPPLIES := {
 	"powder":{"name":"Schwarzpulver", "short":"PULVER", "icon":"supply_powder", "toggle":true, "effect":"+40 % Salvenschaden · 1 je gültiger Salve", "price":60, "pack":10},
 	"plates":{"name":"Panzerplatten", "short":"PLATTEN", "icon":"supply_plates", "toggle":true, "effect":"−35 % erlittener Schaden · 1 je Treffer", "price":60, "pack":10},
 	"repair_kit":{"name":"Notreparatur", "short":"NOTREP", "icon":"supply_repair", "toggle":false, "effect":"+35 % Rumpf sofort · 45 s Abklingzeit", "price":90, "pack":1, "cooldown":45.0},
-	"shield_charge":{"name":"Schildladung", "short":"SCHILD", "icon":"supply_shield", "toggle":false, "effect":"+50 % Schild sofort · 40 s Abklingzeit", "price":90, "pack":1, "cooldown":40.0}
+	"shield_charge":{"name":"Schildladung", "short":"SCHILD", "icon":"supply_shield", "toggle":false, "effect":"+50 % Schild sofort · 40 s Abklingzeit", "price":90, "pack":1, "cooldown":40.0},
+	"wind_draught":{"name":"Windtrank","short":"WIND","icon":"supply_wind","toggle":false,"effect":"+25 % Fahrt für 20 s · 60 s Abklingzeit","price":110,"pack":1,"cooldown":60.0},
+	"smoke_bomb":{"name":"Nebelbombe","short":"NEBEL","icon":"supply_smoke","toggle":false,"effect":"−30 % erlittener Schaden für 8 s · 60 s Abklingzeit","price":140,"pack":1,"cooldown":60.0},
+	"cleansing_rum":{"name":"Befreiungsrum","short":"RUM","icon":"supply_rum","toggle":false,"effect":"Entfernt Verlangsamung · 35 s Abklingzeit","price":80,"pack":1,"cooldown":35.0},
+	"salvage_charm":{"name":"Bergungsamulett","short":"BERGUNG","icon":"supply_charm","toggle":false,"effect":"+20 % Beutegold für 60 s · 120 s Abklingzeit","price":150,"pack":1,"cooldown":120.0}
 }
 ## Ten physical decks in two rows of five; role and material are independent.
 const DECK_SLOT_COUNT := 10
@@ -127,10 +202,10 @@ const FORTRESS_ISLAND := 4
 const FORTRESS_TAG := "KRF"
 const FORTRESS_HOLD := 1800.0
 const TOWERS := [
-	{"kind":"cannon", "name":"Kanonenturm", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.36,-0.04)},
-	{"kind":"mortar", "name":"Mörserturm", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.04,-0.34)},
-	{"kind":"chain", "name":"Kettenturm", "hp":1150, "range":440.0, "damage":22, "shots":2, "reload":3.2, "offset":Vector2(0.38,0.04)},
-	{"kind":"guardian", "name":"Wächterturm", "hp":1900, "range":390.0, "damage":28, "shots":2, "reload":2.2, "offset":Vector2(0.0,0.06)}
+	{"kind":"cannon", "name":"Kanonenturm", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.32,-0.24)},
+	{"kind":"mortar", "name":"Mörserturm", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.32,-0.24)},
+	{"kind":"chain", "name":"Kettenturm", "hp":1150, "range":440.0, "damage":22, "shots":2, "reload":3.2, "offset":Vector2(-0.31,0.19)},
+	{"kind":"guardian", "name":"Wächterturm", "hp":1900, "range":390.0, "damage":28, "shots":2, "reload":2.2, "offset":Vector2(0.31,0.19)}
 ]
 const GUILD_COST := 300
 ## Staff: roles carry permission lists, never hard-coded powers. Online, the server issues and
@@ -179,3 +254,6 @@ const STAFF_GRANTS := {
 ## Guild tags that imitate staff badges are refused, including digit look-alikes such as 4DM or M0D.
 const RESERVED_TAGS := ["ADM","ADMN","GM","GMS","MOD","MODS","QA","STAF","DEV","DEVS","TEAM","SYS","SUPP","GOD","OP","OPS","TEST"]
 const RESERVED_PREFIXES := ["ADM","MOD","GM"]
+
+static func has_guild_island(index: int) -> bool:
+	return index==FORTRESS_MAP or (index in SEA_MAP_IDS and int(MAPS[index].get("lane",1))==2 and int(MAPS[index].get("tier",1))>=3)

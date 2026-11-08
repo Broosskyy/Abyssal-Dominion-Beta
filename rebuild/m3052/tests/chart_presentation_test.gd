@@ -91,8 +91,8 @@ func run() -> void:
 					var plate_anchor=plate.position+Vector2(plate.size.x*.5,17*game._plate_pixels())
 					check(plate_anchor.is_equal_approx(game._plate_screen_anchor(actor)),"actor caption stays directly below its own ship even during overlaps"+suffix)
 				check(not game._plate_has_rank(close[1]) and game._plate_has_rank(sim.player),"pirate rank is exclusive to players"+suffix)
-			check(game.ammo_selector.visible and game.supply_buttons.values().all(func(item):return item.visible),"single ammunition selector and supplies are visible at %s / profile %d" % [dimensions,profile])
-	check(sim.export_save()==before,"caption layout and HUD refresh preserve the captain save")
+			check(game.ammo_selector.visible and game.supply_selector.visible and game.supply_buttons.values().all(func(item):return not item.visible),"separate ammunition and consumable selectors are visible at %s / profile %d" % [dimensions,profile])
+	check(stable_progress(sim.export_save())==stable_progress(before),"caption layout and HUD refresh preserve the captain save")
 	# Regression: zooming while sailing previously caused one-frame-late, blurred
 	# name/HP/shield/deck rendering. The projected layout is refreshed in _process
 	# and the font is drawn at an integer physical size, not zoom magnified.
@@ -196,3 +196,10 @@ func run() -> void:
 	check(game.status.visible and game.status_age==0.0,"a new message becomes visible again")
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)
+
+# UI choices preserve gameplay. A save also advances its wall-clock AFK checkpoint.
+func stable_progress(value: Dictionary) -> Dictionary:
+	var result: Dictionary=value.duplicate(true)
+	if result.has("rewards"):
+		result.rewards.erase("last_seen");result.rewards.erase("high_water")
+	return result

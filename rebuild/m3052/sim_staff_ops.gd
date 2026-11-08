@@ -21,7 +21,7 @@ static func staff_sign_out(s, restore: bool) -> bool:
 	var restored = restore and not snapshot.is_empty()
 	var touched = s.staff.touched
 	if bool(s.bonus.get("staff", false)) and s.in_bonus_map():
-		var origin = clampi(int(s.bonus.origin), 0, CONTENT.REGION_COUNT - 1)
+		var origin = int(s.bonus.origin) if int(s.bonus.origin) in CONTENT.SEA_MAP_IDS else 0
 		var saved: Array = s.bonus.origin_pos
 		s.bonus = {}
 		s.configure_map(origin)
@@ -124,7 +124,7 @@ static func staff_teleport(s, destination: int, place: String = "start", point: 
 	if to_bonus and not s.bonus.is_empty() and not bool(s.bonus.get("staff", false)) and not (s.in_bonus_map() and destination == s.map_id):
 		s.message = "Laufende %s-Bonuskarte zuerst beenden" % CONTENT.BONUS_TIERS[int(s.bonus.tier)].name
 		return false
-	if place == "fortress" and point.x < 0 and destination != CONTENT.FORTRESS_MAP:
+	if place == "fortress" and point.x < 0 and not CONTENT.has_guild_island(destination):
 		s.message = "Die Korsarenfestung liegt in den Schattengewässern"
 		return false
 	if place == "harbor" and point.x < 0 and to_bonus:
@@ -284,7 +284,7 @@ static func staff_target(s, action: String) -> bool:
 
 static func staff_world(s, action: String) -> bool:
 	if not action in ["reset_npcs","reset_fortress","skip_wave","loot"]: return false
-	if action == "reset_fortress" and s.map_id != CONTENT.FORTRESS_MAP:
+	if action == "reset_fortress" and not CONTENT.has_guild_island(s.map_id):
 		s.message = "Die Korsarenfestung liegt in den Schattengewässern"
 		return false
 	if action == "skip_wave" and (not s.in_bonus_map() or s.bonus.is_empty() or str(s.bonus.state) == "done"):

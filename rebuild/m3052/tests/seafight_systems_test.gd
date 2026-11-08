@@ -335,7 +335,7 @@ func _initialize() -> void:
 	sim.player.gold=900;sim.found_guild("Tiefseewacht","TSW");sim.fortress_hold=100;sim.upgrades.war=5;sim.player.shield=321
 	saved=JSON.parse_string(JSON.stringify(sim.export_save()))
 	restored=SIM.new()
-	check(int(saved.schema)==5 and restored.restore_save(saved),"schema 5 save and captain design are accepted")
+	check(int(saved.schema)==6 and restored.restore_save(saved),"schema 6 save and captain design are accepted")
 	check(restored.essence==17 and restored.fragments==4 and restored.scrolls==[1,0,2] and restored.kessel_meter==33 and restored.free_flask_day=="2026-11-04","essence, fragments, scrolls and cauldron survive reload")
 	check(int(restored.supplies.powder)==7 and int(restored.player.cannons)==16 and restored.owns_deck("hunter",2) and restored.deck_slots[0]==0,"supplies, cannons and decks survive reload")
 	check(restored.has_blessing() and float(restored.buffs.tide_deck)>0 and restored.guild.tag=="TSW" and restored.guild_island_held(),"timed buffs and guild survive reload")

@@ -1,6 +1,6 @@
 # Abyssal Dominion M3059 — signed data updates and 2D sea foundations
 
-The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.9-test.1` / Android code `305901`. M3052 is retained in Git history and `releases/M3052/`.
+The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the existing Android app identity and upgrade path. Current version: `0.305.9-test.2` / Android code `305902`. M3052 is retained in Git history and `releases/M3052/`.
 
 ## M3059 foundations
 
@@ -233,3 +233,8 @@ committed to the repository*. Until all nine intact GLBs replace the old
 published and installed, visual geometry remains incomplete. The current 3D
 mode is a perspective NPC GLB overlay on the 2D chart; it is not yet a full
 3D island/ocean/player environment.
+
+
+## Expansion after update 242
+
+Forty seas, separate consumable menu, modular conquerable guild islands, saved captain identity, daily/offline rewards and a graphical welcome/captain-harbor entry flow. The installed launcher changes, so bootstrap APK 305902 is required. Details, migration and current online limits: [Frontier expansion](docs/FRONTIER_AFTER_DATA_242.md).

@@ -53,7 +53,7 @@ var loot_collected := 0
 var monster_kills := 0
 var elite_kills := 0
 var tower_kills := 0
-var visited := [true, false, false]
+var visited: Array = []
 var upgrades := {"cannon":0, "hull":0, "sails":0, "crew":0, "harpoon":0, "war":0}
 var supplies := {"powder":10, "plates":10, "repair_kit":2, "shield_charge":2}
 var powder_on := false
@@ -70,10 +70,19 @@ var decks: Array = []
 var deck_slots := [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
 var bonus: Dictionary = {}
 var bonus_runs := 0
+var captain_name := "Kapitän"
+var battle_points := 0 # Awarded only by an authoritative PvP server, never NPC kills.
+var rewards := preload("res://reward_ledger.gd").new()
+var guild_holdings: Dictionary={}
+var tower_levels := [1,1,1,1]
 var guild: Dictionary = {}
 var fortress_conquests := 0
 var fortress_hold := 0.0
 var portals: Array[Dictionary] = []
+const HARBOR_SIZE := Vector2(350,350)
+const HARBOR_OFFSET := Vector2(343,231)
+var harbor_outline := PackedVector2Array()
+var harbor_bounds := Rect2()
 var harbor := Vector2(1920,1450)
 var base_islands: Array[Dictionary] = []
 var base_npcs: Array[Dictionary] = []
@@ -84,6 +93,11 @@ var staff_marked := false
 var message := "Seekarte antippen: Kurs setzen · Schiff antippen: Ziel wählen"
 
 func _init() -> void:
+	visited.resize(CONTENT.MAPS.size());visited.fill(false);visited[0]=true
+	for key: String in CONTENT.SUPPLY_KEYS:
+		if not supplies.has(key):supplies[key]=0
+		if not cooldowns.has(key):cooldowns[key]=0.0
+	for key in ["wind_draught","smoke_bomb","salvage_charm"]:buffs[key]=0.0
 	captain_id = Crypto.new().generate_random_bytes(6).hex_encode().to_upper()
 	rng.seed = 3060
 	var fresh_skin: int=FINAL_PLAYER_SKIN
@@ -163,6 +177,10 @@ func _build_grid() -> void:
 func blocked(point: Vector2, margin: float = 36.0) -> bool:
 	if point.x < margin or point.y < margin or point.x > WORLD.x - margin or point.y > WORLD.y - margin:
 		return true
+	if not harbor_outline.is_empty() and harbor_bounds.grow(margin).has_point(point):
+		if Geometry2D.is_point_in_polygon(point,harbor_outline):return true
+		for i in harbor_outline.size():
+			if Geometry2D.get_closest_point_to_segment(point,harbor_outline[i],harbor_outline[(i+1)%harbor_outline.size()]).distance_to(point)<margin:return true
 	for island in islands:
 		if not island.bounds.grow(margin).has_point(point):continue
 		var polygon: PackedVector2Array=island.outline
@@ -172,6 +190,7 @@ func blocked(point: Vector2, margin: float = 36.0) -> bool:
 	return false
 
 func on_land(point: Vector2) -> bool:
+	if not harbor_outline.is_empty() and Geometry2D.is_point_in_polygon(point,harbor_outline):return true
 	for island in islands:
 		if island.bounds.has_point(point) and Geometry2D.is_point_in_polygon(point,island.outline):return true
 	return false
@@ -315,7 +334,7 @@ func toggle_supply(key: String) -> bool:
 	return true
 
 func use_supply(key: String) -> bool:
-	if not key in ["repair_kit","shield_charge"] or docked or int(player.hp) <= 0: return false
+	if not CONTENT.SUPPLIES.has(key) or bool(CONTENT.SUPPLIES[key].toggle) or docked or int(player.hp) <= 0: return false
 	var config: Dictionary = CONTENT.SUPPLIES[key]
 	if float(cooldowns[key]) > 0:
 		message = "%s lädt noch %d s" % [config.name, ceili(float(cooldowns[key]))]
@@ -328,11 +347,17 @@ func use_supply(key: String) -> bool:
 			message = "Rumpf ist vollständig intakt"
 			return false
 		player.hp = minf(float(player.max_hp), float(player.hp) + float(player.max_hp) * 0.35)
-	else:
+	elif key == "shield_charge":
 		if float(player.shield) >= float(player.max_shield):
 			message = "Schild ist voll geladen"
 			return false
 		player.shield = minf(float(player.max_shield), float(player.shield) + float(player.max_shield) * 0.5)
+	elif key=="cleansing_rum":
+		if float(player.slow)<=0:return false
+		player.slow=0.0
+	elif key=="wind_draught":buffs.wind_draught=20.0
+	elif key=="smoke_bomb":buffs.smoke_bomb=8.0
+	elif key=="salvage_charm":buffs.salvage_charm=60.0
 	supplies[key] -= 1
 	cooldowns[key] = float(config.cooldown)
 	_event("supply", player.pos, 0, 0)
@@ -473,12 +498,13 @@ func reload_time() -> float:
 	return BASE_RELOAD * (1.0 - 0.04 * float(upgrades.crew))
 
 func loot_gold(amount: int) -> int:
-	var factor := 1.0 + 0.08 * float(upgrades.crew) + deck_value("logistics") / 100.0 + (0.1 if guild_island_held() else 0.0) + (0.15 if float(buffs.salvage_deck)>0 else 0.0)
+	var factor := (1.2 if float(buffs.get("salvage_charm",0))>0 else 1.0) + 0.08 * float(upgrades.crew) + deck_value("logistics") / 100.0 + (0.1 if guild_island_held() else 0.0) + (0.15 if float(buffs.salvage_deck)>0 else 0.0)
 	return roundi(float(amount) * factor)
 
 # --- Simulation step ---------------------------------------------------------------
 
 func _tick_timers(delta: float) -> void:
+	for key in ["wind_draught","smoke_bomb","salvage_charm"]:buffs[key]=maxf(0,float(buffs[key])-delta)
 	for key in cooldowns.keys(): cooldowns[key] = maxf(0.0, float(cooldowns[key]) - delta)
 	if has_blessing():
 		buffs.blessing = maxf(0.0, float(buffs.blessing) - delta)
@@ -493,6 +519,8 @@ func _tick_timers(delta: float) -> void:
 		buffs[key]=maxf(0.0,float(buffs[key])-delta)
 		if float(buffs[key])<=0:
 			apply_upgrades();message="%s abgelaufen" % CONTENT.SPECIAL_DECKS[key].name
+	for key: String in guild_holdings:
+		if int(key)!=map_id:guild_holdings[key].remaining=maxf(0,float(guild_holdings[key].remaining)-delta)
 	if fortress_hold > 0:
 		fortress_hold = maxf(0.0, fortress_hold - delta)
 		if fortress_hold <= 0 and not guild.is_empty(): message = "Korsaren erobern die Festung zurück"
@@ -547,7 +575,7 @@ func step(delta: float) -> void:
 
 func _move(body: Dictionary, delta: float) -> void:
 	var slow_rate = float(body.get("slow_rate", 0.55)) if float(body.slow) > 0 else 1.0
-	var travel = float(body.speed) * slow_rate * delta
+	var travel = float(body.speed) * slow_rate * delta * (1.25 if int(body.id)==0 and float(buffs.get("wind_draught",0))>0 else 1.0)
 	var phasing := int(body.id) == 0 and staff.flag("no_collision")
 	if int(body.id) == 0 and staff.flag("speed"): travel *= 2.5
 	while travel > 0.01 and not body.path.is_empty():
@@ -757,6 +785,7 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 	var damage_amount := int(shot.damage)
 	if float(victim.get("spotted", 0.0)) > clock and str(shot.weapon) != "flare":
 		damage_amount = roundi(float(damage_amount) * 1.15)
+	if int(victim.id)==0 and float(buffs.get("smoke_bomb",0))>0:damage_amount=roundi(float(damage_amount)*.7)
 	var dealt := apply_damage(victim, damage_amount)
 	if shot.weapon == "chain":
 		victim.slow = 4.0
@@ -1261,7 +1290,7 @@ func request_portal(destination: int) -> bool:
 	pending_portal=-1
 	if docked:message="Vor der Überfahrt zuerst im Hafen ablegen";return false
 	if int(player.hp)<=0:return false
-	if destination<0 or destination>=CONTENT.REGION_COUNT or destination==map_id:return false
+	if destination<0 or not destination in CONTENT.SEA_MAP_IDS or destination==map_id:return false
 	if level<int(CONTENT.MAPS[destination].level):
 		message="%s: Kapitänsstufe %d benötigt" % [CONTENT.MAPS[destination].name,CONTENT.MAPS[destination].level]
 		return false
@@ -1280,7 +1309,7 @@ func request_portal(destination: int) -> bool:
 	return false
 
 func travel(destination: int) -> bool:
-	if destination < 0 or destination >= CONTENT.REGION_COUNT or destination == map_id or docked or int(player.hp) <= 0: return false
+	if destination < 0 or not destination in CONTENT.SEA_MAP_IDS or destination == map_id or docked or int(player.hp) <= 0: return false
 	if near_portal() != destination:
 		message = "Für den Kartenwechsel zum Portal fahren"
 		return false
@@ -1312,6 +1341,14 @@ func island_art_scale(art: String) -> float:
 	return clampf(.70/maxf(.1,hi-lo),.95,1.15)
 
 func _harbor_site_for_map() -> Vector2:
+	if not harbor_outline.is_empty():return harbor
+	var cached: PackedVector2Array=harbor_outline
+	harbor_outline=PackedVector2Array()
+	var site: Vector2=_find_harbor_site()
+	harbor_outline=cached
+	return site
+
+func _find_harbor_site() -> Vector2:
 	# The same berth mirrors with its neighbouring coast on maps 1 and 2.
 	# A fallback location is chosen deterministically, not re-rolled on a
 	# revisit (which would break staff teleport, saves and the minimap).
@@ -1326,16 +1363,21 @@ func _harbor_site_for_map() -> Vector2:
 	return primary
 
 func _map_point(point: Vector2) -> Vector2:
-	match map_id:
+	match map_id%6:
 		1, 4: return Vector2(WORLD.x - point.x,point.y)
 		2, 5: return Vector2(point.x,WORLD.y - point.y)
 		3: return WORLD - point
 	return point
 
 func configure_map(destination: int) -> void:
+	_store_fortress_state()
+	harbor_outline.clear()
 	map_id = clampi(destination,0,CONTENT.MAPS.size()-1)
 	if map_id < visited.size(): visited[map_id] = true
 	var config = CONTENT.MAPS[map_id]
+	var holding: Dictionary=guild_holdings.get(str(map_id),{})
+	fortress_hold=float(holding.get("remaining",0.0))
+	tower_levels=holding.get("levels",[1,1,1,1]).duplicate()
 	portals.clear()
 	if bool(config.get("bonus", false)):
 		var tier := map_id - CONTENT.REGION_COUNT
@@ -1370,7 +1412,8 @@ func configure_map(destination: int) -> void:
 		npc.max_shield = roundi(float(npc.max_shield) * float(config.enemy_scale))
 		npc.shield = npc.max_shield
 		npc.reward = roundi(float(npc.reward) * float(config.enemy_scale))
-		if map_id > 0: npc.name = ("Frost · " if map_id == 1 else "Schatten · ") + str(npc.name)
+		if map_id >=6: npc.name="%s · " % config.code+str(npc.name)
+		elif map_id > 0: npc.name = ("Frost · " if map_id == 1 else "Schatten · ") + str(npc.name)
 	var restored := map_states.has(map_id)
 	if restored:
 		npcs = map_states[map_id].npcs.duplicate(true)
@@ -1380,16 +1423,34 @@ func configure_map(destination: int) -> void:
 		_add_drop(START + Vector2(-170,130),25 + map_id * 15)
 		_add_drop(START + Vector2(220,-120),25 + map_id * 15)
 		_add_drop(_map_point(Vector2(2170,1780)),30 + map_id * 20)
-	portals.append({"pos":Vector2(4070,1600),"destination":(map_id + 1) % CONTENT.REGION_COUNT})
-	portals.append({"pos":Vector2(330,1600),"destination":(map_id + 2) % CONTENT.REGION_COUNT})
+	var exits: Array[Vector2]=[Vector2(4070,1600),Vector2(330,1600),Vector2(2200,300)]
+	var neighbors: Array[int]=CONTENT.sea_neighbors(map_id)
+	for i in neighbors.size():portals.append({"pos":exits[i],"destination":neighbors[i]})
+	if CONTENT.has_guild_island(map_id):
+		islands[CONTENT.FORTRESS_ISLAND].art="guild_island"
+		islands[CONTENT.FORTRESS_ISLAND].width=float(base_islands[CONTENT.FORTRESS_ISLAND].width)*island_art_scale("guild_island")
 	_build_grid()
 	harbor=_harbor_site_for_map()
-	if map_id == CONTENT.FORTRESS_MAP:
+	var primary_port: Vector2=harbor
+	for offset in [Vector2.ZERO,Vector2(320,0),Vector2(0,320),Vector2(0,-320),Vector2(-320,0),Vector2(420,260),Vector2(-420,-260),START-primary_port]:
+		harbor=primary_port+offset
+		_set_harbor_collision()
+		_build_grid()
+		if not blocked(harbor) and not plan_path(START,harbor).is_empty():break
+
+	# Never initialize a patrol or chest inside newly introduced harbor land.
+	for npc: Dictionary in npcs:
+		if str(npc.kind)!="tower" and blocked(npc.pos):npc.pos=_free_water(npc.pos);npc.home=npc.pos;npc.path=[]
+	for drop: Dictionary in drops:
+		if blocked(drop.pos):drop.pos=_free_water(drop.pos)
+
+	if CONTENT.has_guild_island(map_id):
 		islands[CONTENT.FORTRESS_ISLAND].name = "Korsarenfestung"
 		if not restored: _add_fortress()
 	_spawn_sparkles()
 
 func export_save() -> Dictionary:
+	_store_fortress_state()
 	var region := map_id
 	var position: Vector2 = player.pos
 	if in_bonus_map() and not bonus.is_empty():
@@ -1398,7 +1459,7 @@ func export_save() -> Dictionary:
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
-	return {"schema":5,"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	return {"schema":6,"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
@@ -1410,7 +1471,14 @@ func export_save() -> Dictionary:
 		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
-	if not int(data.get("schema",0)) in [1,2,3,4,5]: return false
+	if not int(data.get("schema",0)) in [1,2,3,4,5,6]: return false
+	captain_name=str(data.get("captain_name","Kapitän")).strip_edges().left(24)
+	if captain_name.is_empty():captain_name="Kapitän"
+	battle_points=maxi(0,int(data.get("battle_points",0)))
+	rewards.restore(data.get("rewards",{}))
+	var stored_levels: Variant=data.get("tower_levels",[1,1,1,1])
+	if stored_levels is Array and stored_levels.size()==4:
+		for i in 4:tower_levels[i]=clampi(int(stored_levels[i]),1,5)
 	var stored_id := str(data.get("captain_id","")).strip_edges().to_upper()
 	if stored_id.length()==12 and stored_id.is_valid_hex_number():captain_id=stored_id
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
@@ -1439,6 +1507,7 @@ func restore_save(data: Dictionary) -> bool:
 		for key in CONTENT.SUPPLY_KEYS:supplies[key]=clampi(int(saved_supplies.get(key,supplies[key])),0,99999)
 	var saved_buffs: Variant=data.get("buffs",{})
 	if saved_buffs is Dictionary:
+		for key in ["wind_draught","smoke_bomb","salvage_charm"]:buffs[key]=clampf(float(saved_buffs.get(key,0)),0,60)
 		buffs.blessing=clampf(float(saved_buffs.get("blessing",0.0)),0.0,CONTENT.BLESSING_SECONDS)
 		buffs.tide_deck=clampf(float(saved_buffs.get("tide_deck",0.0)),0.0,CONTENT.TIDE_DECK_CAP)
 		for key: String in CONTENT.SPECIAL_DECKS:buffs[key]=clampf(float(saved_buffs.get(key,0.0)),0.0,CONTENT.TIDE_DECK_CAP)
@@ -1471,7 +1540,7 @@ func restore_save(data: Dictionary) -> bool:
 		else:
 			var origin_pos: Variant=run.get("origin_pos",[START.x,START.y])
 			bonus={"tier":clampi(int(run.get("tier",0)),0,CONTENT.BONUS_TIERS.size()-1),"wave":clampi(int(run.get("wave",0)),0,CONTENT.BONUS_WAVES.size()-1),
-				"state":"break","timer":3.0,"origin":clampi(int(run.get("origin",0)),0,CONTENT.REGION_COUNT-1),
+				"state":"break","timer":3.0,"origin":int(run.get("origin",0)) if int(run.get("origin",0)) in CONTENT.SEA_MAP_IDS else 0,
 				"origin_pos":origin_pos if origin_pos is Array and origin_pos.size()==2 else [START.x,START.y]}
 	guild={}
 	var saved_guild: Variant=data.get("guild",{})
@@ -1479,15 +1548,31 @@ func restore_save(data: Dictionary) -> bool:
 		guild={"name":str(saved_guild.name).left(24),"tag":str(saved_guild.tag).left(4).to_upper()}
 	fortress_conquests=maxi(0,int(data.get("fortress_conquests",0)))
 	staff_marked=bool(data.get("staff_marked",false))
-	fortress_hold=clampf(float(data.get("fortress_hold",0.0)),0.0,CONTENT.FORTRESS_HOLD) if not guild.is_empty() else 0.0
+	guild_holdings={}
+	var saved_holdings: Variant=data.get("guild_holdings",{})
+	if saved_holdings is Dictionary and not guild.is_empty():
+		for key in saved_holdings:
+			if not str(key).is_valid_int() or not CONTENT.has_guild_island(int(key)):continue
+			var entry: Variant=saved_holdings[key]
+			if not entry is Dictionary:continue
+			var levels: Array=[1,1,1,1]
+			var raw: Variant=entry.get("levels",[])
+			if raw is Array and raw.size()==4:
+				for i in 4:levels[i]=clampi(int(raw[i]),1,5)
+			guild_holdings[str(key)]={"remaining":clampf(float(entry.get("remaining",0)),0,CONTENT.FORTRESS_HOLD),"levels":levels}
+	if not guild.is_empty() and not guild_holdings.has(str(CONTENT.FORTRESS_MAP)) and float(data.get("fortress_hold",0))>0:
+		guild_holdings[str(CONTENT.FORTRESS_MAP)]={"remaining":clampf(float(data.get("fortress_hold",0)),0,CONTENT.FORTRESS_HOLD),"levels":tower_levels.duplicate()}
+	fortress_hold=0.0 # configure_map restores only its own island, never another sea's owner.
+	map_id=0
 	apply_upgrades()
 	var stock: Variant=data.get("ammo",[])
 	if stock is Array and stock.size()>=3:
 		for i in mini(stock.size(), player.ammo.size()): player.ammo[i]=clampi(int(stock[i]),0,999999)
 	var saved_visited: Variant=data.get("visited",[])
-	if saved_visited is Array and saved_visited.size()==3:
-		for i in 3:visited[i]=bool(saved_visited[i])
-	configure_map(clampi(int(data.get("map_id",0)),0,CONTENT.REGION_COUNT-1))
+	if saved_visited is Array:
+		for i in mini(saved_visited.size(),visited.size()):visited[i]=bool(saved_visited[i])
+	var restored_map: int=int(data.get("map_id",0))
+	configure_map(restored_map if restored_map in CONTENT.SEA_MAP_IDS else 0)
 	player.pos=START
 	var position: Variant=data.get("position",[])
 	if position is Array and position.size()==2:
@@ -1501,3 +1586,28 @@ func restore_save(data: Dictionary) -> bool:
 	docked=bool(data.get("docked",false)) and can_dock()
 	return true
 
+
+func upgrade_guild_tower(index: int) -> bool:
+	if not tower_friendly() or not CONTENT.has_guild_island(map_id) or index<0 or index>=4:return false
+	var tier: int=int(tower_levels[index])
+	var cost: int=300*tier*tier
+	if tier>=5 or int(player.gold)<cost:return false
+	player.gold-=cost;tower_levels[index]=tier+1
+	for actor: Dictionary in npcs:
+		if int(actor.id)==400+index:
+			var config: Dictionary=CONTENT.TOWERS[index]
+			actor.max_hp=roundi(float(config.hp)*(1.0+.35*tier));actor.hp=actor.max_hp
+			actor.damage=roundi(float(config.damage)*(1.0+.2*tier));actor.tower_level=tier+1
+	message="%s auf Stufe %d ausgebaut" % [CONTENT.TOWERS[index].name,tier+1]
+	return true
+
+func _store_fortress_state() -> void:
+	if CONTENT.has_guild_island(map_id) and not guild.is_empty():
+		guild_holdings[str(map_id)]={"remaining":fortress_hold,"levels":tower_levels.duplicate()}
+
+func _set_harbor_collision() -> void:
+	harbor_outline.clear()
+	for vertex: Array in island_shapes.island_harbor.points:
+		harbor_outline.append(harbor-HARBOR_OFFSET+Vector2(vertex[0],vertex[1])*HARBOR_SIZE)
+	harbor_bounds=Rect2(harbor_outline[0],Vector2.ZERO)
+	for vertex: Vector2 in harbor_outline:harbor_bounds=harbor_bounds.expand(vertex)

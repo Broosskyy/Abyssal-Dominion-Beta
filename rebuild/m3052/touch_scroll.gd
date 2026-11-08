@@ -5,6 +5,7 @@ const SKIN = preload("res://ui_skin.gd")
 const SLOP := 12.0
 const FRICTION := 4.5
 const WHEEL_STEP := 70.0
+var active_touch := -1
 var pressing := false
 var dragging := false
 var press_point := Vector2.ZERO
@@ -39,6 +40,7 @@ func gliding() -> bool:
 	return absf(velocity)>30.0
 
 func _process(delta: float) -> void:
+	if not is_visible_in_tree():_cancel_gesture();return
 	if pending>=0:
 		scroll_vertical=pending
 		pending_frames-=1
@@ -69,10 +71,19 @@ func _input(event: InputEvent) -> void:
 		velocity=0.0
 		get_viewport().set_input_as_handled()
 	var emulated=event is InputEventMouse and event.device==InputEvent.DEVICE_ID_EMULATION
-	if pointer and not emulated:
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			if active_touch<0 and not pressing and get_global_rect().has_point(event.position):
+				active_touch=event.index;_press(event.position)
+		elif event.index==active_touch:
+			if event.canceled:_cancel_gesture()
+			else:_release();active_touch=-1
+	elif event is InputEventScreenDrag:
+		if event.index==active_touch and _drag(event.position):get_viewport().set_input_as_handled()
+	elif pointer and not emulated and active_touch<0:
 		if event.pressed:_press(event.position)
 		else:_release()
-	elif event is InputEventScreenDrag or (event is InputEventMouseMotion and not emulated):
+	elif event is InputEventMouseMotion and not emulated and active_touch<0:
 		if _drag(event.position):get_viewport().set_input_as_handled()
 	elif event is InputEventMouseMotion and dragging:
 		get_viewport().set_input_as_handled()
@@ -87,12 +98,13 @@ func _press(point: Vector2) -> void:
 	var bar=get_v_scroll_bar()
 	if bar.visible and bar.get_global_rect().grow(4).has_point(point):return
 	pressing=true;dragging=false
-	press_point=point;press_scroll=scroll_vertical
+	press_point=get_global_transform().affine_inverse()*point;press_scroll=scroll_vertical
 	velocity=0.0
-	samples=[[Time.get_ticks_msec(),point.y]]
+	samples=[[Time.get_ticks_msec(),press_point.y]]
 
 func _drag(point: Vector2) -> bool:
 	if not pressing:return false
+	point=get_global_transform().affine_inverse()*point
 	if not dragging:
 		if absf(point.y-press_point.y)<SLOP:return false
 		dragging=true
@@ -122,3 +134,8 @@ func _cancel_child_press() -> void:
 	cancelling=true
 	get_viewport().push_input(away,true)
 	cancelling=false
+
+func _cancel_gesture() -> void:
+	pressing=false;dragging=false;active_touch=-1;velocity=0.0;samples.clear()
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_APPLICATION_PAUSED,NOTIFICATION_WM_WINDOW_FOCUS_OUT]:_cancel_gesture()

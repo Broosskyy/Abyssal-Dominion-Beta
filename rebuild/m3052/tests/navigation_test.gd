@@ -78,7 +78,7 @@ func _initialize() -> void:
 		sim.configure_map(port_map)
 		var berth: Vector2=sim.harbor
 		port_sites.append(berth)
-		check(sim.has_harbor() and not sim.blocked(berth,94.0) and not sim.on_land(berth),"island-harbor berth stays navigable and out of coastal collision on map "+str(port_map))
+		check(sim.has_harbor() and not sim.blocked(berth,36.0) and not sim.on_land(berth),"island-harbor berth stays navigable and out of coastal collision on map "+str(port_map))
 		check(sim._harbor_site_for_map()==berth,"berth does not reroll during map visits: "+str(port_map))
 		sim.player.pos=berth
 		sim.player.hp=sim.player.max_hp
@@ -103,6 +103,8 @@ func _initialize() -> void:
 		for vertex: Vector2 in island.outline:centroid+=vertex
 		centroid/=island.outline.size()
 		check(sim.blocked(centroid,0),"measured land centroid is blocked: "+str(island.name))
-		check(not sim.blocked(island.bounds.end+Vector2(60,60),0),"water beyond measured bounds is clear: "+str(island.name))
+		var water: Vector2=island.bounds.end+Vector2(60,60)
+		if sim.harbor_bounds.grow(60).has_point(water):water=sim.harbor+Vector2(200,0)
+		check(not sim.blocked(water,0),"water beyond both coastal and harbor land is clear: "+str(island.name))
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)

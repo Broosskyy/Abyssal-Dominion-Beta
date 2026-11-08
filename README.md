@@ -1,6 +1,6 @@
 # Abyssal Dominion
 
-**Current gameplay build: [M3059 — signed data updates and 2D sea foundations](rebuild/m3052/README.md).** Open `rebuild/m3052/project.godot` in Godot 4.7.2. Current Android version is `0.305.9-test.1` (code `305901`). The bootstrap APK is published as a [GitHub release](https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases); compatible game changes ship as signed `data-N` releases without a new APK. Package `com.abyssaldominion.rebuild` and the guest save migrate from M3052.
+**Current gameplay build: [Frontier expansion — captain harbor and forty seas](rebuild/m3052/docs/FRONTIER_AFTER_DATA_242.md).** Open `rebuild/m3052/project.godot` in Godot 4.7.2. The expansion requires Android `0.305.9-test.2` (code `305902`) once for the illustrated updater → welcome/login → captain harbor → sea flow. The bootstrap APK is published as a [GitHub release](https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases); subsequent compatible game changes ship as signed `data-N` releases without a new APK. Package `com.abyssaldominion.rebuild`, signing identity and existing guest progress are retained. The account/map-room sandbox under `server/` prepares crossplay; public online combat is not deployed.
 
 ## Repository layout
 

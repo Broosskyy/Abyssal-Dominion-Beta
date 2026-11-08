@@ -1,0 +1,46 @@
+{
+  "provider": "OpenAI built-in image generation",
+  "date": "2026-11-08",
+  "purpose": "Abyssal Dominion game integration",
+  "source_prompts": {
+    "island_harbor.png": "Production-ready isolated 2.5D pirate MMO island harbor sprite, genuine transparent background. Orthographic aerial 50-degree view. Compact crescent tropical rocky island, dark timber and stone harbor village, weathered red/brown roofs, brass details, two wooden piers around an open lower-right cove. Sharp realistic detailed 3D game materials, controlled neutral daylight, readable at 300px. No ships, ocean rectangle, text, UI or shadow plane; complete silhouette with transparent padding.",
+    "guild_island.png": "Production-ready isolated 2.5D pirate MMO conquerable guild fortress island. Transparent background, orthographic aerial 50-degree view. Rugged oval island, grey stone sea walls, central keep, dark timber roofs, subdued crimson banners. Four empty round stone tower foundations northwest, northeast, southeast, southwest, for separate upgradeable towers. Small beach and timber pier at bottom. Sharp realistic dark materials, controlled neutral daylight, readable at 500px. No ships, ocean rectangle, text, UI or background.",
+    "guild_towers.png": "2x2 transparent sprite atlas, four separate pirate fortress towers, consistent orthographic aerial 50-degree view and ground scale. Top-left circular cannon tower; top-right hexagonal mortar tower; bottom-left square reinforced timber ballista tower; bottom-right ornate guardian tower with brass battlements and subtle teal crystal. Realistic detailed dark grey stone, dark timber, muted brass, controlled daylight, premium 2.5D game quality. Generous transparent separation, no walls, ground plane, labels, text or borders.",
+    "frontier_splash.png": "Wide cinematic 16:9 pirate game login/launcher background: majestic dark wooden warship with cream sails and muted golden fittings in an island port at blue hour, distant fortified guild island, warm harbor lanterns, dark navy sea and moonlit clouds. Premium sharp realistic stylized 2.5D/3D art, restrained lighting, no bright haze. Ship on left; calm dark sea and atmosphere on right for native login UI. No text, logos, watermark or UI."
+  },
+  "processing": "Tower quadrants extracted losslessly with Pillow; original atlas retained; alpha preserved. Collision contours measured from alpha > 180.",
+  "files": {
+    "frontier_splash.png": {
+      "sha256": "d51e882204c217e5315d12aea15f8711fbc78b9cf528021c5b4a6e15848cd684",
+      "bytes": 2561902
+    },
+    "tower_cannon.png": {
+      "sha256": "71cf00f863dc28be3de47beab82d419469d553a561ddf78b972671d8bc503481",
+      "bytes": 398983
+    },
+    "guild_island.png": {
+      "sha256": "f68b6de8616bf288f313b1f12949856f40613b7b3df58f1c225743154a0b43e9",
+      "bytes": 3060284
+    },
+    "tower_chain.png": {
+      "sha256": "49f096e1d2883e2183ee2a7a2a6d62b4722f6c4d2eabe4e80816a3a253e16120",
+      "bytes": 447026
+    },
+    "guild_towers.png": {
+      "sha256": "fb2586875931cf55a33705f7858511ffe7d3dfd0dc15ca86d2cc8f5d6b203015",
+      "bytes": 1832843
+    },
+    "island_harbor.png": {
+      "sha256": "0e6e4eb92eefe3db412f4d462c595bf559a6f12d1a8e797cbac37c51ec544291",
+      "bytes": 2256512
+    },
+    "tower_mortar.png": {
+      "sha256": "055aa09c2e3456aeb787a3715bcb238b5ff3e38fac42daf281eb405900dfb84d",
+      "bytes": 415655
+    },
+    "tower_guardian.png": {
+      "sha256": "b362c2d48e65fc054e0a5ba2e80c834bb82a49a56e443d981edcc3595e4cadfa",
+      "bytes": 477082
+    }
+  }
+}

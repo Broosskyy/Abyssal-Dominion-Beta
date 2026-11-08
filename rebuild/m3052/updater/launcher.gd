@@ -17,9 +17,9 @@ var countdown=false
 func _ready() -> void:
 	var manual=bool(get_tree().get_meta("abyssal_manual_update",false))
 	if manual:get_tree().remove_meta("abyssal_manual_update");autostart=false
-	var bg=ColorRect.new();bg.color=Color("061b28");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
+	var bg=TextureRect.new();bg.texture=load("res://assets/world_v2/frontier_splash.png");bg.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;bg.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED;bg.mouse_filter=Control.MOUSE_FILTER_IGNORE;bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
 	panel=Panel.new();add_child(panel)
-	var skin=StyleBoxFlat.new();skin.bg_color=Color("0b2736");skin.border_color=Color("b89755")
+	var skin=StyleBoxFlat.new();skin.bg_color=Color(.025,.07,.10,.95);skin.border_color=Color("b89755")
 	skin.set_border_width_all(1);skin.set_corner_radius_all(16)
 	skin.content_margin_left=28;skin.content_margin_right=28;skin.content_margin_top=24;skin.content_margin_bottom=24
 	panel.add_theme_stylebox_override("panel",skin)
@@ -27,10 +27,10 @@ func _ready() -> void:
 	var title=Label.new();title.text="ABYSSAL DOMINION";title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size",25);title.add_theme_color_override("font_color",Color("e1c68b"));box.add_child(title)
 	version_label=Label.new();version_label.text="Version "+str(ProjectSettings.get_setting("application/config/version",""));version_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;box.add_child(version_label)
-	status=Label.new();status.text="Seekarte wird vorbereitet …";status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;status.custom_minimum_size.y=48;status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;box.add_child(status)
+	status=Label.new();status.text="Spieldaten werden geprüft …";status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;status.custom_minimum_size.y=48;status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;box.add_child(status)
 	bar=ProgressBar.new();bar.custom_minimum_size.y=16;bar.show_percentage=false;bar.max_value=1;box.add_child(bar)
 	action=Button.new();action.text="Updates prüfen";action.custom_minimum_size.y=48;action.pressed.connect(_action);box.add_child(action)
-	play=Button.new();play.text="Spielen";play.custom_minimum_size.y=48;play.pressed.connect(_play);box.add_child(play)
+	play=Button.new();play.text="ZUR STARTSEITE";play.custom_minimum_size.y=48;play.pressed.connect(_play);box.add_child(play)
 	var hint=Label.new();hint.text="Spieldaten ohne Installation · Android-Updates mit Bestätigung.";hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;hint.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;hint.add_theme_font_size_override("font_size",13);box.add_child(hint)
 	updater=CONTROLLER.new();add_child(updater);updater.changed.connect(_refresh)
 	content=DATA.new();add_child(content);content.changed.connect(_refresh)
@@ -67,7 +67,7 @@ func _refresh() -> void:
 	action.disabled=state=="installing"
 	action.text="Installation fortsetzen" if state in ["ready","permission"] else ("Update herunterladen" if state=="available" else ("Erneut herunterladen" if state=="error" and not current.spec.is_empty() else "Updates prüfen"))
 	if state=="restart":action.text="App schließen"
-	play.text="Spielen · Download läuft weiter" if state in ["downloading","paused"] else "Spielen"
+	play.text="STARTSEITE · Download läuft weiter" if state in ["downloading","paused"] else "ZUR STARTSEITE"
 	if autostart and state in ["current","offline","unsupported"] and content_started and not countdown:
 		countdown=true
 		await get_tree().create_timer(1.2).timeout
@@ -85,4 +85,4 @@ func _action() -> void:
 func _play() -> void:
 	var boot=get_tree().root.get_node_or_null("DataBoot")
 	if boot!=null:boot.prepare_game()
-	get_tree().change_scene_to_file("res://sea_map.tscn")
+	get_tree().change_scene_to_file("res://start_hub.tscn")

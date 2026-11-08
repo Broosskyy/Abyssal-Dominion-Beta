@@ -73,6 +73,7 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	var monster=str(actor.get("kind",""))=="monster"
 	var elite=bool(actor.get("elite",false))
 	var hostile=not player and (bool(actor.get("aggressive",false)) or bool(host.CONTENT.MAPS[sim.map_id].npc_hostile) or (tower and not sim.tower_friendly()))
+	if tower:hostile=not host.sim.tower_friendly()
 	var tint=Color("e8d0a1") if elite else Color("dce8e4")
 	if player:tint=_player_title_tint(actor)
 	elif hostile:tint=Color("eab8a7")
@@ -85,7 +86,7 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	var pixel_scale=float(host._plate_pixels())
 	draw_set_transform(anchor,0,Vector2.ONE)
 	var title: String=host._plate_title(actor)
-	var width=_caption(Vector2.ZERO,title,host._plate_title_size(actor),tint)
+	var width=_player_caption(actor,host._plate_title_size(actor),tint) if player else _caption(Vector2.ZERO,title,host._plate_title_size(actor),tint)
 	# Readable Seafight-like target focus: two small corner brackets, NOT
 	# a full opaque card. On-screen dimensions are native-pixel stable.
 	if not player and int(actor.id)==int(sim.target):
@@ -105,6 +106,7 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	if host._plate_has_rank(actor):
 		var tier=clampi(floori((sim.level-1)/4.0)+1,1,5) if player else clampi(int(actor.get("pirate_rank",1)),1,5)
 		_rank(Vector2(-width*.5-23*pixel_scale,-6*pixel_scale),tier,pixel_scale)
+		if player:_battle_rank(Vector2(width*.5+23*pixel_scale,-6*pixel_scale),pixel_scale,int(sim.battle_points))
 	var identity: String=host._plate_identity(actor)
 	if not identity.is_empty():_caption(Vector2(0,13*pixel_scale),identity,8,Color(.72,.86,.88,.49),1)
 	var bar_width=(132.0 if player else (96.0 if int(actor.id)==sim.target else 84.0))*pixel_scale
@@ -127,3 +129,25 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	if float(actor.get("slow",0.0))>0.0:draw_circle(Vector2(bar_width*.5+6*pixel_scale,14*pixel_scale),2.5*pixel_scale,Color("9fdbf4"))
 	if player and sim.staff.hidden():_caption(Vector2(0,-20*pixel_scale),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color())
 	draw_set_transform(Vector2.ZERO)
+
+func _player_caption(_actor: Dictionary,base_size: int,tint: Color) -> float:
+	var parts: Array=[]
+	if host.sim.staff.shows_badge():parts.append(["[%s] " % host.sim.staff.badge(),host.sim.staff.color()])
+	if not host.sim.guild.is_empty():parts.append(["[%s] " % host.sim.guild.tag,Color("ffd34d")])
+	parts.append([host.sim.captain_name,tint])
+	var fs: int=_font_size(base_size)
+	var total: float=0.0
+	for part: Array in parts:total+=host.font.get_string_size(str(part[0]),HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
+	var x: float=roundf(-total*.5)
+	for part: Array in parts:
+		draw_string_outline(host.font,Vector2(x,0),str(part[0]),HORIZONTAL_ALIGNMENT_LEFT,-1,fs,2,Color("06111b"))
+		draw_string(host.font,Vector2(x,0),str(part[0]),HORIZONTAL_ALIGNMENT_LEFT,-1,fs,part[1])
+		x+=host.font.get_string_size(str(part[0]),HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
+	return total
+func _battle_rank(center: Vector2,k: float,points: int) -> void:
+	var color: Color=Color("69cef2") if points>0 else Color("7c8993")
+	draw_circle(center,10*k,Color("0b2331"));draw_arc(center,10*k,0,TAU,24,color,1.5*k,true)
+	for side in [-1.0,1.0]:
+		draw_line(center+Vector2(-6*side,7)*k,center+Vector2(6*side,-7)*k,color,2*k,true)
+		draw_line(center+Vector2(-7*side,2)*k,center+Vector2(-2*side,6)*k,color,2*k,true)
+	if points>0:draw_circle(center+Vector2(0,-11)*k,2.5*k,Color("ffdf72"))

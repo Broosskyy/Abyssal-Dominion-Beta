@@ -7,20 +7,21 @@ static func leave_guild(s) -> bool:
 	if s.guild.is_empty(): return false
 	s.message = "Gilde [%s] aufgelöst" % s.guild.tag
 	s.guild = {}
+	s.guild_holdings.clear()
 	s.fortress_hold = 0.0
 	return true
 
 static func guild_island_held(s) -> bool:
-	return not s.guild.is_empty() and s.fortress_hold > 0
+	return not s.guild.is_empty() and (s.fortress_hold > 0 or s.guild_holdings.values().any(func(holding):return float(holding.get("remaining",0))>0))
 
 static func tower_friendly(s) -> bool:
-	return s.guild_island_held()
+	return not s.guild.is_empty() and s.fortress_hold>0 and CONTENT.has_guild_island(s.map_id)
 
 static func tower_tag(s) -> String:
 	return str(s.guild.tag) if s.tower_friendly() else CONTENT.FORTRESS_TAG
 
 static func fortress_island(s) -> Dictionary:
-	if s.map_id != CONTENT.FORTRESS_MAP: return {}
+	if not CONTENT.has_guild_island(s.map_id): return {}
 	return s.islands[CONTENT.FORTRESS_ISLAND]
 
 static func _add_fortress(s) -> void:
@@ -31,12 +32,14 @@ static func _add_fortress(s) -> void:
 		var config: Dictionary = CONTENT.TOWERS[i]
 		var point: Vector2 = center + config.offset * island.bounds.size
 		while not s.on_land(point) and point.distance_to(center) > 8: point = point.move_toward(center, 8.0)
-		var shield = roundi(float(config.hp) * 0.3)
+		var tier: int=int(s.tower_levels[i])
+		var hp: int=roundi(float(config.hp)*(1.0+.35*(tier-1)))
+		var shield = roundi(float(hp) * 0.3)
 		s.npcs.append({"id": 400 + i, "name": config.name, "kind": "tower", "tower": config.kind, "pos": point,
-			"home": point, "heading": Vector2.LEFT, "path": [], "hp": config.hp, "max_hp": config.hp,
+			"home": point, "heading": Vector2.LEFT, "path": [], "hp": hp, "max_hp": hp, "tower_level":tier,
 			"shield": shield, "max_shield": shield, "speed": 0.0, "reload": float(i) * 0.7, "repath": 0.0,
 			"state": "guard", "patrol": 0, "aggressive": false, "slow": 0.0, "respawn": 0.0, "reward": 0,
-			"art": i, "elite": true, "range": config.range, "damage": config.damage, "shots": config.shots,
+			"art": i, "elite": true, "range": config.range, "damage": roundi(float(config.damage)*(1.0+.2*(tier-1))), "shots": config.shots,
 			"rate": config.reload, "last_hit": -100.0})
 
 static func towers_alive(s) -> int:

@@ -70,7 +70,10 @@ func _initialize() -> void:
 	sim.player.pos=sim.portals[1].pos
 	check(sim.travel(0) and int(sim.npcs[0].hp)==123,"returning preserves previous map enemy state")
 	sim.award_xp(1000)
-	sim.player.pos=sim.portals[1].pos
+	# Travel through the actual adjacent 2/1 portal before entering 3/1.
+	sim.player.pos=sim.portals[0].pos
+	check(sim.travel(1),"40-map topology requires the adjacent northern sea")
+	sim.player.pos=sim.portals[0].pos
 	check(sim.travel(2) and sim.map_id==2 and sim.visited[2],"shadow region becomes accessible at level four")
 	check(not sim.blocked(sim.START) and not sim.blocked(sim.harbor),"shadow entry and harbor are navigable water")
 	for region in 3:
