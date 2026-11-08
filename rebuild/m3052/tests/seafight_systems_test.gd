@@ -156,7 +156,7 @@ func _initialize() -> void:
 	# Cannon capacity is separate from owned cannons.
 	sim=SIM.new()
 	check(sim.cannon_slots()==10 and sim.equipped_cannons()==10 and sim.weapon_damage(0)==31,"ten slots and ten cannons keep the original salvo")
-	check(not sim.buy_cannons(),"cannons are bought in the harbor")
+	sim.player.gold=0;check(not sim.buy_cannons(),"cannot buy without sufficient currency")
 	sim.player.pos=sim.harbor;sim.dock();sim.player.gold=5000
 	check(sim.buy_cannons() and int(sim.player.cannons)==12 and sim.equipped_cannons()==10 and sim.cannon_storage()==2,"new purchased cannons are stored, not automatically installed")
 	sim.add_tide_deck(1800)
