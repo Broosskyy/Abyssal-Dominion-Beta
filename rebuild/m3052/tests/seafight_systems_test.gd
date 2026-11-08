@@ -296,7 +296,7 @@ func _initialize() -> void:
 	var towers: Array=[]
 	for body: Dictionary in sim.npcs:
 		if body.kind=="tower":towers.append(body)
-	check(towers.size()==10,"fortress carries ten independent towers")
+	check(towers.size()==12,"fortress carries twelve independent towers")
 	var on_land=true
 	for tower: Dictionary in towers:on_land=on_land and sim.on_land(tower.pos)
 	check(on_land,"towers stand on the fortress island")
@@ -320,9 +320,9 @@ func _initialize() -> void:
 	for tower: Dictionary in towers:
 		tower.hp=1;tower.shield=0
 		sim._hit({"source":0,"damage":5,"weapon":"cannon"},tower)
-	check(sim.fortress_conquests==1 and sim.guild_island_held() and sim.tower_kills==10,"destroying all towers conquers the guild island")
+	check(sim.fortress_conquests==1 and sim.guild_island_held() and sim.tower_kills==12,"destroying all twelve towers conquers the guild island")
 	sim.step(7.0)
-	check(sim.towers_alive()==10 and sim.tower_friendly() and sim.tower_tag()=="TSW","towers return under the captain's guild tag")
+	check(sim.towers_alive()==12 and sim.tower_friendly() and sim.tower_tag()=="TSW","towers return under the captain's guild tag")
 	sim.select(cannon.id);sim.player.reload=0;sim.shots.clear();sim._fire_player()
 	check(sim.shots.is_empty(),"guild towers cannot be attacked by their owner")
 	check(sim.loot_gold(100)==110,"held guild island adds loot gold")
