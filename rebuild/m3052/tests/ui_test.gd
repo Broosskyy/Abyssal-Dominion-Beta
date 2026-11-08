@@ -399,6 +399,30 @@ func _run() -> void:
 	game._switch_tab("Decks","SCHIFF")
 	game._switch_tab("Markt","AUSRÜSTUNG")
 	game.modal.hide()
+	# A small portrait phone needs one large product per row, with a
+	# swipeable category strip (no unreadable squashed four-tab ribbon).
+	root.size=Vector2i(720,1280)
+	await process_frame
+	game._layout()
+	game._switch_tab("Markt","MUNITION")
+	await process_frame
+	check(game.modal_tabs_scroll.visible and game.modal_tabs_scroll.size.x>0.0 and game.modal_tabs.get_child_count()==4,"market categories remain on a visible horizontal swipe strip in portrait mode")
+	var long_tabs: bool=true
+	for tab_button: Button in game.modal_tabs.get_children():
+		long_tabs=long_tabs and tab_button.custom_minimum_size.x>=112.0 and tab_button.custom_minimum_size.y>=44.0
+	check(long_tabs and game.modal_tabs.get_combined_minimum_size().x>game.modal_tabs_scroll.size.x,"all market tabs keep large touch size and overflow into horizontal scrolling")
+	var compact_columns: bool=true
+	var art_big: bool=true
+	var market_art_count: int=0
+	for grid: GridContainer in game.modal_body.find_children("*","GridContainer",true,false):
+		if grid.has_meta("catalog_grid"):compact_columns=compact_columns and grid.columns==1
+	for card: PanelContainer in game.modal_body.find_children("*","PanelContainer",true,false):
+		if not card.has_meta("catalog_tile"):continue
+		for picture: TextureRect in card.find_children("*","TextureRect",true,false):
+			market_art_count+=1
+			art_big=art_big and picture.custom_minimum_size.x>=112.0
+	check(compact_columns and market_art_count>=28 and art_big,"narrow portrait menus use single-column large ammunition art instead of cramped tiles")
+	game.modal.hide()
 	# Real landscape reference video is 2340×1080. Test that device size
 	# and a portrait phone keep usable margins while preserving the Werft.
 	for device in [Vector2i(2340,1080),Vector2i(1080,2340)]:
