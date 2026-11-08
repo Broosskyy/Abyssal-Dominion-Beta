@@ -1498,13 +1498,16 @@ func _layout() -> void:
 	_place(quest_claim,column-78,(quest_h-26)*.5,72,26)
 	var target_y=top+(quest_h+6 if journal_visible else 0)
 	var card_h=60.0 if compact else 66.0
-	_place(target_panel,left,target_y,column,card_h)
+	# Enemy HP/shield and the close button need their own readable space.
+	# Do not expand the quest panel or cover the central sea/action corner.
+	var target_w: float=minf(256.0 if compact else 308.0,s.x*.42)
+	_place(target_panel,left,target_y,target_w,card_h)
 	_place(target_portrait,6,6,card_h-12,card_h-12)
 	var tx=card_h
-	_place(target_clear,column-46,4,40,32)
-	_place(target_name,tx,3,column-tx-52,18)
-	_place(target_hp,tx,22,column-tx-51,8)
-	_place(target_numbers,tx,31,column-tx-51,card_h-33)
+	_place(target_clear,target_w-46,4,40,32)
+	_place(target_name,tx,3,target_w-tx-52,18)
+	_place(target_hp,tx,22,target_w-tx-51,8)
+	_place(target_numbers,tx,31,target_w-tx-51,card_h-33)
 	_place(interact,left,target_y+card_h+6,column,34)
 	_place(buff_bar,left,target_y+card_h+46,column,26)
 	# Chart with corner controls, as on classic sea-chart clients.
@@ -1657,8 +1660,15 @@ func _refresh_ui() -> void:
 		if selected.kind=="tower" and sim.tower_friendly():disposition="GILDENTURM"
 		target_health_skin.bg_color=Color("c9573f") if bool(selected.aggressive) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) else Color("cfae55")
 		if selected.kind=="tower" and sim.tower_friendly():target_health_skin.bg_color=Color("61b967")
-		var shield_text=" · Schild %s" % _thousands(int(selected.shield)) if float(selected.get("max_shield",0))>0 else ""
-		target_numbers.text="%s / %s HP%s\n%s · %d m"%[_thousands(int(selected.hp)),_thousands(int(selected.max_hp)),shield_text,disposition,roundi(sim.player.pos.distance_to(selected.pos))]
+		var shield_text=" · S%s" % _thousands(int(selected.shield)) if float(selected.get("max_shield",0))>0 else ""
+		var enemy_distance: int=roundi(sim.player.pos.distance_to(Vector2(selected.pos)))
+		# Exact values remain available on the card; shorten repeated labels on
+		# compact Android screens so the X and the health text never collide.
+		if ui.size.x<1100.0:
+			target_numbers.text="%s/%s%s\n%s · %d m" % [_thousands(int(selected.hp)),_thousands(int(selected.max_hp)),shield_text,disposition,enemy_distance]
+		else:
+			target_numbers.text="%s / %s HP%s\n%s · %d m" % [_thousands(int(selected.hp)),_thousands(int(selected.max_hp)),shield_text,disposition,enemy_distance]
+		target_numbers.tooltip_text="Rumpf: %s / %s · Schutzschild: %s / %s · Distanz: %d m" % [_thousands(int(selected.hp)),_thousands(int(selected.max_hp)),_thousands(int(selected.shield)),_thousands(int(selected.get("max_shield",0))),enemy_distance]
 	attack.text="STOPP" if sim.firing else "FEUER"
 	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0 or sim.docked
 	_set_orb(attack,extra_icons.cannon_action,"",sim.firing,attack.text)
@@ -2698,7 +2708,8 @@ func _open_bonus() -> void:
 		progress.add_theme_constant_override("h_separation",6)
 		progress.add_theme_constant_override("v_separation",6)
 		progress.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		modal_body.add_child(progress)
+		column.add_child(progress)
+		progress.name="BonusFragments"+str(tier.name)
 		for part in need:
 			var filled: bool=part<pieces
 			var slot=_picture(progress,painted.scroll_fragment,32,true)
@@ -2719,8 +2730,16 @@ func _open_bonus() -> void:
 	_note("Kartenteile erhältst du im Gezeitenkessel und als Spielbelohnungen. Wähle aus, für welche Bonuskarte du ein gefundenes Fragment einsetzt. Bisherige Fragmente bleiben erhalten; Belohnungen passen wir später an.",Color("84999c"))
 
 func _start_bonus(tier: int) -> void:
+	# Failed starts must never undock the captain or hide the menu.
+	var issue: String=sim.bonus_entry_issue(tier)
+	if not issue.is_empty():
+		sim.message=issue
+		_refresh_ui()
+		return
 	if sim.docked:sim.depart()
-	sim.start_bonus(tier)
+	if not sim.start_bonus(tier):
+		_refresh_ui()
+		return
 	if previous_region!=sim.map_id:_sync_region()
 	else:_open_modal("Bonuskarten")
 	_refresh_ui()
@@ -3770,12 +3789,60 @@ func _open_events() -> void:
 	_start_shipyard_preview_motion(frames)
 	_note("Beide Event-Anstriche sind während der Beta kostenlos verfügbar und verändern deine Kampfwerte nicht.")
 
+# Active hunt roster is read from real NPCs, never a static fake catalog.
+# Choosing a monster only selects it, and sailing stops at harpoon range:
+# neither action activates fire or spends ammunition.
+func _hunt_monster(enemy_id: int, sail: bool=false) -> void:
+	var enemy: Dictionary=sim.actor(enemy_id)
+	if enemy.is_empty() or str(enemy.get("kind",""))!="monster" or int(enemy.get("hp",0))<=0:
+		sim.message="Dieses Seeungeheuer ist nicht mehr verfügbar"
+		_refresh_ui()
+		return
+	sim.firing=false
+	sim.select(enemy_id)
+	if sail and not sim.docked:
+		var direction: Vector2=sim.player.pos-Vector2(enemy.pos)
+		if direction.length_squared()<.01:direction=Vector2.RIGHT
+		var distance: float=sim.player.pos.distance_to(Vector2(enemy.pos))
+		if distance>485.0:
+			var point: Vector2=sim._free_water(Vector2(enemy.pos)+direction.normalized()*440.0)
+			sim.course(point)
+	modal.hide()
+	modal_backdrop.hide()
+	_refresh_ui()
+
 func _open_monsters() -> void:
 	_section("SEEUNGEHEUER · HARPUNENJAGD")
-	_note("Tiamat bleibt erhalten. Kraken, Panzerschlange und Tiefenpanzer ergänzen die normalen Seekarten. Sie reagieren auf Beschuss; auf den unteren Karten beginnen sie keinen Angriff von selbst.")
-	for spec: Dictionary in preload("res://sea_expansion.gd").MONSTERS:
-		var key: String=spec.key
-		var column=_row(expansion_art[key],"%s\nGrundrumpf %d · Beutegold %d · Harpunen erforderlich" % [spec.name,spec.hp,spec.reward],90)
-		_row_button(column,"KURS ZUM MONSTER",func():
-			for actor: Dictionary in sim.npcs:
-				if str(actor.get("monster_key",""))==key and int(actor.hp)>0:sim.course(actor.pos);modal.hide();_refresh_ui();break)
+	_note("Alle vier Monster werden anhand ihrer tatsächlichen Position auf der aktuellen Seekarte angezeigt. Anvisieren startet keinen Angriff. HINFAHREN hält Abstand für die Harpunenjagd; FEUER musst du anschließend selbst auslösen.")
+	var specs: Array[Dictionary]=[{"key":"tiamat","name":"Tiamat · Tiefenwächter","hp":1650,"reward":240}]
+	for entry: Dictionary in preload("res://sea_expansion.gd").MONSTERS:specs.append(entry)
+	var living: int=0
+	for spec: Dictionary in specs:
+		var key: String=str(spec.key)
+		var found: Dictionary={}
+		for actor: Dictionary in sim.npcs:
+			if str(actor.get("kind",""))!="monster" or int(actor.get("hp",0))<=0:continue
+			var match_key: bool=(int(actor.get("id",-1))==100) if key=="tiamat" else str(actor.get("monster_key",""))==key
+			if not match_key:continue
+			if found.is_empty() or sim.player.pos.distance_to(Vector2(actor.pos))<sim.player.pos.distance_to(Vector2(found.pos)):
+				found=actor
+		var active: bool=not found.is_empty()
+		if active:living+=1
+		var enemy_id: int=int(found.get("id",-1))
+		var distance: int=roundi(sim.player.pos.distance_to(Vector2(found.pos))) if active else 0
+		var monster_art: Texture2D
+		if key=="tiamat":
+			var preview=AtlasTexture.new()
+			preview.atlas=beast
+			preview.region=Rect2(Vector2.ZERO,beast.get_size()/Vector2(CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS))
+			monster_art=preview
+		else:
+			monster_art=expansion_art[key]
+		var details: String="%s\nHP %s/%s · %s m entfernt · Harpunen" % [spec.name,_thousands(int(found.hp)),_thousands(int(found.max_hp)),_thousands(distance)] if active else "%s\nMomentan nicht auf dieser Karte verfügbar" % spec.name
+		var column=_row(monster_art,details,80,Color("b58d56") if active else Color("515f68"))
+		var actions=HBoxContainer.new()
+		actions.add_theme_constant_override("separation",8)
+		column.add_child(actions)
+		_row_button(actions,"ANVISIEREN",func():_hunt_monster(enemy_id),not active)
+		_row_button(actions,"HINFAHREN",func():_hunt_monster(enemy_id,true),not active or sim.docked)
+	_note("%d/4 Monster aktuell lebendig · %s Harpunen im Lager. Monster-Angriffe bleiben auf den unteren Karten defensiv und zielbasiert." % [living,_thousands(int(sim.player.ammo[2]))],Color("9ac9c4"))

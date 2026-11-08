@@ -32,23 +32,34 @@ static func craft_scroll(s, tier: int) -> bool:
 	s.message = "%s-Bonuskarte aus %d Teilen zusammengesetzt" % [CONTENT.BONUS_TIERS[tier].name,cost]
 	return true
 
-static func start_bonus(s, tier: int) -> bool:
-	if tier < 0 or tier >= CONTENT.BONUS_TIERS.size() or s.in_bonus_map(): return false
-	var config: Dictionary = CONTENT.BONUS_TIERS[tier]
-	var resume = not s.bonus.is_empty() and int(s.bonus.tier) == tier
+# Read-only preflight: a failed bonus map start must not undock the ship,
+# spend a scroll, change the region or destroy the player's previous target.
+static func entry_issue(s,tier: int) -> String:
+	if tier<0 or tier>=CONTENT.BONUS_TIERS.size():return "Unbekannte Bonuskarte"
+	if s.in_bonus_map():return "Du bist bereits auf einer Bonuskarte"
+	var config: Dictionary=CONTENT.BONUS_TIERS[tier]
+	var resume: bool=not s.bonus.is_empty() and int(s.bonus.tier)==tier
 	if not s.bonus.is_empty() and not resume:
-		s.message = "Erst die laufende %s-Bonuskarte beenden" % CONTENT.BONUS_TIERS[int(s.bonus.tier)].name
+		return "Erst die laufende %s-Bonuskarte beenden" % CONTENT.BONUS_TIERS[int(s.bonus.tier)].name
+	if int(s.player.hp)<=0:return "Das Schiff muss zuerst repariert werden"
+	if s.level<int(config.level):
+		return "%s-Bonuskarte: Kapitänsstufe %d benötigt" % [config.name,config.level]
+	if s.clock-float(s.player.last_hit)<6.0:
+		return "Bonuskarte erst 6 Sekunden ohne Treffer"
+	if not resume and int(s.scrolls[tier])<=0:
+		return "Keine %s-Schriftrolle · Fragmente sammeln" % config.name
+	return ""
+
+static func start_bonus(s, tier: int) -> bool:
+	var issue: String=entry_issue(s,tier)
+	if not issue.is_empty():
+		s.message=issue
 		return false
 	if s.docked:
-		s.message = "Vor der Bonuskarte zuerst ablegen"
+		s.message="Vor der Bonuskarte zuerst ablegen"
 		return false
-	if int(s.player.hp) <= 0: return false
-	if s.level < int(config.level):
-		s.message = "%s-Bonuskarte: Kapitänsstufe %d benötigt" % [config.name, config.level]
-		return false
-	if s.clock - float(s.player.last_hit) < 6.0:
-		s.message = "Bonuskarte erst 6 Sekunden ohne Treffer"
-		return false
+	var config: Dictionary=CONTENT.BONUS_TIERS[tier]
+	var resume: bool=not s.bonus.is_empty() and int(s.bonus.tier)==tier
 	if not resume:
 		if int(s.scrolls[tier]) <= 0:
 			s.message = "Keine %s-Schriftrolle · Fragmente sammeln" % config.name

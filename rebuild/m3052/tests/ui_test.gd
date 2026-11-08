@@ -633,6 +633,11 @@ func _run() -> void:
 	check(game.sim.target==first_id and not game.sim.firing,"cycle selects first visible live ship and stops ongoing fire")
 	game.target_cycle.pressed.emit();check(game.sim.target==second_id,"cycle advances to the next visible ship")
 	game.target_cycle.pressed.emit();check(game.sim.target==first_id,"cycle wraps and skips sunk ships and targets behind HUD")
+	game._refresh_ui()
+	check(game.target_panel.size.x>game.quest_panel.size.x+8,"enemy card has more room than quest panel for HP and shield")
+	check(not game.target_clear.get_global_rect().intersects(game.target_numbers.get_global_rect()),"target cancel X does not cover health/shield statistics")
+	check(not game.target_clear.get_global_rect().intersects(game.target_name.get_global_rect()),"target cancel X does not cover name")
+	check(game.target_numbers.tooltip_text.contains("Rumpf:") and game.target_numbers.tooltip_text.contains("Schutzschild:"),"enemy card preserves full readable values")
 	# One tap is selection-only; second quick tap arms automatic attack.
 	game.sim.firing=true
 	game.target_clear.pressed.emit()
