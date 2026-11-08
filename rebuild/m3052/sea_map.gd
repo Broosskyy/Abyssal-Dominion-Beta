@@ -2500,46 +2500,59 @@ func _open_weapons() -> void:
 # Marketplace is a real GOLD economy. There is deliberately no pretend
 # online auction, no credit-card form, and no fake premium transaction.
 func _open_market() -> void:
-	_banner_card(painted.nav_harbor,"MARKTPLATZ · HANDEL & VORRÄTE","Dein Guthaben: %s Gold · Einkaufen ist überall auf der Seekarte möglich. Munition gibt es hier, die Montage der Kanonen übernimmt die Werft." % _thousands(int(sim.player.gold)))
+	_banner_card(painted.nav_harbor,"MARKT · HÄNDLER & HANDEL","Große Warenkarten mit Bestandsanzeige, Preis und direktem Kauf. Du kannst auch auf See einkaufen.")
+	_section("DEIN GOLD · %s" % _thousands(int(sim.player.gold)))
 	match _tab("Markt"):
 		"AUSRÜSTUNG":
-			_section("KANONEN & SCHIFFSAUSRÜSTUNG")
-			var row=_row(extra_icons.cannon_1,"STANDARDBATTERIE · 2 KANONEN\nBesitz: %d · montiert: %d · Arsenal: %d\nPreis: %d Gold" % [int(sim.player.cannons),sim.mounted_cannons,sim.cannon_storage(),sim.cannon_price()],62,Color("9d7440"))
-			var buy=_row_button(row,"2 KANONEN KAUFEN",func():
-				sim.buy_cannons();_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.cannons)>=sim.MAX_CANNONS or int(sim.player.gold)<sim.cannon_price(),"primary")
-			buy.tooltip_text="Kauf überall möglich. Gekaufte Kanonen landen im Arsenal und können außerhalb von Gefechten montiert werden."
-			_note("Neue Kanonen liegen zunächst im Arsenal. Ein Schiff kann nie mehr Kanonen abfeuern, als aktive Geschützplätze vorhanden sind.")
-			var access=_grid(2)
-			_action("ZUR KANONENMONTAGE",func():_switch_tab("Werft","KANONEN"),"normal",access)
-			_action("DECKWERFT",func():_open_modal("Decks"),"normal",access)
+			_section("SCHIFFSGESCHÜTZE")
+			var goods=_catalog_grid(2)
+			var column=_catalog_tile(goods,extra_icons.cannon_1,"KANONENPAKET · 2 STÜCK","Besitz: %d · montiert: %d\nIm Arsenal: %d" % [int(sim.player.cannons),sim.mounted_cannons,sim.cannon_storage()],"%s GOLD" % _thousands(sim.cannon_price()),Color("ba9054"))
+			var buy=_catalog_action(column,"2 KANONEN KAUFEN",func():
+				sim.buy_cannons();_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.cannons)>=sim.MAX_CANNONS or int(sim.player.gold)<sim.cannon_price())
+			buy.name="MarketCannons"
+			buy.tooltip_text="Gekaufte Kanonen kommen ins Arsenal und werden in der Werft montiert."
+			var yard=_catalog_tile(goods,painted.nav_shipyard,"WERFT & ARSENAL","Geschützplätze und Schiffsausrüstung verwalten.","SCHIFFSAUSRÜSTUNG",Color("566f79"))
+			_catalog_action(yard,"KANONEN MONTIEREN",func():_switch_tab("Werft","KANONEN"))
+			_note("Kugeln gehören ausschließlich in den Munitionsmarkt. Neue Kanonen werden nicht automatisch aufs Schiff montiert.")
 		"MUNITION":
-			_section("NORMALMUNITION & HARPUNEN")
-			_note("Kaufe Vorräte hier, lade sie anschließend über das separate Munitionsmenü. Kein Munitionskauf in der Werft.")
+			_section("STANDARDMUNITION & HARPUNEN")
+			_note("Wähle die Ware anhand ihres Bildes. Der Preis gilt jeweils für ein Paket; im Kampf wird die Munition separat ausgewählt.")
+			var basic=_catalog_grid(3)
 			for i in AMMO_UI.size():
-				if i==3:_section("SPEZIALMUNITION · BETA-WERTE")
+				if i==3:
+					_section("SPEZIALMUNITION · BETA")
+					basic=_catalog_grid(3)
 				var index: int=i
 				var data: Dictionary=AMMO_UI[i]
-				var price: int=30 if i<3 else 80
-				var row=_row(_ammo_texture(i),"%s · %d Stück im Lager\n+%d Stück · %d Gold" % [str(data.name),int(sim.player.ammo[i]),sim.ammo_pack(i),price],46,Color("caa968") if sim.ammo_mode==i else Color(0,0,0,0))
-				var buy=_row_button(row,"KAUFEN · %d GOLD" % price,func():
-					sim.buy_ammo(index);_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.hp)<=0 or int(sim.player.gold)<price,"primary")
-				buy.name="MarketAmmo"+str(i)
+				var price: int=30 if index<3 else 80
+				var stock: int=int(sim.player.ammo[index])
+				var count: int=sim.ammo_pack(index)
+				var tile=_catalog_tile(basic,_ammo_texture(index),str(data.name).to_upper(),"%s\nIm Lager: %s" % [str(data.use),_thousands(stock)],"+%d STÜCK · %d GOLD" % [count,price],Color("a6bfa3") if sim.ammo_mode==index else Color("a88959"))
+				var purchase=_catalog_action(tile,"KAUFEN · %d GOLD" % price,func():
+					sim.buy_ammo(index);_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.hp)<=0 or int(sim.player.gold)<price)
+				purchase.name="MarketAmmo"+str(index)
+			_action("ZUR MUNITIONSWAHL",func():_open_modal("Munition"))
 		"ITEMS":
 			_section("VERBRAUCHSGEGENSTÄNDE")
+			_note("Reparatur, Schutzschild und Spezialeffekte – direkte Käufe ohne Andocken.")
+			var goods=_catalog_grid(3)
 			for key: String in CONTENT.SUPPLY_KEYS:
 				var item: String=key
 				var config: Dictionary=CONTENT.SUPPLIES[key]
-				var row=_row(_supply_icon(key),"%s · %d auf Lager\n+%d Stück · %d Gold" % [str(config.name),int(sim.supplies[key]),int(config.pack),int(config.price)],46)
-				var buy=_row_button(row,"KAUFEN · %d GOLD" % int(config.price),func():
-					sim.buy_supply(item);_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.gold)<int(config.price),"primary")
-				buy.name="MarketItem_"+key
-			_note("Item-Käufe sind auf See möglich. Zum Einsetzen benutzt du das separate Verbrauchsmenü im Kampf-HUD.")
+				var price: int=int(config.price)
+				var count: int=int(config.pack)
+				var tile=_catalog_tile(goods,_supply_icon(item),str(config.name).to_upper(),"%s\nIm Lager: %d" % [str(config.effect),int(sim.supplies[item])],"+%d STÜCK · %d GOLD" % [count,price],Color("9a7e4f"))
+				var buy=_catalog_action(tile,"KAUFEN · %d GOLD" % price,func():
+					sim.buy_supply(item);_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.gold)<price)
+				buy.name="MarketItem_"+item
+			_action("ZUR VERBRAUCHSAUSWAHL",func():_open_modal("Verbrauch"))
 		"AUKTION":
-			_section("HANDELSPLATZ & AUKTIONEN")
-			_note("Spieler-zu-Spieler-Angebote benötigen eine serverseitige Eigentumsprüfung, Reservierung der Gegenstände und sichere Transaktionsbestätigung. In dieser lokalen Beta sind Auktionen daher noch gesperrt.")
-			var disabled=_action("AUKTIONSHAUS · ONLINE ERFORDERLICH",func():pass)
-			disabled.disabled=true
-			_action("ZURÜCK ZUM NORMALEN MARKT",func():_switch_tab("Markt","AUSRÜSTUNG"))
+			_section("SPIELERHANDEL · SPÄTER ONLINE")
+			var auction=_catalog_grid(2)
+			var tile=_catalog_tile(auction,painted.reward_chest,"AUKTIONSHAUS","Spielerangebote brauchen Serverkonten und sichere Besitzübertragung.","DERZEIT NICHT VERFÜGBAR",Color("566773"))
+			var locked=_catalog_action(tile,"ONLINE-HANDEL GESPERRT",func():pass,true)
+			locked.name="LockedAuction"
+			_action("ZURÜCK ZUM MARKT",func():_switch_tab("Markt","AUSRÜSTUNG"))
 
 func _open_premium_shop() -> void:
 	_banner_card(painted.gold_coins,"KRONEN-SHOP · VORSCHAU","Kronen sind die vorgesehene Premiumwährung. Käufe mit Echtgeld sind in dieser lokalen Beta nicht verfügbar.")
