@@ -450,6 +450,7 @@ func _run() -> void:
 	game._switch_tab("Kastelle","TALENTE")
 	check(game.modal_body.find_child("Talent_gunnery",true,false)!=null and game.modal_body.find_child("Talent_armor",true,false)!=null and game.modal_body.find_child("Talent_navigation",true,false)!=null,"all three real talent trees are present in the upgrades menu")
 	game._switch_tab("Kastelle","KASTELLE")
+	game._switch_tab("Werft","SCHIFFE")
 	game.sim.essence=6;game.kessel_log.clear()
 	game._open_modal("Kessel")
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
