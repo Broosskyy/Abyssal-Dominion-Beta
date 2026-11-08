@@ -2555,18 +2555,20 @@ func _open_market() -> void:
 			_action("ZURÜCK ZUM MARKT",func():_switch_tab("Markt","AUSRÜSTUNG"))
 
 func _open_premium_shop() -> void:
-	_banner_card(painted.gold_coins,"KRONEN-SHOP · VORSCHAU","Kronen sind die vorgesehene Premiumwährung. Käufe mit Echtgeld sind in dieser lokalen Beta nicht verfügbar.")
+	_banner_card(painted.gold_coins,"KRONEN-SHOP · VORSCHAU","Große Artikelkarten wie im Markt – echte Zahlung und Premiumwährung bleiben in der lokalen Beta deaktiviert.")
 	_section("KRONEN · NOCH NICHT AKTIV")
-	_note("Es werden weder Zahlungen angefordert noch Premium-Guthaben auf diesem Gerät erzeugt. Erst die gesicherte Online-Anbindung mit serverseitiger Kaufvalidierung aktiviert echte Transaktionen.")
-	for product in ["Kronen-Paket · Klein","Kronen-Paket · Mittel","Kronen-Paket · Groß","Saisonpass · Premium"]:
-		var preview=_row(painted.reward_chest,product+"\nPreis und Gegenwert folgen nach dem Balancing",44)
-		var inactive=_row_button(preview,"NOCH NICHT KAUFBAR",func():pass,true)
+	var display=_catalog_grid(2)
+	var offers=["Kronen-Paket · Klein","Kronen-Paket · Mittel","Kronen-Paket · Groß","Saisonpass · Premium"]
+	for i in offers.size():
+		var title: String=str(offers[i])
+		var art: Texture2D=painted.reward_chest if i==3 else painted.gold_coins
+		var tile=_catalog_tile(display,art,title.to_upper(),"Preis und Gegenwert werden erst nach Abschluss des Balancings festgelegt.","KEIN GELDVERKEHR",Color("78615f"))
+		var inactive=_catalog_action(tile,"NOCH NICHT KAUFBAR",func():pass,true)
 		inactive.name="DisabledPayment"
+	_note("Keine Zahlung, kein fingiertes Guthaben. Kronen und Echtgeldkäufe benötigen Serverkonten sowie gültige Kaufbestätigungen.")
 	var links=_grid(2)
 	_action("GOLD-MARKTPLATZ",func():_open_modal("Markt"),"normal",links)
 	_action("SAISONPASS ANSEHEN",func():_open_modal("Battle Pass"),"normal",links)
-
-# --- Harbor, logbook and ranking -----------------------------------------------------------
 
 func _open_harbor() -> void:
 	var name: String="PORT AZUR" if sim.map_id==0 else "HAFEN"
@@ -2671,26 +2673,31 @@ func _open_castles() -> void:
 	_action("ZU DEN TALENTEN · %d PUNKTE FREI" % sim.talent_points_available(),func():_switch_tab("Kastelle","TALENTE"))
 
 func _open_battle_pass() -> void:
-	_banner_card(painted.nav_bonus,"SAISONPASS · FREIE BETA-SAISON","Belohnungen basieren auf echten NPC-Siegen, Monsterjagden, Bergungen und abgeschlossenen Bonuskarten. Keine Echtgeldkäufe, keine Premium-Freischaltung auf diesem Gerät.")
+	_banner_card(painted.nav_bonus,"SAISONPASS · FREIE BETA-SAISON","Spiele, sammle Fortschritt und hole kostenfreie Belohnungen ab. Die Premiumspur bleibt gesperrt, bis sichere Konten und Zahlungen existieren.")
 	var current: int=sim.battle_pass_progress()
-	_section("SAISONFORTSCHRITT · %d PUNKTE" % current)
+	var maximum: int=int(CONTENT.BATTLE_PASS_FREE.back().need)
+	_section("DEIN SAISONFORTSCHRITT · %d / %d" % [current,maximum])
+	var progress=_bar(modal_body)
+	progress.max_value=maximum
+	progress.value=min(current,maximum)
+	progress.custom_minimum_size.y=15
+	_section("KOSTENLOSE BELOHNUNGEN")
+	var rewards=_catalog_grid(3)
 	for i in CONTENT.BATTLE_PASS_FREE.size():
 		var index: int=i
 		var tier: Dictionary=CONTENT.BATTLE_PASS_FREE[i]
 		var claimed: bool=sim.battle_pass_claimed.has(i)
 		var unlocked: bool=current>=int(tier.need)
-		var label: String="STUFE %d · %s\nAb %d Fortschritt · %d Gold · %d Essenz" % [i+1,str(tier.name),int(tier.need),int(tier.gold),int(tier.essence)]
-		var card=_row(painted.reward_chest,label,50,Color("4d8667") if claimed else (Color("b58d56") if unlocked else Color("47525a")))
-		var state: String="ABGEHOLT" if claimed else ("KOSTENLOS ABHOLEN" if unlocked else "NOCH GESPERRT")
-		var claim=_row_button(card,state,func():
-			sim.claim_battle_pass_free(index)
-			_save_progress();_open_modal("Battle Pass");_refresh_ui(),claimed or not unlocked,"primary" if unlocked else "normal")
-		claim.name="FreePassClaim"+str(i)
-	_section("PREMIUM-STRECKE")
-	_note("Eine zweite Belohnungsreihe für Kronen wird erst mit serverseitigem Konto, sicherer Bezahlbestätigung und einem verbindlichen Saisonzeitraum aktiviert. Hier gibt es weder versteckte Käufe noch leere Premium-Buttons.")
-	var preview=_action("PREMIUM-FREISCHALTUNG · NICHT VERFÜGBAR",func():pass)
-	preview.disabled=true
-	_action("KRONEN-SHOP ANSEHEN",func():_open_modal("Premium-Shop"))
+		var status: String="ABGEHOLT" if claimed else ("FREIGESCHALTET" if unlocked else "NOCH GESPERRT")
+		var image: Texture2D=painted.reward_chest if i%2==0 else painted.gold_coins
+		var tile=_catalog_tile(rewards,image,"STUFE %d · %s" % [i+1,str(tier.name).to_upper()],"%d Gold + %d Essenz" % [int(tier.gold),int(tier.essence)],"%d PUNKTE · %s" % [int(tier.need),status],Color("508d73") if claimed else (Color("bc9258") if unlocked else Color("5a6570")))
+		var button=_catalog_action(tile,"ABGEHOLT" if claimed else ("KOSTENLOS ABHOLEN" if unlocked else "NOCH GESPERRT"),func():
+			sim.claim_battle_pass_free(index);_save_progress();_open_modal("Battle Pass");_refresh_ui(),claimed or not unlocked)
+		button.name="FreePassClaim"+str(i)
+	_section("PREMIUMSPUR · ZUKÜNFTIG")
+	_note("Kein aktives Abo oder Echtgeldkauf. Die Premium-Belohnungen erscheinen erst mit sicherer serverseitiger Freischaltung.")
+	var disabled=_action("PREMIUM NOCH NICHT VERFÜGBAR",func():pass)
+	disabled.disabled=true
 
 func _upgrade_row(key: String,parent: Node=null) -> void:
 	var config: Dictionary=CONTENT.UPGRADES[key]
