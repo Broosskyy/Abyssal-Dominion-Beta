@@ -55,6 +55,9 @@ var elite_kills := 0
 var tower_kills := 0
 var visited: Array = []
 var upgrades := {"cannon":0, "hull":0, "sails":0, "crew":0, "harpoon":0, "war":0}
+# Purchased cannons belong to the ship inventory, but only these guns are
+# actually fitted to its hardpoints. Legacy saves migrate with guns fitted.
+var mounted_cannons: int=BASE_CANNON_SLOTS
 var supplies := {"powder":10, "plates":10, "repair_kit":2, "shield_charge":2,"skyfire":2,"healing_amulet":2,"blessing_flask":1}
 var powder_on := false
 var plates_on := false
@@ -408,8 +411,9 @@ func buy_supply(key: String) -> bool:
 func buy_cannons() -> bool:
 	if not docked or int(player.cannons) >= MAX_CANNONS or int(player.gold) < cannon_price(): return false
 	player.gold -= cannon_price()
-	player.cannons = mini(MAX_CANNONS, int(player.cannons) + 2)
-	message = "2 Kanonen gekauft · %d an Bord" % player.cannons
+	var acquired: int=mini(2,MAX_CANNONS-int(player.cannons))
+	player.cannons += acquired
+	message = "%d Kanonen gekauft · im Arsenal lagern %d · in der Werft montieren" % [acquired,cannon_storage()]
 	return true
 
 func cannon_price() -> int:
@@ -443,7 +447,30 @@ func cannon_slots() -> int:
 	return BASE_CANNON_SLOTS + roundi(deck_value("cannon")) + (10 if float(buffs.tide_deck) > 0 else 0) + (5 if has_blessing() else 0)
 
 func equipped_cannons() -> int:
-	return mini(int(player.cannons), cannon_slots())
+	return mini(mounted_cannons,cannon_slots())
+
+func cannon_storage() -> int:
+	return maxi(0,int(player.cannons)-mounted_cannons)
+
+func mount_cannons(quantity: int) -> bool:
+	if not docked or quantity<=0:return false
+	var fitting: int=mini(quantity,cannon_storage(),maxi(0,cannon_slots()-mounted_cannons))
+	if fitting<=0:
+		message="Keine freien Geschützplätze oder keine Kanonen im Lager"
+		return false
+	mounted_cannons+=fitting
+	message="%d Kanonen auf das Schiff montiert · %d/%d Plätze" % [fitting,equipped_cannons(),cannon_slots()]
+	return true
+
+func unmount_cannons(quantity: int) -> bool:
+	if not docked or quantity<=0:return false
+	var removing: int=mini(quantity,mounted_cannons)
+	if removing<=0:
+		message="Keine montierten Kanonen vorhanden"
+		return false
+	mounted_cannons-=removing
+	message="%d Kanonen ins Arsenal gelegt · %d im Lager" % [removing,cannon_storage()]
+	return true
 
 func owns_deck(type: String, tier: int) -> bool:
 	for deck: Dictionary in decks:
@@ -1581,7 +1608,7 @@ func export_save() -> Dictionary:
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
 		"position":[position.x,position.y],"hp":player.hp,"shield":player.shield,"docked":docked,
-		"cannons":player.cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
+		"cannons":player.cannons,"mounted_cannons":mounted_cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
 		"essence":essence,"fragments":fragments,"bonus_pieces":bonus_pieces.duplicate(),"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
 		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
 		"deck_slots":deck_slots.duplicate(),"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),"guild_home":guild_home.duplicate(true),
@@ -1625,6 +1652,8 @@ func restore_save(data: Dictionary) -> bool:
 	if saved_upgrades is Dictionary:
 		for key in CONTENT.UPGRADE_KEYS:upgrades[key]=clampi(int(saved_upgrades.get(key,0)),0,CONTENT.CASTLE_MAX)
 	player.cannons=clampi(int(data.get("cannons",BASE_CANNON_SLOTS)),BASE_CANNON_SLOTS,MAX_CANNONS)
+	# Unmodified older player files had all available guns auto-mounted.
+	mounted_cannons=clampi(int(data.get("mounted_cannons",mini(int(player.cannons),cannon_slots()))),0,int(player.cannons))
 	var saved_supplies: Variant=data.get("supplies",{})
 	if saved_supplies is Dictionary:
 		for key in CONTENT.SUPPLY_KEYS:supplies[key]=clampi(int(saved_supplies.get(key,supplies[key])),0,99999)
