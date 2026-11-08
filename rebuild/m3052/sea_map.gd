@@ -822,7 +822,7 @@ func _draw_ruined_tower(actor: Dictionary) -> void:
 		var chips:=PackedVector2Array([origin+Vector2(-5,2),origin+Vector2(-2,-height),origin+Vector2(3,-height*.68),origin+Vector2(6,2)])
 		draw_colored_polygon(chips,Color("77736a") if piece%3==0 else Color("514c44"))
 		draw_line(origin+Vector2(-2,-height),origin+Vector2(3,-height*.68),Color("a89d89",.65),1.0,true)
-	if ship_animations_enabled and float(actor.get("respawn",0.0))>0.0:
+	if ship_animations_enabled and (float(actor.get("respawn",0.0))>0.0 or (not sim.guild.is_empty() and not sim.tower_friendly())):
 		for plume in 3:
 			var life: float=fmod(elapsed*.45+float(plume)*.33+seed*.015,1.0)
 			var drift: Vector2=Vector2(sin(elapsed+float(plume)*2.3)*7.0-life*4.0,-15.0-life*35.0)
@@ -2761,7 +2761,7 @@ func _open_guild() -> void:
 	if sim.tower_friendly():
 		state="[%s] verteidigt die Insel · noch %s · +10 %% Beutegold" % [sim.tower_tag(),_clock_text(sim.fortress_hold)]
 	elif CONTENT.has_guild_island(sim.map_id):
-		state="Angriff auf [%s] · %d / %d Türme stehen" % [sim.guild_owner_tag(sim.map_id),sim.towers_alive(),CONTENT.TOWERS.size()]
+		state="Belagerung [%s] · %d / %d Türme zerstört" % [sim.guild_owner_tag(sim.map_id),CONTENT.TOWERS.size()-sim.towers_alive(),CONTENT.TOWERS.size()]
 	else:
 		state="Schattengewässer %s · ab Lv. %d · Festung [%s]" % [CONTENT.MAPS[CONTENT.FORTRESS_MAP].code,CONTENT.MAPS[CONTENT.FORTRESS_MAP].level,sim.guild_owner_tag(CONTENT.FORTRESS_MAP)]
 	_info(state)
@@ -2782,7 +2782,7 @@ func _open_guild() -> void:
 		label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 		label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		if not report.is_empty():
-			var line: String="STUFE %d · HP %d/%d · SCHILD %d" % [int(report.level),int(report.hp),int(report.max_hp),int(report.shield)] if alive else "ZERSTÖRT · WIEDERAUFBAU IN %d s" % ceili(float(report.respawn))
+			var line: String="STUFE %d · HP %d/%d · SCHILD %d" % [int(report.level),int(report.hp),int(report.max_hp),int(report.shield)] if alive else ("ZERSTÖRT · BIS ZUR EROBERUNG" if bool(report.get("siege_locked",false)) else "ZERSTÖRT · WIEDERAUFBAU IN %d s" % ceili(float(report.respawn)))
 			var health=_text(column,line,11,Color("a6d7b5") if alive and sim.tower_friendly() else (Color("f3bd7b") if alive else Color("df9184")))
 			health.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 			health.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
@@ -2798,7 +2798,7 @@ func _open_guild() -> void:
 		if sim.guild_holding_remaining(sea_id)>0:
 			defended.append("%s · %s" % [CONTENT.MAPS[sea_id].code,_clock_text(sim.guild_holding_remaining(sea_id))])
 	if not defended.is_empty():_note("Eigene Gildeninseln: "+", ".join(defended),Color("a6d7b5"))
-	_note("Kanonenturm: Doppelschuss · Mörserturm: weite Bögen · Kettenturm: bremst · Wächterturm: Schildaufladung. Zerstöre alle zwölf Türme, um die Insel einzunehmen. Der befahrbare Innenhafen liegt hinter der südlichen Einfahrt.")
+	_note("Kanonenturm: Doppelschuss · Mörserturm: weite Bögen · Kettenturm: bremst · Wächterturm: Schildaufladung. Mit eigener Gilde bleiben zerstörte feindliche Türme während der Belagerung ausgeschaltet, bis alle zwölf gefallen sind. Danach übernimmt deine Gilde die Insel. Der Innenhafen bleibt befahrbar.")
 	_note("Eroberungen %d · zerstörte Türme %d" % [sim.fortress_conquests,sim.tower_kills],Color("ffd27a"))
 	if CONTENT.has_guild_island(sim.map_id):
 		var passage: Dictionary=sim.guild_harbor_waypoints()
