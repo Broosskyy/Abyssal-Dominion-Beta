@@ -55,7 +55,7 @@ jobs:
               "https://downloads.sourceforge.net/project/godot-engine.mirror/4.7.2-stable"; do
               rm -f "$output"
               if curl -fL --retry 3 --retry-all-errors --retry-delay 3 --connect-timeout 30 --max-time 1800 -o "$output" "$base/$filename" &&
-                printf '%s  %s\\n' "$digest" "$output" | sha256sum -c -; then
+                printf '%s  %s\n' "$digest" "$output" | sha256sum -c -; then
                 return 0
               fi
               echo "::warning::Failed verified download from $base; trying the next upstream mirror."
@@ -104,7 +104,7 @@ jobs:
             wrapper=rebuild/m3052/android/build/gradle/wrapper/gradle-wrapper.properties
             grep -q 'gradle-8.11.1-bin.zip' "$wrapper"
             sed -i 's#services.gradle.org/distributions/#downloads.gradle.org/distributions/#' "$wrapper"
-            grep -q '^distributionSha256Sum=' "$wrapper" || printf '\\ndistributionSha256Sum=f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6\\n' >> "$wrapper"
+            grep -q '^distributionSha256Sum=' "$wrapper" || printf '\ndistributionSha256Sum=f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6\n' >> "$wrapper"
           fi
       - name: Test account and crossplay preparation
         shell: bash
