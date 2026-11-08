@@ -648,6 +648,8 @@ func _run() -> void:
 	emulated.button_index=MOUSE_BUTTON_LEFT;emulated.pressed=true;emulated.position=intended_enemy
 	game._unhandled_input(emulated)
 	check(not game.sim.firing,"Android synthetic mouse does not count as a second gesture")
+	game._handle_enemy_tap(first_id,intended_enemy,10001)
+	check(not game.sim.firing,"duplicate delivery of one physical tap cannot start combat")
 	game._handle_enemy_tap(first_id,intended_enemy+Vector2(8,4),10210)
 	check(game.sim.target==first_id and game.sim.firing,"double-tap selected ship enables attack without second target selection")
 	game._cancel_target()

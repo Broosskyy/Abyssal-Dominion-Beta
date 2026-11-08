@@ -1,6 +1,8 @@
 extends Control
 ## Update gate → welcome/auth → captain harbor → chart loading → actual sea.
 const SIM=preload("res://simulation.gd")
+const WORLD_CHART=preload("res://world_chart.gd")
+const PARCHMENT=preload("res://assets/ui/painted/chart_parchment.jpg")
 const NETWORK=preload("res://network_client.gd")
 const SKIN=preload("res://ui_skin.gd")
 const SAVE="user://captain_m3052.json"
@@ -20,6 +22,8 @@ var email: LineEdit
 var password: LineEdit
 var username: LineEdit
 var server_field: LineEdit
+var chart_chapter := 0
+var chart_pick := 0
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	backdrop=TextureRect.new();backdrop.name="LivingHarbor"
@@ -33,6 +37,7 @@ func _ready() -> void:
 		var value: Variant=JSON.parse_string(FileAccess.get_file_as_string(SAVE))
 		if value is Dictionary:sim.restore_save(value)
 	_save() # Commit offline accrual before any button can claim it.
+	chart_chapter=maxi(0,sim.CONTENT.SEA_MAP_IDS.find(sim.map_id))/10;chart_pick=sim.map_id
 	network=NETWORK.new();add_child(network)
 	network.auth_completed.connect(_authenticated)
 	if FileAccess.file_exists(CONFIG):
@@ -132,9 +137,18 @@ func _show(next: String) -> void:
 		"maps":
 			_label("SEEKARTEN · 1/1 BIS 20/2",true)
 			_label("Jedes Gebiet hat Hafen, Gegner und Portale. Kartenwahl und Portalkurs auch direkt auf See unter Karten.")
-			for index: int in sim.CONTENT.SEA_MAP_IDS:
-				var map: Dictionary=sim.CONTENT.MAPS[index]
-				_label("%s · %s · Stufe %d%s" % [map.code,map.name,map.level," · HIER" if index==sim.map_id else ""])
+			var leaves=GridContainer.new();leaves.columns=4;body.add_child(leaves)
+			for leaf in 4:
+				var pick: int=leaf
+				var button=Button.new();button.text="%d–%d" % [leaf*5+1,leaf*5+5];button.custom_minimum_size.y=44;button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+				button.pressed.connect(func():chart_chapter=pick;chart_pick=sim.CONTENT.SEA_MAP_IDS[pick*10];_show("maps"));leaves.add_child(button)
+			var chart=WORLD_CHART.new();chart.name="WorldChart";chart.sim=sim;chart.parchment=PARCHMENT;chart.chapter=chart_chapter;chart.selected=chart_pick
+			chart.custom_minimum_size=Vector2(0,390);chart.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			chart.picked.connect(func(index: int):chart_pick=index;_show("maps"));body.add_child(chart)
+			if chart_pick==WORLD_CHART.FORTRESS_NODE:_label("GILDENINSEL · 3/1 · 10 ausbaubare Türme")
+			else:
+				var map: Dictionary=sim.CONTENT.MAPS[chart_pick]
+				_label("%s · %s · Stufe %d%s" % [map.code,map.name,map.level," · HIER" if chart_pick==sim.map_id else ""])
 			_back()
 		"guild":
 			_label("GILDE & GILDENINSEL",true)

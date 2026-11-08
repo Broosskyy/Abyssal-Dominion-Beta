@@ -1,0 +1,11 @@
+# Illustrated atlas, selection-only targeting and ten-tower guild islands
+
+The data-243 continuation restores the earlier illustrated parchment chart with irregular island silhouettes, curved portal routes, animated portal glyphs and a pulsing current-position marker. Four selectable leaves cover levels 1–5, 6–10, 11–15 and 16–20, including both lanes: all forty persistent sea ids remain accessible. The captain harbor and in-sea menu use the same chart. Bonus seas remain scroll-only and the original fortress keeps a separate detail marker.
+
+A new target always stops inherited auto-fire. A single physical touch only selects; emulated mouse events cannot become another world tap, and duplicate deliveries less than 70 ms apart cannot arm double-tap attack. A distinct second tap within 360 ms starts combat when the existing double-tap setting is enabled. The fire button, cancellation, reload, ammunition, docking and range rules remain in effect.
+
+Every guild island now has ten separately placed and upgradeable towers: four cannon, three mortar, two chain and one guardian tower. The latest shared stand restores the classic rocky coast at 2.05× scale, with its visual footprint and collision polygon scaled together; animated surf and tower flags remain intact. All ten towers must fall before conquest. The first four save slots retain their original roles and upgrades; six new level-one slots are appended. Ten-slot upgrades and ownership persist per island across travel and restart. All ten upgrade actions appear in the guild menu.
+
+Verification includes forty-map harbor/portal navigation, ten non-overlapping land-based tower positions on all nineteen islands, four-to-ten-slot save migration, tenth-tower upgrades and reload, atlas hitboxes on all four leaves, touch/emulated-mouse duplication and optional double-tap combat. Actual OpenGL captures cover 2340×1080 landscape, 844×390 compact landscape and 1080×2340 portrait. Local engine: Godot 4.6.3; the release pipeline uses the project's pinned Godot 4.7.2 and runs the signed-pack/updater suites. Physical Android acceptance remains a device check.
+
+Compatible with bootstrap 305902: this is a signed game-data update and requires no new APK.

@@ -147,6 +147,7 @@ var kessel_throw: Dictionary = {}
 var staff_pill: Button
 var staff_code_input: LineEdit
 var chart_pick := -1
+var chart_chapter := -1
 var drag_start := Vector2.ZERO
 var dragging := false
 var last_mouse := Vector2.ZERO
@@ -2665,11 +2666,17 @@ func _open_charts() -> void:
 		_open_chart_guide()
 		return
 	_section("40 SEEKARTEN · 1/1 BIS 20/2")
+	if chart_chapter<0:chart_chapter=maxi(0,CONTENT.SEA_MAP_IDS.find(sim.map_id))/10
+	var leaves=_grid(4)
+	for leaf in 4:
+		var pick: int=leaf
+		_action("%d–%d" % [leaf*5+1,leaf*5+5],func():chart_chapter=pick;chart_pick=CONTENT.SEA_MAP_IDS[pick*10];_open_modal("Seekarten"),"tab_on" if leaf==chart_chapter else "normal",leaves)
 	var chart=WORLD_CHART.new()
 	chart.name="WorldChart"
 	chart.sim=sim;chart.parchment=painted.chart_parchment;chart.font=font
 	chart.selected=chart_pick if chart_pick>=0 else sim.map_id
-	chart.custom_minimum_size=Vector2(0,1340)
+	chart.chapter=chart_chapter
+	chart.custom_minimum_size=Vector2(0,440 if modal.size.x>=640 else 390)
 	chart.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	chart.picked.connect(func(index: int):chart_pick=index;_open_modal("Seekarten"))
 	modal_body.add_child(chart)
@@ -3234,6 +3241,7 @@ func _reset_enemy_tap() -> void:
 func _handle_enemy_tap(enemy_id: int,screen: Vector2,timestamp_ms: int=-1) -> void:
 	if enemy_id<=0:return
 	var now_ms: int=timestamp_ms if timestamp_ms>=0 else Time.get_ticks_msec()
+	if last_enemy_tap_id==enemy_id and now_ms>=last_enemy_tap_ms and now_ms-last_enemy_tap_ms<DOUBLE_TAP_MIN_MS:return
 	var same_double: bool=double_tap_attack_enabled and sim.target==enemy_id and last_enemy_tap_id==enemy_id and now_ms-last_enemy_tap_ms>=DOUBLE_TAP_MIN_MS and now_ms-last_enemy_tap_ms<=DOUBLE_TAP_ATTACK_MS and screen.distance_to(last_enemy_tap_screen)<=DOUBLE_TAP_ATTACK_RADIUS
 	if sim.target!=enemy_id:
 		# New target is selection-only, even if a different ship was firing.
