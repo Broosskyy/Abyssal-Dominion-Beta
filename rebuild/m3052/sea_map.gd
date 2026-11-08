@@ -2656,12 +2656,19 @@ func _open_bonus() -> void:
 		var pieces: int=int(sim.bonus_pieces[i])
 		var need: int=int(tier.fragments)
 		var column=_row(painted.scroll_fragment,"%s-BONUSKARTE · %s %s\nAb Lv. %d · Gegnerstärke ×%s · Teile %d/%d · Schriftrollen %d" % [str(tier.name).to_upper(),region.name,region.code,tier.level,str(region.enemy_scale).replace(".",","),pieces,need,sim.scrolls[i]],64,tints[i])
-		var progress=_grid(5)
+		# Map board uses real parchment fragment art, not placeholder diamonds.
+		# Five tiles per row remain usable on compact phone panels.
+		var progress=GridContainer.new()
+		progress.columns=5
+		progress.add_theme_constant_override("h_separation",6)
+		progress.add_theme_constant_override("v_separation",6)
+		progress.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		modal_body.add_child(progress)
 		for part in need:
 			var filled: bool=part<pieces
-			var slot=_text(progress,"%s %d" % ["◆" if filled else "◇",part+1],13,Color("ffd27a") if filled else Color("667e80"))
-			slot.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-			slot.custom_minimum_size=Vector2(44,28)
+			var slot=_picture(progress,painted.scroll_fragment,32,true)
+			slot.modulate=Color(1,1,1,1) if filled else Color(.42,.48,.48,.32)
+			slot.tooltip_text="%s · Kartenteil %d/%d · %s" % [tier.name,part+1,need,"gefunden" if filled else "fehlt"]
 		var buttons=HBoxContainer.new();buttons.add_theme_constant_override("separation",6);column.add_child(buttons)
 		_row_button(buttons,"TEIL EINSETZEN",func():sim.assign_bonus_piece(index);_save_progress();_open_modal("Bonuskarten");_refresh_ui(),sim.fragments<=0 or pieces>=need)
 		_row_button(buttons,"ZUSAMMENSETZEN",func():sim.craft_scroll(index);_save_progress();_open_modal("Bonuskarten");_refresh_ui(),pieces+sim.fragments<need)
