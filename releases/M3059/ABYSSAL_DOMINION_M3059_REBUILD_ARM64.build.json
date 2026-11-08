@@ -1,9 +1,15 @@
 {
   "engine": "4.7.2.stable.official.ed1daf0bf",
   "milestone": "M3059",
-  "source_commit": "227b1902c75abbae580f24f1e09653c36ca88129",
-  "bootstrap_sha256": "38990a296a1c2131b97a3c411aa3963e1082a4a6af78a333128c4437b3d37238",
+  "source_commit": "4a2ebe2f32ec9c87ba011ae62e300a617b983880",
+  "bootstrap_sha256": "4360d4df0030ee18921f4347614ef6cf5f6319a7db72149f4e87714c44be2d22",
   "tests": [
+    {
+      "test": "frontier_test",
+      "checks": 512,
+      "failures": [],
+      "status": "PASS"
+    },
     {
       "test": "simulation_test",
       "checks": 29,
@@ -12,7 +18,7 @@
     },
     {
       "test": "progression_test",
-      "checks": 85,
+      "checks": 88,
       "failures": [],
       "status": "PASS"
     },
@@ -42,7 +48,7 @@
     },
     {
       "test": "ui_test",
-      "checks": 2715,
+      "checks": 1812,
       "failures": [],
       "status": "PASS"
     },
@@ -80,7 +86,7 @@
     },
     {
       "test": "content_update_test",
-      "checks": 19,
+      "checks": 21,
       "failures": [],
       "status": "PASS"
     },
@@ -93,16 +99,44 @@
     }
   ],
   "data": {
-    "revision": 242,
+    "revision": 243,
     "abi": 1,
     "engine": "4.7.2.stable",
-    "min_apk": 305901,
-    "bytes": 102771477,
-    "sha256": "4bfb0b91e609bfd5aefe6c08a2f10afee84d7c1da3dc6dbc3d8f174ee45dc257",
-    "signature": "ZK7yVpUk5OkVNQKNPBYas2LzfYn8unNZoLL2nkB6EqY5BUmBvQZ6ofLxMGWbhmSGhNl+2mxhZ6jZuypQpBfa9DdPhwylrTdDVP2S61aCKKO7+BWWkk8ne2llfIzm3scMHeD9+4nfYkBQGUrrO8gjgkNK2oR0iH3t1gpPFb8AQB6EH2wrVI/1RoKrdJ/HzFBm53ooAzWkyBkDpCfFtBGznRwLtLPqliBMfSDP6XpD4A12mMW0l9qlcF7YMaunTk0sGwudUK0w/XLePM0EXtJTMLD5TZ44qvlogzgaEqlNwzej6elMcXBPTHTlr5jApDtVtKIwWQ15TPy1a9xpzch7Iw==",
-    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-242/ABYSSAL_DATA_242.zip"
+    "min_apk": 305902,
+    "bytes": 113798530,
+    "sha256": "5442e3209d09d1a6b25751acd6215a750c4d7c0277c46f6652ce8ced67aaab88",
+    "signature": "DpfYW95B7Fgy1tkm6dhPZb+bNtlYlv6FV5lf0XnpNQli0gVXOBXaI2B5bKdBYioZkJUsD8MuehJMCw8FFfW4QHINGUgfw796fZ6sM3MQ7tUo8XbwURCNxoF91V1/4keQy+h3le4hcPoWxlqF7ZdHQfsoSymYwSRrofg/4xuo43a1tt4sXKVDjyNOwhShxjCTKGfl4vodfZtdYsZ/a1DNwYKzZxBbBn4sQkQRdqDnBF/JZTbv7A/+JqJ2fp4mPR0qZ48KtEP0vMLNSXPIVGRPLz4Ml2XqIjFtb3SJx4UpstPvwez1RYqlCEujSdWimHIDfKDSdCkqfCDiuwrqpzvwOQ==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-243/ABYSSAL_DATA_243.zip"
   },
   "audited_pngs": 35,
   "physical_android_test": "NOT_PERFORMED",
-  "apk_built": false
+  "apk_built": true,
+  "apk": "ABYSSAL_DOMINION_M3059_REBUILD_ARM64.apk",
+  "sha256": "5c8654515d264634f2127a1d8776b9a53b0986adb46be083e7e6deaffc48d013",
+  "bytes": 194494573,
+  "signature": "PASS",
+  "certificate_sha256": "278a2899340d58b3db0aced5e0f306ebb121550bc34dc1e6948783424652fe3b",
+  "version_code": 305902,
+  "package": "com.abyssaldominion.rebuild",
+  "updater_native": true,
+  "update_distribution": "GITHUB_RELEASES_MANIFEST_PUBLISHED_LAST",
+  "alignment_16k": "PASS",
+  "mode": "LOCAL_GUEST_SEA_CHART",
+  "public_server": false,
+  "regions": 40,
+  "bonus_regions": 3,
+  "guild_islands": 19,
+  "save_schema": 6,
+  "quest_chain": 7,
+  "equipment_categories": 4,
+  "equipment_tiers": 3,
+  "player_glb_models": 2,
+  "elite_material_variants": 10,
+  "player_ship_choices": 12,
+  "npc_glb_models": 9,
+  "graphics_modes": [
+    "hybrid",
+    "3d"
+  ],
+  "retired_sprite_atlases": 0
 }
