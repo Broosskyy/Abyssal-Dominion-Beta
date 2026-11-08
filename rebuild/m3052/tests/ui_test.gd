@@ -430,6 +430,18 @@ func _run() -> void:
 			art_big=art_big and picture.custom_minimum_size.x>=112.0
 	check(compact_columns and market_art_count>=28 and art_big,"narrow portrait menus use single-column large ammunition art instead of cramped tiles")
 	game.modal.hide()
+	# The central captain menu is a four-tab mobile gallery, not one
+	# endless list of tiny buttons. All destinations are genuine modals.
+	game._open_modal("Spielinfo")
+	check(game.modal_tabs.get_child_count()==4 and game.modal_tabs.visible,"captain menu has four scrollable categories")
+	check(game.modal_body.find_child("MenuShortcut_Belohnungen",true,false)!=null and game.modal_body.find_child("MenuShortcut_Freunde",true,false)!=null,"captain category links real daily reward and social menus")
+	game._switch_tab("Spielinfo","SCHIFF")
+	check(game.modal_body.find_child("MenuShortcut_Markt",true,false)!=null and game.modal_body.find_child("MenuShortcut_Decks",true,false)!=null and game.modal_body.find_child("MenuShortcut_Werft",true,false)!=null,"equipment category links market, decks and the shipyard")
+	game._switch_tab("Spielinfo","WELT")
+	check(game.modal_body.find_child("MenuShortcut_Bonuskarten",true,false)!=null,"world category links actual bonus-map system")
+	game._switch_tab("Spielinfo","SYSTEM")
+	check(game.modal_body.find_child("MenuShortcut_Anzeige",true,false)!=null,"settings category links HUD and graphic customization")
+	game.modal.hide()
 	# Real landscape reference video is 2340×1080. Test that device size
 	# and a portrait phone keep usable margins while preserving the Werft.
 	for device in [Vector2i(2340,1080),Vector2i(1080,2340)]:
