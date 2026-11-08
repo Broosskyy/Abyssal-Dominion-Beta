@@ -82,6 +82,8 @@ var rewards := preload("res://reward_ledger.gd").new()
 var guild_holdings: Dictionary={}
 var tower_levels: Array = CONTENT.normalized_tower_levels()
 var guild: Dictionary = {}
+# Durable, separately owned guild home: NOT the temporary world fortress.
+var guild_home: Dictionary={"tier":1,"treasury":0}
 var fortress_conquests := 0
 var fortress_hold := 0.0
 var portals: Array[Dictionary] = []
@@ -1082,7 +1084,8 @@ func found_guild(title: String, tag: String) -> bool:
 		return false
 	player.gold -= CONTENT.GUILD_COST
 	guild = {"name": title, "tag": tag}
-	message = "Gilde [%s] %s gegründet" % [tag, title]
+	guild_home=GUILD_OPS.default_home()
+	message = "Gilde [%s] %s gegründet · Heimatankerplatz freigeschaltet" % [tag, title]
 	return true
 
 ## Staff badges are reserved, including digit look-alikes such as 4DM or M0D.
@@ -1096,6 +1099,24 @@ static func reserved_tag(tag: String) -> bool:
 
 func leave_guild() -> bool:
 	return GUILD_OPS.leave_guild(self)
+
+func guild_home_tier() -> int:
+	return int(guild_home.get("tier",1)) if not guild.is_empty() else 0
+
+func guild_treasury_capacity() -> int:
+	return GUILD_OPS.treasury_capacity(guild_home_tier()) if not guild.is_empty() else 0
+
+func guild_home_upgrade_cost() -> int:
+	return GUILD_OPS.next_home_cost(self)
+
+func guild_deposit(amount: int) -> bool:
+	return GUILD_OPS.deposit_home(self,amount)
+
+func guild_withdraw(amount: int) -> bool:
+	return GUILD_OPS.withdraw_home(self,amount)
+
+func guild_upgrade_home() -> bool:
+	return GUILD_OPS.upgrade_home(self)
 
 func guild_island_held() -> bool:
 	return GUILD_OPS.guild_island_held(self)
@@ -1560,7 +1581,7 @@ func export_save() -> Dictionary:
 		"cannons":player.cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
 		"essence":essence,"fragments":fragments,"bonus_pieces":bonus_pieces.duplicate(),"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
 		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
-		"deck_slots":deck_slots.duplicate(),"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),
+		"deck_slots":deck_slots.duplicate(),"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),"guild_home":guild_home.duplicate(true),
 		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
@@ -1650,6 +1671,9 @@ func restore_save(data: Dictionary) -> bool:
 	var saved_guild: Variant=data.get("guild",{})
 	if saved_guild is Dictionary and saved_guild.has("name") and saved_guild.has("tag"):
 		guild={"name":str(saved_guild.name).left(24),"tag":str(saved_guild.tag).left(4).to_upper()}
+	# Older schema-8 saves have no guild_home; safely initialize Tier I
+	# without resetting the still-existing contested fortress states.
+	guild_home=GUILD_OPS.normalize_home(data.get("guild_home",{})) if not guild.is_empty() else GUILD_OPS.default_home()
 	fortress_conquests=maxi(0,int(data.get("fortress_conquests",0)))
 	staff_marked=bool(data.get("staff_marked",false))
 	guild_holdings={}
