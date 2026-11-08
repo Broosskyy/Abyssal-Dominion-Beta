@@ -766,20 +766,21 @@ func _launch(source_id: int, target_id: int, weapon: String, damage: int, count:
 	if source.is_empty() or destination.is_empty(): return
 	# Flight metadata is presentation-only. Damage, speed, shot spread, range
 	# and 80 ms salvo staggering stay exactly as before M3100.
-	var visual_heading: Vector2=(_projectile_target(destination)-source.pos).normalized()
+	var visual_start: Vector2=_projectile_target(source)
+	var visual_heading: Vector2=(_projectile_target(destination)-visual_start).normalized()
 	if visual_heading.length_squared()<0.001:visual_heading=Vector2.RIGHT
 	# One render group per real salvo. All three original damage-bearing shots
 	# remain independent; the visual renderer draws ONE tightly packed pile.
 	var group_id: int=next_id+1
 	for i in count:
 		next_id += 1
-		var start: Vector2 = source.pos + Vector2(0, (float(i) - float(count - 1) * 0.5) * 13)
+		var start: Vector2 = visual_start + Vector2(0, (float(i) - float(count - 1) * 0.5) * 13)
 		shots.append({"id": next_id, "source": source_id, "target": target_id, "pos": start,
 			"start": start, "damage": damage, "powder":powdered, "weapon": weapon, "age": -float(i) * 0.08,
 			"distance": maxf(1, start.distance_to(_projectile_target(destination))), "traveled": 0.0,
 			"visual_heading": visual_heading, "salvo_index": i,
 			"salvo_count": count, "salvo_group": group_id, "salvo_origin": source.pos})
-	_event("muzzle", source.pos, count, source_id)
+	_event("muzzle", visual_start, count, source_id)
 	if not events.is_empty():
 		events.back()["powder"]=powdered
 		events.back()["weapon"]=weapon
