@@ -11,14 +11,53 @@ static func leave_guild(s) -> bool:
 	s.fortress_hold = 0.0
 	return true
 
+# One authoritative local ownership view. The current sea's live countdown
+# takes precedence over its saved snapshot (which might still be stale).
+# A remote MMO owner is NOT inferred: this is strictly a local beta preview.
+static func holding_remaining(s, sea_id: int) -> float:
+	if s.guild.is_empty() or not CONTENT.has_guild_island(sea_id):return 0.0
+	if sea_id==s.map_id:return maxf(0.0,float(s.fortress_hold))
+	var entry: Dictionary=s.guild_holdings.get(str(sea_id),{})
+	return maxf(0.0,float(entry.get("remaining",0.0)))
+
+static func owner_tag(s,sea_id: int) -> String:
+	if holding_remaining(s,sea_id)<=0.0:return CONTENT.FORTRESS_TAG
+	return str(s.guild.get("tag",CONTENT.FORTRESS_TAG))
+
 static func guild_island_held(s) -> bool:
-	return not s.guild.is_empty() and (s.fortress_hold > 0 or s.guild_holdings.values().any(func(holding):return float(holding.get("remaining",0))>0))
+	if s.guild.is_empty():return false
+	if holding_remaining(s,s.map_id)>0.0:return true
+	for key: String in s.guild_holdings:
+		if holding_remaining(s,int(key))>0.0:return true
+	return false
 
 static func tower_friendly(s) -> bool:
-	return not s.guild.is_empty() and s.fortress_hold>0 and CONTENT.has_guild_island(s.map_id)
+	return holding_remaining(s,s.map_id)>0.0
 
 static func tower_tag(s) -> String:
-	return str(s.guild.tag) if s.tower_friendly() else CONTENT.FORTRESS_TAG
+	return owner_tag(s,s.map_id)
+
+# Ordered live siege data, one record per independently destroyable turret.
+static func tower_status(s) -> Array[Dictionary]:
+	var status: Array[Dictionary]=[]
+	if not CONTENT.has_guild_island(s.map_id):return status
+	for i in CONTENT.TOWERS.size():
+		var spec: Dictionary=CONTENT.TOWERS[i]
+		var actor: Dictionary={}
+		for candidate: Dictionary in s.npcs:
+			if str(candidate.get("kind",""))=="tower" and int(candidate.get("id",-1))==400+i:
+				actor=candidate
+				break
+		status.append({
+			"index":i,"name":str(spec.name),
+			"level":int(s.tower_levels[i]),
+			"hp":maxi(0,int(actor.get("hp",0))),
+			"max_hp":maxi(1,int(actor.get("max_hp",spec.hp))),
+			"shield":maxi(0,int(actor.get("shield",0))),
+			"alive":not actor.is_empty() and int(actor.get("hp",0))>0,
+			"respawn":maxf(0.0,float(actor.get("respawn",0.0)))
+		})
+	return status
 
 static func fortress_island(s) -> Dictionary:
 	if not CONTENT.has_guild_island(s.map_id): return {}
