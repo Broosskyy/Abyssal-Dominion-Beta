@@ -29,6 +29,7 @@ const TOWER_TEXTURES := {
 	"chain":preload("res://assets/world_v2/tower_chain.png"),
 	"guardian":preload("res://assets/world_v2/tower_guardian.png")}
 const HARBOR_ISLAND: Texture2D=preload("res://assets/world_v2/island_harbor.png")
+const GUILD_FORTRESS_ART: Texture2D=preload("res://assets/world_v3/guild_fortress_base.svg")
 const HARBOR_DRAW_SIZE := SIM.HARBOR_SIZE
 const HARBOR_DOCK_OFFSET := SIM.HARBOR_OFFSET
 const CAPTAIN_PLATE_OFFSET := 62.0
@@ -533,12 +534,22 @@ func _draw() -> void:
 	# Projected art is drawn on the same 2D chart as movement and collision.
 	for island in sim.islands:
 		if not view.has_point(island.pos): continue
-		var tex: Texture2D = island_textures[island.art]
-		var width: float = island.width
-		var dimensions = tex.get_size()*width/tex.get_width()
-		var point: Vector2 = island.pos
+		var guild_island: bool=bool(island.get("guild_fortress",false))
+		var tex: Texture2D=GUILD_FORTRESS_ART if guild_island else island_textures[island.art]
+		var width: float=island.width
+		var dimensions: Vector2=Vector2(width,width*CONTENT.GUILD_FORTRESS_ASPECT) if guild_island else tex.get_size()*width/tex.get_width()
+		var point: Vector2=island.pos
 		draw_texture_rect(tex,Rect2(point-dimensions*Vector2(0.5,0.65),dimensions),false)
 		_draw_coastal_surf(island)
+		if guild_island:
+			# Dynamic owner crest; the texture never hardcodes any guild's name.
+			var owned: bool=sim.tower_friendly()
+			var tag: String=sim.tower_tag()
+			var keep: Vector2=point+Vector2(0,-dimensions.y*.31)
+			var plate: Rect2=Rect2(keep-Vector2(69,19),Vector2(138,26))
+			draw_rect(plate,Color("173c32" if owned else "4a2525",.88))
+			draw_rect(plate,Color("e2b768"),false,2.0)
+			draw_string(font,plate.position+Vector2(11,18),"FESTUNG [%s]" % tag,HORIZONTAL_ALIGNMENT_LEFT,-1,13,Color("ffe0a3"))
 		# Only geometry: no island nameplates (internal navigation names remain
 		# available for testing and staff tools).
 		# The former fake watchtower on island 0 is deliberately gone.
@@ -2705,7 +2716,7 @@ func _open_guild() -> void:
 	elif CONTENT.has_guild_island(sim.map_id):state="Gehalten von [%s] · %d von %d Türmen stehen" % [CONTENT.FORTRESS_TAG,sim.towers_alive(),CONTENT.TOWERS.size()]
 	else:state="Schattengewässer %s · ab Lv. %d · gehalten von [%s]" % [CONTENT.MAPS[CONTENT.FORTRESS_MAP].code,CONTENT.MAPS[CONTENT.FORTRESS_MAP].level,CONTENT.FORTRESS_TAG]
 	_info(state)
-	_note("Kanonenturm: Doppelschuss · Mörserturm: weite Bögen · Kettenturm: bremst · Wächterturm: lädt die Schilde der anderen Türme. Zerstöre alle zehn für +900 Gold, +3 Essenz und +2 Fragmente. Mit Gilde hältst du die Insel 30 Minuten.")
+	_note("Kanonenturm: Doppelschuss · Mörserturm: weite Bögen · Kettenturm: bremst · Wächterturm: Schildaufladung. Zerstöre alle zwölf Türme, um die Insel einzunehmen. Der befahrbare Innenhafen liegt hinter der südlichen Einfahrt.")
 	_note("Eroberungen %d · zerstörte Türme %d" % [sim.fortress_conquests,sim.tower_kills],Color("ffd27a"))
 	if CONTENT.has_guild_island(sim.map_id):
 		var course=_primary("KURS ZUR FESTUNG",func():
