@@ -402,7 +402,7 @@ func use_supply(key: String) -> bool:
 	return true
 
 func buy_supply(key: String) -> bool:
-	if not CONTENT.SUPPLIES.has(key) or not docked: return false
+	if not CONTENT.SUPPLIES.has(key): return false
 	var config: Dictionary = CONTENT.SUPPLIES[key]
 	if int(player.gold) < int(config.price): return false
 	player.gold -= int(config.price)
@@ -411,7 +411,7 @@ func buy_supply(key: String) -> bool:
 	return true
 
 func buy_cannons() -> bool:
-	if not docked or int(player.cannons) >= MAX_CANNONS or int(player.gold) < cannon_price(): return false
+	if int(player.cannons) >= MAX_CANNONS or int(player.gold) < cannon_price(): return false
 	player.gold -= cannon_price()
 	var acquired: int=mini(2,MAX_CANNONS-int(player.cannons))
 	player.cannons += acquired
@@ -454,8 +454,16 @@ func equipped_cannons() -> int:
 func cannon_storage() -> int:
 	return maxi(0,int(player.cannons)-mounted_cannons)
 
+# Ship refits are portable but blocked in live combat. This keeps the
+# marketplace accessible anywhere without instant mid-salvo damage changes.
+func can_refit_cannons() -> bool:
+	return int(player.hp)>0 and not in_bonus_map() and (docked or (not firing and clock-float(player.last_hit)>=6.0))
+
 func mount_cannons(quantity: int) -> bool:
-	if not docked or quantity<=0:return false
+	if quantity<=0:return false
+	if not can_refit_cannons():
+		message="Kanonenumbau nur außerhalb von Gefechten · 6 Sekunden ohne Treffer"
+		return false
 	var fitting: int=mini(quantity,mini(cannon_storage(),maxi(0,cannon_slots()-mounted_cannons)))
 	if fitting<=0:
 		message="Keine freien Geschützplätze oder keine Kanonen im Lager"
@@ -465,7 +473,10 @@ func mount_cannons(quantity: int) -> bool:
 	return true
 
 func unmount_cannons(quantity: int) -> bool:
-	if not docked or quantity<=0:return false
+	if quantity<=0:return false
+	if not can_refit_cannons():
+		message="Kanonenumbau nur außerhalb von Gefechten · 6 Sekunden ohne Treffer"
+		return false
 	var removing: int=mini(quantity,mounted_cannons)
 	if removing<=0:
 		message="Keine montierten Kanonen vorhanden"
@@ -1370,7 +1381,7 @@ func talent_points_available() -> int:
 	return maxi(0,level-1-spent)
 
 func learn_talent(key: String) -> bool:
-	if not docked or not CONTENT.TALENTS.has(key):return false
+	if not CONTENT.TALENTS.has(key):return false
 	if talent_points_available()<=0 or int(talents[key])>=CONTENT.TALENT_MAX:
 		message="Keine freien Talentpunkte oder Talent bereits voll"
 		return false

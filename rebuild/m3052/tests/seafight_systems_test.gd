@@ -156,9 +156,10 @@ func _initialize() -> void:
 	# Cannon capacity is separate from owned cannons.
 	sim=SIM.new()
 	check(sim.cannon_slots()==10 and sim.equipped_cannons()==10 and sim.weapon_damage(0)==31,"ten slots and ten cannons keep the original salvo")
-	check(not sim.buy_cannons(),"cannons are bought in the harbor")
-	sim.player.pos=sim.harbor;sim.dock();sim.player.gold=5000
+	sim.player.gold=0;check(not sim.buy_cannons(),"cannot buy without sufficient currency")
+	sim.player.gold=5000
 	check(sim.buy_cannons() and int(sim.player.cannons)==12 and sim.equipped_cannons()==10 and sim.cannon_storage()==2,"new purchased cannons are stored, not automatically installed")
+	check(not sim.docked,"market transaction succeeds without docking")	sim.player.pos=sim.harbor;sim.dock()
 	sim.add_tide_deck(1800)
 	check(sim.cannon_slots()==20 and sim.equipped_cannons()==10,"tide deck adds ten slots but stored guns remain unused")
 	check(sim.mount_cannons(2) and sim.equipped_cannons()==12 and sim.cannon_storage()==0 and sim.weapon_damage(0)==roundi(31*1.2),"captain manually installs stored guns into available ship slots")
@@ -175,6 +176,22 @@ func _initialize() -> void:
 	cannon_save.erase("mounted_cannons")
 	check(cannon_reload.restore_save(cannon_save) and cannon_reload.mounted_cannons==12,"legacy guest save retains previously automatically mounted guns")
 	check(not sim.mount_cannons(1) or sim.cannon_storage()==0,"cannot mount any gun the captain does not own")
+	var portable=SIM.new()
+	portable.player.gold=1200
+	portable.level=3
+	check(not portable.docked and portable.buy_supply("powder") and int(portable.supplies.powder)==20,"shop supplies are available outside harbor")
+	check(portable.buy_cannons() and portable.cannon_storage()==2 and not portable.docked,"shop cannons enter storage at sea")
+	portable.add_tide_deck(600)
+	check(portable.mount_cannons(2) and portable.equipped_cannons()==12,"portable mounting works outside combat")
+	portable.firing=true
+	check(not portable.unmount_cannons(1),"active combat locks equipment changes")
+	portable.firing=false
+	portable.player.last_hit=portable.clock
+	check(not portable.unmount_cannons(1),"recent damage blocks equipment changes")
+	portable.clock+=7.0
+	check(portable.unmount_cannons(1) and portable.cannon_storage()==1,"equipment changes reopen after combat")
+	check(portable.learn_talent("armor") and int(portable.talents.armor)==1 and not portable.docked,"talents can be assigned without docking")
+	check(not portable.buy_upgrade("cannon"),"castle construction stays a port-only service")
 	# Kristallsegen: one major blessing with moderate combined bonuses.
 	sim=SIM.new()
 	sim.activate_blessing(60)
