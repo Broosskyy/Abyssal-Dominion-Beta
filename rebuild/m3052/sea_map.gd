@@ -1,5 +1,6 @@
 extends Node2D
 const SIM = preload("res://simulation.gd")
+const SOCIAL = preload("res://social_invite.gd")
 const MINI = preload("res://minimap.gd")
 const HUD=preload("res://nautical_button.gd")
 const HUD_PANEL=preload("res://nautical_panel.gd")
@@ -285,6 +286,12 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 	_refresh_ui()
+	# Lobby links open the actual menu, not a second fake copy of the game UI.
+	if get_tree().has_meta("abyssal_start_modal"):
+		var open_on_entry: String=str(get_tree().get_meta("abyssal_start_modal"))
+		get_tree().remove_meta("abyssal_start_modal")
+		if open_on_entry in ["Werft","Markt","Decks","Kastelle","Seekarten","Logbuch","Gilde","Battle Pass","Profil","Belohnungen","Freunde"]:
+			_open_modal(open_on_entry)
 	# Test harnesses attach the scene before claiming it; only a real scene change shows the boot curtain.
 	if get_tree().current_scene==self:_begin_loading(1.4)
 	var data_boot=get_tree().root.get_node_or_null("DataBoot")
@@ -1853,8 +1860,8 @@ func _clock_text(seconds: float) -> String:
 	var minutes=floori((total%3600)/60.0)
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
-const MODAL_TABS := {"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
-const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
+const MODAL_TABS := {"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Freunde":["EINLADEN","FREUNDESLISTE"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
+const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten","Freunde":"Freunde & Einladungen"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
 	if modal.visible and modal_kind!=kind and remember:
@@ -1893,6 +1900,7 @@ func _open_modal(kind: String,remember: bool=true) -> void:
 		"Hilfe":_open_help()
 		"Profil":_open_profile()
 		"Belohnungen":_open_rewards()
+		"Freunde":_open_friends()
 		"Werft":_open_shipyard()
 		"Markt":_open_market()
 		"Premium-Shop":_open_premium_shop()
@@ -3311,6 +3319,7 @@ func _open_help() -> void:
 	var links=_grid(2)
 	_with_icon(_action("SPIELERPROFIL",func():_open_modal("Profil"),"normal",links),painted.nav_ranking)
 	_with_icon(_action("TAGESBONUS & AFK",func():_open_modal("Belohnungen"),"normal",links),painted.reward_chest)
+	_with_icon(_action("FREUNDE EINLADEN",func():_open_modal("Freunde"),"normal",links),painted.nav_guild)
 	_action("ZUM HAUPTMENÜ",func():_save_progress();get_tree().change_scene_to_file("res://start_hub.tscn"),"normal",links)
 	_with_icon(_action("SEEKARTEN",func():_open_modal("Seekarten"),"normal",links),painted.nav_charts)
 	_with_icon(_action("KARTEN-ANLEITUNG",func():modal_tab["Seekarten"]="ANLEITUNG";_open_modal("Seekarten"),"normal",links),extra_icons.world_chart)
@@ -3964,38 +3973,109 @@ func _open_profile() -> void:
 	_action("GILDE VERWALTEN",func():_open_modal("Gilde"))
 
 func _open_rewards() -> void:
-	_banner_card(painted.reward_chest,"DEINE BELOHNUNGEN","Tägliche Versorgung und gesammelte AFK-Beute · lokale Beta")
-	var ready: bool=sim.rewards.daily_available()
-	_action("TAGESBONUS ABHOLEN" if ready else "TAGESBONUS ABGEHOLT",func():sim.rewards.claim_daily(sim);_save_progress();_open_modal("Belohnungen"),"primary").disabled=not ready
-	_note("7-Tage-Serie: %d/7 · nächster Bonus: Gold, Essenz und eine Notreparatur. Tageswechsel 00:00 UTC." % sim.rewards.streak)
-	var gold: int=sim.rewards.afk_gold()
-	_action("AFK-BEUTE · %d GOLD ABHOLEN" % gold,func():sim.rewards.claim_afk(sim);_save_progress();_open_modal("Belohnungen"),"primary").disabled=gold<=0
-	_note("3 Gold pro voller Minute · 10 Vollkugeln je 5 Minuten · maximal 8 Stunden. Du erhältst offline keine Kampf- oder PvP-Punkte.")
+	_banner_card(painted.reward_chest,"TAGESBONUS · 7-TAGE-SERIE","Jeden UTC-Kalendertag genau einmal abholen. Dein bisheriger Bonusstand bleibt erhalten; AFK-Gold ist ein separates System.")
+	var current_day: int=floori(float(Time.get_unix_time_from_system())/86400.0)
+	var last_day: int=sim.rewards.last_claim_day
+	var next_day: int=(sim.rewards.streak%7)+1 if last_day>=current_day-1 else 1
+	_section("DEIN TAGESBONUS · SERIE %d/7" % sim.rewards.streak)
+	var gallery=_catalog_grid(3)
+	for day in 7:
+		var index: int=day+1
+		var claimed: bool=last_day==current_day and index<=sim.rewards.streak
+		var ready: bool=index==next_day and sim.rewards.daily_available()
+		var state: String="ABGEHOLT" if claimed else ("HEUTE VERFÜGBAR" if ready else "BONUSVORSCHAU")
+		var amount: int=100+index*50
+		var essence: int=2 if index==7 else 1
+		var tile=_catalog_tile(gallery,painted.reward_chest,"TAG %d" % index,"%d Gold · %d Essenz\n1 Notreparatur" % [amount,essence],state,Color("56977e") if claimed else (Color("bc9355") if ready else Color("5a6770")))
+		if ready:
+			var claim=_catalog_action(tile,"TAGESBONUS ABHOLEN",func():
+				if sim.rewards.claim_daily(sim):_save_progress()
+				_open_modal("Belohnungen");_refresh_ui())
+			claim.name="DailyClaimButton"
+	var available: bool=sim.rewards.daily_available()
+	if not available:_note("Der heutige Tagesbonus ist bereits abgeholt. Nächster regulärer Tagwechsel: 00:00 UTC.",Color("a7cfb5"))
+	_section("AFK-BEUTE · ZUSÄTZLICH")
+	var offline_gold: int=sim.rewards.afk_gold()
+	var afk=_catalog_tile(_catalog_grid(1),painted.gold_coins,"DEINE GESAMMELTE BEUTE","3 Gold je voller Minute · 10 Vollkugeln je 5 Minuten · maximal 8 Stunden","%d GOLD BEREIT" % offline_gold,Color("a78658"))
+	var action=_catalog_action(afk,"AFK-BEUTE ABHOLEN",func():
+		if sim.rewards.claim_afk(sim):_save_progress()
+		_open_modal("Belohnungen");_refresh_ui(),offline_gold<=0)
+	action.name="AFKClaimButton"
+	_note("Lokale Beta: Kein automatischer PvP-Fortschritt, keine Einladungsprämien. Später müssen tägliche Ansprüche serverseitig abgesichert werden.")
+
+func _open_friends() -> void:
+	_banner_card(painted.nav_guild,"FREUNDE & EINLADUNGEN","Beta-Einladungscode zum Weitergeben. Eine echte Freundesliste und sichere Einladungsbelohnungen werden erst mit Online-Konten verfügbar.")
+	if _tab("Freunde")=="FREUNDESLISTE":
+		_section("DEINE FREUNDESLISTE")
+		_note("Noch keine Online-Verbindung für Freunde, Gruppen oder Präsenzanzeige. Ohne Serverdaten werden hier keine erfundenen Spieler angezeigt.")
+		var locked=_action("FREUND HINZUFÜGEN · ONLINE ERFORDERLICH",func():pass)
+		locked.disabled=true
+		_action("EINLADUNG TEILEN",func():_switch_tab("Freunde","EINLADEN"))
+		return
+	_section("EINLADUNGSCODE DEINES KAPITÄNS")
+	var code: String=SOCIAL.invite_code(sim.captain_id)
+	var tile=_catalog_tile(_catalog_grid(1),painted.nav_guild,code if not code.is_empty() else "NOCH KEIN SPIELERCODE","Lade Freunde zu Abyssal Dominion ein. Der Text enthält die Beta-Release-Seite.","LOKALE BETA · KEINE PRÄMIE",Color("9e8c60"))
+	var share=_catalog_action(tile,"EINLADUNGSTEXT KOPIEREN",func():
+		DisplayServer.clipboard_set(SOCIAL.invite_text(sim.captain_name,sim.captain_id))
+		sim.message="Einladung kopiert · an Freunde weitergeben"
+		_open_modal("Freunde");_refresh_ui(),code.is_empty())
+	share.name="CopyInviteButton"
+	_note("Der Code allein verbindet noch keine Accounts. Echtgeld, Kronen und Belohnungen werden nicht durch unbestätigte Einladungen erzeugt.")
+	_section("GRUPPEN & ONLINE-FREUNDE")
+	var link=_grid(2)
+	_action("GILDE ANSEHEN",func():_open_modal("Gilde"),"normal",link)
+	_action("FREUNDESLISTE",func():_switch_tab("Freunde","FREUNDESLISTE"),"normal",link)
 
 # --- Organized navigation, seasonal content and configurable combat shortcuts ---
 func _open_info() -> void:
-	_section("KAPITÄN & FORTSCHRITT")
-	var captain=_grid(2)
-	for entry in [["Profil","SPIELERPROFIL"],["Belohnungen","TAGESBONUS & AFK"],["Logbuch","LOGBUCH"],["Rangliste","RANGLISTE"]]:
-		var destination: String=entry[0]
-		_action(entry[1],func():_open_modal(destination),"normal",captain)
+	_banner_card(painted.nav_menu,"KAPITÄNSMENÜ · ZENTRALE","Alle wichtigen Spielbereiche mit eigenem Platz: Markt, Werft, Decks, Fortschritt, Freunde und Belohnungen. Große Bilder und eindeutige Buttons statt einer langen Textliste.")
+	_section("KAPITÄN & SPIELFORTSCHRITT")
+	var captain=_catalog_grid(3)
+	for option in [
+		["Profil","SPIELERPROFIL","Name, Rang und Battle Points",painted.nav_ranking],
+		["Belohnungen","TAGESBONUS & AFK","Täglich Gold, Essenz und Vorräte",painted.reward_chest],
+		["Freunde","FREUNDE EINLADEN","Beta-Code kopieren und teilen",painted.nav_guild],
+		["Logbuch","LOGBUCH","Quests, Aufträge und Fortschritt",painted.nav_quests],
+		["Rangliste","RANGLISTE","Wettbewerb und Statistiken",painted.nav_ranking],
+		["Battle Pass","SAISONPASS","Kostenlose Belohnungen erspielen",painted.nav_bonus]
+	]:
+		var dest: String=str(option[0])
+		var tile=_catalog_tile(captain,option[3],str(option[1]),str(option[2]),"KAPITÄN",Color("a58d64"))
+		_catalog_action(tile,"ÖFFNEN",func():_open_modal(dest))
+	_section("SCHIFF & WIRTSCHAFT")
+	var economy=_catalog_grid(3)
+	for option in [
+		["Werft","SCHIFFSWERFT","Designs und Kanonenmontage",painted.nav_shipyard],
+		["Decks","DECKS & LAGER","Gold-, Elite- und Spezialdecks",painted.tide_deck],
+		["Markt","MARKTPLATZ","Kanonen, Munition und Items",painted.gold_coins],
+		["Kastelle","KASTELLE & TALENTE","Schiffsausbauten und Fähigkeitspunkte",painted.nav_castles],
+		["Premium-Shop","KRONEN-SHOP","Noch keine Echtgeldkäufe",painted.gold_coins],
+		["Bewaffnung","ARSENAL","Geschütze und Munitionslager",extra_icons.cannon_0]
+	]:
+		var dest: String=str(option[0])
+		var tile=_catalog_tile(economy,option[3],str(option[1]),str(option[2]),"AUSRÜSTUNG",Color("758c93"))
+		_catalog_action(tile,"ÖFFNEN",func():_open_modal(dest))
 	_section("WELT & VERANSTALTUNGEN")
-	var world=_grid(2)
-	for entry in [["Seekarten","WELTKARTE"],["Events","HALLOWEEN & COLUMBUS"],["Monster","SEEUNGEHEUER"],["Gilde","GILDE & INSELN"]]:
-		var destination: String=entry[0]
-		_action(entry[1],func():_open_modal(destination),"normal",world)
-	_section("HANDEL & VERBESSERUNGEN")
-	var trading=_grid(2)
-	for entry in [["Markt","MARKTPLATZ"],["Werft","SCHIFFSWERFT"],["Bewaffnung","ARSENAL"],["Kastelle","KASTELLE & TALENTE"],["Premium-Shop","KRONEN-SHOP"],["Battle Pass","SAISONPASS"]]:
-		var destination: String=str(entry[0])
-		_action(str(entry[1]),func():_open_modal(destination),"normal",trading)
-	_section("AUSRÜSTUNG & STEUERUNG")
-	var settings=_grid(2)
-	for entry in [["Schnellzugriff","SCHNELLLEISTEN BELEGEN"],["Verbrauch","VERBRAUCHSGEGENSTÄNDE"],["Anzeige","GRAFIK & STEUERUNG"],["Hilfe","SPIELANLEITUNG"],["Kastelle","KASTELLE"],["Staff","STAFF-ZUGANG"]]:
-		var destination: String=entry[0]
-		_action(entry[1],func():_open_modal(destination),"normal",settings)
+	var world=_catalog_grid(3)
+	for option in [
+		["Seekarten","WELTKARTE","Seekarten und Portale",painted.nav_charts],
+		["Bonuskarten","BONUSKARTEN","Fragmente und Wellen",painted.nav_bonus],
+		["Monster","MONSTERJAGD","Harpunen und Tiefenwesen",painted.boss_wave],
+		["Gilde","GILDE","Mitglieder und Inseln",painted.nav_guild],
+		["Events","EVENTS","Halloween und Entdeckerfahrt",painted.ammo_pumpkin],
+		["Kessel","GEZEITENKESSEL","Belohnungen und Fragmente",painted.nav_kessel]
+	]:
+		var dest: String=str(option[0])
+		var tile=_catalog_tile(world,option[3],str(option[1]),str(option[2]),"WELT",Color("648b8b"))
+		_catalog_action(tile,"ÖFFNEN",func():_open_modal(dest))
+	_section("BEDIENUNG & EINSTELLUNGEN")
+	var links=_grid(2)
+	for entry in [["Schnellzugriff","SCHNELLLEISTEN"],["Verbrauch","VERBRAUCHSGEGENSTÄNDE"],["Anzeige","GRAFIK & STEUERUNG"],["Hilfe","SPIELANLEITUNG"],["Staff","STAFF-ZUGANG"]]:
+		var dest: String=str(entry[0])
+		_action(str(entry[1]),func():_open_modal(dest),"normal",links)
 	_action("ZUM HAUPTMENÜ",func():_save_progress();get_tree().change_scene_to_file("res://start_hub.tscn"))
 	_action("UPDATES PRÜFEN",func():_save_progress();get_tree().set_meta("abyssal_manual_update",true);get_tree().change_scene_to_file("res://updater/launcher.tscn"))
+
 
 func _open_quick_config() -> void:
 	_info("3 LEISTEN · JE 3 FREI BELEGBARE PLÄTZE")
