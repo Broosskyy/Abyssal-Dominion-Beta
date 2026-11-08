@@ -361,6 +361,43 @@ func _run() -> void:
 			else:
 				check(game.modal.get_global_rect().size.x<dimensions.x*.85,"combat ammunition retains compact popup instead of full page")
 			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
+	# Two uploaded comparison videos show item artwork, a price, and one
+	# unmistakable action per item. Validate the actual Godot catalog layout
+	# on a compact landscape phone and a normal tablet/desktop viewport.
+	for device in [Vector2i(720,405),Vector2i(1280,720)]:
+		root.size=device
+		await process_frame
+		game._layout()
+		game._switch_tab("Markt","MUNITION")
+		await process_frame
+		await process_frame
+		var number_of_tiles: int=0
+		var all_inside: bool=true
+		var big_buttons: bool=true
+		for node: PanelContainer in game.modal_body.find_children("*","PanelContainer",true,false):
+			if not node.has_meta("catalog_tile"):continue
+			number_of_tiles+=1
+			all_inside=all_inside and node.get_global_rect().end.x<=game.modal_scroll.get_global_rect().end.x+2.0
+			for button: Button in node.find_children("*","Button",true,false):
+				big_buttons=big_buttons and button.custom_minimum_size.y>=48.0
+		check(number_of_tiles==28 and big_buttons and all_inside,"all ammunition tiles have mobile-sized artwork/buttons and stay within viewport "+str(device))
+		game._switch_tab("Markt","ITEMS")
+		check(game.modal_body.find_child("MarketItem_powder",true,false)!=null,"new product cards preserve real item purchase buttons "+str(device))
+		game._switch_tab("Decks","SCHIFF")
+		check(game.modal_body.find_child("DeckOverview",true,false)!=null,"animated 2x5 deck badge preserved in new tabbed deck panel")
+		game._switch_tab("Decks","LAGER")
+		check(game._tab("Decks")=="LAGER","deck inventory has a separate panel")
+		game._switch_tab("Decks","SPEZIAL")
+		check(game._tab("Decks")=="SPEZIAL","timed special decks have separate panel")
+		game._switch_tab("Decks","KAUFEN")
+		check(game.modal_body.find_child("DeckBuy_cannon",true,false)!=null,"gold deck store has its own illustrated buy buttons")
+		game._switch_tab("Kastelle","KASTELLE")
+		check(game.modal_body.find_child("CastleUpgrade_cannon",true,false)!=null,"castle gallery exposes named upgrade actions")
+		game._switch_tab("Kastelle","TALENTE")
+		check(game.modal_body.find_child("Talent_gunnery",true,false)!=null,"talent gallery exposes named skill point action")
+	game._switch_tab("Kastelle","KASTELLE")
+	game._switch_tab("Decks","SCHIFF")
+	game._switch_tab("Markt","AUSRÜSTUNG")
 	game.modal.hide()
 	# Real landscape reference video is 2340×1080. Test that device size
 	# and a portrait phone keep usable margins while preserving the Werft.
