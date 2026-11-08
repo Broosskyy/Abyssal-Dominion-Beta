@@ -160,10 +160,23 @@ func _init() -> void:
 
 func _build_grid() -> void:
 	for island: Dictionary in islands:
-		var shape: Dictionary=island_shapes[str(island.art)]
-		var dimensions=Vector2(float(island.width),float(island.width)*float(shape.size[1])/float(shape.size[0]))
 		var polygon=PackedVector2Array()
-		for vertex: Array in shape.points:polygon.append(island.pos+(Vector2(vertex[0],vertex[1])-Vector2(0.5,0.65))*dimensions)
+		if bool(island.get("guild_fortress",false)):
+			# Deliberately concave U coast: wide navigable water basin and
+			# unblocked southern entrance, not an artificial solid island.
+			var dimensions: Vector2=Vector2(float(island.width),float(island.width)*CONTENT.GUILD_FORTRESS_ASPECT)
+			var outline: Array[Vector2]=[
+				Vector2(.146,.878),Vector2(.092,.75),Vector2(.048,.54),Vector2(.09,.30),
+				Vector2(.23,.13),Vector2(.43,.075),Vector2(.67,.06),Vector2(.85,.20),
+				Vector2(.96,.49),Vector2(.89,.79),Vector2(.84,.878),Vector2(.70,.915),
+				Vector2(.692,.68),Vector2(.64,.422),Vector2(.50,.380),Vector2(.399,.422),
+				Vector2(.305,.68),Vector2(.298,.915)]
+			for vertex: Vector2 in outline:
+				polygon.append(island.pos+(vertex-Vector2(.5,.65))*dimensions)
+		else:
+			var shape: Dictionary=island_shapes[str(island.art)]
+			var dimensions=Vector2(float(island.width),float(island.width)*float(shape.size[1])/float(shape.size[0]))
+			for vertex: Array in shape.points:polygon.append(island.pos+(Vector2(vertex[0],vertex[1])-Vector2(0.5,0.65))*dimensions)
 		island.outline=polygon
 		var bounds=Rect2(polygon[0],Vector2.ZERO)
 		for vertex: Vector2 in polygon:bounds=bounds.expand(vertex)
@@ -1448,10 +1461,11 @@ func configure_map(destination: int) -> void:
 	var neighbors: Array[int]=CONTENT.sea_neighbors(map_id)
 	for i in neighbors.size():portals.append({"pos":exits[i],"destination":neighbors[i]})
 	if CONTENT.has_guild_island(map_id):
-		# Restore the familiar regional island beneath independent animated towers.
-		# The oversized static castle plate from update 243 hid the actual defenses.
+		# A purpose-built island with integrated coastal walls, an open sea gate,
+		# navigable central harbor and twelve independent physical defenses.
 		var fortress: Dictionary=islands[CONTENT.FORTRESS_ISLAND]
-		fortress.art="rock" # Broad classic coast leaves room for ten distinct defenses.
+		fortress.art="rock"
+		fortress["guild_fortress"]=true
 		fortress.width=float(base_islands[CONTENT.FORTRESS_ISLAND].width)*island_art_scale(str(fortress.art))*CONTENT.GUILD_ISLAND_SCALE
 	_build_grid()
 	harbor=_harbor_site_for_map()
