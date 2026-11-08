@@ -36,7 +36,7 @@ func _run() -> void:
 	await process_frame
 	check(hub.page=="home" and hub.body.find_child("SailButton",true,false)!=null,"captain opens functional home with prominent Play button")
 	check(hub.body.find_child("FeaturedNews",true,false)!=null and hub.body.find_child("FeaturedArtwork",true,false)!=null,"home features illustrated carousel with existing game artwork")
-	check(hub.body.find_children("HomeActionCard","PanelContainer",true,false).size()==6,"home offers six illustrated action cards")
+	check(hub.body.find_children("HomeActionCard","PanelContainer",true,false).size()==12,"home offers six captain actions plus six direct equipment/progression shortcuts")
 	check(hub.body.find_child("HubTab_friends",true,false)!=null and hub.body.find_child("HubTab_logbook",true,false)!=null,"home provides navigation to friends and logbook")
 	var before: String=hub.featured_title.text
 	hub._featured_shift(1)
