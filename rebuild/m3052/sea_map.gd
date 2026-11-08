@@ -2444,6 +2444,62 @@ func _open_weapons() -> void:
 	_note("Sieben bewährte Munitionsarten mit ihren vorhandenen Effekten. 21 neue Spezialsorten sind bereits zum Anschauen und Feuern spielbar; ihre Werte und Sonderwirkungen sind vorläufig und werden später abgestimmt.")
 	_action("AUSRÜSTUNG & NACHSCHUB IM HAFEN",func():_open_modal("Hafen"))
 
+# Marketplace is a real GOLD economy. There is deliberately no pretend
+# online auction, no credit-card form, and no fake premium transaction.
+func _open_market() -> void:
+	_banner_card(painted.nav_harbor,"MARKTPLATZ · HANDEL & VORRÄTE","Dein Guthaben: %s Gold · Käufe sind echte lokale Spieltransaktionen. Munition gehört in den Markt, Kanonen ins Arsenal der Werft." % _thousands(int(sim.player.gold)))
+	match _tab("Markt"):
+		"AUSRÜSTUNG":
+			_section("KANONEN & SCHIFFSAUSRÜSTUNG")
+			var row=_row(extra_icons.cannon_1,"STANDARDBATTERIE · 2 KANONEN\nBesitz: %d · montiert: %d · Arsenal: %d\nPreis: %d Gold" % [int(sim.player.cannons),sim.mounted_cannons,sim.cannon_storage(),sim.cannon_price()],62,Color("9d7440"))
+			var buy=_row_button(row,"2 KANONEN KAUFEN",func():
+				sim.buy_cannons();_save_progress();_open_modal("Markt");_refresh_ui(),not sim.docked or int(sim.player.cannons)>=sim.MAX_CANNONS or int(sim.player.gold)<sim.cannon_price(),"primary")
+			buy.tooltip_text="Kauf nur im angedockten Hafen. Neue Kanonen müssen anschließend montiert werden."
+			_note("Neue Kanonen liegen zunächst im Arsenal. Ein Schiff kann nie mehr Kanonen abfeuern, als aktive Geschützplätze vorhanden sind.")
+			var access=_grid(2)
+			_action("ZUR KANONENMONTAGE",func():_switch_tab("Werft","KANONEN"),"normal",access)
+			_action("DECKWERFT",func():_open_modal("Decks"),"normal",access)
+		"MUNITION":
+			_section("NORMALMUNITION & HARPUNEN")
+			_note("Kaufe Vorräte hier, lade sie anschließend über das separate Munitionsmenü. Kein Munitionskauf in der Werft.")
+			for i in AMMO_UI.size():
+				if i==3:_section("SPEZIALMUNITION · BETA-WERTE")
+				var index: int=i
+				var data: Dictionary=AMMO_UI[i]
+				var price: int=30 if i<3 else 80
+				var row=_row(_ammo_texture(i),"%s · %d Stück im Lager\n+%d Stück · %d Gold" % [str(data.name),int(sim.player.ammo[i]),sim.ammo_pack(i),price],46,Color("caa968") if sim.ammo_mode==i else Color(0,0,0,0))
+				var buy=_row_button(row,"KAUFEN · %d GOLD" % price,func():
+					sim.buy_ammo(index);_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.hp)<=0 or int(sim.player.gold)<price,"primary")
+				buy.name="MarketAmmo"+str(i)
+		"ITEMS":
+			_section("VERBRAUCHSGEGENSTÄNDE")
+			for key: String in CONTENT.SUPPLY_KEYS:
+				var item: String=key
+				var config: Dictionary=CONTENT.SUPPLIES[key]
+				var row=_row(_supply_icon(key),"%s · %d auf Lager\n+%d Stück · %d Gold" % [str(config.name),int(sim.supplies[key]),int(config.pack),int(config.price)],46)
+				var buy=_row_button(row,"KAUFEN · %d GOLD" % int(config.price),func():
+					sim.buy_supply(item);_save_progress();_open_modal("Markt");_refresh_ui(),not sim.docked or int(sim.player.gold)<int(config.price),"primary")
+				buy.name="MarketItem_"+key
+			_note("Vorräte werden aus Sicherheitsgründen nur im Hafen gekauft. Anwendungen erfolgen über das separate Verbrauchsmenü.")
+		"AUKTION":
+			_section("HANDELSPLATZ & AUKTIONEN")
+			_note("Spieler-zu-Spieler-Angebote benötigen eine serverseitige Eigentumsprüfung, Reservierung der Gegenstände und sichere Transaktionsbestätigung. In dieser lokalen Beta sind Auktionen daher noch gesperrt.")
+			var disabled=_action("AUKTIONSHAUS · ONLINE ERFORDERLICH",func():pass)
+			disabled.disabled=true
+			_action("ZURÜCK ZUM NORMALEN MARKT",func():_switch_tab("Markt","AUSRÜSTUNG"))
+
+func _open_premium_shop() -> void:
+	_banner_card(painted.gold_coins,"KRONEN-SHOP · VORSCHAU","Kronen sind die vorgesehene Premiumwährung. Käufe mit Echtgeld sind in dieser lokalen Beta nicht verfügbar.")
+	_section("KRONEN · NOCH NICHT AKTIV")
+	_note("Es werden weder Zahlungen angefordert noch Premium-Guthaben auf diesem Gerät erzeugt. Erst die gesicherte Online-Anbindung mit serverseitiger Kaufvalidierung aktiviert echte Transaktionen.")
+	for product in ["Kronen-Paket · Klein","Kronen-Paket · Mittel","Kronen-Paket · Groß","Saisonpass · Premium"]:
+		var preview=_row(painted.reward_chest,product+"\nPreis und Gegenwert folgen nach dem Balancing",44)
+		var inactive=_row_button(preview,"NOCH NICHT KAUFBAR",func():pass,true)
+		inactive.name="DisabledPayment"
+	var links=_grid(2)
+	_action("GOLD-MARKTPLATZ",func():_open_modal("Markt"),"normal",links)
+	_action("SAISONPASS ANSEHEN",func():_open_modal("Battle Pass"),"normal",links)
+
 # --- Harbor, logbook and ranking -----------------------------------------------------------
 
 func _open_harbor() -> void:
