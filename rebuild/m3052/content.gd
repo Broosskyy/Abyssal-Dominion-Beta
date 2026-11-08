@@ -115,6 +115,22 @@ const UPGRADES := {
 	"harpoon":{"name":"Jagdkastell", "role":"Monsterjagd", "icon":"upgrade_harpoon", "effect":"+35 % Harpunenschaden je Stufe"},
 	"war":{"name":"Kriegskastell", "role":"Kriegsführung", "icon":"castle_war", "effect":"+10 % Schaden gegen Elite, Bosse und Türme je Stufe"}
 }
+# Free seasonal track is playable offline; the paid track stays locked until
+# account-bound entitlements and receipt verification exist server-side.
+const BATTLE_PASS_FREE := [
+	{"need":0,"name":"Leichte Proviantkiste","gold":100,"essence":0},
+	{"need":50,"name":"Küstenschatz","gold":200,"essence":1},
+	{"need":150,"name":"Kapitänsreserve","gold":300,"essence":2},
+	{"need":350,"name":"Seefahrertruhe","gold":500,"essence":3},
+	{"need":700,"name":"Admiralskiste","gold":800,"essence":5}
+]
+const TALENT_KEYS := ["gunnery","armor","navigation"]
+const TALENT_MAX := 5
+const TALENTS := {
+	"gunnery":{"name":"Schießkunst","effect":"+2 % Kanonenschaden je Punkt","role":"Kampf","icon":"upgrade_cannon"},
+	"armor":{"name":"Rumpfkunde","effect":"+2 % maximale Rumpfpunkte je Punkt","role":"Verteidigung","icon":"upgrade_hull"},
+	"navigation":{"name":"Seefahrtskunst","effect":"+2 % Fahrt je Punkt","role":"Navigation","icon":"upgrade_sails"}
+}
 const QUESTS := [
 	{"name":"Küstenwache", "description":"Versenke 3 Gegner", "stat":"kills", "goal":3, "gold":180, "xp":120, "essence":2},
 	{"name":"Bergung auf See", "description":"Sammle 3 Beutekisten", "stat":"loot", "goal":3, "gold":140, "xp":100, "essence":2},
