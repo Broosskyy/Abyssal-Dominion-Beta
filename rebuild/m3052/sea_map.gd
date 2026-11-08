@@ -285,6 +285,11 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 	_refresh_ui()
+	if get_tree().has_meta("abyssal_start_modal"):
+		var requested: String=str(get_tree().get_meta("abyssal_start_modal"))
+		get_tree().remove_meta("abyssal_start_modal")
+		if requested in ["Werft","Markt","Decks","Kastelle","Bonuskarten","Battle Pass","Logbuch","Seekarten"]:
+			_open_modal(requested)
 	# Test harnesses attach the scene before claiming it; only a real scene change shows the boot curtain.
 	if get_tree().current_scene==self:_begin_loading(1.4)
 	var data_boot=get_tree().root.get_node_or_null("DataBoot")
@@ -1853,7 +1858,7 @@ func _clock_text(seconds: float) -> String:
 	var minutes=floori((total%3600)/60.0)
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
-const MODAL_TABS := {"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
+const MODAL_TABS := {"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
 const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Freunde":"Freunde & Einladungen","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
@@ -4022,30 +4027,51 @@ func _open_rewards() -> void:
 	_note("Tageswechsel um 00:00 UTC. Diese lokalen Beta-Belohnungen werden noch nicht als Server-Währung geführt.")
 
 # --- Organized navigation, seasonal content and configurable combat shortcuts ---
+func _menu_shortcut(parent: Node,texture: Texture2D,title: String,description: String,kind: String) -> void:
+	var tile=_catalog_tile(parent,texture,title,description,"MENÜ ÖFFNEN",Color("ad8a58"))
+	var button=_catalog_action(tile,"ÖFFNEN",func():_open_modal(kind))
+	button.name="MenuShortcut_"+kind.replace(" ","_")
+
 func _open_info() -> void:
-	_banner_card(painted.nav_menu,"KAPITÄNSMENÜ · DEIN SPIEL","Alle Funktionen in übersichtlichen Bereichen: tägliche Belohnungen, Freunde, Welten, Ausrüstung, Handel und Einstellungen.")
-	_section("KAPITÄN & FORTSCHRITT")
-	var captain=_grid(2)
-	for entry in [["Profil","SPIELERPROFIL"],["Belohnungen","TAGESBONUS & AFK"],["Freunde","FREUNDE EINLADEN"],["Logbuch","LOGBUCH"],["Rangliste","RANGLISTE"]]:
-		var destination: String=entry[0]
-		_action(entry[1],func():_open_modal(destination),"normal",captain)
-	_section("WELT & VERANSTALTUNGEN")
-	var world=_grid(2)
-	for entry in [["Seekarten","WELTKARTE"],["Events","HALLOWEEN & COLUMBUS"],["Monster","SEEUNGEHEUER"],["Gilde","GILDE & INSELN"]]:
-		var destination: String=entry[0]
-		_action(entry[1],func():_open_modal(destination),"normal",world)
-	_section("HANDEL & VERBESSERUNGEN")
-	var trading=_grid(2)
-	for entry in [["Markt","MARKTPLATZ"],["Werft","SCHIFFSWERFT"],["Bewaffnung","ARSENAL"],["Kastelle","KASTELLE & TALENTE"],["Premium-Shop","KRONEN-SHOP"],["Battle Pass","SAISONPASS"]]:
-		var destination: String=str(entry[0])
-		_action(str(entry[1]),func():_open_modal(destination),"normal",trading)
-	_section("AUSRÜSTUNG & STEUERUNG")
-	var settings=_grid(2)
-	for entry in [["Schnellzugriff","SCHNELLLEISTEN BELEGEN"],["Verbrauch","VERBRAUCHSGEGENSTÄNDE"],["Anzeige","GRAFIK & STEUERUNG"],["Hilfe","SPIELANLEITUNG"],["Kastelle","KASTELLE"],["Staff","STAFF-ZUGANG"]]:
-		var destination: String=entry[0]
-		_action(entry[1],func():_open_modal(destination),"normal",settings)
-	_action("ZUM HAUPTMENÜ",func():_save_progress();get_tree().change_scene_to_file("res://start_hub.tscn"))
-	_action("UPDATES PRÜFEN",func():_save_progress();get_tree().set_meta("abyssal_manual_update",true);get_tree().change_scene_to_file("res://updater/launcher.tscn"))
+	_banner_card(painted.nav_menu,"KAPITÄNSMENÜ · DEIN SPIEL","Wähle oben eine Kategorie. Jedes Symbol öffnet eine echte Funktion – große Bilder und Bedienelemente statt eng gepackter Textbuttons.")
+	match _tab("Spielinfo"):
+		"KAPITÄN":
+			_section("KAPITÄN & FORTSCHRITT")
+			var grid=_catalog_grid(2)
+			_menu_shortcut(grid,painted.nav_ranking,"SPIELERPROFIL","Name, Piratenrang & Battle Points","Profil")
+			_menu_shortcut(grid,painted.reward_chest,"TAGESBONUS & AFK","7 Tage, Essenz & Vorräte","Belohnungen")
+			_menu_shortcut(grid,painted.nav_guild,"FREUNDE EINLADEN","Beta an Freunde weitergeben","Freunde")
+			_menu_shortcut(grid,painted.nav_quests,"LOGBUCH","Quest-Fortschritt & Aufträge","Logbuch")
+			_menu_shortcut(grid,painted.nav_bonus,"SAISONPASS","Freie Belohnungsstufen","Battle Pass")
+			_menu_shortcut(grid,painted.nav_ranking,"RANGLISTE","Spielerwertung & Statistik","Rangliste")
+		"SCHIFF":
+			_section("WERFT · ARSENAL · FORTSCHRITT")
+			var grid=_catalog_grid(2)
+			_menu_shortcut(grid,painted.nav_shipyard,"SCHIFFSWERFT","Designs & Kanonenmontage","Werft")
+			_menu_shortcut(grid,painted.tide_deck,"DECKS & LAGER","Montage, Upgrades & Sonderdecks","Decks")
+			_menu_shortcut(grid,painted.gold_coins,"MARKTPLATZ","Kanonen, Munition & Items","Markt")
+			_menu_shortcut(grid,painted.nav_castles,"KASTELLE & TALENTE","Schiffausbau & Fähigkeitszweige","Kastelle")
+			_menu_shortcut(grid,extra_icons.cannon_0,"ARSENAL","Bewaffnung & Geschützplätze","Bewaffnung")
+			_menu_shortcut(grid,painted.gold_coins,"KRONEN-SHOP","Echtgeldkäufe derzeit gesperrt","Premium-Shop")
+		"WELT":
+			_section("WELT · GILDE · VERANSTALTUNGEN")
+			var grid=_catalog_grid(2)
+			_menu_shortcut(grid,painted.nav_charts,"WELTKARTE","Seekarten & Portale","Seekarten")
+			_menu_shortcut(grid,painted.nav_bonus,"BONUSKARTEN","Fragmente, Wellen & Belohnungen","Bonuskarten")
+			_menu_shortcut(grid,painted.boss_wave,"MONSTERJAGD","Seeungeheuer & Harpunen","Monster")
+			_menu_shortcut(grid,painted.nav_guild,"GILDE","Heimatbasis & Gildeninsel","Gilde")
+			_menu_shortcut(grid,painted.ammo_pumpkin,"EVENTS","Halloween & Entdeckerfahrt","Events")
+			_menu_shortcut(grid,painted.nav_kessel,"GEZEITENKESSEL","Essenz & Belohnungen","Kessel")
+		_:
+			_section("BEDIENUNG & EINSTELLUNGEN")
+			var grid=_catalog_grid(2)
+			_menu_shortcut(grid,painted.nav_supplies,"VERBRAUCHSGÜTER","Items & Schnellzugriff","Verbrauch")
+			_menu_shortcut(grid,painted.nav_menu,"SCHNELLLEISTEN","Neun persönliche Aktionsplätze","Schnellzugriff")
+			_menu_shortcut(grid,painted.nav_menu,"GRAFIK & STEUERUNG","HUD, Kameras & Einstellungen","Anzeige")
+			_menu_shortcut(grid,painted.nav_quests,"SPIELANLEITUNG","Steuerung & Hilfe","Hilfe")
+			var links=_grid(2)
+			_action("ZUM HAUPTMENÜ",func():_save_progress();get_tree().change_scene_to_file("res://start_hub.tscn"),"normal",links)
+			_action("UPDATES PRÜFEN",func():_save_progress();get_tree().set_meta("abyssal_manual_update",true);get_tree().change_scene_to_file("res://updater/launcher.tscn"),"normal",links)
 
 func _open_quick_config() -> void:
 	_info("3 LEISTEN · JE 3 FREI BELEGBARE PLÄTZE")
