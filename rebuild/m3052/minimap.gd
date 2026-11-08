@@ -48,7 +48,18 @@ func _draw() -> void:
 	for island in simulation.islands:
 		var shape=PackedVector2Array()
 		for vertex: Vector2 in island.outline:shape.append(r.position+vertex/simulation.WORLD*r.size)
-		draw_colored_polygon(shape,Color("8fa17a"))
+		var fortified: bool=bool(island.get("guild_fortress",false))
+		draw_colored_polygon(shape,Color("9c9979") if fortified else Color("8fa17a"))
+		if fortified:
+			var held: bool=simulation.tower_friendly()
+			var owner: String=simulation.tower_tag()
+			var crown: Vector2=r.position+island.pos/simulation.WORLD*r.size
+			draw_circle(crown,5.5,Color("258f70") if held else Color("d5a654"))
+			draw_circle(crown,5.5,Color("fff3c7"),false,1.2,true)
+			var tag: String="[%s]" % owner
+			var tagwidth: float=font.get_string_size(tag,HORIZONTAL_ALIGNMENT_LEFT,-1,10).x
+			draw_string_outline(font,crown+Vector2(-tagwidth*.5,-9),tag,HORIZONTAL_ALIGNMENT_LEFT,-1,10,3,Color("030c16"))
+			draw_string(font,crown+Vector2(-tagwidth*.5,-9),tag,HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("f2d18a"))
 	for sparkle in simulation.sparkles:
 		if float(sparkle.respawn)>0:continue
 		var p: Vector2=r.position+sparkle.pos/simulation.WORLD*r.size

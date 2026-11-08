@@ -199,23 +199,27 @@ const BONUS_WAVES := [
 ## Kristallsegen: one major blessing at a time, counted in sea time.
 const BLESSING_SECONDS := 900.0
 const TIDE_DECK_CAP := 14400.0
-## Ten independent emplacements; the first four IDs retain legacy upgrade roles.
+## Twelve physical defenses anchored to the island fortress.
+## Indices 0–9 retain the first ten turret upgrade slots; 10–11 are new.
 const FORTRESS_MAP := 2
 const FORTRESS_ISLAND := 4
 const FORTRESS_TAG := "KRF"
 const FORTRESS_HOLD := 1800.0
-const GUILD_ISLAND_SCALE := 2.05
+const GUILD_ISLAND_SCALE := 2.65
+const GUILD_FORTRESS_ASPECT := 790.0/1024.0
 const TOWERS := [
-	{"kind":"cannon", "name":"Kanonenturm I", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.32,-0.04)},
-	{"kind":"mortar", "name":"Mörserturm I", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.28,-0.08)},
-	{"kind":"chain", "name":"Kettenturm I", "hp":1150, "range":440.0, "damage":22, "shots":2, "reload":3.2, "offset":Vector2(-0.25,0.22)},
-	{"kind":"guardian", "name":"Wächterturm", "hp":1900, "range":390.0, "damage":28, "shots":2, "reload":2.2, "offset":Vector2(0.05,0.10)},
-	{"kind":"cannon", "name":"Kanonenturm II", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.18,-0.24)},
-	{"kind":"mortar", "name":"Mörserturm II", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.02,-0.28)},
-	{"kind":"chain", "name":"Kettenturm II", "hp":1150, "range":440.0, "damage":22, "shots":2, "reload":3.2, "offset":Vector2(0.22,-0.30)},
-	{"kind":"cannon", "name":"Kanonenturm III", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(0.33,0.17)},
-	{"kind":"mortar", "name":"Mörserturm III", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.13,0.33)},
-	{"kind":"cannon", "name":"Kanonenturm IV", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.08,0.37)}
+	{"kind":"cannon", "name":"Kanonenturm I", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.35,-0.22)},
+	{"kind":"mortar", "name":"Mörserturm I", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(-0.15,-0.36)},
+	{"kind":"chain", "name":"Kettenturm I", "hp":1150, "range":440.0, "damage":22, "shots":2, "reload":3.2, "offset":Vector2(0.1,-0.35)},
+	{"kind":"guardian", "name":"Wächterturm I", "hp":1900, "range":390.0, "damage":28, "shots":2, "reload":2.2, "offset":Vector2(0.33,-0.25)},
+	{"kind":"cannon", "name":"Kanonenturm II", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(-0.42,-0.01)},
+	{"kind":"mortar", "name":"Mörserturm II", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(0.42,-0.01)},
+	{"kind":"chain", "name":"Kettenturm II", "hp":1150, "range":440.0, "damage":22, "shots":2, "reload":3.2, "offset":Vector2(-0.4,0.21)},
+	{"kind":"cannon", "name":"Kanonenturm III", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(0.39,0.21)},
+	{"kind":"mortar", "name":"Mörserturm III", "hp":1250, "range":620.0, "damage":115, "shots":1, "reload":5.5, "offset":Vector2(-0.29,0.36)},
+	{"kind":"cannon", "name":"Kanonenturm IV", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(0.29,0.36)},
+	{"kind":"guardian", "name":"Wächterturm II", "hp":1900, "range":390.0, "damage":28, "shots":2, "reload":2.2, "offset":Vector2(-0.19,0.1)},
+	{"kind":"cannon", "name":"Kanonenturm V", "hp":1500, "range":470.0, "damage":44, "shots":2, "reload":2.6, "offset":Vector2(0.19,0.1)}
 ]
 
 static func normalized_tower_levels(raw: Variant=null) -> Array:

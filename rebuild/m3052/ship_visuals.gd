@@ -53,7 +53,7 @@ static func impact_labels(events: Array,now: float) -> Array[Dictionary]:
 	var groups: Array[Dictionary]=[]
 	for event: Dictionary in events:
 		var age=now-float(event.time)
-		if event.type!="impact" or age<0 or age>=1.48:continue
+		if event.type!="impact" or age<0 or age>=1.48 or int(event.value)<=0:continue
 		var merged=false
 		for i in range(groups.size()-1,-1,-1):
 			var group: Dictionary=groups[i]

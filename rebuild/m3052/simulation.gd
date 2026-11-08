@@ -62,6 +62,8 @@ var cooldowns := {"repair_kit":0.0, "shield_charge":0.0}
 var buffs := {"blessing":0.0, "tide_deck":0.0, "storm_deck":0.0, "salvage_deck":0.0}
 var essence := 3
 var fragments := 0
+# Assembled parchment segments for Bronze/Silber/Gold, retained across restarts.
+var bonus_pieces := [0,0,0]
 var scrolls := [0, 0, 0]
 var kessel_meter := 0
 var kessel_throws := 0
@@ -160,10 +162,23 @@ func _init() -> void:
 
 func _build_grid() -> void:
 	for island: Dictionary in islands:
-		var shape: Dictionary=island_shapes[str(island.art)]
-		var dimensions=Vector2(float(island.width),float(island.width)*float(shape.size[1])/float(shape.size[0]))
 		var polygon=PackedVector2Array()
-		for vertex: Array in shape.points:polygon.append(island.pos+(Vector2(vertex[0],vertex[1])-Vector2(0.5,0.65))*dimensions)
+		if bool(island.get("guild_fortress",false)):
+			# Deliberately concave U coast: wide navigable water basin and
+			# unblocked southern entrance, not an artificial solid island.
+			var dimensions: Vector2=Vector2(float(island.width),float(island.width)*CONTENT.GUILD_FORTRESS_ASPECT)
+			var outline: Array[Vector2]=[
+				Vector2(.146,.878),Vector2(.092,.75),Vector2(.048,.54),Vector2(.09,.30),
+				Vector2(.23,.13),Vector2(.43,.075),Vector2(.67,.06),Vector2(.85,.20),
+				Vector2(.96,.49),Vector2(.89,.79),Vector2(.84,.878),Vector2(.70,.915),
+				Vector2(.692,.68),Vector2(.64,.422),Vector2(.50,.380),Vector2(.399,.422),
+				Vector2(.305,.68),Vector2(.298,.915)]
+			for vertex: Vector2 in outline:
+				polygon.append(island.pos+(vertex-Vector2(.5,.65))*dimensions)
+		else:
+			var shape: Dictionary=island_shapes[str(island.art)]
+			var dimensions=Vector2(float(island.width),float(island.width)*float(shape.size[1])/float(shape.size[0]))
+			for vertex: Array in shape.points:polygon.append(island.pos+(Vector2(vertex[0],vertex[1])-Vector2(0.5,0.65))*dimensions)
 		island.outline=polygon
 		var bounds=Rect2(polygon[0],Vector2.ZERO)
 		for vertex: Vector2 in polygon:bounds=bounds.expand(vertex)
@@ -740,26 +755,32 @@ func _fire_player() -> void:
 	repairing = false
 	message = AMMO_LABELS[ammo_mode] if ammo_mode >= 2 else ("Breitseite mit Schwarzpulver!" if powdered else "Breitseite!")
 
+# The cannon turrets are tall sprites whose rendered masonry is above their
+# land-footprint origin. Targeting their base visually looks like a ricochet.
+func _projectile_target(victim: Dictionary) -> Vector2:
+	return Vector2(victim.pos)-Vector2(0,56) if str(victim.get("kind",""))=="tower" else Vector2(victim.pos)
+
 func _launch(source_id: int, target_id: int, weapon: String, damage: int, count: int,powdered: bool=false) -> void:
 	var source = actor(source_id)
 	var destination = actor(target_id)
 	if source.is_empty() or destination.is_empty(): return
 	# Flight metadata is presentation-only. Damage, speed, shot spread, range
 	# and 80 ms salvo staggering stay exactly as before M3100.
-	var visual_heading: Vector2=(destination.pos-source.pos).normalized()
+	var visual_start: Vector2=_projectile_target(source)
+	var visual_heading: Vector2=(_projectile_target(destination)-visual_start).normalized()
 	if visual_heading.length_squared()<0.001:visual_heading=Vector2.RIGHT
 	# One render group per real salvo. All three original damage-bearing shots
 	# remain independent; the visual renderer draws ONE tightly packed pile.
 	var group_id: int=next_id+1
 	for i in count:
 		next_id += 1
-		var start: Vector2 = source.pos + Vector2(0, (float(i) - float(count - 1) * 0.5) * 13)
+		var start: Vector2 = visual_start + Vector2(0, (float(i) - float(count - 1) * 0.5) * 13)
 		shots.append({"id": next_id, "source": source_id, "target": target_id, "pos": start,
 			"start": start, "damage": damage, "powder":powdered, "weapon": weapon, "age": -float(i) * 0.08,
-			"distance": maxf(1, start.distance_to(destination.pos)), "traveled": 0.0,
+			"distance": maxf(1, start.distance_to(_projectile_target(destination))), "traveled": 0.0,
 			"visual_heading": visual_heading, "salvo_index": i,
 			"salvo_count": count, "salvo_group": group_id, "salvo_origin": source.pos})
-	_event("muzzle", source.pos, count, source_id)
+	_event("muzzle", visual_start, count, source_id)
 	if not events.is_empty():
 		events.back()["powder"]=powdered
 		events.back()["weapon"]=weapon
@@ -774,7 +795,7 @@ func _step_shots(delta: float) -> void:
 		if victim.is_empty() or int(victim.hp) <= 0 or float(shot.age) > 5:
 			shots.remove_at(i)
 			continue
-		var gap: Vector2 = victim.pos - shot.pos
+		var gap: Vector2 = _projectile_target(victim) - shot.pos
 		var speed = 530.0 if shot.weapon == "harpoon" else (380.0 if shot.weapon == "mortar" else 470.0)
 		var amount = speed * delta
 		if gap.length() <= amount + 12:
@@ -831,8 +852,9 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 		repairing = false
 	else:
 		victim.last_hit = clock
-	_event("impact", victim.pos, dealt, victim.id)
+	_event("impact", _projectile_target(victim), dealt, victim.id)
 	if not events.is_empty():
+		events.back()["structure"]=str(victim.get("kind",""))=="tower"
 		events.back()["powder"]=bool(shot.get("powder",false))
 		events.back()["plates"]=plated
 		events.back()["weapon"]=str(shot.weapon)
@@ -1001,6 +1023,9 @@ func in_bonus_map() -> bool:
 
 func has_harbor() -> bool:
 	return not in_bonus_map()
+
+func assign_bonus_piece(tier: int) -> bool:
+	return BONUS_OPS.assign_bonus_piece(self, tier)
 
 func craft_scroll(tier: int) -> bool:
 	return BONUS_OPS.craft_scroll(self, tier)
@@ -1448,10 +1473,11 @@ func configure_map(destination: int) -> void:
 	var neighbors: Array[int]=CONTENT.sea_neighbors(map_id)
 	for i in neighbors.size():portals.append({"pos":exits[i],"destination":neighbors[i]})
 	if CONTENT.has_guild_island(map_id):
-		# Restore the familiar regional island beneath independent animated towers.
-		# The oversized static castle plate from update 243 hid the actual defenses.
+		# A purpose-built island with integrated coastal walls, an open sea gate,
+		# navigable central harbor and twelve independent physical defenses.
 		var fortress: Dictionary=islands[CONTENT.FORTRESS_ISLAND]
-		fortress.art="rock" # Broad classic coast leaves room for ten distinct defenses.
+		fortress.art="rock"
+		fortress["guild_fortress"]=true
 		fortress.width=float(base_islands[CONTENT.FORTRESS_ISLAND].width)*island_art_scale(str(fortress.art))*CONTENT.GUILD_ISLAND_SCALE
 	_build_grid()
 	harbor=_harbor_site_for_map()
@@ -1485,19 +1511,19 @@ func export_save() -> Dictionary:
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
-	return {"schema":7,"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	return {"schema":8,"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
 		"position":[position.x,position.y],"hp":player.hp,"shield":player.shield,"docked":docked,
 		"cannons":player.cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
-		"essence":essence,"fragments":fragments,"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
+		"essence":essence,"fragments":fragments,"bonus_pieces":bonus_pieces.duplicate(),"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
 		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
 		"deck_slots":deck_slots.duplicate(),"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),
 		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
-	if not int(data.get("schema",0)) in [1,2,3,4,5,6,7]: return false
+	if not int(data.get("schema",0)) in [1,2,3,4,5,6,7,8]: return false
 	event_mode=str(data.get("event_mode","halloween"))
 	if not EXPANSION.EVENT_NAMES.has(event_mode):event_mode="halloween"
 	var saved_tokens: Variant=data.get("event_tokens",{})
@@ -1545,6 +1571,11 @@ func restore_save(data: Dictionary) -> bool:
 		for key: String in CONTENT.SPECIAL_DECKS:buffs[key]=clampf(float(saved_buffs.get(key,0.0)),0.0,CONTENT.TIDE_DECK_CAP)
 	essence=clampi(int(data.get("essence",essence)),0,99999)
 	fragments=clampi(int(data.get("fragments",0)),0,99999)
+	var saved_pieces: Variant=data.get("bonus_pieces",[])
+	bonus_pieces=[0,0,0]
+	if saved_pieces is Array:
+		for i in mini(saved_pieces.size(),bonus_pieces.size()):
+			bonus_pieces[i]=clampi(int(saved_pieces[i]),0,int(CONTENT.BONUS_TIERS[i].fragments))
 	var saved_scrolls: Variant=data.get("scrolls",[])
 	if saved_scrolls is Array and saved_scrolls.size()==scrolls.size():
 		for i in scrolls.size():scrolls[i]=clampi(int(saved_scrolls[i]),0,999)

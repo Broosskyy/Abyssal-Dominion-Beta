@@ -3,15 +3,33 @@ extends RefCounted
 ## Static helpers operating on the sea simulation passed as `s`.
 const CONTENT = preload("res://content.gd")
 
+static func assign_bonus_piece(s,tier: int) -> bool:
+	if tier<0 or tier>=CONTENT.BONUS_TIERS.size():return false
+	var needed: int=int(CONTENT.BONUS_TIERS[tier].fragments)
+	if int(s.bonus_pieces[tier])>=needed:
+		s.message="Alle Teile der %s-Karte sind bereits gesammelt" % CONTENT.BONUS_TIERS[tier].name
+		return false
+	if s.fragments<=0:
+		s.message="Weitere Kartenteile gibt es im Gezeitenkessel und als Belohnung"
+		return false
+	s.fragments-=1
+	s.bonus_pieces[tier]+=1
+	s.message="%s-Karte · Teil %d/%d eingesetzt" % [CONTENT.BONUS_TIERS[tier].name,s.bonus_pieces[tier],needed]
+	return true
+
 static func craft_scroll(s, tier: int) -> bool:
 	if tier < 0 or tier >= CONTENT.BONUS_TIERS.size(): return false
-	var cost = int(CONTENT.BONUS_TIERS[tier].fragments)
-	if s.fragments < cost:
-		s.message = "%d Fragmente für eine %s-Schriftrolle nötig" % [cost, CONTENT.BONUS_TIERS[tier].name]
+	var cost: int = int(CONTENT.BONUS_TIERS[tier].fragments)
+	var assembled: int=int(s.bonus_pieces[tier])
+	if assembled+s.fragments<cost:
+		s.message = "%s: %d von %d Kartenteilen vorhanden" % [CONTENT.BONUS_TIERS[tier].name,assembled+s.fragments,cost]
 		return false
-	s.fragments -= cost
+	# Legacy guest saves with unassigned fragments remain craftable. Assigned
+	# pieces are consumed first, then only the remaining universal pieces.
+	s.fragments -= maxi(0,cost-assembled)
+	s.bonus_pieces[tier]=0
 	s.scrolls[tier] += 1
-	s.message = "%s-Schriftrolle zusammengesetzt" % CONTENT.BONUS_TIERS[tier].name
+	s.message = "%s-Bonuskarte aus %d Teilen zusammengesetzt" % [CONTENT.BONUS_TIERS[tier].name,cost]
 	return true
 
 static func start_bonus(s, tier: int) -> bool:

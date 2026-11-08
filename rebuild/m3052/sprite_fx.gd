@@ -217,6 +217,7 @@ static func draw_impact(canvas: CanvasItem,event: Dictionary,age: float,intensit
 	if age<0.0 or age>=IMPACT_DURATION:return
 	var weapon: String=str(event.get("weapon","cannon"))
 	var p: Vector2=Vector2(event.get("pos",Vector2.ZERO))
+	var structure: bool=bool(event.get("structure",false))
 	var strength: float=clampf(intensity,.35,1.8)
 	var phase: float=clampf(age/IMPACT_DURATION,0.0,1.0)
 	var fade: float=pow(maxf(0.0,1.0-phase),.63)
@@ -225,11 +226,23 @@ static func draw_impact(canvas: CanvasItem,event: Dictionary,age: float,intensit
 	var size_scale: float=sqrt(strength)*(.91+float(signature%5)*.067)
 	if flashes and age<.23:
 		_draw(canvas,p-Vector2(0,12),7,age/.23,Vector2(160,155)*size_scale,(1.0-age/.23)*.91*strength)
-	if water:_foam(canvas,p,age,strength)
-	_draw(canvas,p-Vector2(0,23.0+phase*29.0),family_for_weapon(weapon),phase,Vector2(167,172)*grow*size_scale,.98*fade*strength)
+	if structure:
+		# Masonry strikes make stone chips, sparks and a tight dust plume,
+		# never the enormous water splash used for hulls on the open sea.
+		var burst: float=pow(maxf(0,1.0-age/.85),1.35)
+		canvas.draw_circle(p,7.0+age*19.0,Color("c4ab8b",.34*burst))
+		if particles:
+			for shard_index in 9:
+				var angle: float=TAU*float(shard_index)/9.0+float(int(event.get("vfx_seed",0))%7)*.15
+				var reach: float=(8.0+age*50.0)*burst
+				var chip: Vector2=p+Vector2(cos(angle)*reach,sin(angle)*reach*.62-age*20.0)
+				canvas.draw_line(chip,chip+Vector2(-2,3),Color("d8c6ad",burst*.75),2.0,true)
+	else:
+		if water:_foam(canvas,p,age,strength)
+	_draw(canvas,p-Vector2(0,(5.0 if structure else 23.0)+phase*(12.0 if structure else 29.0)),family_for_weapon(weapon),phase,Vector2(100,107)*grow*size_scale if structure else Vector2(167,172)*grow*size_scale,.92*fade*strength)
 	if particles:
 		var secondary: float=clampf((age-.13)/1.15,0.0,.999)
-		_draw(canvas,p-Vector2(0,29.0+phase*33.0),family_for_weapon(weapon),secondary,Vector2(120,139)*grow*size_scale,.53*fade*strength)
+		_draw(canvas,p-Vector2(0,(9.0 if structure else 29.0)+phase*22.0),family_for_weapon(weapon),secondary,Vector2(90,104)*grow*size_scale if structure else Vector2(120,139)*grow*size_scale,.46*fade*strength)
 	_distinctive_impact(canvas,p,weapon,age,strength,particles)
 
 static func animated_frame(age: float,duration: float=IMPACT_DURATION) -> int:
