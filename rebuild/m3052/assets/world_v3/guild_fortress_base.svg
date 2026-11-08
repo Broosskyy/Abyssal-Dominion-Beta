@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="790" viewBox="0 0 1024 790">
+<defs>
+<linearGradient id="rock" x1="0" x2="0.4" y1="0" y2="1"><stop stop-color="#758172"/><stop offset=".5" stop-color="#424d49"/><stop offset="1" stop-color="#212d32"/></linearGradient>
+<linearGradient id="grass" x1="0" x2=".5" y1="0" y2="1"><stop stop-color="#7e8d54"/><stop offset="1" stop-color="#3e5537"/></linearGradient>
+<linearGradient id="stone" x1="0" x2=".8" y1="0" y2="1"><stop stop-color="#d5c4a3"/><stop offset=".5" stop-color="#8d8b7c"/><stop offset="1" stop-color="#4c514f"/></linearGradient>
+<linearGradient id="castle" x1="0" x2="0.9" y1="0" y2="1"><stop stop-color="#e2c79a"/><stop offset=".55" stop-color="#928577"/><stop offset="1" stop-color="#353b40"/></linearGradient>
+<linearGradient id="roof" x1="0" x2="0.8" y1="0" y2="1"><stop stop-color="#8e4240"/><stop offset="1" stop-color="#4e262b"/></linearGradient>
+<radialGradient id="light"><stop stop-color="#ffd786" stop-opacity=".9"/><stop offset="1" stop-color="#ffad4f" stop-opacity="0"/></radialGradient>
+</defs>
+<!-- Artwork has a real, transparent harbor notch open toward the bottom.
+     Godot uses the corresponding concave coastline for navigation and collision. -->
+<path d="M 150 694 C 35 634 18 420 97 224 Q 211 62 430 57 Q 683 17 860 151 C 1009 254 1024 528 895 694 Q 822 746 718 720 L 708 537 Q 707 396 617 334 Q 508 288 408 333 Q 315 403 312 537 L 305 720 Q 228 738 150 694 Z" fill="#1c2629" opacity=".48" transform="translate(0 15)"/>
+<path d="M 150 694 C 35 634 18 420 97 224 Q 211 62 430 57 Q 683 17 860 151 C 1009 254 1024 528 895 694 Q 822 746 718 720 L 708 537 Q 707 396 617 334 Q 508 288 408 333 Q 315 403 312 537 L 305 720 Q 228 738 150 694 Z" fill="url(#rock)" stroke="#a2a18b" stroke-width="10"/>
+<path d="M 135 628 Q 58 436 141 255 Q 261 102 466 106 Q 701 72 835 210 Q 924 367 854 615 L 756 637 Q 746 372 620 304 Q 505 242 393 304 Q 275 371 267 643Z" fill="url(#grass)" stroke="#4c6245" stroke-width="11"/>
+<path d="M 80 150 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 147 199 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 214 248 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 281 297 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 348 346 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 415 395 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 482 444 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 549 493 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 616 542 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 683 591 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 750 640 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 817 169 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 884 218 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 91 267 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 158 316 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 225 365 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 292 414 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 359 463 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 426 512 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 493 561 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 560 610 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 627 659 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 694 188 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 761 237 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 828 286 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 895 335 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 102 384 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 169 433 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 236 482 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 303 531 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 370 580 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 437 629 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 504 158 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<path d="M 571 207 l 18 -8 15 12 -16 9 z" fill="#65705e" opacity=".26"/>
+<!-- Carved fortress sea wall and sea gate -->
+<path d="M 152 608 Q 113 372 236 229 Q 345 144 500 155 Q 716 126 816 302 Q 888 434 846 622" fill="none" stroke="#353b42" stroke-width="39" stroke-linecap="round"/>
+<path d="M 152 608 Q 113 372 236 229 Q 345 144 500 155 Q 716 126 816 302 Q 888 434 846 622" fill="none" stroke="url(#stone)" stroke-width="27" stroke-linecap="round"/>
+<path d="M 153 606 Q 119 373 239 226 Q 345 151 500 160 Q 715 133 810 303 Q 880 434 846 622" fill="none" stroke="#dac7a2" stroke-width="4" stroke-dasharray="14,7" opacity=".7"/>
+<rect x="102" y="510" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="126" y="501" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="150" y="492" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="174" y="483" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="198" y="474" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="222" y="465" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="246" y="456" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="270" y="447" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="294" y="438" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="318" y="429" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="342" y="420" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="660" y="419" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="683" y="429" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="706" y="439" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="729" y="449" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="752" y="459" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="775" y="469" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="798" y="479" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="821" y="489" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="844" y="499" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="867" y="509" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<rect x="890" y="519" width="17" height="13" rx="2" fill="#a3a49b" stroke="#454647" stroke-width="2"/>
+<!-- Inner harbor quay edges: no land fill over the navigable water -->
+<path d="M 304 714 L 306 523 Q 321 386 399 327 Q 512 259 622 330 Q 706 387 715 523 L 720 718" fill="none" stroke="#302f2d" stroke-width="28"/>
+<path d="M 304 714 L 306 523 Q 321 386 399 327 Q 512 259 622 330 Q 706 387 715 523 L 720 718" fill="none" stroke="#aa9b7c" stroke-width="17"/>
+<path d="M 306 712 L 310 521 Q 324 390 400 332 Q 512 267 616 332 Q 702 389 712 521 L 716 716" fill="none" stroke="#e6d2a5" stroke-width="3" stroke-dasharray="14,8" opacity=".6"/>
+<!-- Docks extend into open harbor but remain decorative and non-colliding -->
+<path d="M 320 475 L 430 487 L 430 501 L 325 487Z M 610 487 L 706 469 L 708 484 L 612 504 Z" fill="#66503b" stroke="#cfb27c" stroke-width="4"/><path d="M 354 484 v 17 M 410 486 v 18 M 634 498 v 17 M 681 484 v 19" stroke="#c8ac7e" stroke-width="5"/>
+<path d="M 320 545 L 430 557 L 430 571 L 325 557Z M 610 557 L 706 539 L 708 554 L 612 574 Z" fill="#66503b" stroke="#cfb27c" stroke-width="4"/><path d="M 354 554 v 17 M 410 556 v 18 M 634 568 v 17 M 681 554 v 19" stroke="#c8ac7e" stroke-width="5"/>
+<path d="M 320 615 L 430 627 L 430 641 L 325 627Z M 610 627 L 706 609 L 708 624 L 612 644 Z" fill="#66503b" stroke="#cfb27c" stroke-width="4"/><path d="M 354 624 v 17 M 410 626 v 18 M 634 638 v 17 M 681 624 v 19" stroke="#c8ac7e" stroke-width="5"/>
+<!-- Main elevated citadel -->
+<path d="M 337 189 L 684 189 L 713 339 L 316 339 Z" fill="url(#castle)" stroke="#504d48" stroke-width="11"/>
+<path d="M 304 190 L 513 102 L 726 190 L 710 227 L 319 228 Z" fill="url(#roof)" stroke="#d0a66a" stroke-width="8"/>
+<rect x="356" y="225" width="320" height="115" fill="url(#castle)" stroke="#524945" stroke-width="8"/>
+<rect x="369" y="245" width="13" height="22" rx="6" fill="#ecb457" stroke="#5d4334" stroke-width="3"/>
+<rect x="411" y="245" width="13" height="22" rx="6" fill="#ecb457" stroke="#5d4334" stroke-width="3"/>
+<rect x="453" y="245" width="13" height="22" rx="6" fill="#ecb457" stroke="#5d4334" stroke-width="3"/>
+<rect x="495" y="245" width="13" height="22" rx="6" fill="#ecb457" stroke="#5d4334" stroke-width="3"/>
+<rect x="537" y="245" width="13" height="22" rx="6" fill="#ecb457" stroke="#5d4334" stroke-width="3"/>
+<rect x="579" y="245" width="13" height="22" rx="6" fill="#ecb457" stroke="#5d4334" stroke-width="3"/>
+<rect x="621" y="245" width="13" height="22" rx="6" fill="#ecb457" stroke="#5d4334" stroke-width="3"/>
+<path d="M 463 337 L 463 277 Q 463 244 511 244 Q 559 244 559 278 L 559 339" fill="#313039" stroke="#b69667" stroke-width="8"/>
+<path d="M 479 324 L 479 285 Q 479 256 512 256 Q 545 256 545 285 L 545 324" fill="#5a3029" stroke="#cb994f" stroke-width="4"/>
+<rect x="459" y="130" width="109" height="67" fill="url(#castle)" stroke="#5b5348" stroke-width="8"/>
+<path d="M 449 133 L 511 60 L 577 133Z" fill="url(#roof)" stroke="#c89a64" stroke-width="8"/>
+<rect x="493" y="37" width="13" height="40" fill="#675540"/><path d="M 506 36 L 576 51 L 506 70Z" fill="#7d2730" stroke="#daa761" stroke-width="4"/>
+<path d="M 310 338 L 716 338" fill="none" stroke="#d7c9a9" stroke-width="8"/>
+<!-- Teal-blue harbor remains translucent enough that ocean shader shows through -->
+<path d="M 342 724 L 343 525 Q 357 403 417 359 Q 511 306 602 359 Q 665 412 675 526 L 677 724" fill="#0b4b5c" opacity=".18"/>
+<!-- Warm harbor lamps and lighthouse glows -->
+<g fill="url(#light)"><circle cx="329" cy="482" r="31"/><circle cx="688" cy="484" r="31"/><circle cx="358" cy="327" r="28"/><circle cx="650" cy="328" r="28"/></g>
+<g stroke="#cda86b" fill="#b57d40" stroke-width="3"><circle cx="328" cy="484" r="6"/><circle cx="688" cy="484" r="6"/><circle cx="357" cy="328" r="6"/><circle cx="650" cy="328" r="6"/></g>
+<!-- Inner dock winches and crates -->
+<g fill="#94754f" stroke="#594731" stroke-width="3"><rect x="330" y="565" width="29" height="23"/><rect x="653" y="565" width="29" height="23"/><rect x="330" y="635" width="21" height="19"/><rect x="665" y="638" width="21" height="19"/></g>
+</svg>
