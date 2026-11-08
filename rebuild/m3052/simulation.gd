@@ -1385,6 +1385,23 @@ func island_art_scale(art: String) -> float:
 		hi=maxf(hi,float(pair[0]))
 	return clampf(.70/maxf(.1,hi-lo),.95,1.15)
 
+# The fortified U-shaped coast contains a REAL open sea lane.
+# The four navigation points are derived from the same coordinates that
+# place the land collision polygon and the (replaceable) island artwork.
+# No separate harbor island/collision is ever inserted in this basin.
+func guild_harbor_waypoints() -> Dictionary:
+	if not CONTENT.has_guild_island(map_id):return {}
+	var fortress: Dictionary=fortress_island()
+	if fortress.is_empty():return {}
+	var size: Vector2=Vector2(float(fortress.width),float(fortress.width)*CONTENT.GUILD_FORTRESS_ASPECT)
+	var top_left: Vector2=fortress.pos-size*Vector2(.5,.65)
+	return {
+		"berth":top_left+size*Vector2(.50,.57),
+		"inner":top_left+size*Vector2(.50,.72),
+		"mouth":top_left+size*Vector2(.50,.94),
+		"sea":top_left+size*Vector2(.50,1.09)
+	}
+
 func _harbor_site_for_map() -> Vector2:
 	if not harbor_outline.is_empty():return harbor
 	var cached: PackedVector2Array=harbor_outline
@@ -1480,13 +1497,24 @@ func configure_map(destination: int) -> void:
 		fortress["guild_fortress"]=true
 		fortress.width=float(base_islands[CONTENT.FORTRESS_ISLAND].width)*island_art_scale(str(fortress.art))*CONTENT.GUILD_ISLAND_SCALE
 	_build_grid()
-	harbor=_harbor_site_for_map()
-	var primary_port: Vector2=harbor
-	for offset in [Vector2.ZERO,Vector2(320,0),Vector2(0,320),Vector2(0,-320),Vector2(-320,0),Vector2(420,260),Vector2(-420,-260),START-primary_port]:
-		harbor=primary_port+offset
-		_set_harbor_collision()
-		_build_grid()
-		if not blocked(harbor) and not plan_path(START,harbor).is_empty():break
+	if CONTENT.has_guild_island(map_id):
+		# Dock in the actual navigable inner bay. Never spawn the old
+		# unrelated, collision-bearing small harbor island over the mouth.
+		var guild_passage: Dictionary=guild_harbor_waypoints()
+		harbor=Vector2(guild_passage.berth)
+		harbor_outline.clear()
+		# Both the harbor and approach must be accessible to normal ships.
+		# Navigation is calculated against the original concave coastline.
+		if blocked(harbor,48.0) or not segment_free(Vector2(guild_passage.sea),Vector2(guild_passage.berth)):
+			push_warning("Guild island inner harbor passage needs an art/collision correction")
+	else:
+		harbor=_harbor_site_for_map()
+		var primary_port: Vector2=harbor
+		for offset in [Vector2.ZERO,Vector2(320,0),Vector2(0,320),Vector2(0,-320),Vector2(-320,0),Vector2(420,260),Vector2(-420,-260),START-primary_port]:
+			harbor=primary_port+offset
+			_set_harbor_collision()
+			_build_grid()
+			if not blocked(harbor) and not plan_path(START,harbor).is_empty():break
 
 	# Never initialize a patrol or chest inside newly introduced harbor land.
 	for npc: Dictionary in npcs:

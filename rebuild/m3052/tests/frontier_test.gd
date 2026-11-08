@@ -32,6 +32,18 @@ func _run() -> void:
 				var mouth: Vector2=fortress.bounds.position+fortress.bounds.size*Vector2(.5,.96)
 				check(not s.on_land(basin) and not s.blocked(basin,15),"guild inner harbor navigable "+str(map.code))
 				check(not s.on_land(mouth) and not s.blocked(mouth,15),"guild entrance open to sea "+str(map.code))
+				var passage: Dictionary=s.guild_harbor_waypoints()
+				check(not passage.is_empty() and s.harbor==Vector2(passage.berth),"guild berth is inside fortress basin "+str(map.code))
+				check(s.harbor_outline.is_empty(),"guild basin never contains the separate harbor collision "+str(map.code))
+				for key in ["sea","mouth","inner","berth"]:
+					check(not s.blocked(Vector2(passage[key]),48.0),"wide safe guild ship passage at "+key+" "+str(map.code))
+				check(s.segment_free(Vector2(passage.sea),Vector2(passage.berth)),"direct unobstructed sea entrance into guild inner basin "+str(map.code))
+				check(not s.plan_path(Vector2(passage.sea),s.harbor).is_empty(),"guild harbor reachable by player navigation "+str(map.code))
+				var old_position: Vector2=s.player.pos
+				s.player.pos=s.harbor
+				s.player.last_hit=-100.0
+				check(s.can_dock(),"guild captain can actually dock in fortress inner harbor "+str(map.code))
+				s.player.pos=old_position
 				for tower: Dictionary in towers:
 					check(s.on_land(tower.pos),"tower stands on enlarged land "+str(tower.id))
 					for other: Dictionary in towers:
