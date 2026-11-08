@@ -3086,7 +3086,7 @@ func _open_chart_guide() -> void:
 	_section("PORTALE")
 	_note("Jede Seekarte hat ein Portal im Osten und eines im Westen; sie verbinden alle 40 Karten in zwei Spuren von 1/1 bis 20/2. Portal antippen setzt Kurs, beim Erreichen wechselt das Schiff automatisch. Nach einem Treffer wartet das Portal 6 Sekunden. Gesperrte Portale zeigen AB LV. und lassen dich erst mit der Kapitänsstufe hinüber.")
 	_section("HAFEN & ANDOCKEN")
-	_note("Das goldene Anker-Symbol ist der Hafen. Innerhalb von 160 m und 6 Sekunden ohne Treffer kannst du andocken: Trockendock, Vorräte, Kanonen, Decks, Kastelle und der Gezeitenkessel. Angedockt bist du geschützt; ABLEGEN bringt dich zurück auf See.")
+	_note("Das goldene Anker-Symbol markiert den Hafen. Innerhalb von 160 m und nach 6 Sekunden ohne Treffer kannst du andocken: Trockendock, vorläufige Kastellausbauten, Deckwerft und Gezeitenkessel. Markt, Munition, Items und Talente sind überall über die Menüs erreichbar. Kanonenmontage geht auch auf See außerhalb von Gefechten. Angedockt bist du geschützt; ABLEGEN bringt dich zurück auf See.")
 	_section("NEUTRAL ODER FEINDLICH")
 	_note("In neutralen Gewässern greifen Patrouillen erst an, wenn du sie beschießt. In feindlichen Gewässern eröffnen sie in der Nähe von selbst das Feuer. Die Farbe des Namens verrät es:")
 	_guide("colors")
@@ -3203,7 +3203,7 @@ func _open_help() -> void:
 	_section("RUMPF, SCHILD & SCHNELLLEISTE")
 	_note("Der Schild fängt Treffer zuerst ab und lädt sich 8 Sekunden nach dem letzten Treffer wieder auf. REP repariert den Rumpf ohne Gegenstand.\nPulver schaltet +40 % Salvenschaden ein und verbraucht nur bei einer gültigen Salve. Der Pfeilknopf wechselt zu Notreparatur, Schildladung und Panzerplatten.",Color("e2ecee"))
 	_section("HAFEN, KESSEL, BONUSKARTEN, GILDE")
-	_note("HAFEN: Trockendock, Vorräte, Kanonen, Decks und Kastelle.\nKESSEL: Gezeitenessenz einwerfen, offene Preistabelle, Meilensteine bei 10, 25, 50 und 100.\nBONUSKARTEN: Fragmente zu Schriftrollen zusammensetzen, fünf Wellen mit Checkpoint.\nGILDE: Kürzel vor dem Schiffsnamen, Korsarenfestung mit zehn Türmen in den Schattengewässern.",Color("e2ecee"))
+	_note("HAFEN: Trockendock, Kastelle, Deckwerft und Gezeitenkessel. Markt, Werft und Talente sind unabhängig vom Hafen erreichbar.\nKESSEL: Gezeitenessenz einwerfen, offene Preistabelle, Meilensteine bei 10, 25, 50 und 100.\nBONUSKARTEN: Fragmente zu Schriftrollen zusammensetzen, fünf Wellen mit Checkpoint.\nGILDE: Kürzel vor dem Schiffsnamen, Korsarenfestung mit zwölf Türmen in den Schattengewässern.",Color("e2ecee"))
 	_section("TASTEN & GESTEN")
 	_note("Zwei Finger / Mausrad / Plus und Minus an der Karte: Zoom. Joystick links unten oder Ziehen / rechte Maustaste: Kamera. Fernrohr / Tab: nächstes Ziel. Tasten 1 bis 3 Munition, 8 Leucht, 9 Kürbis, 0 Schnee, Minus Eis, 4 bis 7 Gegenstände, Q Schnellleiste.\n\nGastfortschritt wird auf diesem Gerät gespeichert. Lokales Spiel; noch kein öffentlicher MMO-Server.",Color("bac7c7"))
 
@@ -3828,7 +3828,7 @@ func _open_consumables() -> void:
 		var button=_row_button(column,"AUS" if active else ("%d s" % ceili(wait) if wait>0 else "AKTIVIEREN"),func():_use_supply(item),false,"tab_on" if active else "primary")
 		button.name="Use_"+key;button.set_meta("supply_key",key)
 		button.disabled=sim.docked or int(sim.player.hp)<=0 or wait>0 or (int(sim.supplies[key])<=0 and not active)
-	_note("Nachschub im Hafen unter Vorräte. Pulver und Platten bleiben bis zum Abschalten aktiv.")
+	_note("Nachschub über MARKT > ITEMS – auch unterwegs. Pulver und Platten bleiben bis zum Abschalten aktiv.")
 
 func _open_profile() -> void:
 	_banner_card(painted.nav_ranking,"SPIELERPROFIL",sim.captain_name+" · ID "+sim.captain_id)
