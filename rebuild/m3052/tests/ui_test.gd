@@ -355,22 +355,29 @@ func _run() -> void:
 			check(game.modal.visible and game.modal_scroll.size.y>100,"new gameplay panel opens at %s: %s"%[dimensions,kind])
 			check(game.modal.get_global_rect().position.x>=0 and game.modal.get_global_rect().position.y>=0 and game.modal.get_global_rect().end.x<=dimensions.x+1 and game.modal.get_global_rect().end.y<=dimensions.y+1,"panel stays inside viewport: "+kind)
 			if kind!="Munition":
-				check(game.menu_fullscreen and game.modal.get_global_rect().size.x>=dimensions.x*.90 and game.modal.get_global_rect().size.y>=dimensions.y*.90,"full-screen experiment covers display safely for "+kind+" at "+str(dimensions))
+				var ratio: Vector2=game._menu_layout_fractions(Vector2(dimensions),game.menu_layout)
+				check(game.menu_layout=="balanced" and game.modal.get_global_rect().size.x>=dimensions.x*(ratio.x-.03) and game.modal.get_global_rect().size.x<=dimensions.x*(ratio.x+.03),"adaptive centered panel has expected width at "+str(dimensions)+" / "+kind)
+				check(game.modal.get_global_rect().size.y>=dimensions.y*(ratio.y-.03) and game.modal.get_global_rect().size.y<=dimensions.y*(ratio.y+.03),"adaptive panel has expected height at "+str(dimensions)+" / "+kind)
+				check(game.modal.get_global_rect().position.x>=dimensions.x*.03 and game.modal.get_global_rect().position.y>=dimensions.y*.03,"sea remains visible around centered menu at "+str(dimensions)+" / "+kind)
 			else:
 				check(game.modal.get_global_rect().size.x<dimensions.x*.85,"combat ammunition retains compact popup instead of full page")
 			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
 	game.modal.hide()
-	# Layout mode is reversible via Settings and must persist across restarts.
+	# User can choose three responsive non-fullscreen modes.
 	root.size=Vector2i(1280,720)
 	await process_frame
 	game._layout()
 	game._open_modal("Anzeige")
-	game._toggle_fullscreen_menus()
-	check(not game.menu_fullscreen and game.modal.get_global_rect().size.x<1100,"compact classic panels remain available by user preference")
+	check(game._menu_layout_fractions(Vector2(1080,2340),"balanced").x>.90,"portrait layout uses near-width without swallowing the screen")
+	var standard_width: float=game.modal.get_global_rect().size.x
+	game._set_menu_layout("compact")
+	check(game.menu_layout=="compact" and game.modal.get_global_rect().size.x<standard_width,"compact layout saves more of the sea around modal")
 	var layout_saved: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
-	check(layout_saved is Dictionary and not bool(layout_saved.get("menu_fullscreen",true)),"compact menu choice persists to local settings")
-	game._toggle_fullscreen_menus()
-	check(game.menu_fullscreen and game.modal.get_global_rect().size.x>=1200,"user can restore the immersive menu layout")
+	check(layout_saved is Dictionary and str(layout_saved.get("menu_layout",""))=="compact","compact preference persists")
+	game._set_menu_layout("large")
+	check(game.menu_layout=="large" and game.modal.get_global_rect().size.x>standard_width and game.modal.get_global_rect().size.x<1280*.94,"large layout grows but never becomes fullscreen")
+	game._set_menu_layout("balanced")
+	check(game.menu_layout=="balanced" and game.modal.get_global_rect().size.x<1100,"balanced layout restores correct desktop-phone composition")
 	game.modal.hide()
 	# The port's visible water berth is also directly tappable on phones.
 	game.sim.configure_map(0)
@@ -614,15 +621,33 @@ func _run() -> void:
 	check(game.sim.target==first_id and not game.sim.firing,"cycle selects first visible live ship and stops ongoing fire")
 	game.target_cycle.pressed.emit();check(game.sim.target==second_id,"cycle advances to the next visible ship")
 	game.target_cycle.pressed.emit();check(game.sim.target==first_id,"cycle wraps and skips sunk ships and targets behind HUD")
-	# Three independent ways to clear target, without course or ammo changes.
+	# One tap is selection-only; second quick tap arms automatic attack.
 	game.sim.firing=true
 	game.target_clear.pressed.emit()
 	check(game.sim.target==-1 and not game.sim.firing and not game.target_panel.visible,"cross button cancels selection, stops auto-fire and hides enemy panel")
-	game.sim.select(first_id)
 	game.camera.position=game.sim.player.pos
 	game.camera.force_update_scroll()
-	game._tap(game.get_canvas_transform()*(game.sim.npcs[0].pos-Vector2(0,25)))
-	check(game.sim.target==-1,"touching the selected enemy a second time cancels its target ring")
+	var intended_enemy: Vector2=game.get_canvas_transform()*(game.sim.npcs[0].pos-Vector2(0,25))
+	game._reset_enemy_tap()
+	game._handle_enemy_tap(first_id,intended_enemy,10000)
+	check(game.sim.target==first_id and not game.sim.firing,"single tap immediately selects ship without firing")
+	game._handle_enemy_tap(first_id,intended_enemy+Vector2(8,4),10210)
+	check(game.sim.target==first_id and game.sim.firing,"double-tap selected ship enables attack without second target selection")
+	game._cancel_target()
+	check(game.sim.target==-1 and not game.sim.firing,"X abort still clears combat and attack after two-tap")
+	game._toggle_double_tap_attack()
+	check(not game.double_tap_attack_enabled,"double-tap attack can be disabled")
+	game._handle_enemy_tap(first_id,intended_enemy,15000)
+	game._handle_enemy_tap(first_id,intended_enemy+Vector2(12,4),15190)
+	check(game.sim.target==first_id and not game.sim.firing,"with attack setting disabled, repeated taps keep selected ship but never fire")
+	var controls_saved: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
+	check(controls_saved is Dictionary and not bool(controls_saved.get("double_tap_attack_enabled",true)),"double-tap toggle persists in display settings")
+	game._toggle_double_tap_attack()
+	check(game.double_tap_attack_enabled,"double-tap attack may be reenabled")
+	game._cancel_target()
+	game._handle_enemy_tap(first_id,intended_enemy,19000)
+	game._handle_enemy_tap(first_id,intended_enemy+Vector2(160,0),19200)
+	check(not game.sim.firing,"far-separated taps do not accidentally trigger double-tap combat")
 	game.sim.select(first_id)
 	var esc=InputEventKey.new()
 	esc.keycode=KEY_ESCAPE
@@ -631,8 +656,8 @@ func _run() -> void:
 	check(game.sim.target==-1 and not game.sim.firing,"Escape cancels selected enemy when no full-screen menu is open")
 	game.sim.select(first_id)
 	check(game.sim.player.pos==before_pos and game.sim.player.ammo==before_stock and game.sim.player.path.is_empty(),"target cycling consumes no ammunition and starts no pursuit")
-	# Android regression: two successive touch gestures on the SAME ship
-	# must select/deselect immediately, with no artificial 180 ms gap.
+	# Android regression: first touch immediately selects; second quick
+	# touch attacks when enabled, never silently deselects.
 	game.modal.hide()
 	game.loading_left=0.0
 	game.suppress_tap_until=0
@@ -642,6 +667,8 @@ func _run() -> void:
 	game.sim.npcs[0].pos=visible_ship_world
 	game.sim.npcs[1].pos=visible_ship_world+Vector2(360,200)
 	game.sim.select(-1)
+	game.sim.firing=false
+	game._reset_enemy_tap()
 	game.sim.player.path=[]
 	var tap_down=InputEventScreenTouch.new()
 	tap_down.index=31
@@ -656,7 +683,7 @@ func _run() -> void:
 	check(game.sim.target==first_id,"Android world-input touch selects projected 3D ship")
 	game._input(tap_down)
 	game._input(tap_up)
-	check(game.sim.target==-1 and not game.sim.firing,"immediate second Android touch deselects without 180 ms lockout")
+	check(game.sim.target==first_id and game.sim.firing,"immediate second Android touch starts auto-fire without accidental deselection")
 	check(game.touch_points.is_empty() and game.touch_starts.is_empty() and game.touch_invalid.is_empty(),"single-finger touch tracking is fully cleared after release")
 	# Multi-touch/drag gestures must never masquerade as a ship tap.
 	var other_down=InputEventScreenTouch.new()
@@ -671,7 +698,7 @@ func _run() -> void:
 	game._input(other_down)
 	game._input(other_up)
 	game._input(tap_up)
-	check(game.sim.target==-1 and game.touch_points.is_empty(),"lifting a two-finger pinch does not select a ship accidentally")
+	check(game.sim.target==first_id and game.touch_points.is_empty(),"lifting a two-finger pinch does not alter selected target")
 	var drag_event=InputEventScreenDrag.new()
 	drag_event.index=31
 	drag_event.position=tap_screen+Vector2(45,0)
@@ -681,7 +708,9 @@ func _run() -> void:
 	tap_up.position=drag_event.position
 	game._input(tap_up)
 	tap_up.position=tap_screen
-	check(game.sim.target==-1 and game.touch_points.is_empty(),"camera dragging over an enemy never toggles target")
+	check(game.sim.target==first_id and game.touch_points.is_empty(),"camera dragging over an enemy never toggles target")
+	game._cancel_target()
+	check(game.sim.target==-1 and not game.sim.firing,"target cross remains the only touch cancellation control")
 	game._recenter_camera()
 	# Rapid water taps must be independent move commands, not dropped taps.
 	# The enemy used for the previous touch/target test must be removed first,
