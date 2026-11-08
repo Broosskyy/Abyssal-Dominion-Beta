@@ -99,12 +99,29 @@ jobs:
             echo '4.7.2.stable' > rebuild/m3052/android/.build_version
             python3 rebuild/m3052/tools/android_updater/inject_bridge.py rebuild/m3052/android/build
             chmod +x rebuild/m3052/android/build/gradlew
-            # Download directly from Gradle's CDN, not its github.com redirect.
-            # Wrapper verifies the published 8.11.1 binary distribution digest.
+            # Both services.gradle.org and downloads.gradle.org currently redirect
+            # to the broken GitHub 504 endpoint. Verify a mirror ZIP and use the
+            # file:// URL so Gradle Wrapper never depends on that redirect.
             wrapper=rebuild/m3052/android/build/gradle/wrapper/gradle-wrapper.properties
             grep -q 'gradle-8.11.1-bin.zip' "$wrapper"
-            sed -i 's#services.gradle.org/distributions/#downloads.gradle.org/distributions/#' "$wrapper"
-            grep -q '^distributionSha256Sum=' "$wrapper" || printf '\ndistributionSha256Sum=f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6\n' >> "$wrapper"
+            gradle_zip="$RUNNER_TEMP/gradle-8.11.1-bin.zip"
+            gradle_sha=f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6
+            gradle_ok=false
+            for source in \
+              "https://vie.at.distfiles.macports.org/gradle/gradle-8.11.1-bin.zip" \
+              "https://mirror.nju.edu.cn/gradle/gradle-8.11.1-bin.zip" \
+              "https://mirrors.aliyun.com/gradle/distributions/v8.11.1/gradle-8.11.1-bin.zip"; do
+              rm -f "$gradle_zip"
+              if curl -fL --retry 2 --retry-all-errors --retry-delay 2 --connect-timeout 20 --max-time 360 -o "$gradle_zip" "$source" &&
+                printf '%s  %s\n' "$gradle_sha" "$gradle_zip" | sha256sum -c -; then
+                gradle_ok=true
+                break
+              fi
+              echo "::warning::Gradle mirror unavailable or invalid: $source"
+            done
+            if [ "$gradle_ok" != true ]; then echo '::error::Gradle 8.11.1 unavailable from verified mirrors'; exit 1; fi
+            sed -i "s#^distributionUrl=.*#distributionUrl=file://$gradle_zip#" "$wrapper"
+            grep -q '^distributionSha256Sum=' "$wrapper" || printf '\ndistributionSha256Sum=%s\n' "$gradle_sha" >> "$wrapper"
           fi
       - name: Test account and crossplay preparation
         shell: bash
