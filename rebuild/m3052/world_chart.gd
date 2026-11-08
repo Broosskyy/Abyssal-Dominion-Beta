@@ -21,6 +21,10 @@ func _process(_delta: float) -> void:
 	if is_visible_in_tree():queue_redraw()
 
 func node_point(index: int) -> Vector2:
+	if chapter==-1:
+		var order: int=CONTENT.SEA_MAP_IDS.find(index)
+		if order<0:return Vector2(-1000,-1000)
+		return Vector2(size.x*(.24 if order%2==0 else .76),76.0+float(order/2)*55.0)
 	var inner=Rect2(size*Vector2(.06,.08),size*Vector2(.88,.84))
 	var position: Vector2
 	if index==FORTRESS_NODE:position=Vector2(.80,.82)
@@ -33,11 +37,13 @@ func node_point(index: int) -> Vector2:
 	return inner.position+position*inner.size
 
 func visible_nodes() -> Array:
+	if chapter==-1:return CONTENT.SEA_MAP_IDS.duplicate()
 	var nodes: Array=CONTENT.SEA_MAP_IDS.slice(chapter*10,(chapter+1)*10)
 	nodes.append_array([3,4,5,FORTRESS_NODE])
 	return nodes
 
 func node_radius() -> float:
+	if chapter==-1:return clampf(size.x*.045,19.0,28.0)
 	return clampf(minf(size.x*.047,size.y*.071),18,34)
 
 func node_at(point: Vector2) -> int:
@@ -67,6 +73,9 @@ func _draw() -> void:
 	if parchment!=null:draw_texture_rect(parchment,Rect2(Vector2.ZERO,size),false)
 	else:draw_rect(Rect2(Vector2.ZERO,size),Color("d8c39a"))
 	draw_rect(Rect2(Vector2.ZERO,size),Color(.05,.12,.16,.10))
+	if chapter==-1:
+		_draw_overview(now)
+		return
 	var r=node_radius()
 	var nodes: Array=visible_nodes()
 	for index: int in CONTENT.SEA_MAP_IDS.slice(chapter*10,(chapter+1)*10):
@@ -84,6 +93,53 @@ func _draw() -> void:
 	var fs=maxi(10,roundi(r*.42))
 	_ink_text(Vector2(size.x*.5,size.y*.065),"SEEKARTEN %d–%d · PORTALROUTEN" % [chapter*5+1,chapter*5+5],fs+2,INK)
 	_ink_text(Vector2(size.x*.36,size.y*.965),"BONUSKARTEN · NUR MIT SCHRIFTROLLE",fs,Color("5a3a12"))
+
+# Every one of the forty seas is present on one scrollable atlas.
+# The former four five-tier leaves remain available as close-up detail views.
+func _draw_overview(now: float) -> void:
+	var r: float=node_radius()
+	_ink_text(Vector2(size.x*.5,29),"WELTKARTE · ALLE 40 SEEKARTEN",maxi(17,roundi(size.x*.028)),INK)
+	_ink_text(Vector2(size.x*.24,51),"SPUR 1",13,Color("503419"))
+	_ink_text(Vector2(size.x*.76,51),"SPUR 2",13,Color("503419"))
+	for tier in 20:
+		var left: int=CONTENT.sea_index(tier+1,1)
+		var right: int=CONTENT.sea_index(tier+1,2)
+		var a: Vector2=node_point(left)
+		var b: Vector2=node_point(right)
+		draw_line(a+Vector2(r,0),b-Vector2(r,0),Color(INK,.34),2.0,true)
+		if tier<19:
+			for index in [left,right]:
+				var from: Vector2=node_point(index)
+				var to: Vector2=node_point(CONTENT.sea_index(tier+2,int(CONTENT.MAPS[index].lane)))
+				draw_line(from+Vector2(0,r),to-Vector2(0,r),Color(INK,.29),1.6,true)
+	for index: int in CONTENT.SEA_MAP_IDS:
+		_overview_node(index,r,now)
+	_ink_text(Vector2(size.x*.5,size.y-17),"ANTIPPEN: KARTE AUSWÄHLEN · RUNTERSCROLLEN BIS 20/2",12,INK)
+
+func _overview_node(index: int,r: float,now: float) -> void:
+	var p: Vector2=node_point(index)
+	var info: Dictionary=CONTENT.MAPS[index]
+	var chosen: bool=index==selected
+	var current: bool=index==sim.map_id
+	var locked: bool=sim.level<int(info.level)
+	var guild: bool=CONTENT.has_guild_island(index)
+	var fill: Color=Color("d9b879") if not locked else Color("978a75")
+	if current:fill=Color("91ceca")
+	if chosen:
+		draw_circle(p,r+8.0,Color("ffc45d",.22+.08*sin(now*3.0)))
+		draw_arc(p,r+7.0,0,TAU,32,Color("7c470c"),2.0,true)
+	draw_circle(p+Vector2(1.4,2.5),r+2.0,Color(INK,.18))
+	draw_circle(p,r+2.0,Color("6a4a21"))
+	draw_circle(p,r,fill)
+	_ink_text(p+Vector2(0,4),str(info.code),maxi(12,roundi(r*.68)),INK)
+	if guild:
+		var holding: Dictionary=sim.guild_holdings.get(str(index),{})
+		var owned: bool=not sim.guild.is_empty() and float(holding.get("remaining",0))>0.0
+		var tag: String=str(sim.guild.get("tag","")) if owned else CONTENT.FORTRESS_TAG
+		_ink_text(p+Vector2(0,-r-8),"GILDE [%s]" % tag,10,Color("236341") if owned else Color("842c1f"))
+	if locked:SEA_MARKS.padlock(self,p+Vector2(r*.8,-r*.65),r*.45,Color("773b27"))
+	elif current:
+		draw_arc(p,r+4.0,0,TAU,24,Color("087888",.8),2.2,true)
 
 func _bezier(a: Vector2,c: Vector2,b: Vector2,t: float) -> Vector2:
 	return a.lerp(c,t).lerp(c.lerp(b,t),t)
