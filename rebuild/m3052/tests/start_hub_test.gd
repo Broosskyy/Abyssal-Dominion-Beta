@@ -17,7 +17,7 @@ func _run() -> void:
 	check(mock.rewards.daily_available(day_stamp),"daily reward is initially claimable")
 	check(mock.rewards.claim_daily(mock,day_stamp),"first daily reward is claimable exactly once")
 	check(int(mock.player.gold)==gold_before+150 and mock.essence==essence_before+1 and mock.rewards.streak==1,"day one deposits real 150 gold and 1 essence")
-	var duplicate=mock.rewards.claim_daily(mock,day_stamp+600)
+	var repeat_claim: bool=mock.rewards.claim_daily(mock,day_stamp+600)
 	check(not repeat_claim,"same UTC day cannot duplicate daily reward")
 	check(int(mock.player.gold)==gold_before+150,"repeating a claim must not change the gold balance")
 	check(mock.rewards.claim_daily(mock,day_stamp+86400) and mock.rewards.streak==2,"next UTC day extends consecutive streak")
