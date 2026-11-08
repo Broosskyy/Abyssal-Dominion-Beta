@@ -2043,6 +2043,50 @@ func _row_button(parent: Node,text: String,callback: Callable,disabled: bool=fal
 	button.disabled=disabled
 	return button
 
+# Shared mobile-first catalog used by Market, Decks, Castles, and Talents.
+# At phone widths a tile spans the panel; landscape gets two or three
+# columns. A price and a touch-sized action always stay BELOW its artwork.
+func _catalog_grid(max_columns: int=3,parent: Node=null) -> GridContainer:
+	var width: float=modal_scroll.size.x
+	var columns: int=1 if width<420.0 else (3 if width>=860.0 else 2)
+	return _grid(mini(max_columns,columns),parent)
+
+func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String,footer: String,accent: Color=Color("ab8852")) -> VBoxContainer:
+	var panel: PanelContainer=_card(accent,parent)
+	panel.custom_minimum_size=Vector2(0,228)
+	var content=VBoxContainer.new()
+	content.add_theme_constant_override("separation",7)
+	content.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	content.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	panel.add_child(content)
+	var frame=CenterContainer.new()
+	frame.custom_minimum_size.y=104
+	frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	content.add_child(frame)
+	if texture!=null:
+		var art=_picture(frame,texture,96,true)
+		art.custom_minimum_size=Vector2(96,96)
+	var heading=_text(content,title,15,Color("ffdf9d"))
+	heading.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	heading.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	heading.custom_minimum_size.y=24
+	var description=_text(content,details,12,Color("c5d4d4"))
+	description.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	description.custom_minimum_size.y=34
+	var price=_text(content,footer,14,Color("a7e4cd"))
+	price.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	price.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	price.custom_minimum_size.y=27
+	return content
+
+func _catalog_action(parent: Node,text: String,handler: Callable,disabled: bool=false) -> Button:
+	var action=_row_button(parent,text,handler,disabled,"primary")
+	action.custom_minimum_size.y=50
+	action.add_theme_font_size_override("font_size",14)
+	action.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	return action
+
 func _banner_card(texture: Texture2D,title: String,text: String,accent: Color=Color("c9a35e")) -> VBoxContainer:
 	var column=_row(texture,title,72,accent)
 	var label: Label=column.get_child(0);label.add_theme_color_override("font_color",Color("f5d78d"));label.add_theme_font_size_override("font_size",15)
