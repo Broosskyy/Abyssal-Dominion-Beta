@@ -1255,7 +1255,7 @@ func _build_ui() -> void:
 	toast.content_margin_left=12;toast.content_margin_right=12
 	status.add_theme_stylebox_override("normal",toast)
 	modal_backdrop=ColorRect.new()
-	modal_backdrop.color=Color(0.002,0.009,0.018,0.77)
+	modal_backdrop.color=Color(0.002,0.009,0.018,0.56)
 	modal_backdrop.z_index=19
 	modal_backdrop.visible=false
 	modal_backdrop.mouse_filter=Control.MOUSE_FILTER_STOP
@@ -1693,11 +1693,12 @@ const MODAL_TABS := {"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT"
 const MODAL_TITLES := {"Munition":"Munitionsauswahl","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String) -> void:
+	_reset_enemy_tap()
 	camera_pad.release()
 	var scroll_position=modal_scroll.scroll_vertical if modal.visible and modal_kind==kind else 0
 	modal_kind=kind
 	modal.plain=kind=="Munition"
-	modal_backdrop.color=Color(0,0,0,0) if kind=="Munition" else Color(0.002,0.009,0.018,0.77)
+	modal_backdrop.color=Color(0,0,0,0) if kind=="Munition" else Color(0.002,0.009,0.018,0.56)
 	modal_title.add_theme_font_size_override("font_size",18 if kind=="Munition" else 21)
 	modal_title.add_theme_constant_override("outline_size",2 if kind=="Munition" else 5)
 	modal_close.add_theme_font_size_override("font_size",20 if kind=="Munition" else 26)
@@ -3038,6 +3039,7 @@ func _handle_world_touch(event: InputEvent) -> void:
 		last_touch_ms=Time.get_ticks_msec()
 		if event.pressed:
 			if _hud_contains(event.position):
+				_reset_enemy_tap()
 				hud_touches[event.index]=true
 				return # let the actual UI button/slider consume it
 			touch_points[event.index]=event.position
