@@ -2653,9 +2653,18 @@ func _open_bonus() -> void:
 		var tier: Dictionary=CONTENT.BONUS_TIERS[i]
 		var region: Dictionary=CONTENT.MAPS[int(tier.map)]
 		var running=not sim.bonus.is_empty() and int(sim.bonus.tier)==i
-		var column=_row(painted.scroll_fragment,"%s-SCHRIFTROLLE · %s %s\nAb Lv. %d · Gegnerstärke ×%s · %d Fragmente · %d im Lager" % [str(tier.name).to_upper(),region.name,region.code,tier.level,str(region.enemy_scale).replace(".",","),tier.fragments,sim.scrolls[i]],64,tints[i])
+		var pieces: int=int(sim.bonus_pieces[i])
+		var need: int=int(tier.fragments)
+		var column=_row(painted.scroll_fragment,"%s-BONUSKARTE · %s %s\nAb Lv. %d · Gegnerstärke ×%s · Teile %d/%d · Schriftrollen %d" % [str(tier.name).to_upper(),region.name,region.code,tier.level,str(region.enemy_scale).replace(".",","),pieces,need,sim.scrolls[i]],64,tints[i])
+		var progress=_grid(5)
+		for part in need:
+			var filled: bool=part<pieces
+			var slot=_text(progress,"%s %d" % ["◆" if filled else "◇",part+1],13,Color("ffd27a") if filled else Color("667e80"))
+			slot.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+			slot.custom_minimum_size=Vector2(44,28)
 		var buttons=HBoxContainer.new();buttons.add_theme_constant_override("separation",6);column.add_child(buttons)
-		_row_button(buttons,"ZUSAMMENSETZEN",func():sim.craft_scroll(index);_save_progress();_open_modal("Bonuskarten");_refresh_ui(),sim.fragments<int(tier.fragments))
+		_row_button(buttons,"TEIL EINSETZEN",func():sim.assign_bonus_piece(index);_save_progress();_open_modal("Bonuskarten");_refresh_ui(),sim.fragments<=0 or pieces>=need)
+		_row_button(buttons,"ZUSAMMENSETZEN",func():sim.craft_scroll(index);_save_progress();_open_modal("Bonuskarten");_refresh_ui(),pieces+sim.fragments<need)
 		var blocked=sim.in_bonus_map() or sim.level<int(tier.level) or (not running and (int(sim.scrolls[i])<=0 or not sim.bonus.is_empty()))
 		_row_button(buttons,"FORTSETZEN" if running else ("AB LV. %d" % tier.level if sim.level<int(tier.level) else "STARTEN"),func():_start_bonus(index),blocked,"primary")
 	_section("WELLEN")
@@ -2665,7 +2674,7 @@ func _open_bonus() -> void:
 		var card=_card(Color("ff6a4d") if not str(wave.boss).is_empty() else Color(0,0,0,0),waves)
 		_text(card,"%d · %s" % [i+1,wave.label],13,Color("fff0c8"))
 	_note("Jede Welle zahlt Gold und 1 Gezeitenessenz. Die Truhe am Ende enthält Pulver, Platten, eine Notreparatur, einen Kristallsegen und ein Deck der Kartenstufe.\nKein Lebenssystem: Wirst du versenkt, geht es nach 8 Sekunden an derselben Welle weiter. Verlassen speichert die aktuelle Welle.")
-	_note("Fragmente gibt es aus dem Kessel und der Korsarenfestung.",Color("84999c"))
+	_note("Kartenteile erhältst du im Gezeitenkessel und als Spielbelohnungen. Wähle aus, für welche Bonuskarte du ein gefundenes Fragment einsetzt. Bisherige Fragmente bleiben erhalten; Belohnungen passen wir später an.",Color("84999c"))
 
 func _start_bonus(tier: int) -> void:
 	if sim.docked:sim.depart()
