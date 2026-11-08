@@ -1498,13 +1498,16 @@ func _layout() -> void:
 	_place(quest_claim,column-78,(quest_h-26)*.5,72,26)
 	var target_y=top+(quest_h+6 if journal_visible else 0)
 	var card_h=60.0 if compact else 66.0
-	_place(target_panel,left,target_y,column,card_h)
+	# Enemy HP/shield and the close button need their own readable space.
+	# Do not expand the quest panel or cover the central sea/action corner.
+	var target_w: float=minf(256.0 if compact else 308.0,s.x*.42)
+	_place(target_panel,left,target_y,target_w,card_h)
 	_place(target_portrait,6,6,card_h-12,card_h-12)
 	var tx=card_h
-	_place(target_clear,column-46,4,40,32)
-	_place(target_name,tx,3,column-tx-52,18)
-	_place(target_hp,tx,22,column-tx-51,8)
-	_place(target_numbers,tx,31,column-tx-51,card_h-33)
+	_place(target_clear,target_w-46,4,40,32)
+	_place(target_name,tx,3,target_w-tx-52,18)
+	_place(target_hp,tx,22,target_w-tx-51,8)
+	_place(target_numbers,tx,31,target_w-tx-51,card_h-33)
 	_place(interact,left,target_y+card_h+6,column,34)
 	_place(buff_bar,left,target_y+card_h+46,column,26)
 	# Chart with corner controls, as on classic sea-chart clients.
@@ -1657,8 +1660,15 @@ func _refresh_ui() -> void:
 		if selected.kind=="tower" and sim.tower_friendly():disposition="GILDENTURM"
 		target_health_skin.bg_color=Color("c9573f") if bool(selected.aggressive) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) else Color("cfae55")
 		if selected.kind=="tower" and sim.tower_friendly():target_health_skin.bg_color=Color("61b967")
-		var shield_text=" · Schild %s" % _thousands(int(selected.shield)) if float(selected.get("max_shield",0))>0 else ""
-		target_numbers.text="%s / %s HP%s\n%s · %d m"%[_thousands(int(selected.hp)),_thousands(int(selected.max_hp)),shield_text,disposition,roundi(sim.player.pos.distance_to(selected.pos))]
+		var shield_text=" · S%s" % _thousands(int(selected.shield)) if float(selected.get("max_shield",0))>0 else ""
+		var enemy_distance: int=roundi(sim.player.pos.distance_to(Vector2(selected.pos)))
+		# Exact values remain available on the card; shorten repeated labels on
+		# compact Android screens so the X and the health text never collide.
+		if ui.size.x<1100.0:
+			target_numbers.text="%s/%s%s\n%s · %d m" % [_thousands(int(selected.hp)),_thousands(int(selected.max_hp)),shield_text,disposition,enemy_distance]
+		else:
+			target_numbers.text="%s / %s HP%s\n%s · %d m" % [_thousands(int(selected.hp)),_thousands(int(selected.max_hp)),shield_text,disposition,enemy_distance]
+		target_numbers.tooltip_text="Rumpf: %s / %s · Schutzschild: %s / %s · Distanz: %d m" % [_thousands(int(selected.hp)),_thousands(int(selected.max_hp)),_thousands(int(selected.shield)),_thousands(int(selected.get("max_shield",0))),enemy_distance]
 	attack.text="STOPP" if sim.firing else "FEUER"
 	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0 or sim.docked
 	_set_orb(attack,extra_icons.cannon_action,"",sim.firing,attack.text)
@@ -3788,6 +3798,7 @@ func _hunt_monster(enemy_id: int, sail: bool=false) -> void:
 		sim.message="Dieses Seeungeheuer ist nicht mehr verfügbar"
 		_refresh_ui()
 		return
+	sim.firing=false
 	sim.select(enemy_id)
 	if sail and not sim.docked:
 		var direction: Vector2=sim.player.pos-Vector2(enemy.pos)
