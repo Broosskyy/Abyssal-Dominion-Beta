@@ -986,6 +986,42 @@ func _run() -> void:
 		if child.get_script()==load("res://chart_guide.gd"):guide_modes.append(str(child.mode))
 	check(guide_modes==["grid","colors","legend"],"chart guide draws the square grid, name colours and minimap legend")
 	game.modal.hide()
+	# New mobile hub/social/daily galleries are navigable and share one
+	# existing reward ledger. No fake online friends or referral credit.
+	game._open_modal("Freunde")
+	check(game.modal_body.find_child("CopyInviteButton",true,false)!=null,"sea captain menu exposes a real copyable beta invitation")
+	game._switch_tab("Freunde","FREUNDESLISTE")
+	check(game._tab("Freunde")=="FREUNDESLISTE","online social list has a separate honest, unavailable state")
+	game._open_modal("Belohnungen")
+	var daily_cards: int=0
+	for caption: Label in game.modal_body.find_children("CatalogTitle","Label",true,false):
+		if caption.text.begins_with("TAG "):daily_cards+=1
+	check(daily_cards==7 and game.modal_body.find_child("AFKClaimButton",true,false)!=null,"reward window renders seven daily tiles and one existing AFK claim action")
+	game._open_modal("Spielinfo")
+	var menu_cards: int=0
+	for tile: PanelContainer in game.modal_body.find_children("*","PanelContainer",true,false):
+		if tile.has_meta("catalog_tile"):menu_cards+=1
+	check(menu_cards>=18,"captain menu presents illustrated navigation for progression, economy and world")
+	game.modal.hide()
+	root.size=Vector2i(1280,720)
+	var lobby=load("res://start_hub.tscn").instantiate()
+	root.add_child(lobby)
+	await process_frame
+	lobby._show("home")
+	await process_frame
+	check(lobby.body.find_child("LobbyHero",true,false)!=null and lobby.body.find_child("SailButton",true,false)!=null,"captain home page has cinematic hero and unmistakable sailing entry")
+	check(lobby.panel.get_global_rect().end.x<=1281 and lobby.panel.get_global_rect().size.x>500,"landscape lobby stays within viewport with generous readable width")
+	lobby._show("rewards")
+	var preview: int=0
+	for label: Label in lobby.body.find_children("*","Label",true,false):
+		if label.text.begins_with("TAG "):preview+=1
+	check(preview==7 and lobby.body.find_child("DailyClaimButton",true,false)!=null,"captain lobby shows persistent seven-day reward preview and daily claim")
+	lobby._show("friends")
+	check(lobby.body.find_child("CopyInviteButton",true,false)!=null and lobby.body.find_child("InviteCodeInput",true,false)!=null,"lobby has working invite-copy action and nonredeeming code check")
+	lobby._show("news")
+	check(lobby.page=="news" and lobby.body.get_child_count()>4,"lobby news has its own readable section")
+	lobby.queue_free()
+	await process_frame
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)
