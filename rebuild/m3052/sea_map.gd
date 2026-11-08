@@ -1842,7 +1842,7 @@ func _clock_text(seconds: float) -> String:
 	var minutes=floori((total%3600)/60.0)
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
-const MODAL_TABS := {"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","VORRÄTE","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
+const MODAL_TABS := {"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
 const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
@@ -2404,7 +2404,7 @@ func _open_shipyard() -> void:
 	_action("MUNITION IM MARKT",func():_switch_tab("Markt","MUNITION"),"normal",yard_links)
 
 func _open_cannon_fitment() -> void:
-	_banner_card(extra_icons.cannon_0,"WERFT · GESCHÜTZMONTAGE","Kanonen werden aus dem Arsenal auf das Schiff montiert. Vollkugeln, Kettenkugeln und andere Munition kaufst du ausschließlich im Markt und wechselst sie im Kampfmenü.")
+	_banner_card(extra_icons.cannon_0,"WERFT · GESCHÜTZMONTAGE","Kanonen werden aus dem Arsenal auf das Schiff montiert – auch außerhalb des Hafens, solange du nicht im Gefecht bist. Munition gehört ausschließlich in den Markt und ins Kampfmenü.")
 	_section("KANONEN AN DEINEM SCHIFF")
 	var stats=_grid(2)
 	_stat(stats,"MONTIERT","%d Kanonen" % sim.mounted_cannons,extra_icons.cannon_0)
@@ -2412,7 +2412,7 @@ func _open_cannon_fitment() -> void:
 	_stat(stats,"IM ARSENAL","%d Kanonen" % sim.cannon_storage(),extra_icons.cannon_1)
 	_stat(stats,"AKTIV","%d Kanonen feuern" % sim.equipped_cannons(),extra_icons.cannon_0)
 	_note("Geschützplätze hängen von Decks und Segnungen ab. Bei ablaufenden Boni bleiben überschüssige Kanonen montiert, aber vorübergehend inaktiv.")
-	if not sim.docked:_note("Zum Ein- und Ausbau der Kanonen musst du im Hafen andocken.",Color("edc68c"))
+	if not sim.can_refit_cannons():_note("Kanonenmontage derzeit gesperrt: Während des Gefechts, kurz nach einem Treffer oder auf einer Bonuskarte ist kein Umbau möglich.",Color("edc68c"))
 	_section("KANONEN AN BORD BRINGEN")
 	var fitting=_grid(3)
 	for n in [1,5,999]:
@@ -2421,7 +2421,7 @@ func _open_cannon_fitment() -> void:
 		var button=_action(label,func():
 			sim.mount_cannons(count)
 			_save_progress();_open_modal("Werft");_refresh_ui(),"normal",fitting)
-		button.disabled=not sim.docked or sim.cannon_storage()<=0 or sim.equipped_cannons()>=sim.cannon_slots()
+		button.disabled=not sim.can_refit_cannons() or sim.cannon_storage()<=0 or sim.equipped_cannons()>=sim.cannon_slots()
 	var storage=_grid(3)
 	for n in [1,5,999]:
 		var count: int=n
@@ -2429,7 +2429,7 @@ func _open_cannon_fitment() -> void:
 		var button=_action(label,func():
 			sim.unmount_cannons(count)
 			_save_progress();_open_modal("Werft");_refresh_ui(),"normal",storage)
-		button.disabled=not sim.docked or sim.mounted_cannons<=0
+		button.disabled=not sim.can_refit_cannons() or sim.mounted_cannons<=0
 	_section("GESCHÜTZPLÄTZE ERWEITERN")
 	var links=_grid(2)
 	_action("KANONEN IM MARKT KAUFEN",func():_switch_tab("Markt","AUSRÜSTUNG"),"normal",links)
@@ -2456,14 +2456,14 @@ func _open_weapons() -> void:
 # Marketplace is a real GOLD economy. There is deliberately no pretend
 # online auction, no credit-card form, and no fake premium transaction.
 func _open_market() -> void:
-	_banner_card(painted.nav_harbor,"MARKTPLATZ · HANDEL & VORRÄTE","Dein Guthaben: %s Gold · Käufe sind echte lokale Spieltransaktionen. Munition gehört in den Markt, Kanonen ins Arsenal der Werft." % _thousands(int(sim.player.gold)))
+	_banner_card(painted.nav_harbor,"MARKTPLATZ · HANDEL & VORRÄTE","Dein Guthaben: %s Gold · Einkaufen ist überall auf der Seekarte möglich. Munition gibt es hier, die Montage der Kanonen übernimmt die Werft." % _thousands(int(sim.player.gold)))
 	match _tab("Markt"):
 		"AUSRÜSTUNG":
 			_section("KANONEN & SCHIFFSAUSRÜSTUNG")
 			var row=_row(extra_icons.cannon_1,"STANDARDBATTERIE · 2 KANONEN\nBesitz: %d · montiert: %d · Arsenal: %d\nPreis: %d Gold" % [int(sim.player.cannons),sim.mounted_cannons,sim.cannon_storage(),sim.cannon_price()],62,Color("9d7440"))
 			var buy=_row_button(row,"2 KANONEN KAUFEN",func():
-				sim.buy_cannons();_save_progress();_open_modal("Markt");_refresh_ui(),not sim.docked or int(sim.player.cannons)>=sim.MAX_CANNONS or int(sim.player.gold)<sim.cannon_price(),"primary")
-			buy.tooltip_text="Kauf nur im angedockten Hafen. Neue Kanonen müssen anschließend montiert werden."
+				sim.buy_cannons();_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.cannons)>=sim.MAX_CANNONS or int(sim.player.gold)<sim.cannon_price(),"primary")
+			buy.tooltip_text="Kauf überall möglich. Gekaufte Kanonen landen im Arsenal und können außerhalb von Gefechten montiert werden."
 			_note("Neue Kanonen liegen zunächst im Arsenal. Ein Schiff kann nie mehr Kanonen abfeuern, als aktive Geschützplätze vorhanden sind.")
 			var access=_grid(2)
 			_action("ZUR KANONENMONTAGE",func():_switch_tab("Werft","KANONEN"),"normal",access)
@@ -2487,9 +2487,9 @@ func _open_market() -> void:
 				var config: Dictionary=CONTENT.SUPPLIES[key]
 				var row=_row(_supply_icon(key),"%s · %d auf Lager\n+%d Stück · %d Gold" % [str(config.name),int(sim.supplies[key]),int(config.pack),int(config.price)],46)
 				var buy=_row_button(row,"KAUFEN · %d GOLD" % int(config.price),func():
-					sim.buy_supply(item);_save_progress();_open_modal("Markt");_refresh_ui(),not sim.docked or int(sim.player.gold)<int(config.price),"primary")
+					sim.buy_supply(item);_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.gold)<int(config.price),"primary")
 				buy.name="MarketItem_"+key
-			_note("Vorräte werden aus Sicherheitsgründen nur im Hafen gekauft. Anwendungen erfolgen über das separate Verbrauchsmenü.")
+			_note("Item-Käufe sind auf See möglich. Zum Einsetzen benutzt du das separate Verbrauchsmenü im Kampf-HUD.")
 		"AUKTION":
 			_section("HANDELSPLATZ & AUKTIONEN")
 			_note("Spieler-zu-Spieler-Angebote benötigen eine serverseitige Eigentumsprüfung, Reservierung der Gegenstände und sichere Transaktionsbestätigung. In dieser lokalen Beta sind Auktionen daher noch gesperrt.")
@@ -2604,7 +2604,7 @@ func _open_ranking() -> void:
 
 func _open_castles() -> void:
 	if _tab("Kastelle")=="TALENTE":
-		_banner_card(painted.nav_castles,"TALENTE · DEIN KAPITÄN","Erhalte pro Kapitänsstufe einen Talentpunkt. Drei eigenständige Fachgebiete verbessern deine echten Kampf- und Schiffswerte. Kastelle werden separat mit Gold ausgebaut.")
+		_banner_card(painted.nav_castles,"TALENTE · DEIN KAPITÄN","Pro Kapitänsstufe erhältst du einen Talentpunkt. Die drei Fachgebiete verbessern deine echten Kampf- und Schiffswerte. Talente kannst du auch unterwegs vergeben; Kastelle bleiben vorerst Hafenausbauten.")
 		_section("FREIE TALENTPUNKTE · %d" % sim.talent_points_available())
 		for key: String in CONTENT.TALENT_KEYS:
 			var talent_key: String=key
@@ -2615,9 +2615,9 @@ func _open_castles() -> void:
 			progress.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 			var learn=_row_button(column,"TALENTPUNKT VERGEBEN" if stage<CONTENT.TALENT_MAX else "MAXIMALE TALENTSTUFE",func():
 				sim.learn_talent(talent_key)
-				_save_progress();_open_modal("Kastelle");_refresh_ui(),not sim.docked or stage>=CONTENT.TALENT_MAX or sim.talent_points_available()<=0,"primary")
+				_save_progress();_open_modal("Kastelle");_refresh_ui(),stage>=CONTENT.TALENT_MAX or sim.talent_points_available()<=0,"primary")
 			learn.name="Talent_"+key
-		if not sim.docked:_note("Talentpunkte werden angedockt im Hafen vergeben; die Übersicht bleibt auf See verfügbar.",Color("e1b979"))
+		_note("Talentvergabe jederzeit verfügbar – keine Hafenbindung.",Color("9bd6bd"))
 		return
 	_banner_card(painted.nav_castles,"KASTELLE · DAUERHAFTE SCHIFFSVERBESSERUNGEN","Sechs Kastelle mit je %d Stufen. Neue Stufen werden mit dem Kapitänslevel freigeschaltet. Aktuell ausbaubar bis Stufe %d; die angezeigten Werte wirken direkt im Spiel." % [CONTENT.CASTLE_MAX,sim.castle_cap()])
 	if not sim.docked:_note("Kastelle werden ausschließlich im Hafen ausgebaut.",Color("e1b979"))
