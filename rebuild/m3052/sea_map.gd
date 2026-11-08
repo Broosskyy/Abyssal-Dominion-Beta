@@ -1842,7 +1842,7 @@ func _clock_text(seconds: float) -> String:
 	var minutes=floori((total%3600)/60.0)
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
-const MODAL_TABS := {"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
+const MODAL_TABS := {"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
 const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
@@ -2717,67 +2717,99 @@ func _deck_effect(deck: Dictionary) -> String:
 const DECK_ART := {"cannon":"cannon_1","armor":"upgrade_hull","hunter":"harpoon_1","navigation":"upgrade_sails","logistics":"castle_crew"}
 
 func _open_decks() -> void:
-	var stage=Control.new()
-	stage.name="DeckOverview"
-	stage.custom_minimum_size=Vector2(0,143)
-	stage.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	stage.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	stage.draw.connect(func():
-		stage.draw_style_box(SKIN.card(),Rect2(Vector2.ZERO,stage.size))
-		SEA_MARKS.deck_badge(stage,Vector2(stage.size.x*.5,52),10.0,sim,elapsed)
-		_canvas_text(stage,Vector2(stage.size.x*.5,108),"10 DECKPLÄTZE · ZWEI REIHEN MIT JE FÜNF",12,Color("ecd29a"))
-		_canvas_text(stage,Vector2(stage.size.x*.5,129),"GOLD  ·  ELITE  ·  KRISTALL",11,Color("c4d5db")))
-	modal_body.add_child(stage)
-	_start_deck_motion(stage)
-	_section("MONTIERTE DECKS")
-	for slot in CONTENT.DECK_SLOT_COUNT:
-		var place=slot
-		var index=int(sim.deck_slots[slot])
-		if index<0:
-			_row(null,"PLATZ %d · FREI" % (slot+1),34,Color("4a4234"));continue
-		var deck: Dictionary=sim.decks[index]
-		var column=_row(deck_icons[str(deck.type)],"PLATZ %d · %s\n%s" % [slot+1,_deck_title(deck),_deck_effect(deck)],48,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
-		_row_button(column,"ABBAUEN",func():sim.unequip_deck(place);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
-	_section("SONDERDECKS & SEGEN")
-	var tide=float(sim.buffs.tide_deck)
-	_row(deck_icons.tide,"GEZEITENDECK · "+("aktiv %s · +10 Kanonenplätze" % _clock_text(tide) if tide>0 else "aus Gezeitenkessel und Meilensteinen"),48,SEA_MARKS.DECK_COLORS.tide)
-	for key: String in CONTENT.SPECIAL_DECKS:
-		var special_key=key
-		var config: Dictionary=CONTENT.SPECIAL_DECKS[key]
-		var left=float(sim.buffs[key])
-		var special=_row(deck_icons[key.trim_suffix("_deck")],"%s · %s\n%s" % [str(config.name).to_upper(),_clock_text(left) if left>0 else "INAKTIV",config.effect],48,config.color)
-		var caption="30 MIN · %d GOLD" % config.price if sim.level>=int(config.level) else "AB KAPITÄNSSTUFE %d" % config.level
-		_row_button(special,caption,func():sim.buy_special_deck(special_key);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.level<int(config.level) or int(sim.player.gold)<int(config.price))
-	_row(deck_icons.blessing,"KRISTALLSEGEN · "+(_clock_text(float(sim.buffs.blessing)) if sim.has_blessing() else "nicht aktiv · aus dem Gezeitenkessel"),48,Color("bd78f2"))
-	if not sim.docked:_note("Decks werden angedockt im Hafen umgebaut.",Color("edc68c"))
-	_section("DECKLAGER · %d / %d" % [sim.decks.size(),CONTENT.DECK_INVENTORY_MAX])
-	if sim.decks.is_empty():_note("Golddecks kaufst du in der Deckwerft. Im Hafen verbesserst du sie später zu Elite und Kristall.")
-	for i in sim.decks.size():
-		var index=i
-		var deck: Dictionary=sim.decks[i]
-		var column=_row(deck_icons[str(deck.type)],"%s\n%s" % [_deck_title(deck),_deck_effect(deck)],48,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
-		var controls=HBoxContainer.new();controls.add_theme_constant_override("separation",6);column.add_child(controls)
-		var picker=OptionButton.new();picker.custom_minimum_size=Vector2(118,40);picker.add_theme_font_size_override("font_size",13)
-		for slot in CONTENT.DECK_SLOT_COUNT:picker.add_item("Platz %d" % (slot+1))
-		var mounted=sim.deck_slots.find(i)
-		picker.select(mounted if mounted>=0 else maxi(0,sim.deck_slots.find(-1)))
-		controls.add_child(picker)
-		_row_button(controls,"MONTIEREN",func():sim.equip_deck(index,picker.selected);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
-		var tier=int(deck.tier)
-		if tier<CONTENT.DECK_TIERS.size()-1:
-			var level=int(CONTENT.DECK_UPGRADE_LEVEL[tier]);var gold=int(CONTENT.DECK_UPGRADE_GOLD[tier]);var essence=int(CONTENT.DECK_UPGRADE_ESSENCE[tier])
-			var text="ZU %s · %d GOLD%s" % [str(CONTENT.DECK_TIERS[tier+1]).to_upper(),gold," · %d ESSENZ" % essence if essence>0 else ""]
-			if sim.level<level:text="%s AB KAPITÄNSSTUFE %d" % [str(CONTENT.DECK_TIERS[tier+1]).to_upper(),level]
-			_row_button(column,text,func():sim.upgrade_deck(index);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.level<level or int(sim.player.gold)<gold or sim.essence<essence,"primary")
-	if sim.docked:
-		_section("DECKWERFT · GOLDDECKS")
-		var yard=_grid(2)
-		for key: String in CONTENT.DECK_KEYS:
-			var type=key
-			var config: Dictionary=CONTENT.DECKS[key]
-			var buy=_with_icon(_action("%s · %d GOLD" % [config.name,config.price],func():sim.buy_deck(type);_save_progress();_open_modal("Decks");_refresh_ui(),"normal",yard),deck_icons[key])
-			buy.disabled=sim.decks.size()>=CONTENT.DECK_INVENTORY_MAX or int(sim.player.gold)<int(config.price)
-	_note("Gekaufte Decks sind einzelne Exemplare. Gleiche Funktionen dürfen auf mehreren Plätzen sitzen. Doppelte Kesselbelohnungen werden weiterhin in %d Gezeitenessenz umgewandelt." % CONTENT.DUPLICATE_DECK_ESSENCE)
+	match _tab("Decks"):
+		"SCHIFF":
+			_section("DECKS AN DEINEM SCHIFF · %d/10" % (CONTENT.DECK_SLOT_COUNT-sim.deck_slots.count(-1)))
+			var stage=Control.new()
+			stage.name="DeckOverview"
+			stage.custom_minimum_size=Vector2(0,143)
+			stage.mouse_filter=Control.MOUSE_FILTER_IGNORE
+			stage.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			stage.draw.connect(func():
+				stage.draw_style_box(SKIN.card(),Rect2(Vector2.ZERO,stage.size))
+				SEA_MARKS.deck_badge(stage,Vector2(stage.size.x*.5,52),10.0,sim,elapsed)
+				_canvas_text(stage,Vector2(stage.size.x*.5,108),"10 DECKPLÄTZE · ZWEI REIHEN MIT JE FÜNF",12,Color("ecd29a"))
+				_canvas_text(stage,Vector2(stage.size.x*.5,129),"GOLD  ·  ELITE  ·  KRISTALL",11,Color("c4d5db")))
+			modal_body.add_child(stage)
+			_start_deck_motion(stage)
+			var slots=_catalog_grid(3)
+			for slot in CONTENT.DECK_SLOT_COUNT:
+				var place: int=slot
+				var index: int=int(sim.deck_slots[slot])
+				if index<0:
+					var empty=_catalog_tile(slots,painted.tide_deck,"PLATZ %02d" % (slot+1),"Noch kein Deck montiert.","FREIER DECKPLATZ",Color("3b535d"))
+					_catalog_action(empty,"DECK AUS LAGER WÄHLEN",func():_switch_tab("Decks","LAGER"))
+					continue
+				var deck: Dictionary=sim.decks[index]
+				var tile=_catalog_tile(slots,deck_icons[str(deck.type)],"PLATZ %02d · %s" % [slot+1,_deck_title(deck)],_deck_effect(deck),"MONTIERT · "+str(CONTENT.DECK_TIERS[int(deck.tier)]),CONTENT.DECK_TIER_COLORS[int(deck.tier)])
+				var unequip=_catalog_action(tile,"ABBAUEN",func():
+					sim.unequip_deck(place);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
+				unequip.name="DeckRemove"+str(slot)
+			_note("Auf der Seekarte bleiben die Deckpunkte unter dem Schiff in der bekannten 2×5-Anordnung sichtbar. Deckwechsel erfolgt vorerst im Hafen.")
+		"LAGER":
+			_section("DEIN DECKLAGER · %d/%d" % [sim.decks.size(),CONTENT.DECK_INVENTORY_MAX])
+			if not sim.docked:_note("Zum Montieren und Verbessern von Decks vorerst im Hafen andocken.",Color("e1b979"))
+			if sim.decks.is_empty():_note("Du besitzt noch keine Decks. Unter KAUFEN kannst du deine ersten Golddecks erwerben.")
+			var collection=_catalog_grid(3)
+			for i in sim.decks.size():
+				var index: int=i
+				var deck: Dictionary=sim.decks[i]
+				var current: int=sim.deck_slots.find(index)
+				var stage: int=int(deck.tier)
+				var title: String=_deck_title(deck)
+				var footer: String="AUF PLATZ %d" % (current+1) if current>=0 else "IM LAGER"
+				var tile=_catalog_tile(collection,deck_icons[str(deck.type)],title.to_upper(),_deck_effect(deck),footer,CONTENT.DECK_TIER_COLORS[stage])
+				var picker=OptionButton.new()
+				picker.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+				picker.custom_minimum_size=Vector2(0,48)
+				picker.add_theme_font_size_override("font_size",14)
+				picker.name="DeckSlotPicker"+str(index)
+				for slot in CONTENT.DECK_SLOT_COUNT:picker.add_item("Platz %02d" % (slot+1))
+				picker.select(current if current>=0 else maxi(0,sim.deck_slots.find(-1)))
+				tile.add_child(picker)
+				var equip=_catalog_action(tile,"AUFS SCHIFF MONTIEREN",func():
+					sim.equip_deck(index,picker.selected);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
+				equip.name="DeckEquip"+str(index)
+				if stage<CONTENT.DECK_TIERS.size()-1:
+					var level: int=int(CONTENT.DECK_UPGRADE_LEVEL[stage])
+					var gold: int=int(CONTENT.DECK_UPGRADE_GOLD[stage])
+					var essence: int=int(CONTENT.DECK_UPGRADE_ESSENCE[stage])
+					var upgrade=_catalog_action(tile,"ZU %s · %d GOLD%s" % [str(CONTENT.DECK_TIERS[stage+1]).to_upper(),gold,(" + %d ESSENZ" % essence if essence>0 else "")],func():
+						sim.upgrade_deck(index);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.level<level or int(sim.player.gold)<gold or sim.essence<essence)
+					upgrade.name="DeckUpgrade"+str(index)
+					if sim.level<level:upgrade.tooltip_text="Ab Kapitänsstufe %d" % level
+			_action("NEUE GOLDDECKS KAUFEN",func():_switch_tab("Decks","KAUFEN"))
+		"SPEZIAL":
+			_section("SONDERDECKS & SEGEN")
+			var special=_catalog_grid(3)
+			var tide: float=float(sim.buffs.tide_deck)
+			var tide_tile=_catalog_tile(special,deck_icons.tide,"GEZEITENDECK","+10 Kanonenplätze bei Aktivierung","AKTIV · %s" % _clock_text(tide) if tide>0 else "AUS DEM GEZEITENKESSEL",SEA_MARKS.DECK_COLORS.tide)
+			_catalog_action(tide_tile,"ZUM GEZEITENKESSEL",func():_open_modal("Kessel"))
+			for key: String in CONTENT.SPECIAL_DECKS:
+				var deck_key: String=key
+				var config: Dictionary=CONTENT.SPECIAL_DECKS[key]
+				var left: float=float(sim.buffs[key])
+				var text: String="%s · %s" % [str(config.name).to_upper(),_clock_text(left) if left>0 else "INAKTIV"]
+				var tile=_catalog_tile(special,deck_icons[key.trim_suffix("_deck")],text,str(config.effect),"30 MIN · %d GOLD" % int(config.price),config.color)
+				var buy=_catalog_action(tile,"AKTIVIEREN" if sim.level>=int(config.level) else "AB STUFE %d" % int(config.level),func():
+					sim.buy_special_deck(deck_key);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.level<int(config.level) or int(sim.player.gold)<int(config.price))
+				buy.name="SpecialDeck_"+key
+			var blessing=_catalog_tile(special,deck_icons.blessing,"KRISTALLSEGEN","Erhöht mehrere Schiffsattribute","AKTIV · %s" % _clock_text(float(sim.buffs.blessing)) if sim.has_blessing() else "AUS DEM GEZEITENKESSEL",Color("b881e3"))
+			_catalog_action(blessing,"ZUM KESSEL",func():_open_modal("Kessel"))
+		"KAUFEN":
+			_section("DECKWERFT · GOLDDECKS")
+			_note("Jeder Kauf ergibt ein eigenes Deck-Exemplar. Montage und Upgrades findest du unter LAGER.")
+			var yard=_catalog_grid(3)
+			for key: String in CONTENT.DECK_KEYS:
+				var type: String=key
+				var config: Dictionary=CONTENT.DECKS[key]
+				var tile=_catalog_tile(yard,deck_icons[key],str(config.name).to_upper(),str(config.effect) % int(config.values[0]),"%d GOLD" % int(config.price),Color("ae8e59"))
+				var buy=_catalog_action(tile,"GOLDDECK KAUFEN",func():
+					sim.buy_deck(type);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.decks.size()>=CONTENT.DECK_INVENTORY_MAX or int(sim.player.gold)<int(config.price))
+				buy.name="DeckBuy_"+key
+			if not sim.docked:_note("Deckkauf und -umbau vorerst nur im Hafen möglich.",Color("e1b979"))
+		_:
+			_note("Wähle SCHIFF, LAGER, SPEZIAL oder KAUFEN.")
 
 func _open_kessel() -> void:
 	var stage=KESSEL_FX.new()
