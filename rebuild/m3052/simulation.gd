@@ -753,13 +753,18 @@ func _fire_player() -> void:
 	repairing = false
 	message = AMMO_LABELS[ammo_mode] if ammo_mode >= 2 else ("Breitseite mit Schwarzpulver!" if powdered else "Breitseite!")
 
+# The cannon turrets are tall sprites whose rendered masonry is above their
+# land-footprint origin. Targeting their base visually looks like a ricochet.
+func _projectile_target(victim: Dictionary) -> Vector2:
+	return Vector2(victim.pos)-Vector2(0,56) if str(victim.get("kind",""))=="tower" else Vector2(victim.pos)
+
 func _launch(source_id: int, target_id: int, weapon: String, damage: int, count: int,powdered: bool=false) -> void:
 	var source = actor(source_id)
 	var destination = actor(target_id)
 	if source.is_empty() or destination.is_empty(): return
 	# Flight metadata is presentation-only. Damage, speed, shot spread, range
 	# and 80 ms salvo staggering stay exactly as before M3100.
-	var visual_heading: Vector2=(destination.pos-source.pos).normalized()
+	var visual_heading: Vector2=(_projectile_target(destination)-source.pos).normalized()
 	if visual_heading.length_squared()<0.001:visual_heading=Vector2.RIGHT
 	# One render group per real salvo. All three original damage-bearing shots
 	# remain independent; the visual renderer draws ONE tightly packed pile.
@@ -769,7 +774,7 @@ func _launch(source_id: int, target_id: int, weapon: String, damage: int, count:
 		var start: Vector2 = source.pos + Vector2(0, (float(i) - float(count - 1) * 0.5) * 13)
 		shots.append({"id": next_id, "source": source_id, "target": target_id, "pos": start,
 			"start": start, "damage": damage, "powder":powdered, "weapon": weapon, "age": -float(i) * 0.08,
-			"distance": maxf(1, start.distance_to(destination.pos)), "traveled": 0.0,
+			"distance": maxf(1, start.distance_to(_projectile_target(destination))), "traveled": 0.0,
 			"visual_heading": visual_heading, "salvo_index": i,
 			"salvo_count": count, "salvo_group": group_id, "salvo_origin": source.pos})
 	_event("muzzle", source.pos, count, source_id)
@@ -787,7 +792,7 @@ func _step_shots(delta: float) -> void:
 		if victim.is_empty() or int(victim.hp) <= 0 or float(shot.age) > 5:
 			shots.remove_at(i)
 			continue
-		var gap: Vector2 = victim.pos - shot.pos
+		var gap: Vector2 = _projectile_target(victim) - shot.pos
 		var speed = 530.0 if shot.weapon == "harpoon" else (380.0 if shot.weapon == "mortar" else 470.0)
 		var amount = speed * delta
 		if gap.length() <= amount + 12:
@@ -844,8 +849,9 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 		repairing = false
 	else:
 		victim.last_hit = clock
-	_event("impact", victim.pos, dealt, victim.id)
+	_event("impact", _projectile_target(victim), dealt, victim.id)
 	if not events.is_empty():
+		events.back()["structure"]=str(victim.get("kind",""))=="tower"
 		events.back()["powder"]=bool(shot.get("powder",false))
 		events.back()["plates"]=plated
 		events.back()["weapon"]=str(shot.weapon)
