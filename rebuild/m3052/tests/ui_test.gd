@@ -348,7 +348,7 @@ func _run() -> void:
 		root.size=dimensions
 		await process_frame
 		game._layout()
-		for kind in ["Hafen","Logbuch","Seekarten","Kessel","Bonuskarten","Gilde","Kastelle","Decks","Schiff","Munition","Markt","Premium-Shop","Battle Pass"]:
+		for kind in ["Hafen","Logbuch","Seekarten","Kessel","Bonuskarten","Gilde","Kastelle","Decks","Schiff","Munition","Markt","Premium-Shop","Battle Pass","Freunde","Belohnungen"]:
 			game._open_modal(kind)
 			if kind in ["Hafen","Kessel","Gilde"]:await process_frame
 			check(game.modal.visible and game.modal_scroll.size.y>100,"new gameplay panel opens at %s: %s"%[dimensions,kind])
@@ -398,6 +398,13 @@ func _run() -> void:
 	game._switch_tab("Kastelle","KASTELLE")
 	game._switch_tab("Decks","SCHIFF")
 	game._switch_tab("Markt","AUSRÜSTUNG")
+	game.modal.hide()
+	game._open_modal("Freunde")
+	check(game.modal_body.find_child("InviteCopy",true,false)!=null,"sea captain menu includes copyable friend invitation")
+	check(game._invite_share_text().contains("github.com/Broosskyy/Abyssal-Dominion-Beta/releases"),"sea invitation links to actual public beta download")
+	game._open_modal("Belohnungen")
+	check(game.modal_body.find_child("DailyDay1",true,false)!=null and game.modal_body.find_child("DailyDay7",true,false)!=null,"sea rewards show full seven-day illustrated calendar")
+	check(game.modal_body.find_child("DailyClaim",true,false)!=null and game.modal_body.find_child("AfkClaim",true,false)!=null,"daily and AFK claim buttons are kept visible from main sea menu")
 	game.modal.hide()
 	# A small portrait phone needs one large product per row, with a
 	# swipeable category strip (no unreadable squashed four-tab ribbon).

@@ -1854,7 +1854,7 @@ func _clock_text(seconds: float) -> String:
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
 const MODAL_TABS := {"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
-const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
+const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Freunde":"Freunde & Einladungen","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
 	if modal.visible and modal_kind!=kind and remember:
@@ -1893,6 +1893,7 @@ func _open_modal(kind: String,remember: bool=true) -> void:
 		"Hilfe":_open_help()
 		"Profil":_open_profile()
 		"Belohnungen":_open_rewards()
+		"Freunde":_open_friends()
 		"Werft":_open_shipyard()
 		"Markt":_open_market()
 		"Premium-Shop":_open_premium_shop()
@@ -3963,20 +3964,69 @@ func _open_profile() -> void:
 	_note("Auf See: Piratenrang · gelbes Gildenkürzel · Spielername · Battle-Point-Abzeichen. NPC-Abschüsse vergeben keine Battle Points.")
 	_action("GILDE VERWALTEN",func():_open_modal("Gilde"))
 
+func _invite_share_text() -> String:
+	# A real downloadable link, not a fabricated unique referral code.
+	return "Komm mit mir auf See bei Abyssal Dominion! Beta spielen: https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases"
+
+func _open_friends() -> void:
+	_banner_card(painted.nav_guild,"FREUNDE & EINLADUNGEN","Teile die Beta mit anderen Piraten. Eine echte Freundesliste mit gemeinsamen Online-Spielern wird erst nach der Account- und Serveranbindung verfügbar.")
+	_section("FREUNDE ZUR BETA EINLADEN")
+	var invitation=_catalog_tile(_catalog_grid(1),painted.nav_charts,"KAPITÄNE ANHEUERN","Schicke deinen Freunden den Download-Link per Messenger, E-Mail oder Discord.","ÖFFENTLICHER BETA-LINK",Color("8ea29b"))
+	var copy=_catalog_action(invitation,"SPIELELINK KOPIEREN",func():
+		DisplayServer.clipboard_set(_invite_share_text())
+		sim.message="Spielelink in die Zwischenablage kopiert"
+		_open_modal("Freunde"))
+	copy.name="InviteCopy"
+	_note("Einladen funktioniert bereits über einen teilbaren Link. Es gibt noch keine automatisch registrierten Freundschaftsanfragen oder Einladungsprämien.")
+	_section("FREUNDESLISTE & CROSSPLAY")
+	var locked=_action("FREUNDE SUCHEN · ONLINE ERFORDERLICH",func():pass)
+	locked.disabled=true
+	_note("Freundschaftsanfragen, Einladungs-Codes mit Zuordnung, Online-Status und Referral-Belohnungen müssen vom Server geprüft werden. Keine fingierten Online-Freunde oder Auszahlungen.",Color("a8c4c8"))
+
 func _open_rewards() -> void:
-	_banner_card(painted.reward_chest,"DEINE BELOHNUNGEN","Tägliche Versorgung und gesammelte AFK-Beute · lokale Beta")
-	var ready: bool=sim.rewards.daily_available()
-	_action("TAGESBONUS ABHOLEN" if ready else "TAGESBONUS ABGEHOLT",func():sim.rewards.claim_daily(sim);_save_progress();_open_modal("Belohnungen"),"primary").disabled=not ready
-	_note("7-Tage-Serie: %d/7 · nächster Bonus: Gold, Essenz und eine Notreparatur. Tageswechsel 00:00 UTC." % sim.rewards.streak)
+	_banner_card(painted.reward_chest,"TAGESBONUS · 7-TAGE-SERIE","Tägliche Beute wird einmal pro UTC-Tag vergeben. Jede siebte aufeinanderfolgende Abholung enthält die zusätzliche Essenz.")
+	var available: bool=sim.rewards.daily_available()
+	var today: int=floori(float(Time.get_unix_time_from_system())/86400.0)
+	var step: int=(sim.rewards.streak%7)+1 if sim.rewards.last_claim_day==today-1 else 1
+	if not available:step=sim.rewards.streak
+	_section("TAGESKALENDER · %d/7" % step)
+	var board=_grid(4 if modal_scroll.size.x>=680.0 else 2)
+	for i in 7:
+		var day: int=i+1
+		var card=_card(Color("e4ba69") if day==step else Color("536970"),board)
+		card.name="DailyDay"+str(day)
+		var tile=VBoxContainer.new()
+		tile.add_theme_constant_override("separation",5)
+		card.add_child(tile)
+		_text(tile,"TAG %d" % day,14,Color("f5dfac")).horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		var picture=CenterContainer.new()
+		picture.custom_minimum_size.y=76
+		tile.add_child(picture)
+		_picture(picture,painted.reward_chest,64,false)
+		_text(tile,"%d GOLD" % (100+day*50),12,Color("cde2d9")).horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		_text(tile,"+%d ESSENZ" % (2 if day==7 else 1),11,Color("b5d4c9")).horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		_text(tile,"BEREIT" if available and day==step else ("HEUTE ABGEHOLT" if day==step else "SERIE"),11,Color("f3cd82") if day==step else Color("889e9e")).horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	var ready_button=_primary("TAGESBONUS ABHOLEN · TAG %d" % step if available else "HEUTE BEREITS ABGEHOLT",func():
+		if sim.rewards.claim_daily(sim):_save_progress()
+		_open_modal("Belohnungen"))
+	ready_button.name="DailyClaim"
+	ready_button.disabled=not available
+	_section("AFK-BEUTE · BIS ZU 8 STUNDEN")
 	var gold: int=sim.rewards.afk_gold()
-	_action("AFK-BEUTE · %d GOLD ABHOLEN" % gold,func():sim.rewards.claim_afk(sim);_save_progress();_open_modal("Belohnungen"),"primary").disabled=gold<=0
-	_note("3 Gold pro voller Minute · 10 Vollkugeln je 5 Minuten · maximal 8 Stunden. Du erhältst offline keine Kampf- oder PvP-Punkte.")
+	_row(painted.gold_coins,"Bisher angesammelt: %s Gold\nDazu Vollkugeln nach Standzeit" % _thousands(gold),68,Color("b59156"))
+	var afk=_primary("AFK-BEUTE ABHOLEN · %s GOLD" % _thousands(gold),func():
+		if sim.rewards.claim_afk(sim):_save_progress()
+		_open_modal("Belohnungen"))
+	afk.name="AfkClaim"
+	afk.disabled=gold<=0
+	_note("Tageswechsel um 00:00 UTC. Diese lokalen Beta-Belohnungen werden noch nicht als Server-Währung geführt.")
 
 # --- Organized navigation, seasonal content and configurable combat shortcuts ---
 func _open_info() -> void:
+	_banner_card(painted.nav_menu,"KAPITÄNSMENÜ · DEIN SPIEL","Alle Funktionen in übersichtlichen Bereichen: tägliche Belohnungen, Freunde, Welten, Ausrüstung, Handel und Einstellungen.")
 	_section("KAPITÄN & FORTSCHRITT")
 	var captain=_grid(2)
-	for entry in [["Profil","SPIELERPROFIL"],["Belohnungen","TAGESBONUS & AFK"],["Logbuch","LOGBUCH"],["Rangliste","RANGLISTE"]]:
+	for entry in [["Profil","SPIELERPROFIL"],["Belohnungen","TAGESBONUS & AFK"],["Freunde","FREUNDE EINLADEN"],["Logbuch","LOGBUCH"],["Rangliste","RANGLISTE"]]:
 		var destination: String=entry[0]
 		_action(entry[1],func():_open_modal(destination),"normal",captain)
 	_section("WELT & VERANSTALTUNGEN")
