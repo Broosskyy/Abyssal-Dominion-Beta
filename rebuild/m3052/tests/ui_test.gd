@@ -363,6 +363,21 @@ func _run() -> void:
 				check(game.modal.get_global_rect().size.x<dimensions.x*.85,"combat ammunition retains compact popup instead of full page")
 			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
 	game.modal.hide()
+	# Real landscape reference video is 2340×1080. Test that device size
+	# and a portrait phone keep usable margins while preserving the Werft.
+	for device in [Vector2i(2340,1080),Vector2i(1080,2340)]:
+		root.size=device
+		await process_frame
+		game._layout()
+		game._open_modal("Werft")
+		await process_frame
+		var bounds: Rect2=game.modal.get_global_rect()
+		var fractions: Vector2=game._menu_layout_fractions(Vector2(device),"balanced")
+		check(bounds.size.x>=device.x*(fractions.x-.03) and bounds.size.x<=device.x*(fractions.x+.03),"adaptive Werft width matches landscape/portrait device "+str(device))
+		check(bounds.size.y>=device.y*(fractions.y-.03) and bounds.size.y<=device.y*(fractions.y+.03),"adaptive Werft height matches landscape/portrait device "+str(device))
+		check(bounds.position.x>12 and bounds.position.y>12 and bounds.end.x<device.x-12 and bounds.end.y<device.y-12,"shipyard leaves visible sea on all four sides at "+str(device))
+		check(game.modal_scroll.size.y>150 and game.modal_body.find_child("ShipDesignPreview11",true,false)!=null,"all Elite preview content remains scrollable at "+str(device))
+	game.modal.hide()
 	# User can choose three responsive non-fullscreen modes.
 	root.size=Vector2i(1280,720)
 	await process_frame
