@@ -1924,10 +1924,12 @@ func _build_tabs(kind: String) -> void:
 	if not current in names:current=str(names[0])
 	modal_tab[kind]=current
 	for name in names:
-		var tab=str(name)
-		var button=_button(modal_tabs,tab,func():_switch_tab(kind,tab),"tab_on" if tab==current else "tab")
+		var tab: String=str(name)
+		var caption: String="KANONEN" if kind=="Markt" and tab=="AUSRÜSTUNG" and get_viewport_rect().size.x<920.0 else tab
+		var button=_button(modal_tabs,caption,func():_switch_tab(kind,tab),"tab_on" if tab==current else "tab")
 		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		button.add_theme_font_size_override("font_size",12 if names.size()>4 else 14)
+		button.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		button.add_theme_font_size_override("font_size",11 if get_viewport_rect().size.x<720 and names.size()>=4 else (12 if names.size()>4 else 14))
 
 func _switch_tab(kind: String,tab: String) -> void:
 	modal_tab[kind]=tab
@@ -2049,10 +2051,13 @@ func _row_button(parent: Node,text: String,callback: Callable,disabled: bool=fal
 func _catalog_grid(max_columns: int=3,parent: Node=null) -> GridContainer:
 	var width: float=modal_scroll.size.x
 	var columns: int=1 if width<420.0 else (3 if width>=860.0 else 2)
-	return _grid(mini(max_columns,columns),parent)
+	var gallery=_grid(mini(max_columns,columns),parent)
+	gallery.set_meta("catalog_grid",true)
+	return gallery
 
 func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String,footer: String,accent: Color=Color("ab8852")) -> VBoxContainer:
 	var panel: PanelContainer=_card(accent,parent)
+	panel.set_meta("catalog_tile",true)
 	panel.custom_minimum_size=Vector2(0,228)
 	var content=VBoxContainer.new()
 	content.add_theme_constant_override("separation",7)
