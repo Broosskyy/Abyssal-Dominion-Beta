@@ -36,7 +36,7 @@ func _run() -> void:
 	await process_frame
 	check(hub.page=="home" and hub.body.find_child("SailButton",true,false)!=null,"captain opens functional home with prominent Play button")
 	check(hub.body.find_child("FeaturedNews",true,false)!=null and hub.body.find_child("FeaturedArtwork",true,false)!=null,"home features illustrated carousel with existing game artwork")
-	check(hub.body.find_children("HomeActionCard","PanelContainer",true,false).size()==12,"home offers six captain actions plus six direct equipment/progression shortcuts")
+	check(hub.body.find_children("HomeActionCard*","PanelContainer",true,false).size()==12,"home offers six captain actions plus six direct equipment/progression shortcuts")
 	check(hub.body.find_child("HubTab_friends",true,false)!=null and hub.body.find_child("HubTab_logbook",true,false)!=null,"home provides navigation to friends and logbook")
 	var before: String=hub.featured_title.text
 	hub._featured_shift(1)
@@ -47,7 +47,7 @@ func _run() -> void:
 	await process_frame
 	hub._layout()
 	var narrow_bounds: Rect2=hub.panel.get_global_rect()
-	check(narrow_bounds.position.x>=0 and narrow_bounds.end.x<=720 and narrow_bounds.end.y<=1280,"home dashboard fits phone portrait margins")
+	check(narrow_bounds.position.x>=0 and narrow_bounds.end.x<=720 and narrow_bounds.end.y<=1280,"home dashboard fits phone portrait margins: "+str(narrow_bounds))
 	hub._show("rewards")
 	await process_frame
 	check(hub.body.find_child("DailyDay1",true,false)!=null and hub.body.find_child("DailyDay7",true,false)!=null,"daily calendar has all seven real bonus day tiles")
