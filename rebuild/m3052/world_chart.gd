@@ -135,9 +135,8 @@ func _overview_node(index: int,r: float,now: float) -> void:
 	draw_circle(p,r,fill)
 	_ink_text(p+Vector2(0,4),str(info.code),maxi(12,roundi(r*.68)),INK)
 	if guild:
-		var holding: Dictionary=sim.guild_holdings.get(str(index),{})
-		var owned: bool=not sim.guild.is_empty() and float(holding.get("remaining",0))>0.0
-		var tag: String=str(sim.guild.get("tag","")) if owned else CONTENT.FORTRESS_TAG
+		var owned: bool=sim.guild_holding_remaining(index)>0.0
+		var tag: String=sim.guild_owner_tag(index)
 		_ink_text(p+Vector2(0,-r-8),"GILDE [%s]" % tag,10,Color("236341") if owned else Color("842c1f"))
 	if locked:SEA_MARKS.padlock(self,p+Vector2(r*.8,-r*.65),r*.45,Color("773b27"))
 	elif current:
@@ -218,9 +217,8 @@ func _node(index: int,r: float,now: float) -> void:
 			var x=center.x+(float(i)-1.0)*radius*.42
 			draw_rect(Rect2(x-radius*.14,center.y-radius*.55,radius*.28,radius*.7),Color(INK,.9))
 			draw_rect(Rect2(x-radius*.18,center.y-radius*.65,radius*.36,radius*.14),Color(INK,.9))
-		var record: Dictionary=sim.guild_holdings.get(str(CONTENT.FORTRESS_MAP),{})
-		var held: bool=not sim.guild.is_empty() and float(record.get("remaining",0))>0
-		var tag="[%s]" % (str(sim.guild.get("tag","")) if held else CONTENT.FORTRESS_TAG)
+		var held: bool=sim.guild_holding_remaining(CONTENT.FORTRESS_MAP)>0.0
+		var tag="[%s]" % sim.guild_owner_tag(CONTENT.FORTRESS_MAP)
 		_ink_text(center+Vector2(0,radius*.45),tag,maxi(9,roundi(r*.32)),Color("2f6b3a") if held else Color("8a1a0c"))
 	else:
 		var code=str(CONTENT.MAPS[index].code)

@@ -808,8 +808,30 @@ func _draw_ship_selection_ring(actor: Dictionary,point: Vector2) -> void:
 			var direction := Vector2(cos(a)*radii.x,sin(a)*radii.y)
 			draw_line(center+direction*1.08,center+direction*1.19,Color(tint,0.60+0.14*pulse),_selection_ring_stroke(1.8),true)
 
+# Destroyed emplacements leave visible rubble rather than vanishing into an
+# intact backdrop. No extra art or collision is added to the sea entrance.
+func _draw_ruined_tower(actor: Dictionary) -> void:
+	var point: Vector2=Vector2(actor.pos)
+	var seed: float=float(int(actor.id))
+	_ellipse(point+Vector2(0,3),Vector2(32,13),Color("100e0d"))
+	for piece in 9:
+		var angle: float=float(piece)*TAU/9.0+seed*.031
+		var distance: float=10.0+float(piece%4)*4.8
+		var origin: Vector2=point+Vector2(cos(angle)*distance,sin(angle)*distance*.44)
+		var height: float=5.0+float((piece*3)%5)*1.8
+		var chips:=PackedVector2Array([origin+Vector2(-5,2),origin+Vector2(-2,-height),origin+Vector2(3,-height*.68),origin+Vector2(6,2)])
+		draw_colored_polygon(chips,Color("77736a") if piece%3==0 else Color("514c44"))
+		draw_line(origin+Vector2(-2,-height),origin+Vector2(3,-height*.68),Color("a89d89",.65),1.0,true)
+	if ship_animations_enabled and float(actor.get("respawn",0.0))>0.0:
+		for plume in 3:
+			var life: float=fmod(elapsed*.45+float(plume)*.33+seed*.015,1.0)
+			var drift: Vector2=Vector2(sin(elapsed+float(plume)*2.3)*7.0-life*4.0,-15.0-life*35.0)
+			draw_circle(point+drift,3.0+life*7.0,Color("6d655e",.14*(1.0-life)))
+
 func _draw_actor(actor: Dictionary) -> void:
-	if float(actor.hp)<=0:return
+	if float(actor.hp)<=0:
+		if str(actor.get("kind",""))=="tower":_draw_ruined_tower(actor)
+		return
 	if actor.get("kind","")=="tower":
 		_draw_tower(actor)
 		return
@@ -2734,25 +2756,61 @@ func _open_guild() -> void:
 	else:
 		_row(painted.nav_guild,"[%s] %s\nAnführer: du (lokal)" % [sim.guild.tag,sim.guild.name],48,Color("ffd27a"))
 	_section("GILDENINSEL · KORSARENFESTUNG")
-	var towers=_grid(2)
-	for config: Dictionary in CONTENT.TOWERS:
-		var card=_card(Color(0,0,0,0),towers)
-		var column=VBoxContainer.new();column.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_child(column)
-		_picture(column,TOWER_TEXTURES[str(config.kind)],56,false)
-		var label=_text(column,str(config.name),12,Color("fff0c8"));label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;label.clip_text=true
-	var state=""
-	if sim.tower_friendly():state="[%s] hält die Insel noch %s · +10 %% Beutegold · die Türme feuern nicht auf dich" % [sim.guild.tag,_clock_text(sim.fortress_hold)]
-	elif CONTENT.has_guild_island(sim.map_id):state="Gehalten von [%s] · %d von %d Türmen stehen" % [CONTENT.FORTRESS_TAG,sim.towers_alive(),CONTENT.TOWERS.size()]
-	else:state="Schattengewässer %s · ab Lv. %d · gehalten von [%s]" % [CONTENT.MAPS[CONTENT.FORTRESS_MAP].code,CONTENT.MAPS[CONTENT.FORTRESS_MAP].level,CONTENT.FORTRESS_TAG]
+	var status: Array[Dictionary]=sim.guild_tower_status()
+	var state: String=""
+	if sim.tower_friendly():
+		state="[%s] verteidigt die Insel · noch %s · +10 %% Beutegold" % [sim.tower_tag(),_clock_text(sim.fortress_hold)]
+	elif CONTENT.has_guild_island(sim.map_id):
+		state="Angriff auf [%s] · %d / %d Türme stehen" % [sim.guild_owner_tag(sim.map_id),sim.towers_alive(),CONTENT.TOWERS.size()]
+	else:
+		state="Schattengewässer %s · ab Lv. %d · Festung [%s]" % [CONTENT.MAPS[CONTENT.FORTRESS_MAP].code,CONTENT.MAPS[CONTENT.FORTRESS_MAP].level,sim.guild_owner_tag(CONTENT.FORTRESS_MAP)]
 	_info(state)
+	# A real-time siege board: each defense is separately destructible and
+	# shows its own HP, shield, level and rebuild countdown. No fake towers
+	# remain in the island backdrop after they are destroyed.
+	var towers=_grid(2)
+	for i in CONTENT.TOWERS.size():
+		var spec: Dictionary=CONTENT.TOWERS[i]
+		var report: Dictionary=status[i] if i<status.size() else {}
+		var alive: bool=bool(report.get("alive",false))
+		var accent: Color=Color("477c5e") if alive and sim.tower_friendly() else (Color("aa7049") if alive else Color("544c4a"))
+		var card=_card(accent,towers)
+		var column=VBoxContainer.new();column.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_child(column)
+		column.add_theme_constant_override("separation",4)
+		_picture(column,TOWER_TEXTURES[str(spec.kind)],48,false)
+		var label=_text(column,"%02d · %s" % [i+1,str(spec.name)],12,Color("fff0c8"))
+		label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		if not report.is_empty():
+			var line: String="STUFE %d · HP %d/%d · SCHILD %d" % [int(report.level),int(report.hp),int(report.max_hp),int(report.shield)] if alive else "ZERSTÖRT · WIEDERAUFBAU IN %d s" % ceili(float(report.respawn))
+			var health=_text(column,line,11,Color("a6d7b5") if alive and sim.tower_friendly() else (Color("f3bd7b") if alive else Color("df9184")))
+			health.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+			health.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+			var gauge=_bar(column)
+			gauge.max_value=float(report.max_hp)
+			gauge.value=float(report.hp)
+			gauge.custom_minimum_size.y=8
+		else:
+			var preview=_text(column,"STATUS AUF DER SEEKARTE",11,Color("84999c"))
+			preview.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	var defended: Array[String]=[]
+	for sea_id: int in CONTENT.SEA_MAP_IDS:
+		if sim.guild_holding_remaining(sea_id)>0:
+			defended.append("%s · %s" % [CONTENT.MAPS[sea_id].code,_clock_text(sim.guild_holding_remaining(sea_id))])
+	if not defended.is_empty():_note("Eigene Gildeninseln: "+", ".join(defended),Color("a6d7b5"))
 	_note("Kanonenturm: Doppelschuss · Mörserturm: weite Bögen · Kettenturm: bremst · Wächterturm: Schildaufladung. Zerstöre alle zwölf Türme, um die Insel einzunehmen. Der befahrbare Innenhafen liegt hinter der südlichen Einfahrt.")
 	_note("Eroberungen %d · zerstörte Türme %d" % [sim.fortress_conquests,sim.tower_kills],Color("ffd27a"))
 	if CONTENT.has_guild_island(sim.map_id):
-		var course=_primary("KURS ZUR FESTUNG",func():
-			var island: Dictionary=sim.fortress_island()
-			sim.course(Vector2(island.bounds.get_center().x,island.bounds.end.y+140))
-			modal.hide();_refresh_ui())
-		course.disabled=sim.docked
+		var passage: Dictionary=sim.guild_harbor_waypoints()
+		var courses=_grid(2)
+		var entrance=_primary("KURS ZUR EINFAHRT",func():
+			if sim.course(Vector2(passage.mouth)):modal.hide()
+			_refresh_ui(),courses)
+		entrance.disabled=sim.docked
+		var harbor_course=_primary("KURS IN DEN INNENHAFEN",func():
+			if sim.course(sim.harbor):modal.hide()
+			_refresh_ui(),courses)
+		harbor_course.disabled=sim.docked
 	else:
 		var travel=_primary("KURS SCHATTENGEWÄSSER",func():_navigate_region(CONTENT.FORTRESS_MAP))
 		travel.disabled=sim.docked or sim.in_bonus_map() or sim.level<int(CONTENT.MAPS[CONTENT.FORTRESS_MAP].level)
@@ -2794,9 +2852,7 @@ func _open_charts() -> void:
 func _chart_details(index: int) -> void:
 	var staff=sim.staff
 	if index==WORLD_CHART.FORTRESS_NODE:
-		var holding: Dictionary=sim.guild_holdings.get(str(CONTENT.FORTRESS_MAP),{})
-		var held: bool=not sim.guild.is_empty() and float(holding.get("remaining",0))>0.0
-		var owner: String=str(sim.guild.get("tag","")) if held else CONTENT.FORTRESS_TAG
+		var owner: String=sim.guild_owner_tag(CONTENT.FORTRESS_MAP)
 		var column=_row(painted.tower_guardian,"KORSARENFESTUNG · IN %s %s\nGehalten von [%s] · %d Türme · ab Lv. %d" % [CONTENT.MAPS[CONTENT.FORTRESS_MAP].code,CONTENT.MAPS[CONTENT.FORTRESS_MAP].name,owner,CONTENT.TOWERS.size(),CONTENT.MAPS[CONTENT.FORTRESS_MAP].level],64,Color("ff6a4d"))
 		var line=HBoxContainer.new();line.add_theme_constant_override("separation",6);column.add_child(line)
 		_row_button(line,"GILDE & FESTUNG",func():_open_modal("Gilde"))
@@ -2818,9 +2874,7 @@ func _chart_details(index: int) -> void:
 		lines.append("Hafen: ja · Portale: "+", ".join(exits))
 		lines.append("16 Patrouillen, davon Elite-Schiffe · Seeungeheuer Tiamat · Gegnerstärke ×%s" % str(region.enemy_scale).replace(".",","))
 		if CONTENT.has_guild_island(index):
-			var island_holding: Dictionary=sim.guild_holdings.get(str(index),{})
-			var island_owned: bool=not sim.guild.is_empty() and float(island_holding.get("remaining",0))>0.0
-			lines.append("Gildeninsel mit 12 Türmen · Eigentümer [%s]" % (str(sim.guild.get("tag","")) if island_owned else CONTENT.FORTRESS_TAG))
+			lines.append("Gildeninsel mit 12 Türmen · Eigentümer [%s]" % sim.guild_owner_tag(index))
 	var column=_row(extra_icons.world_chart,"\n".join(lines),64,Color("a02818") if hostile else Color("2f6b3a"))
 	var line=HBoxContainer.new();line.add_theme_constant_override("separation",6);column.add_child(line)
 	if bonus:
