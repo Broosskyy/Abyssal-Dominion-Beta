@@ -119,7 +119,7 @@ func _stat_chip(parent: Node,title: String,value: String) -> void:
 	number.add_theme_color_override("font_color",Color("f8d995"))
 	column.add_child(number)
 
-func _lobby_card(parent: Node,icon: Texture2D,title: String,description: String,action: String,callback: Callable) -> void:
+func _lobby_card(parent: Node,icon: Texture2D,title: String,description: String,action: String,callback: Callable,enabled: bool=true) -> void:
 	var shell=PanelContainer.new()
 	shell.add_theme_stylebox_override("panel",SKIN.card())
 	shell.size_flags_horizontal=Control.SIZE_EXPAND_FILL
@@ -161,6 +161,7 @@ func _lobby_card(parent: Node,icon: Texture2D,title: String,description: String,
 	button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	SKIN.dress(button,"normal",15)
 	button.pressed.connect(callback)
+	button.disabled=not enabled
 	content.add_child(button)
 
 func _home_dashboard() -> void:
@@ -215,7 +216,7 @@ func _home_dashboard() -> void:
 	rewards.columns=2 if get_viewport_rect().size.x>=600 else 1
 	rewards.add_theme_constant_override("h_separation",8)
 	body.add_child(rewards)
-	_lobby_card(rewards,REWARD_ART,next_reward,"7-Tage-Serie: %d/7" % sim.rewards.streak,"BELONUNGEN ANSEHEN",func():_show("rewards"))
+	_lobby_card(rewards,REWARD_ART,next_reward,"7-Tage-Serie: %d/7" % sim.rewards.streak,"BELOHNUNGEN ANSEHEN",func():_show("rewards"))
 	_lobby_card(rewards,REWARD_ART,"AFK-BEUTE","%d Gold zum Abholen" % sim.rewards.afk_gold(),"AFK-BEUTE ANSEHEN",func():_show("rewards"))
 	_section("DEIN KAPITÄNSMENÜ")
 	var shortcuts=GridContainer.new()
@@ -276,7 +277,7 @@ func _rewards_dashboard() -> void:
 		var completed: bool=index<=sim.rewards.streak and last_claim==today
 		var title: String="TAG %d%s" % [index," · ✓" if completed else (" · NÄCHSTER" if index==next_day else "")]
 		var essence: int=2 if index==7 else 1
-		_lobby_card(cards,REWARD_ART,title,"%d Gold · %d Essenz · 1 Reparatur" % [100+index*50,essence],"ABGEHOLT" if completed else "VORSCHAU",func():pass)
+		_lobby_card(cards,REWARD_ART,title,"%d Gold · %d Essenz · 1 Reparatur" % [100+index*50,essence],"ABGEHOLT" if completed else "VORSCHAU",func():pass,false)
 	# The only payout actions remain the existing reward ledger methods.
 	var reward=_button("TAGESBONUS ABHOLEN" if sim.rewards.daily_available() else "HEUTE BEREITS ABGEHOLT",func():
 		if sim.rewards.claim_daily(sim):_save()
@@ -331,7 +332,7 @@ func _news_dashboard() -> void:
 	updates.columns=1
 	body.add_child(updates)
 	_lobby_card(updates,SHIP_ART,"WERFT & SCHIFFSAUSRÜSTUNG","Kanonenmontage, Decks und Schiffdesigns im eigenen Marineblau-Gold-Look.","WERFT ÖFFNEN",func():_sail_to("Werft"))
-	_lobby_card(updates,REWARD_ART,"TAGESBELOHNUNGEN","Sammle deine täglichen Vorräte und bereits verdiente AFK-Beute.","BELONUNGEN ÖFFNEN",func():_show("rewards"))
+	_lobby_card(updates,REWARD_ART,"TAGESBELOHNUNGEN","Sammle deine täglichen Vorräte und bereits verdiente AFK-Beute.","BELOHNUNGEN ÖFFNEN",func():_show("rewards"))
 	_lobby_card(updates,GUILD_ART,"CROSSPLAY · IN ARBEIT","Login ist vorbereitet; verbindliche Freundeslisten und echte MMO-Welten brauchen einen erreichbaren Server.","FREUNDE",func():_show("friends"))
 	_label("Dies sind Beta-Projektinformationen, keine live vom Server gelieferten Neuigkeiten.")
 	_back()
