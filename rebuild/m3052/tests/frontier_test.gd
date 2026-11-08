@@ -90,7 +90,7 @@ func _run() -> void:
 		root.size=dimensions;await process_frame
 		game._open_modal("Verbrauch");await process_frame
 		check(game.supply_selector.visible and game.supply_buttons.values().all(func(button):return not button.visible),"one separate consumable selector at "+str(dimensions))
-		check(game.modal_body.find_children("Use_*","Button",true,false).size()==8,"all eight functional items in picker")
+		check(game.modal_body.find_children("Use_*","Button",true,false).size()==11,"all eleven functional items in picker")
 		check(Rect2(Vector2.ZERO,Vector2(dimensions)).encloses(game.modal.get_global_rect()),"consumables fit viewport "+str(dimensions))
 		game._open_modal("Seekarten");await process_frame
 		check(game.modal_body.find_child("WorldChart",true,false)!=null,"forty-map chart opens")

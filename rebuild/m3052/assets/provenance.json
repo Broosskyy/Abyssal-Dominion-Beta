@@ -368,6 +368,60 @@
       "source_serialized_file": "sharedassets0.assets",
       "source_name": "RoyaleTowerIcon3",
       "source_path_id": 682
+    },
+    {
+      "path": "assets/expansion/columbus.webp",
+      "sha256": "392bbcc8e20d54ae202d4e2005336d078f5d311f3fa0f69b5b5bf3c50e201565",
+      "source": "Original generated game asset / actual Godot GLB render; assets/expansion/generation.json",
+      "license": "Project-generated asset"
+    },
+    {
+      "path": "assets/expansion/crab.webp",
+      "sha256": "401dde748b84654833c134f2a371f415dd6471e7698a0d0380ae6bf6b1b6779a",
+      "source": "Original generated game asset / actual Godot GLB render; assets/expansion/generation.json",
+      "license": "Project-generated asset"
+    },
+    {
+      "path": "assets/expansion/glitter.webp",
+      "sha256": "999d9fee38e18c61d56518e56bd3e2486bd29e4d610e0b956ff5ef537b3c4083",
+      "source": "Original generated game asset / actual Godot GLB render; assets/expansion/generation.json",
+      "license": "Project-generated asset"
+    },
+    {
+      "path": "assets/expansion/halloween.webp",
+      "sha256": "1ac928495a2496fea439da77aa5009181d5b99bb0f7654de3c782333db0cf859",
+      "source": "Original generated game asset / actual Godot GLB render; assets/expansion/generation.json",
+      "license": "Project-generated asset"
+    },
+    {
+      "path": "assets/expansion/kraken.webp",
+      "sha256": "4efa2314f30d7b2f73d43c10e1e9bea3c7c127024f3e488d8916c65fa9d922d4",
+      "source": "Original generated game asset / actual Godot GLB render; assets/expansion/generation.json",
+      "license": "Project-generated asset"
+    },
+    {
+      "path": "assets/expansion/preview_columbus.webp",
+      "sha256": "2d7259a00517cb867db57b7a977327bfd80b2d4488853978ffe9871f452f79f6",
+      "source": "Original generated game asset / actual Godot GLB render; assets/expansion/generation.json",
+      "license": "Project-generated asset"
+    },
+    {
+      "path": "assets/expansion/preview_halloween.webp",
+      "sha256": "3a192623c73219f9d6fc551b255f9abe40065d88462a59fbc1b77d014b86b5f2",
+      "source": "Original generated game asset / actual Godot GLB render; assets/expansion/generation.json",
+      "license": "Project-generated asset"
+    },
+    {
+      "path": "assets/expansion/pumpkin.webp",
+      "sha256": "87c0f6ebf029b33513b86497406e5b09c430e0136176e03651c428d20b26ca6e",
+      "source": "Original generated game asset / actual Godot GLB render; assets/expansion/generation.json",
+      "license": "Project-generated asset"
+    },
+    {
+      "path": "assets/expansion/serpent.webp",
+      "sha256": "89752c299079e76faf73e8a741d54df42524f8ef95a7daf5dea7131f75adaf3c",
+      "source": "Original generated game asset / actual Godot GLB render; assets/expansion/generation.json",
+      "license": "Project-generated asset"
     }
   ],
   "vector_ui": [
@@ -766,6 +820,16 @@
       "path": "assets/ui/abyssal/supply_charm.svg",
       "sha256": "d65917271292324e4ef086f61458a74fbb5400f764af4223d6008527a4c5bdc9",
       "source": "Original native vector icon 2026-11-08"
+    },
+    {
+      "path": "assets/ui/abyssal/supply_skyfire.svg",
+      "sha256": "af255cbaa96fac4d856008bccc669a19945527c089ed90e2f66ab4c80d0122b2",
+      "source": "Original project SVG icon"
+    },
+    {
+      "path": "assets/ui/abyssal/supply_healing.svg",
+      "sha256": "09d72bc0ae492c502e5273e84c64a3da1f2767b28f0e147c0ff5ca3fcb0f4b16",
+      "source": "Original project SVG icon"
     }
   ]
 }

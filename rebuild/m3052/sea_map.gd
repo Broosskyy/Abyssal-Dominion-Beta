@@ -136,6 +136,14 @@ var quest_claim: Button
 var modal: ORNATE
 var modal_title: Label
 var modal_close: Button
+var modal_back: Button
+var menu_history: Array[String]=[]
+var quick_bar: Control
+var quick_page := 0
+var quick_edit_slot := 0
+var quick_pages: Array=preload("res://sea_expansion.gd").QUICK_DEFAULT.duplicate(true)
+var feedback_overlay: Control
+var expansion_art: Dictionary={}
 var modal_scroll: TOUCH_SCROLL
 var modal_body: VBoxContainer
 var modal_tabs: HBoxContainer
@@ -300,6 +308,7 @@ func _sharp_zoom() -> float:
 	return desired_zoom * clampf(get_viewport_rect().size.y / 720.0, 1.0, 1.7)
 
 func _load_assets() -> void:
+	for key in ["kraken","serpent","crab","glitter","pumpkin"]:expansion_art[key]=load("res://assets/expansion/"+key+".webp")
 	for name in ["anchor","ship","book","compass","chest","gear","plus","minus","focus","arrow","target_cycle"]:hud_icons[name]=load("res://assets/ui/icons/"+name+".svg")
 	for key in ["cannon","armor","hunter","navigation","logistics","tide","storm","salvage","blessing"]:
 		deck_icons[key]=load("res://assets/ui/abyssal/"+key+".svg")
@@ -312,6 +321,9 @@ func _load_assets() -> void:
 	for index in ELITE_V2_NAMES.size():
 		skins.append({"name":"Elite-Schiff %02d · %s" % [index+1,ELITE_V2_NAMES[index]],"mesh_key":"black_crown_corsair_elite_test","texture_level":index+1,"views":0})
 		skin_previews.append(load("res://assets/elite_v2/previews/elite_%02d.png" % (index+1)))
+	for event in ["Halloween · Nachtkrone","Columbus · Entdeckerkrone"]:
+		skins.append({"name":event,"mesh_key":"black_crown_corsair_elite_test","texture_level":skins.size()-1,"views":0})
+		skin_previews.append(load("res://assets/expansion/preview_"+("halloween" if skins.size()==13 else "columbus")+".webp"))
 	for name in ["tropical","rock","snow","snow2"]:
 		island_textures[name] = load("res://assets/reference/islands/"+name+".png")
 	for name in ["cannonball","harpoon","chain","repair_chest","portal"]:
@@ -433,7 +445,7 @@ func _draw_glb_waterline(actor: Dictionary,point: Vector2,heading: Vector2,lengt
 	if heading.length_squared()<0.5:return
 	var moving: float=_wake_intensity_for(actor) if wake_effects_enabled else 0.0
 	var alpha: float=0.17+moving*0.22
-	var half_width: float=length*(.175 if int(actor.get("id",-1))==0 and int(actor.get("skin",0))>=1 and int(actor.get("skin",0))<=11 else .137)
+	var half_width: float=length*(.175 if int(actor.get("id",-1))==0 and int(actor.get("skin",0))>=1 and int(actor.get("skin",0))<=13 else .137)
 	draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
 	for side in [-1.0,1.0]:
 		var side_sign: float=side
@@ -562,10 +574,16 @@ func _draw() -> void:
 		if not view.has_point(drop.pos): continue
 		var p: Vector2 = drop.pos+Vector2(0,sin(elapsed*2+drop.id)*3)
 		_ellipse(p,Vector2(31,13),Color(0.95,0.7,0.2,0.1))
-		var tex: Texture2D = extra_icons["loot_%d" % int(drop.get("art",0))]
-		var dims = tex.get_size()*49.0/maxf(tex.get_width(),tex.get_height())
+		var tex: Texture2D = expansion_art.glitter
+		var dims = tex.get_size()*66.0/maxf(tex.get_width(),tex.get_height())
 		draw_texture_rect(tex,Rect2(p-dims*0.5,dims),false)
 		_label(p+Vector2(0,31),"BEUTE",10,GOLD)
+	for pickup: Dictionary in sim.event_pickups:
+		if float(pickup.respawn)>0 or not view.has_point(pickup.pos):continue
+		var tex: Texture2D=expansion_art.pumpkin if pickup.event=="halloween" else expansion_art.glitter
+		var dims: Vector2=tex.get_size()*75.0/maxf(tex.get_width(),tex.get_height())
+		draw_texture_rect(tex,Rect2(pickup.pos-dims*.5+Vector2(0,sin(elapsed*1.6+pickup.id)*3),dims),false)
+		_ellipse_line(pickup.pos,Vector2(29,12),Color("f9ad55",.55),1.4)
 	var fleet: Array[Dictionary] = []
 	fleet.append(sim.player)
 	for npc in sim.npcs:
@@ -599,17 +617,17 @@ func _draw() -> void:
 			if bool(vfx_flags.enabled) and bool(vfx_flags.impact):
 				SPRITE_FX.draw_impact(self,event,age,vfx_intensity,bool(vfx_flags.particles),bool(vfx_flags.water),bool(vfx_flags.flashes))
 		elif event.type=="muzzle":
+			if bool(event.get("powder",false)):
+				_ellipse_line(p-Vector2(0,20),Vector2(22+age*32,10+age*15),Color("ffb155",maxf(0,.8-age)),3.0)
 			if bool(vfx_flags.enabled) and bool(vfx_flags.muzzle):
 				SPRITE_FX.draw_muzzle(self,event,age,vfx_intensity,bool(vfx_flags.particles),bool(vfx_flags.flashes))
 		elif event.type=="sunk":
 			COMBAT_FX.draw_sinking(self,event,age)
-		elif event.type=="loot":
-			_label(p+Vector2(0,-30-age*45),"+%d GOLD"%int(event.value),19,Color(0.95,0.81,0.4,1-age/1.2))
+		elif event.type=="loot":pass
 		elif event.type=="level":
 			_ellipse_line(p,Vector2(50+age*80,22+age*35),Color(0.5,0.9,1,1-age/1.2),2.2)
 			_label(p+Vector2(0,-100-age*25),"KAPITÄNSSTUFE %d" % int(event.value),22,CYAN)
-		elif event.type=="essence":
-			_label(p+Vector2(0,-48-age*40),"+%d ESSENZ"%int(event.value),17,Color(0.45,1,0.92,1-age/1.2))
+		elif event.type=="essence":pass
 		elif event.type in ["blessing","tide_deck","supply"]:
 			var tint=Color("c69bff") if event.type=="blessing" else (Color("5fe0d2") if event.type=="tide_deck" else Color("8fd0ff"))
 			_ellipse_line(p,Vector2(40+age*90,16+age*36),Color(tint,1-age/1.2),2.6)
@@ -674,7 +692,7 @@ func _npc_ship_texture(_actor: Dictionary) -> Texture2D:
 	return painted.nav_ship
 
 func _actor_visual_length(actor: Dictionary) -> float:
-	if int(actor.id)==0:return 180.0 if int(actor.get("skin",0))>=1 and int(actor.get("skin",0))<=11 else FINAL_SHIP_LENGTH
+	if int(actor.id)==0:return 180.0 if int(actor.get("skin",0))>=1 and int(actor.get("skin",0))<=13 else FINAL_SHIP_LENGTH
 	if str(actor.get("visual_key",""))=="black_crown_corsair_elite_test":return 180.0
 	if actor.kind=="ship":return float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
 	return 150.0
@@ -698,6 +716,8 @@ func _selection_ring_radii(actor: Dictionary) -> Vector2:
 	return Vector2(maxf(36.0,length*0.58),maxf(16.0,length*0.245))
 
 func _ship_design_accent(skin_id: int) -> Color:
+	if skin_id==12:return Color("f59949")
+	if skin_id==13:return Color("e6d2a6")
 	if skin_id==0:return Color("62cce4")
 	if skin_id==1:return Color("efbf69") # Original untouched Corsair test.
 	if skin_id>=2 and skin_id<=11:return ELITE_V2_ACCENTS[skin_id-2]
@@ -789,6 +809,8 @@ func _draw_actor(actor: Dictionary) -> void:
 	else:
 		_ellipse(point+Vector2(0,4),Vector2(length*0.34,length*0.09),Color(0.0,0.02,0.04,0.34))
 	_draw_ship_selection_ring(actor,point)
+	if is_player and sim.plates_on:
+		_ellipse_line(point,Vector2(length*.48,length*.22),Color("90c9ee",.45+.15*sin(elapsed*2)),2.5)
 	if is_player and sim.has_blessing():
 		var blessing_pulse=.5+.5*sin(elapsed*3.2)
 		if mesh_ship:
@@ -805,9 +827,16 @@ func _draw_actor(actor: Dictionary) -> void:
 	var hull_alpha=0.45 if is_player and sim.staff.hidden() else 1.0
 	var monster = not is_player and actor.kind=="monster"
 	if monster:
-		var col = posmod(roundi((heading.angle()+PI*0.25)/TAU*4),4)
-		var row = int(elapsed*6)%CONTENT.MONSTER_ROWS
-		_draw_atlas(beast,point,210.0,col,row,CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS)
+		var key: String=str(actor.get("monster_key",""))
+		if expansion_art.has(key):
+			var tex: Texture2D=expansion_art[key]
+			var breath: float=sin(elapsed*1.8+float(actor.id)) if ship_animations_enabled else 0.0
+			var dims: Vector2=tex.get_size()*(225.0+breath*2.5)/maxf(tex.get_width(),tex.get_height())
+			draw_texture_rect(tex,Rect2(point-dims*.5+Vector2(0,breath*2),dims),false)
+		else:
+			var col = posmod(roundi((heading.angle()+PI*0.25)/TAU*4),4)
+			var row = int(elapsed*6)%CONTENT.MONSTER_ROWS
+			_draw_atlas(beast,point,210.0,col,row,CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS)
 	elif not mesh_ship:
 		# Do not resurrect a removed legacy sprite if a GLB fails to import.
 		pass
@@ -1211,6 +1240,7 @@ func _build_ui() -> void:
 	ui.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	ui.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
 	layer.add_child(ui)
+	feedback_overlay=preload("res://feedback_overlay.gd").new();feedback_overlay.host=self;layer.add_child(feedback_overlay)
 	ruler=RULER.new();ruler.world_size=sim.WORLD;ui.add_child(ruler)
 	chrome=_panel(ui)
 	for name in ["gold_coins","kills_skull"]:
@@ -1286,6 +1316,10 @@ func _build_ui() -> void:
 	loadout_button=_orb(ui,"Bewaffnung",extra_icons.cannon_0,func():_open_modal("Bewaffnung"),"WAFFEN")
 	camera_pad=CAMERA_PAD.new();ui.add_child(camera_pad)
 	interact=_button(ui,"",_interact);interact.name="InteractButton"
+	quick_bar=preload("res://quick_bar.gd").new();quick_bar.host=self;quick_bar.name="QuickBar"
+	quick_bar.used.connect(func(slot: int):_use_supply(str(quick_pages[quick_page][slot])))
+	quick_bar.page_picked.connect(func(page: int):quick_page=page;_persist_display_preferences();quick_bar.refresh())
+	quick_bar.configure.connect(func():_open_modal("Schnellzugriff"));ui.add_child(quick_bar)
 	buff_bar=Control.new();buff_bar.mouse_filter=Control.MOUSE_FILTER_IGNORE;buff_bar.name="BuffBar"
 	buff_bar.draw.connect(_draw_buffs);ui.add_child(buff_bar)
 	status=_text(ui,"",12,Color("e2ecee"));status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
@@ -1320,6 +1354,7 @@ func _build_ui() -> void:
 	modal_title.add_theme_color_override("font_outline_color",Color("2a0c06"));modal_title.add_theme_constant_override("outline_size",5)
 	modal_close=_button(modal,"×",func():modal.hide();_save_progress(),"close")
 	modal_close.add_theme_font_size_override("font_size",26);modal_close.tooltip_text="Schließen";modal_close.clip_text=false
+	modal_back=_button(modal,"‹ ZURÜCK",_back_modal);modal_back.name="BackButton";modal_back.add_theme_font_size_override("font_size",12)
 	modal_tabs=HBoxContainer.new();modal_tabs.add_theme_constant_override("separation",5);modal_tabs.visible=false
 	modal.add_child(modal_tabs)
 	modal_scroll=TOUCH_SCROLL.new()
@@ -1449,6 +1484,7 @@ func _layout() -> void:
 	# Supplies retain their own functions; every ammunition type uses one selector.
 	_place(supply_selector,fx-orb-gap,fy-orb-gap,orb,orb)
 	for item: Button in supply_buttons.values():item.hide()
+	_place(quick_bar,fx-4*(orb+gap),s.y-orb-10-(orb+29)-8,orb*3+gap*2,orb+29)
 	var hot: Array[Button]=[target_cycle,loadout_button]
 	for i in hot.size():_place(hot[hot.size()-1-i],ammo_selector.position.x-(i+1)*(orb+gap),s.y-orb-10,orb,orb)
 	var toast_w=maxf(60.0,minf(380.0,s.x-2.0*(left+column+12)))
@@ -1478,11 +1514,12 @@ func _layout() -> void:
 	else:_place(modal,(menu_size.x-visual_w)*.5,(menu_size.y-visual_h)*.5,width,height)
 	var head=42.0 if modal_kind in ["Munition","Verbrauch"] else (46.0 if height<420 else 52.0)
 	modal.header=head
-	var title_w=width-62 if modal_kind in ["Munition","Verbrauch"] else clampf(font.get_string_size(modal_title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,21).x+70,200,width-170)
-	modal.ribbon=Rect2(10,3,title_w,head-6) if modal_kind in ["Munition","Verbrauch"] else Rect2((width-title_w)*.5,8,title_w,head-14)
+	var title_w=width-150 if modal_kind in ["Munition","Verbrauch"] else clampf(font.get_string_size(modal_title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,21).x+70,minf(150,width-210),width-210)
+	modal.ribbon=Rect2(94,3,title_w,head-6) if modal_kind in ["Munition","Verbrauch"] else Rect2((width-title_w)*.5,8,title_w,head-14)
 	_place(modal_title,modal.ribbon.position.x+8,modal.ribbon.position.y,title_w-16,modal.ribbon.size.y)
 	var close=head-12
 	_place(modal_close,width-close-12,6,close,close)
+	_place(modal_back,10,8,82,30)
 	var inner_top=head+8
 	if modal_tabs.visible:
 		_place(modal_tabs,18,inner_top,width-36,34)
@@ -1543,7 +1580,8 @@ func _refresh_ui() -> void:
 	player_shield.max_value=maxf(1.0,float(sim.player.max_shield))
 	player_shield.value=sim.player.shield
 	shield_numbers.text="%s / %s" % [_thousands(int(sim.player.shield)),_thousands(int(sim.player.max_shield))]
-	buff_bar.visible=sim.has_blessing() or float(sim.buffs.tide_deck)>0 or float(sim.buffs.storm_deck)>0 or float(sim.buffs.salvage_deck)>0 or sim.guild_island_held()
+	quick_bar.refresh()
+	buff_bar.visible=sim.powder_on or sim.plates_on or sim.has_blessing() or float(sim.buffs.tide_deck)>0 or float(sim.buffs.storm_deck)>0 or float(sim.buffs.salvage_deck)>0 or sim.guild_island_held()
 	buff_bar.queue_redraw()
 	player_xp.max_value=maxi(1,sim.xp_required())
 	player_xp.value=sim.xp
@@ -1557,7 +1595,7 @@ func _refresh_ui() -> void:
 			if selected.kind=="monster":
 				var preview=AtlasTexture.new();preview.atlas=beast
 				preview.region=Rect2(Vector2.ZERO,beast.get_size()/Vector2(CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS))
-				target_portrait.texture=preview
+				target_portrait.texture=expansion_art.get(str(selected.get("monster_key","")),preview)
 			elif selected.kind=="tower":target_portrait.texture=painted["tower_"+str(selected.tower)]
 			else:target_portrait.texture=_npc_ship_texture(selected)
 		target_name.text=("[%s] " % sim.tower_tag() if selected.kind=="tower" else "")+str(selected.name)
@@ -1711,6 +1749,8 @@ func _choose_ammo(index: int) -> void:
 ## Active effects with remaining sea time; emergency cooldowns live on their own orbs.
 func _draw_buffs() -> void:
 	var entries: Array=[]
+	if sim.powder_on:entries.append([_supply_icon("powder"),"PULVER +40%",Color("ffb85e")])
+	if sim.plates_on:entries.append([_supply_icon("plates"),"PLATTEN −35%",Color("83cfff")])
 	if sim.has_blessing():entries.append([deck_icons.blessing,_clock_text(float(sim.buffs.blessing)),Color("c69bff")])
 	if float(sim.buffs.tide_deck)>0:entries.append([deck_icons.tide,_clock_text(float(sim.buffs.tide_deck)),Color("5fe0d2")])
 	for key: String in CONTENT.SPECIAL_DECKS:
@@ -1741,9 +1781,13 @@ func _clock_text(seconds: float) -> String:
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
 const MODAL_TABS := {"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
-const MODAL_TITLES := {"Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
+const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
-func _open_modal(kind: String) -> void:
+func _open_modal(kind: String,remember: bool=true) -> void:
+	if modal.visible and modal_kind!=kind and remember:
+		menu_history.append(modal_kind)
+		if menu_history.size()>16:menu_history.pop_front()
+	elif not modal.visible and remember:menu_history.clear()
 	_reset_enemy_tap()
 	camera_pad.release()
 	var scroll_position=modal_scroll.scroll_vertical if modal.visible and modal_kind==kind else 0
@@ -1770,6 +1814,10 @@ func _open_modal(kind: String) -> void:
 		"Schiff":_open_ship()
 		"Munition":_open_ammo()
 		"Verbrauch":_open_consumables()
+		"Events":_open_events()
+		"Monster":_open_monsters()
+		"Schnellzugriff":_open_quick_config()
+		"Hilfe":_open_help()
 		"Profil":_open_profile()
 		"Belohnungen":_open_rewards()
 		"Werft":_open_shipyard()
@@ -1793,6 +1841,14 @@ func _open_modal(kind: String) -> void:
 	modal.show()
 	modal_backdrop.show()
 	modal_scroll.restore(sim.ammo_mode*99 if kind=="Munition" else scroll_position)
+
+func _back_modal() -> void:
+	_reset_enemy_tap()
+	if menu_history.is_empty():
+		modal.hide();modal_backdrop.hide();_save_progress()
+	else:
+		var destination: String=menu_history.pop_back()
+		_open_modal(destination,false)
 
 func _build_tabs(kind: String) -> void:
 	for child in modal_tabs.get_children():
@@ -1860,6 +1916,7 @@ func _draw_section(label: Label) -> void:
 
 func _action(text: String,callback: Callable,variant: String="normal",parent: Node=null) -> Button:
 	var button = _button(parent if parent!=null else modal_body,text,callback,variant)
+	button.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	button.custom_minimum_size.y=48
 	button.add_theme_font_size_override("font_size",16)
 	button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
@@ -2213,21 +2270,21 @@ func _add_shipyard_card(index: int,container: Node,frames: Array[Control]) -> vo
 	# The ten mobile preview renders were exported on opaque #1c1c24.
 	# Remove ONLY that background with a small shader, keeping the real
 	# ship foreground untouched, so the seawater is visible behind it.
-	if index>=2:
+	if index>=2 and index<=11:
 		var key_material=ShaderMaterial.new()
 		key_material.shader=SHIPYARD_STUDIO_KEY
 		preview.material=key_material
 	preview.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	preview.offset_left=6;preview.offset_top=6;preview.offset_right=-6;preview.offset_bottom=-6
-	var status_text: String="AUSGERÜSTET" if chosen else ("ELITE · %02d" % (index-1) if index>=2 else ("ORIGINAL · TEST" if index==1 else "BASISSCHIFF"))
+	var status_text: String="AUSGERÜSTET" if chosen else ("EVENT" if index>=12 else "ELITE · %02d" % (index-1) if index>=2 else ("ORIGINAL · TEST" if index==1 else "BASISSCHIFF"))
 	var badge=_text(frame,status_text,12,accent.lightened(.16))
 	badge.name="ShipStatus%d" % index
 	badge.position=Vector2(14,12)
 	badge.add_theme_color_override("font_outline_color",Color("06161b"))
 	badge.add_theme_constant_override("outline_size",4)
 	var model_ok: bool=mesh_layer!=null and mesh_layer.model_scenes.has(str(skins[index].mesh_key))
-	if index>=2:model_ok=model_ok and ResourceLoader.exists("res://assets/elite_v2/textures/"+str(mesh_layer.ELITE_V2_TEXTURE_FILES[index-2]))
-	var hint: String="ELITE %02d · %s" % [index-1,ELITE_V2_NAMES[index-2].to_upper()] if index>=2 else ("BLACK CROWN · ORIGINAL-TEST" if index==1 else "SCHATTENKRIEGSSCHIFF · STANDARD")
+	if index>=2:model_ok=model_ok and ResourceLoader.exists(mesh_layer.texture_path(index-1))
+	var hint: String=str(skins[index].name).to_upper() if index>=12 else "ELITE %02d · %s" % [index-1,ELITE_V2_NAMES[index-2].to_upper()] if index>=2 else ("BLACK CROWN · ORIGINAL-TEST" if index==1 else "SCHATTENKRIEGSSCHIFF · STANDARD")
 	var description=_text(column,hint,13,accent)
 	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	var details=_text(column,"Echtes 3D-GLB · 2,5D & 3D · Nur Design" if index>=2 else "Originalgeometrie · Gleiche Werte",12,Color("c0d5d5"))
@@ -2240,7 +2297,7 @@ func _add_shipyard_card(index: int,container: Node,frames: Array[Control]) -> vo
 	choose.disabled=chosen or not model_ok
 
 func _set_shipyard_filter(value: String) -> void:
-	if not value in ["all","elite","original"]:return
+	if not value in ["all","elite","original","event"]:return
 	if shipyard_filter==value:return
 	shipyard_filter=value
 	# A new filter must begin at its first card, not an old deep-scroll offset.
@@ -2253,23 +2310,27 @@ func _open_shipyard() -> void:
 	_note("AUSGERÜSTET · "+str(skins[current].name),_ship_design_accent(current))
 	# On compact phones a dozen cards take a lot of scrolling. These controls
 	# only filter the view; all 12 designs remain playable and saved unchanged.
-	var filters=_grid(3)
-	for entry in [["all","ALLE · 12"],["elite","ELITE · 10"],["original","STANDARD / TEST · 2"]]:
+	var filters=_grid(4)
+	for entry in [["all","ALLE · 14"],["elite","ELITE · 10"],["original","STANDARD / TEST · 2"],["event","EVENT · 2"]]:
 		var key: String=str(entry[0])
 		var selected: bool=shipyard_filter==key
 		var button=_action(str(entry[1])+(" ✓" if selected else ""),func():_set_shipyard_filter(key),"tab_on" if selected else "normal",filters)
 		button.disabled=selected
 	var frames: Array[Control]=[]
-	if shipyard_filter!="elite":
+	if shipyard_filter in ["all","original"]:
 		_section("STANDARD & UNVERÄNDERTES TESTMODELL")
 		var original_cards=_grid(2)
 		for index in 2:_add_shipyard_card(index,original_cards,frames)
-	if shipyard_filter!="original":
+	if shipyard_filter in ["all","elite"]:
 		_section("ELITE-DESIGNS 01–10 · V2")
 		# Large landscapes use 3 columns, phones use 2 or 1.
 		var cols: int=3 if modal_scroll.size.x>=970 else (2 if modal_scroll.size.x>=565 else 1)
 		var elites=_grid(cols)
 		for index in range(2,12):_add_shipyard_card(index,elites,frames)
+	if shipyard_filter in ["all","event"]:
+		_section("EVENT-DESIGNS")
+		var events=_grid(2 if modal_scroll.size.x>=565 else 1)
+		for index in range(12,14):_add_shipyard_card(index,events,frames)
 	_start_shipyard_preview_motion(frames)
 	_section("MUNITIONSNACHSCHUB · JE 30 GOLD")
 	var stock=_grid(3)
@@ -2825,7 +2886,7 @@ func _open_display() -> void:
 			choice.disabled=selected
 		_note("Intensiv ist der Standard. Leicht reduziert Zeichnung und Partikel auf schwächeren Smartphones; Extrem liefert stärkere Treffer und sichtbare Folgewellen.",Color("bfcbdf"))
 
-func _open_info() -> void:
+func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
 	_note("Werft: Schattenkriegsschiff, Original-Corsair-Testmodell und Elite-Designs 01–10. Dazu neun NPC-GLBs.",Color("9be4df"))
 	var modes=_grid(2)
@@ -3090,8 +3151,9 @@ func _interact() -> void:
 	_refresh_ui()
 
 func _equip(index: int) -> void:
+	var destination: String="Events" if modal_kind=="Events" else "Werft"
 	if index<0 or index>=skins.size():return
-	if mesh_layer==null or not mesh_layer.model_scenes.has(str(skins[index].mesh_key)) or (index>=2 and not ResourceLoader.exists("res://assets/elite_v2/textures/"+str(mesh_layer.ELITE_V2_TEXTURE_FILES[index-2]))):
+	if mesh_layer==null or not mesh_layer.model_scenes.has(str(skins[index].mesh_key)) or (index>=2 and not ResourceLoader.exists(mesh_layer.texture_path(index-1))):
 		sim.message="3D-Modell oder Elite-Textur noch nicht verfügbar"
 		_refresh_ui()
 		return
@@ -3099,7 +3161,7 @@ func _equip(index: int) -> void:
 	ship_switch_pulse_at=elapsed
 	sim.message=str(skins[index].name)+" aktiv"
 	_save_progress()
-	_open_modal("Werft")
+	_open_modal(destination)
 	_refresh_ui()
 
 func _zoom(factor: float) -> void:
@@ -3192,7 +3254,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode==KEY_TAB:_cycle_target();get_viewport().set_input_as_handled()
 		if event.keycode==KEY_SPACE:_toggle_fire()
 		if event.keycode==KEY_ESCAPE:
-			if modal.visible:modal.hide()
+			if modal.visible:_back_modal()
 			elif sim.target>0:_cancel_target()
 			get_viewport().set_input_as_handled()
 		if event.keycode==KEY_R:sim.toggle_repair()
@@ -3208,7 +3270,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _hud_contains(screen: Vector2) -> bool:
 	if modal.visible:return true
-	var controls: Array[Control]=[supply_selector,chrome,target_panel,chart_mini,quest_panel,attack,repair,ammo_selector,loadout_button,center_button,settings_button,target_cycle,camera_pad,zoom_in,zoom_out,interact,staff_pill]
+	var controls: Array[Control]=[quick_bar,supply_selector,chrome,target_panel,chart_mini,quest_panel,attack,repair,ammo_selector,loadout_button,center_button,settings_button,target_cycle,camera_pad,zoom_in,zoom_out,interact,staff_pill]
 	for item: Button in supply_buttons.values():controls.append(item)
 	for control: Control in controls:
 		if control.is_visible_in_tree() and control.get_global_rect().has_point(screen):return true
@@ -3330,6 +3392,8 @@ func _load_display() -> void:
 	menu_layout=str(data.get("menu_layout","balanced"))
 	if not menu_layout in ["compact","balanced","large"]:menu_layout="balanced"
 	double_tap_attack_enabled=bool(data.get("double_tap_attack_enabled",true))
+	quick_pages=preload("res://sea_expansion.gd").normalize_quick(data.get("quick_pages",[]))
+	quick_page=clampi(int(data.get("quick_page",0)),0,2)
 
 func _cycle_render_mode() -> void:
 	_set_render_mode("3d" if render_mode=="hybrid" else "hybrid")
@@ -3337,7 +3401,7 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"double_tap_attack_enabled":double_tap_attack_enabled}))
+		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"double_tap_attack_enabled":double_tap_attack_enabled}))
 		file.close()
 
 func _set_menu_layout(value: String) -> void:
@@ -3490,3 +3554,77 @@ func _open_rewards() -> void:
 	var gold: int=sim.rewards.afk_gold()
 	_action("AFK-BEUTE · %d GOLD ABHOLEN" % gold,func():sim.rewards.claim_afk(sim);_save_progress();_open_modal("Belohnungen"),"primary").disabled=gold<=0
 	_note("3 Gold pro voller Minute · 10 Vollkugeln je 5 Minuten · maximal 8 Stunden. Du erhältst offline keine Kampf- oder PvP-Punkte.")
+
+# --- Organized navigation, seasonal content and configurable combat shortcuts ---
+func _open_info() -> void:
+	_section("KAPITÄN & FORTSCHRITT")
+	var captain=_grid(2)
+	for entry in [["Profil","SPIELERPROFIL"],["Belohnungen","TAGESBONUS & AFK"],["Logbuch","LOGBUCH"],["Rangliste","RANGLISTE"]]:
+		var destination: String=entry[0]
+		_action(entry[1],func():_open_modal(destination),"normal",captain)
+	_section("WELT & VERANSTALTUNGEN")
+	var world=_grid(2)
+	for entry in [["Seekarten","WELTKARTE"],["Events","HALLOWEEN & COLUMBUS"],["Monster","SEEUNGEHEUER"],["Gilde","GILDE & INSELN"]]:
+		var destination: String=entry[0]
+		_action(entry[1],func():_open_modal(destination),"normal",world)
+	_section("AUSRÜSTUNG & STEUERUNG")
+	var settings=_grid(2)
+	for entry in [["Schnellzugriff","SCHNELLLEISTEN BELEGEN"],["Verbrauch","VERBRAUCHSGEGENSTÄNDE"],["Anzeige","GRAFIK & STEUERUNG"],["Hilfe","SPIELANLEITUNG"],["Kastelle","KASTELLE"],["Staff","STAFF-ZUGANG"]]:
+		var destination: String=entry[0]
+		_action(entry[1],func():_open_modal(destination),"normal",settings)
+	_action("ZUM HAUPTMENÜ",func():_save_progress();get_tree().change_scene_to_file("res://start_hub.tscn"))
+	_action("UPDATES PRÜFEN",func():_save_progress();get_tree().set_meta("abyssal_manual_update",true);get_tree().change_scene_to_file("res://updater/launcher.tscn"))
+
+func _open_quick_config() -> void:
+	_info("3 LEISTEN · JE 3 FREI BELEGBARE PLÄTZE")
+	_note("Leiste und Platz wählen, dann einen Gegenstand zuweisen. Auf See aktiviert ein Tipp den belegten Platz. Die Belegung bleibt gespeichert.")
+	var pages=_grid(3)
+	for i in 3:
+		var page: int=i
+		_action("LEISTE %d" % (i+1),func():quick_page=page;_persist_display_preferences();_open_modal("Schnellzugriff"),"tab_on" if quick_page==i else "normal",pages)
+	var places=_grid(3)
+	for i in 3:
+		var slot: int=i
+		var key: String=quick_pages[quick_page][i]
+		_action("PLATZ %d\n%s" % [i+1,CONTENT.SUPPLIES[key].short],func():quick_edit_slot=slot;_open_modal("Schnellzugriff"),"tab_on" if quick_edit_slot==i else "normal",places)
+	_section("GEGENSTAND FÜR PLATZ %d" % (quick_edit_slot+1))
+	for key: String in CONTENT.SUPPLY_KEYS:
+		var item: String=key
+		var config: Dictionary=CONTENT.SUPPLIES[key]
+		var column=_row(_supply_icon(key),str(config.name)+"\n"+str(config.effect),44)
+		var chosen: bool=quick_pages[quick_page][quick_edit_slot]==key
+		_row_button(column,"BELEGT" if chosen else "ZUWEISEN",func():quick_pages[quick_page][quick_edit_slot]=item;_persist_display_preferences();quick_bar.refresh();_open_modal("Schnellzugriff"),chosen,"tab_on" if chosen else "normal")
+
+func _open_events() -> void:
+	var expansion=preload("res://sea_expansion.gd")
+	_section("VERANSTALTUNGEN · BETA-VORSCHAU")
+	_note("Halloween und Columbus sind hier frei testbar. Saisonzeiten, Belohnungen und Preise werden später abgestimmt. Es ist jeweils eine Sammelveranstaltung aktiv.")
+	var tabs=_grid(3)
+	for key: String in ["halloween","columbus","off"]:
+		var choice: String=key
+		_action({"halloween":"HALLOWEEN","columbus":"COLUMBUS","off":"AUS"}[key],func():expansion.set_event(sim,choice);_save_progress();_open_modal("Events"),"tab_on" if sim.event_mode==key else "normal",tabs)
+	var art: Texture2D=expansion_art.pumpkin if sim.event_mode=="halloween" else expansion_art.glitter
+	_row(art,expansion.EVENT_NAMES[sim.event_mode]+"\nKürbiszeichen: %d · Kompasszeichen: %d" % [sim.event_tokens.halloween,sim.event_tokens.columbus],72)
+	_note("Halloween: schwimmende Kürbisse sammeln → Kürbiszeichen, Gold und Himmelsbrand. Columbus: Entdeckerfunde sammeln → Kompasszeichen, Gold und Lebensamulett. Sammelfunde kehren nach 120 Sekunden zurück.")
+	if not sim.event_pickups.is_empty():
+		_primary("KURS ZUM NÄCHSTEN EVENTFUND",func():
+			var nearest: Vector2=sim.player.pos;var distance: float=INF
+			for pickup: Dictionary in sim.event_pickups:
+				if float(pickup.respawn)<=0 and pickup.pos.distance_to(sim.player.pos)<distance:nearest=pickup.pos;distance=nearest.distance_to(sim.player.pos)
+			if distance<INF:sim.course(nearest);modal.hide();_refresh_ui())
+	_section("EVENT-SCHIFFSDESIGNS · GLEICHE KAMPFWERTE")
+	var cards=_grid(2 if modal_scroll.size.x>=565 else 1)
+	var frames: Array[Control]=[]
+	for index in [12,13]:_add_shipyard_card(index,cards,frames)
+	_start_shipyard_preview_motion(frames)
+	_note("Beide Event-Anstriche sind während der Beta kostenlos verfügbar und verändern deine Kampfwerte nicht.")
+
+func _open_monsters() -> void:
+	_section("SEEUNGEHEUER · HARPUNENJAGD")
+	_note("Tiamat bleibt erhalten. Kraken, Panzerschlange und Tiefenpanzer ergänzen die normalen Seekarten. Sie reagieren auf Beschuss; auf den unteren Karten beginnen sie keinen Angriff von selbst.")
+	for spec: Dictionary in preload("res://sea_expansion.gd").MONSTERS:
+		var key: String=spec.key
+		var column=_row(expansion_art[key],"%s\nGrundrumpf %d · Beutegold %d · Harpunen erforderlich" % [spec.name,spec.hp,spec.reward],90)
+		_row_button(column,"KURS ZUM MONSTER",func():
+			for actor: Dictionary in sim.npcs:
+				if str(actor.get("monster_key",""))==key and int(actor.hp)>0:sim.course(actor.pos);modal.hide();_refresh_ui();break)

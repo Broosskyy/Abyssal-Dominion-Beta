@@ -55,7 +55,7 @@ var elite_kills := 0
 var tower_kills := 0
 var visited: Array = []
 var upgrades := {"cannon":0, "hull":0, "sails":0, "crew":0, "harpoon":0, "war":0}
-var supplies := {"powder":10, "plates":10, "repair_kit":2, "shield_charge":2}
+var supplies := {"powder":10, "plates":10, "repair_kit":2, "shield_charge":2,"skyfire":2,"healing_amulet":2,"blessing_flask":1}
 var powder_on := false
 var plates_on := false
 var cooldowns := {"repair_kit":0.0, "shield_charge":0.0}
@@ -72,6 +72,10 @@ var bonus: Dictionary = {}
 var bonus_runs := 0
 var captain_name := "Kapitän"
 var battle_points := 0 # Awarded only by an authoritative PvP server, never NPC kills.
+const EXPANSION=preload("res://sea_expansion.gd")
+var event_mode := "halloween"
+var event_tokens := {"halloween":0,"columbus":0}
+var event_pickups: Array[Dictionary]=[]
 var rewards := preload("res://reward_ledger.gd").new()
 var guild_holdings: Dictionary={}
 var tower_levels: Array = CONTENT.normalized_tower_levels()
@@ -343,7 +347,17 @@ func use_supply(key: String) -> bool:
 	if int(supplies[key]) <= 0:
 		message = "Keine %s mehr · Nachschub im Hafen oder im Kessel" % config.name
 		return false
-	if key == "repair_kit":
+	if key=="skyfire":
+		var victim: Dictionary=actor(target)
+		if victim.is_empty() or int(victim.hp)<=0 or victim.kind=="monster" or (victim.kind=="tower" and tower_friendly()) or player.pos.distance_to(victim.pos)>650 or (victim.kind!="tower" and not segment_free(player.pos,victim.pos)):
+			message="Himmelsbrand: Schiff oder feindlichen Turm in 650 m Reichweite anvisieren"
+			return false
+		_launch(0,target,"explosive",240,1);victim.aggressive=true;repairing=false
+	elif key=="healing_amulet" or key=="blessing_flask":
+		if key=="healing_amulet" and float(player.hp)>=float(player.max_hp):return false
+		player.hp=minf(float(player.max_hp),float(player.hp)+float(player.max_hp)*(.25 if key=="healing_amulet" else .20))
+		if key=="blessing_flask":activate_blessing(120)
+	elif key == "repair_kit":
 		if float(player.hp) >= float(player.max_hp):
 			message = "Rumpf ist vollständig intakt"
 			return false
@@ -560,6 +574,7 @@ func step(delta: float) -> void:
 		if firing and target > 0 and float(player.reload) <= 0:
 			_fire_player()
 		_collect_sparkles()
+		EXPANSION.collect(self,delta)
 	for npc in npcs:
 		_step_npc(npc, delta)
 	_step_shots(delta)
@@ -719,13 +734,13 @@ func _fire_player() -> void:
 		damage *= 1.4
 		supplies.powder -= 1
 		if int(supplies.powder) <= 0: powder_on = false
-	_launch(0, target, AMMO_NAMES[ammo_mode], roundi(damage), count)
+	_launch(0, target, AMMO_NAMES[ammo_mode], roundi(damage), count,powdered)
 	player.reload = 0.25 if staff.flag("instant_reload") else reload_time()
 	victim.aggressive = true
 	repairing = false
 	message = AMMO_LABELS[ammo_mode] if ammo_mode >= 2 else ("Breitseite mit Schwarzpulver!" if powdered else "Breitseite!")
 
-func _launch(source_id: int, target_id: int, weapon: String, damage: int, count: int) -> void:
+func _launch(source_id: int, target_id: int, weapon: String, damage: int, count: int,powdered: bool=false) -> void:
 	var source = actor(source_id)
 	var destination = actor(target_id)
 	if source.is_empty() or destination.is_empty(): return
@@ -740,12 +755,13 @@ func _launch(source_id: int, target_id: int, weapon: String, damage: int, count:
 		next_id += 1
 		var start: Vector2 = source.pos + Vector2(0, (float(i) - float(count - 1) * 0.5) * 13)
 		shots.append({"id": next_id, "source": source_id, "target": target_id, "pos": start,
-			"start": start, "damage": damage, "weapon": weapon, "age": -float(i) * 0.08,
+			"start": start, "damage": damage, "powder":powdered, "weapon": weapon, "age": -float(i) * 0.08,
 			"distance": maxf(1, start.distance_to(destination.pos)), "traveled": 0.0,
 			"visual_heading": visual_heading, "salvo_index": i,
 			"salvo_count": count, "salvo_group": group_id, "salvo_origin": source.pos})
 	_event("muzzle", source.pos, count, source_id)
 	if not events.is_empty():
+		events.back()["powder"]=powdered
 		events.back()["weapon"]=weapon
 		events.back()["heading"]=visual_heading
 
@@ -787,6 +803,7 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 	if float(victim.get("spotted", 0.0)) > clock and str(shot.weapon) != "flare":
 		damage_amount = roundi(float(damage_amount) * 1.15)
 	if int(victim.id)==0 and float(buffs.get("smoke_bomb",0))>0:damage_amount=roundi(float(damage_amount)*.7)
+	var plated: bool=int(victim.id)==0 and plates_on and int(supplies.plates)>0
 	var dealt := apply_damage(victim, damage_amount)
 	if shot.weapon == "chain":
 		victim.slow = 4.0
@@ -816,6 +833,8 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 		victim.last_hit = clock
 	_event("impact", victim.pos, dealt, victim.id)
 	if not events.is_empty():
+		events.back()["powder"]=bool(shot.get("powder",false))
+		events.back()["plates"]=plated
 		events.back()["weapon"]=str(shot.weapon)
 		events.back()["vfx_seed"]=int(shot.get("id",int(victim.id))) # synthetic admin/test hits have no projectile ID
 	if int(victim.hp) == 0:
@@ -1373,6 +1392,7 @@ func _map_point(point: Vector2) -> Vector2:
 func configure_map(destination: int) -> void:
 	_store_fortress_state()
 	harbor_outline.clear()
+	event_pickups.clear()
 	map_id = clampi(destination,0,CONTENT.MAPS.size()-1)
 	if map_id < visited.size(): visited[map_id] = true
 	var config = CONTENT.MAPS[map_id]
@@ -1451,7 +1471,9 @@ func configure_map(destination: int) -> void:
 	if CONTENT.has_guild_island(map_id):
 		islands[CONTENT.FORTRESS_ISLAND].name = "Korsarenfestung"
 		if not restored: _add_fortress()
+	if not restored:EXPANSION.spawn_monsters(self)
 	_spawn_sparkles()
+	EXPANSION.spawn_collectibles(self)
 
 func export_save() -> Dictionary:
 	_store_fortress_state()
@@ -1463,7 +1485,7 @@ func export_save() -> Dictionary:
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
-	return {"schema":6,"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	return {"schema":7,"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
@@ -1475,7 +1497,15 @@ func export_save() -> Dictionary:
 		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
-	if not int(data.get("schema",0)) in [1,2,3,4,5,6]: return false
+	if not int(data.get("schema",0)) in [1,2,3,4,5,6,7]: return false
+	event_mode=str(data.get("event_mode","halloween"))
+	if not EXPANSION.EVENT_NAMES.has(event_mode):event_mode="halloween"
+	var saved_tokens: Variant=data.get("event_tokens",{})
+	if saved_tokens is Dictionary:
+		for key in event_tokens:event_tokens[key]=clampi(int(saved_tokens.get(key,0)),0,999999)
+	var saved_cooldowns: Variant=data.get("cooldowns",{})
+	if saved_cooldowns is Dictionary:
+		for key in CONTENT.SUPPLY_KEYS:cooldowns[key]=clampf(float(saved_cooldowns.get(key,0)),0,float(CONTENT.SUPPLIES[key].get("cooldown",0)))
 	captain_name=str(data.get("captain_name","Kapitän")).strip_edges().left(24)
 	if captain_name.is_empty():captain_name="Kapitän"
 	battle_points=maxi(0,int(data.get("battle_points",0)))
@@ -1489,7 +1519,7 @@ func restore_save(data: Dictionary) -> bool:
 	# Skins 2-11 extend it with ten actual Elite V2 albedo variants.
 	# All retired skin IDs from older schemas remain migrated to skin 0.
 	var candidate_skin: int=int(data.get("skin",0))
-	player.skin=candidate_skin if int(data.get("schema",0))>=5 and candidate_skin>=1 and candidate_skin<=11 else FINAL_PLAYER_SKIN
+	player.skin=candidate_skin if int(data.get("schema",0))>=5 and candidate_skin>=1 and candidate_skin<=13 and (candidate_skin<=11 or int(data.get("schema",0))>=7) else FINAL_PLAYER_SKIN
 	ammo_mode=clampi(int(data.get("ammo_mode",0)),0,AMMO_NAMES.size()-1)
 	kills=maxi(0,int(data.get("kills",0)))
 	claimed=bool(data.get("claimed",false))

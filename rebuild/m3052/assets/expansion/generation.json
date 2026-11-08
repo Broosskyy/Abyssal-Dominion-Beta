@@ -1,0 +1,111 @@
+{
+  "generator": "image_gen built-in",
+  "created": "2026-11-08",
+  "camera": "elevated isometric 45 degrees",
+  "style": "sharp dark realistic 3D/2.5D pirate game assets; controlled lighting; transparent creature/collectible sprites",
+  "source_model_unchanged": true,
+  "texture_edit_reference": "original embedded Black Crown Corsair albedo UV atlas",
+  "uv_edit_invariants": "preserve packed island placement, orientation and seam boundaries; surface paint only",
+  "prompts": {
+    "kraken": "A compact dark aubergine kraken with eight tentacles, amber eyes, wet detailed skin; creature only, no ocean plane or UI.",
+    "serpent": "Armored dark teal S-shaped sea serpent with bronze dorsal spines, no wings; isolated transparent game sprite.",
+    "crab": "Barnacle-covered blue-black armored deep-sea crab with asymmetric pincers; isolated transparent game sprite.",
+    "glitter": "Gold doubloons, aquamarine crystals, pearl and broken compass on a driftwood sliver; no chest.",
+    "pumpkin": "Weathered carved pumpkin with warm candlelight, rope and seaweed; transparent collectible.",
+    "halloween": "Repaint original UV atlas: violet-black canvas, ember copper trim, pumpkin faces and bat motifs replacing pirate heraldry; preserve geometry and UV layout.",
+    "columbus": "Repaint original UV atlas: ivory woven canvas, crimson crosses and compass motifs, walnut and brass; preserve geometry and UV layout."
+  },
+  "packaging": "WebP quality 95, original dimensions and alpha retained; previews rendered from the actual GLB in Godot",
+  "files": [
+    {
+      "path": "assets/expansion/columbus.webp",
+      "sha256": "392bbcc8e20d54ae202d4e2005336d078f5d311f3fa0f69b5b5bf3c50e201565",
+      "size": [
+        1254,
+        1254
+      ],
+      "alpha": false,
+      "role": "generated event albedo"
+    },
+    {
+      "path": "assets/expansion/crab.webp",
+      "sha256": "401dde748b84654833c134f2a371f415dd6471e7698a0d0380ae6bf6b1b6779a",
+      "size": [
+        1536,
+        1024
+      ],
+      "alpha": true,
+      "role": "generated transparent game sprite"
+    },
+    {
+      "path": "assets/expansion/glitter.webp",
+      "sha256": "999d9fee38e18c61d56518e56bd3e2486bd29e4d610e0b956ff5ef537b3c4083",
+      "size": [
+        1536,
+        1024
+      ],
+      "alpha": true,
+      "role": "generated transparent game sprite"
+    },
+    {
+      "path": "assets/expansion/halloween.webp",
+      "sha256": "1ac928495a2496fea439da77aa5009181d5b99bb0f7654de3c782333db0cf859",
+      "size": [
+        1254,
+        1254
+      ],
+      "alpha": false,
+      "role": "generated event albedo"
+    },
+    {
+      "path": "assets/expansion/kraken.webp",
+      "sha256": "4efa2314f30d7b2f73d43c10e1e9bea3c7c127024f3e488d8916c65fa9d922d4",
+      "size": [
+        1254,
+        1254
+      ],
+      "alpha": true,
+      "role": "generated transparent game sprite"
+    },
+    {
+      "path": "assets/expansion/preview_columbus.webp",
+      "sha256": "2d7259a00517cb867db57b7a977327bfd80b2d4488853978ffe9871f452f79f6",
+      "size": [
+        581,
+        420
+      ],
+      "alpha": true,
+      "role": "rendered game-model preview"
+    },
+    {
+      "path": "assets/expansion/preview_halloween.webp",
+      "sha256": "3a192623c73219f9d6fc551b255f9abe40065d88462a59fbc1b77d014b86b5f2",
+      "size": [
+        581,
+        420
+      ],
+      "alpha": true,
+      "role": "rendered game-model preview"
+    },
+    {
+      "path": "assets/expansion/pumpkin.webp",
+      "sha256": "87c0f6ebf029b33513b86497406e5b09c430e0136176e03651c428d20b26ca6e",
+      "size": [
+        1536,
+        1024
+      ],
+      "alpha": true,
+      "role": "generated transparent game sprite"
+    },
+    {
+      "path": "assets/expansion/serpent.webp",
+      "sha256": "89752c299079e76faf73e8a741d54df42524f8ef95a7daf5dea7131f75adaf3c",
+      "size": [
+        1536,
+        1024
+      ],
+      "alpha": true,
+      "role": "generated transparent game sprite"
+    }
+  ]
+}

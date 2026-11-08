@@ -35,5 +35,8 @@ func _run() -> void:
 	game._open_modal("Gilde");await shot("12_tower_upgrades")
 	root.size=Vector2i(844,390);await process_frame;game._open_modal("Verbrauch");await shot("13_consumables_small_phone")
 	root.size=Vector2i(1080,2340);await process_frame;game._open_modal("Profil");await shot("14_profile_portrait")
+	root.size=Vector2i(2340,1080);await process_frame
+	for kind in ["Spielinfo","Schnellzugriff","Events","Monster"]:
+		game._open_modal(kind);await shot("expansion_"+kind.to_lower())
 	game.queue_free();await process_frame
 	print(JSON.stringify({"status":"CAPTURED","count":16,"renderer":RenderingServer.get_video_adapter_name()}));quit()

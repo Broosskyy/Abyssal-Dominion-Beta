@@ -19,7 +19,7 @@ func _run() -> void:
 	check(scene!=null,"game scene loads from data pack")
 	var game=scene.instantiate();root.add_child(game);current_scene=game
 	await process_frame
-	check(game.sim.npcs.size()==17 and game.skins.size()==12 and game.skin_previews.size()==12,"signed pack includes 16 patrol ships and all twelve original/V2 player designs")
+	check(game.sim.npcs.size()==20 and game.skins.size()==14 and game.skin_previews.size()==14,"signed pack includes 16 patrol ships and all twelve original/V2 player designs")
 	var all_elites:=true
 	for level in range(1,11):
 		all_elites=all_elites and ResourceLoader.exists("res://assets/elite_v2/previews/elite_%02d.png" % level)

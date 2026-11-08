@@ -125,8 +125,11 @@ const QUESTS := [
 	{"name":"Herr der Meere", "description":"Versenke insgesamt 20 Gegner", "stat":"kills", "goal":20, "gold":800, "xp":400, "essence":5}
 ]
 ## Consumable ship supplies. Toggles are spent only by a valid salvo or a received hit.
-const SUPPLY_KEYS := ["powder","plates","repair_kit","shield_charge","wind_draught","smoke_bomb","cleansing_rum","salvage_charm"]
+const SUPPLY_KEYS := ["powder","plates","repair_kit","shield_charge","wind_draught","smoke_bomb","cleansing_rum","salvage_charm","skyfire","healing_amulet","blessing_flask"]
 const SUPPLIES := {
+	"skyfire":{"name":"Himmelsbrand","short":"RAKETE","icon":"supply_skyfire","toggle":false,"effect":"Extrakapsel gegen Schiffe · 240 Schaden · 650 m · 35 s Abklingzeit","price":160,"pack":1,"cooldown":35.0},
+	"healing_amulet":{"name":"Lebensamulett","short":"AMULETT","icon":"supply_healing","toggle":false,"effect":"+25 % Rumpf sofort · 55 s Abklingzeit","price":140,"pack":1,"cooldown":55.0},
+	"blessing_flask":{"name":"Segen der Tiefe","short":"SEGEN","icon":"blessing","toggle":false,"effect":"+20 % Rumpf und 2 Minuten Kristallsegen · 120 s Abklingzeit","price":220,"pack":1,"cooldown":120.0},
 	"powder":{"name":"Schwarzpulver", "short":"PULVER", "icon":"supply_powder", "toggle":true, "effect":"+40 % Salvenschaden · 1 je gültiger Salve", "price":60, "pack":10},
 	"plates":{"name":"Panzerplatten", "short":"PLATTEN", "icon":"supply_plates", "toggle":true, "effect":"−35 % erlittener Schaden · 1 je Treffer", "price":60, "pack":10},
 	"repair_kit":{"name":"Notreparatur", "short":"NOTREP", "icon":"supply_repair", "toggle":false, "effect":"+35 % Rumpf sofort · 45 s Abklingzeit", "price":90, "pack":1, "cooldown":45.0},

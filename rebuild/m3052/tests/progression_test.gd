@@ -90,6 +90,7 @@ func _initialize() -> void:
 
 	for start_region in 3:
 		sim=SIM.new();sim.level=20;sim.configure_map(start_region);sim.npcs.clear();sim.drops.clear()
+		sim.EXPANSION.set_event(sim,"off")
 		var original_gold: int=sim.player.gold
 		var destination: int=sim.portals[0].destination
 		check(sim.request_portal(destination) and sim.pending_portal==destination,"portal request queues route from region "+str(start_region))

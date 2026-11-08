@@ -164,17 +164,23 @@ const ELITE_V2_TEXTURE_FILES := [
 	"Elite_03_Tiefblau_Albedo.png", "Elite_04_Waldgruen_Albedo.png",
 	"Elite_05_Violett_Albedo.png", "Elite_06_Petrol_Albedo.png",
 	"Elite_07_Elfenbein_Albedo.png", "Elite_08_Stahlblau_Albedo.png",
-	"Elite_09_Karmesin_Albedo.png", "Elite_10_Knochen_Albedo.png"
+	"Elite_09_Karmesin_Albedo.png", "Elite_10_Knochen_Albedo.png",
+	"res://assets/expansion/halloween.webp","res://assets/expansion/columbus.webp"
 ]
 const ELITE_V2_TEXTURE_ROOT := "res://assets/elite_v2/textures/"
 
 func player_key_for_skin(skin: int) -> String:
 	# Skin 0 is shaded, skin 1 retains the ORIGINAL Black Crown test model.
 	# Skins 2-11 use that EXACT SAME GLB, with one variant albedo at a time.
-	return "black_crown_corsair_elite_test" if skin>=1 and skin<=11 else "schattenkriegsschiff_shaded"
+	return "black_crown_corsair_elite_test" if skin>=1 and skin<=13 else "schattenkriegsschiff_shaded"
 
 func elite_texture_level(skin: int) -> int:
-	return skin-1 if skin>=2 and skin<=11 else 0
+	return skin-1 if skin>=2 and skin<=13 else 0
+
+func texture_path(level: int) -> String:
+	if level<1 or level>ELITE_V2_TEXTURE_FILES.size():return ""
+	var filename: String=ELITE_V2_TEXTURE_FILES[level-1]
+	return filename if filename.begins_with("res://") else ELITE_V2_TEXTURE_ROOT+filename
 
 func _apply_elite_texture(owner: Node3D,level: int) -> bool:
 	# Only the albedo changes; NEVER re-instantiate the 3D hull for a paint
@@ -182,7 +188,7 @@ func _apply_elite_texture(owner: Node3D,level: int) -> bool:
 	if level<0 or level>ELITE_V2_TEXTURE_FILES.size():return false
 	var texture: Texture2D
 	if level>0:
-		var path: String=ELITE_V2_TEXTURE_ROOT+str(ELITE_V2_TEXTURE_FILES[level-1])
+		var path: String=texture_path(level)
 		if not ResourceLoader.exists(path):
 			push_error("Missing original Elite V2 albedo: "+path)
 			return false

@@ -7,7 +7,7 @@ func check(ok: bool,label: String) -> void:
 	if not ok:failures.append(label)
 func _initialize() -> void:
 	var sim=SIM.new()
-	check(sim.npcs.size()==17,"16 ship patrols and one monster exist")
+	check(sim.npcs.size()==20,"16 ship patrols and four monsters exist")
 	var npc=sim.npcs[0]
 	check(str(npc.renderer)=="mesh" and str(npc.navigation)=="free","real GLB ships use unrestricted navigation rather than four-sprite zigzags")
 	check(float(npc.speed)<=40.0 and float(sim.npcs[8].speed)<=46.0,"normal and elite NPC speed is rebalanced")

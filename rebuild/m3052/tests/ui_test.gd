@@ -19,10 +19,10 @@ func _run() -> void:
 	current_scene=game
 	await process_frame
 
-	check(game.skins.size()==12 and str(game.skins[0].name)=="Schattenkriegsschiff" and str(game.skins[1].name).contains("Testmodell"),"original starter and original Black Crown test remain separate")
+	check(game.skins.size()==14 and str(game.skins[0].name)=="Schattenkriegsschiff" and str(game.skins[1].name).contains("Testmodell"),"original starter and original Black Crown test remain separate")
 	for level in range(1,11):
 		check(str(game.skins[level+1].name).contains("Elite-Schiff %02d" % level),"ten unique Elite V2 color entries in the Werft: "+str(level))
-	check(game.skin_previews.size()==12 and game.skin_previews.all(func(tex):return tex!=null),"12 actual model/texture preview images imported")
+	check(game.skin_previews.size()==14 and game.skin_previews.all(func(tex):return tex!=null),"14 actual model/texture preview images imported")
 	check(game.sim.player.skin==0,"M3099 new players start with only shaded ship")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"nine NPCs + shaded captain GLB load")
 	check(game.mesh_layer.model_scenes.size()==11,"nine NPC GLBs plus two player options load")
@@ -163,7 +163,7 @@ func _run() -> void:
 	check(migration.restore_save(old_skin_one) and migration.player.skin==0,"old schema 4 skin 1 is not mistaken for new Elite 1")
 	var elite_save=migration.export_save()
 	elite_save.skin=1
-	check(migration.restore_save(elite_save) and migration.player.skin==1 and int(migration.export_save().schema)==6,"Elite 1 survives schema 6 guest save")
+	check(migration.restore_save(elite_save) and migration.player.skin==1 and int(migration.export_save().schema)==7,"Elite 1 survives schema 7 guest save")
 	migration.player.skin=0
 	for level in range(2,12):
 		var new_save=migration.export_save()
@@ -173,6 +173,7 @@ func _run() -> void:
 	for old_id in [0,12,26,27,28,29,30]:
 		var old_save=migration.export_save()
 		old_save.skin=old_id
+		old_save.schema=6
 		check(migration.restore_save(old_save) and int(migration.player.skin)==0,"M3099 retired skin %d maps to shaded ship"%old_id)
 	for course in [Vector2.UP,Vector2.DOWN,Vector2.LEFT,Vector2.RIGHT,Vector2(1,1).normalized(),Vector2(-1,-1).normalized()]:
 		check(game.mesh_layer.forward_for_model("schattenkriegsschiff_shaded",course).distance_to(course)<.001,"M3099 shaded bow orientation "+str(course))
@@ -823,7 +824,7 @@ func _run() -> void:
 	var choices:=0
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
 		if "AUSRÜSTEN" in button.text and not button.disabled:choices+=1
-	check(choices==11 and game.skins.size()==12,"eleven unequipped choices remain clickable alongside active captain")
+	check(choices==13 and game.skins.size()==14,"thirteen unequipped choices remain clickable alongside active captain")
 	game.modal.hide()
 	# Staff tools, the world chart and the chart guide.
 	var map_before: int=game.sim.map_id
