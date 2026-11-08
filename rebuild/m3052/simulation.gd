@@ -55,6 +55,11 @@ var elite_kills := 0
 var tower_kills := 0
 var visited: Array = []
 var upgrades := {"cannon":0, "hull":0, "sails":0, "crew":0, "harpoon":0, "war":0}
+# Purchased cannons belong to the ship inventory, but only these guns are
+# actually fitted to its hardpoints. Legacy saves migrate with guns fitted.
+var mounted_cannons: int=BASE_CANNON_SLOTS
+var talents: Dictionary={"gunnery":0,"armor":0,"navigation":0}
+var battle_pass_claimed: Array=[]
 var supplies := {"powder":10, "plates":10, "repair_kit":2, "shield_charge":2,"skyfire":2,"healing_amulet":2,"blessing_flask":1}
 var powder_on := false
 var plates_on := false
@@ -408,8 +413,9 @@ func buy_supply(key: String) -> bool:
 func buy_cannons() -> bool:
 	if not docked or int(player.cannons) >= MAX_CANNONS or int(player.gold) < cannon_price(): return false
 	player.gold -= cannon_price()
-	player.cannons = mini(MAX_CANNONS, int(player.cannons) + 2)
-	message = "2 Kanonen gekauft · %d an Bord" % player.cannons
+	var acquired: int=mini(2,MAX_CANNONS-int(player.cannons))
+	player.cannons += acquired
+	message = "%d Kanonen gekauft · im Arsenal lagern %d · in der Werft montieren" % [acquired,cannon_storage()]
 	return true
 
 func cannon_price() -> int:
@@ -443,7 +449,30 @@ func cannon_slots() -> int:
 	return BASE_CANNON_SLOTS + roundi(deck_value("cannon")) + (10 if float(buffs.tide_deck) > 0 else 0) + (5 if has_blessing() else 0)
 
 func equipped_cannons() -> int:
-	return mini(int(player.cannons), cannon_slots())
+	return mini(mounted_cannons,cannon_slots())
+
+func cannon_storage() -> int:
+	return maxi(0,int(player.cannons)-mounted_cannons)
+
+func mount_cannons(quantity: int) -> bool:
+	if not docked or quantity<=0:return false
+	var fitting: int=mini(quantity,mini(cannon_storage(),maxi(0,cannon_slots()-mounted_cannons)))
+	if fitting<=0:
+		message="Keine freien Geschützplätze oder keine Kanonen im Lager"
+		return false
+	mounted_cannons+=fitting
+	message="%d Kanonen auf das Schiff montiert · %d/%d Plätze" % [fitting,equipped_cannons(),cannon_slots()]
+	return true
+
+func unmount_cannons(quantity: int) -> bool:
+	if not docked or quantity<=0:return false
+	var removing: int=mini(quantity,mounted_cannons)
+	if removing<=0:
+		message="Keine montierten Kanonen vorhanden"
+		return false
+	mounted_cannons-=removing
+	message="%d Kanonen ins Arsenal gelegt · %d im Lager" % [removing,cannon_storage()]
+	return true
 
 func owns_deck(type: String, tier: int) -> bool:
 	for deck: Dictionary in decks:
@@ -1294,11 +1323,14 @@ func weapon_damage(mode: int) -> int:
 		var special: float = 31.0 * ([0.75, 1.2, 0.8, 0.95][mode-3] if mode<7 else 1.0) # M3105 visual-first test ammo: neutral placeholder value
 		special *= float(equipped_cannons()) / float(BASE_CANNON_SLOTS)
 		if has_blessing(): special *= 1.15
+		special *= 1.0+float(talents.gunnery)*0.02
 		return roundi(special)
 	var key = "harpoon" if mode == 2 else "cannon"
 	var bonus_rate = 0.35 if mode == 2 else 0.25
 	var value: float = float([31,19,96][mode]) * (1.0 + float(upgrades[key]) * bonus_rate)
-	if mode < 2: value *= float(equipped_cannons()) / float(BASE_CANNON_SLOTS)
+	if mode < 2:
+		value *= float(equipped_cannons()) / float(BASE_CANNON_SLOTS)
+		value *= 1.0+float(talents.gunnery)*0.02
 	else: value *= 1.0 + deck_value("hunter") / 100.0
 	if has_blessing(): value *= 1.15
 	return roundi(value)
@@ -1306,11 +1338,11 @@ func weapon_damage(mode: int) -> int:
 func apply_upgrades() -> void:
 	var armor := 1.0 + deck_value("armor") / 100.0
 	var blessed := has_blessing()
-	player.max_hp = roundi(float(PLAYER_HP + int(upgrades.hull) * 400) * armor * (1.2 if blessed else 1.0))
+	player.max_hp = roundi(float(PLAYER_HP + int(upgrades.hull) * 400) * armor * (1.2 if blessed else 1.0) * (1.0+float(talents.armor)*0.02))
 	player.max_shield = roundi(float(PLAYER_SHIELD + int(upgrades.hull) * 120) * armor)
 	player.hp = minf(float(player.hp),float(player.max_hp))
 	player.shield = minf(float(player.shield),float(player.max_shield))
-	player.speed = PLAYER_SPEED * (1.0 + 0.12 * float(upgrades.sails) + deck_value("navigation") / 100.0) * (1.1 if blessed else 1.0) * (1.12 if float(buffs.storm_deck)>0 else 1.0)
+	player.speed = PLAYER_SPEED * (1.0 + 0.12 * float(upgrades.sails) + deck_value("navigation") / 100.0) * (1.1 if blessed else 1.0) * (1.12 if float(buffs.storm_deck)>0 else 1.0) * (1.0+float(talents.navigation)*0.02)
 
 ## Captain level paces the castles: levels 1-3 are always open, then one more every three levels.
 func castle_cap() -> int:
@@ -1330,6 +1362,41 @@ func buy_upgrade(key: String) -> bool:
 	upgrades[key] += 1
 	apply_upgrades()
 	message = "%s auf Stufe %d ausgebaut" % [CONTENT.UPGRADES[key].name,upgrades[key]]
+	return true
+
+func talent_points_available() -> int:
+	var spent: int=0
+	for key: String in CONTENT.TALENT_KEYS:spent+=int(talents[key])
+	return maxi(0,level-1-spent)
+
+func learn_talent(key: String) -> bool:
+	if not docked or not CONTENT.TALENTS.has(key):return false
+	if talent_points_available()<=0 or int(talents[key])>=CONTENT.TALENT_MAX:
+		message="Keine freien Talentpunkte oder Talent bereits voll"
+		return false
+	talents[key]=int(talents[key])+1
+	apply_upgrades()
+	message="%s auf Stufe %d verbessert" % [CONTENT.TALENTS[key].name,talents[key]]
+	return true
+
+func battle_pass_progress() -> int:
+	# Deterministic from real account progress; no timers, paid track or fake
+	# purchases are introduced in this offline beta.
+	return mini(999999,maxi(0,kills*10+monster_kills*25+elite_kills*10+loot_collected*5+bonus_runs*50))
+
+func claim_battle_pass_free(index: int) -> bool:
+	if index<0 or index>=CONTENT.BATTLE_PASS_FREE.size() or battle_pass_claimed.has(index):return false
+	var tier: Dictionary=CONTENT.BATTLE_PASS_FREE[index]
+	if battle_pass_progress()<int(tier.need):
+		message="Saisonfortschritt noch nicht erreicht"
+		return false
+	if int(player.gold)>99999999-int(tier.gold) or essence>99999-int(tier.essence):
+		message="Bitte erst Platz im Inventar schaffen"
+		return false
+	player.gold+=int(tier.gold)
+	essence+=int(tier.essence)
+	battle_pass_claimed.append(index)
+	message="Saisonpass: %s abgeholt" % str(tier.name)
 	return true
 
 func can_dock() -> bool:
@@ -1579,9 +1646,10 @@ func export_save() -> Dictionary:
 	return {"schema":8,"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
+		"talents":talents.duplicate(),"battle_pass_claimed":battle_pass_claimed.duplicate(),
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
 		"position":[position.x,position.y],"hp":player.hp,"shield":player.shield,"docked":docked,
-		"cannons":player.cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
+		"cannons":player.cannons,"mounted_cannons":mounted_cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
 		"essence":essence,"fragments":fragments,"bonus_pieces":bonus_pieces.duplicate(),"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
 		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
 		"deck_slots":deck_slots.duplicate(),"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),"guild_home":guild_home.duplicate(true),
@@ -1624,7 +1692,22 @@ func restore_save(data: Dictionary) -> bool:
 	var saved_upgrades: Variant=data.get("upgrades",{})
 	if saved_upgrades is Dictionary:
 		for key in CONTENT.UPGRADE_KEYS:upgrades[key]=clampi(int(saved_upgrades.get(key,0)),0,CONTENT.CASTLE_MAX)
+	# Avoid overspending talent points in damaged/malicious guest saves.
+	var saved_talents: Variant=data.get("talents",{})
+	var talent_budget: int=maxi(0,level-1)
+	for key: String in CONTENT.TALENT_KEYS:
+		var requested: int=int(saved_talents.get(key,0)) if saved_talents is Dictionary else 0
+		talents[key]=clampi(requested,0,mini(CONTENT.TALENT_MAX,talent_budget))
+		talent_budget-=int(talents[key])
+	battle_pass_claimed.clear()
+	var saved_claimed: Variant=data.get("battle_pass_claimed",[])
+	if saved_claimed is Array:
+		for entry in saved_claimed:
+			var tier_id: int=int(entry)
+			if tier_id>=0 and tier_id<CONTENT.BATTLE_PASS_FREE.size() and not battle_pass_claimed.has(tier_id):battle_pass_claimed.append(tier_id)
 	player.cannons=clampi(int(data.get("cannons",BASE_CANNON_SLOTS)),BASE_CANNON_SLOTS,MAX_CANNONS)
+	# Unmodified older player files had all available guns auto-mounted.
+	mounted_cannons=clampi(int(data.get("mounted_cannons",int(player.cannons))),0,int(player.cannons))
 	var saved_supplies: Variant=data.get("supplies",{})
 	if saved_supplies is Dictionary:
 		for key in CONTENT.SUPPLY_KEYS:supplies[key]=clampi(int(saved_supplies.get(key,supplies[key])),0,99999)

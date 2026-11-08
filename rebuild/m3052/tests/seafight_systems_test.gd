@@ -158,14 +158,23 @@ func _initialize() -> void:
 	check(sim.cannon_slots()==10 and sim.equipped_cannons()==10 and sim.weapon_damage(0)==31,"ten slots and ten cannons keep the original salvo")
 	check(not sim.buy_cannons(),"cannons are bought in the harbor")
 	sim.player.pos=sim.harbor;sim.dock();sim.player.gold=5000
-	check(sim.buy_cannons() and int(sim.player.cannons)==12 and sim.equipped_cannons()==10,"extra cannons wait for free slots")
+	check(sim.buy_cannons() and int(sim.player.cannons)==12 and sim.equipped_cannons()==10 and sim.cannon_storage()==2,"new purchased cannons are stored, not automatically installed")
 	sim.add_tide_deck(1800)
-	check(sim.cannon_slots()==20 and sim.equipped_cannons()==12 and sim.weapon_damage(0)==roundi(31*1.2),"tide deck adds ten slots and the extra cannons fire")
+	check(sim.cannon_slots()==20 and sim.equipped_cannons()==10,"tide deck adds ten slots but stored guns remain unused")
+	check(sim.mount_cannons(2) and sim.equipped_cannons()==12 and sim.cannon_storage()==0 and sim.weapon_damage(0)==roundi(31*1.2),"captain manually installs stored guns into available ship slots")
+	check(sim.unmount_cannons(1) and sim.cannon_storage()==1 and sim.equipped_cannons()==11,"captain transfers guns from ship back to arsenal")
+	check(sim.mount_cannons(1) and sim.equipped_cannons()==12 and sim.cannon_storage()==0,"stored guns can be reinstalled without purchasing again")
 	sim.add_tide_deck(1800)
 	check(is_equal_approx(float(sim.buffs.tide_deck),3600),"finding another tide deck extends its time")
 	sim.step(3601)
 	check(sim.cannon_slots()==10 and sim.equipped_cannons()==10,"expired tide deck returns the slots")
 
+	var cannon_save: Dictionary=JSON.parse_string(JSON.stringify(sim.export_save()))
+	var cannon_reload=SIM.new()
+	check(cannon_reload.restore_save(cannon_save) and cannon_reload.mounted_cannons==12 and int(cannon_reload.player.cannons)==12,"mounted and stored guns persist without duplication")
+	cannon_save.erase("mounted_cannons")
+	check(cannon_reload.restore_save(cannon_save) and cannon_reload.mounted_cannons==12,"legacy guest save retains previously automatically mounted guns")
+	check(not sim.mount_cannons(1) or sim.cannon_storage()==0,"cannot mount any gun the captain does not own")
 	# Kristallsegen: one major blessing with moderate combined bonuses.
 	sim=SIM.new()
 	sim.activate_blessing(60)
@@ -369,6 +378,36 @@ func _initialize() -> void:
 	patrol.pos=sea.npcs[2].pos
 	sea._hit({"source":0,"damage":100,"weapon":"pumpkin"},patrol)
 	check(int(sea.npcs[2].hp)+int(sea.npcs[2].shield)<pumpkin_before,"pumpkin ammunition splashes a nearby ship, taking shields before hull")
+	# Captain talent points are earned, not purchased; they really affect
+	# combat and ship stats, and cannot exceed the level-based point budget.
+	var specialist=SIM.new()
+	check(specialist.talent_points_available()==0 and not specialist.learn_talent("gunnery"),"no talent points before first captain level")
+	specialist.level=6
+	specialist.player.pos=specialist.harbor;specialist.dock()
+	check(specialist.talent_points_available()==5,"captain level six has five unspent talent points")
+	var damage_before: int=specialist.weapon_damage(0)
+	var hull_before: int=int(specialist.player.max_hp)
+	var speed_before: float=float(specialist.player.speed)
+	check(specialist.learn_talent("gunnery") and specialist.weapon_damage(0)>damage_before,"gunnery talent improves live cannonball damage")
+	check(specialist.learn_talent("armor") and int(specialist.player.max_hp)>hull_before,"armoring talent increases actual hull capacity")
+	check(specialist.learn_talent("navigation") and float(specialist.player.speed)>speed_before,"navigation talent increases movement speed")
+	check(specialist.talent_points_available()==2,"talent costs one point and does not spend gold")
+	var saved_talents: Dictionary=JSON.parse_string(JSON.stringify(specialist.export_save()))
+	var loaded_talents=SIM.new()
+	check(loaded_talents.restore_save(saved_talents) and int(loaded_talents.talents.gunnery)==1 and int(loaded_talents.talents.armor)==1 and int(loaded_talents.talents.navigation)==1,"talent tree survives JSON save reload")
+	saved_talents.talents={"gunnery":999,"armor":999,"navigation":999}
+	check(loaded_talents.restore_save(saved_talents) and loaded_talents.talent_points_available()==0 and int(loaded_talents.talents.gunnery)<=5,"edited player saves cannot overallocate talents")
+	var free_pass=SIM.new()
+	free_pass.kills=5
+	var old_gold: int=int(free_pass.player.gold)
+	var old_essence: int=free_pass.essence
+	check(free_pass.battle_pass_progress()>=50 and free_pass.claim_battle_pass_free(1),"free season pass reward is unlocked with genuine progress")
+	check(int(free_pass.player.gold)==old_gold+200 and free_pass.essence==old_essence+1,"free pass pays correct gold and essence amounts")
+	check(not free_pass.claim_battle_pass_free(1) and int(free_pass.player.gold)==old_gold+200,"season milestone cannot be claimed twice")
+	var saved_pass: Dictionary=JSON.parse_string(JSON.stringify(free_pass.export_save()))
+	var pass_reload=SIM.new()
+	check(pass_reload.restore_save(saved_pass) and pass_reload.battle_pass_claimed.has(1) and not pass_reload.claim_battle_pass_free(1),"season pass claims persist and resist reload duplication")
+	check(not free_pass.claim_battle_pass_free(4),"locked season pass reward rejects premature claim")
 	_staff_checks()
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
