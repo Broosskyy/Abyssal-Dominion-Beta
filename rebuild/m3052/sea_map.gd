@@ -1842,7 +1842,7 @@ func _clock_text(seconds: float) -> String:
 	var minutes=floori((total%3600)/60.0)
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
-const MODAL_TABS := {"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
+const MODAL_TABS := {"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
 const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
@@ -1924,10 +1924,12 @@ func _build_tabs(kind: String) -> void:
 	if not current in names:current=str(names[0])
 	modal_tab[kind]=current
 	for name in names:
-		var tab=str(name)
-		var button=_button(modal_tabs,tab,func():_switch_tab(kind,tab),"tab_on" if tab==current else "tab")
+		var tab: String=str(name)
+		var caption: String="KANONEN" if kind=="Markt" and tab=="AUSRÜSTUNG" and get_viewport_rect().size.x<920.0 else tab
+		var button=_button(modal_tabs,caption,func():_switch_tab(kind,tab),"tab_on" if tab==current else "tab")
 		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		button.add_theme_font_size_override("font_size",12 if names.size()>4 else 14)
+		button.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		button.add_theme_font_size_override("font_size",11 if get_viewport_rect().size.x<720 and names.size()>=4 else (12 if names.size()>4 else 14))
 
 func _switch_tab(kind: String,tab: String) -> void:
 	modal_tab[kind]=tab
@@ -2042,6 +2044,53 @@ func _row_button(parent: Node,text: String,callback: Callable,disabled: bool=fal
 	button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	button.disabled=disabled
 	return button
+
+# Shared mobile-first catalog used by Market, Decks, Castles, and Talents.
+# At phone widths a tile spans the panel; landscape gets two or three
+# columns. A price and a touch-sized action always stay BELOW its artwork.
+func _catalog_grid(max_columns: int=3,parent: Node=null) -> GridContainer:
+	var width: float=modal_scroll.size.x
+	var columns: int=1 if width<420.0 else (3 if width>=860.0 else 2)
+	var gallery=_grid(mini(max_columns,columns),parent)
+	gallery.set_meta("catalog_grid",true)
+	return gallery
+
+func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String,footer: String,accent: Color=Color("ab8852")) -> VBoxContainer:
+	var panel: PanelContainer=_card(accent,parent)
+	panel.set_meta("catalog_tile",true)
+	panel.custom_minimum_size=Vector2(0,228)
+	var content=VBoxContainer.new()
+	content.add_theme_constant_override("separation",7)
+	content.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	content.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	panel.add_child(content)
+	var frame=CenterContainer.new()
+	frame.custom_minimum_size.y=104
+	frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	content.add_child(frame)
+	if texture!=null:
+		var art=_picture(frame,texture,96,true)
+		art.custom_minimum_size=Vector2(96,96)
+	var heading=_text(content,title,15,Color("ffdf9d"))
+	heading.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	heading.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	heading.custom_minimum_size.y=24
+	var description=_text(content,details,12,Color("c5d4d4"))
+	description.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	description.custom_minimum_size.y=34
+	var price=_text(content,footer,14,Color("a7e4cd"))
+	price.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	price.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	price.custom_minimum_size.y=27
+	return content
+
+func _catalog_action(parent: Node,text: String,handler: Callable,disabled: bool=false) -> Button:
+	var action=_row_button(parent,text,handler,disabled,"primary")
+	action.custom_minimum_size.y=50
+	action.add_theme_font_size_override("font_size",14)
+	action.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	return action
 
 func _banner_card(texture: Texture2D,title: String,text: String,accent: Color=Color("c9a35e")) -> VBoxContainer:
 	var column=_row(texture,title,72,accent)
@@ -2456,60 +2505,75 @@ func _open_weapons() -> void:
 # Marketplace is a real GOLD economy. There is deliberately no pretend
 # online auction, no credit-card form, and no fake premium transaction.
 func _open_market() -> void:
-	_banner_card(painted.nav_harbor,"MARKTPLATZ · HANDEL & VORRÄTE","Dein Guthaben: %s Gold · Einkaufen ist überall auf der Seekarte möglich. Munition gibt es hier, die Montage der Kanonen übernimmt die Werft." % _thousands(int(sim.player.gold)))
+	_banner_card(painted.nav_harbor,"MARKT · HÄNDLER & HANDEL","Große Warenkarten mit Bestandsanzeige, Preis und direktem Kauf. Du kannst auch auf See einkaufen.")
+	_section("DEIN GOLD · %s" % _thousands(int(sim.player.gold)))
 	match _tab("Markt"):
 		"AUSRÜSTUNG":
-			_section("KANONEN & SCHIFFSAUSRÜSTUNG")
-			var row=_row(extra_icons.cannon_1,"STANDARDBATTERIE · 2 KANONEN\nBesitz: %d · montiert: %d · Arsenal: %d\nPreis: %d Gold" % [int(sim.player.cannons),sim.mounted_cannons,sim.cannon_storage(),sim.cannon_price()],62,Color("9d7440"))
-			var buy=_row_button(row,"2 KANONEN KAUFEN",func():
-				sim.buy_cannons();_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.cannons)>=sim.MAX_CANNONS or int(sim.player.gold)<sim.cannon_price(),"primary")
-			buy.tooltip_text="Kauf überall möglich. Gekaufte Kanonen landen im Arsenal und können außerhalb von Gefechten montiert werden."
-			_note("Neue Kanonen liegen zunächst im Arsenal. Ein Schiff kann nie mehr Kanonen abfeuern, als aktive Geschützplätze vorhanden sind.")
-			var access=_grid(2)
-			_action("ZUR KANONENMONTAGE",func():_switch_tab("Werft","KANONEN"),"normal",access)
-			_action("DECKWERFT",func():_open_modal("Decks"),"normal",access)
+			_section("SCHIFFSGESCHÜTZE")
+			var goods=_catalog_grid(2)
+			var column=_catalog_tile(goods,extra_icons.cannon_1,"KANONENPAKET · 2 STÜCK","Besitz: %d · montiert: %d\nIm Arsenal: %d" % [int(sim.player.cannons),sim.mounted_cannons,sim.cannon_storage()],"%s GOLD" % _thousands(sim.cannon_price()),Color("ba9054"))
+			var buy=_catalog_action(column,"2 KANONEN KAUFEN",func():
+				sim.buy_cannons();_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.cannons)>=sim.MAX_CANNONS or int(sim.player.gold)<sim.cannon_price())
+			buy.name="MarketCannons"
+			buy.tooltip_text="Gekaufte Kanonen kommen ins Arsenal und werden in der Werft montiert."
+			var yard=_catalog_tile(goods,painted.nav_shipyard,"WERFT & ARSENAL","Geschützplätze und Schiffsausrüstung verwalten.","SCHIFFSAUSRÜSTUNG",Color("566f79"))
+			_catalog_action(yard,"KANONEN MONTIEREN",func():_switch_tab("Werft","KANONEN"))
+			_note("Kugeln gehören ausschließlich in den Munitionsmarkt. Neue Kanonen werden nicht automatisch aufs Schiff montiert.")
 		"MUNITION":
-			_section("NORMALMUNITION & HARPUNEN")
-			_note("Kaufe Vorräte hier, lade sie anschließend über das separate Munitionsmenü. Kein Munitionskauf in der Werft.")
+			_section("STANDARDMUNITION & HARPUNEN")
+			_note("Wähle die Ware anhand ihres Bildes. Der Preis gilt jeweils für ein Paket; im Kampf wird die Munition separat ausgewählt.")
+			var basic=_catalog_grid(3)
 			for i in AMMO_UI.size():
-				if i==3:_section("SPEZIALMUNITION · BETA-WERTE")
+				if i==3:
+					_section("SPEZIALMUNITION · BETA")
+					basic=_catalog_grid(3)
 				var index: int=i
 				var data: Dictionary=AMMO_UI[i]
-				var price: int=30 if i<3 else 80
-				var row=_row(_ammo_texture(i),"%s · %d Stück im Lager\n+%d Stück · %d Gold" % [str(data.name),int(sim.player.ammo[i]),sim.ammo_pack(i),price],46,Color("caa968") if sim.ammo_mode==i else Color(0,0,0,0))
-				var buy=_row_button(row,"KAUFEN · %d GOLD" % price,func():
-					sim.buy_ammo(index);_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.hp)<=0 or int(sim.player.gold)<price,"primary")
-				buy.name="MarketAmmo"+str(i)
+				var price: int=30 if index<3 else 80
+				var stock: int=int(sim.player.ammo[index])
+				var count: int=sim.ammo_pack(index)
+				var tile=_catalog_tile(basic,_ammo_texture(index),str(data.name).to_upper(),"%s\nIm Lager: %s" % [str(data.use),_thousands(stock)],"+%d STÜCK · %d GOLD" % [count,price],Color("a6bfa3") if sim.ammo_mode==index else Color("a88959"))
+				var purchase=_catalog_action(tile,"KAUFEN · %d GOLD" % price,func():
+					sim.buy_ammo(index);_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.hp)<=0 or int(sim.player.gold)<price)
+				purchase.name="MarketAmmo"+str(index)
+			_action("ZUR MUNITIONSWAHL",func():_open_modal("Munition"))
 		"ITEMS":
 			_section("VERBRAUCHSGEGENSTÄNDE")
+			_note("Reparatur, Schutzschild und Spezialeffekte – direkte Käufe ohne Andocken.")
+			var goods=_catalog_grid(3)
 			for key: String in CONTENT.SUPPLY_KEYS:
 				var item: String=key
 				var config: Dictionary=CONTENT.SUPPLIES[key]
-				var row=_row(_supply_icon(key),"%s · %d auf Lager\n+%d Stück · %d Gold" % [str(config.name),int(sim.supplies[key]),int(config.pack),int(config.price)],46)
-				var buy=_row_button(row,"KAUFEN · %d GOLD" % int(config.price),func():
-					sim.buy_supply(item);_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.gold)<int(config.price),"primary")
-				buy.name="MarketItem_"+key
-			_note("Item-Käufe sind auf See möglich. Zum Einsetzen benutzt du das separate Verbrauchsmenü im Kampf-HUD.")
+				var price: int=int(config.price)
+				var count: int=int(config.pack)
+				var tile=_catalog_tile(goods,_supply_icon(item),str(config.name).to_upper(),"%s\nIm Lager: %d" % [str(config.effect),int(sim.supplies[item])],"+%d STÜCK · %d GOLD" % [count,price],Color("9a7e4f"))
+				var buy=_catalog_action(tile,"KAUFEN · %d GOLD" % price,func():
+					sim.buy_supply(item);_save_progress();_open_modal("Markt");_refresh_ui(),int(sim.player.gold)<price)
+				buy.name="MarketItem_"+item
+			_action("ZUR VERBRAUCHSAUSWAHL",func():_open_modal("Verbrauch"))
 		"AUKTION":
-			_section("HANDELSPLATZ & AUKTIONEN")
-			_note("Spieler-zu-Spieler-Angebote benötigen eine serverseitige Eigentumsprüfung, Reservierung der Gegenstände und sichere Transaktionsbestätigung. In dieser lokalen Beta sind Auktionen daher noch gesperrt.")
-			var disabled=_action("AUKTIONSHAUS · ONLINE ERFORDERLICH",func():pass)
-			disabled.disabled=true
-			_action("ZURÜCK ZUM NORMALEN MARKT",func():_switch_tab("Markt","AUSRÜSTUNG"))
+			_section("SPIELERHANDEL · SPÄTER ONLINE")
+			var auction=_catalog_grid(2)
+			var tile=_catalog_tile(auction,painted.reward_chest,"AUKTIONSHAUS","Spielerangebote brauchen Serverkonten und sichere Besitzübertragung.","DERZEIT NICHT VERFÜGBAR",Color("566773"))
+			var locked=_catalog_action(tile,"ONLINE-HANDEL GESPERRT",func():pass,true)
+			locked.name="LockedAuction"
+			_action("ZURÜCK ZUM MARKT",func():_switch_tab("Markt","AUSRÜSTUNG"))
 
 func _open_premium_shop() -> void:
-	_banner_card(painted.gold_coins,"KRONEN-SHOP · VORSCHAU","Kronen sind die vorgesehene Premiumwährung. Käufe mit Echtgeld sind in dieser lokalen Beta nicht verfügbar.")
+	_banner_card(painted.gold_coins,"KRONEN-SHOP · VORSCHAU","Große Artikelkarten wie im Markt – echte Zahlung und Premiumwährung bleiben in der lokalen Beta deaktiviert.")
 	_section("KRONEN · NOCH NICHT AKTIV")
-	_note("Es werden weder Zahlungen angefordert noch Premium-Guthaben auf diesem Gerät erzeugt. Erst die gesicherte Online-Anbindung mit serverseitiger Kaufvalidierung aktiviert echte Transaktionen.")
-	for product in ["Kronen-Paket · Klein","Kronen-Paket · Mittel","Kronen-Paket · Groß","Saisonpass · Premium"]:
-		var preview=_row(painted.reward_chest,product+"\nPreis und Gegenwert folgen nach dem Balancing",44)
-		var inactive=_row_button(preview,"NOCH NICHT KAUFBAR",func():pass,true)
+	var display=_catalog_grid(2)
+	var offers=["Kronen-Paket · Klein","Kronen-Paket · Mittel","Kronen-Paket · Groß","Saisonpass · Premium"]
+	for i in offers.size():
+		var title: String=str(offers[i])
+		var art: Texture2D=painted.reward_chest if i==3 else painted.gold_coins
+		var tile=_catalog_tile(display,art,title.to_upper(),"Preis und Gegenwert werden erst nach Abschluss des Balancings festgelegt.","KEIN GELDVERKEHR",Color("78615f"))
+		var inactive=_catalog_action(tile,"NOCH NICHT KAUFBAR",func():pass,true)
 		inactive.name="DisabledPayment"
+	_note("Keine Zahlung, kein fingiertes Guthaben. Kronen und Echtgeldkäufe benötigen Serverkonten sowie gültige Kaufbestätigungen.")
 	var links=_grid(2)
 	_action("GOLD-MARKTPLATZ",func():_open_modal("Markt"),"normal",links)
 	_action("SAISONPASS ANSEHEN",func():_open_modal("Battle Pass"),"normal",links)
-
-# --- Harbor, logbook and ranking -----------------------------------------------------------
 
 func _open_harbor() -> void:
 	var name: String="PORT AZUR" if sim.map_id==0 else "HAFEN"
@@ -2587,68 +2651,77 @@ func _open_ranking() -> void:
 
 func _open_castles() -> void:
 	if _tab("Kastelle")=="TALENTE":
-		_banner_card(painted.nav_castles,"TALENTE · DEIN KAPITÄN","Pro Kapitänsstufe erhältst du einen Talentpunkt. Die drei Fachgebiete verbessern deine echten Kampf- und Schiffswerte. Talente kannst du auch unterwegs vergeben; Kastelle bleiben vorerst Hafenausbauten.")
+		_banner_card(painted.nav_castles,"KAPITÄNSTALENTE","Drei Fachgebiete mit spürbaren Effekten. Die Punkte erhältst du durch Kapitänsstufen und kannst sie jederzeit vergeben.")
 		_section("FREIE TALENTPUNKTE · %d" % sim.talent_points_available())
+		var choices=_catalog_grid(3)
 		for key: String in CONTENT.TALENT_KEYS:
 			var talent_key: String=key
 			var config: Dictionary=CONTENT.TALENTS[key]
 			var stage: int=int(sim.talents[key])
-			var column=_row(_art(str(config.icon)),"%s · %s\nSTUFE %d/%d · %s" % [str(config.name).to_upper(),str(config.role),stage,CONTENT.TALENT_MAX,str(config.effect)],60,Color("d5b779") if stage>0 else Color("435864"))
-			var progress=_text(column,"FORTSCHRITT  "+"◆".repeat(stage)+"◇".repeat(CONTENT.TALENT_MAX-stage),13,Color("f8d58e"))
-			progress.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-			var learn=_row_button(column,"TALENTPUNKT VERGEBEN" if stage<CONTENT.TALENT_MAX else "MAXIMALE TALENTSTUFE",func():
-				sim.learn_talent(talent_key)
-				_save_progress();_open_modal("Kastelle");_refresh_ui(),stage>=CONTENT.TALENT_MAX or sim.talent_points_available()<=0,"primary")
-			learn.name="Talent_"+key
-		_note("Talentvergabe jederzeit verfügbar – keine Hafenbindung.",Color("9bd6bd"))
+			var tile=_catalog_tile(choices,_art(str(config.icon)),str(config.name).to_upper(),"%s · %s" % [str(config.role),str(config.effect)],"TALENT · STUFE %d/%d" % [stage,CONTENT.TALENT_MAX],Color("c9a35e") if stage>0 else Color("5e7683"))
+			var gauge=_bar(tile)
+			gauge.max_value=CONTENT.TALENT_MAX
+			gauge.value=stage
+			gauge.custom_minimum_size.y=12
+			var upgrade=_catalog_action(tile,"PUNKT VERGEBEN" if stage<CONTENT.TALENT_MAX else "TALENT VOLLSTÄNDIG",func():
+				sim.learn_talent(talent_key);_save_progress();_open_modal("Kastelle");_refresh_ui(),stage>=CONTENT.TALENT_MAX or sim.talent_points_available()<=0)
+			upgrade.name="Talent_"+key
+		_note("Talentvergabe ist weltweit möglich. Kastelle sind weiterhin stationäre Bauten und vorerst an den Hafen gebunden.",Color("a7cfc5"))
 		return
-	_banner_card(painted.nav_castles,"KASTELLE · DAUERHAFTE SCHIFFSVERBESSERUNGEN","Sechs Kastelle mit je %d Stufen. Neue Stufen werden mit dem Kapitänslevel freigeschaltet. Aktuell ausbaubar bis Stufe %d; die angezeigten Werte wirken direkt im Spiel." % [CONTENT.CASTLE_MAX,sim.castle_cap()])
-	if not sim.docked:_note("Kastelle werden ausschließlich im Hafen ausgebaut.",Color("e1b979"))
+	_banner_card(painted.nav_castles,"KASTELLE · DAUERHAFTE AUSBAUTEN","Sechs getrennte Bauzweige, freigeschaltet durch Kapitänsstufen. Bilder, Effekte, Ausbaustufe und Preis auf einer Karte.")
 	var total: int=0
 	for key: String in CONTENT.UPGRADE_KEYS:total+=int(sim.upgrades[key])
-	_section("AUSBAUSTAND · %d/%d" % [total,CONTENT.UPGRADE_KEYS.size()*CONTENT.CASTLE_MAX])
-	var upgrades=_grid(2)
+	_section("AUSBAUSTAND · %d/%d · FREI BIS STUFE %d" % [total,CONTENT.UPGRADE_KEYS.size()*CONTENT.CASTLE_MAX,sim.castle_cap()])
+	if not sim.docked:_note("Kastelle werden vorerst nur am Hafen ausgebaut. Die Übersicht funktioniert überall.",Color("e1b979"))
+	var upgrades=_catalog_grid(3)
 	for key: String in CONTENT.UPGRADE_KEYS:_upgrade_row(key,upgrades)
 	_action("ZU DEN TALENTEN · %d PUNKTE FREI" % sim.talent_points_available(),func():_switch_tab("Kastelle","TALENTE"))
 
 func _open_battle_pass() -> void:
-	_banner_card(painted.nav_bonus,"SAISONPASS · FREIE BETA-SAISON","Belohnungen basieren auf echten NPC-Siegen, Monsterjagden, Bergungen und abgeschlossenen Bonuskarten. Keine Echtgeldkäufe, keine Premium-Freischaltung auf diesem Gerät.")
+	_banner_card(painted.nav_bonus,"SAISONPASS · FREIE BETA-SAISON","Spiele, sammle Fortschritt und hole kostenfreie Belohnungen ab. Die Premiumspur bleibt gesperrt, bis sichere Konten und Zahlungen existieren.")
 	var current: int=sim.battle_pass_progress()
-	_section("SAISONFORTSCHRITT · %d PUNKTE" % current)
+	var maximum: int=int(CONTENT.BATTLE_PASS_FREE.back().need)
+	_section("DEIN SAISONFORTSCHRITT · %d / %d" % [current,maximum])
+	var progress=_bar(modal_body)
+	progress.max_value=maximum
+	progress.value=min(current,maximum)
+	progress.custom_minimum_size.y=15
+	_section("KOSTENLOSE BELOHNUNGEN")
+	var rewards=_catalog_grid(3)
 	for i in CONTENT.BATTLE_PASS_FREE.size():
 		var index: int=i
 		var tier: Dictionary=CONTENT.BATTLE_PASS_FREE[i]
 		var claimed: bool=sim.battle_pass_claimed.has(i)
 		var unlocked: bool=current>=int(tier.need)
-		var label: String="STUFE %d · %s\nAb %d Fortschritt · %d Gold · %d Essenz" % [i+1,str(tier.name),int(tier.need),int(tier.gold),int(tier.essence)]
-		var card=_row(painted.reward_chest,label,50,Color("4d8667") if claimed else (Color("b58d56") if unlocked else Color("47525a")))
-		var state: String="ABGEHOLT" if claimed else ("KOSTENLOS ABHOLEN" if unlocked else "NOCH GESPERRT")
-		var claim=_row_button(card,state,func():
-			sim.claim_battle_pass_free(index)
-			_save_progress();_open_modal("Battle Pass");_refresh_ui(),claimed or not unlocked,"primary" if unlocked else "normal")
-		claim.name="FreePassClaim"+str(i)
-	_section("PREMIUM-STRECKE")
-	_note("Eine zweite Belohnungsreihe für Kronen wird erst mit serverseitigem Konto, sicherer Bezahlbestätigung und einem verbindlichen Saisonzeitraum aktiviert. Hier gibt es weder versteckte Käufe noch leere Premium-Buttons.")
-	var preview=_action("PREMIUM-FREISCHALTUNG · NICHT VERFÜGBAR",func():pass)
-	preview.disabled=true
-	_action("KRONEN-SHOP ANSEHEN",func():_open_modal("Premium-Shop"))
+		var status: String="ABGEHOLT" if claimed else ("FREIGESCHALTET" if unlocked else "NOCH GESPERRT")
+		var image: Texture2D=painted.reward_chest if i%2==0 else painted.gold_coins
+		var tile=_catalog_tile(rewards,image,"STUFE %d · %s" % [i+1,str(tier.name).to_upper()],"%d Gold + %d Essenz" % [int(tier.gold),int(tier.essence)],"%d PUNKTE · %s" % [int(tier.need),status],Color("508d73") if claimed else (Color("bc9258") if unlocked else Color("5a6570")))
+		var button=_catalog_action(tile,"ABGEHOLT" if claimed else ("KOSTENLOS ABHOLEN" if unlocked else "NOCH GESPERRT"),func():
+			sim.claim_battle_pass_free(index);_save_progress();_open_modal("Battle Pass");_refresh_ui(),claimed or not unlocked)
+		button.name="FreePassClaim"+str(i)
+	_section("PREMIUMSPUR · ZUKÜNFTIG")
+	_note("Kein aktives Abo oder Echtgeldkauf. Die Premium-Belohnungen erscheinen erst mit sicherer serverseitiger Freischaltung.")
+	var disabled=_action("PREMIUM NOCH NICHT VERFÜGBAR",func():pass)
+	disabled.disabled=true
 
 func _upgrade_row(key: String,parent: Node=null) -> void:
 	var config: Dictionary=CONTENT.UPGRADES[key]
-	var art_key = key+"_%d" % mini(2,int(sim.upgrades[key])) if key in ["cannon","harpoon"] else str(config.icon)
-	var stage=int(sim.upgrades[key])
-	var column=_row(_art(art_key),"%s · %s · Stufe %d/%d\n%s" % [config.name,config.role,stage,CONTENT.CASTLE_MAX,config.effect],58,Color("c9a35e") if stage>0 else Color(0,0,0,0),parent)
-	var pips=Control.new();pips.custom_minimum_size=Vector2(0,12);pips.mouse_filter=Control.MOUSE_FILTER_IGNORE;column.add_child(pips)
-	pips.draw.connect(func():
-		for i in CONTENT.CASTLE_MAX:
-			var c=Vector2(8+i*16,6)
-			SEA_MARKS.gem(pips,c,5.5,Color("f2c14e"),-1,i<stage))
+	var stage: int=int(sim.upgrades[key])
+	var art_key: String=key+"_%d" % mini(2,stage) if key in ["cannon","harpoon"] else str(config.icon)
 	var cost: int=sim.upgrade_cost(key)
-	var gated=cost>=0 and stage>=sim.castle_cap()
-	var text="MAXIMALE STUFE" if cost<0 else ("AB KAPITÄNSSTUFE %d" % ((stage-2)*3) if gated else "VERBESSERN · %d Gold" % cost)
-	var button = _row_button(column,text,func():sim.buy_upgrade(key);_save_progress();_open_modal("Kastelle");_refresh_ui(),cost<0 or gated or not sim.docked or int(sim.player.gold)<cost,"primary")
-	button.custom_minimum_size.y=42
-	if cost>=0 and not gated:_with_icon(button,painted.gold_coins)
+	var gated: bool=cost>=0 and stage>=sim.castle_cap()
+	var footer: String="MAXIMALE STUFE" if cost<0 else ("AB KAPITÄNSSTUFE %d" % ((stage-2)*3) if gated else "%d GOLD" % cost)
+	var tile=_catalog_tile(parent,_art(art_key),str(config.name).to_upper(),"%s\n%s" % [str(config.role),str(config.effect)],"STUFE %d/%d" % [stage,CONTENT.CASTLE_MAX],Color("c9a35e") if stage>0 else Color("607785"))
+	var progress=_bar(tile)
+	progress.max_value=CONTENT.CASTLE_MAX
+	progress.value=stage
+	progress.custom_minimum_size.y=12
+	var title: String="MAXIMALE STUFE" if cost<0 else ("AB KAPITÄNSSTUFE %d" % ((stage-2)*3) if gated else "VERBESSERN · %d Gold" % cost)
+	var upgrade=_catalog_action(tile,title,func():
+		sim.buy_upgrade(key);_save_progress();_open_modal("Kastelle");_refresh_ui(),cost<0 or gated or not sim.docked or int(sim.player.gold)<cost)
+	upgrade.name="CastleUpgrade_"+key
+	upgrade.tooltip_text=footer
+	if cost>=0 and not gated:_with_icon(upgrade,painted.gold_coins)
 
 func _deck_title(deck: Dictionary) -> String:
 	return "%s %s" % [CONTENT.DECKS[str(deck.type)].name,CONTENT.DECK_TIERS[int(deck.tier)]]
@@ -2660,67 +2733,99 @@ func _deck_effect(deck: Dictionary) -> String:
 const DECK_ART := {"cannon":"cannon_1","armor":"upgrade_hull","hunter":"harpoon_1","navigation":"upgrade_sails","logistics":"castle_crew"}
 
 func _open_decks() -> void:
-	var stage=Control.new()
-	stage.name="DeckOverview"
-	stage.custom_minimum_size=Vector2(0,143)
-	stage.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	stage.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	stage.draw.connect(func():
-		stage.draw_style_box(SKIN.card(),Rect2(Vector2.ZERO,stage.size))
-		SEA_MARKS.deck_badge(stage,Vector2(stage.size.x*.5,52),10.0,sim,elapsed)
-		_canvas_text(stage,Vector2(stage.size.x*.5,108),"10 DECKPLÄTZE · ZWEI REIHEN MIT JE FÜNF",12,Color("ecd29a"))
-		_canvas_text(stage,Vector2(stage.size.x*.5,129),"GOLD  ·  ELITE  ·  KRISTALL",11,Color("c4d5db")))
-	modal_body.add_child(stage)
-	_start_deck_motion(stage)
-	_section("MONTIERTE DECKS")
-	for slot in CONTENT.DECK_SLOT_COUNT:
-		var place=slot
-		var index=int(sim.deck_slots[slot])
-		if index<0:
-			_row(null,"PLATZ %d · FREI" % (slot+1),34,Color("4a4234"));continue
-		var deck: Dictionary=sim.decks[index]
-		var column=_row(deck_icons[str(deck.type)],"PLATZ %d · %s\n%s" % [slot+1,_deck_title(deck),_deck_effect(deck)],48,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
-		_row_button(column,"ABBAUEN",func():sim.unequip_deck(place);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
-	_section("SONDERDECKS & SEGEN")
-	var tide=float(sim.buffs.tide_deck)
-	_row(deck_icons.tide,"GEZEITENDECK · "+("aktiv %s · +10 Kanonenplätze" % _clock_text(tide) if tide>0 else "aus Gezeitenkessel und Meilensteinen"),48,SEA_MARKS.DECK_COLORS.tide)
-	for key: String in CONTENT.SPECIAL_DECKS:
-		var special_key=key
-		var config: Dictionary=CONTENT.SPECIAL_DECKS[key]
-		var left=float(sim.buffs[key])
-		var special=_row(deck_icons[key.trim_suffix("_deck")],"%s · %s\n%s" % [str(config.name).to_upper(),_clock_text(left) if left>0 else "INAKTIV",config.effect],48,config.color)
-		var caption="30 MIN · %d GOLD" % config.price if sim.level>=int(config.level) else "AB KAPITÄNSSTUFE %d" % config.level
-		_row_button(special,caption,func():sim.buy_special_deck(special_key);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.level<int(config.level) or int(sim.player.gold)<int(config.price))
-	_row(deck_icons.blessing,"KRISTALLSEGEN · "+(_clock_text(float(sim.buffs.blessing)) if sim.has_blessing() else "nicht aktiv · aus dem Gezeitenkessel"),48,Color("bd78f2"))
-	if not sim.docked:_note("Decks werden angedockt im Hafen umgebaut.",Color("edc68c"))
-	_section("DECKLAGER · %d / %d" % [sim.decks.size(),CONTENT.DECK_INVENTORY_MAX])
-	if sim.decks.is_empty():_note("Golddecks kaufst du in der Deckwerft. Im Hafen verbesserst du sie später zu Elite und Kristall.")
-	for i in sim.decks.size():
-		var index=i
-		var deck: Dictionary=sim.decks[i]
-		var column=_row(deck_icons[str(deck.type)],"%s\n%s" % [_deck_title(deck),_deck_effect(deck)],48,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
-		var controls=HBoxContainer.new();controls.add_theme_constant_override("separation",6);column.add_child(controls)
-		var picker=OptionButton.new();picker.custom_minimum_size=Vector2(118,40);picker.add_theme_font_size_override("font_size",13)
-		for slot in CONTENT.DECK_SLOT_COUNT:picker.add_item("Platz %d" % (slot+1))
-		var mounted=sim.deck_slots.find(i)
-		picker.select(mounted if mounted>=0 else maxi(0,sim.deck_slots.find(-1)))
-		controls.add_child(picker)
-		_row_button(controls,"MONTIEREN",func():sim.equip_deck(index,picker.selected);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
-		var tier=int(deck.tier)
-		if tier<CONTENT.DECK_TIERS.size()-1:
-			var level=int(CONTENT.DECK_UPGRADE_LEVEL[tier]);var gold=int(CONTENT.DECK_UPGRADE_GOLD[tier]);var essence=int(CONTENT.DECK_UPGRADE_ESSENCE[tier])
-			var text="ZU %s · %d GOLD%s" % [str(CONTENT.DECK_TIERS[tier+1]).to_upper(),gold," · %d ESSENZ" % essence if essence>0 else ""]
-			if sim.level<level:text="%s AB KAPITÄNSSTUFE %d" % [str(CONTENT.DECK_TIERS[tier+1]).to_upper(),level]
-			_row_button(column,text,func():sim.upgrade_deck(index);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.level<level or int(sim.player.gold)<gold or sim.essence<essence,"primary")
-	if sim.docked:
-		_section("DECKWERFT · GOLDDECKS")
-		var yard=_grid(2)
-		for key: String in CONTENT.DECK_KEYS:
-			var type=key
-			var config: Dictionary=CONTENT.DECKS[key]
-			var buy=_with_icon(_action("%s · %d GOLD" % [config.name,config.price],func():sim.buy_deck(type);_save_progress();_open_modal("Decks");_refresh_ui(),"normal",yard),deck_icons[key])
-			buy.disabled=sim.decks.size()>=CONTENT.DECK_INVENTORY_MAX or int(sim.player.gold)<int(config.price)
-	_note("Gekaufte Decks sind einzelne Exemplare. Gleiche Funktionen dürfen auf mehreren Plätzen sitzen. Doppelte Kesselbelohnungen werden weiterhin in %d Gezeitenessenz umgewandelt." % CONTENT.DUPLICATE_DECK_ESSENCE)
+	match _tab("Decks"):
+		"SCHIFF":
+			_section("DECKS AN DEINEM SCHIFF · %d/10" % (CONTENT.DECK_SLOT_COUNT-sim.deck_slots.count(-1)))
+			var stage=Control.new()
+			stage.name="DeckOverview"
+			stage.custom_minimum_size=Vector2(0,143)
+			stage.mouse_filter=Control.MOUSE_FILTER_IGNORE
+			stage.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			stage.draw.connect(func():
+				stage.draw_style_box(SKIN.card(),Rect2(Vector2.ZERO,stage.size))
+				SEA_MARKS.deck_badge(stage,Vector2(stage.size.x*.5,52),10.0,sim,elapsed)
+				_canvas_text(stage,Vector2(stage.size.x*.5,108),"10 DECKPLÄTZE · ZWEI REIHEN MIT JE FÜNF",12,Color("ecd29a"))
+				_canvas_text(stage,Vector2(stage.size.x*.5,129),"GOLD  ·  ELITE  ·  KRISTALL",11,Color("c4d5db")))
+			modal_body.add_child(stage)
+			_start_deck_motion(stage)
+			var slots=_catalog_grid(3)
+			for slot in CONTENT.DECK_SLOT_COUNT:
+				var place: int=slot
+				var index: int=int(sim.deck_slots[slot])
+				if index<0:
+					var empty=_catalog_tile(slots,painted.tide_deck,"PLATZ %02d" % (slot+1),"Noch kein Deck montiert.","FREIER DECKPLATZ",Color("3b535d"))
+					_catalog_action(empty,"DECK AUS LAGER WÄHLEN",func():_switch_tab("Decks","LAGER"))
+					continue
+				var deck: Dictionary=sim.decks[index]
+				var tile=_catalog_tile(slots,deck_icons[str(deck.type)],"PLATZ %02d · %s" % [slot+1,_deck_title(deck)],_deck_effect(deck),"MONTIERT · "+str(CONTENT.DECK_TIERS[int(deck.tier)]),CONTENT.DECK_TIER_COLORS[int(deck.tier)])
+				var unequip=_catalog_action(tile,"ABBAUEN",func():
+					sim.unequip_deck(place);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
+				unequip.name="DeckRemove"+str(slot)
+			_note("Auf der Seekarte bleiben die Deckpunkte unter dem Schiff in der bekannten 2×5-Anordnung sichtbar. Deckwechsel erfolgt vorerst im Hafen.")
+		"LAGER":
+			_section("DEIN DECKLAGER · %d/%d" % [sim.decks.size(),CONTENT.DECK_INVENTORY_MAX])
+			if not sim.docked:_note("Zum Montieren und Verbessern von Decks vorerst im Hafen andocken.",Color("e1b979"))
+			if sim.decks.is_empty():_note("Du besitzt noch keine Decks. Unter KAUFEN kannst du deine ersten Golddecks erwerben.")
+			var collection=_catalog_grid(3)
+			for i in sim.decks.size():
+				var index: int=i
+				var deck: Dictionary=sim.decks[i]
+				var current: int=sim.deck_slots.find(index)
+				var stage: int=int(deck.tier)
+				var title: String=_deck_title(deck)
+				var footer: String="AUF PLATZ %d" % (current+1) if current>=0 else "IM LAGER"
+				var tile=_catalog_tile(collection,deck_icons[str(deck.type)],title.to_upper(),_deck_effect(deck),footer,CONTENT.DECK_TIER_COLORS[stage])
+				var picker=OptionButton.new()
+				picker.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+				picker.custom_minimum_size=Vector2(0,48)
+				picker.add_theme_font_size_override("font_size",14)
+				picker.name="DeckSlotPicker"+str(index)
+				for slot in CONTENT.DECK_SLOT_COUNT:picker.add_item("Platz %02d" % (slot+1))
+				picker.select(current if current>=0 else maxi(0,sim.deck_slots.find(-1)))
+				tile.add_child(picker)
+				var equip=_catalog_action(tile,"AUFS SCHIFF MONTIEREN",func():
+					sim.equip_deck(index,picker.selected);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
+				equip.name="DeckEquip"+str(index)
+				if stage<CONTENT.DECK_TIERS.size()-1:
+					var level: int=int(CONTENT.DECK_UPGRADE_LEVEL[stage])
+					var gold: int=int(CONTENT.DECK_UPGRADE_GOLD[stage])
+					var essence: int=int(CONTENT.DECK_UPGRADE_ESSENCE[stage])
+					var upgrade=_catalog_action(tile,"ZU %s · %d GOLD%s" % [str(CONTENT.DECK_TIERS[stage+1]).to_upper(),gold,(" + %d ESSENZ" % essence if essence>0 else "")],func():
+						sim.upgrade_deck(index);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.level<level or int(sim.player.gold)<gold or sim.essence<essence)
+					upgrade.name="DeckUpgrade"+str(index)
+					if sim.level<level:upgrade.tooltip_text="Ab Kapitänsstufe %d" % level
+			_action("NEUE GOLDDECKS KAUFEN",func():_switch_tab("Decks","KAUFEN"))
+		"SPEZIAL":
+			_section("SONDERDECKS & SEGEN")
+			var special=_catalog_grid(3)
+			var tide: float=float(sim.buffs.tide_deck)
+			var tide_tile=_catalog_tile(special,deck_icons.tide,"GEZEITENDECK","+10 Kanonenplätze bei Aktivierung","AKTIV · %s" % _clock_text(tide) if tide>0 else "AUS DEM GEZEITENKESSEL",SEA_MARKS.DECK_COLORS.tide)
+			_catalog_action(tide_tile,"ZUM GEZEITENKESSEL",func():_open_modal("Kessel"))
+			for key: String in CONTENT.SPECIAL_DECKS:
+				var deck_key: String=key
+				var config: Dictionary=CONTENT.SPECIAL_DECKS[key]
+				var left: float=float(sim.buffs[key])
+				var text: String="%s · %s" % [str(config.name).to_upper(),_clock_text(left) if left>0 else "INAKTIV"]
+				var tile=_catalog_tile(special,deck_icons[key.trim_suffix("_deck")],text,str(config.effect),"30 MIN · %d GOLD" % int(config.price),config.color)
+				var buy=_catalog_action(tile,"AKTIVIEREN" if sim.level>=int(config.level) else "AB STUFE %d" % int(config.level),func():
+					sim.buy_special_deck(deck_key);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.level<int(config.level) or int(sim.player.gold)<int(config.price))
+				buy.name="SpecialDeck_"+key
+			var blessing=_catalog_tile(special,deck_icons.blessing,"KRISTALLSEGEN","Erhöht mehrere Schiffsattribute","AKTIV · %s" % _clock_text(float(sim.buffs.blessing)) if sim.has_blessing() else "AUS DEM GEZEITENKESSEL",Color("b881e3"))
+			_catalog_action(blessing,"ZUM KESSEL",func():_open_modal("Kessel"))
+		"KAUFEN":
+			_section("DECKWERFT · GOLDDECKS")
+			_note("Jeder Kauf ergibt ein eigenes Deck-Exemplar. Montage und Upgrades findest du unter LAGER.")
+			var yard=_catalog_grid(3)
+			for key: String in CONTENT.DECK_KEYS:
+				var type: String=key
+				var config: Dictionary=CONTENT.DECKS[key]
+				var tile=_catalog_tile(yard,deck_icons[key],str(config.name).to_upper(),str(config.effect) % int(config.values[0]),"%d GOLD" % int(config.price),Color("ae8e59"))
+				var buy=_catalog_action(tile,"GOLDDECK KAUFEN",func():
+					sim.buy_deck(type);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.decks.size()>=CONTENT.DECK_INVENTORY_MAX or int(sim.player.gold)<int(config.price))
+				buy.name="DeckBuy_"+key
+			if not sim.docked:_note("Deckkauf und -umbau vorerst nur im Hafen möglich.",Color("e1b979"))
+		_:
+			_note("Wähle SCHIFF, LAGER, SPEZIAL oder KAUFEN.")
 
 func _open_kessel() -> void:
 	var stage=KESSEL_FX.new()
