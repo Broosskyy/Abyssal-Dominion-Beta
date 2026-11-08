@@ -553,7 +553,10 @@ func _tick_timers(delta: float) -> void:
 		if int(key)!=map_id:guild_holdings[key].remaining=maxf(0,float(guild_holdings[key].remaining)-delta)
 	if fortress_hold > 0:
 		fortress_hold = maxf(0.0, fortress_hold - delta)
-		if fortress_hold <= 0 and not guild.is_empty(): message = "Korsaren erobern die Festung zurück"
+		if fortress_hold <= 0 and not guild.is_empty():
+			# Keep the saved overview in sync even before the captain changes sea.
+			if guild_holdings.has(str(map_id)):guild_holdings[str(map_id)]["remaining"]=0.0
+			message = "Korsaren erobern die Festung zurück"
 	if int(player.hp) > 0 and clock - float(player.last_hit) >= SHIELD_DELAY:
 		player.shield = minf(float(player.max_shield), float(player.shield) + float(player.max_shield) * 0.05 * delta)
 	for sparkle in sparkles:
@@ -1095,6 +1098,15 @@ func leave_guild() -> bool:
 
 func guild_island_held() -> bool:
 	return GUILD_OPS.guild_island_held(self)
+
+func guild_holding_remaining(sea_id: int) -> float:
+	return GUILD_OPS.holding_remaining(self,sea_id)
+
+func guild_owner_tag(sea_id: int) -> String:
+	return GUILD_OPS.owner_tag(self,sea_id)
+
+func guild_tower_status() -> Array[Dictionary]:
+	return GUILD_OPS.tower_status(self)
 
 func tower_friendly() -> bool:
 	return GUILD_OPS.tower_friendly(self)
