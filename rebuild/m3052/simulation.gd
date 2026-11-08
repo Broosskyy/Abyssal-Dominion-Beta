@@ -881,7 +881,8 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 			if victim.kind == "tower":
 				tower_kills += 1
 				award_xp(80)
-				message = "%s zerstört" % victim.name
+				var destroyed: int=CONTENT.TOWERS.size()-towers_alive()
+				message="%s zerstört · FESTUNG %d/%d" % [victim.name,destroyed,CONTENT.TOWERS.size()]
 				_check_fortress()
 				return
 			kills += 1
