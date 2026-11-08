@@ -313,13 +313,24 @@ func _initialize() -> void:
 	cannon.shield=0
 	sim._step_tower(cannon,1.0)
 	check(float(cannon.shield)>0,"guardian tower recharges the other towers' shields")
+	# Outside a guild siege, a neutral test fight still repairs its defenses.
+	cannon.hp=0;cannon.respawn=1.0
+	sim._step_tower(cannon,2.0)
+	check(int(cannon.hp)==int(cannon.max_hp),"neutral practice tower respawns before a guild siege")
 	check(not sim.found_guild("Ab","XY") and not sim.found_guild("Tiefseewacht","X!") and not sim.found_guild("Tiefseewacht","KRF"),"guild founding validates name and tag")
 	sim.player.gold=1000
 	check(sim.found_guild("Tiefseewacht","tsw") and sim.guild.tag=="TSW" and int(sim.player.gold)==700,"local guild founding costs gold and stores the tag")
+	# A siege must remain winnable by a single captain: a destroyed defense
+	# stays rubble instead of silently respawning after ninety seconds.
+	cannon.hp=0;cannon.shield=0;cannon.respawn=90.0
+	sim._step_tower(cannon,180.0)
+	check(int(cannon.hp)==0 and float(cannon.respawn)==0.0,"guild siege pauses hostile tower respawn until all twelve are destroyed")
+	check(bool(sim.guild_tower_status()[0].get("siege_locked",false)),"guild siege board identifies permanently downed enemy defense")
 	sim.select(cannon.id);sim.player.reload=0
 	for tower: Dictionary in towers:
 		tower.hp=1;tower.shield=0
 		sim._hit({"source":0,"damage":5,"weapon":"cannon"},tower)
+		if int(tower.id)==400:check(sim.towers_alive()==11 and sim.message.contains("1/12"),"tower loss reports actual siege progress")
 	check(sim.fortress_conquests==1 and sim.guild_island_held() and sim.tower_kills==12,"destroying all twelve towers conquers the guild island")
 	sim.step(7.0)
 	check(sim.towers_alive()==12 and sim.tower_friendly() and sim.tower_tag()=="TSW","towers return under the captain's guild tag")
