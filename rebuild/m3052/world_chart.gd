@@ -39,7 +39,8 @@ func node_point(index: int) -> Vector2:
 func visible_nodes() -> Array:
 	if chapter==-1:return CONTENT.SEA_MAP_IDS.duplicate()
 	var nodes: Array=CONTENT.SEA_MAP_IDS.slice(chapter*10,(chapter+1)*10)
-	nodes.append_array([3,4,5,FORTRESS_NODE])
+	# Bonus instances and the 3/1 fortress belong to the first leaf only.
+	if chapter==0:nodes.append_array([3,4,5,FORTRESS_NODE])
 	return nodes
 
 func node_radius() -> float:
@@ -85,14 +86,15 @@ func _draw() -> void:
 			var bend=(a+b)*.5+(b-a).orthogonal().normalized()*r*.5
 			_dashed_curve(a,bend,b,Color(INK,.6),1.7,9.0)
 			_portal_glyph(_bezier(a,bend,b,.5),r*.27,now)
-	for bonus in [3,4,5]:
-		var from=node_point(CONTENT.sea_index(chapter*5+bonus-2,2))
-		_dashed_curve(from,(from+node_point(bonus))*.5+Vector2(r*.5,0),node_point(bonus),Color("6b4a1c",.55),1.4,5.0)
+	if chapter==0:
+		for bonus in [3,4,5]:
+			var from=node_point(CONTENT.sea_index(bonus-2,2))
+			_dashed_curve(from,(from+node_point(bonus))*.5+Vector2(r*.5,0),node_point(bonus),Color("6b4a1c",.55),1.4,5.0)
 	_compass(Vector2(size.x*.95,size.y*.09),r*.7)
 	for index: int in nodes:_node(index,r,now)
 	var fs=maxi(10,roundi(r*.42))
 	_ink_text(Vector2(size.x*.5,size.y*.065),"SEEKARTEN %d–%d · PORTALROUTEN" % [chapter*5+1,chapter*5+5],fs+2,INK)
-	_ink_text(Vector2(size.x*.36,size.y*.965),"BONUSKARTEN · NUR MIT SCHRIFTROLLE",fs,Color("5a3a12"))
+	if chapter==0:_ink_text(Vector2(size.x*.36,size.y*.965),"BONUSKARTEN · NUR MIT SCHRIFTROLLE",fs,Color("5a3a12"))
 
 # Every one of the forty seas is present on one scrollable atlas.
 # The former four five-tier leaves remain available as close-up detail views.
@@ -216,12 +218,14 @@ func _node(index: int,r: float,now: float) -> void:
 			var x=center.x+(float(i)-1.0)*radius*.42
 			draw_rect(Rect2(x-radius*.14,center.y-radius*.55,radius*.28,radius*.7),Color(INK,.9))
 			draw_rect(Rect2(x-radius*.18,center.y-radius*.65,radius*.36,radius*.14),Color(INK,.9))
-		var tag="[%s]" % sim.tower_tag()
-		_ink_text(center+Vector2(0,radius*.45),tag,maxi(9,roundi(r*.32)),Color("2f6b3a") if sim.tower_friendly() else Color("8a1a0c"))
+		var record: Dictionary=sim.guild_holdings.get(str(CONTENT.FORTRESS_MAP),{})
+		var held: bool=not sim.guild.is_empty() and float(record.get("remaining",0))>0
+		var tag="[%s]" % (str(sim.guild.get("tag","")) if held else CONTENT.FORTRESS_TAG)
+		_ink_text(center+Vector2(0,radius*.45),tag,maxi(9,roundi(r*.32)),Color("2f6b3a") if held else Color("8a1a0c"))
 	else:
 		var code=str(CONTENT.MAPS[index].code)
 		_ink_text(center+Vector2(0,radius*.22),code,maxi(10,roundi(radius*.62)),INK)
-	var title="10 GILDENTÜRME" if fortress else (str(CONTENT.MAPS[index].name) if bonus else "LV. %d" % region_level(index))
+	var title="12 GILDENTÜRME" if fortress else (str(CONTENT.MAPS[index].name) if bonus else "LV. %d" % region_level(index))
 	var fs=maxi(10,roundi(r*.34))
 	var below=radius+fs+4
 	_ink_text(center+Vector2(0,below),str(title).to_upper(),fs,INK)
