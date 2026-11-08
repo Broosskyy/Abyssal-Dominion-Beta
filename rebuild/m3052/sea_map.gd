@@ -212,7 +212,7 @@ var ship_animations_enabled := true
 var wake_effects_enabled := true
 # Centered, device-proportional menu frames; legacy fullscreen choice is ignored.
 var menu_layout := "balanced"
-var double_tap_attack_enabled := true
+var double_tap_attack_enabled := false
 const DOUBLE_TAP_MIN_MS := 70
 const DOUBLE_TAP_ATTACK_MS := 360
 const DOUBLE_TAP_ATTACK_RADIUS := 82.0
@@ -822,7 +822,7 @@ func _draw_ruined_tower(actor: Dictionary) -> void:
 		var chips:=PackedVector2Array([origin+Vector2(-5,2),origin+Vector2(-2,-height),origin+Vector2(3,-height*.68),origin+Vector2(6,2)])
 		draw_colored_polygon(chips,Color("77736a") if piece%3==0 else Color("514c44"))
 		draw_line(origin+Vector2(-2,-height),origin+Vector2(3,-height*.68),Color("a89d89",.65),1.0,true)
-	if ship_animations_enabled and float(actor.get("respawn",0.0))>0.0:
+	if ship_animations_enabled and (float(actor.get("respawn",0.0))>0.0 or (not sim.guild.is_empty() and not sim.tower_friendly())):
 		for plume in 3:
 			var life: float=fmod(elapsed*.45+float(plume)*.33+seed*.015,1.0)
 			var drift: Vector2=Vector2(sin(elapsed+float(plume)*2.3)*7.0-life*4.0,-15.0-life*35.0)
@@ -2761,7 +2761,7 @@ func _open_guild() -> void:
 	if sim.tower_friendly():
 		state="[%s] verteidigt die Insel · noch %s · +10 %% Beutegold" % [sim.tower_tag(),_clock_text(sim.fortress_hold)]
 	elif CONTENT.has_guild_island(sim.map_id):
-		state="Angriff auf [%s] · %d / %d Türme stehen" % [sim.guild_owner_tag(sim.map_id),sim.towers_alive(),CONTENT.TOWERS.size()]
+		state="Belagerung [%s] · %d / %d Türme zerstört" % [sim.guild_owner_tag(sim.map_id),CONTENT.TOWERS.size()-sim.towers_alive(),CONTENT.TOWERS.size()]
 	else:
 		state="Schattengewässer %s · ab Lv. %d · Festung [%s]" % [CONTENT.MAPS[CONTENT.FORTRESS_MAP].code,CONTENT.MAPS[CONTENT.FORTRESS_MAP].level,sim.guild_owner_tag(CONTENT.FORTRESS_MAP)]
 	_info(state)
@@ -2782,7 +2782,7 @@ func _open_guild() -> void:
 		label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 		label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		if not report.is_empty():
-			var line: String="STUFE %d · HP %d/%d · SCHILD %d" % [int(report.level),int(report.hp),int(report.max_hp),int(report.shield)] if alive else "ZERSTÖRT · WIEDERAUFBAU IN %d s" % ceili(float(report.respawn))
+			var line: String="STUFE %d · HP %d/%d · SCHILD %d" % [int(report.level),int(report.hp),int(report.max_hp),int(report.shield)] if alive else ("ZERSTÖRT · BIS ZUR EROBERUNG" if bool(report.get("siege_locked",false)) else "ZERSTÖRT · WIEDERAUFBAU IN %d s" % ceili(float(report.respawn)))
 			var health=_text(column,line,11,Color("a6d7b5") if alive and sim.tower_friendly() else (Color("f3bd7b") if alive else Color("df9184")))
 			health.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 			health.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
@@ -2798,7 +2798,7 @@ func _open_guild() -> void:
 		if sim.guild_holding_remaining(sea_id)>0:
 			defended.append("%s · %s" % [CONTENT.MAPS[sea_id].code,_clock_text(sim.guild_holding_remaining(sea_id))])
 	if not defended.is_empty():_note("Eigene Gildeninseln: "+", ".join(defended),Color("a6d7b5"))
-	_note("Kanonenturm: Doppelschuss · Mörserturm: weite Bögen · Kettenturm: bremst · Wächterturm: Schildaufladung. Zerstöre alle zwölf Türme, um die Insel einzunehmen. Der befahrbare Innenhafen liegt hinter der südlichen Einfahrt.")
+	_note("Kanonenturm: Doppelschuss · Mörserturm: weite Bögen · Kettenturm: bremst · Wächterturm: Schildaufladung. Mit eigener Gilde bleiben zerstörte feindliche Türme während der Belagerung ausgeschaltet, bis alle zwölf gefallen sind. Danach übernimmt deine Gilde die Insel. Der Innenhafen bleibt befahrbar.")
 	_note("Eroberungen %d · zerstörte Türme %d" % [sim.fortress_conquests,sim.tower_kills],Color("ffd27a"))
 	if CONTENT.has_guild_island(sim.map_id):
 		var passage: Dictionary=sim.guild_harbor_waypoints()
@@ -2908,7 +2908,7 @@ func _open_chart_guide() -> void:
 	_section("MINIKARTE · LEGENDE")
 	_guide("legend")
 	_section("STEUERUNG AUF DER KARTE")
-	_note("Freies Wasser: Kurs setzen. Gegner einmal antippen: anvisieren. Doppel-Tipp (optional): automatischen Angriff starten. Abwählen über ×/Esc. Minikarte: Kurs setzen. Joystick bewegt nur die Kamera. Zwei Finger oder Mausrad: Zoom.")
+	_note("Freies Wasser: Kurs setzen. Gegner einmal antippen: nur anvisieren. FEUER bewusst drücken, STOPP beendet das Schießen. Doppel-Tipp-Angriff ist standardmäßig AUS und unter Anzeige > Steuerung zuschaltbar. Abwählen über ×/Esc. Minikarte: Kurs setzen. Joystick bewegt nur die Kamera. Zwei Finger oder Mausrad: Zoom.")
 
 func _guide(mode: String) -> void:
 	var diagram=CHART_GUIDE.new()
@@ -2944,9 +2944,9 @@ func _open_display() -> void:
 		_note("Schaukeln, Rollen und Wasserspuren lassen sich separat deaktivieren. Kurs, Kollision und Kampflogik bleiben unverändert.",Color("a3c9cf"))
 	if _tab("Anzeige")=="STEUERUNG":
 		_section("KAMPFSTEUERUNG · ANTIPPEN")
-		_note("Einmal auf das Schiff: nur anvisieren. Zweimal schnell auf dasselbe Schiff: automatischer Angriff, wenn eingeschaltet. Ziel mit dem × im Gegnerfeld oder Esc aufheben.",Color("a3c9cf"))
+		_note("Standard: Gegner antippen wählt nur das Ziel, niemals automatisch feuern. FEUER startet den Angriff, STOPP beendet ihn. Optional kannst du einen bewusst gesetzten Doppeltipp als Angriff aktivieren. Mit × oder Esc das Ziel vollständig abwählen.",Color("a3c9cf"))
 		var double_grid=_grid(2)
-		_action("DOPPELTIPP-ANGRIFF: "+("EIN" if double_tap_attack_enabled else "AUS"),_toggle_double_tap_attack,"tab_on" if double_tap_attack_enabled else "normal",double_grid)
+		_action("DOPPELTIPP-ANGRIFF: "+("EIN" if double_tap_attack_enabled else "AUS · SICHER"),_toggle_double_tap_attack,"tab_on" if double_tap_attack_enabled else "normal",double_grid)
 	if _tab("Anzeige")=="HUD":
 		_section("FENSTERGRÖSSE · ADAPTIV")
 		var menu_grid=_grid(3)
@@ -3498,7 +3498,10 @@ func _load_display() -> void:
 	# All old true/false fullscreen preferences migrate to balanced windows.
 	menu_layout=str(data.get("menu_layout","balanced"))
 	if not menu_layout in ["compact","balanced","large"]:menu_layout="balanced"
-	double_tap_attack_enabled=bool(data.get("double_tap_attack_enabled",true))
+	# Earlier builds silently enabled double-tap attack by default and stored
+	# that value with unrelated HUD preferences. Treat pre-v2 settings as
+	# unconfirmed: keep combat safe until the captain explicitly opts in.
+	double_tap_attack_enabled=bool(data.get("double_tap_attack_enabled",false)) if int(data.get("combat_input_revision",0))>=2 else false
 	quick_pages=preload("res://sea_expansion.gd").normalize_quick(data.get("quick_pages",[]))
 	quick_page=clampi(int(data.get("quick_page",0)),0,2)
 
@@ -3508,7 +3511,7 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"double_tap_attack_enabled":double_tap_attack_enabled}))
+		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
 		file.close()
 
 func _set_menu_layout(value: String) -> void:
@@ -3555,7 +3558,7 @@ func _reset_display_preferences() -> void:
 	ship_animations_enabled=true
 	wake_effects_enabled=true
 	menu_layout="balanced"
-	double_tap_attack_enabled=true
+	double_tap_attack_enabled=false
 	_reset_enemy_tap()
 	_set_display(1,true)
 

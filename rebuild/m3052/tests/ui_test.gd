@@ -640,6 +640,14 @@ func _run() -> void:
 	game.camera.position=game.sim.player.pos
 	game.camera.force_update_scroll()
 	var intended_enemy: Vector2=game.get_canvas_transform()*(game.sim.npcs[0].pos-Vector2(0,25))
+	# Fresh captains are safe: even two taps do not fire until explicitly enabled.
+	game.double_tap_attack_enabled=false
+	game._reset_enemy_tap()
+	game._handle_enemy_tap(first_id,intended_enemy,5000)
+	game._handle_enemy_tap(first_id,intended_enemy+Vector2(5,3),5200)
+	check(game.sim.target==first_id and not game.sim.firing,"fresh captain double tap does not shoot without opt-in")
+	game._cancel_target()
+	game.double_tap_attack_enabled=true
 	game._reset_enemy_tap()
 	game._handle_enemy_tap(first_id,intended_enemy,10000)
 	check(game.sim.target==first_id and not game.sim.firing,"single tap immediately selects ship without firing")
@@ -661,9 +669,19 @@ func _run() -> void:
 	game._handle_enemy_tap(first_id,intended_enemy+Vector2(12,4),15190)
 	check(game.sim.target==first_id and not game.sim.firing,"with attack setting disabled, repeated taps keep selected ship but never fire")
 	var controls_saved: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
-	check(controls_saved is Dictionary and not bool(controls_saved.get("double_tap_attack_enabled",true)),"double-tap toggle persists in display settings")
+	check(controls_saved is Dictionary and not bool(controls_saved.get("double_tap_attack_enabled",true)) and int(controls_saved.get("combat_input_revision",0))==2,"safe double-tap setting persists with explicit opt-in revision")
+	# Historic HUD saves stored an implicit TRUE even when users never enabled
+	# combat-by-doubletap themselves. They migrate to selection-only.
+	var legacy_prefs: Dictionary=controls_saved.duplicate(true)
+	legacy_prefs.erase("combat_input_revision")
+	legacy_prefs["double_tap_attack_enabled"]=true
+	var legacy_file=FileAccess.open(game.HUD_SAVE,FileAccess.WRITE)
+	if legacy_file!=null:legacy_file.store_string(JSON.stringify(legacy_prefs));legacy_file.close()
+	game._load_display()
+	check(not game.double_tap_attack_enabled,"legacy implicit doubletap TRUE migrates to safe selection-only")
 	game._toggle_double_tap_attack()
-	check(game.double_tap_attack_enabled,"double-tap attack may be reenabled")
+	var opted_in: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
+	check(game.double_tap_attack_enabled and opted_in is Dictionary and int(opted_in.get("combat_input_revision",0))==2 and bool(opted_in.get("double_tap_attack_enabled",false)),"explicit user opt-in survives HUD save and migration")
 	game._cancel_target()
 	game._handle_enemy_tap(first_id,intended_enemy,19000)
 	game._handle_enemy_tap(first_id,intended_enemy+Vector2(160,0),19200)

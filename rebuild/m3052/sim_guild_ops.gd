@@ -55,6 +55,7 @@ static func tower_status(s) -> Array[Dictionary]:
 			"max_hp":maxi(1,int(actor.get("max_hp",spec.hp))),
 			"shield":maxi(0,int(actor.get("shield",0))),
 			"alive":not actor.is_empty() and int(actor.get("hp",0))>0,
+			"siege_locked":not actor.is_empty() and int(actor.get("hp",0))<=0 and not s.guild.is_empty() and not s.tower_friendly(),
 			"respawn":maxf(0.0,float(actor.get("respawn",0.0)))
 		})
 	return status
@@ -105,6 +106,14 @@ static func towers_alive(s) -> int:
 
 static func _step_tower(s, npc: Dictionary, delta: float) -> void:
 	if int(npc.hp) <= 0:
+		# A founded guild can capture the fortress by destroying all twelve
+		# towers one after another. Their ruins stay down for the duration of
+		# the siege; a 90-second auto-rebuild must not undo prior progress.
+		# After conquest, friendly towers use their short rebuild countdown.
+		# Without a founded guild, the fortress is only a neutral practice fight.
+		if not s.guild.is_empty() and not s.tower_friendly():
+			npc.respawn=0.0
+			return
 		npc.respawn = float(npc.respawn) - delta
 		if float(npc.respawn) <= 0:
 			npc.hp = npc.max_hp
