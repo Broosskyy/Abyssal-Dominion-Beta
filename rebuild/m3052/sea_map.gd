@@ -212,7 +212,7 @@ var ship_animations_enabled := true
 var wake_effects_enabled := true
 # Centered, device-proportional menu frames; legacy fullscreen choice is ignored.
 var menu_layout := "balanced"
-var double_tap_attack_enabled := true
+var double_tap_attack_enabled := false
 const DOUBLE_TAP_MIN_MS := 70
 const DOUBLE_TAP_ATTACK_MS := 360
 const DOUBLE_TAP_ATTACK_RADIUS := 82.0
@@ -2908,7 +2908,7 @@ func _open_chart_guide() -> void:
 	_section("MINIKARTE · LEGENDE")
 	_guide("legend")
 	_section("STEUERUNG AUF DER KARTE")
-	_note("Freies Wasser: Kurs setzen. Gegner einmal antippen: anvisieren. Doppel-Tipp (optional): automatischen Angriff starten. Abwählen über ×/Esc. Minikarte: Kurs setzen. Joystick bewegt nur die Kamera. Zwei Finger oder Mausrad: Zoom.")
+	_note("Freies Wasser: Kurs setzen. Gegner einmal antippen: nur anvisieren. FEUER bewusst drücken, STOPP beendet das Schießen. Doppel-Tipp-Angriff ist standardmäßig AUS und unter Anzeige > Steuerung zuschaltbar. Abwählen über ×/Esc. Minikarte: Kurs setzen. Joystick bewegt nur die Kamera. Zwei Finger oder Mausrad: Zoom.")
 
 func _guide(mode: String) -> void:
 	var diagram=CHART_GUIDE.new()
@@ -2944,9 +2944,9 @@ func _open_display() -> void:
 		_note("Schaukeln, Rollen und Wasserspuren lassen sich separat deaktivieren. Kurs, Kollision und Kampflogik bleiben unverändert.",Color("a3c9cf"))
 	if _tab("Anzeige")=="STEUERUNG":
 		_section("KAMPFSTEUERUNG · ANTIPPEN")
-		_note("Einmal auf das Schiff: nur anvisieren. Zweimal schnell auf dasselbe Schiff: automatischer Angriff, wenn eingeschaltet. Ziel mit dem × im Gegnerfeld oder Esc aufheben.",Color("a3c9cf"))
+		_note("Standard: Gegner antippen wählt nur das Ziel, niemals automatisch feuern. FEUER startet den Angriff, STOPP beendet ihn. Optional kannst du einen bewusst gesetzten Doppeltipp als Angriff aktivieren. Mit × oder Esc das Ziel vollständig abwählen.",Color("a3c9cf"))
 		var double_grid=_grid(2)
-		_action("DOPPELTIPP-ANGRIFF: "+("EIN" if double_tap_attack_enabled else "AUS"),_toggle_double_tap_attack,"tab_on" if double_tap_attack_enabled else "normal",double_grid)
+		_action("DOPPELTIPP-ANGRIFF: "+("EIN" if double_tap_attack_enabled else "AUS · SICHER"),_toggle_double_tap_attack,"tab_on" if double_tap_attack_enabled else "normal",double_grid)
 	if _tab("Anzeige")=="HUD":
 		_section("FENSTERGRÖSSE · ADAPTIV")
 		var menu_grid=_grid(3)
@@ -3498,7 +3498,7 @@ func _load_display() -> void:
 	# All old true/false fullscreen preferences migrate to balanced windows.
 	menu_layout=str(data.get("menu_layout","balanced"))
 	if not menu_layout in ["compact","balanced","large"]:menu_layout="balanced"
-	double_tap_attack_enabled=bool(data.get("double_tap_attack_enabled",true))
+	double_tap_attack_enabled=bool(data.get("double_tap_attack_enabled",false))
 	quick_pages=preload("res://sea_expansion.gd").normalize_quick(data.get("quick_pages",[]))
 	quick_page=clampi(int(data.get("quick_page",0)),0,2)
 
@@ -3555,7 +3555,7 @@ func _reset_display_preferences() -> void:
 	ship_animations_enabled=true
 	wake_effects_enabled=true
 	menu_layout="balanced"
-	double_tap_attack_enabled=true
+	double_tap_attack_enabled=false
 	_reset_enemy_tap()
 	_set_display(1,true)
 
