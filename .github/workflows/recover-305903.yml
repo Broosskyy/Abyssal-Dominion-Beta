@@ -1,0 +1,88 @@
+name: Recover verified Android 305903 and data 251 release
+on:
+  push:
+    paths:
+      - '.github/workflows/recover-305903.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            updates
+            releases/M3059
+      - name: Retrieve original tested and signed build (no rebuild)
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 42468884925
+          name: Abyssal-Dominion-M3059-251
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: releases/M3059
+      - name: Validate built artifacts and existing APK release via GitHub asset digest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,subprocess
+          p=pathlib.Path('releases/M3059')
+          latest=json.loads((p/'latest.json').read_text())['latest']
+          data=json.loads((p/'data.json').read_text())['latest']
+          report=json.loads((p/'ABYSSAL_DOMINION_M3059_REBUILD_ARM64.build.json').read_text())
+          def check_file(path,record):
+              assert path.is_file(),path
+              assert path.stat().st_size==record['bytes'],(path,'size')
+              with path.open('rb') as f:
+                  h=hashlib.file_digest(f,'sha256').hexdigest()
+              assert h==record['sha256'],(path,'sha256')
+          check_file(p/'ABYSSAL_DOMINION_M3059_REBUILD_ARM64.apk',latest)
+          check_file(p/'ABYSSAL_DATA_251.zip',data)
+          assert latest['version_code']==305903 and latest['package']=='com.abyssaldominion.rebuild'
+          assert data['min_apk']==305903 and data['revision']==251
+          assert report['signature']=='PASS' and report['version_code']==305903
+          assert all(x['status']=='PASS' for x in report['tests'])
+          remote=json.loads(subprocess.check_output(['gh','api','repos/Broosskyy/Abyssal-Dominion-Beta/releases/tags/abyssal-305903-android'],text=True))
+          assets={x['name']:x for x in remote['assets']}
+          apk=assets['ABYSSAL_DOMINION_305903.apk']
+          assert apk['size']==latest['bytes']
+          assert apk['digest']=='sha256:'+latest['sha256']
+          print('VERIFIED_SAME_SIGNED_APK_RELEASE_AND_DATA_251',report['source_commit'])
+          PY
+      - name: Publish remaining data release and verify asset digest without unreliable GitHub download redirect
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd releases/M3059 && zip -qr9 "$RUNNER_TEMP/ABYSSAL_CAPTURES_251.zip" captures)
+          if ! gh release view data-251 > /dev/null 2>&1; then
+            gh release create data-251 releases/M3059/ABYSSAL_DATA_251.zip releases/M3059/data.json "$RUNNER_TEMP/ABYSSAL_CAPTURES_251.zip" --target 6013c0395b258d37468a2cbec75a051a9e651541 --title 'Abyssal game data 251' --notes 'Verified signed data pack from the tested 305903 build; APK certificate and original guest saves are preserved.' --prerelease
+          fi
+          python3 - <<'PY'
+          import json,pathlib,subprocess
+          remote=json.loads(subprocess.check_output(['gh','api','repos/Broosskyy/Abyssal-Dominion-Beta/releases/tags/data-251'],text=True))
+          asset=next(a for a in remote['assets'] if a['name']=='ABYSSAL_DATA_251.zip')
+          expected=json.loads(pathlib.Path('releases/M3059/data.json').read_text())['latest']
+          assert asset['size']==expected['bytes'] and asset['digest']=='sha256:'+expected['sha256']
+          print('VERIFIED_DATA_RELEASE_251_GITHUB_ASSET_DIGEST')
+          PY
+      - name: Publish updater manifests only after both release assets verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p updates
+          cp releases/M3059/latest.json updates/latest.json
+          cp releases/M3059/data.json updates/data.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f updates/latest.json updates/data.json releases/M3059/latest.json releases/M3059/data.json releases/M3059/*.build.json releases/M3059/*.manifest.txt releases/M3059/*.signature.txt releases/M3059/*.android-xml.txt releases/M3059/captures/*.log
+          git commit -m 'Publish verified Android 305903 and signed data 251 manifests [skip ci]' || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
