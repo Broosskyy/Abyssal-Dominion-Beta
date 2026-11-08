@@ -148,6 +148,7 @@ var expansion_art: Dictionary={}
 var modal_scroll: TOUCH_SCROLL
 var modal_body: VBoxContainer
 var modal_tabs: HBoxContainer
+var modal_tabs_scroll: ScrollContainer
 var modal_tab := {}
 var scroll_hint: Control
 var modal_scroll_box := Rect2()
@@ -1405,8 +1406,18 @@ func _build_ui() -> void:
 	modal_close=_button(modal,"×",func():modal.hide();_save_progress(),"close")
 	modal_close.add_theme_font_size_override("font_size",26);modal_close.tooltip_text="Schließen";modal_close.clip_text=false
 	modal_back=_button(modal,"‹ ZURÜCK",_back_modal);modal_back.name="BackButton";modal_back.add_theme_font_size_override("font_size",12)
-	modal_tabs=HBoxContainer.new();modal_tabs.add_theme_constant_override("separation",5);modal_tabs.visible=false
-	modal.add_child(modal_tabs)
+	# Scrolling category tabs avoid tiny/unreadable buttons on portrait phones.
+	modal_tabs_scroll=ScrollContainer.new()
+	modal_tabs_scroll.name="ModalCategoryScroller"
+	modal_tabs_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_AUTO
+	modal_tabs_scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+	modal_tabs_scroll.follow_focus=true
+	modal_tabs_scroll.visible=false
+	modal.add_child(modal_tabs_scroll)
+	modal_tabs=HBoxContainer.new()
+	modal_tabs.add_theme_constant_override("separation",6)
+	modal_tabs.visible=false
+	modal_tabs_scroll.add_child(modal_tabs)
 	modal_scroll=TOUCH_SCROLL.new()
 	modal.add_child(modal_scroll)
 	modal_scroll.minimum_size_changed.connect(_fit_modal_scroll)
@@ -1577,8 +1588,8 @@ func _layout() -> void:
 	_place(modal_back,10,8,82,30)
 	var inner_top=head+8
 	if modal_tabs.visible:
-		_place(modal_tabs,18,inner_top,width-36,34)
-		inner_top+=42
+		_place(modal_tabs_scroll,18,inner_top,width-36,46)
+		inner_top+=54
 	modal_scroll_box=Rect2(18,inner_top,width-36,height-inner_top-18)
 	_fit_modal_scroll()
 	_fit_modal_scroll.call_deferred()
@@ -1919,6 +1930,7 @@ func _build_tabs(kind: String) -> void:
 	var names: Array=MODAL_TABS.get(kind,[])
 	if kind=="Staff" and not sim.staff.active():names=[]
 	modal_tabs.visible=not names.is_empty()
+	modal_tabs_scroll.visible=not names.is_empty()
 	if names.is_empty():return
 	var current=str(modal_tab.get(kind,names[0]))
 	if not current in names:current=str(names[0])
@@ -1927,9 +1939,10 @@ func _build_tabs(kind: String) -> void:
 		var tab: String=str(name)
 		var caption: String="KANONEN" if kind=="Markt" and tab=="AUSRÜSTUNG" and get_viewport_rect().size.x<920.0 else tab
 		var button=_button(modal_tabs,caption,func():_switch_tab(kind,tab),"tab_on" if tab==current else "tab")
-		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		button.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
+		button.custom_minimum_size=Vector2(118 if names.size()>=4 else 128,44)
 		button.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-		button.add_theme_font_size_override("font_size",11 if get_viewport_rect().size.x<720 and names.size()>=4 else (12 if names.size()>4 else 14))
+		button.add_theme_font_size_override("font_size",13 if names.size()>=4 else 14)
 
 func _switch_tab(kind: String,tab: String) -> void:
 	modal_tab[kind]=tab
@@ -2040,7 +2053,7 @@ func _row(texture: Texture2D,text: String,size: float=64.0,accent: Color=Color(0
 
 func _row_button(parent: Node,text: String,callback: Callable,disabled: bool=false,variant: String="normal") -> Button:
 	var button=_button(parent,text,callback,variant)
-	button.custom_minimum_size.y=40
+	button.custom_minimum_size.y=48
 	button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	button.disabled=disabled
 	return button
@@ -2050,7 +2063,9 @@ func _row_button(parent: Node,text: String,callback: Callable,disabled: bool=fal
 # columns. A price and a touch-sized action always stay BELOW its artwork.
 func _catalog_grid(max_columns: int=3,parent: Node=null) -> GridContainer:
 	var width: float=modal_scroll.size.x
-	var columns: int=1 if width<420.0 else (3 if width>=860.0 else 2)
+	# Keep each illustrated product at least ~280px wide; never put two
+	# tall image cards side by side in the narrow portrait modal.
+	var columns: int=1 if width<680.0 else (3 if width>=1080.0 else 2)
 	var gallery=_grid(mini(max_columns,columns),parent)
 	gallery.set_meta("catalog_grid",true)
 	return gallery
@@ -2058,27 +2073,27 @@ func _catalog_grid(max_columns: int=3,parent: Node=null) -> GridContainer:
 func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String,footer: String,accent: Color=Color("ab8852")) -> VBoxContainer:
 	var panel: PanelContainer=_card(accent,parent)
 	panel.set_meta("catalog_tile",true)
-	panel.custom_minimum_size=Vector2(0,228)
+	panel.custom_minimum_size=Vector2(0,264)
 	var content=VBoxContainer.new()
 	content.add_theme_constant_override("separation",7)
 	content.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	content.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	panel.add_child(content)
 	var frame=CenterContainer.new()
-	frame.custom_minimum_size.y=104
+	frame.custom_minimum_size.y=124
 	frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	content.add_child(frame)
 	if texture!=null:
-		var art=_picture(frame,texture,96,true)
-		art.custom_minimum_size=Vector2(96,96)
-	var heading=_text(content,title,15,Color("ffdf9d"))
+		var art=_picture(frame,texture,112,true)
+		art.custom_minimum_size=Vector2(112,112)
+	var heading=_text(content,title,16,Color("ffdf9d"))
 	heading.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	heading.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	heading.custom_minimum_size.y=24
-	var description=_text(content,details,12,Color("c5d4d4"))
+	var description=_text(content,details,14,Color("c5d4d4"))
 	description.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	description.custom_minimum_size.y=34
+	description.custom_minimum_size.y=40
 	var price=_text(content,footer,14,Color("a7e4cd"))
 	price.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	price.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
@@ -2087,7 +2102,7 @@ func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String
 
 func _catalog_action(parent: Node,text: String,handler: Callable,disabled: bool=false) -> Button:
 	var action=_row_button(parent,text,handler,disabled,"primary")
-	action.custom_minimum_size.y=50
+	action.custom_minimum_size.y=54
 	action.add_theme_font_size_override("font_size",14)
 	action.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	return action
