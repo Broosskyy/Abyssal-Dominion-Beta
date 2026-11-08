@@ -13,7 +13,7 @@ static func invite_text(captain_name: String,captain_id: String) -> String:
 	if code.is_empty():return ""
 	var display_name: String=captain_name.strip_edges().left(24)
 	if display_name.is_empty():display_name="Ein Kapitän"
-	return "%s lädt dich zu Abyssal Dominion ein!\\nMein Beta-Einladungscode: %s\\nSpielversion & Releases: %s\\nHinweis: Freundesliste und Einladungsbelohnungen werden erst mit Online-Konten freigeschaltet." % [display_name,code,BETA_RELEASES]
+	return "%s lädt dich zu Abyssal Dominion ein!\nMein Beta-Einladungscode: %s\nSpielversion & Releases: %s\nHinweis: Freundesliste und Einladungsbelohnungen werden erst mit Online-Konten freigeschaltet." % [display_name,code,BETA_RELEASES]
 
 static func is_invite_code(value: String) -> bool:
 	var code: String=value.strip_edges().to_upper()
