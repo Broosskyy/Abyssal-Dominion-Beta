@@ -62,6 +62,8 @@ var cooldowns := {"repair_kit":0.0, "shield_charge":0.0}
 var buffs := {"blessing":0.0, "tide_deck":0.0, "storm_deck":0.0, "salvage_deck":0.0}
 var essence := 3
 var fragments := 0
+# Assembled parchment segments for Bronze/Silber/Gold, retained across restarts.
+var bonus_pieces := [0,0,0]
 var scrolls := [0, 0, 0]
 var kessel_meter := 0
 var kessel_throws := 0
@@ -1021,6 +1023,9 @@ func in_bonus_map() -> bool:
 func has_harbor() -> bool:
 	return not in_bonus_map()
 
+func assign_bonus_piece(tier: int) -> bool:
+	return BONUS_OPS.assign_bonus_piece(self, tier)
+
 func craft_scroll(tier: int) -> bool:
 	return BONUS_OPS.craft_scroll(self, tier)
 
@@ -1505,19 +1510,19 @@ func export_save() -> Dictionary:
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
-	return {"schema":7,"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	return {"schema":8,"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
 		"position":[position.x,position.y],"hp":player.hp,"shield":player.shield,"docked":docked,
 		"cannons":player.cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
-		"essence":essence,"fragments":fragments,"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
+		"essence":essence,"fragments":fragments,"bonus_pieces":bonus_pieces.duplicate(),"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
 		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
 		"deck_slots":deck_slots.duplicate(),"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),
 		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
-	if not int(data.get("schema",0)) in [1,2,3,4,5,6,7]: return false
+	if not int(data.get("schema",0)) in [1,2,3,4,5,6,7,8]: return false
 	event_mode=str(data.get("event_mode","halloween"))
 	if not EXPANSION.EVENT_NAMES.has(event_mode):event_mode="halloween"
 	var saved_tokens: Variant=data.get("event_tokens",{})
@@ -1565,6 +1570,11 @@ func restore_save(data: Dictionary) -> bool:
 		for key: String in CONTENT.SPECIAL_DECKS:buffs[key]=clampf(float(saved_buffs.get(key,0.0)),0.0,CONTENT.TIDE_DECK_CAP)
 	essence=clampi(int(data.get("essence",essence)),0,99999)
 	fragments=clampi(int(data.get("fragments",0)),0,99999)
+	var saved_pieces: Variant=data.get("bonus_pieces",[])
+	bonus_pieces=[0,0,0]
+	if saved_pieces is Array:
+		for i in mini(saved_pieces.size(),bonus_pieces.size()):
+			bonus_pieces[i]=clampi(int(saved_pieces[i]),0,int(CONTENT.BONUS_TIERS[i].fragments))
 	var saved_scrolls: Variant=data.get("scrolls",[])
 	if saved_scrolls is Array and saved_scrolls.size()==scrolls.size():
 		for i in scrolls.size():scrolls[i]=clampi(int(saved_scrolls[i]),0,999)
