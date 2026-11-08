@@ -2644,27 +2644,29 @@ func _open_ranking() -> void:
 
 func _open_castles() -> void:
 	if _tab("Kastelle")=="TALENTE":
-		_banner_card(painted.nav_castles,"TALENTE · DEIN KAPITÄN","Pro Kapitänsstufe erhältst du einen Talentpunkt. Die drei Fachgebiete verbessern deine echten Kampf- und Schiffswerte. Talente kannst du auch unterwegs vergeben; Kastelle bleiben vorerst Hafenausbauten.")
+		_banner_card(painted.nav_castles,"KAPITÄNSTALENTE","Drei Fachgebiete mit spürbaren Effekten. Die Punkte erhältst du durch Kapitänsstufen und kannst sie jederzeit vergeben.")
 		_section("FREIE TALENTPUNKTE · %d" % sim.talent_points_available())
+		var choices=_catalog_grid(3)
 		for key: String in CONTENT.TALENT_KEYS:
 			var talent_key: String=key
 			var config: Dictionary=CONTENT.TALENTS[key]
 			var stage: int=int(sim.talents[key])
-			var column=_row(_art(str(config.icon)),"%s · %s\nSTUFE %d/%d · %s" % [str(config.name).to_upper(),str(config.role),stage,CONTENT.TALENT_MAX,str(config.effect)],60,Color("d5b779") if stage>0 else Color("435864"))
-			var progress=_text(column,"FORTSCHRITT  "+"◆".repeat(stage)+"◇".repeat(CONTENT.TALENT_MAX-stage),13,Color("f8d58e"))
-			progress.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-			var learn=_row_button(column,"TALENTPUNKT VERGEBEN" if stage<CONTENT.TALENT_MAX else "MAXIMALE TALENTSTUFE",func():
-				sim.learn_talent(talent_key)
-				_save_progress();_open_modal("Kastelle");_refresh_ui(),stage>=CONTENT.TALENT_MAX or sim.talent_points_available()<=0,"primary")
-			learn.name="Talent_"+key
-		_note("Talentvergabe jederzeit verfügbar – keine Hafenbindung.",Color("9bd6bd"))
+			var tile=_catalog_tile(choices,_art(str(config.icon)),str(config.name).to_upper(),"%s · %s" % [str(config.role),str(config.effect)],"TALENT · STUFE %d/%d" % [stage,CONTENT.TALENT_MAX],Color("c9a35e") if stage>0 else Color("5e7683"))
+			var gauge=_bar(tile)
+			gauge.max_value=CONTENT.TALENT_MAX
+			gauge.value=stage
+			gauge.custom_minimum_size.y=12
+			var upgrade=_catalog_action(tile,"PUNKT VERGEBEN" if stage<CONTENT.TALENT_MAX else "TALENT VOLLSTÄNDIG",func():
+				sim.learn_talent(talent_key);_save_progress();_open_modal("Kastelle");_refresh_ui(),stage>=CONTENT.TALENT_MAX or sim.talent_points_available()<=0)
+			upgrade.name="Talent_"+key
+		_note("Talentvergabe ist weltweit möglich. Kastelle sind weiterhin stationäre Bauten und vorerst an den Hafen gebunden.",Color("a7cfc5"))
 		return
-	_banner_card(painted.nav_castles,"KASTELLE · DAUERHAFTE SCHIFFSVERBESSERUNGEN","Sechs Kastelle mit je %d Stufen. Neue Stufen werden mit dem Kapitänslevel freigeschaltet. Aktuell ausbaubar bis Stufe %d; die angezeigten Werte wirken direkt im Spiel." % [CONTENT.CASTLE_MAX,sim.castle_cap()])
-	if not sim.docked:_note("Kastelle werden ausschließlich im Hafen ausgebaut.",Color("e1b979"))
+	_banner_card(painted.nav_castles,"KASTELLE · DAUERHAFTE AUSBAUTEN","Sechs getrennte Bauzweige, freigeschaltet durch Kapitänsstufen. Bilder, Effekte, Ausbaustufe und Preis auf einer Karte.")
 	var total: int=0
 	for key: String in CONTENT.UPGRADE_KEYS:total+=int(sim.upgrades[key])
-	_section("AUSBAUSTAND · %d/%d" % [total,CONTENT.UPGRADE_KEYS.size()*CONTENT.CASTLE_MAX])
-	var upgrades=_grid(2)
+	_section("AUSBAUSTAND · %d/%d · FREI BIS STUFE %d" % [total,CONTENT.UPGRADE_KEYS.size()*CONTENT.CASTLE_MAX,sim.castle_cap()])
+	if not sim.docked:_note("Kastelle werden vorerst nur am Hafen ausgebaut. Die Übersicht funktioniert überall.",Color("e1b979"))
+	var upgrades=_catalog_grid(3)
 	for key: String in CONTENT.UPGRADE_KEYS:_upgrade_row(key,upgrades)
 	_action("ZU DEN TALENTEN · %d PUNKTE FREI" % sim.talent_points_available(),func():_switch_tab("Kastelle","TALENTE"))
 
@@ -2692,20 +2694,22 @@ func _open_battle_pass() -> void:
 
 func _upgrade_row(key: String,parent: Node=null) -> void:
 	var config: Dictionary=CONTENT.UPGRADES[key]
-	var art_key = key+"_%d" % mini(2,int(sim.upgrades[key])) if key in ["cannon","harpoon"] else str(config.icon)
-	var stage=int(sim.upgrades[key])
-	var column=_row(_art(art_key),"%s · %s · Stufe %d/%d\n%s" % [config.name,config.role,stage,CONTENT.CASTLE_MAX,config.effect],58,Color("c9a35e") if stage>0 else Color(0,0,0,0),parent)
-	var pips=Control.new();pips.custom_minimum_size=Vector2(0,12);pips.mouse_filter=Control.MOUSE_FILTER_IGNORE;column.add_child(pips)
-	pips.draw.connect(func():
-		for i in CONTENT.CASTLE_MAX:
-			var c=Vector2(8+i*16,6)
-			SEA_MARKS.gem(pips,c,5.5,Color("f2c14e"),-1,i<stage))
+	var stage: int=int(sim.upgrades[key])
+	var art_key: String=key+"_%d" % mini(2,stage) if key in ["cannon","harpoon"] else str(config.icon)
 	var cost: int=sim.upgrade_cost(key)
-	var gated=cost>=0 and stage>=sim.castle_cap()
-	var text="MAXIMALE STUFE" if cost<0 else ("AB KAPITÄNSSTUFE %d" % ((stage-2)*3) if gated else "VERBESSERN · %d Gold" % cost)
-	var button = _row_button(column,text,func():sim.buy_upgrade(key);_save_progress();_open_modal("Kastelle");_refresh_ui(),cost<0 or gated or not sim.docked or int(sim.player.gold)<cost,"primary")
-	button.custom_minimum_size.y=42
-	if cost>=0 and not gated:_with_icon(button,painted.gold_coins)
+	var gated: bool=cost>=0 and stage>=sim.castle_cap()
+	var footer: String="MAXIMALE STUFE" if cost<0 else ("AB KAPITÄNSSTUFE %d" % ((stage-2)*3) if gated else "%d GOLD" % cost)
+	var tile=_catalog_tile(parent,_art(art_key),str(config.name).to_upper(),"%s\n%s" % [str(config.role),str(config.effect)],"STUFE %d/%d" % [stage,CONTENT.CASTLE_MAX],Color("c9a35e") if stage>0 else Color("607785"))
+	var progress=_bar(tile)
+	progress.max_value=CONTENT.CASTLE_MAX
+	progress.value=stage
+	progress.custom_minimum_size.y=12
+	var title: String="MAXIMALE STUFE" if cost<0 else ("AB KAPITÄNSSTUFE %d" % ((stage-2)*3) if gated else "VERBESSERN · %d Gold" % cost)
+	var upgrade=_catalog_action(tile,title,func():
+		sim.buy_upgrade(key);_save_progress();_open_modal("Kastelle");_refresh_ui(),cost<0 or gated or not sim.docked or int(sim.player.gold)<cost)
+	upgrade.name="CastleUpgrade_"+key
+	upgrade.tooltip_text=footer
+	if cost>=0 and not gated:_with_icon(upgrade,painted.gold_coins)
 
 func _deck_title(deck: Dictionary) -> String:
 	return "%s %s" % [CONTENT.DECKS[str(deck.type)].name,CONTENT.DECK_TIERS[int(deck.tier)]]
