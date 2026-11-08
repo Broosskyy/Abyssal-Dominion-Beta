@@ -1274,13 +1274,17 @@ func _build_ui() -> void:
 	target_clear.focus_mode=Control.FOCUS_NONE
 	target_clear.add_theme_font_size_override("font_size",18)
 	target_portrait=_portrait(target_panel)
-	target_panel.clip_contents=true
+	target_panel.clip_contents=false
 	target_name=_text(target_panel,"",13);target_name.clip_text=true
 	target_hp=_bar(target_panel)
 	target_health_skin=target_hp.get_theme_stylebox("fill").duplicate();target_hp.add_theme_stylebox_override("fill",target_health_skin)
 	target_numbers=_text(target_panel,"",10)
 	target_numbers.clip_text=true
 	target_numbers.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	# Topmost and touch-owning: never let portraits, text or bars cover cancel.
+	target_clear.move_to_front()
+	target_clear.z_index=3
+	target_clear.mouse_filter=Control.MOUSE_FILTER_STOP
 	quest_panel=_panel(ui)
 	quest_icon=_portrait(quest_panel);quest_icon.texture=painted.nav_quests
 	quest_text=_text(quest_panel,"",11);quest_text.clip_text=true;quest_text.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
@@ -1451,8 +1455,10 @@ func _layout() -> void:
 	_place(target_panel,left,target_y,column,card_h)
 	_place(target_portrait,6,6,card_h-12,card_h-12)
 	var tx=card_h
-	_place(target_clear,column-48,2,42,34)
-	_place(target_name,tx,3,column-tx-56,18);_place(target_hp,tx,22,column-tx-10,8);_place(target_numbers,tx,31,column-tx-6,card_h-33)
+	_place(target_clear,column-46,4,40,32)
+	_place(target_name,tx,3,column-tx-52,18)
+	_place(target_hp,tx,22,column-tx-51,8)
+	_place(target_numbers,tx,31,column-tx-51,card_h-33)
 	_place(interact,left,target_y+card_h+6,column,34)
 	_place(buff_bar,left,target_y+card_h+46,column,26)
 	# Chart with corner controls, as on classic sea-chart clients.
@@ -2727,8 +2733,9 @@ func _open_charts() -> void:
 		_open_chart_guide()
 		return
 	_section("40 SEEKARTEN · 1/1 BIS 20/2")
-	if chart_chapter<0:chart_chapter=maxi(0,CONTENT.SEA_MAP_IDS.find(sim.map_id))/10
-	var leaves=_grid(4)
+	# -1 is the complete overview, not an invalid page.
+	var leaves=_grid(5)
+	_action("ALLE 40",func():chart_chapter=-1;chart_pick=sim.map_id;_open_modal("Seekarten"),"tab_on" if chart_chapter==-1 else "normal",leaves)
 	for leaf in 4:
 		var pick: int=leaf
 		_action("%d–%d" % [leaf*5+1,leaf*5+5],func():chart_chapter=pick;chart_pick=CONTENT.SEA_MAP_IDS[pick*10];_open_modal("Seekarten"),"tab_on" if leaf==chart_chapter else "normal",leaves)
@@ -2737,11 +2744,11 @@ func _open_charts() -> void:
 	chart.sim=sim;chart.parchment=painted.chart_parchment;chart.font=font
 	chart.selected=chart_pick if chart_pick>=0 else sim.map_id
 	chart.chapter=chart_chapter
-	chart.custom_minimum_size=Vector2(0,440 if modal.size.x>=640 else 390)
+	chart.custom_minimum_size=Vector2(0,1190 if chart_chapter==-1 else (440 if modal.size.x>=640 else 390))
 	chart.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	chart.picked.connect(func(index: int):chart_pick=index;_open_modal("Seekarten"))
 	modal_body.add_child(chart)
-	_note("Tippe auf ein Seegebiet der Karte für Details. Die Karten-Anleitung erklärt Koordinaten, Portale und die Minikarte.",Color("84999c"))
+	_note("Alle 40 Karten stehen in der Übersicht in zwei Spuren. Nach unten scrollen; mit 1–5, 6–10, 11–15 oder 16–20 einen Abschnitt vergrößern.",Color("84999c"))
 	_chart_details(chart.selected)
 
 func _chart_details(index: int) -> void:
@@ -2767,7 +2774,7 @@ func _chart_details(index: int) -> void:
 		for neighbor in CONTENT.sea_neighbors(index):exits.append(str(CONTENT.MAPS[neighbor].code))
 		lines.append("Hafen: ja · Portale: "+", ".join(exits))
 		lines.append("16 Patrouillen, davon Elite-Schiffe · Seeungeheuer Tiamat · Gegnerstärke ×%s" % str(region.enemy_scale).replace(".",","))
-		if CONTENT.has_guild_island(index):lines.append("Korsarenfestung mit zehn Türmen · Gildeninsel")
+		if CONTENT.has_guild_island(index):lines.append("Korsarenfestung mit zwölf Türmen · Gildeninsel")
 	var column=_row(extra_icons.world_chart,"\n".join(lines),64,Color("a02818") if hostile else Color("2f6b3a"))
 	var line=HBoxContainer.new();line.add_theme_constant_override("separation",6);column.add_child(line)
 	if bonus:
@@ -2797,7 +2804,7 @@ func _open_chart_guide() -> void:
 	_note("In neutralen Gewässern greifen Patrouillen erst an, wenn du sie beschießt. In feindlichen Gewässern eröffnen sie in der Nähe von selbst das Feuer. Die Farbe des Namens verrät es:")
 	_guide("colors")
 	_section("BONUSKARTEN & FESTUNG")
-	_note("Bonuskarten B-1 bis B-3 erreichst du nur mit einer Schriftrolle aus Fragmenten. Fünf Wellen, Checkpoint nach jeder Welle, Truhe am Ende. Die Korsarenfestung liegt in den Schattengewässern 3-1: vier Türme, und mit Gilde hältst du die Insel 30 Minuten.")
+	_note("Bonuskarten B-1 bis B-3 erreichst du mit vollständig zusammengesetzten Karten aus Fragmenten. Fünf Wellen, Checkpoint nach jeder Welle, Truhe am Ende. Die Korsarenfestung auf 3/1 hat zwölf Türme und einen befahrbaren Innenhafen.")
 	_section("MINIKARTE · LEGENDE")
 	_guide("legend")
 	_section("STEUERUNG AUF DER KARTE")
