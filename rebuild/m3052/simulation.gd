@@ -454,7 +454,7 @@ func cannon_storage() -> int:
 
 func mount_cannons(quantity: int) -> bool:
 	if not docked or quantity<=0:return false
-	var fitting: int=mini(quantity,cannon_storage(),maxi(0,cannon_slots()-mounted_cannons))
+	var fitting: int=mini(quantity,mini(cannon_storage(),maxi(0,cannon_slots()-mounted_cannons)))
 	if fitting<=0:
 		message="Keine freien Geschützplätze oder keine Kanonen im Lager"
 		return false
