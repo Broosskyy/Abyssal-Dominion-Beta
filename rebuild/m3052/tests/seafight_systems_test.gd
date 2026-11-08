@@ -157,8 +157,9 @@ func _initialize() -> void:
 	sim=SIM.new()
 	check(sim.cannon_slots()==10 and sim.equipped_cannons()==10 and sim.weapon_damage(0)==31,"ten slots and ten cannons keep the original salvo")
 	sim.player.gold=0;check(not sim.buy_cannons(),"cannot buy without sufficient currency")
-	sim.player.pos=sim.harbor;sim.dock();sim.player.gold=5000
+	sim.player.gold=5000
 	check(sim.buy_cannons() and int(sim.player.cannons)==12 and sim.equipped_cannons()==10 and sim.cannon_storage()==2,"new purchased cannons are stored, not automatically installed")
+	check(not sim.docked,"market transaction succeeds without docking")	sim.player.pos=sim.harbor;sim.dock()
 	sim.add_tide_deck(1800)
 	check(sim.cannon_slots()==20 and sim.equipped_cannons()==10,"tide deck adds ten slots but stored guns remain unused")
 	check(sim.mount_cannons(2) and sim.equipped_cannons()==12 and sim.cannon_storage()==0 and sim.weapon_damage(0)==roundi(31*1.2),"captain manually installs stored guns into available ship slots")
