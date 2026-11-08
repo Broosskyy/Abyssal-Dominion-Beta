@@ -1036,6 +1036,9 @@ func assign_bonus_piece(tier: int) -> bool:
 func craft_scroll(tier: int) -> bool:
 	return BONUS_OPS.craft_scroll(self, tier)
 
+func bonus_entry_issue(tier: int) -> String:
+	return BONUS_OPS.entry_issue(self,tier)
+
 func start_bonus(tier: int) -> bool:
 	return BONUS_OPS.start_bonus(self, tier)
 
