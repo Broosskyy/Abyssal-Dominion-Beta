@@ -364,22 +364,21 @@ func _show(next: String) -> void:
 				network.authenticate(email.text,password.text,username.text if registration else "",registration),true)
 			_button("ZURÜCK",func():_show("welcome"))
 		"home":
-			_label("KAPITÄNSHAFEN",true)
-			_label("%s · Stufe %d\n%s Gold · Karte %s" % [sim.captain_name,sim.level,sim.player.gold,sim.CONTENT.MAPS[sim.map_id].code])
-			_label("Lokale Beta · "+("Konto angemeldet; Weltserver-Vorschau vorbereitet" if not network.account.is_empty() else "Gastfortschritt auf diesem Gerät"))
-			_button("ZUR SEE · KARTE STARTEN",_sail,true).name="SailButton"
-			_button("TAGESBONUS & AFK-BEUTE",func():_show("rewards"))
-			_button("SPIELERPROFIL",func():_show("profile"))
-			_button("SEEKARTEN · 40 GEBIETE",func():_show("maps"))
-			_button("GILDE & INSEL",func():_show("guild"))
-			_button("EINSTELLUNGEN & KONTO",func():_show("settings"))
+			_show_home()
 		"rewards":
-			_label("TAGESBONUS & AFK-BEUTE",true)
-			_label("Serie %d/7 · Tagwechsel 00:00 UTC" % sim.rewards.streak)
-			_button("TAGESBONUS ABHOLEN" if sim.rewards.daily_available() else "HEUTE BEREITS ABGEHOLT",func():sim.rewards.claim_daily(sim);_save();_show("rewards"),true).disabled=not sim.rewards.daily_available()
-			_label("AFK-Beute: %d Gold · maximal 8 Stunden" % sim.rewards.afk_gold())
-			_button("AFK-BEUTE ABHOLEN",func():sim.rewards.claim_afk(sim);_save();_show("rewards"),true).disabled=sim.rewards.afk_gold()<=0
-			_label("Tagesbonus: 150–450 Gold, Essenz, Notreparatur. AFK: 3 Gold/Minute und Vollkugeln. Lokale Beta-Belohnungen werden nicht als Online-Fortschritt übertragen.")
+			_show_daily_rewards()
+		"friends":
+			_show_friends()
+		"logbook":
+			_label("KAPITÄNSLOGBUCH",true)
+			_hint(body,"Deine bisherige Fahrt, Siege und Belohnungen. Detaillierte Aufträge und tägliche Missionen findest du auf der Seekarte.",14)
+			var ledger=_dashboard_grid(2)
+			for detail in [["VERSENKTE SCHIFFE",str(sim.kills)],["SEEUNGEHEUER",str(sim.monster_kills)],["BONUSKARTEN",str(sim.bonus_runs)],["BATTLE POINTS",str(sim.battle_points)]]:
+				var card=PanelContainer.new();card.add_theme_stylebox_override("panel",SKIN.card(Color("a78d5c")));ledger.add_child(card)
+				var info=VBoxContainer.new();card.add_child(info)
+				_hint(info,str(detail[0]),12,Color("aabcbc"))
+				_hint(info,str(detail[1]),22,Color("f7db9d"))
+			_button("ZUR SEE & ZU DEN MISSIONEN",_sail,true)
 			_back()
 		"profile":
 			_label("SPIELERPROFIL",true)
@@ -399,7 +398,7 @@ func _show(next: String) -> void:
 			var chart=WORLD_CHART.new();chart.name="WorldChart";chart.sim=sim;chart.parchment=PARCHMENT;chart.chapter=chart_chapter;chart.selected=chart_pick
 			chart.custom_minimum_size=Vector2(0,390);chart.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 			chart.picked.connect(func(index: int):chart_pick=index;_show("maps"));body.add_child(chart)
-			if chart_pick==WORLD_CHART.FORTRESS_NODE:_label("GILDENINSEL · 3/1 · 10 ausbaubare Türme")
+			if chart_pick==WORLD_CHART.FORTRESS_NODE:_label("GILDENINSEL · 3/1 · 12 ausbaubare Türme")
 			else:
 				var map: Dictionary=sim.CONTENT.MAPS[chart_pick]
 				_label("%s · %s · Stufe %d%s" % [map.code,map.name,map.level," · HIER" if chart_pick==sim.map_id else ""])
@@ -407,7 +406,7 @@ func _show(next: String) -> void:
 		"guild":
 			_label("GILDE & GILDENINSEL",true)
 			_label("[%s] %s" % [sim.guild.get("tag","–"),sim.guild.get("name","Noch keine Gilde")])
-			_label("Die Korsarenfestung auf 3/1 ist eroberbar: alle zehn Türme zerstören, mit deiner Gilde halten und jeden Turm bis Stufe 5 ausbauen. Verwaltung und Inselkampf findest du auf See unter Gilde.")
+			_label("Die Korsarenfestung auf 3/1 ist eroberbar: zwölf Türme zerstören und mit deiner Gilde halten. Deine permanente Heimatbasis bleibt unabhängig vom Besitz der Weltinsel. Die Verwaltung findest du auf See unter Gilde.")
 			_back()
 		"settings":
 			_label("EINSTELLUNGEN & KONTO",true)
