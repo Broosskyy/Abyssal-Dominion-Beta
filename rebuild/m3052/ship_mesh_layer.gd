@@ -55,6 +55,9 @@ var web_performance := OS.has_feature("web")
 # WebGL adaptive resolution: only the 3D render target is resized. Native,
 # 2D chart, HUD, simulation and saved game resolution remain untouched.
 var web_quality: float=1.0
+# Remember the last chart viewport rather than using window dimensions when
+# WebGL adaptive quality changes (also enables deterministic portrait tests).
+var viewport_screen: Vector2=Vector2.ZERO
 # M3099: preserve native shaded material, ensure back faces of sails are visible.
 var gameplay_double_sided_count := 0
 
@@ -277,7 +280,8 @@ func set_web_performance(enabled: bool) -> void:
 	web_quality=1.0
 	if stage==null:return
 	stage.msaa_3d=Viewport.MSAA_DISABLED if web_performance else Viewport.MSAA_4X
-	if host!=null:resize_view(host.get_viewport_rect().size)
+	if viewport_screen!=Vector2.ZERO:resize_view(viewport_screen)
+	elif host!=null:resize_view(host.get_viewport_rect().size)
 
 ## Pure policy for replayable tests: drop quality immediately on a sustained
 ## slow window; recover only after three consecutive near-target windows.
@@ -300,9 +304,12 @@ func set_web_quality(quality: float) -> void:
 	var requested: float=clampf(quality,0.65,1.0)
 	if absf(requested-web_quality)<0.02:return
 	web_quality=requested
-	if stage!=null and host!=null:resize_view(host.get_viewport_rect().size)
+	if stage!=null:
+		if viewport_screen!=Vector2.ZERO:resize_view(viewport_screen)
+		elif host!=null:resize_view(host.get_viewport_rect().size)
 
 func resize_view(screen: Vector2) -> void:
+	viewport_screen=screen
 	position=Vector2.ZERO
 	size=screen
 	if stage==null:return
