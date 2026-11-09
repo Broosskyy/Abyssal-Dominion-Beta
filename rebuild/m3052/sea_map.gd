@@ -357,7 +357,7 @@ func _online_snapshot(packet: Dictionary) -> void:
 		if str(candidate.get("id",""))==my_id:continue
 		var x: float=float(candidate.get("x",-1))
 		var y: float=float(candidate.get("y",-1))
-		if not is_finite(x) or not is_finite(y) or x<0 or x>sim.WORLD.x or y<0 or y>sim.WORLD.y:continue
+		if not Vector2(x,y).is_finite() or x<0 or x>sim.WORLD.x or y<0 or y>sim.WORLD.y:continue
 		others.append({"id":str(candidate.get("id","")), "username":str(candidate.get("username","Kapitän")).left(24),
 			"x":x,"y":y})
 	online_players=others
