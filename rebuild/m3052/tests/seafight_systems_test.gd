@@ -214,10 +214,10 @@ func _initialize() -> void:
 	check(not sim.equip_deck(2,1),"deck refitting still requires the harbor")
 	sim.player.pos=sim.harbor;sim.dock()
 	check(sim.equip_deck(2,1) and sim.deck_slots[2]==-1,"deck can move to any slot without duplication")
-	check(sim.cannon_slots()==19,"Gold and Pearl deck bonuses sum independently")
+	check(sim.cannon_slots()==18,"replacing an occupied slot drops the displaced Gold copy bonus")
 	sim.player.gold=1000
-	check(sim.buy_deck("cannon") and sim.deck_slots[2]==3 and sim.cannon_slots()==20,"harbor sells another identical Gold I deck with independent cannon bonus")
-	check(sim.unequip_deck(2) and sim.cannon_slots()==19,"removing any copy removes exactly its own cannon bonus")
+	check(sim.buy_deck("cannon") and sim.deck_slots[2]==3 and sim.cannon_slots()==19,"harbor sells another identical Gold I deck with independent cannon bonus")
+	check(sim.unequip_deck(2) and sim.cannon_slots()==18,"removing any copy removes exactly its own cannon bonus")
 
 	# Kastelle: six castles to level 8, paced by captain level.
 	sim=SIM.new();sim.player.pos=sim.harbor;sim.dock();sim.player.gold=99999
