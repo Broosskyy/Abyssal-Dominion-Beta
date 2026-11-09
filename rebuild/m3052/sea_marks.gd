@@ -148,7 +148,7 @@ static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,time_seco
 	special_deck_arm(canvas,center,r,-1,"tide",float(sim.buffs.tide_deck)>0,time_seconds)
 	special_deck_arm(canvas,center,r,1,"storm",float(sim.buffs.storm_deck)>0,time_seconds)
 	special_deck_arm(canvas,center,r,-1,"salvage",float(sim.buffs.salvage_deck)>0,time_seconds)
-	special_deck_arm(canvas,center,r,1,"blessing",sim.has_blessing(),time_seconds)
+	# Kristallsegen is a separate blessing in the buff bar, not a fourth special deck.
 
 ## Kristallsegen beside the deck row: the crystal, a gold ring and a timer that runs down.
 static func blessing_crystal(canvas: CanvasItem,center: Vector2,r: float,texture: Texture2D,remaining: float,total: float) -> void:

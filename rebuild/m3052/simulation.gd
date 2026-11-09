@@ -15,7 +15,7 @@ const PLAYER_HP := 2400
 const PLAYER_SHIELD := 1000
 const SHIELD_DELAY := 8.0
 const BASE_CANNON_SLOTS := 10
-const MAX_CANNONS := 40
+const MAX_CANNONS := 350
 const BASE_RELOAD := 1.65
 const START := Vector2(2100, 1450)
 const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice", "fire", "poison", "shrapnel", "lightning", "holy", "shadow", "wind", "earth", "water", "cursed", "bleed", "necro", "gold", "crystal", "explosive", "arcane", "spectral", "lava", "light", "armor_piercing", "gas"]
@@ -437,16 +437,23 @@ func add_tide_deck(seconds: float) -> void:
 	buffs.tide_deck = minf(CONTENT.TIDE_DECK_CAP, float(buffs.tide_deck) + seconds)
 	_event("tide_deck", player.pos, 0, 0)
 
+## Temporary test balance: individual stage-based cannon slots for ten decks.
+func deck_cannon_bonus(tier: int,stage: int) -> int:
+	var material: int=clampi(tier,0,CONTENT.DECK_TIERS.size()-1)
+	var rank: int=clampi(stage,1,CONTENT.DECK_STAGE_MAX)
+	return int(CONTENT.DECK_CANNON_BASE[material])+rank*(material+1)
+
 func deck_value(type: String) -> float:
+	if type!="cannon":return 0.0
 	var total := 0.0
 	for slot in deck_slots:
-		if int(slot) < 0 or int(slot) >= decks.size(): continue
-		var deck: Dictionary = decks[int(slot)]
-		if str(deck.type) == type: total += float(CONTENT.DECKS[type].values[int(deck.tier)])
+		if int(slot)<0 or int(slot)>=decks.size():continue
+		var deck: Dictionary=decks[int(slot)]
+		total+=float(deck_cannon_bonus(int(deck.tier),int(deck.get("stage",1))))
 	return total
 
 func cannon_slots() -> int:
-	return BASE_CANNON_SLOTS + roundi(deck_value("cannon")) + (10 if float(buffs.tide_deck) > 0 else 0) + (5 if has_blessing() else 0)
+	return BASE_CANNON_SLOTS + roundi(deck_value("cannon")) + (10 if float(buffs.tide_deck)>0 else 0) + (5 if has_blessing() else 0)
 
 func equipped_cannons() -> int:
 	return mini(mounted_cannons,cannon_slots())
@@ -485,71 +492,96 @@ func unmount_cannons(quantity: int) -> bool:
 	message="%d Kanonen ins Arsenal gelegt · %d im Lager" % [removing,cannon_storage()]
 	return true
 
-func owns_deck(type: String, tier: int) -> bool:
+func owns_deck(type: String,tier: int) -> bool:
+	if type not in CONTENT.DECK_LEGACY_TYPES:return false
 	for deck: Dictionary in decks:
-		if str(deck.type) == type and int(deck.tier) == tier: return true
+		if int(deck.tier)==tier:return true
 	return false
 
-func grant_deck(type: String, tier: int, purchased: bool = false) -> bool:
-	if not CONTENT.DECKS.has(type): return false
-	tier = clampi(tier, 0, CONTENT.DECK_TIERS.size() - 1)
-	var title := "%s %s" % [CONTENT.DECKS[type].name, CONTENT.DECK_TIERS[tier]]
-	if not purchased and owns_deck(type, tier):
-		essence += CONTENT.DUPLICATE_DECK_ESSENCE
-		message = "%s doppelt · in %d Gezeitenessenz umgewandelt" % [title, CONTENT.DUPLICATE_DECK_ESSENCE]
-		return false
+func grant_deck(type: String,tier: int,purchased: bool=false) -> bool:
+	# Keep all old loot IDs valid, but normalize every physical deck.
+	if type not in CONTENT.DECK_LEGACY_TYPES:return false
+	tier=clampi(tier,0,CONTENT.DECK_TIERS.size()-1)
 	if decks.size()>=CONTENT.DECK_INVENTORY_MAX:
-		message="Decklager voll";return false
-	decks.append({"type":type, "tier":tier})
+		if not purchased:
+			essence+=CONTENT.DUPLICATE_DECK_ESSENCE
+			message="Decklager voll · %d Essenz gutgeschrieben" % CONTENT.DUPLICATE_DECK_ESSENCE
+		return false
+	decks.append({"type":"cannon","tier":tier,"stage":1})
 	for i in deck_slots.size():
-		if int(deck_slots[i]) < 0:
-			deck_slots[i] = decks.size() - 1
+		if int(deck_slots[i])<0:
+			deck_slots[i]=decks.size()-1
 			break
 	apply_upgrades()
-	message = "Neues Deck: %s" % title
+	message="Neues %sdeck · Stufe I" % CONTENT.DECK_TIERS[tier]
 	return true
 
-func equip_deck(index: int, slot: int) -> bool:
-	if index < 0 or index >= decks.size() or slot < 0 or slot >= deck_slots.size(): return false
+func equip_deck(index: int,slot: int) -> bool:
+	if index<0 or index>=decks.size() or slot<0 or slot>=deck_slots.size():return false
 	if not docked:
-		message = "Decks werden im Hafen umgebaut"
+		message="Decks werden im Hafen umgebaut"
 		return false
-	# A physical deck may move between slots, but never occupy two slots at once.
 	for other in deck_slots.size():
 		if other!=slot and int(deck_slots[other])==index:deck_slots[other]=-1
-	deck_slots[slot] = index
+	deck_slots[slot]=index
 	apply_upgrades()
-	message = "%s montiert" % CONTENT.DECKS[str(decks[index].type)].name
+	message="Deck %02d montiert · %s Stufe %d" % [slot+1,CONTENT.DECK_TIERS[int(decks[index].tier)],int(decks[index].get("stage",1))]
 	return true
 
 func unequip_deck(slot: int) -> bool:
-	if slot < 0 or slot >= deck_slots.size() or int(deck_slots[slot]) < 0 or not docked: return false
-	deck_slots[slot] = -1
+	if slot<0 or slot>=deck_slots.size() or int(deck_slots[slot])<0 or not docked:return false
+	deck_slots[slot]=-1
 	apply_upgrades()
-	message = "Deckplatz %d frei" % (slot + 1)
+	message="Deckplatz %d frei" % (slot+1)
 	return true
 
-func buy_deck(type: String) -> bool:
-	if not docked or not CONTENT.DECKS.has(type) or decks.size()>=CONTENT.DECK_INVENTORY_MAX:return false
-	var price=int(CONTENT.DECKS[type].price)
+func buy_deck(type: String="cannon") -> bool:
+	if not docked or type!="cannon" or decks.size()>=CONTENT.DECK_INVENTORY_MAX:return false
+	var price: int=int(CONTENT.DECKS.cannon.price)
 	if int(player.gold)<price:return false
-	if not grant_deck(type,0,true):return false
+	if not grant_deck("cannon",0,true):return false
 	player.gold-=price
 	return true
 
+## Authoritative next step: both UI and purchase read this same result.
+func deck_upgrade_info(index: int) -> Dictionary:
+	if index<0 or index>=decks.size():return {}
+	var deck: Dictionary=decks[index]
+	var tier: int=clampi(int(deck.tier),0,CONTENT.DECK_TIERS.size()-1)
+	var stage: int=clampi(int(deck.get("stage",1)),1,CONTENT.DECK_STAGE_MAX)
+	var maximum: bool=tier==CONTENT.DECK_TIERS.size()-1 and stage==CONTENT.DECK_STAGE_MAX
+	var promoting: bool=stage==CONTENT.DECK_STAGE_MAX
+	var next_tier: int=tier+1 if promoting and not maximum else tier
+	var next_stage: int=1 if promoting and not maximum else mini(CONTENT.DECK_STAGE_MAX,stage+1)
+	var gold: int=int(CONTENT.DECK_UPGRADE_GOLD[tier])*stage
+	var essence_cost: int=int(CONTENT.DECK_UPGRADE_ESSENCE[tier])*stage
+	if promoting and not maximum:essence_cost+=2 if next_tier==1 else 8
+	return {
+		"maximum":maximum,"tier":tier,"stage":stage,
+		"next_tier":next_tier,"next_stage":next_stage,
+		"promoting":promoting and not maximum,
+		"gold":0 if maximum else gold,"essence":0 if maximum else essence_cost,
+		"captain_level":int(CONTENT.DECK_UPGRADE_LEVEL[next_tier]),
+		"cannons_now":deck_cannon_bonus(tier,stage),
+		"cannons_next":deck_cannon_bonus(next_tier,next_stage)
+	}
+
 func upgrade_deck(index: int) -> bool:
-	if not docked or index<0 or index>=decks.size():return false
-	var tier=int(decks[index].tier)
-	if tier>=CONTENT.DECK_TIERS.size()-1:return false
-	if level<int(CONTENT.DECK_UPGRADE_LEVEL[tier]):
-		message="%sdecks ab Kapitänsstufe %d" % [CONTENT.DECK_TIERS[tier+1],CONTENT.DECK_UPGRADE_LEVEL[tier]];return false
-	var gold=int(CONTENT.DECK_UPGRADE_GOLD[tier])
-	var cost=int(CONTENT.DECK_UPGRADE_ESSENCE[tier])
-	if int(player.gold)<gold or essence<cost:return false
-	player.gold-=gold;essence-=cost
-	decks[index].tier=tier+1
+	if not docked:return false
+	var info: Dictionary=deck_upgrade_info(index)
+	if info.is_empty() or bool(info.maximum):return false
+	if level<int(info.captain_level):
+		message="%sdecks ab Kapitänsstufe %d" % [CONTENT.DECK_TIERS[int(info.next_tier)],int(info.captain_level)]
+		return false
+	if int(player.gold)<int(info.gold) or essence<int(info.essence):
+		message="Nicht genug Gold oder Essenz für dieses Deckupgrade"
+		return false
+	player.gold-=int(info.gold)
+	essence-=int(info.essence)
+	decks[index].tier=int(info.next_tier)
+	decks[index].stage=int(info.next_stage)
 	apply_upgrades()
-	message="Deck zu %s verbessert" % CONTENT.DECK_TIERS[tier+1]
+	message="%sdeck Stufe %d · +%d Kanonenplätze (Beta)" % [CONTENT.DECK_TIERS[int(info.next_tier)],int(info.next_stage),int(info.cannons_next)]
 	return true
 
 func add_special_deck(key: String,seconds: float) -> bool:
@@ -561,6 +593,7 @@ func add_special_deck(key: String,seconds: float) -> bool:
 
 func buy_special_deck(key: String) -> bool:
 	if not docked or not CONTENT.SPECIAL_DECKS.has(key):return false
+	if str(CONTENT.SPECIAL_DECKS[key].get("source","market"))=="kessel":return false
 	var config: Dictionary=CONTENT.SPECIAL_DECKS[key]
 	if level<int(config.level) or int(player.gold)<int(config.price):return false
 	player.gold-=int(config.price)
@@ -1047,6 +1080,9 @@ func _grant(id: String, amount: int, title: String, rarity: int) -> Dictionary:
 		"tide_deck":
 			add_tide_deck(float(amount))
 			text = "Gezeitendeck +%d min" % roundi(amount / 60.0)
+		"storm_deck":
+			add_special_deck("storm_deck",float(amount))
+			text = "Runendeck +%d min" % roundi(amount / 60.0)
 		"scroll0", "scroll1", "scroll2":
 			scrolls[int(id.right(1))] += amount
 			text = "%s-Schriftrolle" % CONTENT.BONUS_TIERS[int(id.right(1))].name
@@ -1059,7 +1095,7 @@ func _grant(id: String, amount: int, title: String, rarity: int) -> Dictionary:
 				var type: String = parts[1] if parts.size() > 1 else CONTENT.DECK_KEYS[rng.randi_range(0, CONTENT.DECK_KEYS.size() - 1)]
 				var tier := int(parts[2]) if parts.size() > 2 else 0
 				var fresh := grant_deck(type, tier)
-				text = "%s %s%s" % [CONTENT.DECKS[type].name, CONTENT.DECK_TIERS[tier], "" if fresh else " · Duplikat → %d Essenz" % CONTENT.DUPLICATE_DECK_ESSENCE]
+				text = "%sdeck Stufe I%s" % [CONTENT.DECK_TIERS[clampi(tier,0,CONTENT.DECK_TIERS.size()-1)],"" if fresh else " · Lager voll → %d Essenz" % CONTENT.DUPLICATE_DECK_ESSENCE]
 	return {"id": id, "text": text, "rarity": rarity}
 
 # --- Bonus maps --------------------------------------------------------------------
@@ -1745,8 +1781,10 @@ func restore_save(data: Dictionary) -> bool:
 	var saved_decks: Variant=data.get("decks",[])
 	if saved_decks is Array:
 		for entry: Variant in saved_decks:
-			if entry is Dictionary and CONTENT.DECKS.has(str(entry.get("type",""))):
-				decks.append({"type":str(entry.type),"tier":clampi(int(entry.get("tier",0)),0,CONTENT.DECK_TIERS.size()-1)})
+			if entry is Dictionary and str(entry.get("type","")) in CONTENT.DECK_LEGACY_TYPES and decks.size()<CONTENT.DECK_INVENTORY_MAX:
+				# Keep physical purchases, material and mount index. Former
+				# role-specific copies now grant only cannon capacity.
+				decks.append({"type":"cannon","tier":clampi(int(entry.get("tier",0)),0,CONTENT.DECK_TIERS.size()-1),"stage":clampi(int(entry.get("stage",1)),1,CONTENT.DECK_STAGE_MAX)})
 	deck_slots=[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
 	var saved_slots: Variant=data.get("deck_slots",[])
 	if saved_slots is Array:
