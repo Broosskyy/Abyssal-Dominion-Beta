@@ -237,9 +237,11 @@ func _run() -> void:
 		game.sim.select(2)
 		game._refresh_ui()
 		check(game.nav_buttons.size()==9,"top bar carries nine sea-chart menus")
+		check(game.nav_scroll!=null and game.nav_scroll.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and game.nav_scroll.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x,"swipeable navigation viewport stays between wallet and captain meters at "+str(dimensions))
+		check(game.nav_strip.get_combined_minimum_size().x>game.nav_scroll.size.x or dimensions.x>=1200,"navigation scrolls rather than shrinking the nine buttons at "+str(dimensions))
 		for nav: Button in game.nav_buttons:
 			check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
-			check(nav.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and nav.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x,"navigation stays between wallet and captain meters at "+str(dimensions))
+			check(nav.get_parent()==game.nav_strip and nav.custom_minimum_size.x>=64.0,"navigation is swipe-reachable with readable touch width: "+nav.text+" at "+str(dimensions))
 		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.settings_button,game.render_toggle,game.interact,game.loadout_button,game.ammo_selector,game.camera_pad,game.target_cycle,game.supply_selector]
 		for control: Control in controls:
 			var rect=control.get_global_rect()
@@ -361,6 +363,19 @@ func _run() -> void:
 			else:
 				check(game.modal.get_global_rect().size.x<dimensions.x*.85,"combat ammunition retains compact popup instead of full page")
 			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
+	# Closing a full-screen menu must release its invisible touch blocker.
+	# The same back path is shared by Market, Decks and other nested panels.
+	game._close_modal()
+	game._open_modal("Markt")
+	check(game.modal.visible and game.modal_backdrop.visible,"modal displays its touch-blocking backdrop while open")
+	game.modal_close.pressed.emit()
+	check(not game.modal.visible and not game.modal_backdrop.visible and game.menu_history.is_empty(),"X button releases BOTH menu and invisible backdrop")
+	game._open_modal("Markt")
+	game._open_modal("Decks")
+	game._back_modal()
+	check(game.modal.visible and game.modal_kind=="Markt" and game.modal_backdrop.visible,"back navigates to previous real menu")
+	game._back_modal()
+	check(not game.modal.visible and not game.modal_backdrop.visible and game.menu_history.is_empty(),"back on root menu returns full touch control to chart")
 	# Two uploaded comparison videos show item artwork, a price, and one
 	# unmistakable action per item. Validate the actual Godot catalog layout
 	# on a compact landscape phone and a normal tablet/desktop viewport.
