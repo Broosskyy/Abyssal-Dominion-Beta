@@ -1,0 +1,139 @@
+name: Abyssal Dominion – browser preview
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'rebuild/m3052/**'
+      - 'server/**'
+      - '.github/workflows/browser-preview.yml'
+
+concurrency:
+  group: abyssal-browser-preview
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Export first playable HTML5 beta
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            rebuild/m3052
+            server
+      - name: Install verified Godot 4.7.2 and Web export template
+        shell: bash
+        run: |
+          set -euo pipefail
+          fetch_pinned() {
+            local output="$1" digest="$2" filename="$3"
+            for base in \
+              "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable" \
+              "https://downloads.sourceforge.net/project/godot-engine.mirror/4.7.2-stable"; do
+              rm -f "$output"
+              if curl -fL --retry 3 --retry-all-errors --retry-delay 3 --connect-timeout 30 --max-time 1800 -o "$output" "$base/$filename" &&
+                 printf '%s  %s\n' "$digest" "$output" | sha256sum -c -; then return 0; fi
+            done
+            echo "::error::Pinned Godot download or signature check failed"
+            return 1
+          }
+          fetch_pinned /tmp/godot.zip cadd3204e728a35d3f13adb7fd0d7902636b79f6b95c40c265eb73b6c35329e4 Godot_v4.7.2-stable_linux.x86_64.zip
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.7.2-stable_linux.x86_64
+          fetch_pinned /tmp/templates.tpz f298490b8d44d934be425a5a65a51bf15f422428b229a06a6e11d9ffea248011 Godot_v4.7.2-stable_export_templates.tpz
+          tpl="$HOME/.local/share/godot/export_templates/4.7.2.stable"
+          mkdir -p "$tpl"
+          unzip -p /tmp/templates.tpz templates/web_release.zip > "$tpl/web_release.zip"
+          test -s "$tpl/web_release.zip"
+          unzip -p /tmp/templates.tpz templates/version.txt > "$tpl/version.txt"
+          /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --version
+      - name: Import resources and export Godot WebGL2 build
+        run: |
+          set -euo pipefail
+          engine=/tmp/godot/Godot_v4.7.2-stable_linux.x86_64
+          mkdir -p rebuild/m3052/builds/web
+          "$engine" --headless --path rebuild/m3052 --editor --import --quit > /tmp/web-import.log 2>&1 || { tail -100 /tmp/web-import.log; exit 1; }
+          "$engine" --headless --path rebuild/m3052 --export-release Web "$PWD/rebuild/m3052/builds/web/index.html" > /tmp/web-export.log 2>&1 || { tail -100 /tmp/web-export.log; exit 1; }
+          if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script' /tmp/web-export.log; then exit 1; fi
+          test -s rebuild/m3052/builds/web/index.html
+          test -s rebuild/m3052/builds/web/index.js
+          test -s rebuild/m3052/builds/web/index.pck
+          test -s rebuild/m3052/builds/web/index.wasm
+          ls -lh rebuild/m3052/builds/web
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('rebuild/m3052/builds/web')
+          sizes={p.name:p.stat().st_size for p in root.iterdir() if p.is_file()}
+          assert min(sizes[n] for n in ['index.html','index.js','index.pck','index.wasm'])>0
+          (root/'web-build-info.json').write_text(json.dumps({'status':'browser-preview','scope':'local-guest-sea','multiuser':'presence-server-required','files':sizes},indent=2))
+          PY
+      - name: Package downloadable browser build
+        run: |
+          set -euo pipefail
+          cd rebuild/m3052/builds/web
+          zip -q -r ../ABYSSAL_BROWSER_${GITHUB_RUN_NUMBER}.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: abyssal-browser-${{ github.run_number }}
+          path: rebuild/m3052/builds/web/
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: abyssal-browser-zip-${{ github.run_number }}
+          path: rebuild/m3052/builds/ABYSSAL_BROWSER_${{ github.run_number }}.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    name: Publish browser test package
+    needs: web
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: abyssal-browser-zip-${{ github.run_number }}
+          path: ./dist
+      - name: Publish uniquely versioned browser prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          REV: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          gh release create "browser-test-${REV}" "dist/ABYSSAL_BROWSER_${REV}.zip" \
+            --repo "$REPO" --target "${GITHUB_SHA}" --prerelease \
+            --title "Abyssal Dominion – Browser-Test ${REV}" \
+            --notes "HTML5/WebGL2 guest preview of Abyssal Dominion. Download ZIP and host via HTTP(S); double-clicking index.html from a local file is not supported. Browser login needs an external HTTPS/WSS presence server; local guest gameplay is available without one."
+
+  pages:
+    name: Deploy playable GitHub Pages test
+    needs: web
+    runs-on: ubuntu-24.04
+    # GitHub Pages must first be enabled in repo Settings -> Pages, source GitHub Actions.
+    # Keep the standalone browser build available even before that setting is enabled.
+    if: vars.ABYSSAL_PAGES_ENABLED == 'true'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: abyssal-browser-${{ github.run_number }}
+          path: ./dist
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

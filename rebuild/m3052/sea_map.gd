@@ -18,6 +18,7 @@ const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
 const AMMO_CHOICE=preload("res://ammo_choice.gd")
+const NETWORK=preload("res://network_client.gd")
 const COMBAT_FX=preload("res://combat_fx.gd")
 const SPRITE_FX=preload("res://sprite_fx.gd")
 const USER_AMMO_ATLAS: Texture2D=preload("res://assets/ui/ammo/user_ammo_atlas.webp")
@@ -133,6 +134,10 @@ const AMMO_UI := [
 var nav_buttons: Array[Button] = []
 var nav_scroll: ScrollContainer
 var nav_strip: HBoxContainer
+var online_client: Node
+var online_players: Array[Dictionary]=[]
+var online_population: int=0
+var online_connected: bool=false
 var quest_panel: Panel
 var quest_text: Label
 var quest_claim: Button
@@ -285,6 +290,7 @@ func _ready() -> void:
 	ocean.set_shader_parameter("sea_tile",load("res://assets/ui/painted/sea_tile.png"))
 	water.material = ocean
 	_build_ui()
+	_start_online_presence()
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 	_refresh_ui()
@@ -313,6 +319,66 @@ func _use_uhd() -> void:
 	var screen := DisplayServer.screen_get_size()
 	if screen.x >= uhd.x and screen.y >= uhd.y:
 		window.position = (screen - uhd) / 2
+
+## Test-only online presence. Account and room transport are real, but the
+## economy, enemy AI, PvP and ship damage remain local to each client.
+## Never treat server presence snapshots as player or inventory authority.
+func _start_online_presence() -> void:
+	if not get_tree().has_meta("abyssal_session"):return
+	online_client=NETWORK.new()
+	online_client.name="OnlinePresencePreview"
+	add_child(online_client)
+	online_client.snapshot_received.connect(_online_snapshot)
+	online_client.connection_changed.connect(_online_connection_changed)
+	_join_online_room()
+
+func _join_online_room() -> void:
+	if online_client==null or not is_instance_valid(online_client):return
+	if str(online_client.token).is_empty() or sim.in_bonus_map():return
+	var result: Error=online_client.connect_world(sim.map_id)
+	if result!=OK:online_connected=false
+
+func _online_connection_changed(connected: bool) -> void:
+	online_connected=connected
+	if not connected:
+		online_players.clear()
+		online_population=0
+
+func _online_snapshot(packet: Dictionary) -> void:
+	if str(packet.get("type",""))!="snapshot" or int(packet.get("map_id",-1))!=sim.map_id:return
+	var entries: Variant=packet.get("players",[])
+	if not entries is Array:return
+	var all_players: Array=entries
+	online_population=mini(all_players.size(),32)
+	var others: Array[Dictionary]=[]
+	var my_id: String=str(online_client.account.get("id","")) if online_client!=null else ""
+	for candidate in all_players.slice(0,32):
+		if not candidate is Dictionary:continue
+		if str(candidate.get("id",""))==my_id:continue
+		var x: float=float(candidate.get("x",-1))
+		var y: float=float(candidate.get("y",-1))
+		if not Vector2(x,y).is_finite() or x<0 or x>sim.WORLD.x or y<0 or y>sim.WORLD.y:continue
+		others.append({"id":str(candidate.get("id","")), "username":str(candidate.get("username","Kapitän")).left(24),
+			"x":x,"y":y})
+	online_players=others
+
+func _send_online_course(point: Vector2) -> void:
+	if online_client!=null and is_instance_valid(online_client) and online_connected:
+		online_client.send_course(point)
+
+func _draw_online_presence(view: Rect2) -> void:
+	# Distinct cyan *test markers*, not fake synchronized ship meshes.
+	# A real server-backed ship renderer will replace them when combat and
+	# collisions become authoritative. No collision or hitbox is added.
+	for other in online_players:
+		var pos: Vector2=Vector2(float(other.x),float(other.y))
+		if not view.has_point(pos):continue
+		var back: Vector2=pos+Vector2(0,13)
+		draw_arc(back,25,0,TAU,32,Color("6fe7f3",.72),2.0,true)
+		draw_colored_polygon(PackedVector2Array([pos+Vector2(0,-17),pos+Vector2(13,12),pos+Vector2(-13,12)]),Color("1f9eb5",.75))
+		draw_line(pos+Vector2(0,-18),pos+Vector2(0,14),Color("d8feff",.85),2)
+		_label(pos+Vector2(0,-37),str(other.username),13,Color("a4f3fa"))
+		_label(pos+Vector2(0,-23),"ONLINE · TEST",10,Color("63c6da"))
 
 func _sharp_zoom() -> float:
 	return desired_zoom * clampf(get_viewport_rect().size.y / 720.0, 1.0, 1.7)
@@ -614,6 +680,7 @@ func _draw() -> void:
 		if int(actor.hp)>0:_draw_wake(actor)
 	for actor: Dictionary in fleet:
 		if int(actor.hp)>0: _draw_actor(actor)
+	_draw_online_presence(view)
 	# Name/HP/shield/decks are rendered in a screen-space CanvasLayer,
 	# already synced during _process(), never sourced from an old draw pass.
 	# Original M3100 missile silhouettes, contrails, sparks and shadow arcs.
@@ -1303,9 +1370,13 @@ func _build_ui() -> void:
 	gold_label=_text(chrome,"",15,Color("ffe2a0"))
 	kills_label=_text(chrome,"",12,Color("eadfc6"))
 	for label in [gold_label,kills_label]:label.clip_text=true;label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
-	var nav_items=[["Schiff","nav_ship","Schiff"],["Werft","nav_shipyard","Werft"],["Decks","tide_deck","Decks"],["Markt","gold_coins","Markt"],["Talente","nav_castles","Kastelle"],["Hafen","nav_harbor","Hafen"],["Logbuch","nav_quests","Logbuch"],["Bonus","nav_bonus","Bonuskarten"],["Kessel","nav_kessel","Kessel"],["Gilde","nav_guild","Gilde"],["Menü","nav_menu","Spielinfo"]]
-	# Use a real horizontal scroll viewport on narrow phones. Keep all nine
-	# commands readable and reachable instead of shrinking their hit areas.
+	# Sea HUD is a combat overlay, not a second inventory dashboard.
+	# Kill count lives in the profile/logbook; only gold stays in the header.
+	kills_label.hide()
+	wallet_icons[1].hide()
+	var nav_items=[["Schiff","nav_ship","Schiff"],["Markt","gold_coins","Markt"],["Decks","tide_deck","Decks"],["Karten","nav_charts","Seekarten"],["Menü","nav_menu","Menü"]]
+	# Five primary actions only. Everything else lives in a real grouped
+	# menu instead of eleven scrolling buttons covering the top of the sea.
 	nav_scroll=ScrollContainer.new()
 	nav_scroll.name="SeaHeaderNavigation"
 	nav_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_SHOW_NEVER
@@ -1495,21 +1566,29 @@ func _layout() -> void:
 	water.size=viewport_size
 	_place(ruler,0,0,s.x,s.y)
 	# Top bar: wallet left, full-width navigation, captain meters right.
-	var header=48.0 if compact else 54.0
+	var header=46.0 if compact else 50.0
 	_place(chrome,0,0,s.x,header)
-	var wallet=104.0 if compact else 138.0
-	var row=(header-6)*.5
-	for i in 2:_place(wallet_icons[i],6,4+i*row,row-2,row-2)
-	_place(gold_label,row+8,3,wallet-row-10,row)
-	_place(kills_label,row+8,3+row,wallet-row-10,row)
-	var meters=140.0 if compact else 204.0
+	var wallet=102.0 if compact else 118.0
+	_place(wallet_icons[0],6,6,header-12,header-12)
+	_place(wallet_icons[1],0,0,0,0)
+	_place(gold_label,header-3,5,wallet-header+1,header-10)
+	_place(kills_label,0,0,0,0)
+	var meters=150.0 if compact else 185.0
 	var meter_x=s.x-meters-8
-	var meter_row=(header-6)/3.0
-	var bars: Array[ProgressBar]=[player_xp,player_hp,player_shield]
-	var readouts: Array[Label]=[xp_numbers,player_numbers,shield_numbers]
-	for i in 3:
-		_place(meter_tags[i],meter_x,3+i*meter_row,34,meter_row)
-		_place(bars[i],meter_x+34,4+i*meter_row,meters-34,meter_row-2)
+	var meter_row=(header-8)/2.0
+	# Only the combat-critical hull and shield bars remain in the top HUD.
+	# Level and experience stay in captain profile and ship menu.
+	player_xp.hide()
+	meter_tags[0].hide()
+	xp_numbers.hide()
+	_place(player_xp,0,0,0,0)
+	_place(meter_tags[0],0,0,0,0)
+	_place(xp_numbers,0,0,0,0)
+	var bars: Array[ProgressBar]=[player_hp,player_shield]
+	var readouts: Array[Label]=[player_numbers,shield_numbers]
+	for i in 2:
+		_place(meter_tags[i+1],meter_x,3+i*meter_row,42,meter_row)
+		_place(bars[i],meter_x+42,4+i*meter_row,meters-42,meter_row-2)
 		_place(readouts[i],0,0,bars[i].size.x,bars[i].size.y)
 	var pill_w=minf(220.0,s.x*.3)
 	_place(staff_pill,(s.x-pill_w)*.5,header+4,pill_w,22)
@@ -1518,7 +1597,7 @@ func _layout() -> void:
 	_place(nav_scroll,nav_left,1,nav_span,header-2)
 	# The HBox owns child positions; width is never reduced below a
 	# readable 64px touch target even when only one fits at a time.
-	var nav_button_w=minf(98.0,maxf(64.0,nav_span/float(nav_buttons.size())-3.0))
+	var nav_button_w=minf(96.0,maxf(64.0,nav_span/float(nav_buttons.size())-4.0))
 	for nav: Button in nav_buttons:
 		nav.custom_minimum_size=Vector2(nav_button_w,header-4)
 		nav.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
@@ -1662,6 +1741,9 @@ func _refresh_ui() -> void:
 				badge=str(sim.essence);alert=sim.free_flask_ready(today)
 			"Gilde":
 				badge="%d'" % ceili(sim.fortress_hold/60.0) if sim.guild_island_held() else ""
+			"Menü":
+				alert=quest_ready or sim.free_flask_ready(today)
+				badge="!" if alert else ""
 		nav.set("quantity",badge);nav.set("badge_alert",alert)
 		nav.set("latched",modal.visible and modal_kind==kind);nav.queue_redraw()
 	gold_label.text=_thousands(int(sim.player.gold))
@@ -1879,7 +1961,7 @@ func _clock_text(seconds: float) -> String:
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
 const MODAL_TABS := {"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
-const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Freunde":"Freunde & Einladungen","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
+const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Menü":"Spielmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Freunde":"Freunde & Einladungen","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
 	if modal.visible and modal_kind!=kind and remember:
@@ -1910,6 +1992,7 @@ func _open_modal(kind: String,remember: bool=true) -> void:
 	_layout()
 	match kind:
 		"Schiff":_open_ship()
+		"Menü":_open_menu_hub()
 		"Munition":_open_ammo()
 		"Verbrauch":_open_consumables()
 		"Events":_open_events()
@@ -3606,6 +3689,33 @@ func _open_display() -> void:
 			choice.disabled=selected
 		_note("Intensiv ist der Standard. Leicht reduziert Zeichnung und Partikel auf schwächeren Smartphones; Extrem liefert stärkere Treffer und sichtbare Folgewellen.",Color("bfcbdf"))
 
+func _open_menu_hub() -> void:
+	# One compact, grouped index instead of 11 persistent nav buttons.
+	# All existing functional panels remain directly reachable.
+	if online_client!=null and online_connected:
+		_note("ONLINE-PRÄSENZTEST · %d Kapitäne auf dieser Karte. Türkise Testmarkierungen zeigen andere angemeldete Spieler. Kampf, Schaden und Beute sind noch lokal." % online_population,Color("8bd7db"))
+	else:
+		_note("LOKALE BETA · Online-Anmeldung und WebSocket-Test können auf der Startseite unter Einstellungen & Konto eingerichtet werden. Es läuft noch kein öffentlicher MMO-Server.",Color("9fb9ba"))
+	_section("SCHNELLZUGRIFF")
+	var quick=_grid(3)
+	for item in [["HAFEN","Hafen"],["WERFT","Werft"],["KASTELLE","Kastelle"],["MUNITION","Munition"],["KESSEL","Kessel"],["LOGBUCH","Logbuch"]]:
+		var destination: String=str(item[1])
+		var button=_action(str(item[0]),func():_open_modal(destination),"normal",quick)
+		button.name="MenuShortcut_"+destination
+	_section("WELT & SOZIALES")
+	var world=_grid(3)
+	for item in [["BONUSKARTEN","Bonuskarten"],["GILDE","Gilde"],["MONSTER","Monster"],["EVENTS","Events"],["FREUNDE","Freunde"],["RANGLISTE","Rangliste"]]:
+		var destination: String=str(item[1])
+		var button=_action(str(item[0]),func():_open_modal(destination),"normal",world)
+		button.name="MenuShortcut_"+destination
+	_section("KAPITÄN & SYSTEM")
+	var captain=_grid(3)
+	for item in [["PROFIL","Profil"],["BELOHNUNGEN","Belohnungen"],["ARSENAL","Bewaffnung"],["ANZEIGE","Anzeige"],["HILFE","Spielinfo"],["SAISONPASS","Battle Pass"]]:
+		var destination: String=str(item[1])
+		var button=_action(str(item[0]),func():_open_modal(destination),"normal",captain)
+		button.name="MenuShortcut_"+destination
+	_action("ZUR STARTSEITE",func():_save_progress();get_tree().change_scene_to_file("res://start_hub.tscn"))
+
 func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
 	_note("Werft: Schattenkriegsschiff, Original-Corsair-Testmodell und Elite-Designs 01–10. Dazu neun NPC-GLBs.",Color("9be4df"))
@@ -3834,6 +3944,11 @@ func _load_staff() -> void:
 	if data is Dictionary:sim.staff.restore_state(data)
 
 func _sync_region() -> void:
+	if online_client!=null and is_instance_valid(online_client):
+		online_client.leave_world()
+		online_players.clear()
+		online_population=0
+		call_deferred("_join_online_room")
 	previous_region=sim.map_id
 	chart_pick=-1
 	_close_modal()
@@ -3851,7 +3966,8 @@ func _chart_course(point: Vector2) -> void:
 	for portal in sim.portals:
 		if point.distance_to(portal.pos)<120:
 			_navigate_region(int(portal.destination));return
-	sim.course(point);_refresh_ui()
+	if sim.course(point):_send_online_course(point)
+	_refresh_ui()
 
 func _interact() -> void:
 	if sim.in_bonus_map():
@@ -4074,7 +4190,7 @@ func _tap(screen: Vector2) -> void:
 		sim.staff_teleport(sim.map_id,"",point)
 		_save_staff()
 	else:
-		sim.course(point)
+		if sim.course(point):_send_online_course(point)
 	_refresh_ui()
 
 func _save_progress() -> void:

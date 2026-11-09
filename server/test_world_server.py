@@ -40,6 +40,41 @@ class CrossplayTest(unittest.IsolatedAsyncioTestCase):
         await asyncio.sleep(.1)
         self.assertEqual(self.client.server.app['world'].peers[next(iter(self.client.server.app['world'].peers))]['sequence'],1)
         await wa.close();await wb.close()
+    async def test_two_captains_share_one_room_without_economy_or_combat(self):
+        first=await self.account('room-one@example.com','HarborOne')
+        second=await self.account('room-two@example.com','HarborTwo')
+        wa=await self.client.ws_connect('/v1/world')
+        wb=await self.client.ws_connect('/v1/world')
+        try:
+            await wa.send_json({'type':'join','protocol':1,'token':first['token'],'map_id':0})
+            self.assertEqual((await wa.receive_json())['type'],'welcome')
+            await wb.send_json({'type':'join','protocol':1,'token':second['token'],'map_id':0})
+            self.assertEqual((await wb.receive_json())['type'],'welcome')
+            async def both(ws):
+                for _ in range(30):
+                    frame=await asyncio.wait_for(ws.receive_json(),timeout=2)
+                    if frame.get('type')=='snapshot' and len(frame['players'])==2:return frame
+                self.fail('Both captains did not receive the same online room')
+            left,right=await asyncio.gather(both(wa),both(wb))
+            expected={first['account']['id'],second['account']['id']}
+            for frame in (left,right):
+                self.assertEqual({x['id'] for x in frame['players']},expected)
+                self.assertEqual(frame['map_id'],0)
+                self.assertNotIn('token',str(frame))
+                self.assertNotIn('password',str(frame))
+                self.assertNotIn('gold',str(frame))
+                self.assertNotIn('hp',str(frame))
+            await wa.send_json({'type':'course','sequence':1,'x':2200,'y':1700})
+            seen_move=False
+            for _ in range(30):
+                frame=await asyncio.wait_for(wb.receive_json(),timeout=2)
+                if frame.get('type')!='snapshot':continue
+                p=next(x for x in frame['players'] if x['id']==first['account']['id'])
+                if p['x']>2100:seen_move=True;break
+            self.assertTrue(seen_move,'Second player must see the first player moving')
+        finally:
+            await wa.close()
+            await wb.close()
     async def test_invalid_auth_map_origin_and_duplicate(self):
         a=await self.account('one@example.com','One')
         invalid=await self.client.post('/v1/login',json=[],headers={'Origin':'https://bad.example'})
