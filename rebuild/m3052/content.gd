@@ -155,25 +155,29 @@ const SUPPLIES := {
 	"cleansing_rum":{"name":"Befreiungsrum","short":"RUM","icon":"supply_rum","toggle":false,"effect":"Entfernt Verlangsamung · 35 s Abklingzeit","price":80,"pack":1,"cooldown":35.0},
 	"salvage_charm":{"name":"Bergungsamulett","short":"BERGUNG","icon":"supply_charm","toggle":false,"effect":"+20 % Beutegold für 60 s · 120 s Abklingzeit","price":150,"pack":1,"cooldown":120.0}
 }
-## Ten physical decks in two rows of five; role and material are independent.
+## Exactly ten identical, independently upgraded standard decks. Each can
+## be Gold, Pearls or Crystal at level I-V. The +cannon balance is PROVISIONAL
+## until real ship/cannon values are agreed; never present it as final.
 const DECK_SLOT_COUNT := 10
 const DECK_INVENTORY_MAX := 30
-const DECK_KEYS := ["cannon","armor","hunter","navigation","logistics"]
-const DECK_TIERS := ["Gold","Elite","Kristall"]
-const DECK_TIER_COLORS := [Color("ffb640"),Color("4fa9ff"),Color("bd78f2")]
-const DECK_UPGRADE_GOLD := [900,1800]
-const DECK_UPGRADE_ESSENCE := [0,6]
-const DECK_UPGRADE_LEVEL := [3,8]
-const SPECIAL_DECKS := {
-	"storm_deck":{"name":"Sturmdeck","effect":"+12 % Fahrt","price":900,"seconds":1800.0,"level":3,"icon":"helm_wheel","color":Color("80bdff")},
-	"salvage_deck":{"name":"Bergungsdeck","effect":"+15 % Beutegold","price":900,"seconds":1800.0,"level":3,"icon":"reward_chest","color":Color("edc36a")}
-}
+const DECK_KEYS := ["cannon"]
+const DECK_LEGACY_TYPES := ["cannon","armor","hunter","navigation","logistics"]
+const DECK_STAGE_MAX := 5
+const DECK_TIERS := ["Gold","Perlen","Kristall"]
+const DECK_TIER_COLORS := [Color("ffb640"),Color("81d9e4"),Color("bd78f2")]
+const DECK_CANNON_BASE := [0,5,10]
+const DECK_UPGRADE_GOLD := [180,540,1200]
+const DECK_UPGRADE_ESSENCE := [0,1,3]
+const DECK_UPGRADE_LEVEL := [1,3,8]
 const DECKS := {
-	"cannon":{"name":"Kanonendeck", "effect":"+%d Kanonenplätze", "values":[4,6,8], "price":600},
-	"armor":{"name":"Panzerdeck", "effect":"+%d %% Rumpf und Schild", "values":[10,15,20], "price":600},
-	"hunter":{"name":"Jägerdeck", "effect":"+%d %% Harpunenschaden", "values":[15,25,35], "price":600},
-	"navigation":{"name":"Navigationsdeck", "effect":"+%d %% Fahrt", "values":[6,9,12], "price":600},
-	"logistics":{"name":"Logistikdeck", "effect":"+%d %% Beutegold", "values":[15,25,35], "price":600}
+	"cannon":{"name":"Standarddeck", "effect":"+%d Kanonenplätze", "price":600}
+}
+## Three independent, temporary side decks. They never replace one of
+## the 10 physical deck slots. Persist the historical buff keys so older
+## signed mobile saves keep their timers across the upgrade.
+const SPECIAL_DECKS := {
+	"storm_deck":{"name":"Runendeck","effect":"+12 % Fahrt · Kessel-Fund","price":0,"seconds":1800.0,"level":3,"source":"kessel","icon":"helm_wheel","color":Color("80bdff")},
+	"salvage_deck":{"name":"Korsarendeck","effect":"+15 % Beutegold","price":900,"seconds":1800.0,"level":3,"source":"market","icon":"reward_chest","color":Color("edc36a")}
 }
 ## Gezeitenkessel: every essence thrown pays from this public pool (weights total 100).
 const KESSEL_POOL := [
@@ -182,11 +186,12 @@ const KESSEL_POOL := [
 	{"id":"ammo2", "name":"Harpunen", "amount":30, "weight":8, "rarity":0},
 	{"id":"powder", "name":"Schwarzpulver", "amount":5, "weight":12, "rarity":0},
 	{"id":"plates", "name":"Panzerplatten", "amount":5, "weight":12, "rarity":0},
-	{"id":"gold", "name":"Gold", "amount":150, "weight":11, "rarity":0},
+	{"id":"gold", "name":"Gold", "amount":150, "weight":9, "rarity":0},
 	{"id":"repair_kit", "name":"Notreparatur", "amount":1, "weight":6, "rarity":1},
 	{"id":"shield_charge", "name":"Schildladung", "amount":1, "weight":6, "rarity":1},
 	{"id":"essence", "name":"Gezeitenessenz", "amount":2, "weight":3, "rarity":1},
 	{"id":"tide_deck", "name":"Gezeitendeck 30 min", "amount":1800, "weight":2, "rarity":2},
+	{"id":"storm_deck", "name":"Runendeck 30 min", "amount":1800, "weight":2, "rarity":2},
 	{"id":"deck", "name":"Zufälliges Deck I", "amount":0, "weight":1, "rarity":3}
 ]
 const RARITIES := ["Häufig","Selten","Episch","Legendär"]
@@ -196,7 +201,7 @@ const KESSEL_MILESTONES := [
 	{"at":10, "id":"repair_kit", "name":"2 Notreparaturen", "amount":2},
 	{"at":25, "id":"scroll0", "name":"Bronze-Schriftrolle", "amount":1},
 	{"at":50, "id":"tide_deck", "name":"Gezeitendeck 60 min", "amount":3600},
-	{"at":100, "id":"deck_cannon_1", "name":"Kanonendeck II", "amount":1}
+	{"at":100, "id":"deck_cannon_1", "name":"Perlendeck Stufe I", "amount":1}
 ]
 const DUPLICATE_DECK_ESSENCE := 3
 ## Bonus maps: scroll tiers, level gates and the five-wave structure.
@@ -291,7 +296,7 @@ const STAFF_SPAWNS := {
 const STAFF_GRANT_ORDER := ["gold","essence","fragments","scrolls","supplies","ammo","decks","blessing","tide_deck","flask","level"]
 const STAFF_GRANTS := {
 	"gold":"10.000 Gold", "essence":"25 Gezeitenessenz", "fragments":"16 Fragmente", "scrolls":"je 1 Schriftrolle",
-	"supplies":"je 10 Vorräte", "ammo":"Munition auffüllen", "decks":"alle Decks Stufe III", "blessing":"Kristallsegen 15 min",
+	"supplies":"je 10 Vorräte", "ammo":"Munition auffüllen", "decks":"Kristalldeck Stufe I", "blessing":"Kristallsegen 15 min",
 	"tide_deck":"Gezeitendeck 30 min", "flask":"Tagesflasche zurücksetzen", "level":"Kapitänsstufe +1"
 }
 ## Guild tags that imitate staff badges are refused, including digit look-alikes such as 4DM or M0D.
