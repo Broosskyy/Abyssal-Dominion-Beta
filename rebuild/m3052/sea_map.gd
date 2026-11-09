@@ -1342,7 +1342,7 @@ func _build_ui() -> void:
 	target_clear.add_theme_font_size_override("font_size",18)
 	target_portrait=_portrait(target_panel)
 	target_panel.clip_contents=false
-	target_name=_text(target_panel,"",13);target_name.clip_text=true
+	target_name=_text(target_panel,"",14,Color("ffdf9d"));target_name.clip_text=true
 	target_hp=_bar(target_panel)
 	target_health_skin=target_hp.get_theme_stylebox("fill").duplicate();target_hp.add_theme_stylebox_override("fill",target_health_skin)
 	target_numbers=_text(target_panel,"",10)
@@ -1393,7 +1393,7 @@ func _build_ui() -> void:
 	quick_bar.configure.connect(func():_open_modal("Schnellzugriff"));ui.add_child(quick_bar)
 	buff_bar=Control.new();buff_bar.mouse_filter=Control.MOUSE_FILTER_IGNORE;buff_bar.name="BuffBar"
 	buff_bar.draw.connect(_draw_buffs);ui.add_child(buff_bar)
-	status=_text(ui,"",12,Color("e2ecee"));status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
+	status=_text(ui,"",13,Color("e2ecee"));status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
 	status.clip_text=true
 	status.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 	status.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -2006,7 +2006,8 @@ func _note(text: String,color: Color=Color("bac7c7"),parent: Node=null) -> Label
 func _section(text: String,parent: Node=null) -> Label:
 	var label=_text(parent if parent!=null else modal_body,text,15,Color("f5d78d"))
 	label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
-	label.custom_minimum_size.y=30
+	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	label.custom_minimum_size.y=34
 	label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	label.add_theme_color_override("font_outline_color",Color("061016"));label.add_theme_constant_override("outline_size",4)
 	label.draw.connect(func():_draw_section(label))
@@ -2100,7 +2101,7 @@ func _catalog_grid(max_columns: int=3,parent: Node=null) -> GridContainer:
 	var width: float=modal_scroll.size.x
 	# Keep each illustrated product at least ~280px wide; never put two
 	# tall image cards side by side in the narrow portrait modal.
-	var columns: int=1 if width<680.0 else (3 if width>=1080.0 else 2)
+	var columns: int=1 if width<690.0 else (3 if width>=1220.0 else 2)
 	var gallery=_grid(mini(max_columns,columns),parent)
 	gallery.set_meta("catalog_grid",true)
 	return gallery
@@ -2108,37 +2109,49 @@ func _catalog_grid(max_columns: int=3,parent: Node=null) -> GridContainer:
 func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String,footer: String,accent: Color=Color("ab8852")) -> VBoxContainer:
 	var panel: PanelContainer=_card(accent,parent)
 	panel.set_meta("catalog_tile",true)
-	panel.custom_minimum_size=Vector2(0,264)
+	panel.custom_minimum_size=Vector2(0,310)
 	var content=VBoxContainer.new()
-	content.add_theme_constant_override("separation",7)
+	content.add_theme_constant_override("separation",8)
 	content.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	content.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	panel.add_child(content)
+	# A dedicated image stage gives each existing authentic item graphic
+	# room to breathe. Simple reusable vector chrome keeps the pack small.
+	var art_stage=PanelContainer.new()
+	art_stage.name="CatalogArtStage"
+	art_stage.add_theme_stylebox_override("panel",SKIN.catalog_art(accent))
+	art_stage.custom_minimum_size.y=172
+	art_stage.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	art_stage.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	content.add_child(art_stage)
 	var frame=CenterContainer.new()
-	frame.custom_minimum_size.y=124
 	frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	content.add_child(frame)
+	art_stage.add_child(frame)
 	if texture!=null:
-		var art=_picture(frame,texture,112,true)
-		art.custom_minimum_size=Vector2(112,112)
-	var heading=_text(content,title,16,Color("ffdf9d"))
+		var art=_picture(frame,texture,148,false)
+		art.name="CatalogArtwork"
+		art.custom_minimum_size=Vector2(148,148)
+	var heading=_text(content,title,17,Color("ffdf9d"))
+	heading.name="CatalogTitle"
 	heading.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	heading.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	heading.custom_minimum_size.y=24
+	heading.custom_minimum_size.y=28
 	var description=_text(content,details,14,Color("c5d4d4"))
 	description.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	description.custom_minimum_size.y=40
-	var price=_text(content,footer,14,Color("a7e4cd"))
+	description.custom_minimum_size.y=42
+	var price=_text(content,footer,15,Color("a7e4cd"))
+	price.name="CatalogStatus"
 	price.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	price.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	price.custom_minimum_size.y=27
+	price.custom_minimum_size.y=32
+	price.add_theme_stylebox_override("normal",SKIN.note())
 	return content
 
 func _catalog_action(parent: Node,text: String,handler: Callable,disabled: bool=false) -> Button:
 	var action=_row_button(parent,text,handler,disabled,"primary")
-	action.custom_minimum_size.y=54
-	action.add_theme_font_size_override("font_size",14)
+	action.custom_minimum_size.y=56
+	action.add_theme_font_size_override("font_size",15)
 	action.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	return action
 
@@ -2419,7 +2432,7 @@ func _add_shipyard_card(index: int,container: Node,frames: Array[Control]) -> vo
 	card.add_child(column)
 	var frame=Panel.new()
 	frame.name="ShipDesignPreview%d" % index
-	frame.custom_minimum_size=Vector2(0,180 if index<=1 else 153)
+	frame.custom_minimum_size=Vector2(0,205 if index<=1 else 185)
 	frame.clip_contents=true
 	frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	frame.add_theme_stylebox_override("panel",SKIN.icon_frame(accent))
@@ -2484,17 +2497,18 @@ func _open_shipyard() -> void:
 	var frames: Array[Control]=[]
 	if shipyard_filter in ["all","original"]:
 		_section("STANDARD & UNVERÄNDERTES TESTMODELL")
-		var original_cards=_grid(2)
+		var original_cards=_grid(2 if modal_scroll.size.x>=700 else 1)
 		for index in 2:_add_shipyard_card(index,original_cards,frames)
 	if shipyard_filter in ["all","elite"]:
 		_section("ELITE-DESIGNS 01–10 · V2")
-		# Large landscapes use 3 columns, phones use 2 or 1.
-		var cols: int=3 if modal_scroll.size.x>=970 else (2 if modal_scroll.size.x>=565 else 1)
+		# Larger water-backed ship portraits: two columns on tablets and one
+		# on narrow phones, with three only on genuinely wide desktop panels.
+		var cols: int=3 if modal_scroll.size.x>=1260 else (2 if modal_scroll.size.x>=700 else 1)
 		var elites=_grid(cols)
 		for index in range(2,12):_add_shipyard_card(index,elites,frames)
 	if shipyard_filter in ["all","event"]:
 		_section("EVENT-DESIGNS")
-		var events=_grid(2 if modal_scroll.size.x>=565 else 1)
+		var events=_grid(2 if modal_scroll.size.x>=700 else 1)
 		for index in range(12,14):_add_shipyard_card(index,events,frames)
 	_start_shipyard_preview_motion(frames)
 	_section("SCHIFFSAUSRÜSTUNG")
@@ -2798,6 +2812,13 @@ func _open_decks() -> void:
 				_canvas_text(stage,Vector2(stage.size.x*.5,129),"GOLD  ·  ELITE  ·  KRISTALL",11,Color("c4d5db")))
 			modal_body.add_child(stage)
 			_start_deck_motion(stage)
+			var tier_counts: Array[int]=[0,0,0]
+			for deck_slot in sim.deck_slots:
+				var item_index: int=int(deck_slot)
+				if item_index<0 or item_index>=sim.decks.size():continue
+				var tier_index: int=clampi(int(sim.decks[item_index].tier),0,2)
+				tier_counts[tier_index]+=1
+			_note("MONTIERT · %d GOLD  /  %d ELITE  /  %d KRISTALL" % [tier_counts[0],tier_counts[1],tier_counts[2]],Color("d4e6d9"))
 			var slots=_catalog_grid(3)
 			for slot in CONTENT.DECK_SLOT_COUNT:
 				var place: int=slot
@@ -3720,7 +3741,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _hud_contains(screen: Vector2) -> bool:
 	if modal.visible:return true
-	var controls: Array[Control]=[quick_bar,supply_selector,chrome,target_panel,chart_mini,quest_panel,attack,repair,ammo_selector,loadout_button,center_button,settings_button,target_cycle,camera_pad,zoom_in,zoom_out,interact,staff_pill]
+	var controls: Array[Control]=[quick_bar,supply_selector,chrome,target_panel,chart_mini,quest_panel,attack,repair,ammo_selector,loadout_button,center_button,settings_button,render_toggle,target_cycle,camera_pad,zoom_in,zoom_out,interact,staff_pill]
 	for item: Button in supply_buttons.values():controls.append(item)
 	for control: Control in controls:
 		if control.is_visible_in_tree() and control.get_global_rect().has_point(screen):return true
