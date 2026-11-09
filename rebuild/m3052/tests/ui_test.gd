@@ -32,6 +32,23 @@ func _run() -> void:
 	check(game.CLASSIC_SLOOP!=null and game.CLASSIC_BRIG!=null and game.CLASSIC_GALLEON!=null,"Classic browser three original 2D ship textures imported")
 	check(game.CLASSIC_SLOOP.get_size().x>64.0 and game.CLASSIC_GALLEON.get_size().y>48.0,"Classic browser SVG art imports as legible textures")
 	check(game._classic_ship_texture(game.sim.player)==game.CLASSIC_SLOOP,"Classic starter renders a recognizable small sloop")
+	# Eight browser directions come from the real GLB atlases, never a
+	# rotated side-view image. Explicit player skins keep their own renders.
+	check(game._classic_atlas_key(game.sim.player)=="schattenkriegsschiff_shaded","Classic starter resolves to the actual shaded captain GLB atlas")
+	var original_skin_for_atlas: int=int(game.sim.player.skin)
+	for skin_number in range(1,14):
+		game.sim.player.skin=skin_number
+		var expected_atlas: String="black_crown_corsair_elite_test" if skin_number==1 else "elite_%02d" % (skin_number-1) if skin_number<=11 else "event_halloween" if skin_number==12 else "event_columbus"
+		check(game._classic_atlas_key(game.sim.player)==expected_atlas,"player skin %d uses its own source-GLB/texture 8-direction atlas" % skin_number)
+	game.sim.player.skin=original_skin_for_atlas
+	for model_key: String in game.CLASSIC_MODEL_KEYS:
+		check(model_key in game.mesh_layer.MODEL_INFO,"source GLB atlas name maps to a real approved 3D model: "+model_key)
+	var heading_probe: Dictionary={"id":9237,"heading":Vector2.UP,"visual_key":"merchant_brig_3002"}
+	check(game._classic_atlas_key(heading_probe)=="merchant_brig_3002","NPC sprite selection uses its actual GLB visual key")
+	for a in 8:
+		heading_probe.heading=Vector2.UP.rotated(float(a)*PI*.25)
+		game.classic_heading_cache.erase(9237)
+		check(game._classic_frame_for_actor(heading_probe)==a,"8 camera-baked directions align with world heading %d" % a)
 	var classic_skin_before: int=int(game.sim.player.skin)
 	game.sim.player.skin=11
 	check(game._classic_ship_texture(game.sim.player)==game.CLASSIC_GALLEON,"Classic elite design selects larger galleon sprite instead of GLB mesh")
