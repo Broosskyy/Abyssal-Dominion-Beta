@@ -2632,7 +2632,7 @@ func _open_harbor() -> void:
 	elif not sim.docked:
 		_banner_card(painted.nav_harbor,"%s · EINLAUFEN" % name,"Zum Schutz, zur Reparatur und für stationäre Hafendienste kannst du am goldenen Anleger festmachen. Entfernung: %d m." % roundi(sim.player.pos.distance_to(sim.harbor)))
 		var navigation=_grid(2)
-		_primary("KURS ZUM HAFEN",func():sim.course(sim.harbor);modal.hide(),navigation)
+		_primary("KURS ZUM HAFEN",func():sim.course(sim.harbor);_close_modal(),navigation)
 		var dock_button=_action("ANDOCKEN",func():
 			if sim.dock():_save_progress();_open_modal("Hafen")
 			_refresh_ui(),"normal",navigation)
@@ -2659,7 +2659,7 @@ func _open_harbor() -> void:
 				_note("Weitere Hafengebäude und Dienstleistungen bestimmen wir später. Markt, Items, Schiffe, Kanonen und Talente sind unabhängig vom Andocken erreichbar.")
 			_:
 				_note("Wähle DOCK oder DIENSTE.",Color("bac7c7"))
-		_primary("ABLEGEN",func():sim.depart();modal.hide();_save_progress();_refresh_ui())
+		_primary("ABLEGEN",func():sim.depart();_close_modal();_refresh_ui())
 	if not sim.docked:
 		_note("Der Markt, die Werft und die Talentübersicht sind auch ohne Hafen erreichbar. Öffne dafür die jeweiligen Menüs.",Color("9bd6bd"))
 	_action("UPDATES PRÜFEN",func():
@@ -2973,7 +2973,7 @@ func _open_bonus() -> void:
 		if bool(sim.bonus.get("staff",false)):text+=" · STAFF-TESTLAUF"
 		if done and sim.bonus.has("chest"):text+="\nTruhe: "+str(sim.bonus.chest)
 		var column=_row(painted.reward_chest if done else painted.boss_wave,text,64,Color("ffc04d"))
-		if sim.in_bonus_map():_row_button(column,"BONUSKARTE VERLASSEN",func():modal.hide();_interact(),false,"danger")
+		if sim.in_bonus_map():_row_button(column,"BONUSKARTE VERLASSEN",func():_close_modal();_interact(),false,"danger")
 	var tints=[Color("cd8a4c"),Color("c9d2d6"),Color("ffd27a")]
 	for i in CONTENT.BONUS_TIERS.size():
 		var index=i
@@ -3146,11 +3146,11 @@ func _open_guild() -> void:
 		var passage: Dictionary=sim.guild_harbor_waypoints()
 		var courses=_grid(2)
 		var entrance=_primary("KURS ZUR EINFAHRT",func():
-			if sim.course(Vector2(passage.mouth)):modal.hide()
+			if sim.course(Vector2(passage.mouth)):_close_modal()
 			_refresh_ui(),courses)
 		entrance.disabled=sim.docked
 		var harbor_course=_primary("KURS IN DEN INNENHAFEN",func():
-			if sim.course(sim.harbor):modal.hide()
+			if sim.course(sim.harbor):_close_modal()
 			_refresh_ui(),courses)
 		harbor_course.disabled=sim.docked
 	else:
@@ -3370,7 +3370,7 @@ func _staff(action: Callable,leave: bool=false) -> void:
 	if previous_region!=sim.map_id:
 		_sync_region()
 	elif leave:
-		modal.hide();_recenter_camera();camera.position=sim.player.pos
+		_close_modal();_recenter_camera();camera.position=sim.player.pos
 	else:
 		_open_modal("Staff")
 	_refresh_ui()
@@ -3565,7 +3565,7 @@ func _load_staff() -> void:
 func _sync_region() -> void:
 	previous_region=sim.map_id
 	chart_pick=-1
-	modal.hide()
+	_close_modal()
 	_recenter_camera();camera.position=sim.player.pos
 	_save_progress();_refresh_ui()
 	_begin_loading(1.1)
@@ -3573,7 +3573,8 @@ func _sync_region() -> void:
 func _navigate_region(destination: int) -> void:
 	sim.request_portal(destination)
 	if previous_region!=sim.map_id:_sync_region()
-	modal.hide();_refresh_ui()
+	else:_close_modal()
+	_refresh_ui()
 
 func _chart_course(point: Vector2) -> void:
 	for portal in sim.portals:
@@ -3587,7 +3588,7 @@ func _interact() -> void:
 		if previous_region!=sim.map_id:_sync_region()
 	elif sim.docked:
 		sim.depart()
-		modal.hide()
+		_close_modal()
 	elif sim.near_portal()>=0:
 		_navigate_region(sim.near_portal())
 	elif sim.pending_portal>=0:
@@ -4138,7 +4139,7 @@ func _open_events() -> void:
 			var nearest: Vector2=sim.player.pos;var distance: float=INF
 			for pickup: Dictionary in sim.event_pickups:
 				if float(pickup.respawn)<=0 and pickup.pos.distance_to(sim.player.pos)<distance:nearest=pickup.pos;distance=nearest.distance_to(sim.player.pos)
-			if distance<INF:sim.course(nearest);modal.hide();_refresh_ui())
+			if distance<INF:sim.course(nearest);_close_modal();_refresh_ui())
 	_section("EVENT-SCHIFFSDESIGNS · GLEICHE KAMPFWERTE")
 	var cards=_grid(2 if modal_scroll.size.x>=565 else 1)
 	var frames: Array[Control]=[]
@@ -4164,8 +4165,7 @@ func _hunt_monster(enemy_id: int, sail: bool=false) -> void:
 		if distance>485.0:
 			var point: Vector2=sim._free_water(Vector2(enemy.pos)+direction.normalized()*440.0)
 			sim.course(point)
-	modal.hide()
-	modal_backdrop.hide()
+	_close_modal()
 	_refresh_ui()
 
 func _open_monsters() -> void:

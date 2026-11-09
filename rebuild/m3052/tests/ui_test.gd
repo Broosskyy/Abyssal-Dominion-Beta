@@ -377,6 +377,18 @@ func _run() -> void:
 	check(game.modal.visible and game.modal_kind=="Markt" and game.modal_backdrop.visible,"back navigates to previous real menu")
 	game._back_modal()
 	check(not game.modal.visible and not game.modal_backdrop.visible and game.menu_history.is_empty(),"back on root menu returns full touch control to chart")
+	# Choosing a live monster from its menu must not leave the invisible
+	# modal blocker over the sea after the captain starts hunting.
+	var hunt_target: Dictionary={}
+	for candidate: Dictionary in game.sim.npcs:
+		if str(candidate.kind)=="monster" and float(candidate.hp)>0:
+			hunt_target=candidate
+			break
+	check(not hunt_target.is_empty(),"live monster is available for hunt navigation regression")
+	if not hunt_target.is_empty():
+		game._open_modal("Monster")
+		game._hunt_monster(int(hunt_target.id))
+		check(not game.modal.visible and not game.modal_backdrop.visible and game.menu_history.is_empty(),"monster hunt releases touch blocker and menu history")
 	# Two uploaded comparison videos show item artwork, a price, and one
 	# unmistakable action per item. Validate the actual Godot catalog layout
 	# on a compact landscape phone and a normal tablet/desktop viewport.
