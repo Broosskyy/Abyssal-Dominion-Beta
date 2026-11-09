@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="128" viewBox="0 0 192 128">
+<defs>
+  <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#261c1b"/><stop offset=".40" stop-color="#553c35"/><stop offset=".65" stop-color="#553c35"/><stop offset="1" stop-color="#261c1b"/></linearGradient>
+  <linearGradient id="deck" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c39b66"/><stop offset=".48" stop-color="#906c44"/><stop offset="1" stop-color="#49392e"/></linearGradient>
+  <linearGradient id="sail" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#bcb8a5"/><stop offset=".3" stop-color="#ebe6d4"/><stop offset=".68" stop-color="#fff4d9"/><stop offset="1" stop-color="#b6ad91"/></linearGradient>
+</defs>
+<!-- Lightweight originally drawn 2D top-down sprite, not a copied Seafight asset. -->
+<path d="M18 64 Q25 22 64 18 L137 21 Q165 24 183 64 Q165 104 137 107 L64 110 Q26 105 18 64Z" fill="url(#hull)" stroke="#171d1e" stroke-width="4" stroke-linejoin="round"/>
+<path d="M28 64 Q35 31 67 28 L137 31 Q154 37 169 64 Q154 91 137 97 L67 100 Q35 97 28 64Z" fill="url(#deck)" stroke="#c7a36a" stroke-width="3"/>
+<path d="M33 52 Q45 29 82 30 M33 76 Q46 99 82 98 M87 30 L142 33 M87 98 L142 95" fill="none" stroke="#392c26" stroke-width="3" opacity=".65"/>
+<path d="M39 65 H166" stroke="#6b462d" stroke-width="2.2" opacity=".65"/>
+<rect x="52" y="19" width="10" height="9" rx="2" fill="#272b2b" stroke="#bb9f79" stroke-width=".7"/><rect x="52" y="99" width="10" height="9" rx="2" fill="#272b2b" stroke="#bb9f79" stroke-width=".7"/><rect x="78" y="19" width="10" height="9" rx="2" fill="#272b2b" stroke="#bb9f79" stroke-width=".7"/><rect x="78" y="99" width="10" height="9" rx="2" fill="#272b2b" stroke="#bb9f79" stroke-width=".7"/><rect x="107" y="19" width="10" height="9" rx="2" fill="#272b2b" stroke="#bb9f79" stroke-width=".7"/><rect x="107" y="99" width="10" height="9" rx="2" fill="#272b2b" stroke="#bb9f79" stroke-width=".7"/><rect x="128" y="19" width="10" height="9" rx="2" fill="#272b2b" stroke="#bb9f79" stroke-width=".7"/><rect x="128" y="99" width="10" height="9" rx="2" fill="#272b2b" stroke="#bb9f79" stroke-width=".7"/>
+<!-- Raised stern balcony and captain's cabin -->
+<path d="M31 44 L55 39 Q60 64 55 89 L31 84 Q24 65 31 44Z" fill="#48372d" stroke="#c7a36a" stroke-width="2"/>
+<path d="M38 49 L49 47 L51 81 L38 79Z" fill="#ad8956" stroke="#2f2420" stroke-width="1.4"/>
+<path d="M37 51 L51 51 M37 61 L51 61 M37 71 L51 71" stroke="#e0b46d" stroke-width="1.3"/>
+
+<path d="M51 38 Q49 53 54 62 Q52 81 51 105.7 L85.2 102.7 Q89.36 81 83.9 65 Q85.2 38 87.8 37Z" fill="url(#sail)" stroke="#9d9886" stroke-width="1.2"/>
+<path d="M81.82 41 Q74.53999999999999 47 77.14 63 L76.1 102.7" fill="none" stroke="#c3b89f" stroke-width="2" opacity=".65"/>
+<path d="M49 64 H89.88" stroke="#a1845d" stroke-width="2" opacity=".85"/>
+<path d="M69 32 L69 99" stroke="#5c3827" stroke-width="4" stroke-linecap="round"/>
+<circle cx="69" cy="64" r="3.5" fill="#d8ac62" stroke="#2d2222" stroke-width="1"/>
+<path d="M87 28 Q85 43 90 62 Q88 81 87 106.7 L124.7 103.7 Q129.66 81 123.15 65 Q124.7 38 127.8 27Z" fill="url(#sail)" stroke="#9d9886" stroke-width="1.2"/>
+<path d="M120.67 31 Q111.99 47 115.09 63 L113.85 103.7" fill="none" stroke="#c3b89f" stroke-width="2" opacity=".65"/>
+<path d="M85 64 H130.28" stroke="#a1845d" stroke-width="2" opacity=".85"/>
+<path d="M105 32 L105 99" stroke="#5c3827" stroke-width="4" stroke-linecap="round"/>
+<circle cx="105" cy="64" r="3.5" fill="#d8ac62" stroke="#2d2222" stroke-width="1"/>
+<path d="M123 38 Q121 53 126 62 Q124 81 123 105.7 L157.2 102.7 Q161.36 81 155.9 65 Q157.2 38 159.8 37Z" fill="url(#sail)" stroke="#9d9886" stroke-width="1.2"/>
+<path d="M153.82 41 Q146.54 47 149.14 63 L148.1 102.7" fill="none" stroke="#c3b89f" stroke-width="2" opacity=".65"/>
+<path d="M121 64 H161.88" stroke="#a1845d" stroke-width="2" opacity=".85"/>
+<path d="M141 32 L141 99" stroke="#5c3827" stroke-width="4" stroke-linecap="round"/>
+<circle cx="141" cy="64" r="3.5" fill="#d8ac62" stroke="#2d2222" stroke-width="1"/>
+<!-- Deck lanterns and gilded prow -->
+<path d="M172 58 L188 64 L172 70" fill="#d9b47d" stroke="#4d3222" stroke-width="1.8"/>
+<circle cx="37" cy="64" r="3.4" fill="#f8de87" stroke="#4b392b"/>
+<circle cx="154" cy="64" r="3.4" fill="#f8de87" stroke="#4b392b"/>
+</svg>
