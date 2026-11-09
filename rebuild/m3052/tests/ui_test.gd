@@ -439,6 +439,10 @@ func _run() -> void:
 		game._switch_tab("Decks","SCHIFF")
 		var ship_matrix: Node=game.modal_body.find_child("DeckShipMatrix",true,false)
 		check(ship_matrix!=null and ship_matrix.get_child_count()==10,"ship menu uses compact clickable 2×5 deck matrix, not a wall of ten catalog cards "+str(device))
+		var ship_hp_legend: bool=false
+		for ship_note: Label in game.modal_body.find_children("*","Label",true,false):
+			if ship_note.text.contains("RUMPF-HP") and ship_note.text.contains("KANONENPLÄTZE"):ship_hp_legend=true
+		check(ship_hp_legend,"deck ship view shows combined real cannon-slot and hull HP bonuses "+str(device))
 		var open_deck: Button=game.modal_body.find_child("DeckSlotFocus0",true,false) as Button
 		check(open_deck!=null,"tap on mounted deck 01 exposes focused upgrade action "+str(device))
 		if open_deck!=null:open_deck.pressed.emit()
@@ -446,6 +450,10 @@ func _run() -> void:
 		var chosen: Node=game.modal_body.find_child("DeckSlotSelector",true,false)
 		check(chosen!=null and chosen.get_child_count()==10,"compact deckyard has exactly ten physical slot selectors "+str(device))
 		check(game.modal_body.find_child("DeckNextPreview0",true,false)!=null and game.modal_body.find_child("DeckLevelProgress0",true,false)!=null,"focused deck shows current-to-next promotion and upgrade progress "+str(device))
+		var focused_hp_visible: bool=false
+		for hp_note: Label in game.modal_body.find_children("*","Label",true,false):
+			if hp_note.text.contains("NÄCHSTES:") and hp_note.text.contains("HP"):focused_hp_visible=true
+		check(focused_hp_visible,"focused deck shows real HP at current and upcoming upgrade stages "+str(device))
 		var level_tiles: int=0
 		for tier_name in ["GOLD","PERLEN","KRISTALL"]:
 			var path: Node=game.modal_body.find_child("DeckRoadmap_"+tier_name,true,false)
