@@ -191,15 +191,16 @@ func _dashboard_card(parent: Node,heading: String,detail: String,callback: Calla
 		preview.texture=image
 		preview.name="HomeActionArt"
 		preview.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
-		preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		preview.custom_minimum_size=Vector2(0,76)
+		preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		preview.custom_minimum_size=Vector2(0,146)
 		preview.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		stack.add_child(preview)
 	var caption=_hint(stack,heading,16,Color("f5db9a"))
 	caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	var copy=_hint(stack,detail,12)
 	copy.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-	_dashboard_button(stack,"ÖFFNEN",callback)
+	var action=_dashboard_button(stack,"BEREICH ÖFFNEN",callback)
+	action.name="HomeActionOpen"
 	return panel_card
 
 func _featured_shift(direction: int) -> void:
@@ -264,10 +265,29 @@ func _switch_home_section(section: String) -> void:
 	home_section=section
 	_show("home")
 
+func _open_manual_updates() -> void:
+	# The actual signed-game update gate, not a pretend "updated" message.
+	get_tree().set_meta("abyssal_manual_update",true)
+	get_tree().change_scene_to_file("res://updater/launcher.tscn")
+
 func _show_home() -> void:
 	_label("ABYSSAL DOMINION · KAPITÄNSHAFEN",true)
 	var summary=_hint(body,"%s  ·  LV. %d  ·  SEEKARTE %s  ·  %s" % [sim.captain_name,sim.level,sim.CONTENT.MAPS[sim.map_id].code,"ONLINE" if not network.account.is_empty() else "LOKALE BETA"],14)
 	summary.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	# Show the *mounted* signed content revision, so players can distinguish
+	# an old local APK/data pack from the newly published interface.
+	var boot=get_tree().root.get_node_or_null("DataBoot")
+	var installed: String=str(boot.active_revision) if boot!=null else "EDITOR"
+	var version_strip=HBoxContainer.new()
+	version_strip.name="ActiveBuildStrip"
+	version_strip.add_theme_constant_override("separation",8)
+	body.add_child(version_strip)
+	var revision_label=_hint(version_strip,"AKTIVE SPIELDATEN: "+installed,12,Color("9fdbce"))
+	revision_label.name="ActiveDataRevision"
+	revision_label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
+	var update_button=_dashboard_button(version_strip,"UPDATES PRÜFEN",_open_manual_updates)
+	update_button.name="HomeUpdateCheck"
+	update_button.custom_minimum_size.x=152
 	_home_nav()
 	_label("AKTUELL AUF DEN MEEREN",true)
 	var hero=PanelContainer.new()
