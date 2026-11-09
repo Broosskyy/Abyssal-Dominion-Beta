@@ -6,7 +6,8 @@ const http=require('node:http');
 const zlib=require('node:zlib');
 const directory=path.resolve(__dirname,'../../rebuild/m3052/builds/web');
 const report=JSON.parse(fs.readFileSync(path.join(directory,'delivery-report.json')));
-const requests=[];
+const downloads=[];
+let revalidations=0;
 const served=new Map();
 let wireBytes=0;
 const server=http.createServer((req,res)=>{
@@ -18,9 +19,13 @@ const server=http.createServer((req,res)=>{
  if(!data){const raw=fs.readFileSync(file);data=name.endsWith('.wasm')?zlib.gzipSync(raw):raw;served.set(name,data);}
  res.setHeader('Content-Type',name.endsWith('.wasm')?'application/wasm':name.endsWith('.js')?'text/javascript':name.endsWith('.html')?'text/html':'application/octet-stream');
  if(name.endsWith('.wasm'))res.setHeader('Content-Encoding','gzip');
- if(/^(engine-|core-|ships-)/.test(name))res.setHeader('Cache-Control','public,max-age=31536000,immutable');
+ if(/^(engine-|core-|ships-)/.test(name)){
+  res.setHeader('Cache-Control','public,max-age=31536000,immutable');
+  const etag='"'+name+'"';res.setHeader('ETag',etag);
+  if(req.headers['if-none-match']===etag){revalidations++;res.writeHead(304).end();return;}
+ }
  res.setHeader('Content-Length',data.length);
- requests.push(name);wireBytes+=data.length;res.end(data);
+ downloads.push(name);wireBytes+=data.length;res.end(data);
 });
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
@@ -48,15 +53,15 @@ const server=http.createServer((req,res)=>{
   while(stage!=='sea'&&Date.now()<seaDeadline)await new Promise(r=>setTimeout(r,100));
   assert.equal(stage,'sea','guest reaches the actual shared Godot simulation');
   await page.screenshot({path:'/tmp/abyssal-web-sea.png'});
-  assert(!requests.some(n=>n.startsWith('ships-')),'guest sailing must not download optional ship art');
+  assert(!downloads.some(n=>n.startsWith('ships-')),'guest sailing must not download optional ship art');
   const cold=wireBytes;
   assert(cold<23000000,`cold transfer budget exceeded: ${cold}`);
   await page.reload();
   await page.locator('#windowed').click();
   await page.locator('#launch').waitFor({state:'hidden',timeout:120000});
-  assert.equal(requests.filter(n=>n.endsWith('.wasm')).length,1,'unchanged engine is reused from browser cache');
-  assert.equal(requests.filter(n=>n===report.start_files[0]).length,1,'unchanged core is reused from browser cache');
+  assert.equal(downloads.filter(n=>n.endsWith('.wasm')).length,1,'unchanged engine is reused from browser cache');
+  assert.equal(downloads.filter(n=>n===report.start_files[0]).length,1,'unchanged core is reused from browser cache');
   assert.deepEqual(errors,[],'no runtime resource or script errors in the real Web export');
-  console.log(JSON.stringify({status:'PASS',cold_transfer_bytes:cold,revisit_transfer_bytes:wireBytes-cold,optional_requests:0,real_webgl:true,shared_godot_game:true}));
+  console.log(JSON.stringify({status:'PASS',cold_transfer_bytes:cold,revisit_transfer_bytes:wireBytes-cold,cache_revalidations:revalidations,optional_requests:0,real_webgl:true,shared_godot_game:true}));
  }finally{await browser.close();server.close();}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1;});

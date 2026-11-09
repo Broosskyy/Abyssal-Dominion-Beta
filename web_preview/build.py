@@ -42,6 +42,17 @@ def main() -> None:
             entry.get("filename") == ".github/workflows/browser-preview.yml"
             for entry in commit.get("files", [])
         )
+        if not wait_for_source:
+            # Signing-bot or hosting-only commits must still publish the
+            # newest browser export, even when its CI has not finished yet.
+            runs = json.loads(response(f"https://api.github.com/repos/{REPOSITORY}/actions/workflows/browser-preview.yml/runs?branch=main&per_page=1"))
+            recent = runs.get("workflow_runs", [])
+            if recent:
+                run = recent[0]
+                if run.get('status') == 'completed' and run.get('conclusion') != 'success':
+                    raise RuntimeError('The latest browser export failed; keeping the previous deployment active')
+                source_sha = str(run.get('head_sha', ''))
+                wait_for_source = bool(source_sha)
     # Vercel starts at push time, before Godot finishes exporting. Never
     # silently publish test N-1 under the source SHA of browser test N.
     deadline = time.monotonic() + 600

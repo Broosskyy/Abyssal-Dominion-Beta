@@ -268,6 +268,10 @@ func _switch_home_section(section: String) -> void:
 	_show("home")
 
 func _open_manual_updates() -> void:
+	if OS.has_feature("web"):
+		_show("settings")
+		_label("Die Browser-Version aktualisiert sich beim Öffnen automatisch. Es werden keine Android-Datenpakete heruntergeladen.")
+		return
 	# The actual signed-game update gate, not a pretend "updated" message.
 	get_tree().set_meta("abyssal_manual_update",true)
 	get_tree().change_scene_to_file("res://updater/launcher.tscn")
