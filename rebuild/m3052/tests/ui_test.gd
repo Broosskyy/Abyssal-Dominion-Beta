@@ -37,6 +37,7 @@ func _run() -> void:
 	check(is_equal_approx(float(slow_step.quality),0.91) and int(slow_step.good_windows)==0,"sustained browser FPS drop lowers the 3D GPU buffer one step")
 	game.mesh_layer.set_web_quality(float(slow_step.quality))
 	check(game.mesh_layer.resolution_factor<0.55 and game.mesh_layer.can_render_actor(game.sim.player),"adaptive browser quality shrinks 3D buffer without removing any GLB models")
+	check(game.mesh_layer.viewport_screen==Vector2(1080,2340) and game.mesh_layer.stage.size.x<=600 and game.mesh_layer.stage.size.y<=1310,"adaptive quality keeps last portrait viewport and does not jump to desktop/window dimensions")
 	var recovery_a: Dictionary=game.mesh_layer.adaptive_quality_step(0.72,30.0,30.0,0)
 	var recovery_b: Dictionary=game.mesh_layer.adaptive_quality_step(float(recovery_a.quality),30.0,30.0,int(recovery_a.good_windows))
 	var recovery_c: Dictionary=game.mesh_layer.adaptive_quality_step(float(recovery_b.quality),30.0,30.0,int(recovery_b.good_windows))
