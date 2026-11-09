@@ -23,7 +23,7 @@ var sea_time := 0.0
 var backdrop: TextureRect
 var sim=SIM.new()
 var network: Node
-var panel: PanelContainer
+var panel: Panel
 var scroll: ScrollContainer
 var body: VBoxContainer
 var page := "welcome"
@@ -64,7 +64,9 @@ func _ready() -> void:
 	if FileAccess.file_exists(CONFIG):
 		var config: Variant=JSON.parse_string(FileAccess.get_file_as_string(CONFIG))
 		if config is Dictionary:network.server_url=str(config.get("server_url",""))
-	panel=PanelContainer.new();panel.name="CaptainPanel";add_child(panel)
+	# A plain Panel does NOT derive its minimum size from the long dashboard.
+	# PanelContainer did and could overflow 480px portrait screens by 2x.
+	panel=Panel.new();panel.name="CaptainPanel";add_child(panel)
 	panel.add_theme_stylebox_override("panel",SKIN.card())
 	# A PanelContainer must size to the viewport, NOT to the combined
 	# minimum size of a long dashboard. A neutral Control wrapper absorbs
@@ -75,6 +77,11 @@ func _ready() -> void:
 	scroll_view.size_flags_vertical=Control.SIZE_EXPAND_FILL
 	scroll_view.clip_contents=true
 	panel.add_child(scroll_view)
+	scroll_view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scroll_view.offset_left=10
+	scroll_view.offset_top=10
+	scroll_view.offset_right=-10
+	scroll_view.offset_bottom=-10
 	scroll=preload("res://touch_scroll.gd").new()
 	scroll.name="CaptainContentScroll"
 	scroll_view.add_child(scroll)
