@@ -185,6 +185,7 @@ var target_health_skin: StyleBoxFlat
 var hud_icons: Dictionary={}
 var painted: Dictionary={}
 var deck_icons: Dictionary={}
+var focused_deck_index: int=-1 # Selected physical deck in the mobile deckyard
 var ammo_selector: Button
 var settings_button: Button
 var render_toggle: Button
@@ -2888,6 +2889,50 @@ func _deck_effect(deck: Dictionary) -> String:
 
 const DECK_ART := {"cannon":"cannon_1","armor":"upgrade_hull","hunter":"harpoon_1","navigation":"upgrade_sails","logistics":"castle_crew"}
 
+func _open_selected_deck(index: int) -> void:
+	if index<0 or index>=sim.decks.size():return
+	focused_deck_index=index
+	_switch_tab("Decks","LAGER")
+
+## A fixed 3×5 progression map: stage, material and target promotion
+## remain visible on compact phones without fifteen separate tall cards.
+func _deck_progression_roadmap(info: Dictionary) -> void:
+	_section("AUSBAUWEG · 15 STUFEN")
+	var material_names: Array[String]=["GOLD","PERLEN","KRISTALL"]
+	var roman: Array[String]=["I","II","III","IV","V"]
+	for material in 3:
+		var material_color: Color=CONTENT.DECK_TIER_COLORS[material]
+		var row_panel: PanelContainer=_card(Color(material_color.r,material_color.g,material_color.b,.9))
+		row_panel.name="DeckRoadmap_"+str(material_names[material])
+		var column=VBoxContainer.new()
+		column.add_theme_constant_override("separation",5)
+		row_panel.add_child(column)
+		var heading=_text(column,material_names[material]+" · STUFEN I–V",13,material_color)
+		heading.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		var path=GridContainer.new()
+		path.columns=5
+		path.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		path.add_theme_constant_override("h_separation",4)
+		path.add_theme_constant_override("v_separation",4)
+		column.add_child(path)
+		for stage in CONTENT.DECK_STAGE_MAX:
+			var rank: int=stage+1
+			var complete: bool=material<int(info.tier) or (material==int(info.tier) and rank<int(info.stage))
+			var current: bool=material==int(info.tier) and rank==int(info.stage)
+			var upcoming: bool=not bool(info.maximum) and material==int(info.next_tier) and rank==int(info.next_stage)
+			var tile: PanelContainer=_card(material_color if current else (Color(material_color.r,material_color.g,material_color.b,.35) if complete or upcoming else Color(0,0,0,0)),path)
+			tile.name="DeckStage_%s_%d" % [material_names[material],rank]
+			tile.custom_minimum_size=Vector2(0,49)
+			tile.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			var number=_text(tile,roman[stage],14,Color("fff0c4") if current else (material_color if complete or upcoming else Color("687982")))
+			number.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+			number.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
+			number.custom_minimum_size.y=32
+			if current:tile.tooltip_text="Aktuell ausgebaut"
+			elif upcoming:tile.tooltip_text="Nächstes Upgrade"
+			elif complete:tile.tooltip_text="Bereits freigeschaltet"
+			else:tile.tooltip_text="Spätere Deckstufe"
+
 func _open_decks() -> void:
 	_banner_card(painted.tide_deck,"10 STANDARDDECKS · 3 SONDERDECKS","Alle zehn normalen Decks sind identisch und frei kombinierbar. Jedes wird einzeln von Gold I–V über Perlen I–V bis Kristall I–V verbessert. Die Kanonenwerte sind vorläufig.")
 	match _tab("Decks"):
@@ -2911,63 +2956,139 @@ func _open_decks() -> void:
 				if index<0 or index>=sim.decks.size():continue
 				tier_counts[clampi(int(sim.decks[index].tier),0,2)]+=1
 			_note("MONTIERT · %d GOLD / %d PERLEN / %d KRISTALL · +%d KANONENPLÄTZE" % [tier_counts[0],tier_counts[1],tier_counts[2],int(sim.deck_value("cannon"))],Color("d4e6d9"))
-			var slots=_catalog_grid(3)
+			_section("DEIN DECKPLAN · 2 REIHEN MIT JE 5 PLÄTZEN")
+			var compact_slots=GridContainer.new()
+			compact_slots.name="DeckShipMatrix"
+			compact_slots.columns=5
+			compact_slots.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			compact_slots.add_theme_constant_override("h_separation",4)
+			compact_slots.add_theme_constant_override("v_separation",6)
+			modal_body.add_child(compact_slots)
 			for slot in CONTENT.DECK_SLOT_COUNT:
 				var place: int=slot
 				var index: int=int(sim.deck_slots[slot])
-				if index<0:
-					var empty=_catalog_tile(slots,deck_icons.cannon,"PLATZ %02d · FREI" % (slot+1),"Ein beliebiges Gold-, Perlen- oder Kristalldeck kann hier eingebaut werden.","FREIER DECKPLATZ",Color("3b535d"))
-					_catalog_action(empty,"DECK AUS LAGER WÄHLEN",func():_switch_tab("Decks","LAGER"))
-					continue
-				var deck: Dictionary=sim.decks[index]
-				var tile=_catalog_tile(slots,deck_icons.cannon,"PLATZ %02d · %s" % [slot+1,_deck_title(deck)],_deck_effect(deck),"MONTIERT",CONTENT.DECK_TIER_COLORS[int(deck.tier)])
-				_catalog_action(tile,"STUFE ANSEHEN & UPGRADEN",func():_switch_tab("Decks","LAGER"))
-				var unequip=_catalog_action(tile,"ABBAUEN",func():
-					sim.unequip_deck(place);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
-				unequip.name="DeckRemove"+str(slot)
-			_note("Die 2×5-Punkteanordnung unter dem Schiff bleibt erhalten. Gold, Perlen und Kristall sind unterschiedlich gefärbt. Der Umbau erfolgt vorerst angedockt.")
+				var mounted: bool=index>=0 and index<sim.decks.size()
+				var label: String="%02d\nFREI" % (slot+1)
+				if mounted:
+					var deck: Dictionary=sim.decks[index]
+					label="%02d\n%s %d" % [slot+1,["GOLD","PERL.","KRIST."][int(deck.tier)],int(deck.get("stage",1))]
+				var focus_index: int=index
+				var focus=_row_button(compact_slots,label,func():
+					if focus_index>=0:_open_selected_deck(focus_index)
+					else:_switch_tab("Decks","LAGER"),false,"primary" if mounted else "normal")
+				focus.name="DeckSlotFocus"+str(slot)
+				focus.custom_minimum_size=Vector2(45,70)
+				focus.add_theme_font_size_override("font_size",12)
+				focus.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+				if mounted:
+					var material_color: Color=CONTENT.DECK_TIER_COLORS[int(sim.decks[index].tier)]
+					focus.add_theme_color_override("font_color",material_color)
+					focus.add_theme_color_override("font_hover_color",material_color.lightened(.25))
+			_note("TIPP AUF EINEN PLATZ: Das passende Deck öffnet sich direkt mit Stufenplan, Materialwechsel, Kanonenbonus, Kosten und Montage.")
+			_action("DECKS AUS LAGER MONTIEREN",func():_switch_tab("Decks","LAGER"))
 		"LAGER":
-			_section("DECKLAGER · %d/%d INDIVIDUELLE EXEMPLARE" % [sim.decks.size(),CONTENT.DECK_INVENTORY_MAX])
-			if not sim.docked:_note("Decks verbessern und montieren geht vorerst nur im Hafen.",Color("e1b979"))
-			if sim.decks.is_empty():_note("Noch kein Deck erworben. Unter KAUFEN kannst du zehn identische Golddecks kaufen und getrennt verbessern.")
-			var collection=_catalog_grid(2)
-			for i in sim.decks.size():
-				var index: int=i
-				var deck: Dictionary=sim.decks[i]
-				var current: int=sim.deck_slots.find(index)
+			_section("DECKWERFT · %d/%d EXEMPLARE" % [sim.decks.size(),CONTENT.DECK_INVENTORY_MAX])
+			if not sim.docked:_note("Deckmontage und Upgrades sind nur im Hafen möglich.",Color("e1b979"))
+			if sim.decks.is_empty():
+				_note("Du hast noch keine Decks. Kaufe ein Golddeck, um einen der zehn Plätze zu bestücken.")
+				_action("ERSTES GOLDDECK KAUFEN",func():_switch_tab("Decks","KAUFEN"))
+			else:
+				if focused_deck_index<0 or focused_deck_index>=sim.decks.size():
+					focused_deck_index=0
+					for mounted_index in sim.deck_slots:
+						if int(mounted_index)>=0 and int(mounted_index)<sim.decks.size():
+							focused_deck_index=int(mounted_index)
+							break
+				_section("MONTIERTE DECKS · PLATZ ANTIPPEN")
+				var quick=GridContainer.new()
+				quick.name="DeckSlotSelector"
+				quick.columns=5
+				quick.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+				quick.add_theme_constant_override("h_separation",4)
+				quick.add_theme_constant_override("v_separation",5)
+				modal_body.add_child(quick)
+				for slot in CONTENT.DECK_SLOT_COUNT:
+					var deck_index: int=int(sim.deck_slots[slot])
+					var tag: String="FREI"
+					if deck_index>=0 and deck_index<sim.decks.size():
+						var material: int=int(sim.decks[deck_index].tier)
+						tag=["GOLD","PERLEN","KRIST."][material]+" "+str(int(sim.decks[deck_index].get("stage",1)))
+					var slot_number: int=slot
+					var picker_button=_row_button(quick,"%02d\n%s" % [slot+1,tag],func():
+						var found: int=int(sim.deck_slots[slot_number])
+						if found>=0:_open_selected_deck(found)
+						else:_switch_tab("Decks","LAGER"),deck_index<0,"primary" if deck_index==focused_deck_index else "normal")
+					picker_button.name="DeckSlotSelect"+str(slot)
+					picker_button.custom_minimum_size=Vector2(45,65)
+					picker_button.add_theme_font_size_override("font_size",12)
+					picker_button.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+				var index: int=focused_deck_index
+				var deck: Dictionary=sim.decks[index]
 				var info: Dictionary=sim.deck_upgrade_info(index)
-				var next_name: String="MAXIMAL AUSGEBAUT" if bool(info.maximum) else "%sDECK STUFE %d/%d" % [str(CONTENT.DECK_TIERS[int(info.next_tier)]).to_upper(),int(info.next_stage),CONTENT.DECK_STAGE_MAX]
-				var detail: String="JETZT: +%d Kanonenplätze\nALS NÄCHSTES: %s · +%d Kanonenplätze" % [int(info.cannons_now),next_name,int(info.cannons_next)]
-				var footer: String="AUF PLATZ %02d" % (current+1) if current>=0 else "IM LAGER"
-				var tile=_catalog_tile(collection,deck_icons.cannon,"DECK %02d · %s" % [i+1,_deck_title(deck)],detail,footer,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
+				var current_slot: int=sim.deck_slots.find(index)
+				var next_name: String="MAXIMAL AUSGEBAUT" if bool(info.maximum) else "%sDECK STUFE %d" % [str(CONTENT.DECK_TIERS[int(info.next_tier)]).to_upper(),int(info.next_stage)]
+				_section("AUSGEWÄHLT · DECK %02d" % (index+1))
+				var status: String="MONTIERT AUF PLATZ %02d" % (current_slot+1) if current_slot>=0 else "IM LAGER · NOCH NICHT MONTIERT"
+				var description: String="JETZT: %s · +%d Kanonenplätze\nNÄCHSTES: %s · +%d Kanonenplätze" % [_deck_title(deck),int(info.cannons_now),next_name,int(info.cannons_next)]
+				var tile=_catalog_tile(modal_body,deck_icons.cannon,"STANDARDDECK %02d" % (index+1),description,status,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
 				var progress=_bar(tile)
 				progress.name="DeckLevelProgress"+str(index)
 				progress.max_value=CONTENT.DECK_STAGE_MAX
 				progress.value=int(info.stage)
-				progress.custom_minimum_size.y=14
-				var next_preview=_note("AKTUELL: %s  →  NÄCHSTES: %s" % [_deck_title(deck),next_name],CONTENT.DECK_TIER_COLORS[int(info.next_tier)],tile)
-				next_preview.name="DeckNextPreview"+str(index)
-				if not bool(info.maximum):
-					var price: String="%d GOLD%s" % [int(info.gold),(" + %d ESSENZ" % int(info.essence)) if int(info.essence)>0 else ""]
-					var upgrade=_catalog_action(tile,"ZU %s · %s" % [next_name,price],func():
-						sim.upgrade_deck(index);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.level<int(info.captain_level) or int(sim.player.gold)<int(info.gold) or sim.essence<int(info.essence))
-					upgrade.name="DeckUpgrade"+str(index)
-					if sim.level<int(info.captain_level):upgrade.tooltip_text="Freischaltung ab Kapitänsstufe %d" % int(info.captain_level)
+				progress.custom_minimum_size.y=16
+				var now_vs_next=_note("%s  →  %s" % [_deck_title(deck),next_name],CONTENT.DECK_TIER_COLORS[int(info.next_tier)],tile)
+				now_vs_next.name="DeckNextPreview"+str(index)
+				if bool(info.maximum):
+					var max_button=_catalog_action(tile,"KRISTALL V · VOLLSTÄNDIG AUSGEBAUT",func():pass,true)
+					max_button.name="DeckMax"+str(index)
 				else:
-					var maximum=_catalog_action(tile,"KRISTALLDECK · MAXIMALE STUFE",func():pass,true)
-					maximum.name="DeckMax"+str(index)
-				var picker=OptionButton.new()
-				picker.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-				picker.custom_minimum_size=Vector2(0,48)
-				picker.add_theme_font_size_override("font_size",14)
-				picker.name="DeckSlotPicker"+str(index)
-				for slot in CONTENT.DECK_SLOT_COUNT:picker.add_item("Platz %02d" % (slot+1))
-				picker.select(current if current>=0 else maxi(0,sim.deck_slots.find(-1)))
-				tile.add_child(picker)
-				var equip=_catalog_action(tile,"AUFS SCHIFF MONTIEREN",func():
-					sim.equip_deck(index,picker.selected);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
+					var price: String="%d GOLD%s" % [int(info.gold),(" + %d ESSENZ" % int(info.essence)) if int(info.essence)>0 else ""]
+					var gain: int=int(info.cannons_next)-int(info.cannons_now)
+					var hint: String="MATERIALWECHSEL" if bool(info.promoting) else "NÄCHSTE STUFE"
+					var upgrade=_catalog_action(tile,"%s: %s · +%d KANONEN · %s" % [hint,next_name,gain,price],func():
+						if sim.upgrade_deck(index):
+							_save_progress()
+							_open_modal("Decks")
+							_refresh_ui(),not sim.docked or sim.level<int(info.captain_level) or int(sim.player.gold)<int(info.gold) or sim.essence<int(info.essence))
+					upgrade.name="DeckUpgrade"+str(index)
+					upgrade.tooltip_text="Ab Kapitänsstufe %d · Kanonenwerte vorläufig" % int(info.captain_level)
+				var choice=OptionButton.new()
+				choice.name="DeckSlotPicker"+str(index)
+				choice.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+				choice.custom_minimum_size.y=50
+				choice.add_theme_font_size_override("font_size",14)
+				for deck_slot in CONTENT.DECK_SLOT_COUNT:
+					var occupant: int=int(sim.deck_slots[deck_slot])
+					choice.add_item("Platz %02d%s" % [deck_slot+1," · BELEGT / AUSTAUSCH" if occupant>=0 and occupant!=index else ""])
+				choice.select(current_slot if current_slot>=0 else maxi(0,sim.deck_slots.find(-1)))
+				tile.add_child(choice)
+				var equip=_catalog_action(tile,"AUFS SCHIFF MONTIEREN / UMSETZEN",func():
+					if sim.equip_deck(index,choice.selected):
+						_save_progress()
+						_open_modal("Decks")
+						_refresh_ui(),not sim.docked)
 				equip.name="DeckEquip"+str(index)
-			_action("WEITERE GOLDDECKS KAUFEN",func():_switch_tab("Decks","KAUFEN"))
+				if current_slot>=0:
+					var remove=_catalog_action(tile,"DECK VON SCHIFF ABBAUEN",func():
+						if sim.unequip_deck(current_slot):
+							_save_progress()
+							_open_modal("Decks")
+							_refresh_ui(),not sim.docked)
+					remove.name="DeckRemove"+str(current_slot)
+				_deck_progression_roadmap(info)
+				_section("WEITERE DECKS IM LAGER")
+				var spare_list=_grid(2)
+				var spare_count:=0
+				for other in sim.decks.size():
+					if sim.deck_slots.has(other):continue
+					spare_count+=1
+					var other_index: int=other
+					var entry: Dictionary=sim.decks[other]
+					var item=_row_button(spare_list,"DECK %02d · %s STUFE %d" % [other+1,CONTENT.DECK_TIERS[int(entry.tier)].to_upper(),int(entry.get("stage",1))],func():_open_selected_deck(other_index),false,"primary" if other==focused_deck_index else "normal")
+					item.name="DeckReserve"+str(other)
+					item.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+				if spare_count==0:_note("Keine weiteren Decks auf Lager. Alle erworbenen Decks sind montiert.")
+				_action("NEUE GOLDDECKS KAUFEN",func():_switch_tab("Decks","KAUFEN"))
 		"SPEZIAL":
 			_section("DREI SONDERDECKS · AUSSERHALB DER 10 PLÄTZE")
 			_note("Gezeitendeck, Runendeck und Korsarendeck wirken zusätzlich. Sie belegen niemals einen der zehn normalen Deckplätze.")
@@ -3000,7 +3121,11 @@ func _open_decks() -> void:
 			var config: Dictionary=CONTENT.DECKS.cannon
 			var tile=_catalog_tile(yard,deck_icons.cannon,"GOLDDECK · STUFE I","+%d Kanonenplätze je Deck · vorläufiger Testwert" % sim.deck_cannon_bonus(0,1),"%d GOLD PRO DECK" % int(config.price),CONTENT.DECK_TIER_COLORS[0])
 			var buy=_catalog_action(tile,"EIN GOLDDECK KAUFEN",func():
-				sim.buy_deck("cannon");_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked or sim.decks.size()>=CONTENT.DECK_INVENTORY_MAX or int(sim.player.gold)<int(config.price))
+				if sim.buy_deck("cannon"):
+					focused_deck_index=sim.decks.size()-1
+					_save_progress()
+					_switch_tab("Decks","LAGER")
+					_refresh_ui(),not sim.docked or sim.decks.size()>=CONTENT.DECK_INVENTORY_MAX or int(sim.player.gold)<int(config.price))
 			buy.name="DeckBuy_cannon"
 			if not sim.docked:_note("Deckkauf und -umbau vorerst nur im Hafen möglich.",Color("e1b979"))
 		_:

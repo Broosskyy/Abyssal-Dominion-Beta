@@ -433,8 +433,25 @@ func _run() -> void:
 		for deck_label: Label in game.modal_body.find_children("*","Label",true,false):
 			if "MONTIERT" in deck_label.text and "KRISTALL" in deck_label.text:deck_legend_visible=true
 		check(deck_legend_visible,"deck screen reports actual Gold/Elite/Kristall mounted tier counts")
-		game._switch_tab("Decks","LAGER")
-		check(game._tab("Decks")=="LAGER","deck inventory has a separate panel")
+		if game.sim.decks.is_empty():game.sim.grant_deck("cannon",0)
+		game._switch_tab("Decks","SCHIFF")
+		var ship_matrix: Node=game.modal_body.find_child("DeckShipMatrix",true,false)
+		check(ship_matrix!=null and ship_matrix.get_child_count()==10,"ship menu uses compact clickable 2×5 deck matrix, not a wall of ten catalog cards "+str(device))
+		var open_deck: Button=game.modal_body.find_child("DeckSlotFocus0",true,false) as Button
+		check(open_deck!=null,"tap on mounted deck 01 exposes focused upgrade action "+str(device))
+		if open_deck!=null:open_deck.pressed.emit()
+		check(game._tab("Decks")=="LAGER" and game.focused_deck_index==0,"ship slot tap selects physical deck and opens its own upgrade screen "+str(device))
+		var chosen: Node=game.modal_body.find_child("DeckSlotSelector",true,false)
+		check(chosen!=null and chosen.get_child_count()==10,"compact deckyard has exactly ten physical slot selectors "+str(device))
+		check(game.modal_body.find_child("DeckNextPreview0",true,false)!=null and game.modal_body.find_child("DeckLevelProgress0",true,false)!=null,"focused deck shows current-to-next promotion and upgrade progress "+str(device))
+		var level_tiles: int=0
+		for tier_name in ["GOLD","PERLEN","KRISTALL"]:
+			var path: Node=game.modal_body.find_child("DeckRoadmap_"+tier_name,true,false)
+			check(path!=null,"15-stage path contains visible "+tier_name+" material row "+str(device))
+			for step in range(1,6):
+				if game.modal_body.find_child("DeckStage_%s_%d" % [tier_name,step],true,false)!=null:level_tiles+=1
+		check(level_tiles==15,"all fifteen progression steps are represented, five per material "+str(device))
+		check(game.modal_body.find_child("DeckEquip0",true,false)!=null and game.modal_body.find_child("DeckUpgrade0",true,false)!=null,"selected deck exposes real mount and upgrade actions "+str(device))
 		game._switch_tab("Decks","SPEZIAL")
 		check(game._tab("Decks")=="SPEZIAL","timed special decks have separate panel")
 		game._switch_tab("Decks","KAUFEN")
