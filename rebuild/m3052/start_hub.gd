@@ -66,7 +66,19 @@ func _ready() -> void:
 		if config is Dictionary:network.server_url=str(config.get("server_url",""))
 	panel=PanelContainer.new();panel.name="CaptainPanel";add_child(panel)
 	panel.add_theme_stylebox_override("panel",SKIN.card())
-	scroll=preload("res://touch_scroll.gd").new();panel.add_child(scroll)
+	# A PanelContainer must size to the viewport, NOT to the combined
+	# minimum size of a long dashboard. A neutral Control wrapper absorbs
+	# the ScrollContainer content minimum on rotated/portrait phones.
+	var scroll_view=Control.new()
+	scroll_view.name="CaptainScrollViewport"
+	scroll_view.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	scroll_view.size_flags_vertical=Control.SIZE_EXPAND_FILL
+	scroll_view.clip_contents=true
+	panel.add_child(scroll_view)
+	scroll=preload("res://touch_scroll.gd").new()
+	scroll.name="CaptainContentScroll"
+	scroll_view.add_child(scroll)
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	body=VBoxContainer.new();body.add_theme_constant_override("separation",12);body.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(body)
 	get_viewport().size_changed.connect(_layout)
 	page="home" if get_tree().get_meta("abyssal_entered",false) else "welcome"
