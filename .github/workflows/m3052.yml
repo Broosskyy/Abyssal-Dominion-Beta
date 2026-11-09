@@ -219,8 +219,20 @@ jobs:
           # Renderer captures are release evidence, not source: attach them to the release instead of committing ~30 MB of PNG/MP4 per build.
           (cd releases/M3059 && zip -qr9 "$RUNNER_TEMP/ABYSSAL_CAPTURES_${GITHUB_RUN_NUMBER}.zip" captures)
           gh release create "data-${GITHUB_RUN_NUMBER}" "releases/M3059/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip" releases/M3059/data.json "$RUNNER_TEMP/ABYSSAL_CAPTURES_${GITHUB_RUN_NUMBER}.zip" --target "$GITHUB_SHA" --title "Abyssal game data ${GITHUB_RUN_NUMBER}" --notes 'Signed game scripts and assets for the M3059 bootstrap. No Android installation for compatible data updates.' --prerelease
-          curl -fL --retry 3 -o "$RUNNER_TEMP/served.zip" "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-${GITHUB_RUN_NUMBER}/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip"
-          python3 -c 'import json,hashlib,pathlib,os; s=json.loads(pathlib.Path("releases/M3059/data.json").read_text())["latest"]; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"served.zip"; assert p.stat().st_size==s["bytes"] and hashlib.sha256(p.read_bytes()).hexdigest()==s["sha256"]; print("ANONYMOUS_DATA_DOWNLOAD_VERIFIED")'
+          # Fresh GitHub release assets can return transient CDN 504 errors
+          # before propagation. Retry with backoff; on CDN failure verify
+          # the same immutable asset through GitHub's authenticated API.
+          # The byte length + SHA-256 check below remains mandatory.
+          asset_url="https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-${GITHUB_RUN_NUMBER}/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip"
+          if curl -fL --retry 5 --retry-all-errors --retry-delay 8 --retry-max-time 170 --connect-timeout 25 --max-time 80 -o "$RUNNER_TEMP/served.zip" "$asset_url"; then
+            echo "Anonymous release-download path verified at CDN"
+          else
+            echo "::warning::Anonymous CDN is returning errors; verifying release asset through the authenticated GitHub API as fallback."
+            rm -f "$RUNNER_TEMP/served.zip"
+            gh release download "data-${GITHUB_RUN_NUMBER}" --pattern "ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip" --dir "$RUNNER_TEMP" --clobber
+            mv "$RUNNER_TEMP/ABYSSAL_DATA_${GITHUB_RUN_NUMBER}.zip" "$RUNNER_TEMP/served.zip"
+          fi
+          python3 -c 'import json,hashlib,pathlib,os; s=json.loads(pathlib.Path("releases/M3059/data.json").read_text())["latest"]; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"served.zip"; assert p.stat().st_size==s["bytes"] and hashlib.sha256(p.read_bytes()).hexdigest()==s["sha256"]; print("RELEASE_DATA_DOWNLOAD_VERIFIED")'
           mkdir -p updates
           if [ "$SHELL_NEEDED" = true ]; then cp releases/M3059/latest.json updates/latest.json; fi
           cp releases/M3059/data.json updates/data.json
