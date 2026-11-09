@@ -85,6 +85,24 @@ func _initialize() -> void:
 	check(restored.decks==sim.decks and restored.deck_slots==sim.deck_slots,"material and five-stage progression survive signed pack/restart")
 	check(int(restored.player.max_hp)==int(sim.player.max_hp) and restored.mounted_deck_hp()==sim.mounted_deck_hp(),"real deck HP survives schema-8 save migration and load")
 	check(restored.buffs.tide_deck==1200 and restored.buffs.storm_deck==600 and restored.buffs.salvage_deck==900,"three special timers survive reload")
+	check(saved.has("max_hp") and int(saved.max_hp)==int(sim.player.max_hp),"modern save persists real max HP for damage-preserving reloads")
+	# Data packs before this feature stored hp but NOT max_hp. An old,
+	# fully repaired captain must receive deck HP immediately on migration.
+	var old_save: Dictionary=saved.duplicate(true)
+	old_save.erase("max_hp")
+	var old_base_hp: int=roundi(float(sim.PLAYER_HP+int(sim.upgrades.hull)*400) * (1.2 if sim.has_blessing() else 1.0) * (1.0+float(sim.talents.armor)*0.02))
+	old_save.hp=old_base_hp
+	var old_full=SIM.new()
+	check(old_full.restore_save(old_save) and int(old_full.player.hp)==int(old_full.player.max_hp),"old full-health save upgrades to the new full hull including deck HP")
+	old_save.hp=old_base_hp-120
+	var old_hurt=SIM.new()
+	check(old_hurt.restore_save(old_save) and roundi(float(old_hurt.player.max_hp)-float(old_hurt.player.hp))==120,"old damaged save preserves missing 120 HP rather than silently healing")
+	old_save.hp=0
+	var old_sunk=SIM.new()
+	check(old_sunk.restore_save(old_save) and int(old_sunk.player.hp)==0,"new deck HP does not resurrect sunk old saves")
+	var recovered: Dictionary=JSON.parse_string(JSON.stringify(old_hurt.export_save()))
+	var old_reloaded=SIM.new()
+	check(old_reloaded.restore_save(recovered) and roundi(float(old_reloaded.player.max_hp)-float(old_reloaded.player.hp))==120,"new hull max HP metadata avoids repeat conversion on subsequent reloads")
 	# Legacy copies must remain owned, not silently sold or deduplicated.
 	var legacy={"schema":3,"gold":774,"ammo":[29,111,151],"level":5,"decks":[{"type":"armor","tier":0},{"type":"hunter","tier":1},{"type":"cannon","tier":2}],"deck_slots":[0,1,2],"buffs":{"tide_deck":450}}
 	var migrated=SIM.new()
