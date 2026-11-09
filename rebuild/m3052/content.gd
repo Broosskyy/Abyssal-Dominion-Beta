@@ -166,6 +166,11 @@ const DECK_STAGE_MAX := 5
 const DECK_TIERS := ["Gold","Perlen","Kristall"]
 const DECK_TIER_COLORS := [Color("ffb640"),Color("81d9e4"),Color("bd78f2")]
 const DECK_CANNON_BASE := [0,5,15]
+## Provisional flat Rumpf-HP per physical standard deck. Each material's
+## five stages strictly increase; the next material starts ABOVE rank V.
+## Gold: +40–200, Perlen: +250–450, Kristall: +520–800 HP per deck.
+const DECK_HP_BASE := [0,200,450]
+const DECK_HP_PER_STAGE := [40,50,70]
 const DECK_UPGRADE_GOLD := [180,540,1200]
 const DECK_UPGRADE_ESSENCE := [0,1,3]
 const DECK_UPGRADE_LEVEL := [1,3,8]
