@@ -1764,7 +1764,7 @@ func export_save() -> Dictionary:
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"talents":talents.duplicate(),"battle_pass_claimed":battle_pass_claimed.duplicate(),
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
-		"position":[position.x,position.y],"hp":player.hp,"shield":player.shield,"docked":docked,
+		"position":[position.x,position.y],"hp":player.hp,"max_hp":player.max_hp,"shield":player.shield,"docked":docked,
 		"cannons":player.cannons,"mounted_cannons":mounted_cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
 		"essence":essence,"fragments":fragments,"bonus_pieces":bonus_pieces.duplicate(),"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
 		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
@@ -1907,7 +1907,14 @@ func restore_save(data: Dictionary) -> bool:
 	if position is Array and position.size()==2:
 		var point=Vector2(float(position[0]),float(position[1]))
 		if point.is_finite() and not blocked(point):player.pos=point
-	player.hp=clampi(int(data.get("hp",player.max_hp)),0,int(player.max_hp))
+	# Schema-8 saves written before deck HP did not include max_hp.
+	# Preserve their MISSING hull HP through migration instead of making
+	# fully repaired ships mysteriously spawn wounded after this update.
+	var old_hull_max: int=roundi(float(PLAYER_HP + int(upgrades.hull)*400) * (1.2 if has_blessing() else 1.0) * (1.0+float(talents.armor)*0.02))
+	var stored_max_hp: float=maxf(1.0,float(data.get("max_hp",old_hull_max)))
+	var stored_hp: float=clampf(float(data.get("hp",stored_max_hp)),0.0,stored_max_hp)
+	if stored_hp<=0.0:player.hp=0
+	else:player.hp=clampf(float(player.max_hp)-(stored_max_hp-stored_hp),0.0,float(player.max_hp))
 	player.shield=clampi(int(data.get("shield",player.max_shield)),0,int(player.max_shield))
 	if int(player.hp)==0:player.respawn=8.0
 	powder_on=false
