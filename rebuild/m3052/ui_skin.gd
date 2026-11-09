@@ -52,11 +52,25 @@ static func card(accent: Color=Color(0,0,0,0),margin: float=10.0) -> StyleBox:
 
 ## Restrained gallery stage for real ship/equipment art.
 ## Shared by Market, Decks, Talents and Castles without extra textures.
+# Banner-grade header for the main game systems. This prominent, wide
+# illustrated surface replaces the tiny icon-and-text info rows.
+static func feature_banner(rim: Color=Color("c9a35e")) -> StyleBox:
+	var style=bevel(Color("234e59"),Color("061922"),rim,14.0,13.0)
+	style.sheen=.25
+	style.shadow=.62
+	style.inner=Color(1,.95,.65,.19)
+	style.accent=rim
+	style.content_margin_left=16
+	style.content_margin_right=16
+	style.content_margin_top=12
+	style.content_margin_bottom=12
+	return style
+
 static func catalog_art(rim: Color=Color("b08a4c")) -> StyleBoxFlat:
 	var style=StyleBoxFlat.new()
-	style.bg_color=Color("0b2430")
+	style.bg_color=Color("103442")
 	style.border_color=Color(rim.r,rim.g,rim.b,.72)
-	style.set_border_width_all(1)
+	style.set_border_width_all(2)
 	style.set_corner_radius_all(10)
 	style.content_margin_left=8
 	style.content_margin_right=8

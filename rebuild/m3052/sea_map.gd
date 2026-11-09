@@ -1302,7 +1302,7 @@ func _build_ui() -> void:
 	gold_label=_text(chrome,"",15,Color("ffe2a0"))
 	kills_label=_text(chrome,"",12,Color("eadfc6"))
 	for label in [gold_label,kills_label]:label.clip_text=true;label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
-	var nav_items=[["Schiff","nav_ship","Schiff"],["Werft","nav_shipyard","Werft"],["Hafen","nav_harbor","Hafen"],["Logbuch","nav_quests","Logbuch"],["Bonus","nav_bonus","Bonuskarten"],["Kessel","nav_kessel","Kessel"],["Gilde","nav_guild","Gilde"],["Markt","gold_coins","Markt"],["Menü","nav_menu","Spielinfo"]]
+	var nav_items=[["Schiff","nav_ship","Schiff"],["Werft","nav_shipyard","Werft"],["Decks","tide_deck","Decks"],["Markt","gold_coins","Markt"],["Talente","nav_castles","Kastelle"],["Hafen","nav_harbor","Hafen"],["Logbuch","nav_quests","Logbuch"],["Bonus","nav_bonus","Bonuskarten"],["Kessel","nav_kessel","Kessel"],["Gilde","nav_guild","Gilde"],["Menü","nav_menu","Spielinfo"]]
 	# Use a real horizontal scroll viewport on narrow phones. Keep all nine
 	# commands readable and reachable instead of shrinking their hit areas.
 	nav_scroll=ScrollContainer.new()
@@ -1613,8 +1613,8 @@ func _layout() -> void:
 	_place(modal_back,10,8,82,30)
 	var inner_top=head+8
 	if modal_tabs.visible:
-		_place(modal_tabs_scroll,18,inner_top,width-36,46)
-		inner_top+=54
+		_place(modal_tabs_scroll,18,inner_top,width-36,62)
+		inner_top+=70
 	modal_scroll_box=Rect2(18,inner_top,width-36,height-inner_top-18)
 	_fit_modal_scroll()
 	_fit_modal_scroll.call_deferred()
@@ -1974,10 +1974,45 @@ func _build_tabs(kind: String) -> void:
 		var tab: String=str(name)
 		var caption: String="KANONEN" if kind=="Markt" and tab=="AUSRÜSTUNG" and get_viewport_rect().size.x<920.0 else tab
 		var button=_button(modal_tabs,caption,func():_switch_tab(kind,tab),"tab_on" if tab==current else "tab")
+		button.set_meta("menu_tab",tab)
 		button.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
-		button.custom_minimum_size=Vector2(118 if names.size()>=4 else 128,44)
+		button.custom_minimum_size=Vector2(154 if names.size()>=4 else 174,58)
 		button.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-		button.add_theme_font_size_override("font_size",13 if names.size()>=4 else 14)
+		button.add_theme_font_size_override("font_size",14)
+		var tab_art: Texture2D=_menu_tab_art(kind,tab)
+		if tab_art!=null:
+			_with_icon(button,tab_art)
+			button.add_theme_constant_override("icon_max_width",38)
+
+# Genuine game artwork, not text-only placeholder icons: each category
+# provides a directly recognizable pictogram beside its active pill.
+func _menu_tab_art(kind: String,tab: String) -> Texture2D:
+	match kind:
+		"Markt":
+			match tab:
+				"AUSRÜSTUNG":return extra_icons.cannon_1
+				"MUNITION":return icons.cannonball
+				"ITEMS":return painted.supply_repair
+				"AUKTION":return painted.reward_chest
+		"Decks":
+			match tab:
+				"SCHIFF":return painted.nav_ship
+				"LAGER":return painted.reward_chest
+				"SPEZIAL":return painted.tide_deck
+				"KAUFEN":return painted.gold_coins
+		"Kastelle":
+			return painted.nav_castles
+		"Werft":
+			return extra_icons.cannon_0 if tab=="KANONEN" else painted.nav_shipyard
+		"Hafen":
+			return painted.nav_harbor
+		"Gilde":
+			return painted.nav_guild
+		"Anzeige":
+			return hud_icons.gear
+		"Seekarten":
+			return painted.nav_bonus
+	return null
 
 func _switch_tab(kind: String,tab: String) -> void:
 	modal_tab[kind]=tab
@@ -2109,56 +2144,114 @@ func _catalog_grid(max_columns: int=3,parent: Node=null) -> GridContainer:
 func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String,footer: String,accent: Color=Color("ab8852")) -> VBoxContainer:
 	var panel: PanelContainer=_card(accent,parent)
 	panel.set_meta("catalog_tile",true)
-	panel.custom_minimum_size=Vector2(0,310)
+	# On phones the portrait and product information sit side by side with
+	# the action BELOW them: big enough to see, but no 350px-tall card wall.
+	# Wider panels retain the classic illustrated shop-grid presentation.
+	var compact: bool=modal_scroll.size.x<690.0
+	panel.custom_minimum_size=Vector2(0,224 if compact else 326)
+	panel.set_meta("catalog_compact",compact)
 	var content=VBoxContainer.new()
-	content.add_theme_constant_override("separation",8)
+	content.add_theme_constant_override("separation",10)
 	content.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	content.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	panel.add_child(content)
-	# A dedicated image stage gives each existing authentic item graphic
-	# room to breathe. Simple reusable vector chrome keeps the pack small.
+	var lead: Node=content
+	var copy: Node=content
+	if compact:
+		var product_row=HBoxContainer.new()
+		product_row.name="CatalogProductRow"
+		product_row.add_theme_constant_override("separation",12)
+		product_row.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		content.add_child(product_row)
+		lead=product_row
+		var info=VBoxContainer.new()
+		info.name="CatalogInfo"
+		info.add_theme_constant_override("separation",6)
+		info.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		info.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		copy=info
+		# Art must precede copy in the row.
 	var art_stage=PanelContainer.new()
 	art_stage.name="CatalogArtStage"
 	art_stage.add_theme_stylebox_override("panel",SKIN.catalog_art(accent))
-	art_stage.custom_minimum_size.y=172
-	art_stage.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	art_stage.custom_minimum_size=Vector2(132,140) if compact else Vector2(0,172)
+	art_stage.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
 	art_stage.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	content.add_child(art_stage)
+	lead.add_child(art_stage)
 	var frame=CenterContainer.new()
 	frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	art_stage.add_child(frame)
 	if texture!=null:
-		var art=_picture(frame,texture,148,false)
+		var image_size: float=116.0 if compact else 148.0
+		var art=_picture(frame,texture,image_size,false)
 		art.name="CatalogArtwork"
-		art.custom_minimum_size=Vector2(148,148)
-	var heading=_text(content,title,17,Color("ffdf9d"))
+		art.custom_minimum_size=Vector2(image_size,image_size)
+	if compact:lead.add_child(copy)
+	var heading=_text(copy,title,17,Color("ffe4ad"))
 	heading.name="CatalogTitle"
-	heading.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	heading.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if compact else HORIZONTAL_ALIGNMENT_CENTER
 	heading.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	heading.custom_minimum_size.y=28
-	var description=_text(content,details,14,Color("c5d4d4"))
-	description.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	var description=_text(copy,details,14,Color("d6e5e6"))
+	description.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if compact else HORIZONTAL_ALIGNMENT_CENTER
 	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	description.custom_minimum_size.y=42
-	var price=_text(content,footer,15,Color("a7e4cd"))
+	description.custom_minimum_size.y=38
+	var price=_text(copy,footer,15,Color("b8eacf"))
 	price.name="CatalogStatus"
-	price.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	price.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if compact else HORIZONTAL_ALIGNMENT_CENTER
 	price.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	price.custom_minimum_size.y=32
+	price.custom_minimum_size.y=30
 	price.add_theme_stylebox_override("normal",SKIN.note())
 	return content
 
 func _catalog_action(parent: Node,text: String,handler: Callable,disabled: bool=false) -> Button:
 	var action=_row_button(parent,text,handler,disabled,"primary")
-	action.custom_minimum_size.y=56
+	action.custom_minimum_size.y=60
 	action.add_theme_font_size_override("font_size",15)
 	action.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	return action
 
 func _banner_card(texture: Texture2D,title: String,text: String,accent: Color=Color("c9a35e")) -> VBoxContainer:
-	var column=_row(texture,title,72,accent)
-	var label: Label=column.get_child(0);label.add_theme_color_override("font_color",Color("f5d78d"));label.add_theme_font_size_override("font_size",15)
-	var body=_text(column,text,13,Color("bac7c7"));body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	# Full-width illustrated hero: all major systems now open with a large
+	# readable image, carved navy/brass title and concise explanatory copy.
+	var banner=PanelContainer.new()
+	banner.name="FeaturedMenuBanner"
+	banner.add_theme_stylebox_override("panel",SKIN.feature_banner(accent))
+	banner.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	banner.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	modal_body.add_child(banner)
+	var row=HBoxContainer.new()
+	row.name="FeaturedMenuContent"
+	row.add_theme_constant_override("separation",14)
+	row.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	banner.add_child(row)
+	var compact: bool=modal_scroll.size.x<510.0
+	if texture!=null:
+		var art_stage=PanelContainer.new()
+		art_stage.name="FeaturedMenuArtStage"
+		art_stage.add_theme_stylebox_override("panel",SKIN.catalog_art(accent))
+		art_stage.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		art_stage.size_flags_vertical=Control.SIZE_SHRINK_CENTER
+		row.add_child(art_stage)
+		var image_size: float=88.0 if compact else 132.0
+		var art=_picture(art_stage,texture,image_size,false)
+		art.name="FeaturedMenuArtwork"
+		art.custom_minimum_size=Vector2(image_size,image_size)
+	var column=VBoxContainer.new()
+	column.name="FeaturedMenuCopy"
+	column.add_theme_constant_override("separation",8)
+	column.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	column.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	row.add_child(column)
+	var eyebrow=_text(column,"ABYSSAL DOMINION  /  KAPITÄNSMENÜ",10,Color("9fd0cf"))
+	eyebrow.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	var label=_text(column,title,18 if compact else 22,Color("ffe2a0"))
+	label.name="FeaturedMenuTitle"
+	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	label.add_theme_color_override("font_outline_color",Color("081a20"))
+	label.add_theme_constant_override("outline_size",3)
+	var body=_text(column,text,13 if compact else 14,Color("d5e4e4"))
+	body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	return column
 
 func _banner(texture: Texture2D,height: float) -> void:
@@ -2432,7 +2525,7 @@ func _add_shipyard_card(index: int,container: Node,frames: Array[Control]) -> vo
 	card.add_child(column)
 	var frame=Panel.new()
 	frame.name="ShipDesignPreview%d" % index
-	frame.custom_minimum_size=Vector2(0,205 if index<=1 else 185)
+	frame.custom_minimum_size=Vector2(0,252 if index<=1 else 222)
 	frame.clip_contents=true
 	frame.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	frame.add_theme_stylebox_override("panel",SKIN.icon_frame(accent))

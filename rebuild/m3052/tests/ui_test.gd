@@ -237,10 +237,10 @@ func _run() -> void:
 		await process_frame # HBox solves the swipeable header's child widths.
 		game.sim.select(2)
 		game._refresh_ui()
-		check(game.nav_buttons.size()==9,"top bar carries nine sea-chart menus")
+		check(game.nav_buttons.size()==11 and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Decks") and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Kastelle"),"top navigation offers 11 direct entries including decks and talents")
 		check(game._hud_contains(game.render_toggle.get_global_rect().get_center()),"mobile touch on graphics switch is reserved for its button, never treated as a sailing tap")
 		check(game.nav_scroll!=null and game.nav_scroll.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and game.nav_scroll.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x,"swipeable navigation viewport stays between wallet and captain meters at "+str(dimensions))
-		check(game.nav_strip.get_combined_minimum_size().x>game.nav_scroll.size.x or dimensions.x>=1200,"navigation scrolls rather than shrinking the nine buttons at "+str(dimensions))
+		check(game.nav_strip.get_combined_minimum_size().x>game.nav_scroll.size.x or dimensions.x>=1200,"navigation scrolls rather than shrinking eleven readable buttons at "+str(dimensions))
 		for nav: Button in game.nav_buttons:
 			check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
 			check(nav.get_parent()==game.nav_strip and nav.custom_minimum_size.x>=64.0,"navigation is swipe-reachable with readable touch width: "+nav.text+" at "+str(dimensions))
@@ -294,7 +294,7 @@ func _run() -> void:
 		check(elite_art!=null and elite_art.material is ShaderMaterial and elite_ten_art!=null and elite_ten_art.material is ShaderMaterial,"first and tenth RGB elite thumbnails key out flat backgrounds to reveal moving water")
 		check(game.modal_body.find_child("ShipStatus2",true,false)!=null,"shipyard artwork status badge is above the ship portrait rather than painted behind it")
 		var sea_preview: Control=game.modal_body.find_child("ShipDesignPreview2",true,false) as Control
-		check(sea_preview!=null and sea_preview.custom_minimum_size.y>=185,"elite art has a larger water-backed shipyard presentation")
+		check(sea_preview!=null and sea_preview.custom_minimum_size.y>=222,"elite art now has a significantly larger animated sea-backed presentation")
 		var yard:=0
 		for button in game.modal_body.find_children("*","Button",true,false):
 			if "AUSRÜSTEN" in button.text or "AKTIV" in button.text:yard+=1
@@ -406,16 +406,25 @@ func _run() -> void:
 		var all_inside: bool=true
 		var big_buttons: bool=true
 		var large_art: int=0
+		var compact_rows: int=0
+		var expected_compact: bool=game.modal_scroll.size.x<690.0
+		var art_side: float=116.0 if expected_compact else 148.0
 		for node: PanelContainer in game.modal_body.find_children("*","PanelContainer",true,false):
 			if not node.has_meta("catalog_tile"):continue
 			number_of_tiles+=1
 			all_inside=all_inside and node.get_global_rect().end.x<=game.modal_scroll.get_global_rect().end.x+2.0
 			var stage: PanelContainer=node.find_child("CatalogArtStage",true,false) as PanelContainer
 			var artwork: TextureRect=node.find_child("CatalogArtwork",true,false) as TextureRect
-			if stage!=null and artwork!=null and stage.custom_minimum_size.y>=170 and artwork.custom_minimum_size.x>=148:large_art+=1
+			if stage!=null and artwork!=null and stage.custom_minimum_size.y>=140 and artwork.custom_minimum_size.x>=art_side:large_art+=1
+			if node.find_child("CatalogProductRow",true,false)!=null:compact_rows+=1
 			for button: Button in node.find_children("*","Button",true,false):
 				big_buttons=big_buttons and button.custom_minimum_size.y>=48.0
-		check(number_of_tiles==28 and big_buttons and all_inside and large_art==28,"all 28 ammunition tiles have large real item art, accessible buttons and safe viewport bounds "+str(device))
+		check(number_of_tiles==28 and big_buttons and all_inside and large_art==28 and compact_rows==(28 if expected_compact else 0),"all 28 ammunition tiles use responsive horizontal phone rows or wide image cards with safe viewport bounds "+str(device))
+		var featured: Node=game.modal_body.find_child("FeaturedMenuBanner",true,false)
+		var menu_art: TextureRect=game.modal_body.find_child("FeaturedMenuArtwork",true,false) as TextureRect
+		check(featured!=null and menu_art!=null and menu_art.custom_minimum_size.x>=88,"Market menu begins with a full-width illustrated feature banner "+str(device))
+		var category_button: Button=game.modal_tabs.find_child("*",true,false) as Button
+		check(category_button!=null and category_button.custom_minimum_size.y>=58 and category_button.icon!=null,"Market has prominent illustrated category tabs instead of text-only chips "+str(device))
 		game._switch_tab("Markt","ITEMS")
 		check(game.modal_body.find_child("MarketItem_powder",true,false)!=null,"new product cards preserve real item purchase buttons "+str(device))
 		game._switch_tab("Decks","SCHIFF")
