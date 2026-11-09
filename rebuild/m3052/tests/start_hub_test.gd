@@ -70,6 +70,9 @@ func _run() -> void:
 	hub._show("rewards")
 	await process_frame
 	check(hub.body.find_child("DailyDay1",true,false)!=null and hub.body.find_child("DailyDay7",true,false)!=null,"daily calendar has all seven real bonus day tiles")
+	var calendar: ScrollContainer=hub.body.find_child("DailyCalendarScroller",true,false) as ScrollContainer
+	check(calendar!=null and calendar.horizontal_scroll_mode==ScrollContainer.SCROLL_MODE_AUTO,"seven-day reward strip can scroll horizontally on portrait devices")
+	check(calendar.get_child(0).get_combined_minimum_size().x>calendar.size.x,"reward art remains large and doesn't shrink to fit 7 tiny columns")
 	var claim: Button=hub.body.find_child("DailyClaim",true,false) as Button
 	check(claim!=null and not claim.disabled,"daily claim action is accessible to fresh captain")
 	var amount: int=int(hub.sim.player.gold)
