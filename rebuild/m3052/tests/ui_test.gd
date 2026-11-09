@@ -237,10 +237,10 @@ func _run() -> void:
 		await process_frame # HBox solves the swipeable header's child widths.
 		game.sim.select(2)
 		game._refresh_ui()
-		check(game.nav_buttons.size()==11 and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Decks") and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Kastelle"),"top navigation offers 11 direct entries including decks and talents")
+		check(game.nav_buttons.size()==5 and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Decks") and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Menü"),"five clean primary HUD shortcuts preserve Decks and grouped Menu at "+str(dimensions))
 		check(game._hud_contains(game.render_toggle.get_global_rect().get_center()),"mobile touch on graphics switch is reserved for its button, never treated as a sailing tap")
 		check(game.nav_scroll!=null and game.nav_scroll.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and game.nav_scroll.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x,"swipeable navigation viewport stays between wallet and captain meters at "+str(dimensions))
-		check(game.nav_strip.get_combined_minimum_size().x>game.nav_scroll.size.x or dimensions.x>=1200,"navigation scrolls rather than shrinking eleven readable buttons at "+str(dimensions))
+		check(game.nav_strip.get_combined_minimum_size().x<=game.nav_scroll.size.x+8,"five top-level buttons fit without horizontal scrolling at "+str(dimensions))
 		for nav: Button in game.nav_buttons:
 			check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
 			check(nav.get_parent()==game.nav_strip and nav.custom_minimum_size.x>=64.0,"navigation is swipe-reachable with readable touch width: "+nav.text+" at "+str(dimensions))
@@ -269,7 +269,8 @@ func _run() -> void:
 		check(game.attack.get_global_rect().position.x>dimensions.x*.7 and ring,"cannon stays bottom-right with ammunition and repair within thumb reach")
 		check(game.loadout_button.get_global_rect().end.x<game.ammo_selector.get_global_rect().position.x and is_equal_approx(game.loadout_button.get_global_rect().position.y,game.ammo_selector.get_global_rect().position.y),"utility slots continue the bottom row left of the cannon")
 		check(str(game.attack.get("art").resource_path).ends_with("cannon_action.png") and game.attack.get("hero"),"fire control uses the dedicated cannon graphic")
-		check(game.player_hp.get_parent()==game.chrome and game.player_xp.get_parent()==game.chrome and game.player_shield.get_parent()==game.chrome,"captain experience, hull and shield meters sit in the top bar")
+		check(game.player_hp.get_parent()==game.chrome and game.player_xp.get_parent()==game.chrome and game.player_shield.get_parent()==game.chrome and not game.player_xp.visible,"captain hull/shield remain while XP moves out of crowded top HUD")
+		check(not game.kills_label.visible and not game.wallet_icons[1].visible,"top HUD hides redundant kill counter, still available in logbook")
 		check(game.player_shield.get_global_rect().position.y>=game.player_hp.get_global_rect().end.y-1 and game.player_shield.get_global_rect().end.y<=game.chrome.get_global_rect().end.y+1,"shield meter stacks below hull inside the top bar at "+str(dimensions))
 		check(game.supply_selector.visible and game.supply_buttons.values().all(func(item):return not item.visible),"one consumable selector replaces persistent supply orbs")
 		check(game.chart_mini.get_global_rect().encloses(Rect2(game.zoom_in.get_global_rect().get_center(),Vector2.ONE)) and game.chart_mini.get_global_rect().encloses(Rect2(game.settings_button.get_global_rect().get_center(),Vector2.ONE)),"map controls sit on the chart frame corners")
@@ -367,6 +368,14 @@ func _run() -> void:
 			else:
 				check(game.modal.get_global_rect().size.x<dimensions.x*.85,"combat ammunition retains compact popup instead of full page")
 			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
+	# All old full-feature menus remain reachable from a compact grouped index.
+	game._open_modal("Menü")
+	for destination in ["Hafen","Werft","Kastelle","Munition","Kessel","Logbuch","Bonuskarten","Gilde","Monster","Events","Freunde","Rangliste","Profil","Belohnungen","Bewaffnung","Anzeige","Spielinfo","Battle Pass"]:
+		check(game.modal_body.find_child("MenuShortcut_"+destination,true,false)!=null,"compact menu links to "+destination)
+	var harbor_button: Button=game.modal_body.find_child("MenuShortcut_Hafen",true,false) as Button
+	if harbor_button!=null:harbor_button.pressed.emit()
+	check(game.modal.visible and game.modal_kind=="Hafen" and game.menu_history.has("Menü"),"shortcut opens its actual panel and keeps an accessible Back path")
+	game._close_modal()
 	# Closing a full-screen menu must release its invisible touch blocker.
 	# The same back path is shared by Market, Decks and other nested panels.
 	game._close_modal()
