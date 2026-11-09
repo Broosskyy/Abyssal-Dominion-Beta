@@ -4309,17 +4309,9 @@ func _update_web_auto_quality(delta: float) -> void:
 	web_fps_frames=0
 	var touch_browser: bool=DisplayServer.is_touchscreen_available() or get_viewport_rect().size.y>get_viewport_rect().size.x
 	var target_fps: float=30.0 if touch_browser else 45.0
-	if measured_fps<target_fps*0.82:
-		web_quality_good_windows=0
-		mesh_layer.set_web_quality(float(mesh_layer.web_quality)-0.09)
-	elif measured_fps>target_fps*0.96:
-		web_quality_good_windows+=1
-		# Climb more slowly than we downshift, to avoid quality oscillation.
-		if web_quality_good_windows>=3:
-			web_quality_good_windows=0
-			mesh_layer.set_web_quality(float(mesh_layer.web_quality)+0.04)
-	else:
-		web_quality_good_windows=0
+	var adjustment: Dictionary=mesh_layer.adaptive_quality_step(float(mesh_layer.web_quality),measured_fps,target_fps,web_quality_good_windows)
+	web_quality_good_windows=int(adjustment.good_windows)
+	mesh_layer.set_web_quality(float(adjustment.quality))
 
 func _set_web_fast_mode(enabled: bool) -> void:
 	if not OS.has_feature("web"):return
