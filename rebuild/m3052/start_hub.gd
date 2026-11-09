@@ -160,7 +160,7 @@ func _dashboard_button(parent: Node,label: String,callback: Callable,primary: bo
 
 func _dashboard_card(parent: Node,heading: String,detail: String,callback: Callable,image: Texture2D=null) -> PanelContainer:
 	var panel_card=PanelContainer.new()
-	panel_card.name="HomeActionCard"
+	panel_card.name="HomeActionCard_"+heading.replace(" ","_").replace("&","UND")
 	panel_card.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	panel_card.add_theme_stylebox_override("panel",SKIN.card(Color("a88c59")))
 	parent.add_child(panel_card)
