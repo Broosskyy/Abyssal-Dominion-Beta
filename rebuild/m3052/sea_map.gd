@@ -2956,23 +2956,36 @@ func _open_decks() -> void:
 				if index<0 or index>=sim.decks.size():continue
 				tier_counts[clampi(int(sim.decks[index].tier),0,2)]+=1
 			_note("MONTIERT · %d GOLD / %d PERLEN / %d KRISTALL · +%d KANONENPLÄTZE" % [tier_counts[0],tier_counts[1],tier_counts[2],int(sim.deck_value("cannon"))],Color("d4e6d9"))
-			var slots=_catalog_grid(3)
+			_section("DEIN DECKPLAN · 2 REIHEN MIT JE 5 PLÄTZEN")
+			var compact_slots=GridContainer.new()
+			compact_slots.name="DeckShipMatrix"
+			compact_slots.columns=5
+			compact_slots.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			compact_slots.add_theme_constant_override("h_separation",4)
+			compact_slots.add_theme_constant_override("v_separation",6)
+			modal_body.add_child(compact_slots)
 			for slot in CONTENT.DECK_SLOT_COUNT:
 				var place: int=slot
 				var index: int=int(sim.deck_slots[slot])
-				if index<0:
-					var empty=_catalog_tile(slots,deck_icons.cannon,"PLATZ %02d · FREI" % (slot+1),"Ein beliebiges Gold-, Perlen- oder Kristalldeck kann hier eingebaut werden.","FREIER DECKPLATZ",Color("3b535d"))
-					_catalog_action(empty,"DECK AUS LAGER WÄHLEN",func():_switch_tab("Decks","LAGER"))
-					continue
-				var deck: Dictionary=sim.decks[index]
-				var tile=_catalog_tile(slots,deck_icons.cannon,"PLATZ %02d · %s" % [slot+1,_deck_title(deck)],_deck_effect(deck),"MONTIERT",CONTENT.DECK_TIER_COLORS[int(deck.tier)])
+				var mounted: bool=index>=0 and index<sim.decks.size()
+				var label: String="%02d\nFREI" % (slot+1)
+				if mounted:
+					var deck: Dictionary=sim.decks[index]
+					label="%02d\n%s %d" % [slot+1,["GOLD","PERL.","KRIST."][int(deck.tier)],int(deck.get("stage",1))]
 				var focus_index: int=index
-				var open_upgrade=_catalog_action(tile,"DIESES DECK UPGRADEN",func():_open_selected_deck(focus_index))
-				open_upgrade.name="DeckSlotFocus"+str(slot)
-				var unequip=_catalog_action(tile,"ABBAUEN",func():
-					sim.unequip_deck(place);_save_progress();_open_modal("Decks");_refresh_ui(),not sim.docked)
-				unequip.name="DeckRemove"+str(slot)
-			_note("Die 2×5-Punkteanordnung unter dem Schiff bleibt erhalten. Gold, Perlen und Kristall sind unterschiedlich gefärbt. Der Umbau erfolgt vorerst angedockt.")
+				var focus=_row_button(compact_slots,label,func():
+					if focus_index>=0:_open_selected_deck(focus_index)
+					else:_switch_tab("Decks","LAGER"),false,"primary" if mounted else "normal")
+				focus.name="DeckSlotFocus"+str(slot)
+				focus.custom_minimum_size=Vector2(45,70)
+				focus.add_theme_font_size_override("font_size",12)
+				focus.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+				if mounted:
+					var material_color: Color=CONTENT.DECK_TIER_COLORS[int(sim.decks[index].tier)]
+					focus.add_theme_color_override("font_color",material_color)
+					focus.add_theme_color_override("font_hover_color",material_color.lightened(.25))
+			_note("TIPP AUF EINEN PLATZ: Das passende Deck öffnet sich direkt mit Stufenplan, Materialwechsel, Kanonenbonus, Kosten und Montage.")
+			_action("DECKS AUS LAGER MONTIEREN",func():_switch_tab("Decks","LAGER"))
 		"LAGER":
 			_section("DECKWERFT · %d/%d EXEMPLARE" % [sim.decks.size(),CONTENT.DECK_INVENTORY_MAX])
 			if not sim.docked:_note("Deckmontage und Upgrades sind nur im Hafen möglich.",Color("e1b979"))
@@ -3055,6 +3068,13 @@ func _open_decks() -> void:
 						_open_modal("Decks")
 						_refresh_ui(),not sim.docked)
 				equip.name="DeckEquip"+str(index)
+				if current_slot>=0:
+					var remove=_catalog_action(tile,"DECK VON SCHIFF ABBAUEN",func():
+						if sim.unequip_deck(current_slot):
+							_save_progress()
+							_open_modal("Decks")
+							_refresh_ui(),not sim.docked)
+					remove.name="DeckRemove"+str(current_slot)
 				_deck_progression_roadmap(info)
 				_section("WEITERE DECKS IM LAGER")
 				var spare_list=_grid(2)
