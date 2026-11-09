@@ -272,7 +272,7 @@ func _open_manual_updates() -> void:
 
 func _show_home() -> void:
 	_label("ABYSSAL DOMINION · KAPITÄNSHAFEN",true)
-	var summary=_hint(body,"%s  ·  LV. %d  ·  SEEKARTE %s  ·  %s" % [sim.captain_name,sim.level,sim.CONTENT.MAPS[sim.map_id].code,"ONLINE" if not network.account.is_empty() else "LOKALE BETA"],14)
+	var summary=_hint(body,"%s  ·  LV. %d  ·  SEEKARTE %s  ·  %s" % [sim.captain_name,sim.level,sim.CONTENT.MAPS[sim.map_id].code,"PRÄSENZ-TEST · KEIN LIVE-KAMPF" if not network.account.is_empty() else "LOKALE BETA"],14)
 	summary.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	# Show the *mounted* signed content revision, so players can distinguish
 	# an old local APK/data pack from the newly published interface.
@@ -511,7 +511,7 @@ func _show(next: String) -> void:
 			_label("KONTO ERSTELLEN" if registration else "WILLKOMMEN ZURÜCK",true)
 			if registration:username=_field("Spielername · 3 bis 24 Zeichen")
 			email=_field("E-Mail");password=_field("Passwort · mindestens 10 Zeichen",true)
-			var notice=_label(status_text if not status_text.is_empty() else ("Beta-Server verbunden" if not network.server_url.is_empty() else "Beta-Server noch nicht verbunden · Gastspiel verfügbar"))
+			var notice=_label(status_text if not status_text.is_empty() else ("Beta-Adresse hinterlegt · Verbindung noch nicht geprüft" if not network.server_url.is_empty() else "Beta-Server noch nicht verbunden · Gastspiel verfügbar"))
 			notice.name="AuthStatus"
 			_button("REGISTRIEREN" if registration else "ANMELDEN",func():
 				notice.text="Anmeldung wird geprüft …"
