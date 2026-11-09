@@ -368,6 +368,16 @@ func _run() -> void:
 			else:
 				check(game.modal.get_global_rect().size.x<dimensions.x*.85,"combat ammunition retains compact popup instead of full page")
 			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
+	# Only authenticated room snapshots produce remote presence markers.
+	var base_rumpf: float=float(game.sim.player.hp)
+	var base_coins: int=int(game.sim.player.gold)
+	game._online_snapshot({"type":"snapshot","map_id":game.sim.map_id,"players":[{"id":"remote-fixture","username":"RemoteCaptain","x":2120.0,"y":1600.0,"sequence":1}]})
+	check(game.online_population==1 and game.online_players.size()==1 and game.online_players[0].username=="RemoteCaptain","validated online room snapshots produce a visible remote test marker")
+	game._online_snapshot({"type":"snapshot","map_id":-99,"players":[]})
+	check(game.online_players.size()==1,"out-of-room snapshots cannot wipe active map presence")
+	game._online_connection_changed(false)
+	check(game.online_players.is_empty() and game.online_population==0,"disconnect clears all stale remote map markers")
+	check(float(game.sim.player.hp)==base_rumpf and int(game.sim.player.gold)==base_coins,"remote presence cannot alter local combat hull or currency")
 	# All old full-feature menus remain reachable from a compact grouped index.
 	game._open_modal("Menü")
 	for destination in ["Hafen","Werft","Kastelle","Munition","Kessel","Logbuch","Bonuskarten","Gilde","Monster","Events","Freunde","Rangliste","Profil","Belohnungen","Bewaffnung","Anzeige","Spielinfo","Battle Pass"]:
