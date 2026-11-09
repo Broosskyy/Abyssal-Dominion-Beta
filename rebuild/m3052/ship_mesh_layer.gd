@@ -52,6 +52,9 @@ var resolution_factor := 1.0
 # at 4x MSAA on top of the animated 2D ocean (2.5M pixels on 1080x2340 phones).
 # The reduced internal 3D buffer stretches smoothly; world/UI remain crisp.
 var web_performance := OS.has_feature("web")
+# WebGL adaptive resolution: only the 3D render target is resized. Native,
+# 2D chart, HUD, simulation and saved game resolution remain untouched.
+var web_quality: float=1.0
 # M3099: preserve native shaded material, ensure back faces of sails are visible.
 var gameplay_double_sided_count := 0
 
@@ -271,9 +274,19 @@ func projected_hull_bottom(actor: Dictionary) -> float:
 
 func set_web_performance(enabled: bool) -> void:
 	web_performance=enabled
+	web_quality=1.0
 	if stage==null:return
 	stage.msaa_3d=Viewport.MSAA_DISABLED if web_performance else Viewport.MSAA_4X
 	if host!=null:resize_view(host.get_viewport_rect().size)
+
+## Adaptive GPU budget: adjust only at the controller's infrequent sampling
+## intervals. This keeps physical GLB instances, rotation, and camera stable.
+func set_web_quality(quality: float) -> void:
+	if not web_performance:return
+	var requested: float=clampf(quality,0.65,1.0)
+	if absf(requested-web_quality)<0.02:return
+	web_quality=requested
+	if stage!=null and host!=null:resize_view(host.get_viewport_rect().size)
 
 func resize_view(screen: Vector2) -> void:
 	position=Vector2.ZERO
@@ -287,7 +300,10 @@ func resize_view(screen: Vector2) -> void:
 		if screen.y>screen.x*1.15:factor=0.55
 		# Absolute GPU pixel budget avoids huge buffers on 4K/hi-DPI browsers.
 		factor=minf(factor,sqrt(950000.0/maxf(1.0,screen.x*screen.y)))
-		factor=maxf(0.42,factor)
+		factor=maxf(0.42,factor)*web_quality
+		# On slow mobile GPUs we may downshift from 0.55 to 0.36;
+		# cap the smallest level to keep hull silhouettes identifiable.
+		factor=maxf(0.35,factor)
 	resolution_factor=factor
 	var wanted=Vector2i(maxi(64,roundi(screen.x*factor)),maxi(64,roundi(screen.y*factor)))
 	if stage.size!=wanted:stage.size=wanted
