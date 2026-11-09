@@ -50,6 +50,22 @@ static func card(accent: Color=Color(0,0,0,0),margin: float=10.0) -> StyleBox:
 	style.sheen=.07;style.shadow=.4;style.inner=Color(1,.9,.6,.07);style.accent=accent
 	return style
 
+## Restrained gallery stage for real ship/equipment art.
+## Shared by Market, Decks, Talents and Castles without extra textures.
+static func catalog_art(rim: Color=Color("b08a4c")) -> StyleBoxFlat:
+	var style=StyleBoxFlat.new()
+	style.bg_color=Color("0b2430")
+	style.border_color=Color(rim.r,rim.g,rim.b,.72)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(10)
+	style.content_margin_left=8
+	style.content_margin_right=8
+	style.content_margin_top=8
+	style.content_margin_bottom=8
+	style.shadow_color=Color(0,0,0,.28)
+	style.shadow_size=3
+	return style
+
 static func icon_frame(rim: Color=Color("b08a4c")) -> StyleBox:
 	var style=bevel(Color("27434c"),Color("09141a"),rim,10.0,4.0)
 	style.content_margin_left=4;style.content_margin_right=4;style.content_margin_top=4;style.content_margin_bottom=4
