@@ -47,8 +47,8 @@ func _run() -> void:
 	for tile in promo_cards:
 		var portrait: TextureRect=tile.find_child("HomeActionArt",true,false) as TextureRect
 		all_cinematic=all_cinematic and portrait!=null and portrait.custom_minimum_size.y>=140
-	check(promo_cards.size()==9 and all_cinematic,"all nine discovery cards display larger cinematic artwork")
-	check(hub.body.find_children("HomeActionCard*","PanelContainer",true,false).size()==9,"home has 3 illustrated news teasers and 6 active menu cards rather than a wall of 12")
+	check(promo_cards.size()==4 and all_cinematic,"four focused discovery cards retain their real cinematic artwork")
+	check(hub.body.find_children("HomeActionCard*","PanelContainer",true,false).size()==4,"home removes the redundant teaser wall and retains four direct adventure links")
 	check(hub.body.find_child("HubTab_friends",true,false)!=null and hub.body.find_child("HubTab_logbook",true,false)!=null,"home provides navigation to friends and logbook")
 	var hero: Node=hub.body.find_child("FeaturedNews",true,false)
 	var sail: Node=hub.body.find_child("SailButton",true,false)
@@ -62,7 +62,7 @@ func _run() -> void:
 	hub._featured_shift(1)
 	check(hub.featured_action.text=="BONUSKARTEN ÖFFNEN" and str(hub.NEWS_FRAMES[hub.featured_index].action)=="Bonuskarten","feature carousel links to Bonuskarten rather than always starting open sea")
 	hub._switch_home_section("SCHIFF & HANDEL")
-	check(hub.home_section=="SCHIFF & HANDEL" and hub.body.find_children("HomeActionCard*","PanelContainer",true,false).size()==9,"ship/market/decks/castles are one compact home category")
+	check(hub.home_section=="SCHIFF & HANDEL" and hub.body.find_children("HomeActionCard*","PanelContainer",true,false).size()==4,"four ship/market/deck/castle cards offer a focused compact home section")
 	hub._switch_home_section("KAPITÄN & BONUS")
 	check(hub.home_section=="KAPITÄN & BONUS" and hub.body.find_child("HomeDailyButton",true,false)!=null,"captain tab and daily shortcut are accessible without scrolling through 12 menus")
 	hub._switch_home_section("ABENTEUER")
