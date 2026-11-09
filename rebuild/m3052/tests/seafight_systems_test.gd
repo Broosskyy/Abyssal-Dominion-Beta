@@ -206,7 +206,7 @@ func _initialize() -> void:
 	# Ten identical decks replace the old unique hull/hunter/etc. classes.
 	sim=SIM.new()
 	check(sim.grant_deck("armor",0) and sim.deck_slots[0]==0 and sim.decks[0].type=="cannon","old deck drop ID normalizes into physical Gold I standard deck")
-	check(sim.cannon_slots()==11 and int(sim.player.max_hp)==sim.PLAYER_HP,"standard deck grants cannon slots, not former armor perks")
+	check(sim.cannon_slots()==11 and int(sim.player.max_hp)==sim.PLAYER_HP+40 and sim.mounted_deck_hp()==40,"one Gold I standard deck now grants one cannon slot AND 40 real Rumpf-HP")
 	var essence: int=sim.essence
 	check(sim.grant_deck("armor",0) and sim.essence==essence and sim.decks.size()==2,"identical deck copies coexist instead of being converted to essence")
 	sim.grant_deck("hunter",1)
