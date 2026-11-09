@@ -25,8 +25,7 @@ void fragment(){
   sea+=(tone-.28)*vec3(.085,.145,.164);
   sea*=mix(vec3(1.),region_tint/vec3(.75,1.14,1.12),.45);
   COLOR=vec4(clamp(sea,0.,1.),1.);
-  return;
- }
+ }else{
  // Quiet, world-anchored water: broad depth variation and restrained surface light.
  // Two differently scaled samples break up tiling without sharpened grain or sine stripes.
  vec2 flow=vec2(TIME*.006,-TIME*.004);
@@ -52,4 +51,5 @@ void fragment(){
  // The Caribbean stays teal; north and shadow waters retain their authored regional identity.
  sea*=mix(vec3(1.),region_tint/vec3(.75,1.14,1.12),.45);
  COLOR=vec4(clamp(sea,0.,1.),1.);
+ }
 }
