@@ -5,6 +5,7 @@ uniform vec2 camera_world=vec2(2100.,1450.);
 uniform vec2 viewport_size=vec2(1280.,720.);
 uniform float map_zoom=.96;
 uniform vec3 region_tint=vec3(.75,1.14,1.12);
+uniform bool web_classic=false; // Classic browser sea: one cheap tiled texture lookup
 uniform bool web_fast=false; // Browser fast mode only: lower-cost ocean surface
 float water_hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float water_noise(vec2 p){
@@ -13,7 +14,15 @@ float water_noise(vec2 p){
 }
 void fragment(){
  vec2 world=(UV-.5)*viewport_size/map_zoom+camera_world;
- if(web_fast){
+ if(web_classic){
+  // Seafight-era calm teal sea: one world-anchored texture sample,
+  // no per-pixel trig, no procedural hash, no particle/reflection passes.
+  vec3 tile=texture(sea_tile,world/610.).rgb;
+  float detail=dot(tile,vec3(.213,.715,.072));
+  vec3 sea=vec3(.026,.192,.313)+vec3(.072,.097,.111)*(detail-.32);
+  sea*=mix(vec3(1.),region_tint/vec3(.75,1.14,1.12),.38);
+  COLOR=vec4(clamp(sea,0.,1.),1.);
+ }else if(web_fast){
   // At 1080x2340 this saves millions of sine/hash evaluations and four
   // texture samples per frame. It retains the animated, world-anchored sea
   // tile, a broad shaded gradient and region tint without noisy CPU work.
