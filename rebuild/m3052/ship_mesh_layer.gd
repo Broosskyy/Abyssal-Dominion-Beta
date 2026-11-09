@@ -47,7 +47,11 @@ var model_instances: Dictionary={}
 var model_instance_keys: Dictionary={}
 var model_instance_skins: Dictionary={}
 var mode := "hybrid"
-var resolution_factor := 0.8
+var resolution_factor := 1.0
+# Browser WebGL2 previously rendered a FULL device-resolution alpha 3D pass
+# at 4x MSAA on top of the animated 2D ocean (2.5M pixels on 1080x2340 phones).
+# The reduced internal 3D buffer stretches smoothly; world/UI remain crisp.
+var web_performance := OS.has_feature("web")
 # M3099: preserve native shaded material, ensure back faces of sails are visible.
 var gameplay_double_sided_count := 0
 
@@ -104,7 +108,7 @@ func _ready() -> void:
 	stage.transparent_bg=true
 	stage.render_target_clear_mode=SubViewport.CLEAR_MODE_ALWAYS
 	stage.render_target_update_mode=SubViewport.UPDATE_DISABLED
-	stage.msaa_3d=Viewport.MSAA_4X
+	stage.msaa_3d=Viewport.MSAA_DISABLED if web_performance else Viewport.MSAA_4X
 	add_child(stage)
 	world_root=Node3D.new()
 	world_root.name="Fleet3D"
@@ -265,11 +269,25 @@ func projected_hull_bottom(actor: Dictionary) -> float:
 	var screen_center: Vector2=host.get_canvas_transform()*host._visual_actor_pos(actor)
 	return screen_center.y+maximum-origin_screen.y
 
+func set_web_performance(enabled: bool) -> void:
+	web_performance=enabled
+	if stage==null:return
+	stage.msaa_3d=Viewport.MSAA_DISABLED if web_performance else Viewport.MSAA_4X
+	if host!=null:resize_view(host.get_viewport_rect().size)
+
 func resize_view(screen: Vector2) -> void:
 	position=Vector2.ZERO
 	size=screen
 	if stage==null:return
-	var factor=1.0 # Render at native screen resolution; source texture mips provide downsampling.
+	var factor: float=1.0
+	if web_performance:
+		# Preserve 2.5D/3D geometry and gameplay; reduce ONLY the expensive
+		# transparent ship SubViewport's pixels and disable 4x MSAA.
+		factor=0.72 if screen.x<900.0 else 0.60
+		if screen.y>screen.x*1.15:factor=0.55
+		# Absolute GPU pixel budget avoids huge buffers on 4K/hi-DPI browsers.
+		factor=minf(factor,sqrt(950000.0/maxf(1.0,screen.x*screen.y)))
+		factor=maxf(0.42,factor)
 	resolution_factor=factor
 	var wanted=Vector2i(maxi(64,roundi(screen.x*factor)),maxi(64,roundi(screen.y*factor)))
 	if stage.size!=wanted:stage.size=wanted
