@@ -2340,7 +2340,7 @@ func _open_ship() -> void:
 		var index=int(sim.deck_slots[slot])
 		if index>=0:
 			var deck: Dictionary=sim.decks[index]
-			_row(deck_icons[str(deck.type)],"PLATZ %d · %s\n%s" % [slot+1,_deck_title(deck).to_upper(),_deck_effect(deck)],44,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
+			_row(deck_icons.cannon,"PLATZ %d · %s\n%s" % [slot+1,_deck_title(deck),_deck_effect(deck)],44,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
 		else:_row(null,"PLATZ %d · FREI\nDecks montierst du angedockt im Hafen." % (slot+1),44,Color("4a4234"))
 	var tide=float(sim.buffs.tide_deck)
 	_row(deck_icons.tide,"GEZEITENDECK · "+("aktiv %s · +10 Kanonenplätze" % _clock_text(tide) if tide>0 else "nicht aktiv"),44,SEA_MARKS.DECK_COLORS.tide if tide>0 else Color("4a4234"))
@@ -2881,11 +2881,10 @@ func _upgrade_row(key: String,parent: Node=null) -> void:
 	if cost>=0 and not gated:_with_icon(upgrade,painted.gold_coins)
 
 func _deck_title(deck: Dictionary) -> String:
-	return "%s %s" % [CONTENT.DECKS[str(deck.type)].name,CONTENT.DECK_TIERS[int(deck.tier)]]
+	return "%sDECK · STUFE %d/%d" % [str(CONTENT.DECK_TIERS[int(deck.tier)]).to_upper(),int(deck.get("stage",1)),CONTENT.DECK_STAGE_MAX]
 
 func _deck_effect(deck: Dictionary) -> String:
-	var config: Dictionary=CONTENT.DECKS[str(deck.type)]
-	return str(config.effect) % int(config.values[int(deck.tier)])
+	return "+%d KANONENPLÄTZE · BETA-WERT" % sim.deck_cannon_bonus(int(deck.tier),int(deck.get("stage",1)))
 
 const DECK_ART := {"cannon":"cannon_1","armor":"upgrade_hull","hunter":"harpoon_1","navigation":"upgrade_sails","logistics":"castle_crew"}
 
@@ -3044,10 +3043,10 @@ func _open_kessel() -> void:
 	_section("PREISTABELLE · OFFEN EINSEHBAR")
 	var table=_grid(2)
 	for entry: Dictionary in CONTENT.KESSEL_POOL:
-		var pack=" ×%d" % int(entry.amount) if int(entry.amount)>1 and str(entry.id)!="tide_deck" else ""
+		var pack=" ×%d" % int(entry.amount) if int(entry.amount)>1 and str(entry.id) not in ["tide_deck","storm_deck"] else ""
 		var label=_note("%d %% · %s%s · %s" % [entry.weight,entry.name,pack,CONTENT.RARITIES[int(entry.rarity)]],RARITY_INK[int(entry.rarity)],table)
 		label.add_theme_font_size_override("font_size",13)
-	_note("Doppelte Decks werden in %d Essenz umgewandelt. Essenz gibt es nur im Spiel, nicht gegen Echtgeld." % CONTENT.DUPLICATE_DECK_ESSENCE,Color("84999c"))
+	_note("Mehrere identische Decks sind ausdrücklich erlaubt. Nur bei vollem Decklager gibt es für weitere Deckfunde %d Essenz." % CONTENT.DUPLICATE_DECK_ESSENCE,Color("84999c"))
 
 func _result_icon(id: String) -> Texture2D:
 	if id=="fragment" or id.begins_with("scroll"):return painted.scroll_fragment
@@ -3063,6 +3062,7 @@ func _result_icon(id: String) -> Texture2D:
 		"shield_charge":return painted.supply_shield
 		"essence":return painted.essence_flask
 		"tide_deck":return painted.tide_deck
+		"storm_deck":return deck_icons.storm
 		"blessing":return painted.crystal_blessing
 	return painted.reward_chest
 
