@@ -26,6 +26,19 @@ func _run() -> void:
 	check(game.sim.player.skin==0,"M3099 new players start with only shaded ship")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"nine NPCs + shaded captain GLB load")
 	check(game.mesh_layer.model_scenes.size()==11,"nine NPC GLBs plus two player options load")
+	# Browser regression: only the transparent 3D fleet is rendered smaller;
+	# original GLB scenes, ship steering and the full-resolution touch HUD stay.
+	game.mesh_layer.set_web_performance(true)
+	game.mesh_layer.resize_view(Vector2(1080,2340))
+	check(game.mesh_layer.stage.msaa_3d==Viewport.MSAA_DISABLED,"WebGL fast renderer disables expensive 4× MSAA without touching GLB fleet")
+	check(game.mesh_layer.resolution_factor<=0.56 and game.mesh_layer.stage.size.x<=600 and game.mesh_layer.stage.size.y<=1310,"1080×2340 phone uses a bounded sub-million-pixel 3D buffer")
+	check(game.mesh_layer.has_complete_fleet() and game.mesh_layer.can_render_actor(game.sim.player),"web fast quality retains ALL physical ship GLB models")
+	game.ocean.set_shader_parameter("web_fast",true)
+	check(bool(game.ocean.get_shader_parameter("web_fast")),"web fast setting selects cheaper animated ocean shader")
+	game.ocean.set_shader_parameter("web_fast",false)
+	game.mesh_layer.set_web_performance(false)
+	game.mesh_layer.resize_view(game.get_viewport_rect().size)
+	check(game.mesh_layer.stage.msaa_3d==Viewport.MSAA_4X and is_equal_approx(game.mesh_layer.resolution_factor,1.0),"native/quality mode retains the original native-resolution 4× MSAA renderer")
 	check(game.mesh_layer.has_player_ship() and game.mesh_layer.has_elite_1_ship(),"shaded and Black Crown can be player ships")
 	check(game.mesh_layer.player_key_for_skin(30)=="schattenkriegsschiff_shaded" and game.mesh_layer.player_key_for_skin(1)=="black_crown_corsair_elite_test","retired skins migrate and original test routes to its GLB")
 	for i in range(2,12):
