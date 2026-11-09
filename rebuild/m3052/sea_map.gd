@@ -219,6 +219,14 @@ var vfx_intensity := 1.35
 # Browser only. Native APK/desktop visuals keep their existing fidelity.
 # The player may opt back into full-quality WebGL2 from Anzeige → Grafik.
 var web_fast_mode := OS.has_feature("web")
+# Browser quality controller samples actual presented frames only once per
+# 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
+var web_fps_clock: float=0.0
+var web_fps_frames: int=0
+var web_fps_warmup: float=0.0
+var web_fps_last: float=0.0
+var web_quality_good_windows: int=0
+var web_minimap_clock: float=0.0
 # Independent from combat VFX: mobile users can disable mesh rocking and wakes.
 var ship_animations_enabled := true
 var wake_effects_enabled := true
@@ -557,6 +565,7 @@ func _draw_bow_spray(actor: Dictionary,point: Vector2,heading: Vector2,length: f
 		draw_circle(out,1.8,Color(.83,.98,1.0,.28*intensity))
 
 func _process(delta: float) -> void:
+	_update_web_auto_quality(delta)
 	status_age += delta
 	if modal_backdrop!=null:modal_backdrop.visible=modal.visible
 	if modal.visible:scroll_hint.queue_redraw()
@@ -595,10 +604,15 @@ func _process(delta: float) -> void:
 	ocean.set_shader_parameter("region_tint",CONTENT.MAPS[sim.map_id].tint)
 	chart_mini.camera_world = camera.position
 	chart_mini.view_world = get_viewport_rect().size/camera.zoom
-	chart_mini.queue_redraw()
+	# Minimap icons (not the chart or ship labels) need only ~10 updates/s.
+	# Avoid redrawing this entire secondary canvas every display frame on WebGL.
+	web_minimap_clock+=delta
+	if not (OS.has_feature("web") and web_fast_mode) or web_minimap_clock>=0.10:
+		web_minimap_clock=0.0
+		chart_mini.queue_redraw()
 	_sync_ruler()
 	refresh_clock += delta
-	if refresh_clock > 0.12:
+	if refresh_clock > (0.20 if OS.has_feature("web") and web_fast_mode else 0.12):
 		refresh_clock = 0
 		_refresh_ui()
 	save_clock += delta
@@ -3643,7 +3657,7 @@ func _open_display() -> void:
 			var fast_button=_action("WEB-LEICHTMODUS: "+("AN · EMPFOHLEN" if web_fast_mode else "AUS · MAXIMALE GRAFIK"),func():_set_web_fast_mode(not web_fast_mode),"tab_on" if web_fast_mode else "normal")
 			fast_button.name="WebFastModeToggle"
 			_note("Handy-Browser: kleinere interne 3D-Zeichenfläche ohne 4× Kantenglättung, vereinfachtes bewegtes Meer und weniger Effektpartikel. Schiffe, Kanonen, Beute und Steuerung bleiben vollständig erhalten.",Color("a1dacf"))
-			_note("AKTUELLE FPS: %d · 3D-AUFLÖSUNG: %d%%" % [Engine.get_frames_per_second(),roundi(float(mesh_layer.resolution_factor)*100.0)] if mesh_layer!=null else "Grafik wird initialisiert",Color("f1d39a"))
+			_note("FPS: %d · 3D-AUFLÖSUNG: %d%% · AUTOMATISCH" % [roundi(web_fps_last if web_fps_last>0 else float(Engine.get_frames_per_second())),roundi(float(mesh_layer.resolution_factor)*100.0)] if mesh_layer!=null and web_fast_mode else ("MAXIMALE 3D-QUALITÄT · AUTOMATIK AUS" if mesh_layer!=null else "Grafik wird initialisiert"),Color("f1d39a"))
 		_section("GRAFIKMODUS")
 		for option in [["hybrid","2,5D / HYBRID"],["3d","3D"]]:
 			var key: String=str(option[0])
@@ -4265,12 +4279,47 @@ func _persist_display_preferences() -> void:
 ## Browser-only render budget: no effect on collision, AI ticks, camera,
 ## movement speed, save progress, network tick rate, or native Android UI.
 func _apply_web_performance() -> void:
+	# Start quality high; only sustained slow frames reduce the ship GPU pass.
+	web_fps_clock=0.0
+	web_fps_frames=0
+	web_fps_warmup=0.0
+	web_fps_last=0.0
+	web_quality_good_windows=0
+	web_minimap_clock=0.0
 	var active: bool=OS.has_feature("web") and web_fast_mode
 	if mesh_layer!=null:mesh_layer.set_web_performance(active)
 	if ocean!=null:ocean.set_shader_parameter("web_fast",active)
 	if OS.has_feature("web"):
 		var small_touch: bool=DisplayServer.is_touchscreen_available() or get_viewport_rect().size.y>get_viewport_rect().size.x
 		Engine.max_fps=(30 if small_touch else 45) if active else 0
+
+## Adapt 3D resolution ONLY. Never alter simulation ticks, NPC density,
+## steering, projectile trajectories or the sharp full-resolution HUD.
+func _update_web_auto_quality(delta: float) -> void:
+	if not OS.has_feature("web") or not web_fast_mode or mesh_layer==null:return
+	if loading_left>0.0 or delta<=0.0:return
+	web_fps_warmup+=delta
+	if web_fps_warmup<4.0:return
+	web_fps_clock+=delta
+	web_fps_frames+=1
+	if web_fps_clock<2.5:return
+	var measured_fps: float=float(web_fps_frames)/maxf(web_fps_clock,0.1)
+	web_fps_last=measured_fps
+	web_fps_clock=0.0
+	web_fps_frames=0
+	var touch_browser: bool=DisplayServer.is_touchscreen_available() or get_viewport_rect().size.y>get_viewport_rect().size.x
+	var target_fps: float=30.0 if touch_browser else 45.0
+	if measured_fps<target_fps*0.82:
+		web_quality_good_windows=0
+		mesh_layer.set_web_quality(float(mesh_layer.web_quality)-0.09)
+	elif measured_fps>target_fps*0.96:
+		web_quality_good_windows+=1
+		# Climb more slowly than we downshift, to avoid quality oscillation.
+		if web_quality_good_windows>=3:
+			web_quality_good_windows=0
+			mesh_layer.set_web_quality(float(mesh_layer.web_quality)+0.04)
+	else:
+		web_quality_good_windows=0
 
 func _set_web_fast_mode(enabled: bool) -> void:
 	if not OS.has_feature("web"):return
