@@ -79,7 +79,7 @@ $GODOT_HEAD_INCLUDE
    const exit = document.exitFullscreen || document.webkitExitFullscreen;
    try { if (exit) await exit.call(document); } catch (_) { tell('Nutze die Zurück-Taste, um das Vollbild zu verlassen.'); }
   } else await enterFullscreen();
-  canvas.focus({preventScroll:true});
+  updateFullscreen(); canvas.focus({preventScroll:true});
  });
  function updateFullscreen() {
   const label = fullscreenElement() ? 'Vollbild verlassen' : 'Vollbild einschalten';

@@ -27,7 +27,7 @@ const server = http.createServer((req,res) => {res.setHeader('Content-Type', req
    await page.waitForFunction(() => document.querySelector('#launch').hidden);
    assert.equal(await page.locator('#fullscreen').isVisible(), true);
    await page.locator('#fullscreen').click();
-   await page.waitForFunction(() => !document.fullscreenElement);
+   await page.waitForFunction(() => !document.fullscreenElement && document.querySelector('#fullscreen').getAttribute('aria-label') === 'Vollbild einschalten');
    assert.equal(await page.locator('#fullscreen').getAttribute('aria-label'), 'Vollbild einschalten');
    // Start without fullscreen, then recover a denied fullscreen request.
    await page.reload();
