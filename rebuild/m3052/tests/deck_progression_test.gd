@@ -119,7 +119,7 @@ func _initialize() -> void:
 	check(not fleet.upgrade_mounted_decks() and fleet.decks[0].tier==0 and fleet.decks[0].stage==5,"batch upgrade cannot bypass captain level")
 	fleet.level=3
 	preview=fleet.deck_fleet_upgrade_preview()
-	check(not preview.can_upgrade and preview.reason.contains("Essenz"),"material promotion checks full bundle essence")
+	check(not preview.can_upgrade and preview.reason.to_lower().contains("essenz"),"material promotion checks full bundle essence")
 	fleet.essence=2
 	preview=fleet.deck_fleet_upgrade_preview()
 	var before_gold: int=int(fleet.player.gold)
