@@ -210,14 +210,22 @@ func _copy_invite() -> void:
 # information hubs. Promotions are only links to real existing game areas;
 # no fake payment offers, server events or referral rewards are displayed.
 func _home_nav() -> void:
+	# Ordinary Control wrapper prevents the 6-button HBox minimum width
+	# propagating into the modal PanelContainer on portrait phones.
+	var viewport=Control.new()
+	viewport.name="HomeNavViewport"
+	viewport.custom_minimum_size.y=60
+	viewport.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	viewport.clip_contents=true
+	body.add_child(viewport)
 	var swipe=ScrollContainer.new()
 	swipe.name="HomeNavigationScroller"
-	swipe.custom_minimum_size.y=58
 	swipe.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_AUTO
 	swipe.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
 	swipe.follow_focus=true
 	swipe.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	body.add_child(swipe)
+	viewport.add_child(swipe)
+	swipe.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var items=HBoxContainer.new()
 	items.add_theme_constant_override("separation",8)
 	swipe.add_child(items)
@@ -309,15 +317,28 @@ func _show_home() -> void:
 	# Separate, swipeable groups avoid forcing every menu into an enormous
 	# lobby wall. The shared menu content remains available via the sea HUD.
 	_label("DEINE SPIELBEREICHE",true)
+	var section_view=Control.new()
+	section_view.name="HomeSectionsViewport"
+	section_view.custom_minimum_size.y=58
+	section_view.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	section_view.clip_contents=true
+	body.add_child(section_view)
+	var section_scroll=ScrollContainer.new()
+	section_scroll.name="HomeSectionScroller"
+	section_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_AUTO
+	section_scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+	section_scroll.follow_focus=true
+	section_view.add_child(section_scroll)
+	section_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var sections=HBoxContainer.new()
 	sections.name="HomeSections"
 	sections.add_theme_constant_override("separation",6)
-	body.add_child(sections)
+	section_scroll.add_child(sections)
 	for section in ["ABENTEUER","SCHIFF & HANDEL","KAPITÄN & BONUS"]:
 		var choice: String=section
 		var tab=_dashboard_button(sections,section,func():_switch_home_section(choice),home_section==section)
 		tab.name="HomeSection_"+section.replace(" ","_").replace("&","UND")
-		tab.custom_minimum_size.y=52
+		tab.custom_minimum_size=Vector2(152,52)
 	var tiles=_dashboard_grid(3)
 	match home_section:
 		"ABENTEUER":
@@ -372,14 +393,20 @@ func _show_daily_rewards() -> void:
 	if not available:next_day=sim.rewards.streak
 	# All seven days stay in one swipeable reward strip on phones instead
 	# of producing four tall stacked rows that hide the claim button.
+	var calendar_view=Control.new()
+	calendar_view.name="DailyCalendarViewport"
+	calendar_view.custom_minimum_size.y=214
+	calendar_view.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	calendar_view.clip_contents=true
+	body.add_child(calendar_view)
 	var calendar=ScrollContainer.new()
 	calendar.name="DailyCalendarScroller"
-	calendar.custom_minimum_size.y=214
 	calendar.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_AUTO
 	calendar.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
 	calendar.follow_focus=true
 	calendar.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	body.add_child(calendar)
+	calendar_view.add_child(calendar)
+	calendar.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var board=HBoxContainer.new()
 	board.add_theme_constant_override("separation",8)
 	calendar.add_child(board)
