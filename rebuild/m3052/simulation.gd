@@ -1080,6 +1080,9 @@ func _grant(id: String, amount: int, title: String, rarity: int) -> Dictionary:
 		"tide_deck":
 			add_tide_deck(float(amount))
 			text = "Gezeitendeck +%d min" % roundi(amount / 60.0)
+		"storm_deck":
+			add_special_deck("storm_deck",float(amount))
+			text = "Runendeck +%d min" % roundi(amount / 60.0)
 		"scroll0", "scroll1", "scroll2":
 			scrolls[int(id.right(1))] += amount
 			text = "%s-Schriftrolle" % CONTENT.BONUS_TIERS[int(id.right(1))].name
@@ -1092,7 +1095,7 @@ func _grant(id: String, amount: int, title: String, rarity: int) -> Dictionary:
 				var type: String = parts[1] if parts.size() > 1 else CONTENT.DECK_KEYS[rng.randi_range(0, CONTENT.DECK_KEYS.size() - 1)]
 				var tier := int(parts[2]) if parts.size() > 2 else 0
 				var fresh := grant_deck(type, tier)
-				text = "%s %s%s" % [CONTENT.DECKS[type].name, CONTENT.DECK_TIERS[tier], "" if fresh else " · Duplikat → %d Essenz" % CONTENT.DUPLICATE_DECK_ESSENCE]
+				text = "%sdeck Stufe I%s" % [CONTENT.DECK_TIERS[clampi(tier,0,CONTENT.DECK_TIERS.size()-1)],"" if fresh else " · Lager voll → %d Essenz" % CONTENT.DUPLICATE_DECK_ESSENCE]
 	return {"id": id, "text": text, "rarity": rarity}
 
 # --- Bonus maps --------------------------------------------------------------------
@@ -1778,8 +1781,10 @@ func restore_save(data: Dictionary) -> bool:
 	var saved_decks: Variant=data.get("decks",[])
 	if saved_decks is Array:
 		for entry: Variant in saved_decks:
-			if entry is Dictionary and CONTENT.DECKS.has(str(entry.get("type",""))):
-				decks.append({"type":str(entry.type),"tier":clampi(int(entry.get("tier",0)),0,CONTENT.DECK_TIERS.size()-1)})
+			if entry is Dictionary and str(entry.get("type","")) in CONTENT.DECK_LEGACY_TYPES and decks.size()<CONTENT.DECK_INVENTORY_MAX:
+				# Keep physical purchases, material and mount index. Former
+				# role-specific copies now grant only cannon capacity.
+				decks.append({"type":"cannon","tier":clampi(int(entry.get("tier",0)),0,CONTENT.DECK_TIERS.size()-1),"stage":clampi(int(entry.get("stage",1)),1,CONTENT.DECK_STAGE_MAX)})
 	deck_slots=[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
 	var saved_slots: Variant=data.get("deck_slots",[])
 	if saved_slots is Array:
