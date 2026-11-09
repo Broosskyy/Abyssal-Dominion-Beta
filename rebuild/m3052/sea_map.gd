@@ -19,6 +19,16 @@ const MESH_SHIPS_PATH := "res://ship_mesh_layer.gd"
 const CLASSIC_SLOOP: Texture2D=preload("res://assets/classic/classic_sloop.svg")
 const CLASSIC_BRIG: Texture2D=preload("res://assets/classic/classic_brig.svg")
 const CLASSIC_GALLEON: Texture2D=preload("res://assets/classic/classic_galleon.svg")
+const CLASSIC_ATLAS_ROOT := "res://assets/classic_baked/"
+const CLASSIC_ATLAS_COLUMNS := 8
+# The still images are baked in CI from the exact authored 3D GLB meshes.
+# 8 images share one atlas per hull/paint: no 3D work at browser runtime.
+const CLASSIC_MODEL_KEYS := [
+	"schattenkriegsschiff_shaded","black_crown_corsair_elite_test",
+	"old_harbor_trader","merchant_brig_3002","merchant_brig_2921",
+	"merchant_brig_2912","weathered_voyager","weathered_junk",
+	"emerald_voyager","midnight_mariner","crimson_tide_galley"
+]
 const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
@@ -224,6 +234,8 @@ var vfx_intensity := 1.35
 # Browser only. Native APK/desktop visuals keep their existing fidelity.
 # The player may opt back into full-quality WebGL2 from Anzeige → Grafik.
 var browser_classic := OS.has_feature("web")
+var classic_atlases: Dictionary={}
+var classic_heading_cache: Dictionary={}
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
 # 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
@@ -403,6 +415,17 @@ func _sharp_zoom() -> float:
 	return desired_zoom * clampf(get_viewport_rect().size.y / 720.0, 1.0, 1.7)
 
 func _load_assets() -> void:
+	if browser_classic:
+		var baked_keys: Array[String]=[]
+		for model_key: String in CLASSIC_MODEL_KEYS:baked_keys.append(model_key)
+		for index in range(1,11):baked_keys.append("elite_%02d" % index)
+		baked_keys.append_array(["event_halloween","event_columbus"])
+		for key: String in baked_keys:
+			var file: String=CLASSIC_ATLAS_ROOT+key+".png"
+			if ResourceLoader.exists(file):
+				classic_atlases[key]=load(file) as Texture2D
+			else:
+				push_error("Missing original-GLB browser sprite atlas: "+file)
 	for key in ["kraken","serpent","crab","glitter","pumpkin"]:expansion_art[key]=load("res://assets/expansion/"+key+".webp")
 	for name in ["anchor","ship","book","compass","chest","gear","plus","minus","focus","arrow","target_cycle"]:hud_icons[name]=load("res://assets/ui/icons/"+name+".svg")
 	for key in ["cannon","armor","hunter","navigation","logistics","tide","storm","salvage","blessing"]:
@@ -1026,19 +1049,48 @@ func _classic_ship_texture(actor: Dictionary) -> Texture2D:
 	elif key.contains("galley") or key.contains("mariner"):choice=2
 	return CLASSIC_SLOOP if choice==0 else CLASSIC_BRIG if choice==1 else CLASSIC_GALLEON
 
+func _classic_atlas_key(actor: Dictionary) -> String:
+	if int(actor.get("id",-1))==0:
+		var skin: int=int(actor.get("skin",0))
+		if skin==0:return "schattenkriegsschiff_shaded"
+		if skin==1:return "black_crown_corsair_elite_test"
+		if skin>=2 and skin<=11:return "elite_%02d" % (skin-1)
+		if skin==12:return "event_halloween"
+		if skin==13:return "event_columbus"
+		return "schattenkriegsschiff_shaded"
+	return str(actor.get("visual_key",""))
+
+func _classic_frame_for_actor(actor: Dictionary) -> int:
+	var id: int=int(actor.get("id",-1))
+	var before: int=int(classic_heading_cache.get(id,-1))
+	var heading: Vector2=actor.get("heading",Vector2.RIGHT)
+	var current: int=VISUALS.heading_eight(heading,before)
+	classic_heading_cache[id]=current
+	return current
+
 func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
+	var key: String=_classic_atlas_key(actor)
+	var atlas: Texture2D=classic_atlases.get(key) as Texture2D
+	if atlas!=null:
+		# Frame 0 = North; 1 = NE; 2 = East; ... 7 = NW, exactly as
+		# ship_visuals.heading_eight and the offline Godot GLB renderer.
+		# The camera perspective is ALREADY baked for each heading:
+		# never rotate 2D atlas frames or the sails become inaccurate.
+		var heading_index: int=_classic_frame_for_actor(actor)
+		var frame_width: float=float(atlas.get_width())/float(CLASSIC_ATLAS_COLUMNS)
+		var frame_height: float=float(atlas.get_height())
+		var side: float=length*1.38
+		var target: Rect2=Rect2(point-Vector2(side,side)*.5,Vector2(side,side))
+		var source: Rect2=Rect2(float(heading_index)*frame_width,0.0,frame_width,frame_height)
+		draw_texture_rect_region(atlas,target,source)
+		return
+	# Editor/offline fallback only. Production browser CI rejects any missing
+	# baked atlas; it never substitutes hand-drawn hulls for the actual GLBs.
 	var art: Texture2D=_classic_ship_texture(actor)
 	if art==null:return
-	var h: float=length*0.667
-	var color: Color=Color.WHITE
-	if int(actor.get("id",0))==0 and int(actor.get("skin",0))>1:
-		color=_ship_design_accent(int(actor.get("skin",0))).lerp(Color.WHITE,0.74)
+	var h: float=length*.667
 	draw_set_transform(point,heading.angle(),Vector2.ONE)
-	draw_texture_rect(art,Rect2(Vector2(-length*.5,-h*.5),Vector2(length,h)),false,color)
-	# One distinctive pennant for elite player designs, without repainting
-	# the sprite or adding any additional material/shader.
-	if int(actor.get("id",0))==0 and int(actor.get("skin",0))>1:
-		draw_colored_polygon(PackedVector2Array([Vector2(-length*.29,-h*.09),Vector2(-length*.41,-h*.24),Vector2(-length*.29,-h*.24)]),_ship_design_accent(int(actor.get("skin",0))))
+	draw_texture_rect(art,Rect2(Vector2(-length*.5,-h*.5),Vector2(length,h)),false)
 	draw_set_transform(Vector2.ZERO)
 
 func _plate_pixels() -> float:
