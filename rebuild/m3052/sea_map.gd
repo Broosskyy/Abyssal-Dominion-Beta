@@ -131,6 +131,8 @@ const AMMO_UI := [
 	{"name":"Gaskugeln","use":"Gaswolken · Grafik-Beta","icon":"gas"}
 ]
 var nav_buttons: Array[Button] = []
+var nav_scroll: ScrollContainer
+var nav_strip: HBoxContainer
 var quest_panel: Panel
 var quest_text: Label
 var quest_claim: Button
@@ -1301,9 +1303,22 @@ func _build_ui() -> void:
 	kills_label=_text(chrome,"",12,Color("eadfc6"))
 	for label in [gold_label,kills_label]:label.clip_text=true;label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
 	var nav_items=[["Schiff","nav_ship","Schiff"],["Werft","nav_shipyard","Werft"],["Hafen","nav_harbor","Hafen"],["Logbuch","nav_quests","Logbuch"],["Bonus","nav_bonus","Bonuskarten"],["Kessel","nav_kessel","Kessel"],["Gilde","nav_guild","Gilde"],["Markt","gold_coins","Markt"],["Menü","nav_menu","Spielinfo"]]
+	# Use a real horizontal scroll viewport on narrow phones. Keep all nine
+	# commands readable and reachable instead of shrinking their hit areas.
+	nav_scroll=ScrollContainer.new()
+	nav_scroll.name="SeaHeaderNavigation"
+	nav_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	nav_scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+	nav_scroll.scroll_deadzone=12
+	nav_scroll.follow_focus=true
+	chrome.add_child(nav_scroll)
+	nav_strip=HBoxContainer.new()
+	nav_strip.name="SeaHeaderNavigationItems"
+	nav_strip.add_theme_constant_override("separation",3)
+	nav_scroll.add_child(nav_strip)
 	for item in nav_items:
 		var kind: String=item[2]
-		var button=_orb(chrome,str(item[0]),painted[item[1]],func():_open_modal(kind),str(item[0]),true)
+		var button=_orb(nav_strip,str(item[0]),painted[item[1]],func():_open_modal(kind),str(item[0]),true)
 		button.tooltip_text=kind
 		button.set_meta("modal",kind);nav_buttons.append(button)
 	for tag in ["EXP","HP","SCHILD"]:
@@ -1408,7 +1423,8 @@ func _build_ui() -> void:
 	modal_title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;modal_title.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
 	modal_title.clip_text=true;modal_title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 	modal_title.add_theme_color_override("font_outline_color",Color("2a0c06"));modal_title.add_theme_constant_override("outline_size",5)
-	modal_close=_button(modal,"×",func():modal.hide();_save_progress(),"close")
+	modal_close=_button(modal,"×",_close_modal,"close")
+	modal_close.name="ModalCloseButton"
 	modal_close.add_theme_font_size_override("font_size",26);modal_close.tooltip_text="Schließen";modal_close.clip_text=false
 	modal_back=_button(modal,"‹ ZURÜCK",_back_modal);modal_back.name="BackButton";modal_back.add_theme_font_size_override("font_size",12)
 	# Scrolling category tabs avoid tiny/unreadable buttons on portrait phones.
@@ -1497,10 +1513,14 @@ func _layout() -> void:
 	var pill_w=minf(220.0,s.x*.3)
 	_place(staff_pill,(s.x-pill_w)*.5,header+4,pill_w,22)
 	var nav_left=wallet+8
-	var nav_span=meter_x-10-nav_left
-	var nw=minf(nav_span/nav_buttons.size(),98.0)
-	var nav_x=nav_left+(nav_span-nw*nav_buttons.size())*.5
-	for i in nav_buttons.size():_place(nav_buttons[i],nav_x+i*nw+1,2,nw-3,header-4)
+	var nav_span=maxf(1.0,meter_x-10-nav_left)
+	_place(nav_scroll,nav_left,1,nav_span,header-2)
+	# The HBox owns child positions; width is never reduced below a
+	# readable 64px touch target even when only one fits at a time.
+	var nav_button_w=minf(98.0,maxf(64.0,nav_span/float(nav_buttons.size())-3.0))
+	for nav: Button in nav_buttons:
+		nav.custom_minimum_size=Vector2(nav_button_w,header-4)
+		nav.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
 	# Left column sits inside the row-letter ruler.
 	var left=22.0
 	var top=header+18
@@ -1815,8 +1835,7 @@ func _toggle_ammo() -> void:
 	else:_open_modal("Munition")
 
 func _close_ammo() -> void:
-	modal.hide();modal_backdrop.hide()
-	suppress_tap_until=Time.get_ticks_msec()+250
+	_close_modal()
 	_refresh_ui()
 
 func _choose_ammo(index: int) -> void:
@@ -1921,10 +1940,20 @@ func _open_modal(kind: String,remember: bool=true) -> void:
 	modal_backdrop.show()
 	modal_scroll.restore(sim.ammo_mode*99 if kind=="Munition" else scroll_position)
 
+func _close_modal() -> void:
+	# Close BOTH surfaces. Leaving the backdrop active after X made the
+	# sea appear frozen because it still intercepted every touch.
+	_reset_enemy_tap()
+	modal.hide()
+	modal_backdrop.hide()
+	menu_history.clear()
+	suppress_tap_until=Time.get_ticks_msec()+250
+	_save_progress()
+
 func _back_modal() -> void:
 	_reset_enemy_tap()
 	if menu_history.is_empty():
-		modal.hide();modal_backdrop.hide();_save_progress()
+		_close_modal()
 	else:
 		var destination: String=menu_history.pop_back()
 		_open_modal(destination,false)
