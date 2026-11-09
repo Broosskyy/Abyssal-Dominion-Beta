@@ -18,6 +18,7 @@ const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
 const AMMO_CHOICE=preload("res://ammo_choice.gd")
+const NETWORK=preload("res://network_client.gd")
 const COMBAT_FX=preload("res://combat_fx.gd")
 const SPRITE_FX=preload("res://sprite_fx.gd")
 const USER_AMMO_ATLAS: Texture2D=preload("res://assets/ui/ammo/user_ammo_atlas.webp")
@@ -133,6 +134,10 @@ const AMMO_UI := [
 var nav_buttons: Array[Button] = []
 var nav_scroll: ScrollContainer
 var nav_strip: HBoxContainer
+var online_client: Node
+var online_players: Array[Dictionary]=[]
+var online_population: int=0
+var online_connected: bool=false
 var quest_panel: Panel
 var quest_text: Label
 var quest_claim: Button
@@ -285,6 +290,7 @@ func _ready() -> void:
 	ocean.set_shader_parameter("sea_tile",load("res://assets/ui/painted/sea_tile.png"))
 	water.material = ocean
 	_build_ui()
+	_start_online_presence()
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 	_refresh_ui()
@@ -313,6 +319,66 @@ func _use_uhd() -> void:
 	var screen := DisplayServer.screen_get_size()
 	if screen.x >= uhd.x and screen.y >= uhd.y:
 		window.position = (screen - uhd) / 2
+
+## Test-only online presence. Account and room transport are real, but the
+## economy, enemy AI, PvP and ship damage remain local to each client.
+## Never treat server presence snapshots as player or inventory authority.
+func _start_online_presence() -> void:
+	if not get_tree().has_meta("abyssal_session"):return
+	online_client=NETWORK.new()
+	online_client.name="OnlinePresencePreview"
+	add_child(online_client)
+	online_client.snapshot_received.connect(_online_snapshot)
+	online_client.connection_changed.connect(_online_connection_changed)
+	_join_online_room()
+
+func _join_online_room() -> void:
+	if online_client==null or not is_instance_valid(online_client):return
+	if str(online_client.token).is_empty() or sim.in_bonus_map():return
+	var result: Error=online_client.connect_world(sim.map_id)
+	if result!=OK:online_connected=false
+
+func _online_connection_changed(connected: bool) -> void:
+	online_connected=connected
+	if not connected:
+		online_players.clear()
+		online_population=0
+
+func _online_snapshot(packet: Dictionary) -> void:
+	if str(packet.get("type",""))!="snapshot" or int(packet.get("map_id",-1))!=sim.map_id:return
+	var entries: Variant=packet.get("players",[])
+	if not entries is Array:return
+	var all_players: Array=entries
+	online_population=mini(all_players.size(),32)
+	var others: Array[Dictionary]=[]
+	var my_id: String=str(online_client.account.get("id","")) if online_client!=null else ""
+	for candidate in all_players.slice(0,32):
+		if not candidate is Dictionary:continue
+		if str(candidate.get("id",""))==my_id:continue
+		var x: float=float(candidate.get("x",-1))
+		var y: float=float(candidate.get("y",-1))
+		if not is_finite(x) or not is_finite(y) or x<0 or x>sim.WORLD.x or y<0 or y>sim.WORLD.y:continue
+		others.append({"id":str(candidate.get("id","")), "username":str(candidate.get("username","Kapitän")).left(24),
+			"x":x,"y":y})
+	online_players=others
+
+func _send_online_course(point: Vector2) -> void:
+	if online_client!=null and is_instance_valid(online_client) and online_connected:
+		online_client.send_course(point)
+
+func _draw_online_presence(view: Rect2) -> void:
+	# Distinct cyan *test markers*, not fake synchronized ship meshes.
+	# A real server-backed ship renderer will replace them when combat and
+	# collisions become authoritative. No collision or hitbox is added.
+	for other in online_players:
+		var pos: Vector2=Vector2(float(other.x),float(other.y))
+		if not view.has_point(pos):continue
+		var back: Vector2=pos+Vector2(0,13)
+		draw_arc(back,25,0,TAU,32,Color("6fe7f3",.72),2.0,true)
+		draw_colored_polygon(PackedVector2Array([pos+Vector2(0,-17),pos+Vector2(13,12),pos+Vector2(-13,12)]),Color("1f9eb5",.75))
+		draw_line(pos+Vector2(0,-18),pos+Vector2(0,14),Color("d8feff",.85),2)
+		_label(pos+Vector2(0,-37),str(other.username),13,Color("a4f3fa"))
+		_label(pos+Vector2(0,-23),"ONLINE · TEST",10,Color("63c6da"))
 
 func _sharp_zoom() -> float:
 	return desired_zoom * clampf(get_viewport_rect().size.y / 720.0, 1.0, 1.7)
@@ -614,6 +680,7 @@ func _draw() -> void:
 		if int(actor.hp)>0:_draw_wake(actor)
 	for actor: Dictionary in fleet:
 		if int(actor.hp)>0: _draw_actor(actor)
+	_draw_online_presence(view)
 	# Name/HP/shield/decks are rendered in a screen-space CanvasLayer,
 	# already synced during _process(), never sourced from an old draw pass.
 	# Original M3100 missile silhouettes, contrails, sparks and shadow arcs.
@@ -3625,6 +3692,10 @@ func _open_display() -> void:
 func _open_menu_hub() -> void:
 	# One compact, grouped index instead of 11 persistent nav buttons.
 	# All existing functional panels remain directly reachable.
+	if online_client!=null and online_connected:
+		_note("ONLINE-PRÄSENZTEST · %d Kapitäne auf dieser Karte. Türkise Testmarkierungen zeigen andere angemeldete Spieler. Kampf, Schaden und Beute sind noch lokal." % online_population,Color("8bd7db"))
+	else:
+		_note("LOKALE BETA · Online-Anmeldung und WebSocket-Test können auf der Startseite unter Einstellungen & Konto eingerichtet werden. Es läuft noch kein öffentlicher MMO-Server.",Color("9fb9ba"))
 	_section("SCHNELLZUGRIFF")
 	var quick=_grid(3)
 	for item in [["HAFEN","Hafen"],["WERFT","Werft"],["KASTELLE","Kastelle"],["MUNITION","Munition"],["KESSEL","Kessel"],["LOGBUCH","Logbuch"]]:
@@ -3873,6 +3944,11 @@ func _load_staff() -> void:
 	if data is Dictionary:sim.staff.restore_state(data)
 
 func _sync_region() -> void:
+	if online_client!=null and is_instance_valid(online_client):
+		online_client.leave_world()
+		online_players.clear()
+		online_population=0
+		call_deferred("_join_online_room")
 	previous_region=sim.map_id
 	chart_pick=-1
 	_close_modal()
@@ -3890,7 +3966,8 @@ func _chart_course(point: Vector2) -> void:
 	for portal in sim.portals:
 		if point.distance_to(portal.pos)<120:
 			_navigate_region(int(portal.destination));return
-	sim.course(point);_refresh_ui()
+	if sim.course(point):_send_online_course(point)
+	_refresh_ui()
 
 func _interact() -> void:
 	if sim.in_bonus_map():
@@ -4113,7 +4190,7 @@ func _tap(screen: Vector2) -> void:
 		sim.staff_teleport(sim.map_id,"",point)
 		_save_staff()
 	else:
-		sim.course(point)
+		if sim.course(point):_send_online_course(point)
 	_refresh_ui()
 
 func _save_progress() -> void:
