@@ -203,21 +203,21 @@ func _initialize() -> void:
 	sim.step(61)
 	check(int(sim.player.max_hp)==sim.PLAYER_HP and not sim.has_blessing(),"blessing expires back to base values")
 
-	# Decks.
+	# Ten identical decks replace the old unique hull/hunter/etc. classes.
 	sim=SIM.new()
-	check(sim.grant_deck("armor",0) and sim.deck_slots[0]==0,"first deck mounts into a free slot")
-	check(int(sim.player.max_hp)==roundi(sim.PLAYER_HP*1.1) and int(sim.player.max_shield)==roundi(sim.PLAYER_SHIELD*1.1),"armor deck raises hull and shield")
+	check(sim.grant_deck("armor",0) and sim.deck_slots[0]==0 and sim.decks[0].type=="cannon","old deck drop ID normalizes into physical Gold I standard deck")
+	check(sim.cannon_slots()==11 and int(sim.player.max_hp)==sim.PLAYER_HP,"standard deck grants cannon slots, not former armor perks")
 	var essence: int=sim.essence
-	check(not sim.grant_deck("armor",0) and sim.essence==essence+CONTENT.DUPLICATE_DECK_ESSENCE and sim.decks.size()==1,"duplicate deck converts into essence")
-	sim.grant_deck("armor",1)
-	check(sim.deck_slots.size()==10 and sim.deck_slots[1]==1,"separate physical decks can occupy the ten slots")
-	check(not sim.equip_deck(1,1),"decks are rebuilt only in the harbor")
+	check(sim.grant_deck("armor",0) and sim.essence==essence and sim.decks.size()==2,"identical deck copies coexist instead of being converted to essence")
+	sim.grant_deck("hunter",1)
+	check(sim.deck_slots.size()==10 and sim.deck_slots[2]==2,"three independent normal decks can occupy the same ten slots")
+	check(not sim.equip_deck(2,1),"deck refitting still requires the harbor")
 	sim.player.pos=sim.harbor;sim.dock()
-	check(sim.equip_deck(1,1),"different copies of a deck role can be mounted together")
-	check(sim.equip_deck(1,0) and int(sim.player.max_hp)==roundi(sim.PLAYER_HP*1.15),"higher tier deck replaces the mounted one")
+	check(sim.equip_deck(2,1) and sim.deck_slots[2]==-1,"deck can move to any slot without duplication")
+	check(sim.cannon_slots()==19,"Gold and Pearl deck bonuses sum independently")
 	sim.player.gold=1000
-	check(sim.buy_deck("cannon") and sim.deck_slots[1]==2 and sim.cannon_slots()==14,"harbor sells a tier I cannon deck that adds capacity")
-	check(sim.unequip_deck(1) and sim.cannon_slots()==10,"unmounting a deck removes its bonus")
+	check(sim.buy_deck("cannon") and sim.deck_slots[2]==3 and sim.cannon_slots()==20,"harbor sells another identical Gold I deck with independent cannon bonus")
+	check(sim.unequip_deck(2) and sim.cannon_slots()==19,"removing any copy removes exactly its own cannon bonus")
 
 	# Kastelle: six castles to level 8, paced by captain level.
 	sim=SIM.new();sim.player.pos=sim.harbor;sim.dock();sim.player.gold=99999
