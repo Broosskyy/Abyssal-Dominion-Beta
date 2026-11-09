@@ -427,10 +427,8 @@ func has_blessing() -> bool:
 	return float(buffs.blessing) > 0
 
 func activate_blessing(seconds: float = CONTENT.BLESSING_SECONDS) -> void:
-	var before := float(player.max_hp)
 	buffs.blessing = maxf(float(buffs.blessing), seconds)
 	apply_upgrades()
-	player.hp = minf(float(player.max_hp), float(player.hp) + maxf(0, float(player.max_hp) - before))
 	_event("blessing", player.pos, 0, 0)
 
 func add_tide_deck(seconds: float) -> void:
@@ -442,6 +440,21 @@ func deck_cannon_bonus(tier: int,stage: int) -> int:
 	var material: int=clampi(tier,0,CONTENT.DECK_TIERS.size()-1)
 	var rank: int=clampi(stage,1,CONTENT.DECK_STAGE_MAX)
 	return int(CONTENT.DECK_CANNON_BASE[material])+rank*(material+1)
+
+## Flat hull HP added by each mounted physical deck; no warehouse bonus.
+func deck_hp_bonus(tier: int,stage: int) -> int:
+	var material: int=clampi(tier,0,CONTENT.DECK_TIERS.size()-1)
+	var rank: int=clampi(stage,1,CONTENT.DECK_STAGE_MAX)
+	return int(CONTENT.DECK_HP_BASE[material])+rank*int(CONTENT.DECK_HP_PER_STAGE[material])
+
+func mounted_deck_hp() -> int:
+	var total: int=0
+	for slot in deck_slots:
+		var index: int=int(slot)
+		if index<0 or index>=decks.size():continue
+		var deck: Dictionary=decks[index]
+		total+=deck_hp_bonus(int(deck.tier),int(deck.get("stage",1)))
+	return total
 
 func deck_value(type: String) -> float:
 	if type!="cannon":return 0.0
@@ -563,7 +576,9 @@ func deck_upgrade_info(index: int) -> Dictionary:
 		"gold":0 if maximum else gold,"essence":0 if maximum else essence_cost,
 		"captain_level":int(CONTENT.DECK_UPGRADE_LEVEL[next_tier]),
 		"cannons_now":deck_cannon_bonus(tier,stage),
-		"cannons_next":deck_cannon_bonus(next_tier,next_stage)
+		"cannons_next":deck_cannon_bonus(next_tier,next_stage),
+		"hp_now":deck_hp_bonus(tier,stage),
+		"hp_next":deck_hp_bonus(next_tier,next_stage)
 	}
 
 func upgrade_deck(index: int) -> bool:
@@ -581,7 +596,7 @@ func upgrade_deck(index: int) -> bool:
 	decks[index].tier=int(info.next_tier)
 	decks[index].stage=int(info.next_stage)
 	apply_upgrades()
-	message="%sdeck Stufe %d · +%d Kanonenplätze (Beta)" % [CONTENT.DECK_TIERS[int(info.next_tier)],int(info.next_stage),int(info.cannons_next)]
+	message="%sdeck Stufe %d · +%d Kanonenplätze · +%d Rumpf-HP (Beta)" % [CONTENT.DECK_TIERS[int(info.next_tier)],int(info.next_stage),int(info.cannons_next),int(info.hp_next)]
 	return true
 
 ## Every mounted, upgradable physical deck advances by exactly ONE step.
@@ -593,6 +608,7 @@ func deck_fleet_upgrade_preview() -> Dictionary:
 	var gold_total: int=0
 	var essence_total: int=0
 	var cannon_gain: int=0
+	var hp_gain: int=0
 	var required_level: int=1
 	for slot in deck_slots:
 		var index: int=int(slot)
@@ -603,6 +619,7 @@ func deck_fleet_upgrade_preview() -> Dictionary:
 		gold_total+=int(info.gold)
 		essence_total+=int(info.essence)
 		cannon_gain+=int(info.cannons_next)-int(info.cannons_now)
+		hp_gain+=int(info.hp_next)-int(info.hp_now)
 		required_level=maxi(required_level,int(info.captain_level))
 	var reason: String=""
 	if targets.is_empty():reason="Keine montierten Decks mit weiteren Ausbaustufen"
@@ -611,7 +628,7 @@ func deck_fleet_upgrade_preview() -> Dictionary:
 	elif int(player.gold)<gold_total:reason="%d Gold erforderlich" % gold_total
 	elif essence<essence_total:reason="%d Gezeitenessenz erforderlich" % essence_total
 	return {"targets":targets,"count":targets.size(),"gold":gold_total,"essence":essence_total,
-		"cannon_gain":cannon_gain,"captain_level":required_level,"can_upgrade":reason.is_empty(),"reason":reason}
+		"cannon_gain":cannon_gain,"hp_gain":hp_gain,"captain_level":required_level,"can_upgrade":reason.is_empty(),"reason":reason}
 
 func upgrade_mounted_decks() -> bool:
 	var preview: Dictionary=deck_fleet_upgrade_preview()
@@ -626,7 +643,7 @@ func upgrade_mounted_decks() -> bool:
 		decks[index].tier=int(info.next_tier)
 		decks[index].stage=int(info.next_stage)
 	apply_upgrades()
-	message="%d Decks einzeln um eine Stufe verbessert · +%d Kanonenplätze (Beta)" % [int(preview.count),int(preview.cannon_gain)]
+	message="%d Decks um eine Stufe verbessert · +%d Kanonenplätze · +%d Rumpf-HP (Beta)" % [int(preview.count),int(preview.cannon_gain),int(preview.hp_gain)]
 	return true
 
 func add_special_deck(key: String,seconds: float) -> bool:
@@ -1430,9 +1447,16 @@ func weapon_damage(mode: int) -> int:
 func apply_upgrades() -> void:
 	var armor := 1.0 + deck_value("armor") / 100.0
 	var blessed := has_blessing()
-	player.max_hp = roundi(float(PLAYER_HP + int(upgrades.hull) * 400) * armor * (1.2 if blessed else 1.0) * (1.0+float(talents.armor)*0.02))
+	var old_max_hp: float=float(player.max_hp)
+	var old_hp: float=float(player.hp)
+	# Decks add real hull capacity before blessing/talent multipliers.
+	# Preserve existing DAMAGE rather than granting free heals or losing
+	# the newly built hull at each mount/dismount/upgrade. A sunk ship stays
+	# sunk; toggling a deck must never revive it or reset battle damage.
+	player.max_hp = roundi(float(PLAYER_HP + int(upgrades.hull) * 400 + mounted_deck_hp()) * armor * (1.2 if blessed else 1.0) * (1.0+float(talents.armor)*0.02))
 	player.max_shield = roundi(float(PLAYER_SHIELD + int(upgrades.hull) * 120) * armor)
-	player.hp = minf(float(player.hp),float(player.max_hp))
+	if old_hp<=0.0:player.hp=0
+	else:player.hp=clampf(float(player.max_hp)-maxf(0.0,old_max_hp-old_hp),0.0,float(player.max_hp))
 	player.shield = minf(float(player.shield),float(player.max_shield))
 	player.speed = PLAYER_SPEED * (1.0 + 0.12 * float(upgrades.sails) + deck_value("navigation") / 100.0) * (1.1 if blessed else 1.0) * (1.12 if float(buffs.storm_deck)>0 else 1.0) * (1.0+float(talents.navigation)*0.02)
 
@@ -1740,7 +1764,7 @@ func export_save() -> Dictionary:
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"talents":talents.duplicate(),"battle_pass_claimed":battle_pass_claimed.duplicate(),
 		"upgrades":upgrades.duplicate(),"visited":visited.duplicate(),"map_id":region,
-		"position":[position.x,position.y],"hp":player.hp,"shield":player.shield,"docked":docked,
+		"position":[position.x,position.y],"hp":player.hp,"max_hp":player.max_hp,"shield":player.shield,"docked":docked,
 		"cannons":player.cannons,"mounted_cannons":mounted_cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
 		"essence":essence,"fragments":fragments,"bonus_pieces":bonus_pieces.duplicate(),"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
 		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
@@ -1883,7 +1907,14 @@ func restore_save(data: Dictionary) -> bool:
 	if position is Array and position.size()==2:
 		var point=Vector2(float(position[0]),float(position[1]))
 		if point.is_finite() and not blocked(point):player.pos=point
-	player.hp=clampi(int(data.get("hp",player.max_hp)),0,int(player.max_hp))
+	# Schema-8 saves written before deck HP did not include max_hp.
+	# Preserve their MISSING hull HP through migration instead of making
+	# fully repaired ships mysteriously spawn wounded after this update.
+	var old_hull_max: int=roundi(float(PLAYER_HP + int(upgrades.hull)*400) * (1.2 if has_blessing() else 1.0) * (1.0+float(talents.armor)*0.02))
+	var stored_max_hp: float=maxf(1.0,float(data.get("max_hp",old_hull_max)))
+	var stored_hp: float=clampf(float(data.get("hp",stored_max_hp)),0.0,stored_max_hp)
+	if stored_hp<=0.0:player.hp=0
+	else:player.hp=clampf(float(player.max_hp)-(stored_max_hp-stored_hp),0.0,float(player.max_hp))
 	player.shield=clampi(int(data.get("shield",player.max_shield)),0,int(player.max_shield))
 	if int(player.hp)==0:player.respawn=8.0
 	powder_on=false

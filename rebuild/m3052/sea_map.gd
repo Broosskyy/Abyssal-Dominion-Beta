@@ -2885,7 +2885,7 @@ func _deck_title(deck: Dictionary) -> String:
 	return "%sDECK · STUFE %d/%d" % [str(CONTENT.DECK_TIERS[int(deck.tier)]).to_upper(),int(deck.get("stage",1)),CONTENT.DECK_STAGE_MAX]
 
 func _deck_effect(deck: Dictionary) -> String:
-	return "+%d KANONENPLÄTZE · BETA-WERT" % sim.deck_cannon_bonus(int(deck.tier),int(deck.get("stage",1)))
+	return "+%d KANONENPLÄTZE · +%d RUMPF-HP · BETA-WERTE" % [sim.deck_cannon_bonus(int(deck.tier),int(deck.get("stage",1))),sim.deck_hp_bonus(int(deck.tier),int(deck.get("stage",1)))]
 
 const DECK_ART := {"cannon":"cannon_1","armor":"upgrade_hull","hunter":"harpoon_1","navigation":"upgrade_sails","logistics":"castle_crew"}
 
@@ -2934,7 +2934,7 @@ func _deck_progression_roadmap(info: Dictionary) -> void:
 			else:tile.tooltip_text="Spätere Deckstufe"
 
 func _open_decks() -> void:
-	_banner_card(painted.tide_deck,"10 STANDARDDECKS · 3 SONDERDECKS","Alle zehn normalen Decks sind identisch und frei kombinierbar. Jedes wird einzeln von Gold I–V über Perlen I–V bis Kristall I–V verbessert. Die Kanonenwerte sind vorläufig.")
+	_banner_card(painted.tide_deck,"10 STANDARDDECKS · 3 SONDERDECKS","Alle zehn normalen Decks sind identisch und frei kombinierbar. Gold I–V → Perlen I–V → Kristall I–V. Jedes montierte Deck bringt Kanonenplätze UND zusätzliche Rumpf-HP (Beta-Balance).")
 	match _tab("Decks"):
 		"SCHIFF":
 			_section("DECKS AN DEINEM SCHIFF · %d/10" % (CONTENT.DECK_SLOT_COUNT-sim.deck_slots.count(-1)))
@@ -2955,7 +2955,7 @@ func _open_decks() -> void:
 				var index: int=int(deck_slot)
 				if index<0 or index>=sim.decks.size():continue
 				tier_counts[clampi(int(sim.decks[index].tier),0,2)]+=1
-			_note("MONTIERT · %d GOLD / %d PERLEN / %d KRISTALL · +%d KANONENPLÄTZE" % [tier_counts[0],tier_counts[1],tier_counts[2],int(sim.deck_value("cannon"))],Color("d4e6d9"))
+			_note("MONTIERT · %d GOLD / %d PERLEN / %d KRISTALL\nBONUS: +%d KANONENPLÄTZE · +%d RUMPF-HP" % [tier_counts[0],tier_counts[1],tier_counts[2],int(sim.deck_value("cannon")),sim.mounted_deck_hp()],Color("d4e6d9"))
 			_section("DEIN DECKPLAN · 2 REIHEN MIT JE 5 PLÄTZEN")
 			var compact_slots=GridContainer.new()
 			compact_slots.name="DeckShipMatrix"
@@ -2984,13 +2984,13 @@ func _open_decks() -> void:
 					var material_color: Color=CONTENT.DECK_TIER_COLORS[int(sim.decks[index].tier)]
 					focus.add_theme_color_override("font_color",material_color)
 					focus.add_theme_color_override("font_hover_color",material_color.lightened(.25))
-			_note("TIPP AUF EINEN PLATZ: Öffnet genau dieses Deck mit Stufenplan, Materialwechsel, Kanonenbonus, Kosten und Montage.")
+			_note("TIPP AUF EINEN PLATZ: Öffnet genau dieses Deck mit Stufenplan, Materialwechsel, Kanonen- und HP-Bonus, Kosten und Montage.")
 			_action("DECKS AUS LAGER MONTIEREN",func():_switch_tab("Decks","LAGER"))
 			_section("OPTIONAL · MONTIERTE DECKS GEMEINSAM VERBESSERN")
 			var fleet_preview: Dictionary=sim.deck_fleet_upgrade_preview()
 			var bundle_count: int=int(fleet_preview.count)
 			if bundle_count>0:
-				_note("%d montierte Decks erhalten jeweils GENAU EINE Ausbaustufe. Keine Lagerdecks betroffen. Gesamtpreis: %d Gold%s. Zusätzlicher Platzgewinn: +%d Kanonen (vorläufig)." % [bundle_count,int(fleet_preview.gold),(" + %d Essenz" % int(fleet_preview.essence)) if int(fleet_preview.essence)>0 else "",int(fleet_preview.cannon_gain)],Color("f1d19b"))
+				_note("%d montierte Decks erhalten jeweils GENAU EINE Ausbaustufe. Keine Lagerdecks betroffen. Gesamtpreis: %d Gold%s. Bonus aus dem Upgrade: +%d Kanonenplätze UND +%d Rumpf-HP (Beta)." % [bundle_count,int(fleet_preview.gold),(" + %d Essenz" % int(fleet_preview.essence)) if int(fleet_preview.essence)>0 else "",int(fleet_preview.cannon_gain),int(fleet_preview.hp_gain)],Color("f1d19b"))
 			else:
 				_note("Noch keine aufwertbaren Standarddecks montiert.")
 			var batch_button=_action("MONTIERTE DECKS · 1 STUFE JE DECK",func():
@@ -3044,7 +3044,7 @@ func _open_decks() -> void:
 				var next_name: String="MAXIMAL AUSGEBAUT" if bool(info.maximum) else "%sDECK STUFE %d" % [str(CONTENT.DECK_TIERS[int(info.next_tier)]).to_upper(),int(info.next_stage)]
 				_section("AUSGEWÄHLT · DECK %02d" % (index+1))
 				var status: String="MONTIERT AUF PLATZ %02d" % (current_slot+1) if current_slot>=0 else "IM LAGER · NOCH NICHT MONTIERT"
-				var description: String="JETZT: %s · +%d Kanonenplätze\nNÄCHSTES: %s · +%d Kanonenplätze" % [_deck_title(deck),int(info.cannons_now),next_name,int(info.cannons_next)]
+				var description: String="JETZT: %s · +%d Kanonenplätze · +%d HP\nNÄCHSTES: %s · +%d Kanonenplätze · +%d HP" % [_deck_title(deck),int(info.cannons_now),int(info.hp_now),next_name,int(info.cannons_next),int(info.hp_next)]
 				var tile=_catalog_tile(modal_body,deck_icons.cannon,"STANDARDDECK %02d" % (index+1),description,status,CONTENT.DECK_TIER_COLORS[int(deck.tier)])
 				var progress=_bar(tile)
 				progress.name="DeckLevelProgress"+str(index)
@@ -3059,14 +3059,15 @@ func _open_decks() -> void:
 				else:
 					var price: String="%d GOLD%s" % [int(info.gold),(" + %d ESSENZ" % int(info.essence)) if int(info.essence)>0 else ""]
 					var gain: int=int(info.cannons_next)-int(info.cannons_now)
+					var hp_gain: int=int(info.hp_next)-int(info.hp_now)
 					var hint: String="MATERIALWECHSEL" if bool(info.promoting) else "NÄCHSTE STUFE"
-					var upgrade=_catalog_action(tile,"%s: %s · +%d KANONEN · %s" % [hint,next_name,gain,price],func():
+					var upgrade=_catalog_action(tile,"%s: %s · +%d KANONEN · +%d HP · %s" % [hint,next_name,gain,hp_gain,price],func():
 						if sim.upgrade_deck(index):
 							_save_progress()
 							_open_modal("Decks")
 							_refresh_ui(),not sim.docked or sim.level<int(info.captain_level) or int(sim.player.gold)<int(info.gold) or sim.essence<int(info.essence))
 					upgrade.name="DeckUpgrade"+str(index)
-					upgrade.tooltip_text="Ab Kapitänsstufe %d · Kanonenwerte vorläufig" % int(info.captain_level)
+					upgrade.tooltip_text="Ab Kapitänsstufe %d · Kanonen- und HP-Werte vorläufig" % int(info.captain_level)
 				var choice=OptionButton.new()
 				choice.name="DeckSlotPicker"+str(index)
 				choice.size_flags_horizontal=Control.SIZE_EXPAND_FILL
@@ -3134,7 +3135,7 @@ func _open_decks() -> void:
 			_note("Es gibt nur eine normale Deckart. Du darfst mehrere gleiche Golddecks erwerben und jedes einzeln ausbauen: Gold I–V → Perlen I–V → Kristall I–V.")
 			var yard=_catalog_grid(2)
 			var config: Dictionary=CONTENT.DECKS.cannon
-			var tile=_catalog_tile(yard,deck_icons.cannon,"GOLDDECK · STUFE I","+%d Kanonenplätze je Deck · vorläufiger Testwert" % sim.deck_cannon_bonus(0,1),"%d GOLD PRO DECK" % int(config.price),CONTENT.DECK_TIER_COLORS[0])
+			var tile=_catalog_tile(yard,deck_icons.cannon,"GOLDDECK · STUFE I","+%d Kanonenplätze UND +%d Rumpf-HP je montiertes Deck · Beta-Werte" % [sim.deck_cannon_bonus(0,1),sim.deck_hp_bonus(0,1)],"%d GOLD PRO DECK" % int(config.price),CONTENT.DECK_TIER_COLORS[0])
 			var buy=_catalog_action(tile,"EIN GOLDDECK KAUFEN",func():
 				if sim.buy_deck("cannon"):
 					focused_deck_index=sim.decks.size()-1
