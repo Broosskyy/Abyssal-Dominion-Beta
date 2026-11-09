@@ -9,6 +9,9 @@ func _initialize() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
+	# Layout tests must use the real resized viewport, not the static
+	# project-level content scale that otherwise ignores root.size changes.
+	root.content_scale_size=Vector2i.ZERO
 	var sim_class=load("res://simulation.gd")
 	var mock=sim_class.new()
 	var day_stamp: int=199999*86400+123
@@ -60,7 +63,7 @@ func _run() -> void:
 	await process_frame
 	hub._layout()
 	var narrow_bounds: Rect2=hub.panel.get_global_rect()
-	check(narrow_bounds.position.x>=0 and narrow_bounds.end.x<=720 and narrow_bounds.end.y<=1280,"home dashboard fits phone portrait margins: "+str(narrow_bounds))
+	check(narrow_bounds.position.x>=0 and narrow_bounds.end.x<=720 and narrow_bounds.end.y<=1280,"home dashboard fits phone portrait margins: "+str(narrow_bounds)+" viewport="+str(hub.get_viewport_rect().size)+" scale="+str(hub.panel.scale)+" raw="+str(hub.panel.size))
 	check(hub.body.find_child("HomeNavigationScroller",true,false)!=null and hub.body.find_child("HomeNavigationScroller",true,false).size.x>0,"portrait has visible swipeable home navigation")
 	check(hub.body.find_child("FeaturedNews",true,false)!=null and hub.body.find_child("HomeDailyButton",true,false)!=null,"mobile home retains feature card and daily reward entry")
 	root.size=Vector2i(480,900)
