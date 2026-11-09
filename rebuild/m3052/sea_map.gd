@@ -2984,8 +2984,23 @@ func _open_decks() -> void:
 					var material_color: Color=CONTENT.DECK_TIER_COLORS[int(sim.decks[index].tier)]
 					focus.add_theme_color_override("font_color",material_color)
 					focus.add_theme_color_override("font_hover_color",material_color.lightened(.25))
-			_note("TIPP AUF EINEN PLATZ: Das passende Deck öffnet sich direkt mit Stufenplan, Materialwechsel, Kanonenbonus, Kosten und Montage.")
+			_note("TIPP AUF EINEN PLATZ: Öffnet genau dieses Deck mit Stufenplan, Materialwechsel, Kanonenbonus, Kosten und Montage.")
 			_action("DECKS AUS LAGER MONTIEREN",func():_switch_tab("Decks","LAGER"))
+			_section("OPTIONAL · MONTIERTE DECKS GEMEINSAM VERBESSERN")
+			var fleet_preview: Dictionary=sim.deck_fleet_upgrade_preview()
+			var bundle_count: int=int(fleet_preview.count)
+			if bundle_count>0:
+				_note("%d montierte Decks erhalten jeweils GENAU EINE Ausbaustufe. Keine Lagerdecks betroffen. Gesamtpreis: %d Gold%s. Zusätzlicher Platzgewinn: +%d Kanonen (vorläufig)." % [bundle_count,int(fleet_preview.gold),(" + %d Essenz" % int(fleet_preview.essence)) if int(fleet_preview.essence)>0 else "",int(fleet_preview.cannon_gain)],Color("f1d19b"))
+			else:
+				_note("Noch keine aufwertbaren Standarddecks montiert.")
+			var batch_button=_action("MONTIERTE DECKS · 1 STUFE JE DECK",func():
+				if sim.upgrade_mounted_decks():
+					_save_progress()
+					_open_modal("Decks")
+					_refresh_ui(),"primary")
+			batch_button.name="DeckFleetUpgrade"
+			batch_button.disabled=not bool(fleet_preview.can_upgrade)
+			batch_button.tooltip_text="Erst prüfen: "+str(fleet_preview.reason) if not bool(fleet_preview.can_upgrade) else "Alle montierten Decks einmal verbessern; Kosten werden zusammen abgezogen"
 		"LAGER":
 			_section("DECKWERFT · %d/%d EXEMPLARE" % [sim.decks.size(),CONTENT.DECK_INVENTORY_MAX])
 			if not sim.docked:_note("Deckmontage und Upgrades sind nur im Hafen möglich.",Color("e1b979"))
