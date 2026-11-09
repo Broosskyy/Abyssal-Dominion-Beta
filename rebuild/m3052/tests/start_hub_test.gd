@@ -39,6 +39,15 @@ func _run() -> void:
 	await process_frame
 	check(hub.page=="home" and hub.body.find_child("SailButton",true,false)!=null,"captain opens functional home with prominent Play button")
 	check(hub.body.find_child("FeaturedNews",true,false)!=null and hub.body.find_child("FeaturedArtwork",true,false)!=null,"home features illustrated carousel with existing game artwork")
+	var version: Label=hub.body.find_child("ActiveDataRevision",true,false) as Label
+	check(version!=null and version.text.begins_with("AKTIVE SPIELDATEN:"),"captain home shows mounted signed content revision instead of silently using an old UI")
+	check(hub.body.find_child("HomeUpdateCheck",true,false)!=null,"captain home provides a direct real updater entry")
+	var promo_cards: Array=hub.body.find_children("HomeActionCard*","PanelContainer",true,false)
+	var all_cinematic: bool=true
+	for tile in promo_cards:
+		var portrait: TextureRect=tile.find_child("HomeActionArt",true,false) as TextureRect
+		all_cinematic=all_cinematic and portrait!=null and portrait.custom_minimum_size.y>=140
+	check(promo_cards.size()==9 and all_cinematic,"all nine discovery cards display larger cinematic artwork")
 	check(hub.body.find_children("HomeActionCard*","PanelContainer",true,false).size()==9,"home has 3 illustrated news teasers and 6 active menu cards rather than a wall of 12")
 	check(hub.body.find_child("HubTab_friends",true,false)!=null and hub.body.find_child("HubTab_logbook",true,false)!=null,"home provides navigation to friends and logbook")
 	var hero: Node=hub.body.find_child("FeaturedNews",true,false)
