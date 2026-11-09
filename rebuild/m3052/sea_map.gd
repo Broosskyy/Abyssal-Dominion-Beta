@@ -4290,8 +4290,12 @@ func _apply_web_performance() -> void:
 	if mesh_layer!=null:mesh_layer.set_web_performance(active)
 	if ocean!=null:ocean.set_shader_parameter("web_fast",active)
 	if OS.has_feature("web"):
-		var small_touch: bool=DisplayServer.is_touchscreen_available() or get_viewport_rect().size.y>get_viewport_rect().size.x
-		Engine.max_fps=(30 if small_touch else 45) if active else 0
+		# The previous hard 30 FPS cap made every 60/120 Hz Android screen
+		# look choppy EVEN when the GPU had capacity for smoother rendering.
+		# Keep all collision/AI at the unchanged 30 Hz fixed simulation tick;
+		# the visual interpolation and 3D ship meshes may render up to 60 FPS.
+		# Adaptive GLB buffer scaling still reacts to sustained FPS drops.
+		Engine.max_fps=60 if active else 0
 
 ## Adapt 3D resolution ONLY. Never alter simulation ticks, NPC density,
 ## steering, projectile trajectories or the sharp full-resolution HUD.
