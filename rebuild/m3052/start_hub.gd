@@ -329,13 +329,9 @@ func _show_home() -> void:
 	var start_action=_button("JETZT SPIELEN · ZUR SEEKARTE",_sail,true)
 	start_action.name="SailButton"
 	start_action.custom_minimum_size.y=56
-	# Compact teaser row, the equivalent of the three small news cards in
-	# the reference. All actions open real features from the current game.
-	_label("ENTDECKEN & VORBEREITEN",true)
-	var teasers=_dashboard_grid(3)
-	_dashboard_card(teasers,"NEUE SCHIFFSDESIGNS","Schiffe & Kanonen",func():_sail_menu("Werft"),NEWS_HARBOR)
-	_dashboard_card(teasers,"GEZEITENKESSEL","Fragmente & Belohnungen",func():_sail_menu("Kessel"),NEWS_KESSEL)
-	_dashboard_card(teasers,"SAISONPASS","Kostenlose Stufen",func():_sail_menu("Battle Pass"),DAILY_CHEST)
+	# Feature carousel already navigates to these destinations. Removing
+	# duplicate teaser panels leaves the real rewards and chart visible
+	# without a second screen of promotional cards.
 	# Daily rewards are existing ledger-backed systems, not a new wallet.
 	var daily_pending: bool=sim.rewards.daily_available()
 	var daily=PanelContainer.new()
@@ -383,37 +379,20 @@ func _show_home() -> void:
 		"ABENTEUER":
 			_dashboard_card(tiles,"SEEKARTEN","40 Karten & Portale",func():_show("maps"),NEWS_CHART)
 			_dashboard_card(tiles,"MONSTERJAGD","Seeungeheuer & Harpunen",func():_sail_menu("Monster"),ART)
-			_dashboard_card(tiles,"BONUSKARTEN","Fragmente & fünf Wellen",func():_sail_menu("Bonuskarten"),NEWS_CHART)
+			_dashboard_card(tiles,"BONUSKARTEN","Schriftrollen & fünf Wellen",func():_sail_menu("Bonuskarten"),NEWS_CHART)
 			_dashboard_card(tiles,"GILDE & INSEL","Heimatbasis & Belagerungen",func():_show("guild"),NEWS_HARBOR)
-			_dashboard_card(tiles,"LOGBUCH","Aufträge & Fortschritt",func():_show("logbook"),NEWS_CHART)
-			_dashboard_card(tiles,"EVENTS","Saisoninhalte ansehen",func():_sail_menu("Events"),NEWS_KESSEL)
 		"SCHIFF & HANDEL":
 			_dashboard_card(tiles,"SCHIFFSWERFT","Designs & Kanonenmontage",func():_sail_menu("Werft"),NEWS_HARBOR)
 			_dashboard_card(tiles,"MARKTPLATZ","Munition & Items",func():_sail_menu("Markt"),NEWS_CHART)
-			_dashboard_card(tiles,"DECKS & LAGER","Gold-, Elite- & Sonderdecks",func():_sail_menu("Decks"),DAILY_CHEST)
+			_dashboard_card(tiles,"DECKS & LAGER","Gold-, Perlen- & Kristalldecks",func():_sail_menu("Decks"),DAILY_CHEST)
 			_dashboard_card(tiles,"KASTELLE & TALENTE","Schiffsausbau & Punkte",func():_sail_menu("Kastelle"),ART)
-			_dashboard_card(tiles,"ARSENAL","Geschütze & Montage",func():_sail_menu("Bewaffnung"),NEWS_HARBOR)
-			_dashboard_card(tiles,"GEZEITENKESSEL","Essenz & Glück",func():_sail_menu("Kessel"),NEWS_KESSEL)
 		_:
 			_dashboard_card(tiles,"TAGESBONUS & AFK","Echte lokale Belohnungen",func():_show("rewards"),DAILY_CHEST)
 			_dashboard_card(tiles,"FREUNDE EINLADEN","Teilbarer Beta-Link",func():_show("friends"),NEWS_CHART)
-			_dashboard_card(tiles,"SAISONPASS","Kostenlose Belohnungsstufen",func():_sail_menu("Battle Pass"),DAILY_CHEST)
 			_dashboard_card(tiles,"SPIELERPROFIL","Name, Rang & Battle Points",func():_show("profile"),ART)
-			_dashboard_card(tiles,"KRONEN-SHOP","Echtgeldkäufe noch gesperrt",func():_sail_menu("Premium-Shop"),NEWS_HARBOR)
 			_dashboard_card(tiles,"EINSTELLUNGEN","Server, Konto & Updater",func():_show("settings"),NEWS_KESSEL)
-	var stats=_dashboard_grid(4)
-	if get_viewport_rect().size.x<620.0:stats.columns=2
-	for entry in [["GOLD",_coins(int(sim.player.gold))],["ESSENZ",str(sim.essence)],["STUFE",str(sim.level)],["BATTLE POINTS",str(sim.battle_points)]]:
-		var stat_card=PanelContainer.new()
-		stat_card.add_theme_stylebox_override("panel",SKIN.card(Color("b7985e")))
-		stat_card.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		stats.add_child(stat_card)
-		var stack=VBoxContainer.new()
-		stat_card.add_child(stack)
-		var stat_name=_hint(stack,str(entry[0]),11,Color("a8bec1"))
-		stat_name.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-		var value=_hint(stack,str(entry[1]),16,Color("f5dcab"))
-		value.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	# Stats are now on the captain profile. No duplicated 4-card wallet
+	# at the bottom of an already long start-screen dashboard.
 
 func _coins(value: int) -> String:
 	var digits: String=str(maxi(0,value))
