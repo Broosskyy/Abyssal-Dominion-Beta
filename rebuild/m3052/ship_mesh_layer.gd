@@ -279,6 +279,20 @@ func set_web_performance(enabled: bool) -> void:
 	stage.msaa_3d=Viewport.MSAA_DISABLED if web_performance else Viewport.MSAA_4X
 	if host!=null:resize_view(host.get_viewport_rect().size)
 
+## Pure policy for replayable tests: drop quality immediately on a sustained
+## slow window; recover only after three consecutive near-target windows.
+static func adaptive_quality_step(quality: float,fps: float,target: float,good_windows: int) -> Dictionary:
+	var next: float=clampf(quality,0.65,1.0)
+	var good: int=0
+	if fps<target*0.82:
+		next=maxf(0.65,next-0.09)
+	elif fps>target*0.96:
+		good=good_windows+1
+		if good>=3:
+			good=0
+			next=minf(1.0,next+0.04)
+	return {"quality":next,"good_windows":good}
+
 ## Adaptive GPU budget: adjust only at the controller's infrequent sampling
 ## intervals. This keeps physical GLB instances, rotation, and camera stable.
 func set_web_quality(quality: float) -> void:
