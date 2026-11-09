@@ -216,6 +216,9 @@ var projectile_visual_count := 3 # purely cosmetic per actual hit: 1, 3, 5 or 8
 const VFX_DEFAULT_FLAGS := {"enabled":true,"flight":true,"muzzle":true,"impact":true,"particles":true,"water":true,"flashes":true}
 var vfx_flags: Dictionary = VFX_DEFAULT_FLAGS.duplicate(true)
 var vfx_intensity := 1.35
+# Browser only. Native APK/desktop visuals keep their existing fidelity.
+# The player may opt back into full-quality WebGL2 from Anzeige → Grafik.
+var web_fast_mode := OS.has_feature("web")
 # Independent from combat VFX: mobile users can disable mesh rocking and wakes.
 var ship_animations_enabled := true
 var wake_effects_enabled := true
@@ -290,6 +293,7 @@ func _ready() -> void:
 	ocean.set_shader_parameter("sea_tile",load("res://assets/ui/painted/sea_tile.png"))
 	water.material = ocean
 	_build_ui()
+	_apply_web_performance()
 	_start_online_presence()
 	get_viewport().size_changed.connect(_layout)
 	_layout()
@@ -686,6 +690,13 @@ func _draw() -> void:
 	# Original M3100 missile silhouettes, contrails, sparks and shadow arcs.
 	# Both approved GLB modes share the same chart-space combat VFX layer.
 	drawn_shots=0
+	# Keep real projectiles and impacts, but skip purely decorative fragment
+	# particles, water flashes and high overdraw in mobile-browser fast mode.
+	var fast_fx: bool=OS.has_feature("web") and web_fast_mode
+	var fx_strength: float=minf(vfx_intensity,0.85) if fast_fx else vfx_intensity
+	var fx_particles: bool=bool(vfx_flags.particles) and not fast_fx
+	var fx_splashes: bool=bool(vfx_flags.water) and not fast_fx
+	var fx_flashes: bool=bool(vfx_flags.flashes) and not fast_fx
 	# One compact flying Kugelhaufen per salvo. A three-hit broadside does
 	# NOT produce three separate rows or three duplicate bundles.
 	var rendered_salvos: Dictionary={}
@@ -695,19 +706,19 @@ func _draw() -> void:
 		if rendered_salvos.has(salvo_key):continue
 		rendered_salvos[salvo_key]=true
 		drawn_shots+=1
-		COMBAT_FX.draw_projectile(self,shot,sim.clock,projectile_visual_count,bool(vfx_flags.enabled) and bool(vfx_flags.flight),vfx_intensity,bool(vfx_flags.particles))
+		COMBAT_FX.draw_projectile(self,shot,sim.clock,projectile_visual_count,bool(vfx_flags.enabled) and bool(vfx_flags.flight),fx_strength,fx_particles)
 	for event in sim.events:
 		var age: float = sim.clock-float(event.time)
 		if age>(1.8 if str(event.type)=="impact" else 1.2):continue
 		var p: Vector2 = event.pos
 		if event.type=="impact":
 			if bool(vfx_flags.enabled) and bool(vfx_flags.impact):
-				SPRITE_FX.draw_impact(self,event,age,vfx_intensity,bool(vfx_flags.particles),bool(vfx_flags.water),bool(vfx_flags.flashes))
+				SPRITE_FX.draw_impact(self,event,age,fx_strength,fx_particles,fx_splashes,fx_flashes)
 		elif event.type=="muzzle":
 			if bool(event.get("powder",false)):
 				_ellipse_line(p-Vector2(0,20),Vector2(22+age*32,10+age*15),Color("ffb155",maxf(0,.8-age)),3.0)
 			if bool(vfx_flags.enabled) and bool(vfx_flags.muzzle):
-				SPRITE_FX.draw_muzzle(self,event,age,vfx_intensity,bool(vfx_flags.particles),bool(vfx_flags.flashes))
+				SPRITE_FX.draw_muzzle(self,event,age,fx_strength,fx_particles,fx_flashes)
 		elif event.type=="sunk":
 			COMBAT_FX.draw_sinking(self,event,age)
 		elif event.type=="loot":pass
@@ -3627,6 +3638,12 @@ func _open_display() -> void:
 	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Zwei Grafikmodi: 2,5D oder 3D. Beide zeigen das Schattenkriegsschiff, das originale Black-Crown-Testmodell und zehn Elite-Designs mit eigenständigen Texturen.")
 	_note("DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
+		if OS.has_feature("web"):
+			_section("BROWSER-LEISTUNG")
+			var fast_button=_action("WEB-LEICHTMODUS: "+("AN · EMPFOHLEN" if web_fast_mode else "AUS · MAXIMALE GRAFIK"),func():_set_web_fast_mode(not web_fast_mode),"tab_on" if web_fast_mode else "normal")
+			fast_button.name="WebFastModeToggle"
+			_note("Handy-Browser: kleinere interne 3D-Zeichenfläche ohne 4× Kantenglättung, vereinfachtes bewegtes Meer und weniger Effektpartikel. Schiffe, Kanonen, Beute und Steuerung bleiben vollständig erhalten.",Color("a1dacf"))
+			_note("AKTUELLE FPS: %d · 3D-AUFLÖSUNG: %d%%" % [Engine.get_frames_per_second(),roundi(float(mesh_layer.resolution_factor)*100.0)] if mesh_layer!=null else "Grafik wird initialisiert",Color("f1d39a"))
 		_section("GRAFIKMODUS")
 		for option in [["hybrid","2,5D / HYBRID"],["3d","3D"]]:
 			var key: String=str(option[0])
@@ -4213,6 +4230,7 @@ func _load_display() -> void:
 	if not FileAccess.file_exists(HUD_SAVE):return
 	var data: Variant=JSON.parse_string(FileAccess.get_file_as_string(HUD_SAVE))
 	if not data is Dictionary:return
+	web_fast_mode=bool(data.get("web_fast_mode",true)) if OS.has_feature("web") else false
 	hud_size=clampi(int(data.get("hud_size",1)),0,2)
 	journal_visible=bool(data.get("journal_visible",true))
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
@@ -4241,8 +4259,26 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
+		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
 		file.close()
+
+## Browser-only render budget: no effect on collision, AI ticks, camera,
+## movement speed, save progress, network tick rate, or native Android UI.
+func _apply_web_performance() -> void:
+	var active: bool=OS.has_feature("web") and web_fast_mode
+	if mesh_layer!=null:mesh_layer.set_web_performance(active)
+	if ocean!=null:ocean.set_shader_parameter("web_fast",active)
+	if OS.has_feature("web"):
+		var small_touch: bool=DisplayServer.is_touchscreen_available() or get_viewport_rect().size.y>get_viewport_rect().size.x
+		Engine.max_fps=(30 if small_touch else 45) if active else 0
+
+func _set_web_fast_mode(enabled: bool) -> void:
+	if not OS.has_feature("web"):return
+	web_fast_mode=enabled
+	_apply_web_performance()
+	_persist_display_preferences()
+	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal("Anzeige")
+	queue_redraw()
 
 func _set_menu_layout(value: String) -> void:
 	if not value in ["compact","balanced","large"]:return
@@ -4285,6 +4321,8 @@ func _reset_display_preferences() -> void:
 	projectile_visual_count=3
 	vfx_flags=VFX_DEFAULT_FLAGS.duplicate(true)
 	vfx_intensity=1.35
+	web_fast_mode=OS.has_feature("web")
+	_apply_web_performance()
 	ship_animations_enabled=true
 	wake_effects_enabled=true
 	menu_layout="balanced"
