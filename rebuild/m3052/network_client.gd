@@ -60,6 +60,13 @@ func send_course(point: Vector2) -> void:
 	if not joined or not point.is_finite():return
 	sequence+=1
 	socket.send_text(JSON.stringify({"type":"course","sequence":sequence,"x":point.x,"y":point.y}))
+## Switch between room snapshots without losing the authenticated session.
+func leave_world() -> void:
+	if connecting or joined:socket.close()
+	connecting=false
+	joined=false
+	connection_changed.emit(false)
+
 func sign_out() -> void:
-	socket.close();joined=false;connecting=false;token="";account={}
+	leave_world();token="";account={}
 	if get_tree().has_meta("abyssal_session"):get_tree().remove_meta("abyssal_session")
