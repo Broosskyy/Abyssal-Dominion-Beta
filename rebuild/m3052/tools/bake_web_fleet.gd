@@ -185,12 +185,14 @@ func _bake_all() -> void:
 		return
 	_prepare_view()
 	for key in MODELS:
-		if not await _render_atlas(key,0,key):
+		var baked: bool=await _render_atlas(key,0,key)
+		if not baked:
 			quit(1)
 			return
 	for i in range(ELITE_PAINT.size()):
 		var name="elite_%02d" % (i+1) if i<10 else "event_halloween" if i==10 else "event_columbus"
-		if not await _render_atlas("black_crown_corsair_elite_test",i+1,name):
+		var painted: bool=await _render_atlas("black_crown_corsair_elite_test",i+1,name)
+		if not painted:
 			quit(1)
 			return
 	var data={"status":"BAKED_FROM_ORIGINAL_GLBS","angles":ANGLES,"frame_px":FRAME,
