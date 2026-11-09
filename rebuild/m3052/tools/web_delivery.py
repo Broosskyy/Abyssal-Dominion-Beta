@@ -62,6 +62,7 @@ def zipped(entries: dict[str, bytes]) -> bytes:
     return output.getvalue()
 
 def finalize(directory: Path, source: Path) -> None:
+    (directory/'asset-cache.js').write_bytes((ROOT/'web/asset-cache.js').read_bytes())
     with ZipFile(source) as archive:
         entries = {n: archive.read(n) for n in archive.namelist() if not n.endswith('/')}
     assert 'project.binary' in entries

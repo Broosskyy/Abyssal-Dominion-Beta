@@ -10,6 +10,8 @@ The browser starts at the existing account/welcome scene without the Android upd
 
 The stock Godot WebAssembly binary remains a first-visit cost. Its URL is hashed by content so an unchanged engine survives future game releases in the HTTP cache. Core and optional packs also have immutable content hashes. `delivery-report.json` records raw sizes and a conservative gzip transfer estimate; only a browser network test establishes actual transferred bytes.
 
+Because some browsers do not retain the large engine in their ordinary response cache, a small service worker also caches only same-origin, content-addressed engine/core/art files. It verifies the decoded SHA-256 prefix before storage, keeps a bounded number of versions, and never intercepts HTML, login/account requests or WebSockets. Unsupported/blocked cache APIs fall back to the normal small download.
+
 Local first implementation: initial core approximately 6.8 MB (previous game pack 89 MB), optional designs approximately 1.9 MB, stock engine approximately 10.1 MB with gzip. The roughly 17 MB cold-start estimate is not a 3–5 MB first-play claim. CI enforces a 23 MB cold transfer budget and checks that the optional pack is absent during guest startup and that repeat visits reuse the core/engine cache.
 
 Tests include an isolated exported core boot with real HTTP optional download, imported atlas/preview resolution, cached remount and design equip. The browser check starts the actual WebGL game and sails using real canvas input. Existing native UI and HTTP/WebSocket preparation regressions remain in the signed-content pipeline.
