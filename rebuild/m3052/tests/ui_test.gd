@@ -234,6 +234,7 @@ func _run() -> void:
 		root.size=dimensions
 		await process_frame
 		game._layout()
+		await process_frame # HBox solves the swipeable header's child widths.
 		game.sim.select(2)
 		game._refresh_ui()
 		check(game.nav_buttons.size()==9,"top bar carries nine sea-chart menus")
