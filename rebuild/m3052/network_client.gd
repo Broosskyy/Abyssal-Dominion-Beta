@@ -63,6 +63,8 @@ func send_course(point: Vector2) -> void:
 ## Switch between room snapshots without losing the authenticated session.
 func leave_world() -> void:
 	if connecting or joined:socket.close()
+	# A fresh peer allows an immediate reconnect when crossing chart rooms.
+	socket=WebSocketPeer.new()
 	connecting=false
 	joined=false
 	connection_changed.emit(false)
