@@ -429,6 +429,8 @@ func _run() -> void:
 		check(game.modal_body.find_child("MarketItem_powder",true,false)!=null,"new product cards preserve real item purchase buttons "+str(device))
 		game._switch_tab("Decks","SCHIFF")
 		check(game.modal_body.find_child("DeckOverview",true,false)!=null,"animated 2x5 deck badge preserved in new tabbed deck panel")
+		var fleet_upgrade: Button=game.modal_body.find_child("DeckFleetUpgrade",true,false) as Button
+		check(fleet_upgrade!=null and fleet_upgrade.custom_minimum_size.y>=48,"ship deck matrix offers an explicit touch-sized optional group upgrade with total cost preview "+str(device))
 		var deck_legend_visible: bool=false
 		for deck_label: Label in game.modal_body.find_children("*","Label",true,false):
 			if "MONTIERT" in deck_label.text and "KRISTALL" in deck_label.text:deck_legend_visible=true

@@ -584,6 +584,51 @@ func upgrade_deck(index: int) -> bool:
 	message="%sdeck Stufe %d · +%d Kanonenplätze (Beta)" % [CONTENT.DECK_TIERS[int(info.next_tier)],int(info.next_stage),int(info.cannons_next)]
 	return true
 
+## Every mounted, upgradable physical deck advances by exactly ONE step.
+## The price preview and the transaction share the same requirements.
+## No partial upgrades: insufficient gold, essence or captain level blocks
+## the entire bundle, and warehouse-only decks are never touched.
+func deck_fleet_upgrade_preview() -> Dictionary:
+	var targets: Array[int]=[]
+	var gold_total: int=0
+	var essence_total: int=0
+	var cannon_gain: int=0
+	var required_level: int=1
+	for slot in deck_slots:
+		var index: int=int(slot)
+		if index<0 or index>=decks.size() or index in targets:continue
+		var info: Dictionary=deck_upgrade_info(index)
+		if info.is_empty() or bool(info.maximum):continue
+		targets.append(index)
+		gold_total+=int(info.gold)
+		essence_total+=int(info.essence)
+		cannon_gain+=int(info.cannons_next)-int(info.cannons_now)
+		required_level=maxi(required_level,int(info.captain_level))
+	var reason: String=""
+	if targets.is_empty():reason="Keine montierten Decks mit weiteren Ausbaustufen"
+	elif not docked:reason="Deckwerft nur im Hafen verfügbar"
+	elif level<required_level:reason="Kapitänsstufe %d erforderlich" % required_level
+	elif int(player.gold)<gold_total:reason="%d Gold erforderlich" % gold_total
+	elif essence<essence_total:reason="%d Gezeitenessenz erforderlich" % essence_total
+	return {"targets":targets,"count":targets.size(),"gold":gold_total,"essence":essence_total,
+		"cannon_gain":cannon_gain,"captain_level":required_level,"can_upgrade":reason.is_empty(),"reason":reason}
+
+func upgrade_mounted_decks() -> bool:
+	var preview: Dictionary=deck_fleet_upgrade_preview()
+	if not bool(preview.can_upgrade):
+		message=str(preview.reason)
+		return false
+	# No other changes between validation and debit: atomic local operation.
+	player.gold-=int(preview.gold)
+	essence-=int(preview.essence)
+	for index: int in preview.targets:
+		var info: Dictionary=deck_upgrade_info(index)
+		decks[index].tier=int(info.next_tier)
+		decks[index].stage=int(info.next_stage)
+	apply_upgrades()
+	message="%d Decks einzeln um eine Stufe verbessert · +%d Kanonenplätze (Beta)" % [int(preview.count),int(preview.cannon_gain)]
+	return true
+
 func add_special_deck(key: String,seconds: float) -> bool:
 	if not CONTENT.SPECIAL_DECKS.has(key) or seconds<=0:return false
 	buffs[key]=minf(CONTENT.TIDE_DECK_CAP,float(buffs[key])+seconds)

@@ -99,5 +99,38 @@ func _initialize() -> void:
 	special.step(2)
 	check(special.buffs.storm_deck==0 and special.buffs.salvage_deck==0 and is_equal_approx(float(special.player.speed),special.PLAYER_SPEED) and special.loot_gold(100)==100,"independent side decks expire cleanly")
 	check(not special.add_special_deck("invented",60),"unknown side decks cannot be granted")
+	# Opt-in, atomic one-step upgrade of ONLY the mounted standard decks.
+	var fleet=SIM.new()
+	fleet.player.pos=fleet.harbor
+	fleet.dock()
+	fleet.player.gold=9000
+	for i in 3:check(fleet.buy_deck("cannon"),"set up mounted Gold deck for bundle test "+str(i))
+	var preview: Dictionary=fleet.deck_fleet_upgrade_preview()
+	check(preview.count==3 and preview.gold==540 and preview.essence==0 and preview.cannon_gain==3 and preview.can_upgrade,"preview sums three independent Gold I→II upgrades exactly")
+	fleet.player.gold=539
+	check(not fleet.upgrade_mounted_decks() and fleet.decks.all(func(d):return d.stage==1) and fleet.player.gold==539,"short gold fails the entire upgrade bundle without partial charges")
+	fleet.player.gold=9000
+	check(fleet.upgrade_mounted_decks() and fleet.decks.all(func(d):return d.stage==2) and fleet.player.gold==8460,"all mounted copies advance exactly one stage with one atomic debit")
+	fleet.decks[0].stage=5
+	fleet.player.gold=9000
+	fleet.essence=0
+	preview=fleet.deck_fleet_upgrade_preview()
+	check(preview.count==3 and preview.captain_level==3 and preview.essence==2 and not preview.can_upgrade,"material promotion reports captain-level gate before debit")
+	check(not fleet.upgrade_mounted_decks() and fleet.decks[0].tier==0 and fleet.decks[0].stage==5,"batch upgrade cannot bypass captain level")
+	fleet.level=3
+	preview=fleet.deck_fleet_upgrade_preview()
+	check(not preview.can_upgrade and preview.reason.contains("Essenz"),"material promotion checks full bundle essence")
+	fleet.essence=2
+	preview=fleet.deck_fleet_upgrade_preview()
+	var before_gold: int=int(fleet.player.gold)
+	check(preview.can_upgrade and fleet.upgrade_mounted_decks(),"mixed deck ranks can be upgraded together when total cost and level are met")
+	check(fleet.decks[0].tier==1 and fleet.decks[0].stage==1 and fleet.decks[1].stage==3 and fleet.decks[2].stage==3,"Gold V promotes to Pearl I while Gold II copies independently advance to III")
+	check(int(fleet.player.gold)==before_gold-int(preview.gold) and fleet.essence==0,"mixed fleet upgrade charges the exact previewed sum once")
+	check(fleet.unequip_deck(2),"unequip a standard deck for exclusion from bundle")
+	preview=fleet.deck_fleet_upgrade_preview()
+	check(preview.count==2 and not 2 in preview.targets and fleet.decks[2].stage==3,"warehouse-only decks never enter a mounted-only bulk upgrade")
+	var fleet_saved: Dictionary=JSON.parse_string(JSON.stringify(fleet.export_save()))
+	var fleet_loaded=SIM.new()
+	check(fleet_loaded.restore_save(fleet_saved) and fleet_loaded.decks==fleet.decks and fleet_loaded.deck_slots==fleet.deck_slots,"batch upgraded individual copies persist across save reload")
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)
