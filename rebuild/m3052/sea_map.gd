@@ -13,7 +13,12 @@ const TOUCH_SCROLL = preload("res://touch_scroll.gd")
 const ORNATE = preload("res://ornate_frame.gd")
 const SEA_MARKS = preload("res://sea_marks.gd")
 const PLATE_OVERLAY = preload("res://ship_plate_overlay.gd")
-const MESH_SHIPS = preload("res://ship_mesh_layer.gd")
+# Load real GLB ships only on native. The browser Classic client must not
+# even import the GLB rendering script or instantiate a 3D SubViewport.
+const MESH_SHIPS_PATH := "res://ship_mesh_layer.gd"
+const CLASSIC_SLOOP: Texture2D=preload("res://assets/classic/classic_sloop.svg")
+const CLASSIC_BRIG: Texture2D=preload("res://assets/classic/classic_brig.svg")
+const CLASSIC_GALLEON: Texture2D=preload("res://assets/classic/classic_galleon.svg")
 const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
@@ -218,6 +223,7 @@ var vfx_flags: Dictionary = VFX_DEFAULT_FLAGS.duplicate(true)
 var vfx_intensity := 1.35
 # Browser only. Native APK/desktop visuals keep their existing fidelity.
 # The player may opt back into full-quality WebGL2 from Anzeige → Grafik.
+var browser_classic := OS.has_feature("web")
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
 # 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
@@ -300,6 +306,7 @@ func _ready() -> void:
 	ocean.set_shader_parameter("wave_noise",load("res://assets/reference/ocean/wave_noise.png"))
 	ocean.set_shader_parameter("sea_tile",load("res://assets/ui/painted/sea_tile.png"))
 	water.material = ocean
+	ocean.set_shader_parameter("web_classic",browser_classic)
 	_build_ui()
 	_apply_web_performance()
 	_start_online_presence()
@@ -940,9 +947,9 @@ func _draw_actor(actor: Dictionary) -> void:
 	var point: Vector2=_visual_actor_pos(actor)
 	var heading: Vector2=actor.heading
 	var length=_actor_visual_length(actor)
-	# The old four always-on foam segments did not match ship speed.
-	# The sampled trail is drawn before the ship; bow spray follows its course.
-	_draw_bow_spray(actor,point,heading,length)
+	# Classic ships use the same world positions and interactions; keep their
+	# wake limited to the sampled trails, without expensive crest polygons.
+	if not browser_classic:_draw_bow_spray(actor,point,heading,length)
 	# Mesh ships are lit in their own SubViewport. Do not add the previous
 	# oversized opaque 2D oval beneath their hulls.
 	var mesh_ship=mesh_layer!=null and mesh_layer.can_render_actor(actor)
@@ -984,8 +991,10 @@ func _draw_actor(actor: Dictionary) -> void:
 			var col = posmod(roundi((heading.angle()+PI*0.25)/TAU*4),4)
 			var row = int(elapsed*6)%CONTENT.MONSTER_ROWS
 			_draw_atlas(beast,point,210.0,col,row,CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS)
+	elif browser_classic and not monster:
+		_draw_classic_ship(actor,point,heading,length)
 	elif not mesh_ship:
-		# Do not resurrect a removed legacy sprite if a GLB fails to import.
+		# Never replace a broken native GLB with a fake sprite.
 		pass
 	if is_player and sim.staff.shows_badge():
 		var pulse=.5+.5*sin(elapsed*4.0)
@@ -1004,6 +1013,33 @@ func _draw_actor(actor: Dictionary) -> void:
 		draw_line(nose-heading*8+side,nose,course_tint,1.4,true)
 		draw_line(nose-heading*8-side,nose,course_tint,1.4,true)
 	if gallery_page>=0:_nameplate(actor,point+Vector2(0,28))
+
+## Original Abyssal sprites for the 2010–2016-style browser sea chart.
+## One rotated 2D texture draw per vessel: no 3D GLB, lighting, shadows
+## or per-frame mesh transforms. World coordinates and combat are unchanged.
+func _classic_ship_texture(actor: Dictionary) -> Texture2D:
+	if int(actor.get("id",0))==0:
+		return CLASSIC_SLOOP if int(actor.get("skin",0))==0 else CLASSIC_GALLEON
+	var key: String=str(actor.get("visual_key",""))
+	var choice: int=posmod(int(actor.get("id",0)),3)
+	if key.contains("brig") or key.contains("trader"):choice=1
+	elif key.contains("galley") or key.contains("mariner"):choice=2
+	return CLASSIC_SLOOP if choice==0 else CLASSIC_BRIG if choice==1 else CLASSIC_GALLEON
+
+func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
+	var art: Texture2D=_classic_ship_texture(actor)
+	if art==null:return
+	var h: float=length*0.667
+	var color: Color=Color.WHITE
+	if int(actor.get("id",0))==0 and int(actor.get("skin",0))>1:
+		color=_ship_design_accent(int(actor.get("skin",0))).lerp(Color.WHITE,0.74)
+	draw_set_transform(point,heading.angle(),Vector2.ONE)
+	draw_texture_rect(art,Rect2(Vector2(-length*.5,-h*.5),Vector2(length,h)),false,color)
+	# One distinctive pennant for elite player designs, without repainting
+	# the sprite or adding any additional material/shader.
+	if int(actor.get("id",0))==0 and int(actor.get("skin",0))>1:
+		draw_colored_polygon(PackedVector2Array([Vector2(-length*.29,-h*.09),Vector2(-length*.41,-h*.24),Vector2(-length*.29,-h*.24)]),_ship_design_accent(int(actor.get("skin",0))))
+	draw_set_transform(Vector2.ZERO)
 
 func _plate_pixels() -> float:
 	return clampf(get_viewport_rect().size.y/720.0,1.0,1.45)
@@ -1368,14 +1404,17 @@ func _set_orb(button: Button,texture: Texture2D,amount: String="",active: bool=f
 func _build_ui() -> void:
 	var layer =CanvasLayer.new()
 	add_child(layer)
-	# Render real 3D GLB NPC ships into an alpha SubViewport, composited on the
-	# chart below names, deck badges and the existing touch HUD.
-	mesh_layer=MESH_SHIPS.new()
-	mesh_layer.name="Real3DNpcFleet"
-	mesh_layer.host=self
-	layer.add_child(mesh_layer)
-	mesh_layer.set_render_mode(render_mode)
-	render_mode=mesh_layer.mode
+	# Browser Classic: zero GLB instances, zero 3D draw passes, zero transparent
+	# screen-sized SubViewport. Native APK/Desktop keep their existing 3D fleet.
+	if browser_classic:
+		render_mode="classic"
+	else:
+		mesh_layer=load(MESH_SHIPS_PATH).new()
+		mesh_layer.name="Real3DNpcFleet"
+		mesh_layer.host=self
+		layer.add_child(mesh_layer)
+		mesh_layer.set_render_mode(render_mode)
+		render_mode=mesh_layer.mode
 	# Screen-space captain/NPC readouts, independent of all Camera2D zoom/pan.
 	plate_overlay=PLATE_OVERLAY.new()
 	plate_overlay.host=self
@@ -1466,8 +1505,9 @@ func _build_ui() -> void:
 	# Directly reachable beside the minimap: no hidden submenu or scrolling.
 	render_toggle=_button(ui,"GRAFIK: 2,5D / 3D",_cycle_render_mode,"normal")
 	render_toggle.name="GraphicsModeToggle"
-	render_toggle.tooltip_text="2,5D Hybrid oder 3D – beide mit echten GLB-Schiffen"
+	render_toggle.tooltip_text="Browser: klassisches 2D ohne 3D; App: echtes 2,5D/3D"
 	render_toggle.add_theme_font_size_override("font_size",10)
+	if browser_classic:render_toggle.hide()
 	attack=_orb(ui,"Feuer ein/aus",extra_icons.cannon_action,_toggle_fire,"FEUER");attack.name="FireButton"
 	attack.set("hero",true)
 	repair=_orb(ui,"Schiff reparieren",extra_icons.upgrade_hull,func():sim.toggle_repair();_refresh_ui(),"REP");repair.name="RepairButton"
@@ -1745,8 +1785,9 @@ func _thousands(value: int) -> String:
 func _refresh_ui() -> void:
 	if gold_label==null:return
 	if render_toggle!=null:
-		render_toggle.text={"hybrid":"GRAFIK 2,5D","3d":"GRAFIK 3D"}.get(render_mode,"GRAFIK 2,5D")
-		render_toggle.disabled=mesh_layer==null or not mesh_layer.has_complete_fleet()
+		render_toggle.text="GRAFIK CLASSIC 2D" if browser_classic else {"hybrid":"GRAFIK 2,5D","3d":"GRAFIK 3D"}.get(render_mode,"GRAFIK 2,5D")
+		render_toggle.disabled=browser_classic or mesh_layer==null or not mesh_layer.has_complete_fleet()
+		render_toggle.visible=not browser_classic
 	var today=Time.get_date_string_from_system()
 	var quest_ready=not sim.current_quest().is_empty() and sim.quest_progress()>=int(sim.current_quest().goal)
 	for nav: Button in nav_buttons:
@@ -2659,12 +2700,12 @@ func _add_shipyard_card(index: int,container: Node,frames: Array[Control]) -> vo
 	badge.position=Vector2(14,12)
 	badge.add_theme_color_override("font_outline_color",Color("06161b"))
 	badge.add_theme_constant_override("outline_size",4)
-	var model_ok: bool=mesh_layer!=null and mesh_layer.model_scenes.has(str(skins[index].mesh_key))
-	if index>=2:model_ok=model_ok and ResourceLoader.exists(mesh_layer.texture_path(index-1))
+	var model_ok: bool=browser_classic or (mesh_layer!=null and mesh_layer.model_scenes.has(str(skins[index].mesh_key)))
+	if index>=2 and not browser_classic:model_ok=model_ok and ResourceLoader.exists(mesh_layer.texture_path(index-1))
 	var hint: String=str(skins[index].name).to_upper() if index>=12 else "ELITE %02d · %s" % [index-1,ELITE_V2_NAMES[index-2].to_upper()] if index>=2 else ("BLACK CROWN · ORIGINAL-TEST" if index==1 else "SCHATTENKRIEGSSCHIFF · STANDARD")
 	var description=_text(column,hint,13,accent)
 	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var details=_text(column,"Echtes 3D-GLB · 2,5D & 3D · Nur Design" if index>=2 else "Originalgeometrie · Gleiche Werte",12,Color("c0d5d5"))
+	var details=_text(column,"Browser: Classic-2D-Schiff · App: 3D-Original" if browser_classic else ("Echtes 3D-GLB · 2,5D & 3D · Nur Design" if index>=2 else "Originalgeometrie · Gleiche Werte"),12,Color("c0d5d5"))
 	details.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	var label: String=str(skins[index].name).to_upper()+"\n"+("AKTIV · AUSGERÜSTET" if chosen else ("AUSRÜSTEN · TEST" if model_ok else "TEXTUR / MODELL FEHLT"))
 	var choose=_button(column,label,func():_equip(choice),"normal" if chosen else "primary")
@@ -4021,7 +4062,7 @@ func _interact() -> void:
 func _equip(index: int) -> void:
 	var destination: String="Events" if modal_kind=="Events" else "Werft"
 	if index<0 or index>=skins.size():return
-	if mesh_layer==null or not mesh_layer.model_scenes.has(str(skins[index].mesh_key)) or (index>=2 and not ResourceLoader.exists(mesh_layer.texture_path(index-1))):
+	if not browser_classic and (mesh_layer==null or not mesh_layer.model_scenes.has(str(skins[index].mesh_key)) or (index>=2 and not ResourceLoader.exists(mesh_layer.texture_path(index-1)))):
 		sim.message="3D-Modell oder Elite-Textur noch nicht verfügbar"
 		_refresh_ui()
 		return
@@ -4248,7 +4289,7 @@ func _load_display() -> void:
 	hud_size=clampi(int(data.get("hud_size",1)),0,2)
 	journal_visible=bool(data.get("journal_visible",true))
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
-	render_mode="3d" if str(data.get("render_mode","hybrid"))=="3d" else "hybrid"
+	render_mode="classic" if browser_classic else ("3d" if str(data.get("render_mode","hybrid"))=="3d" else "hybrid")
 	projectile_visual_count=COMBAT_FX.visual_count(int(data.get("projectile_visual_count",3)))
 	var stored_flags: Variant=data.get("vfx_flags",{})
 	if stored_flags is Dictionary:
@@ -4268,6 +4309,7 @@ func _load_display() -> void:
 	quick_page=clampi(int(data.get("quick_page",0)),0,2)
 
 func _cycle_render_mode() -> void:
+	if browser_classic:return
 	_set_render_mode("3d" if render_mode=="hybrid" else "hybrid")
 
 func _persist_display_preferences() -> void:
@@ -4378,6 +4420,9 @@ func _set_projectile_visual_count(requested: int) -> void:
 	queue_redraw()
 
 func _set_render_mode(value: String) -> void:
+	if browser_classic:
+		render_mode="classic"
+		return
 	render_mode=value if value in ["hybrid","3d"] else "hybrid"
 	if mesh_layer!=null:
 		mesh_layer.set_render_mode(render_mode)
