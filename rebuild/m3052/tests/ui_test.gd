@@ -238,6 +238,7 @@ func _run() -> void:
 		game.sim.select(2)
 		game._refresh_ui()
 		check(game.nav_buttons.size()==9,"top bar carries nine sea-chart menus")
+		check(game._hud_contains(game.render_toggle.get_global_rect().get_center()),"mobile touch on graphics switch is reserved for its button, never treated as a sailing tap")
 		check(game.nav_scroll!=null and game.nav_scroll.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and game.nav_scroll.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x,"swipeable navigation viewport stays between wallet and captain meters at "+str(dimensions))
 		check(game.nav_strip.get_combined_minimum_size().x>game.nav_scroll.size.x or dimensions.x>=1200,"navigation scrolls rather than shrinking the nine buttons at "+str(dimensions))
 		for nav: Button in game.nav_buttons:
@@ -292,6 +293,8 @@ func _run() -> void:
 		check(original_art!=null and original_art.material==null,"original Black Crown test portrait stays untouched without a chroma-key filter")
 		check(elite_art!=null and elite_art.material is ShaderMaterial and elite_ten_art!=null and elite_ten_art.material is ShaderMaterial,"first and tenth RGB elite thumbnails key out flat backgrounds to reveal moving water")
 		check(game.modal_body.find_child("ShipStatus2",true,false)!=null,"shipyard artwork status badge is above the ship portrait rather than painted behind it")
+		var sea_preview: Control=game.modal_body.find_child("ShipDesignPreview2",true,false) as Control
+		check(sea_preview!=null and sea_preview.custom_minimum_size.y>=185,"elite art has a larger water-backed shipyard presentation")
 		var yard:=0
 		for button in game.modal_body.find_children("*","Button",true,false):
 			if "AUSRÜSTEN" in button.text or "AKTIV" in button.text:yard+=1
@@ -402,17 +405,25 @@ func _run() -> void:
 		var number_of_tiles: int=0
 		var all_inside: bool=true
 		var big_buttons: bool=true
+		var large_art: int=0
 		for node: PanelContainer in game.modal_body.find_children("*","PanelContainer",true,false):
 			if not node.has_meta("catalog_tile"):continue
 			number_of_tiles+=1
 			all_inside=all_inside and node.get_global_rect().end.x<=game.modal_scroll.get_global_rect().end.x+2.0
+			var stage: PanelContainer=node.find_child("CatalogArtStage",true,false) as PanelContainer
+			var artwork: TextureRect=node.find_child("CatalogArtwork",true,false) as TextureRect
+			if stage!=null and artwork!=null and stage.custom_minimum_size.y>=170 and artwork.custom_minimum_size.x>=148:large_art+=1
 			for button: Button in node.find_children("*","Button",true,false):
 				big_buttons=big_buttons and button.custom_minimum_size.y>=48.0
-		check(number_of_tiles==28 and big_buttons and all_inside,"all ammunition tiles have mobile-sized artwork/buttons and stay within viewport "+str(device))
+		check(number_of_tiles==28 and big_buttons and all_inside and large_art==28,"all 28 ammunition tiles have large real item art, accessible buttons and safe viewport bounds "+str(device))
 		game._switch_tab("Markt","ITEMS")
 		check(game.modal_body.find_child("MarketItem_powder",true,false)!=null,"new product cards preserve real item purchase buttons "+str(device))
 		game._switch_tab("Decks","SCHIFF")
 		check(game.modal_body.find_child("DeckOverview",true,false)!=null,"animated 2x5 deck badge preserved in new tabbed deck panel")
+		var deck_legend_visible: bool=false
+		for deck_label: Label in game.modal_body.find_children("*","Label",true,false):
+			if "MONTIERT" in deck_label.text and "KRISTALL" in deck_label.text:deck_legend_visible=true
+		check(deck_legend_visible,"deck screen reports actual Gold/Elite/Kristall mounted tier counts")
 		game._switch_tab("Decks","LAGER")
 		check(game._tab("Decks")=="LAGER","deck inventory has a separate panel")
 		game._switch_tab("Decks","SPEZIAL")
