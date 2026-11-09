@@ -25,6 +25,11 @@ jobs:
           sparse-checkout: |
             rebuild/m3052
             server
+            web_preview/tests
+      - name: Verify mobile browser launch and fullscreen
+        run: |
+          npm install --prefix /tmp/abyssal-browser-check playwright@1.62.1 --no-save
+          NODE_PATH=/tmp/abyssal-browser-check/node_modules CHROMIUM_PATH=/usr/bin/google-chrome node web_preview/tests/mobile_shell.cjs
       - name: Install verified Godot 4.7.2 and Web export template
         shell: bash
         run: |
@@ -83,6 +88,10 @@ jobs:
               png=root/(item['name']+'.png')
               assert png.stat().st_size>4000, f'missing original 3D render: {png}'
               assert len(item['coverage'])==8 and min(item['coverage'])>15
+              assert len(item['frames'])==8 and item['reference_extent']>0
+              for frame in item['frames']:
+                  assert len(frame['rect'])==4 and min(frame['rect'][2:])>0
+                  assert len(frame['pivot'])==2 and frame['reference_extent']==item['reference_extent']
           print('PASS: 23 actual GLB-derived atlases / 184 distinct heading renders')
           PY
           "$engine" --headless --path rebuild/m3052 --editor --import --quit > /tmp/sprites-import.log 2>&1 || { tail -100 /tmp/sprites-import.log; exit 1; }
@@ -99,9 +108,15 @@ jobs:
           replacement='exclude_filter="tests/**,tools/**,qa/**,README.md,builds/**,assets/npc/meshy/models/*.glb,assets/player/*.glb,assets/elite_v2/textures/*.png,ship_mesh_layer.gd,stern_hull_taper.gd"'
           if original not in web:raise SystemExit("Web export filter changed unexpectedly")
           web=web.replace(original,replacement)
+          web=web.replace('assets/visuals/island_collision.json"','assets/visuals/island_collision.json,assets/classic_baked/manifest.json"')
+          web=web.replace('html/custom_html_shell=""','html/custom_html_shell="res://web/browser_shell.html"')
           f.write_text(head+'[preset.1]'+web+'[preset.2]'+tail,encoding='utf-8')
           print('Browser Classic: heavy GLBs/materials excluded from Web only')
           PY
+          "$engine" --headless --path rebuild/m3052 --script tests/browser_geometry_test.gd
+          LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a --server-args='-screen 0 1280x720x24' \
+            "$engine" --audio-driver Dummy --path rebuild/m3052 \
+            --script tests/browser_capture.gd -- --out="$RUNNER_TEMP/browser-captures"
           "$engine" --headless --path rebuild/m3052 --export-release Web "$PWD/rebuild/m3052/builds/web/index.html" > /tmp/web-export.log 2>&1 || { tail -100 /tmp/web-export.log; exit 1; }
           if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script' /tmp/web-export.log; then exit 1; fi
           test -s rebuild/m3052/builds/web/index.html
@@ -122,6 +137,12 @@ jobs:
           set -euo pipefail
           cd rebuild/m3052/builds/web
           zip -q -r ../ABYSSAL_BROWSER_${GITHUB_RUN_NUMBER}.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: abyssal-browser-visual-check-${{ github.run_number }}
+          path: ${{ runner.temp }}/browser-captures/
+          if-no-files-found: error
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         with:
           name: abyssal-browser-${{ github.run_number }}

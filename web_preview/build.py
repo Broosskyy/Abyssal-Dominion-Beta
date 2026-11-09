@@ -14,7 +14,7 @@ from urllib.request import Request, urlopen
 from zipfile import ZipFile
 
 REPOSITORY = "Broosskyy/Abyssal-Dominion-Beta"
-RELEASES = f"https://api.github.com/repos/{REPOSITORY}/releases?per_page=30"
+RELEASES = f"https://api.github.com/repos/{REPOSITORY}/releases?per_page=100"
 DEST = Path(__file__).resolve().parent / "dist"
 EXPECTED = {"index.html", "index.js", "index.pck", "index.wasm"}
 
@@ -33,11 +33,36 @@ def response(url: str) -> bytes:
 
 
 def main() -> None:
-    versions = json.loads(response(RELEASES))
+    source_sha = os.environ.get("VERCEL_GIT_COMMIT_SHA", "").strip()
+    wait_for_source = False
+    if source_sha:
+        commit = json.loads(response(f"https://api.github.com/repos/{REPOSITORY}/commits/{source_sha}"))
+        wait_for_source = "[skip ci]" not in commit.get("commit", {}).get("message", "") and any(
+            entry.get("filename", "").startswith(("rebuild/m3052/", "server/")) or
+            entry.get("filename") == ".github/workflows/browser-preview.yml"
+            for entry in commit.get("files", [])
+        )
+    # Vercel starts at push time, before Godot finishes exporting. Never
+    # silently publish test N-1 under the source SHA of browser test N.
+    deadline = time.monotonic() + 600
+    while True:
+        versions = json.loads(response(RELEASES))
+        if not wait_for_source or any(
+            re.fullmatch(r"browser-test-\d+", str(item.get("tag_name", ""))) and
+            item.get("target_commitish") == source_sha and item.get("assets")
+            for item in versions
+        ):
+            break
+        if time.monotonic() >= deadline:
+            raise RuntimeError("The browser export for this commit is not ready; keeping the previous deployment active")
+        print("Waiting for the matching Godot browser export …", flush=True)
+        time.sleep(10)
     candidates = []
     for release in versions:
         match = re.fullmatch(r"browser-test-(\d+)", str(release.get("tag_name", "")))
         if match is None or release.get("draft", False):
+            continue
+        if wait_for_source and release.get("target_commitish") != source_sha:
             continue
         for asset in release.get("assets", []):
             if re.fullmatch(r"ABYSSAL_BROWSER_\d+\.zip", str(asset.get("name", ""))):

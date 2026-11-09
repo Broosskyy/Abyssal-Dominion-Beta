@@ -8,6 +8,7 @@ const TAPER = preload("res://stern_hull_taper.gd")
 const OUT := "res://assets/classic_baked"
 const FRAME := 256
 const ANGLES := 8
+const CAMERA_SIZE := 3.35
 const MODELS := {
 	"schattenkriegsschiff_shaded":"res://assets/player/schattenkriegsschiff_shaded.glb",
 	"black_crown_corsair_elite_test":"res://assets/npc/meshy/models/black_crown_corsair_elite_test.glb",
@@ -41,6 +42,21 @@ var camera: Camera3D
 var output: String=OUT
 var files: Array[Dictionary]=[]
 
+func _monster_baselines() -> Dictionary:
+	var result: Dictionary={}
+	var image: Image=Image.load_from_file("res://assets/reference/monsters/tiamat.png")
+	var cell: Vector2=Vector2(image.get_size())/Vector2(4,10)
+	var bottom: float=0.0
+	for row in 10:
+		for column in 4:
+			var region: Image=image.get_region(Rect2i(Vector2(column,row)*cell,cell))
+			bottom=maxf(bottom,(float(region.get_used_rect().end.y)-cell.y*.68)*210.0/cell.x)
+	result["tiamat"]=bottom
+	for key: String in ["kraken","serpent","crab","glitter","pumpkin"]:
+		var source: Image=Image.load_from_file("res://assets/expansion/"+key+".webp")
+		result[key]=(float(source.get_used_rect().end.y)-source.get_height()*.5)*227.5/maxf(source.get_width(),source.get_height())+2.5
+	return result
+
 func _initialize() -> void:
 	call_deferred("_bake_all")
 
@@ -59,7 +75,7 @@ func _prepare_view() -> void:
 	viewport.add_child(world)
 	camera=Camera3D.new()
 	camera.projection=Camera3D.PROJECTION_ORTHOGONAL
-	camera.size=3.35
+	camera.size=CAMERA_SIZE
 	camera.near=.1
 	camera.far=100.0
 	viewport.add_child(camera)
@@ -141,6 +157,10 @@ func _render_atlas(key: String,paint: int,name: String) -> bool:
 	var atlas=Image.create(FRAME*ANGLES,FRAME,false,Image.FORMAT_RGBA8)
 	atlas.fill(Color.TRANSPARENT)
 	var coverage: Array[int]=[]
+	var frames: Array[Dictionary]=[]
+	var water_pivot: Vector2=camera.unproject_position(Vector3.ZERO)
+	var reference_extent: float=float(FRAME)*float(MESH.MODEL_INFO[key][0])/CAMERA_SIZE
+	var stable_bottom: float=0.0
 	for heading_index in range(ANGLES):
 		# Exactly the 8 clockwise headings used by ship_visuals.heading_eight:
 		# N, NE, E, SE, S, SW, W, NW (index 0 points chart-north).
@@ -163,6 +183,14 @@ func _render_atlas(key: String,paint: int,name: String) -> bool:
 			owner.queue_free()
 			return false
 		coverage.append(visible)
+		var bounds: Rect2i=capture.get_used_rect()
+		if bounds.position.x<2 or bounds.position.y<2 or bounds.end.x>FRAME-2 or bounds.end.y>FRAME-2:
+			push_error("Clipped original GLB render: "+name+" heading "+str(heading_index))
+			owner.queue_free()
+			return false
+		frames.append({"rect":[heading_index*FRAME+bounds.position.x,bounds.position.y,bounds.size.x,bounds.size.y],
+			"pivot":[water_pivot.x-bounds.position.x,water_pivot.y-bounds.position.y],"reference_extent":reference_extent})
+		stable_bottom=maxf(stable_bottom,float(bounds.end.y)-water_pivot.y)
 		atlas.blit_rect(capture,Rect2i(0,0,FRAME,FRAME),Vector2i(heading_index*FRAME,0))
 	owner.queue_free()
 	var path=output+"/"+name+".png"
@@ -170,7 +198,10 @@ func _render_atlas(key: String,paint: int,name: String) -> bool:
 	if err!=OK:
 		push_error("Cannot write "+path+": "+str(err))
 		return false
-	files.append({"name":name,"source":key,"paint":paint,"coverage":coverage})
+	# Every heading keeps the SAME source-unit scale and water-contact pivot.
+	# Alpha crops remove padding, never resize each view to a different size.
+	files.append({"name":name,"source":key,"paint":paint,"coverage":coverage,
+		"frames":frames,"reference_extent":reference_extent,"stable_bottom":stable_bottom})
 	print("BAKED_GLTF_ATLAS "+name+" "+str(coverage))
 	await process_frame
 	return true
@@ -196,7 +227,7 @@ func _bake_all() -> void:
 			quit(1)
 			return
 	var data={"status":"BAKED_FROM_ORIGINAL_GLBS","angles":ANGLES,"frame_px":FRAME,
-		"order":"N,NE,E,SE,S,SW,W,NW","atlases":files}
+		"order":"N,NE,E,SE,S,SW,W,NW","atlases":files,"monster_bottoms":_monster_baselines()}
 	var manifest=FileAccess.open(output+"/manifest.json",FileAccess.WRITE)
 	if manifest==null:
 		push_error("Cannot save atlas manifest")

@@ -235,6 +235,8 @@ var vfx_intensity := 1.35
 # The player may opt back into full-quality WebGL2 from Anzeige → Grafik.
 var browser_classic := OS.has_feature("web")
 var classic_atlases: Dictionary={}
+var classic_geometry: Dictionary={}
+var classic_monster_bottoms: Dictionary={}
 var classic_heading_cache: Dictionary={}
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
@@ -416,6 +418,12 @@ func _sharp_zoom() -> float:
 
 func _load_assets() -> void:
 	if browser_classic:
+		var metadata_path: String=CLASSIC_ATLAS_ROOT+"manifest.json"
+		if FileAccess.file_exists(metadata_path):
+			var metadata=JSON.parse_string(FileAccess.get_file_as_string(metadata_path))
+			if metadata is Dictionary:
+				for entry: Dictionary in metadata.get("atlases",[]):classic_geometry[str(entry.name)]=entry
+				classic_monster_bottoms=metadata.get("monster_bottoms",{})
 		var baked_keys: Array[String]=[]
 		for model_key: String in CLASSIC_MODEL_KEYS:baked_keys.append(model_key)
 		for index in range(1,11):baked_keys.append("elite_%02d" % index)
@@ -1072,6 +1080,14 @@ func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length
 	var key: String=_classic_atlas_key(actor)
 	var atlas: Texture2D=classic_atlases.get(key) as Texture2D
 	if atlas!=null:
+		var entry: Dictionary=classic_geometry.get(key,{})
+		if not entry.is_empty():
+			var frame: Dictionary=entry.frames[_classic_frame_for_actor(actor)]
+			var spec: Dictionary=VISUALS.geometry(frame,length)
+			var target: Rect2=spec.destination
+			target.position+=point
+			draw_texture_rect_region(atlas,target,spec.source)
+			return
 		# Frame 0 = North; 1 = NE; 2 = East; ... 7 = NW, exactly as
 		# ship_visuals.heading_eight and the offline Godot GLB renderer.
 		# The camera perspective is ALREADY baked for each heading:
@@ -1094,7 +1110,8 @@ func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length
 	draw_set_transform(Vector2.ZERO)
 
 func _plate_pixels() -> float:
-	return clampf(get_viewport_rect().size.y/720.0,1.0,1.45)
+	var minimum: float=1.15 if browser_classic else 1.0
+	return clampf(get_viewport_rect().size.y/720.0,minimum,1.45)
 
 func _plate_scale() -> float:
 	if gallery_page>=0 or camera==null:return 1.0
@@ -1170,6 +1187,22 @@ func _plate_screen_anchor(actor: Dictionary) -> Vector2:
 	var pixels=_plate_pixels()
 	var point: Vector2=get_canvas_transform()*_visual_actor_pos(actor)
 	var player=int(actor.id)==0
+	if browser_classic:
+		var zoom: float=absf(get_canvas_transform().y.y)
+		var entry: Dictionary=classic_geometry.get(_classic_atlas_key(actor),{})
+		if not entry.is_empty() and str(actor.get("kind","ship"))=="ship":
+			var bottom: float=float(entry.stable_bottom)*_actor_visual_length(actor)/float(entry.reference_extent)
+			return Vector2(point.x,point.y+bottom*zoom+22.0*pixels)
+		if str(actor.get("kind",""))=="monster":
+			# The monster atlas is drawn around a 68% waterline pivot, not
+			# the old 72-world-unit 3D hull envelope used for every monster.
+			var key: String=str(actor.get("monster_key",""))
+			var bottom: float=210.0*beast.get_height()/float(CONTENT.MONSTER_ROWS)/(beast.get_width()/float(CONTENT.MONSTER_COLUMNS))*.32
+			if expansion_art.has(key):
+				var tex: Texture2D=expansion_art[key]
+				bottom=tex.get_height()*227.5/maxf(tex.get_width(),tex.get_height())*.5+2.0
+			bottom=float(classic_monster_bottoms.get(key if expansion_art.has(key) else "tiamat",bottom))
+			return Vector2(point.x,point.y+bottom*zoom+21.0*pixels)
 	# The player 3D plate follows a constant hull envelope. Its position
 	# is independent of yaw while still tracking camera zoom every frame.
 	if player and mesh_layer!=null and mesh_layer.can_render_actor(actor):
@@ -1672,6 +1705,7 @@ func _layout() -> void:
 	# Scale only the HUD. Ocean, camera, world input and simulation keep viewport coordinates.
 	var base=maxf(viewport_size.y/600.0,1.0)
 	var requested=base*[0.86,1.0,1.14][hud_size]
+	if browser_classic:requested*=1.15
 	hud_scale=clampf(requested,0.86,minf(viewport_size.x/720.0,viewport_size.y/390.0))
 	ui.scale=Vector2.ONE*hud_scale
 	var s=viewport_size/hud_scale
