@@ -13,10 +13,10 @@ const NEWS_KESSEL=preload("res://assets/ui/painted/kessel_scene.jpg")
 const NEWS_CHART=preload("res://assets/ui/painted/chart_parchment.jpg")
 const DAILY_CHEST=preload("res://assets/ui/painted/reward_chest.png")
 const NEWS_FRAMES=[
-	{"title":"DIE SCHATTENGEWÄSSER RUFEN","tag":"WELT & ABENTEUER","description":"Erkunde 40 Seekarten, kämpfe gegen neue Seeungeheuer und entdecke die befahrbaren Inselhäfen.","art":0},
-	{"title":"WERFT & MARKTPLATZ","tag":"DEIN SCHIFF","description":"Rüste Geschütze aus, entdecke Schiffsdesigns und bereite dich auf die nächste große Seeschlacht vor.","art":1},
-	{"title":"GEZEITENKESSEL & BONUSKARTEN","tag":"BELOHNUNGEN","description":"Sammle Bonuskartenfragmente, stelle Schriftrollen zusammen und kämpfe dich durch fünf Wellen.","art":2},
-	{"title":"ERKUNDE DEINE WELTKARTE","tag":"SEEKARTEN","description":"Von den Küsten bis zu den Schattengewässern: Deine Route bestimmst du selbst.","art":3}
+	{"title":"DIE SCHATTENGEWÄSSER RUFEN","tag":"WELT & ABENTEUER","description":"Erkunde 40 Seekarten, kämpfe gegen Seeungeheuer und entdecke die befahrbaren Inselhäfen.","art":0,"action":"Seekarten","button":"WELTKARTE ÖFFNEN"},
+	{"title":"WERFT & MARKTPLATZ","tag":"DEIN SCHIFF","description":"Rüste Geschütze aus, entdecke Schiffsdesigns und bereite dich auf die nächste große Seeschlacht vor.","art":1,"action":"Werft","button":"ZUR WERFT"},
+	{"title":"GEZEITENKESSEL & BONUSKARTEN","tag":"BELOHNUNGEN","description":"Sammle Bonuskartenfragmente, stelle Schriftrollen zusammen und kämpfe dich durch fünf Wellen.","art":2,"action":"Bonuskarten","button":"BONUSKARTEN ÖFFNEN"},
+	{"title":"ERKUNDE DEINE WELTKARTE","tag":"SEEKARTEN","description":"Von den Küsten bis zu den Schattengewässern: Deine Route bestimmst du selbst.","art":3,"action":"start","button":"JETZT IN SEE STECHEN"}
 ]
 const FRIEND_SHARE_URL="https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases"
 var sea_time := 0.0
@@ -43,6 +43,8 @@ var featured_title: Label
 var featured_tag: Label
 var featured_detail: Label
 var featured_position: Label
+var featured_action: Button
+var home_section := "ABENTEUER"
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	backdrop=TextureRect.new();backdrop.name="LivingHarbor"
@@ -135,7 +137,9 @@ func _hint(parent: Node,message: String,size: int=14,color: Color=Color("c3d5dd"
 func _dashboard_grid(wide_columns: int=4) -> GridContainer:
 	var grid=GridContainer.new()
 	var size: Vector2=get_viewport_rect().size
-	grid.columns=wide_columns if size.x>size.y*1.3 else 2
+	# Large art/cards use only one column on small logical phone widths.
+	# Stat chips deliberately use their own compact two-column grid.
+	grid.columns=wide_columns if size.x>size.y*1.3 else (1 if size.x<620.0 and wide_columns>=3 else 2)
 	grid.add_theme_constant_override("h_separation",8)
 	grid.add_theme_constant_override("v_separation",8)
 	grid.size_flags_horizontal=Control.SIZE_EXPAND_FILL
@@ -189,6 +193,8 @@ func _featured_shift(direction: int) -> void:
 	featured_tag.text=str(spec.tag)
 	featured_detail.text=str(spec.description)
 	featured_position.text="%d / %d" % [featured_index+1,NEWS_FRAMES.size()]
+	if is_instance_valid(featured_action):
+		featured_action.text=str(spec.button)
 
 func _invite_text() -> String:
 	# Share a real, reachable download page; do not invent referral rewards
@@ -200,31 +206,45 @@ func _copy_invite() -> void:
 	status_text="Spielelink in die Zwischenablage kopiert. Du kannst ihn in WhatsApp, Discord oder anderen Apps teilen."
 	_show("friends")
 
-func _show_home() -> void:
-	_label("KAPITÄNSHAFEN · STARTSEITE",true)
-	var stats=_dashboard_grid(4)
-	for entry in [["GOLD",_coins(int(sim.player.gold))],["ESSENZ",str(sim.essence)],["STUFE",str(sim.level)],["BATTLE POINTS",str(sim.battle_points)]]:
-		var card=PanelContainer.new()
-		card.add_theme_stylebox_override("panel",SKIN.card(Color("b7985e")))
-		card.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		stats.add_child(card)
-		var stack=VBoxContainer.new();card.add_child(stack)
-		var stat_name=_hint(stack,str(entry[0]),11,Color("a8bec1"))
-		stat_name.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-		var val=_hint(stack,str(entry[1]),16,Color("f5dcab"))
-		val.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-	var summary=_hint(body,"%s · Stufe %d · Seekarte %s  |  %s" % [sim.captain_name,sim.level,sim.CONTENT.MAPS[sim.map_id].code,"Online-Konto" if not network.account.is_empty() else "Lokale Beta"],14)
-	summary.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-	var start_action=_button("JETZT SPIELEN · ZUR SEEKARTE",_sail,true)
-	start_action.name="SailButton"
-	start_action.custom_minimum_size.y=54
-	var shortcuts=_dashboard_grid(5)
-	for entry in [["STARTSEITE","home"],["LOGBUCH","logbook"],["FREUNDE","friends"],["PROFIL","profile"],["KONTO","settings"]]:
-		var destination: String=str(entry[1])
-		var action=_dashboard_button(shortcuts,str(entry[0]),func():_show(destination),destination=="home")
+# An original illustrated news-first home inspired by classic sea MMO
+# information hubs. Promotions are only links to real existing game areas;
+# no fake payment offers, server events or referral rewards are displayed.
+func _home_nav() -> void:
+	var swipe=ScrollContainer.new()
+	swipe.name="HomeNavigationScroller"
+	swipe.custom_minimum_size.y=58
+	swipe.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_AUTO
+	swipe.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+	swipe.follow_focus=true
+	swipe.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	body.add_child(swipe)
+	var items=HBoxContainer.new()
+	items.add_theme_constant_override("separation",8)
+	swipe.add_child(items)
+	for option in [["STARTSEITE","home"],["BELOHNUNGEN","rewards"],["FREUNDE","friends"],["LOGBUCH","logbook"],["WELTKARTE","maps"],["PROFIL","profile"]]:
+		var destination: String=str(option[1])
+		var action=_dashboard_button(items,str(option[0]),func():_show(destination),destination=="home")
 		action.name="HubTab_"+destination
-	_label("AKTUELL AUF DEM MEER",true)
-	var hero=PanelContainer.new();hero.name="FeaturedNews"
+		action.custom_minimum_size.x=138
+
+func _activate_featured() -> void:
+	var destination: String=str(NEWS_FRAMES[featured_index].get("action","start"))
+	if destination=="start":_sail()
+	else:_sail_menu(destination)
+
+func _switch_home_section(section: String) -> void:
+	if not section in ["ABENTEUER","SCHIFF & HANDEL","KAPITÄN & BONUS"]:return
+	home_section=section
+	_show("home")
+
+func _show_home() -> void:
+	_label("ABYSSAL DOMINION · KAPITÄNSHAFEN",true)
+	var summary=_hint(body,"%s  ·  LV. %d  ·  SEEKARTE %s  ·  %s" % [sim.captain_name,sim.level,sim.CONTENT.MAPS[sim.map_id].code,"ONLINE" if not network.account.is_empty() else "LOKALE BETA"],14)
+	summary.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	_home_nav()
+	_label("AKTUELL AUF DEN MEEREN",true)
+	var hero=PanelContainer.new()
+	hero.name="FeaturedNews"
 	hero.add_theme_stylebox_override("panel",SKIN.card(Color("d9b16c")))
 	hero.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	body.add_child(hero)
@@ -237,49 +257,103 @@ func _show_home() -> void:
 	featured_image.name="FeaturedArtwork"
 	featured_image.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
 	featured_image.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	featured_image.custom_minimum_size=Vector2(370,214) if wide else Vector2(0,194)
+	featured_image.custom_minimum_size=Vector2(370,214) if wide else Vector2(0,180)
 	featured_image.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	featured_image.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	content.add_child(featured_image)
 	var copy=VBoxContainer.new()
-	copy.add_theme_constant_override("separation",9)
+	copy.add_theme_constant_override("separation",8)
 	copy.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	content.add_child(copy)
 	featured_tag=_hint(copy,"",12,Color("a7d5cb"))
 	featured_title=_hint(copy,"",21,Color("f4d595"))
 	featured_detail=_hint(copy,"",14)
+	featured_action=_dashboard_button(copy,"",_activate_featured,true)
+	featured_action.name="FeaturedAction"
 	var nav=HBoxContainer.new()
-	nav.add_theme_constant_override("separation",9)
+	nav.add_theme_constant_override("separation",8)
 	copy.add_child(nav)
-	_dashboard_button(nav,"‹ ZURÜCK",func():_featured_shift(-1))
+	_dashboard_button(nav,"‹",func():_featured_shift(-1))
 	featured_position=_hint(nav,"1 / 4",13,Color("e1c38a"))
 	featured_position.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	featured_position.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
-	_dashboard_button(nav,"WEITER ›",func():_featured_shift(1))
-	_dashboard_button(copy,"ABENTEUER STARTEN",_sail,true).name="HeroSailButton"
+	_dashboard_button(nav,"›",func():_featured_shift(1))
 	_featured_shift(0)
-	if sim.rewards.daily_available():
-		_hint(body,"TAGESBONUS BEREIT · Deine nächste Belohnung wartet.",14,Color("a5e1c1"))
-	else:
-		_hint(body,"Tagesbonus bereits geholt · neue Belohnung ab 00:00 UTC.",13)
+	var start_action=_button("JETZT SPIELEN · ZUR SEEKARTE",_sail,true)
+	start_action.name="SailButton"
+	start_action.custom_minimum_size.y=56
+	# Compact teaser row, the equivalent of the three small news cards in
+	# the reference. All actions open real features from the current game.
+	_label("ENTDECKEN & VORBEREITEN",true)
+	var teasers=_dashboard_grid(3)
+	_dashboard_card(teasers,"NEUE SCHIFFSDESIGNS","Schiffe & Kanonen",func():_sail_menu("Werft"),NEWS_HARBOR)
+	_dashboard_card(teasers,"GEZEITENKESSEL","Fragmente & Belohnungen",func():_sail_menu("Kessel"),NEWS_KESSEL)
+	_dashboard_card(teasers,"SAISONPASS","Kostenlose Stufen",func():_sail_menu("Battle Pass"),DAILY_CHEST)
+	# Daily rewards are existing ledger-backed systems, not a new wallet.
+	var daily_pending: bool=sim.rewards.daily_available()
+	var daily=PanelContainer.new()
+	daily.name="DailyStatusBanner"
+	daily.add_theme_stylebox_override("panel",SKIN.card(Color("77bda1") if daily_pending else Color("778591")))
+	body.add_child(daily)
+	var daily_row=HBoxContainer.new()
+	daily_row.add_theme_constant_override("separation",10)
+	daily.add_child(daily_row)
+	var daily_info=VBoxContainer.new()
+	daily_info.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	daily_row.add_child(daily_info)
+	_hint(daily_info,"TAGESBONUS BEREIT" if daily_pending else "TAGESBONUS ABGEHOLT",16,Color("f1d7a0"))
+	_hint(daily_info,"7-Tage-Serie · AFK-Beute · " + ("Heute abholbar" if daily_pending else "Nächste Abholung ab 00:00 UTC"),12)
+	var daily_open=_dashboard_button(daily_row,"ABHOLEN" if daily_pending else "ANSEHEN",func():_show("rewards"),daily_pending)
+	daily_open.name="HomeDailyButton"
+	daily_open.custom_minimum_size.x=118
+	# Separate, swipeable groups avoid forcing every menu into an enormous
+	# lobby wall. The shared menu content remains available via the sea HUD.
 	_label("DEINE SPIELBEREICHE",true)
-	var actions=_dashboard_grid(3)
-	_dashboard_card(actions,"TÄGLICHE BELOHNUNG","7-Tage-Serie · AFK-Beute",func():_show("rewards"),DAILY_CHEST)
-	_dashboard_card(actions,"FREUNDE EINLADEN","Beta mit anderen Piraten teilen",func():_show("friends"),NEWS_CHART)
-	_dashboard_card(actions,"SEEKARTEN","40 Gebiete · Kapitänsroute",func():_show("maps"),NEWS_CHART)
-	_dashboard_card(actions,"GILDE & INSEL","Heimatbasis und Belagerungen",func():_show("guild"),NEWS_HARBOR)
-	_dashboard_card(actions,"SPIELERPROFIL","Name, Rang und Battle Points",func():_show("profile"),ART)
-	_dashboard_card(actions,"EINSTELLUNGEN","Verbindung und Updater",func():_show("settings"),NEWS_KESSEL)
-	# The lobby can open the actual in-sea commerce/upgrade screens directly.
-	# No duplicate market inventory or separate shadow captain save is made.
-	_label("SCHIFF, HANDEL & FORTSCHRITT",true)
-	var equipment=_dashboard_grid(3)
-	_dashboard_card(equipment,"SCHIFFSWERFT","Schiffdesigns und Kanonenmontage",func():_sail_menu("Werft"),NEWS_HARBOR)
-	_dashboard_card(equipment,"MARKTPLATZ","Munition, Kanonen und Items",func():_sail_menu("Markt"),NEWS_CHART)
-	_dashboard_card(equipment,"DECKS & LAGER","Gold- und Elite-Decks verwalten",func():_sail_menu("Decks"),DAILY_CHEST)
-	_dashboard_card(equipment,"KASTELLE & TALENTE","Schiffsausbau und Talentpunkte",func():_sail_menu("Kastelle"),ART)
-	_dashboard_card(equipment,"BONUSKARTEN","Fragmente und Wellen",func():_sail_menu("Bonuskarten"),NEWS_CHART)
-	_dashboard_card(equipment,"SAISONPASS","Freie Belohnungen abholen",func():_sail_menu("Battle Pass"),DAILY_CHEST)
+	var sections=HBoxContainer.new()
+	sections.name="HomeSections"
+	sections.add_theme_constant_override("separation",6)
+	body.add_child(sections)
+	for section in ["ABENTEUER","SCHIFF & HANDEL","KAPITÄN & BONUS"]:
+		var choice: String=section
+		var tab=_dashboard_button(sections,section,func():_switch_home_section(choice),home_section==section)
+		tab.name="HomeSection_"+section.replace(" ","_").replace("&","UND")
+		tab.custom_minimum_size.y=52
+	var tiles=_dashboard_grid(3)
+	match home_section:
+		"ABENTEUER":
+			_dashboard_card(tiles,"SEEKARTEN","40 Karten & Portale",func():_show("maps"),NEWS_CHART)
+			_dashboard_card(tiles,"MONSTERJAGD","Seeungeheuer & Harpunen",func():_sail_menu("Monster"),ART)
+			_dashboard_card(tiles,"BONUSKARTEN","Fragmente & fünf Wellen",func():_sail_menu("Bonuskarten"),NEWS_CHART)
+			_dashboard_card(tiles,"GILDE & INSEL","Heimatbasis & Belagerungen",func():_show("guild"),NEWS_HARBOR)
+			_dashboard_card(tiles,"LOGBUCH","Aufträge & Fortschritt",func():_show("logbook"),NEWS_CHART)
+			_dashboard_card(tiles,"EVENTS","Saisoninhalte ansehen",func():_sail_menu("Events"),NEWS_KESSEL)
+		"SCHIFF & HANDEL":
+			_dashboard_card(tiles,"SCHIFFSWERFT","Designs & Kanonenmontage",func():_sail_menu("Werft"),NEWS_HARBOR)
+			_dashboard_card(tiles,"MARKTPLATZ","Munition & Items",func():_sail_menu("Markt"),NEWS_CHART)
+			_dashboard_card(tiles,"DECKS & LAGER","Gold-, Elite- & Sonderdecks",func():_sail_menu("Decks"),DAILY_CHEST)
+			_dashboard_card(tiles,"KASTELLE & TALENTE","Schiffsausbau & Punkte",func():_sail_menu("Kastelle"),ART)
+			_dashboard_card(tiles,"ARSENAL","Geschütze & Montage",func():_sail_menu("Bewaffnung"),NEWS_HARBOR)
+			_dashboard_card(tiles,"GEZEITENKESSEL","Essenz & Glück",func():_sail_menu("Kessel"),NEWS_KESSEL)
+		_:
+			_dashboard_card(tiles,"TAGESBONUS & AFK","Echte lokale Belohnungen",func():_show("rewards"),DAILY_CHEST)
+			_dashboard_card(tiles,"FREUNDE EINLADEN","Teilbarer Beta-Link",func():_show("friends"),NEWS_CHART)
+			_dashboard_card(tiles,"SAISONPASS","Kostenlose Belohnungsstufen",func():_sail_menu("Battle Pass"),DAILY_CHEST)
+			_dashboard_card(tiles,"SPIELERPROFIL","Name, Rang & Battle Points",func():_show("profile"),ART)
+			_dashboard_card(tiles,"KRONEN-SHOP","Echtgeldkäufe noch gesperrt",func():_sail_menu("Premium-Shop"),NEWS_HARBOR)
+			_dashboard_card(tiles,"EINSTELLUNGEN","Server, Konto & Updater",func():_show("settings"),NEWS_KESSEL)
+	var stats=_dashboard_grid(4)
+	if get_viewport_rect().size.x<620.0:stats.columns=2
+	for entry in [["GOLD",_coins(int(sim.player.gold))],["ESSENZ",str(sim.essence)],["STUFE",str(sim.level)],["BATTLE POINTS",str(sim.battle_points)]]:
+		var stat_card=PanelContainer.new()
+		stat_card.add_theme_stylebox_override("panel",SKIN.card(Color("b7985e")))
+		stat_card.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		stats.add_child(stat_card)
+		var stack=VBoxContainer.new()
+		stat_card.add_child(stack)
+		var stat_name=_hint(stack,str(entry[0]),11,Color("a8bec1"))
+		stat_name.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		var value=_hint(stack,str(entry[1]),16,Color("f5dcab"))
+		value.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 
 func _coins(value: int) -> String:
 	var digits: String=str(maxi(0,value))
@@ -296,12 +370,25 @@ func _show_daily_rewards() -> void:
 	var today: int=floori(float(Time.get_unix_time_from_system())/86400.0)
 	var next_day: int=(sim.rewards.streak%7)+1 if sim.rewards.last_claim_day==today-1 else 1
 	if not available:next_day=sim.rewards.streak
-	var board=_dashboard_grid(4)
+	# All seven days stay in one swipeable reward strip on phones instead
+	# of producing four tall stacked rows that hide the claim button.
+	var calendar=ScrollContainer.new()
+	calendar.name="DailyCalendarScroller"
+	calendar.custom_minimum_size.y=214
+	calendar.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_AUTO
+	calendar.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+	calendar.follow_focus=true
+	calendar.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	body.add_child(calendar)
+	var board=HBoxContainer.new()
+	board.add_theme_constant_override("separation",8)
+	calendar.add_child(board)
 	for day in 7:
 		var position: int=day+1
 		var accent: Color=Color("e8be6d") if position==next_day else Color("65838b")
 		var tile=PanelContainer.new()
 		tile.name="DailyDay"+str(position)
+		tile.custom_minimum_size=Vector2(136,200)
 		tile.add_theme_stylebox_override("panel",SKIN.card(accent))
 		board.add_child(tile)
 		var stack=VBoxContainer.new()
@@ -326,6 +413,7 @@ func _show_daily_rewards() -> void:
 			_save()
 		_show("rewards"),true)
 	daily.name="DailyClaim"
+	daily.custom_minimum_size.y=58
 	daily.disabled=not available
 	_label("AFK-BEUTE",true)
 	_hint(body,"Bis zu 8 Stunden gesammelt · %s Gold verfügbar. Beim Abholen erhältst du auch Vollkugeln." % _coins(sim.rewards.afk_gold()),14)

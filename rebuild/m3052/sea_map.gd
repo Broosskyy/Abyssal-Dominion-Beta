@@ -288,7 +288,7 @@ func _ready() -> void:
 	if get_tree().has_meta("abyssal_start_modal"):
 		var requested: String=str(get_tree().get_meta("abyssal_start_modal"))
 		get_tree().remove_meta("abyssal_start_modal")
-		if requested in ["Werft","Markt","Decks","Kastelle","Bonuskarten","Battle Pass","Logbuch","Seekarten"]:
+		if requested in ["Werft","Markt","Decks","Kastelle","Bonuskarten","Battle Pass","Logbuch","Seekarten","Monster","Events","Bewaffnung","Kessel","Premium-Shop","Belohnungen","Freunde","Gilde","Hafen","Profil"]:
 			_open_modal(requested)
 	# Test harnesses attach the scene before claiming it; only a real scene change shows the boot curtain.
 	if get_tree().current_scene==self:_begin_loading(1.4)
@@ -4028,8 +4028,8 @@ func _open_rewards() -> void:
 
 # --- Organized navigation, seasonal content and configurable combat shortcuts ---
 func _menu_shortcut(parent: Node,texture: Texture2D,title: String,description: String,kind: String) -> void:
-	var tile=_catalog_tile(parent,texture,title,description,"MENÜ ÖFFNEN",Color("ad8a58"))
-	var button=_catalog_action(tile,"ÖFFNEN",func():_open_modal(kind))
+	var tile=_catalog_tile(parent,texture,title,description,"DIREKTZUGRIFF",Color("ad8a58"))
+	var button=_catalog_action(tile,"ZUM BEREICH",func():_open_modal(kind))
 	button.name="MenuShortcut_"+kind.replace(" ","_")
 
 func _open_info() -> void:
