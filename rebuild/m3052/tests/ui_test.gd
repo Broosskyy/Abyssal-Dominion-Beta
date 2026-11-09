@@ -26,6 +26,17 @@ func _run() -> void:
 	check(game.sim.player.skin==0,"M3099 new players start with only shaded ship")
 	check(game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"nine NPCs + shaded captain GLB load")
 	check(game.mesh_layer.model_scenes.size()==11,"nine NPC GLBs plus two player options load")
+	# Classic browser sprites must be real imported 2D textures. Native still
+	# instantiates all original GLBs; switching the browser flag at runtime
+	# is intentionally not part of the native test.
+	check(game.CLASSIC_SLOOP!=null and game.CLASSIC_BRIG!=null and game.CLASSIC_GALLEON!=null,"Classic browser three original 2D ship textures imported")
+	check(game.CLASSIC_SLOOP.get_size().x>64.0 and game.CLASSIC_GALLEON.get_size().y>48.0,"Classic browser SVG art imports as legible textures")
+	check(game._classic_ship_texture(game.sim.player)==game.CLASSIC_SLOOP,"Classic starter renders a recognizable small sloop")
+	var classic_skin_before: int=int(game.sim.player.skin)
+	game.sim.player.skin=11
+	check(game._classic_ship_texture(game.sim.player)==game.CLASSIC_GALLEON,"Classic elite design selects larger galleon sprite instead of GLB mesh")
+	game.sim.player.skin=classic_skin_before
+	check(not game.browser_classic and game.mesh_layer!=null and game.mesh_layer.has_complete_fleet(),"native clients still instantiate the complete 3D fleet")
 	# Browser regression: only the transparent 3D fleet is rendered smaller;
 	# original GLB scenes, ship steering and the full-resolution touch HUD stay.
 	game.mesh_layer.set_web_performance(true)
