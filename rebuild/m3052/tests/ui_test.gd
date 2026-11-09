@@ -435,6 +435,8 @@ func _run() -> void:
 		check(deck_legend_visible,"deck screen reports actual Gold/Elite/Kristall mounted tier counts")
 		if game.sim.decks.is_empty():game.sim.grant_deck("cannon",0)
 		game._switch_tab("Decks","SCHIFF")
+		var ship_matrix: Node=game.modal_body.find_child("DeckShipMatrix",true,false)
+		check(ship_matrix!=null and ship_matrix.get_child_count()==10,"ship menu uses compact clickable 2×5 deck matrix, not a wall of ten catalog cards "+str(device))
 		var open_deck: Button=game.modal_body.find_child("DeckSlotFocus0",true,false) as Button
 		check(open_deck!=null,"tap on mounted deck 01 exposes focused upgrade action "+str(device))
 		if open_deck!=null:open_deck.pressed.emit()
