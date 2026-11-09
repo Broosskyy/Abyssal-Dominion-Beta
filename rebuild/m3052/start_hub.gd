@@ -342,6 +342,7 @@ func _show_home() -> void:
 			_dashboard_card(tiles,"KRONEN-SHOP","Echtgeldkäufe noch gesperrt",func():_sail_menu("Premium-Shop"),NEWS_HARBOR)
 			_dashboard_card(tiles,"EINSTELLUNGEN","Server, Konto & Updater",func():_show("settings"),NEWS_KESSEL)
 	var stats=_dashboard_grid(4)
+	if get_viewport_rect().size.x<620.0:stats.columns=2
 	for entry in [["GOLD",_coins(int(sim.player.gold))],["ESSENZ",str(sim.essence)],["STUFE",str(sim.level)],["BATTLE POINTS",str(sim.battle_points)]]:
 		var stat_card=PanelContainer.new()
 		stat_card.add_theme_stylebox_override("panel",SKIN.card(Color("b7985e")))
@@ -369,12 +370,25 @@ func _show_daily_rewards() -> void:
 	var today: int=floori(float(Time.get_unix_time_from_system())/86400.0)
 	var next_day: int=(sim.rewards.streak%7)+1 if sim.rewards.last_claim_day==today-1 else 1
 	if not available:next_day=sim.rewards.streak
-	var board=_dashboard_grid(4)
+	# All seven days stay in one swipeable reward strip on phones instead
+	# of producing four tall stacked rows that hide the claim button.
+	var calendar=ScrollContainer.new()
+	calendar.name="DailyCalendarScroller"
+	calendar.custom_minimum_size.y=214
+	calendar.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_AUTO
+	calendar.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+	calendar.follow_focus=true
+	calendar.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	body.add_child(calendar)
+	var board=HBoxContainer.new()
+	board.add_theme_constant_override("separation",8)
+	calendar.add_child(board)
 	for day in 7:
 		var position: int=day+1
 		var accent: Color=Color("e8be6d") if position==next_day else Color("65838b")
 		var tile=PanelContainer.new()
 		tile.name="DailyDay"+str(position)
+		tile.custom_minimum_size=Vector2(136,200)
 		tile.add_theme_stylebox_override("panel",SKIN.card(accent))
 		board.add_child(tile)
 		var stack=VBoxContainer.new()
@@ -399,6 +413,7 @@ func _show_daily_rewards() -> void:
 			_save()
 		_show("rewards"),true)
 	daily.name="DailyClaim"
+	daily.custom_minimum_size.y=58
 	daily.disabled=not available
 	_label("AFK-BEUTE",true)
 	_hint(body,"Bis zu 8 Stunden gesammelt · %s Gold verfügbar. Beim Abholen erhältst du auch Vollkugeln." % _coins(sim.rewards.afk_gold()),14)
