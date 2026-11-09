@@ -3690,21 +3690,21 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Zwei Grafikmodi: 2,5D oder 3D. Beide zeigen das Schattenkriegsschiff, das originale Black-Crown-Testmodell und zehn Elite-Designs mit eigenständigen Texturen.")
-	_note("DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Browser: leichte Classic-2D-Seekarte im Stil von 2010–2016, mit eigenen Schiffs-Grafiken. Die Android-App und Desktop nutzen weiterhin originale GLB-Schiffe." if browser_classic else "Zwei Grafikmodi: 2,5D oder 3D. Die originalen GLB-Schiffe bleiben erhalten.")
+	_note("DATENUPDATE %d · BROWSER CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
-		if OS.has_feature("web"):
-			_section("BROWSER-LEISTUNG")
-			var fast_button=_action("WEB-LEICHTMODUS: "+("AN · EMPFOHLEN" if web_fast_mode else "AUS · MAXIMALE GRAFIK"),func():_set_web_fast_mode(not web_fast_mode),"tab_on" if web_fast_mode else "normal")
-			fast_button.name="WebFastModeToggle"
-			_note("Handy-Browser: kleinere interne 3D-Zeichenfläche ohne 4× Kantenglättung, vereinfachtes bewegtes Meer und weniger Effektpartikel. Schiffe, Kanonen, Beute und Steuerung bleiben vollständig erhalten.",Color("a1dacf"))
-			_note("FPS: %d · 3D-AUFLÖSUNG: %d%% · AUTOMATISCH" % [roundi(web_fps_last if web_fps_last>0 else float(Engine.get_frames_per_second())),roundi(float(mesh_layer.resolution_factor)*100.0)] if mesh_layer!=null and web_fast_mode else ("MAXIMALE 3D-QUALITÄT · AUTOMATIK AUS" if mesh_layer!=null else "Grafik wird initialisiert"),Color("f1d39a"))
-		_section("GRAFIKMODUS")
-		for option in [["hybrid","2,5D / HYBRID"],["3d","3D"]]:
-			var key: String=str(option[0])
-			var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
-			choice.disabled=render_mode==key or (mesh_layer==null or not mesh_layer.has_complete_fleet())
-		_note("Zwei originale Spieler-GLBs, neun NPC-GLBs und zehn Materialvarianten des Black Crown Corsair. Gleiche Mechanik und Seekarten.")
+		if browser_classic:
+			_section("BROWSER CLASSIC · 2D")
+			_note("AKTIV · Originale 2D-Schiffsgrafiken, ruhiges Meeresmuster, keine 3D-Szene und kein WebGL-3D-Schattenpass.",Color("a1dacf"))
+			_note("FPS: %d · Schiffe: 2D · 3D-Berechnung: AUS" % Engine.get_frames_per_second(),Color("f1d39a"))
+			_note("Die Werft, Seekarten, Decks, Kämpfe und Steuerung funktionieren mit derselben Spielmechanik. 3D gibt es weiterhin in der APK/Desktop-Version.")
+		else:
+			_section("GRAFIKMODUS")
+			for option in [["hybrid","2,5D / HYBRID"],["3d","3D"]]:
+				var key: String=str(option[0])
+				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
+				choice.disabled=render_mode==key or (mesh_layer==null or not mesh_layer.has_complete_fleet())
+			_note("Zwei originale Spieler-GLBs, neun NPC-GLBs und zehn Materialvarianten des Black Crown Corsair. Gleiche Mechanik und Seekarten.")
 		_section("SCHIFFE & SEEKARTE")
 		var ship_grid=_grid(2)
 		_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
@@ -3790,12 +3790,13 @@ func _open_menu_hub() -> void:
 
 func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
-	_note("Werft: Schattenkriegsschiff, Original-Corsair-Testmodell und Elite-Designs 01–10. Dazu neun NPC-GLBs.",Color("9be4df"))
-	var modes=_grid(2)
-	for option in [["hybrid","2,5D"],["3d","3D"]]:
-		var key: String=str(option[0])
-		var button=_action(str(option[1])+(" ✓" if key==render_mode else ""),func():_set_render_mode(key),"tab_on" if key==render_mode else "normal",modes)
-		button.disabled=key==render_mode or (mesh_layer==null or not mesh_layer.has_complete_fleet())
+	_note("Browser: Classic-2D-Seekarte mit eigenen Schiffen. In App/Desktop stehen 2,5D und 3D zur Verfügung." if browser_classic else "Werft: Schattenkriegsschiff, Original-Corsair-Testmodell und Elite-Designs 01–10. Dazu neun NPC-GLBs.",Color("9be4df"))
+	if not browser_classic:
+		var modes=_grid(2)
+		for option in [["hybrid","2,5D"],["3d","3D"]]:
+			var key: String=str(option[0])
+			var button=_action(str(option[1])+(" ✓" if key==render_mode else ""),func():_set_render_mode(key),"tab_on" if key==render_mode else "normal",modes)
+			button.disabled=key==render_mode or (mesh_layer==null or not mesh_layer.has_complete_fleet())
 	var links=_grid(2)
 	_with_icon(_action("SPIELERPROFIL",func():_open_modal("Profil"),"normal",links),painted.nav_ranking)
 	_with_icon(_action("TAGESBONUS & AFK",func():_open_modal("Belohnungen"),"normal",links),painted.reward_chest)
@@ -4285,7 +4286,7 @@ func _load_display() -> void:
 	if not FileAccess.file_exists(HUD_SAVE):return
 	var data: Variant=JSON.parse_string(FileAccess.get_file_as_string(HUD_SAVE))
 	if not data is Dictionary:return
-	web_fast_mode=bool(data.get("web_fast_mode",true)) if OS.has_feature("web") else false
+	web_fast_mode=true if browser_classic else bool(data.get("web_fast_mode",true)) if OS.has_feature("web") else false
 	hud_size=clampi(int(data.get("hud_size",1)),0,2)
 	journal_visible=bool(data.get("journal_visible",true))
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
@@ -4333,7 +4334,9 @@ func _apply_web_performance() -> void:
 	if ocean!=null:ocean.set_shader_parameter("web_fast",active)
 	if OS.has_feature("web"):
 		var small_touch: bool=DisplayServer.is_touchscreen_available() or get_viewport_rect().size.y>get_viewport_rect().size.x
-		Engine.max_fps=(30 if small_touch else 45) if active else 0
+		# Classic 2D has no GPU-heavy 3D stage; don't retain the old artificial
+		# 30 FPS mobile ceiling that made 60/120Hz phones look stuttery.
+		Engine.max_fps=60 if browser_classic else ((30 if small_touch else 45) if active else 0)
 
 ## Adapt 3D resolution ONLY. Never alter simulation ticks, NPC density,
 ## steering, projectile trajectories or the sharp full-resolution HUD.
@@ -4356,6 +4359,7 @@ func _update_web_auto_quality(delta: float) -> void:
 	mesh_layer.set_web_quality(float(adjustment.quality))
 
 func _set_web_fast_mode(enabled: bool) -> void:
+	if browser_classic:return
 	if not OS.has_feature("web"):return
 	web_fast_mode=enabled
 	_apply_web_performance()
