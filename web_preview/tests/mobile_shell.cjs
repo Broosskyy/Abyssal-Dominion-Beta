@@ -16,7 +16,7 @@ const server = http.createServer((req,res) => {res.setHeader('Content-Type', req
    const page = await browser.newPage({viewport:size});
    await page.goto(`http://127.0.0.1:${server.address().port}`);
    await page.waitForFunction(() => window.completeBoot);
-   assert.match(await page.locator('#status').textContent(), /50 %.*5.0 MB/);
+   assert.match(await page.locator('#status').textContent(), /50 %/);
    const start = await page.locator('#start').boundingBox();
    assert(start.height >= 48 && start.x >= 0 && start.x + start.width <= size.width);
    if (size.width === 852) await page.screenshot({path:'/tmp/abyssal-shell-loading.png'});

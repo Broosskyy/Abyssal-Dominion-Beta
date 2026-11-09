@@ -16,7 +16,7 @@ from zipfile import ZipFile
 REPOSITORY = "Broosskyy/Abyssal-Dominion-Beta"
 RELEASES = f"https://api.github.com/repos/{REPOSITORY}/releases?per_page=100"
 DEST = Path(__file__).resolve().parent / "dist"
-EXPECTED = {"index.html", "index.js", "index.pck", "index.wasm"}
+EXPECTED = {"index.html", "index.js"}
 
 
 def response(url: str) -> bytes:
@@ -83,12 +83,16 @@ def main() -> None:
             path = Path(name)
             if path.is_absolute() or ".." in path.parts:
                 raise RuntimeError("Unsafe browser release archive path")
-            if path.suffix not in {".html", ".js", ".pck", ".wasm", ".png", ".ico", ".svg", ".json", ".webp"}:
+            if path.suffix not in {".html", ".js", ".pck", ".wasm", ".png", ".ico", ".svg", ".json", ".webp", ".zip"}:
                 continue
             destination = DEST / path
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes(archive.read(name))
-    if any(not (DEST / name).is_file() or (DEST / name).stat().st_size == 0 for name in EXPECTED):
+    delivery_path = DEST / 'delivery-report.json'
+    delivery = json.loads(delivery_path.read_text()) if delivery_path.exists() else {}
+    required = EXPECTED | set(delivery.get('start_files', ['index.pck', 'index.wasm']))
+    required |= {pack['file'] for pack in delivery.get('packs', {}).values()}
+    if any(not (DEST / name).is_file() or (DEST / name).stat().st_size == 0 for name in required):
         raise RuntimeError("Browser release is incomplete")
     metadata = {
         "scope": "public-browser-test",

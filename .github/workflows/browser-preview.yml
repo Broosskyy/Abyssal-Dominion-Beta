@@ -95,43 +95,40 @@ jobs:
           print('PASS: 23 actual GLB-derived atlases / 184 distinct heading renders')
           PY
           "$engine" --headless --path rebuild/m3052 --editor --import --quit > /tmp/sprites-import.log 2>&1 || { tail -100 /tmp/sprites-import.log; exit 1; }
-          # Web-only build manifest customization. Never alter the repo's
-          # signed Android bootstrap/export preset, so existing APKs remain
-          # compatible and do not spuriously require a version-code bump.
-          python3 - <<'PY'
-          from pathlib import Path
-          f=Path('rebuild/m3052/export_presets.cfg')
-          s=f.read_text(encoding='utf-8')
-          head,rest=s.split('[preset.1]',1)
-          web,tail=rest.split('[preset.2]',1)
-          original='exclude_filter="tests/**,tools/**,qa/**,README.md,builds/**"'
-          replacement='exclude_filter="tests/**,tools/**,qa/**,README.md,builds/**,assets/npc/meshy/models/*.glb,assets/player/*.glb,assets/elite_v2/textures/*.png,ship_mesh_layer.gd,stern_hull_taper.gd"'
-          if original not in web:raise SystemExit("Web export filter changed unexpectedly")
-          web=web.replace(original,replacement)
-          web=web.replace('assets/visuals/island_collision.json"','assets/visuals/island_collision.json,assets/classic_baked/manifest.json"')
-          web=web.replace('html/custom_html_shell=""','html/custom_html_shell="res://web/browser_shell.html"')
-          f.write_text(head+'[preset.1]'+web+'[preset.2]'+tail,encoding='utf-8')
-          print('Browser Classic: heavy GLBs/materials excluded from Web only')
-          PY
+          # Web-only imports, art exclusions and streaming autoload. Native
+          # presets/project are never modified in the signed Android job.
+          python3 rebuild/m3052/tools/web_delivery.py prepare
+          "$engine" --headless --path rebuild/m3052 --editor --import --quit > /tmp/web-art-import.log 2>&1 || { tail -100 /tmp/web-art-import.log; exit 1; }
           "$engine" --headless --path rebuild/m3052 --script tests/browser_geometry_test.gd
           LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a --server-args='-screen 0 1280x720x24' \
             "$engine" --audio-driver Dummy --path rebuild/m3052 \
             --script tests/browser_capture.gd -- --out="$RUNNER_TEMP/browser-captures"
           "$engine" --headless --path rebuild/m3052 --export-release Web "$PWD/rebuild/m3052/builds/web/index.html" > /tmp/web-export.log 2>&1 || { tail -100 /tmp/web-export.log; exit 1; }
           if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script' /tmp/web-export.log; then exit 1; fi
-          test -s rebuild/m3052/builds/web/index.html
-          test -s rebuild/m3052/builds/web/index.js
-          test -s rebuild/m3052/builds/web/index.pck
-          test -s rebuild/m3052/builds/web/index.wasm
-          ls -lh rebuild/m3052/builds/web
+          "$engine" --headless --path rebuild/m3052 --export-pack Web "$PWD/rebuild/m3052/builds/web/full.zip" > /tmp/web-pack.log 2>&1 || { tail -100 /tmp/web-pack.log; exit 1; }
+          python3 rebuild/m3052/tools/web_delivery.py finalize
           python3 - <<'PY'
           from pathlib import Path
           import json
           root=Path('rebuild/m3052/builds/web')
-          sizes={p.name:p.stat().st_size for p in root.iterdir() if p.is_file()}
-          assert min(sizes[n] for n in ['index.html','index.js','index.pck','index.wasm'])>0
-          (root/'web-build-info.json').write_text(json.dumps({'status':'browser-preview','scope':'local-guest-sea','multiuser':'presence-server-required','files':sizes},indent=2))
+          report=json.loads((root/'delivery-report.json').read_text())
+          assert report['core_zip_bytes']<12000000, 'browser core size regression'
+          assert report['initial_gzip_estimate_bytes']<23000000, 'cold start budget regression'
+          for name in ['index.html',*report['start_files']]:assert (root/name).stat().st_size>0
           PY
+      - name: Verify isolated core and optional art download
+        run: |
+          set -euo pipefail
+          engine=/tmp/godot/Godot_v4.7.2-stable_linux.x86_64
+          python3 -m http.server 8314 --bind 127.0.0.1 --directory rebuild/m3052/builds/web >/tmp/content-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          mkdir -p "$RUNNER_TEMP/isolated-browser-core"
+          core=$(find "$PWD/rebuild/m3052/builds/web" -name 'core-*.zip' -print -quit)
+          timeout 60 "$engine" --headless --path "$RUNNER_TEMP/isolated-browser-core" --main-pack "$core" --script "$PWD/rebuild/m3052/tests/browser_delivery_test.gd"
+      - name: Verify real WebGL startup and streamed designs
+        run: |
+          NODE_PATH=/tmp/abyssal-browser-check/node_modules CHROMIUM_PATH=/usr/bin/google-chrome node web_preview/tests/streaming_game.cjs
       - name: Package downloadable browser build
         run: |
           set -euo pipefail

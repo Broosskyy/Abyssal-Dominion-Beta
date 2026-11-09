@@ -31,7 +31,7 @@ $GODOT_HEAD_INCLUDE
    <div id="status" role="status" aria-live="polite">Seekarte wird vorbereitet …</div>
    <button id="start" class="primary" type="button">Im Vollbild spielen</button>
    <button id="windowed" class="secondary" type="button">Im Browserfenster spielen</button>
-   <p id="hint">Auf dem Handy am besten im Querformat.</p>
+   <p id="hint">Weitere Schiffsdesigns laden erst bei Bedarf. Auf dem Handy am besten im Querformat.</p>
    <button id="retry" class="secondary" type="button" hidden>Erneut laden</button>
   </div>
  </section>
@@ -96,14 +96,18 @@ $GODOT_HEAD_INCLUDE
   console.error('Abyssal browser start failed:', error);
  }
  try {
+  if (typeof Engine.isWebGLAvailable === 'function' && !Engine.isWebGLAvailable(2)) {
+   failure(new Error('WebGL 2 unavailable'));
+   status.textContent = 'Dieser Browser stellt WebGL 2 nicht bereit. Bitte öffne das Spiel in einem aktuellen Chrome, Firefox oder Safari mit aktivierter Grafikbeschleunigung.';
+   return;
+  }
   const engine = new Engine(config);
   // Download immediately while the captain chooses fullscreen. No extra load screen.
   engine.startGame({canvas, canvasResizePolicy:2, onProgress:(current,total) => {
-   const mb = (current / 1048576).toFixed(1);
    if (total > 0) {
     progress.max = total; progress.value = current;
-    status.textContent = current < total ? `Spieldaten laden · ${Math.floor(current/total*100)} % · ${mb} MB` : 'Schiffe und Seekarte werden vorbereitet …';
-   } else { progress.removeAttribute('value'); status.textContent = `Spieldaten laden · ${mb} MB`; }
+    status.textContent = current < total ? `Seekarte laden · ${Math.floor(current/total*100)} %` : 'Schiffe und Seekarte werden vorbereitet …';
+   } else { progress.removeAttribute('value'); status.textContent = 'Seekarte wird geladen …'; }
   }}).then(() => {
    ready = true; progress.max = 1; progress.value = 1; status.textContent = 'Bereit zum Ablegen';
    start.textContent = 'Im Vollbild spielen'; reveal();

@@ -45,6 +45,7 @@ var featured_detail: Label
 var featured_position: Label
 var featured_action: Button
 var home_section := "ABENTEUER"
+var sailing := false
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	backdrop=TextureRect.new();backdrop.name="LivingHarbor"
@@ -92,6 +93,7 @@ func _ready() -> void:
 	_show(page);_layout()
 	var boot=get_tree().root.get_node_or_null("DataBoot")
 	if boot!=null:boot.mark_healthy()
+	if OS.has_feature("web"):print("BROWSER_READY:captain_hub")
 func _process(delta: float) -> void:
 	sea_time+=delta
 	if backdrop!=null:backdrop.material.set_shader_parameter("sea_time",sea_time)
@@ -505,7 +507,8 @@ func _show(next: String) -> void:
 			_label("Dein Schiff. Deine Gilde. Dein Meer.")
 			_button("ANMELDEN",func():registration=false;_show("auth"),true)
 			_button("KONTO ERSTELLEN",func():registration=true;_show("auth"))
-			_button("ALS GAST WEITERSPIELEN",_enter_home)
+			if OS.has_feature("web"):_button("ALS GAST SOFORT IN SEE",_sail)
+			else:_button("ALS GAST WEITERSPIELEN",_enter_home)
 			_button("VERBINDUNG & EINSTELLUNGEN",func():_show("settings"))
 		"auth":
 			_label("KONTO ERSTELLEN" if registration else "WILLKOMMEN ZURÜCK",true)
@@ -590,6 +593,15 @@ func _authenticated(ok: bool,message: String) -> void:
 func _enter_home() -> void:
 	get_tree().set_meta("abyssal_entered",true);_show("home")
 func _sail() -> void:
+	if sailing:return
+	var delivery=get_tree().root.get_node_or_null("BrowserContent")
+	if delivery!=null and int(sim.player.get("skin",0))>=2 and not delivery.available("ship_designs"):
+		sailing=true
+		_label("Dein Schiffsdesign wird geladen …")
+		if not await delivery.ensure("ship_designs"):
+			sailing=false
+			_label("Das Schiffsdesign konnte nicht geladen werden. Bitte erneut versuchen.")
+			return
 	_save();get_tree().change_scene_to_file("res://sea_map.tscn")
 
 func _sail_menu(kind: String) -> void:

@@ -336,6 +336,7 @@ func _ready() -> void:
 	if get_tree().current_scene==self:_begin_loading(1.4)
 	var data_boot=get_tree().root.get_node_or_null("DataBoot")
 	if data_boot!=null:data_boot.mark_healthy()
+	if browser_classic:print("BROWSER_READY:sea")
 
 ## One screen pixel is one drawn pixel. Desktop opens at 3840×2160. Phones use the
 ## device resolution instead of stretching a 1280×720 picture. Tests that clear the
@@ -416,7 +417,7 @@ func _draw_online_presence(view: Rect2) -> void:
 func _sharp_zoom() -> float:
 	return desired_zoom * clampf(get_viewport_rect().size.y / 720.0, 1.0, 1.7)
 
-func _load_assets() -> void:
+func _load_classic_atlases() -> void:
 	if browser_classic:
 		var metadata_path: String=CLASSIC_ATLAS_ROOT+"manifest.json"
 		if FileAccess.file_exists(metadata_path):
@@ -433,7 +434,11 @@ func _load_assets() -> void:
 			if ResourceLoader.exists(file):
 				classic_atlases[key]=load(file) as Texture2D
 			else:
-				push_error("Missing original-GLB browser sprite atlas: "+file)
+				if not key.begins_with("elite_") and not key.begins_with("event_"):
+					push_error("Missing original-GLB browser sprite atlas: "+file)
+
+func _load_assets() -> void:
+	if browser_classic:_load_classic_atlases()
 	for key in ["kraken","serpent","crab","glitter","pumpkin"]:expansion_art[key]=load("res://assets/expansion/"+key+".webp")
 	for name in ["anchor","ship","book","compass","chest","gear","plus","minus","focus","arrow","target_cycle"]:hud_icons[name]=load("res://assets/ui/icons/"+name+".svg")
 	for key in ["cannon","armor","hunter","navigation","logistics","tide","storm","salvage","blessing"]:
@@ -446,10 +451,10 @@ func _load_assets() -> void:
 	skin_previews.append(ELITE_ONE_SHIP_PREVIEW)
 	for index in ELITE_V2_NAMES.size():
 		skins.append({"name":"Elite-Schiff %02d · %s" % [index+1,ELITE_V2_NAMES[index]],"mesh_key":"black_crown_corsair_elite_test","texture_level":index+1,"views":0})
-		skin_previews.append(load("res://assets/elite_v2/previews/elite_%02d.png" % (index+1)))
+		skin_previews.append(_ship_preview("res://assets/elite_v2/previews/elite_%02d.png" % (index+1)))
 	for event in ["Halloween · Nachtkrone","Columbus · Entdeckerkrone"]:
 		skins.append({"name":event,"mesh_key":"black_crown_corsair_elite_test","texture_level":skins.size()-1,"views":0})
-		skin_previews.append(load("res://assets/expansion/preview_"+("halloween" if skins.size()==13 else "columbus")+".webp"))
+		skin_previews.append(_ship_preview("res://assets/expansion/preview_"+("halloween" if skins.size()==13 else "columbus")+".webp"))
 	for name in ["tropical","rock","snow","snow2"]:
 		island_textures[name] = load("res://assets/reference/islands/"+name+".png")
 	for name in ["cannonball","harpoon","chain","repair_chest","portal"]:
@@ -466,6 +471,15 @@ func _load_assets() -> void:
 	painted.loading=load("res://assets/ui/painted/loading_harbor.jpg")
 	painted.kessel_scene=load("res://assets/ui/painted/kessel_scene.jpg")
 	painted.chart_parchment=load("res://assets/ui/painted/chart_parchment.jpg")
+
+func _ship_preview(path: String) -> Texture2D:
+	return load(path) as Texture2D if ResourceLoader.exists(path) else FINAL_SHIP_PREVIEW
+
+func _refresh_ship_catalog() -> void:
+	_load_classic_atlases()
+	for index in range(2,12):skin_previews[index]=_ship_preview("res://assets/elite_v2/previews/elite_%02d.png" % (index-1))
+	skin_previews[12]=_ship_preview("res://assets/expansion/preview_halloween.webp")
+	skin_previews[13]=_ship_preview("res://assets/expansion/preview_columbus.webp")
 
 func _art(name: String) -> Texture2D:
 	return extra_icons[name] if extra_icons.has(name) else painted.get(name)
@@ -2116,6 +2130,16 @@ const MODAL_TABS := {"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":[
 const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Menü":"Spielmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Freunde":"Freunde & Einladungen","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
+	if browser_classic and kind in ["Werft","Events"]:
+		var delivery=get_tree().root.get_node_or_null("BrowserContent")
+		if delivery!=null and not delivery.available("ship_designs"):
+			sim.message="Schiffskatalog wird geladen …"
+			_refresh_ui()
+			if not await delivery.ensure("ship_designs"):
+				sim.message="Schiffskatalog nicht geladen. Bitte erneut öffnen."
+				_refresh_ui()
+				return
+			_refresh_ship_catalog()
 	if modal.visible and modal_kind!=kind and remember:
 		menu_history.append(modal_kind)
 		if menu_history.size()>16:menu_history.pop_front()
@@ -4149,6 +4173,16 @@ func _interact() -> void:
 func _equip(index: int) -> void:
 	var destination: String="Events" if modal_kind=="Events" else "Werft"
 	if index<0 or index>=skins.size():return
+	if browser_classic and index>=2:
+		var delivery=get_tree().root.get_node_or_null("BrowserContent")
+		if delivery!=null and not delivery.available("ship_designs"):
+			sim.message="Schiffsdesign wird geladen …"
+			_refresh_ui()
+			if not await delivery.ensure("ship_designs"):
+				sim.message="Schiffsdesign nicht geladen. Bitte erneut versuchen."
+				_refresh_ui()
+				return
+			_refresh_ship_catalog()
 	if not browser_classic and (mesh_layer==null or not mesh_layer.model_scenes.has(str(skins[index].mesh_key)) or (index>=2 and not ResourceLoader.exists(mesh_layer.texture_path(index-1)))):
 		sim.message="3D-Modell oder Elite-Textur noch nicht verfügbar"
 		_refresh_ui()
