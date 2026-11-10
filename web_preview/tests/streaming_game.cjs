@@ -6,6 +6,8 @@ const http=require('node:http');
 const zlib=require('node:zlib');
 const directory=path.resolve(__dirname,'../../rebuild/m3052/builds/web');
 const report=JSON.parse(fs.readFileSync(path.join(directory,'delivery-report.json')));
+assert.equal(report.embedded_ship_catalog,true,'all ship designs and previews must be in the startup core');
+assert.deepEqual(report.packs,{},'shipyard must not depend on an extra art download');
 const downloads=[];
 let revalidations=0;
 const served=new Map();
@@ -53,7 +55,7 @@ const server=http.createServer((req,res)=>{
   while(stage!=='sea'&&Date.now()<seaDeadline)await new Promise(r=>setTimeout(r,100));
   assert.equal(stage,'sea','guest reaches the actual shared Godot simulation');
   await page.screenshot({path:'/tmp/abyssal-web-sea.png'});
-  assert(!downloads.some(n=>n.startsWith('ships-')),'guest sailing must not download optional ship art');
+  assert(!downloads.some(n=>n.startsWith('ships-')),'catalog must arrive inside the startup core');
   const cold=wireBytes;
   assert(cold<23000000,`cold transfer budget exceeded: ${cold}`);
   await page.reload();

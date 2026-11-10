@@ -1,4 +1,4 @@
-"""Web-only imports, minimal export, and content-addressed optional art packs.
+"""Web-only imports and a cached startup core containing the complete ship catalog.
 
 Run prepare only in a disposable build checkout, after baking original GLBs.
 No simulation, account, world, or protocol code is generated or forked here.
@@ -67,22 +67,20 @@ def finalize(directory: Path, source: Path) -> None:
         entries = {n: archive.read(n) for n in archive.namelist() if not n.endswith('/')}
     assert 'project.binary' in entries
     assert not any(n.endswith('.glb') or 'assets/npc/meshy/' in n or 'Elite_01_Obsidian_Albedo' in n for n in entries)
-    optional_names: set[str] = set()
+    catalog_names: set[str] = set()
     for name in entries:
         if (re.fullmatch(r'assets/classic_baked/(elite_\d\d|event_\w+)\.png\.import', name) or
             re.fullmatch(r'assets/elite_v2/previews/elite_\d\d\.png\.import',name) or
             re.fullmatch(r'assets/expansion/preview_(halloween|columbus)\.webp\.import',name)):
-            optional_names.add(name)
-            optional_names.update(re.findall(r'"res://([^"\n]+\.ctex)"', entries[name].decode()))
+            catalog_names.add(name)
+            catalog_names.update(re.findall(r'"res://([^"\n]+\.ctex)"', entries[name].decode()))
             source_name = name.removesuffix('.import')
-            if source_name in entries: optional_names.add(source_name)
-    assert len([n for n in optional_names if n.endswith('.import')]) == 24
-    optional = {n: entries.pop(n) for n in optional_names}
-    data = zipped(optional)
-    digest = hashlib.sha256(data).hexdigest()
-    filename = f'ships-{digest[:20]}.zip'
-    (directory / filename).write_bytes(data)
-    manifest = {'schema': 1, 'packs': {'ship_designs': {'file': filename, 'bytes': len(data), 'sha256': digest}}}
+            if source_name in entries: catalog_names.add(source_name)
+    assert len([n for n in catalog_names if n.endswith('.import')]) == 24
+    # All approved designs and their previews are in the startup pack.
+    # Keep one shared game and cache the complete catalog before play.
+    catalog_bytes = sum(len(entries[n]) for n in catalog_names)
+    manifest = {'schema': 1, 'packs': {}, 'embedded': ['ship_designs']}
     entries['web/content_manifest.json'] = json.dumps(manifest).encode()
     core = zipped(entries)
     core_name = f'core-{hashlib.sha256(core).hexdigest()[:20]}.zip'
@@ -102,10 +100,10 @@ def finalize(directory: Path, source: Path) -> None:
     (directory / 'index.pck').unlink(missing_ok=True)
     source.unlink(missing_ok=True)
     report = {'schema':1,'start_files':[core_name,engine_name+'.wasm','index.js'],
-        'core_zip_bytes':len(core),'optional_ship_bytes':len(data),'engine_raw_bytes':len(wasm),
+        'core_zip_bytes':len(core),'optional_ship_bytes':0,'embedded_ship_art_bytes':catalog_bytes,'embedded_ship_catalog':True,'engine_raw_bytes':len(wasm),
         'engine_gzip_bytes':len(gzip.compress(wasm, compresslevel=9)),
         'initial_gzip_estimate_bytes':len(core)+len(gzip.compress(wasm,compresslevel=9))+(directory/'index.js').stat().st_size,
-        'core_file_count':len(entries),'optional_file_count':len(optional),
+        'core_file_count':len(entries),'optional_file_count':0,
         'shared_logic':'simulation.gd/network_client.gd/server unchanged', 'packs':manifest['packs']}
     (directory / 'delivery-report.json').write_text(json.dumps(report,indent=2))
     print(json.dumps(report,indent=2))

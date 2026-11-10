@@ -116,17 +116,14 @@ jobs:
           assert report['initial_gzip_estimate_bytes']<23000000, 'cold start budget regression'
           for name in ['index.html',*report['start_files']]:assert (root/name).stat().st_size>0
           PY
-      - name: Verify isolated core and optional art download
+      - name: Verify complete ship catalog in startup core
         run: |
           set -euo pipefail
           engine=/tmp/godot/Godot_v4.7.2-stable_linux.x86_64
-          python3 -m http.server 8314 --bind 127.0.0.1 --directory rebuild/m3052/builds/web >/tmp/content-http.log 2>&1 &
-          server_pid=$!
-          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           mkdir -p "$RUNNER_TEMP/isolated-browser-core"
           core=$(find "$PWD/rebuild/m3052/builds/web" -name 'core-*.zip' -print -quit)
           timeout 60 "$engine" --headless --path "$RUNNER_TEMP/isolated-browser-core" --main-pack "$core" --script "$PWD/rebuild/m3052/tests/browser_delivery_test.gd"
-      - name: Verify real WebGL startup and streamed designs
+      - name: Verify real WebGL startup and cached catalog
         run: |
           NODE_PATH=/tmp/abyssal-browser-check/node_modules CHROMIUM_PATH=/usr/bin/google-chrome node web_preview/tests/streaming_game.cjs
       - name: Package downloadable browser build

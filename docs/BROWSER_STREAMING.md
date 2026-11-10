@@ -1,17 +1,13 @@
-# Small Godot browser delivery
+# Godot browser delivery with the complete catalog
 
-The browser still runs the shared Godot game, `simulation.gd`, `network_client.gd` and protocol 1. No alternate rules engine or account system is introduced. Public multiplayer remains the existing presence preview until the common server simulation is implemented and deployed.
+The browser runs the shared Godot game, `simulation.gd`, `network_client.gd` and protocol 1. Account/session handling, map rooms and existing crossplay preparation are unchanged. Public shared combat remains a separate unfinished feature.
 
-Web CI bakes the original GLB fleet, then excludes the complete native mesh/texture directories and native-only paints. Browser UI/background import sizes and compression are bounded in that disposable build checkout. Signed Android presets and the committed project configuration remain unchanged.
+All approved ship designs, event finishes and shipyard previews are now included directly in the initial core ZIP. The scene loads all 23 ship atlases and all 14 previews immediately. Opening the shipyard and equipping a design require no further art download. `web/content_manifest.json` declares the catalog embedded and has no external ship pack.
 
-`tools/web_delivery.py` exports an initial ZIP containing the real shared game plus startup art, and a separate content-addressed ZIP for 12 additional ship atlases and their previews. `BrowserContent` fetches that art only when opening the shipyard/events or needing a saved elite ship. Packs are size/hash checked, restricted to art resources, cached by hash and mounted without overriding existing core files. A failed download leaves the previous equipped ship intact and can be retried.
+Web CI still excludes native 3D meshes and their source textures, and bounds browser texture imports in its disposable checkout. The committed Android project and export presets are unchanged. The smaller Godot browser build keeps the same gameplay rather than introducing another engine.
 
-The browser starts at the existing account/welcome scene without the Android updater. Its guest button sails directly onto the sea. Registration, login, room selection, WebSocket snapshots and account/session handling keep the shared implementation.
+The stock engine and the complete core use content-addressed filenames. A bounded service-worker cache verifies file hashes and retains unchanged runtime/art files across visits and releases. It caches no account requests, HTML or WebSockets. Browser updates remain separate from Android data packages.
 
-The stock Godot WebAssembly binary remains a first-visit cost. Its URL is hashed by content so an unchanged engine survives future game releases in the HTTP cache. Core and optional packs also have immutable content hashes. `delivery-report.json` records raw sizes and a conservative gzip transfer estimate; only a browser network test establishes actual transferred bytes.
+Bundling the approximately 1.9 MB catalog into startup increases a cold visit from approximately 17 MB to approximately 19 MB; measured values belong to each build's browser checks. CI enforces the existing 23 MB compressed-transfer budget and checks warm reuse of both engine and complete core. No 3–5 MB cold-start claim is made.
 
-Because some browsers do not retain the large engine in their ordinary response cache, a small service worker also caches only same-origin, content-addressed engine/core/art files. It verifies the decoded SHA-256 prefix before storage, keeps a bounded number of versions, and never intercepts HTML, login/account requests or WebSockets. Unsupported/blocked cache APIs fall back to the normal small download.
-
-Local first implementation: initial core approximately 6.8 MB (previous game pack 89 MB), optional designs approximately 1.9 MB, stock engine approximately 10.1 MB with gzip. The roughly 17 MB cold-start estimate is not a 3–5 MB first-play claim. CI enforces a 23 MB cold transfer budget and checks that the optional pack is absent during guest startup and that repeat visits reuse the core/engine cache.
-
-Tests include an isolated exported core boot with real HTTP optional download, imported atlas/preview resolution, cached remount and design equip. The browser check starts the actual WebGL game and sails using real canvas input. Existing native UI and HTTP/WebSocket preparation regressions remain in the signed-content pipeline.
+`browser_delivery_test.gd` runs against the exported core with no network URL, loads every Elite/event atlas and preview, verifies all 23 runtime atlases, opens the shipyard immediately and equips a design. The WebGL test sails into the actual shared game and verifies cache reuse on reopening.
