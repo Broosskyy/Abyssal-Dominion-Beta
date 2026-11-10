@@ -13,17 +13,25 @@ var badge_alert:=false
 var ammo_marker:=false
 var ammo_color: Color=Color("e2be83")
 const GOLD=Color("c7a15a")
+var motion_enabled:=true
+var hover_reaction:=0.0
 var motion_time:=0.0
 var press_reaction:=0.0
 func _press_visual() -> void:
-	press_reaction=1.0
+	press_reaction=1.0 if motion_enabled else 0.0
 	queue_redraw()
 func _process(delta: float) -> void:
-	motion_time=fposmod(motion_time+delta,TAU*64.0)
+	var before: float=press_reaction
+	var hover_before: float=hover_reaction
+	var wanted: float=1.0 if not disabled and is_hovered() else 0.0
+	hover_reaction=lerpf(hover_reaction,wanted,1.0-exp(-delta*13.0)) if motion_enabled else wanted
+	if absf(hover_reaction-wanted)<.005:hover_reaction=wanted
+	motion_time=fposmod(motion_time+delta,TAU*64.0) if motion_enabled else 0.0
 	if press_reaction>0.0:press_reaction=maxf(0.0,press_reaction-delta*3.7)
-	# Idle controls do not redraw; active/cooling controls receive gentle motion.
-	if press_reaction>0.0 or latched or ammo_marker or (hero and cooldown>0.0):queue_redraw()
+	if before>0.0 or absf(hover_before-hover_reaction)>.001 or (motion_enabled and (latched or ammo_marker or (hero and cooldown>0.0) or badge_alert or (hero and state_label=="BEREIT"))):queue_redraw()
 func _ready() -> void:
+	add_to_group("living_hud")
+	motion_enabled=bool(get_tree().get_meta("abyssal_ui_motion",true))
 	focus_mode=Control.FOCUS_NONE
 	clip_text=true
 	for state in ["normal","hover","pressed","hover_pressed","disabled","focus"]:add_theme_stylebox_override(state,StyleBoxEmpty.new())
@@ -74,6 +82,7 @@ func _draw() -> void:
 		var radius=diameter*.5-2
 		if latched:draw_circle(center,radius+2,Color(1,.42,.16,.13+.16*wave))
 		_bezel(center,radius,gold)
+		if state_label=="BEREIT" and motion_enabled:draw_arc(center,radius-1,PI*1.08,PI*1.78,24,Color("f4d9a1",.18+.12*wave),1.5,true)
 		if latched:draw_arc(center,radius-3,motion_time*.55,motion_time*.55+TAU*.18,36,Color("ffe8a1",.55+.4*wave),1.8,true)
 		draw_circle(center,radius-6,Color("7a5c34"),false,1.0,true)
 		if art!=null:
@@ -108,11 +117,12 @@ func _draw() -> void:
 		draw_polygon(corners,PackedColorArray([top,top,bottom,bottom]))
 		draw_rect(Rect2(Vector2(1,1),size-Vector2(2,2)),gold,false,1.0)
 		draw_rect(Rect2(Vector2(3,3),size-Vector2(6,6)),Color(0,0,0,.35),false,1.0)
+		if hover_reaction>0.0:draw_rect(Rect2(Vector2(3,3),size-Vector2(6,6)),Color(1,.83,.5,.085*hover_reaction))
 		draw_line(Vector2(4,3),Vector2(size.x-4,3),Color(1,.86,.55,.22),1)
 		if latched:draw_line(Vector2(5,size.y-3),Vector2(size.x-5,size.y-3),Color("f5d78d"),2)
 		if press_reaction>0.0:draw_rect(Rect2(Vector2(3,3),size-Vector2(6,6)),Color("ffe4a2",press_reaction*.6),false,1.2,true)
 		var icon=minf(minf(size.y-19,size.x-10),40.0)
-		if art!=null:draw_texture_rect(art,Rect2(Vector2((size.x-icon)*.5,3),Vector2(icon,icon)),false,Color.WHITE if not disabled else Color(.5,.5,.5))
+		if art!=null:draw_texture_rect(art,Rect2(Vector2((size.x-icon)*.5,3-hover_reaction*1.4+press_reaction),Vector2(icon,icon)),false,Color.WHITE if not disabled else Color(.5,.5,.5))
 		var title_size=12 if size.x>=66 else 10
 		_outlined(font,caption,Vector2(size.x*.5,size.y-6),title_size,Color("f2dfb1") if not latched else Color("ffe7a6"))
 		if not quantity.is_empty():
@@ -120,6 +130,7 @@ func _draw() -> void:
 			var badge=Rect2(Vector2(size.x-bw-3,3),Vector2(bw,15))
 			var chip=StyleBoxFlat.new();chip.bg_color=Color("b8402e") if badge_alert else Color("1f6f6a");chip.set_corner_radius_all(7)
 			chip.border_color=Color("f5d78d");chip.set_border_width_all(1)
+			if badge_alert and motion_enabled:draw_circle(badge.get_center(),badge.size.y*.62,Color("f7d18a",.12+.09*sin(motion_time*2.3)))
 			draw_style_box(chip,badge)
 			_outlined(font,quantity,Vector2(badge.get_center().x,badge.end.y-3.5),10,Color.WHITE)
 		return

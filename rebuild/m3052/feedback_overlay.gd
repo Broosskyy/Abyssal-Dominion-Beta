@@ -18,6 +18,7 @@ func _draw() -> void:
 				text="−%d" % int(event.value);ink=Color("ff8c73") if int(event.actor)==0 else Color("fff1cf")
 				if bool(event.get("powder",false)):text+="  PULVER +40%";ink=Color("ffb85e")
 				if bool(event.get("plates",false)):text+="  PLATTEN −35%";ink=Color("83cfff")
+			"level":text="STUFE %d" % int(event.value);ink=Color("ffe6a1")
 			"loot":text="+%d GOLD" % int(event.value)
 			"essence":text="+%d ESSENZ" % int(event.value);ink=Color("7ce5d1")
 			"event_loot":text=str(event.get("label","EVENTFUND"));ink=Color("ffba69")

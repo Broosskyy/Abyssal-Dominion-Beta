@@ -267,6 +267,9 @@ var web_fps_last: float=0.0
 var web_quality_good_windows: int=0
 var web_minimap_clock: float=0.0
 # Independent from combat VFX: mobile users can disable mesh rocking and wakes.
+var ambient_motion_enabled := true
+var wallet_previous: Array[int]=[]
+var wallet_tweens: Dictionary={}
 var ship_animations_enabled := true
 var wake_effects_enabled := true
 # Centered, device-proportional menu frames; legacy fullscreen choice is ignored.
@@ -321,6 +324,7 @@ func _ready() -> void:
 	_load_progress()
 	_load_staff()
 	_load_display()
+	get_tree().set_meta("abyssal_ui_motion",ambient_motion_enabled)
 	previous_region=sim.map_id
 	camera = Camera2D.new()
 	# Camera and ship-nameplate sampling must share the idle/render clock.
@@ -341,6 +345,7 @@ func _ready() -> void:
 	water.material = ocean
 	ocean.set_shader_parameter("web_classic",browser_classic)
 	_build_ui()
+	_apply_ambient_motion()
 	_apply_web_performance()
 	_start_online_presence()
 	get_viewport().size_changed.connect(_layout)
@@ -1541,7 +1546,7 @@ func _portrait(parent: Control) -> TextureRect:
 	return p
 
 func _bar(parent: Node) -> ProgressBar:
-	var b =ProgressBar.new()
+	var b: ProgressBar=preload("res://living_meter.gd").new()
 	b.show_percentage=false
 	b.max_value=sim.PLAYER_HP
 	var bg =StyleBoxFlat.new();bg.bg_color=Color("061018");bg.set_corner_radius_all(3);bg.border_color=Color("6d5634");bg.set_border_width_all(1)
@@ -2005,6 +2010,7 @@ func _refresh_ui() -> void:
 				badge="!" if alert else ""
 		nav.set("quantity",badge);nav.set("badge_alert",alert)
 		nav.set("latched",modal.visible and modal_kind==kind);nav.queue_redraw()
+	_wallet_feedback([int(sim.player.gold),sim.pearls,sim.crystals])
 	gold_label.text=_wallet_amount(int(sim.player.gold))
 	pearl_label.text=_wallet_amount(sim.pearls)
 	crystal_label.text=_wallet_amount(sim.crystals)
@@ -3949,6 +3955,7 @@ func _open_display() -> void:
 			var index=i
 			var choice=_action((["KOMPAKT · mehr freie Seekarte","KOMFORT · größere Anzeigen","GROSS · beste Lesbarkeit"][i])+(" · AKTIV" if hud_size==i else ""),func():_set_display(index,journal_visible),"tab_on" if hud_size==i else "normal")
 			choice.disabled=hud_size==i
+		_action("HUD & WASSERBEWEGUNG: "+("EIN" if ambient_motion_enabled else "AUS"),_toggle_ambient_motion,"tab_on" if ambient_motion_enabled else "normal")
 		_section("LEISTEN")
 		var toggles=_grid(2)
 		_action("AUFTRAGSLEISTE: "+("EIN" if journal_visible else "AUS"),func():_set_display(hud_size,not journal_visible),"normal",toggles)
@@ -4551,6 +4558,7 @@ func _load_display() -> void:
 		for key in VFX_DEFAULT_FLAGS:
 			if stored_flags.get(key) is bool:vfx_flags[key]=stored_flags[key]
 	vfx_intensity=clampf(float(data.get("vfx_intensity",1.35)),.65,1.7)
+	ambient_motion_enabled=bool(data.get("ambient_motion_enabled",true))
 	ship_animations_enabled=bool(data.get("ship_animations_enabled",true))
 	wake_effects_enabled=bool(data.get("wake_effects_enabled",true))
 	# All old true/false fullscreen preferences migrate to balanced windows.
@@ -4570,7 +4578,7 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
+		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ambient_motion_enabled":ambient_motion_enabled,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
 		file.close()
 
 ## Browser-only render budget: no effect on collision, AI ticks, camera,
@@ -4636,6 +4644,33 @@ func _toggle_double_tap_attack() -> void:
 	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal("Anzeige")
 	_refresh_ui()
 
+func _apply_ambient_motion() -> void:
+	get_tree().set_meta("abyssal_ui_motion",ambient_motion_enabled)
+	get_tree().set_group("living_hud","motion_enabled",ambient_motion_enabled)
+	if ocean!=null:ocean.set_shader_parameter("surface_motion",ambient_motion_enabled)
+	if not ambient_motion_enabled:
+		for tween: Tween in wallet_tweens.values():
+			if tween!=null and tween.is_valid():tween.kill()
+		for label: Label in [gold_label,pearl_label,crystal_label]:
+			if label!=null:label.modulate=Color.WHITE
+
+func _toggle_ambient_motion() -> void:
+	ambient_motion_enabled=not ambient_motion_enabled
+	_apply_ambient_motion();_persist_display_preferences()
+	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal("Anzeige")
+
+func _wallet_feedback(values: Array) -> void:
+	var labels: Array[Label]=[gold_label,pearl_label,crystal_label]
+	for index in values.size():
+		if ambient_motion_enabled and wallet_previous.size()==3 and int(values[index])!=wallet_previous[index]:
+			var before: Tween=wallet_tweens.get(index)
+			if before!=null and before.is_valid():before.kill()
+			labels[index].modulate=Color("9bf2bc") if int(values[index])>wallet_previous[index] else Color("ffab91")
+			var pulse: Tween=create_tween()
+			pulse.tween_property(labels[index],"modulate",Color.WHITE,.65).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+			wallet_tweens[index]=pulse
+	wallet_previous.assign(values)
+
 func _set_ship_visual_toggle(which: String) -> void:
 	if which=="motion":ship_animations_enabled=not ship_animations_enabled
 	elif which=="wake":wake_effects_enabled=not wake_effects_enabled
@@ -4664,6 +4699,8 @@ func _reset_display_preferences() -> void:
 	vfx_intensity=1.35
 	web_fast_mode=OS.has_feature("web")
 	_apply_web_performance()
+	ambient_motion_enabled=true
+	_apply_ambient_motion()
 	ship_animations_enabled=true
 	wake_effects_enabled=true
 	menu_layout="balanced"

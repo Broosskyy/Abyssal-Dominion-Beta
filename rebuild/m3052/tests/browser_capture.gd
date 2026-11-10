@@ -38,5 +38,7 @@ func _run() -> void:
 			await RenderingServer.frame_post_draw
 			var filename="%dx%d-heading%d.png" % [dimensions.x,dimensions.y,direction]
 			root.get_texture().get_image().save_png(output+"/"+filename)
+	var motion: Dictionary=await preload("res://tests/ocean_motion_probe.gd").run(self)
+	print(JSON.stringify(motion))
 	print("BROWSER_CAPTURES_READY "+output)
-	quit()
+	quit(0 if motion.status=="PASS" else 1)

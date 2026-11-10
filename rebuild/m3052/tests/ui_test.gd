@@ -432,6 +432,22 @@ func _run() -> void:
 			else:
 				check(game.modal.get_global_rect().size.x<dimensions.x*.85,"combat ammunition retains compact popup instead of full page")
 			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
+	var meter=load("res://living_meter.gd").new()
+	root.add_child(meter);meter.size=Vector2(200,20);meter.max_value=100;meter.value=100
+	meter._process(.01)
+	meter.value=40;meter._process(.05)
+	check(meter.value==40 and meter.display_ratio>.4 and meter.display_ratio<1.0 and meter.trail_ratio>=meter.display_ratio,"damage feedback animates only painted fill, never the real HP value")
+	for frame in 80:meter._process(.05)
+	check(absf(meter.display_ratio-.4)<.002 and absf(meter.trail_ratio-.4)<.002,"HP fill and loss trail settle exactly on current health")
+	meter.motion_enabled=false;meter.value=85;meter._process(.01)
+	check(is_equal_approx(meter.display_ratio,.85) and meter.feedback==0,"quiet HUD snaps to live values without an animated trail")
+	meter.queue_free()
+	var motion_before: bool=game.ambient_motion_enabled
+	game.ambient_motion_enabled=false;game._apply_ambient_motion();game._persist_display_preferences()
+	check(not game.player_hp.motion_enabled and not game.attack.motion_enabled and not bool(game.ocean.get_shader_parameter("surface_motion")),"one quiet setting disables meter, control and ocean movement")
+	var motion_save: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
+	check(motion_save is Dictionary and motion_save.get("ambient_motion_enabled")==false,"quiet movement preference survives a saved configuration")
+	game.ambient_motion_enabled=motion_before;game._apply_ambient_motion();game._persist_display_preferences()
 	var wallet_before: Array=[game.sim.pearls,game.sim.crystals,game.sim.captain_name]
 	game.sim.pearls=1250;game.sim.crystals=64;game.sim.captain_name="Testpirat"
 	game._refresh_ui()
