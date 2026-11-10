@@ -135,7 +135,9 @@ def main():
     for name in ['download_recovery_test', 'expansion_test', 'frontier_test', 'simulation_test', 'progression_test', 'seafight_systems_test', 'ship_visual_test', 'stern_hull_taper_test', 'combat_fx_test', 'ui_test', 'start_hub_test', 'updater_test', 'navigation_test', 'chart_presentation_test', 'deck_progression_test', 'ammo_picker_test', 'content_update_test']:
         with tempfile.TemporaryDirectory() as user_data:
             env = dict(os.environ, XDG_DATA_HOME=user_data)
-            log = checked([engine, '--headless', '--path', str(ROOT), '--quit-after', '120',
+            # UI navigation verifies deferred container layout across extra frames.
+            frame_budget = '180' if name == 'ui_test' else '120'
+            log = checked([engine, '--headless', '--path', str(ROOT), '--quit-after', frame_budget,
                            '--script', 'tests/'+name+'.gd'], output.with_suffix('.'+name+'.log'), env)
             rows = [json.loads(line) for line in log.splitlines() if line.startswith('{')]
             if not rows or rows[-1].get('status') != 'PASS':
