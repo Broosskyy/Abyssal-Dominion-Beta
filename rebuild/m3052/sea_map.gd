@@ -2576,6 +2576,7 @@ func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String
 	# the action BELOW them: big enough to see, but no 350px-tall card wall.
 	# Wider panels retain the classic illustrated shop-grid presentation.
 	var compact: bool=modal_scroll.size.x<690.0
+	var side_by_side: bool=compact and modal_scroll.size.x>=420.0
 	panel.custom_minimum_size=Vector2(0,224 if compact else 326)
 	panel.set_meta("catalog_compact",compact)
 	var content=VBoxContainer.new()
@@ -2585,7 +2586,7 @@ func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String
 	panel.add_child(content)
 	var lead: Node=content
 	var copy: Node=content
-	if compact:
+	if side_by_side:
 		var product_row=HBoxContainer.new()
 		product_row.name="CatalogProductRow"
 		product_row.add_theme_constant_override("separation",12)
@@ -2602,8 +2603,8 @@ func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String
 	var art_stage=PanelContainer.new()
 	art_stage.name="CatalogArtStage"
 	art_stage.add_theme_stylebox_override("panel",SKIN.catalog_art(accent))
-	art_stage.custom_minimum_size=Vector2(132,140) if compact else Vector2(0,172)
-	art_stage.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
+	art_stage.custom_minimum_size=Vector2(132,140) if side_by_side else Vector2(0,140 if compact else 172)
+	art_stage.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN if side_by_side else Control.SIZE_EXPAND_FILL
 	art_stage.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	lead.add_child(art_stage)
 	var frame=CenterContainer.new()
@@ -2614,19 +2615,19 @@ func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String
 		var art=_picture(frame,texture,image_size,false)
 		art.name="CatalogArtwork"
 		art.custom_minimum_size=Vector2(image_size,image_size)
-	if compact:lead.add_child(copy)
+	if side_by_side:lead.add_child(copy)
 	var heading=_text(copy,title,17,Color("ffe4ad"))
 	heading.name="CatalogTitle"
-	heading.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if compact else HORIZONTAL_ALIGNMENT_CENTER
+	heading.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if side_by_side else HORIZONTAL_ALIGNMENT_CENTER
 	heading.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	heading.custom_minimum_size.y=28
 	var description=_text(copy,details,14,Color("d6e5e6"))
-	description.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if compact else HORIZONTAL_ALIGNMENT_CENTER
+	description.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if side_by_side else HORIZONTAL_ALIGNMENT_CENTER
 	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	description.custom_minimum_size.y=38
 	var price=_text(copy,footer,15,Color("b8eacf"))
 	price.name="CatalogStatus"
-	price.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if compact else HORIZONTAL_ALIGNMENT_CENTER
+	price.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if side_by_side else HORIZONTAL_ALIGNMENT_CENTER
 	price.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	price.custom_minimum_size.y=30
 	price.add_theme_stylebox_override("normal",SKIN.note())
@@ -3272,7 +3273,9 @@ func _open_castles() -> void:
 			gauge.max_value=CONTENT.TALENT_MAX
 			gauge.value=stage
 			gauge.custom_minimum_size.y=12
-			var upgrade=_catalog_action(tile,"PUNKT VERGEBEN" if stage<CONTENT.TALENT_MAX else "TALENT VOLLSTÄNDIG",func():
+			_note("Talentbonus: +%d %% → +%d %%" % [stage*2,mini(CONTENT.TALENT_MAX,stage+1)*2],Color("bde5d4"),tile)
+			var talent_action: String="TALENT VOLLSTÄNDIG" if stage>=CONTENT.TALENT_MAX else ("KEINE TALENTPUNKTE" if sim.talent_points_available()<=0 else "PUNKT VERGEBEN")
+			var upgrade=_catalog_action(tile,talent_action,func():
 				sim.learn_talent(talent_key);_save_progress();_open_modal("Kastelle");_refresh_ui(),stage>=CONTENT.TALENT_MAX or sim.talent_points_available()<=0)
 			upgrade.name="Talent_"+key
 		_note("Talentvergabe ist weltweit möglich. Kastelle sind weiterhin stationäre Bauten und vorerst an den Hafen gebunden.",Color("a7cfc5"))
@@ -3282,9 +3285,14 @@ func _open_castles() -> void:
 	for key: String in CONTENT.UPGRADE_KEYS:total+=int(sim.upgrades[key])
 	_section("AUSBAUSTAND · %d/%d · FREI BIS STUFE %d" % [total,CONTENT.UPGRADE_KEYS.size()*CONTENT.CASTLE_MAX,sim.castle_cap()])
 	if not sim.docked:_note("Kastelle werden vorerst nur am Hafen ausgebaut. Die Übersicht funktioniert überall.",Color("e1b979"))
+	_note("Vorschau mit deiner aktuellen Ausrüstung. Ein Kauf verbessert jeweils genau eine Stufe.",Color("bde5d4"))
 	var upgrades=_catalog_grid(3)
 	for key: String in CONTENT.UPGRADE_KEYS:_upgrade_row(key,upgrades)
 	_action("ZU DEN TALENTEN · %d PUNKTE FREI" % sim.talent_points_available(),func():_switch_tab("Kastelle","TALENTE"))
+	var paths=_grid(2)
+	if not sim.docked:_action("HAFEN & ANDOCKEN",func():_open_modal("Hafen"),"normal",paths)
+	_action("DECKS & GESCHÜTZPLÄTZE",func():_open_modal("Decks"),"normal",paths)
+	_action("WERFT & KANONEN",func():_switch_tab("Werft","KANONEN"),"normal",paths)
 
 func _open_battle_pass() -> void:
 	_banner_card(painted.nav_bonus,"SAISONPASS · FREIE BETA-SAISON","Spiele, sammle Fortschritt und hole kostenfreie Belohnungen ab. Die Premiumspur bleibt gesperrt, bis sichere Konten und Zahlungen existieren.")
@@ -3313,24 +3321,32 @@ func _open_battle_pass() -> void:
 	var disabled=_action("PREMIUM NOCH NICHT VERFÜGBAR",func():pass)
 	disabled.disabled=true
 
+func _upgrade_value(value: Variant,unit: String) -> String:
+	if unit=="s":return ("%.2f s" % float(value)).replace(".",",")
+	if unit=="m/s":return ("%.1f m/s" % float(value)).replace(".",",")
+	return _thousands(int(value))+(" "+unit if not unit.is_empty() else "")
+
 func _upgrade_row(key: String,parent: Node=null) -> void:
 	var config: Dictionary=CONTENT.UPGRADES[key]
-	var stage: int=int(sim.upgrades[key])
+	var preview: Dictionary=sim.castle_upgrade_preview(key)
+	var stage: int=int(preview.stage)
 	var art_key: String=key+"_%d" % mini(2,stage) if key in ["cannon","harpoon"] else str(config.icon)
-	var cost: int=sim.upgrade_cost(key)
-	var gated: bool=cost>=0 and stage>=sim.castle_cap()
-	var footer: String="MAXIMALE STUFE" if cost<0 else ("AB KAPITÄNSSTUFE %d" % ((stage-2)*3) if gated else "%d GOLD" % cost)
 	var tile=_catalog_tile(parent,_art(art_key),str(config.name).to_upper(),"%s\n%s" % [str(config.role),str(config.effect)],"STUFE %d/%d" % [stage,CONTENT.CASTLE_MAX],Color("c9a35e") if stage>0 else Color("607785"))
+	var comparison: Array[String]=[]
+	for row: Dictionary in preview.rows:
+		comparison.append("%s\n%s → %s" % [row.label,_upgrade_value(row.before,str(row.unit)),_upgrade_value(row.after,str(row.unit))])
+	var values=_note("\n".join(comparison),Color("bde5d4"),tile)
+	values.name="CastlePreview_"+key
 	var progress=_bar(tile)
-	progress.max_value=CONTENT.CASTLE_MAX
-	progress.value=stage
-	progress.custom_minimum_size.y=12
-	var title: String="MAXIMALE STUFE" if cost<0 else ("AB KAPITÄNSSTUFE %d" % ((stage-2)*3) if gated else "VERBESSERN · %d Gold" % cost)
-	var upgrade=_catalog_action(tile,title,func():
-		sim.buy_upgrade(key);_save_progress();_open_modal("Kastelle");_refresh_ui(),cost<0 or gated or not sim.docked or int(sim.player.gold)<cost)
+	progress.max_value=CONTENT.CASTLE_MAX;progress.value=stage;progress.custom_minimum_size.y=12
+	var reason: String=str(preview.reason)
+	var cost: int=int(preview.cost)
+	if cost>=0:_note("Preis: %s Gold · Bestand: %s" % [_thousands(cost),_thousands(int(sim.player.gold))],GOLD,tile)
+	var upgrade=_catalog_action(tile,reason if not reason.is_empty() else "VERBESSERN · %s Gold" % _thousands(cost),func():
+		sim.buy_upgrade(key);_save_progress();_open_modal("Kastelle");_refresh_ui(),not bool(preview.can_upgrade))
 	upgrade.name="CastleUpgrade_"+key
-	upgrade.tooltip_text=footer
-	if cost>=0 and not gated:_with_icon(upgrade,painted.gold_coins)
+	upgrade.tooltip_text=reason if not reason.is_empty() else "Eine Stufe ausbauen; die Vorschau zeigt die daraus entstehenden Werte."
+
 
 func _deck_title(deck: Dictionary) -> String:
 	return "%sDECK · STUFE %d/%d" % [str(CONTENT.DECK_TIERS[int(deck.tier)]).to_upper(),int(deck.get("stage",1)),CONTENT.DECK_STAGE_MAX]

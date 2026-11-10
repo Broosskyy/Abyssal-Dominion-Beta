@@ -140,6 +140,38 @@ func _initialize() -> void:
 	var legacy={"schema":1,"gold":543,"ammo":[50,20,10],"skin":8,"kills":3,"claimed":true}
 	check(restored.restore_save(legacy) and int(restored.player.gold)==543 and int(restored.player.skin)==0 and restored.quest_index==1,"M3052 legacy wallet, design and claimed quest migrate")
 	check(not restored.restore_save({"schema":999}),"unsupported saves are rejected")
+	# Compare a read-only projection with the real purchase, including multipliers.
+	for stage in [0,2,SIM.CONTENT.CASTLE_MAX-1]:
+		for key: String in SIM.CONTENT.UPGRADE_KEYS:
+			var projected=SIM.new()
+			projected.level=40;projected.docked=true;projected.player.gold=1000000
+			projected.upgrades[key]=stage
+			projected.talents={"gunnery":3,"armor":2,"navigation":1}
+			projected.activate_blessing(90)
+			projected.apply_upgrades();projected.player.hp-=123
+			var snapshot: String=JSON.stringify([projected.player,projected.upgrades,projected.talents,projected.buffs,projected.message])
+			var hp_before: float=float(projected.player.hp)
+			var preview: Dictionary=projected.castle_upgrade_preview(key)
+			check(JSON.stringify([projected.player,projected.upgrades,projected.talents,projected.buffs,projected.message])==snapshot and float(projected.player.hp)==hp_before,"castle preview is read-only: "+key+str(stage))
+			check(bool(preview.can_upgrade) and projected.buy_upgrade(key),"preview allows exactly the real legal purchase: "+key+str(stage))
+			var actual: Array=[]
+			match key:
+				"cannon":actual=[projected.weapon_damage(0)]
+				"harpoon":actual=[projected.weapon_damage(2)]
+				"hull":actual=[projected.player.max_hp,projected.player.max_shield]
+				"sails":actual=[projected.player.speed]
+				"crew":actual=[projected.reload_time(),projected.loot_gold(100)]
+				"war":actual=[int(projected.upgrades.war)*10]
+			for i in actual.size():check(is_equal_approx(float(preview.rows[i].after),float(actual[i])),"preview equals committed upgrade: "+key+str(stage)+"/"+str(i))
+	var denied=SIM.new()
+	check(denied.castle_upgrade_preview("unknown").is_empty(),"unknown upgrade has no fabricated preview")
+	check(denied.castle_upgrade_preview("hull").reason=="AM HAFEN ANDOCKEN","castle preview explains physical docking prerequisite")
+	denied.docked=true;denied.player.gold=0
+	check(denied.castle_upgrade_preview("hull").reason.begins_with("ES FEHLEN"),"castle preview states missing gold")
+	denied.upgrades.hull=denied.castle_cap()
+	check(denied.castle_upgrade_preview("hull").reason.begins_with("AB KAPITÄNSSTUFE"),"castle preview states captain prerequisite")
+	denied.upgrades.hull=SIM.CONTENT.CASTLE_MAX
+	check(not denied.castle_upgrade_preview("hull").can_upgrade and denied.castle_upgrade_preview("hull").cost==-1,"maxed castle cannot quote another purchase")
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)

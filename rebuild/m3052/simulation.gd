@@ -1436,7 +1436,8 @@ func quest_progress() -> int:
 		"abyss": return 1 if visited[2] else 0
 	return 0
 
-func weapon_damage(mode: int) -> int:
+func weapon_damage(mode: int,castle_stages: Dictionary={}) -> int:
+	var stages: Dictionary=upgrades if castle_stages.is_empty() else castle_stages
 	if mode >= 3:
 		var special: float = 31.0 * ([0.75, 1.2, 0.8, 0.95][mode-3] if mode<7 else 1.0) # M3105 visual-first test ammo: neutral placeholder value
 		special *= float(equipped_cannons()) / float(BASE_CANNON_SLOTS)
@@ -1445,7 +1446,7 @@ func weapon_damage(mode: int) -> int:
 		return roundi(special)
 	var key = "harpoon" if mode == 2 else "cannon"
 	var bonus_rate = 0.35 if mode == 2 else 0.25
-	var value: float = float([31,19,96][mode]) * (1.0 + float(upgrades[key]) * bonus_rate)
+	var value: float = float([31,19,96][mode]) * (1.0 + float(stages[key]) * bonus_rate)
 	if mode < 2:
 		value *= float(equipped_cannons()) / float(BASE_CANNON_SLOTS)
 		value *= 1.0+float(talents.gunnery)*0.02
@@ -1476,6 +1477,35 @@ func castle_cap() -> int:
 func upgrade_cost(key: String) -> int:
 	if not upgrades.has(key) or int(upgrades[key]) >= CONTENT.CASTLE_MAX: return -1
 	return CONTENT.CASTLE_COSTS[int(upgrades[key])]
+
+## Read-only projections. Never buy, heal, change equipment or consume currency.
+func castle_upgrade_preview(key: String) -> Dictionary:
+	if not CONTENT.UPGRADES.has(key):return {}
+	var stage: int=int(upgrades[key])
+	var maximum: bool=stage>=CONTENT.CASTLE_MAX
+	var next: int=stage if maximum else stage+1
+	var future: Dictionary=upgrades.duplicate()
+	future[key]=next
+	var rows: Array=[]
+	match key:
+		"cannon","harpoon":
+			var mode: int=2 if key=="harpoon" else 0
+			rows.append({"label":"Harpunenschaden" if mode==2 else "Vollkugel / Geschoss","before":weapon_damage(mode),"after":weapon_damage(mode,future),"unit":""})
+		"hull":
+			var armor: float=1.0+deck_value("armor")/100.0
+			var hp: int=roundi(float(PLAYER_HP+next*400+mounted_deck_hp())*armor*(1.2 if has_blessing() else 1.0)*(1.0+float(talents.armor)*.02))
+			rows.append({"label":"Max. Rumpf-HP","before":int(player.max_hp),"after":hp,"unit":""})
+			rows.append({"label":"Max. Schutzschild","before":int(player.max_shield),"after":roundi(float(PLAYER_SHIELD+next*120)*armor),"unit":""})
+		"sails":
+			var speed: float=PLAYER_SPEED*(1.0+.12*next+deck_value("navigation")/100.0)*(1.1 if has_blessing() else 1.0)*(1.12 if float(buffs.storm_deck)>0 else 1.0)*(1.0+float(talents.navigation)*.02)
+			rows.append({"label":"Basisfahrt","before":float(player.speed),"after":speed,"unit":"m/s"})
+		"crew":
+			rows.append({"label":"Nachladen","before":reload_time(),"after":BASE_RELOAD*(1.0-.04*next),"unit":"s"})
+			rows.append({"label":"Beute je 100 Basisgold","before":loot_gold(100),"after":loot_gold(100)+(next-stage)*8,"unit":"Gold"})
+		"war":rows.append({"label":"Elite-/Turm-Bonus","before":stage*10,"after":next*10,"unit":"%"})
+	var cost: int=upgrade_cost(key)
+	var reason: String="MAXIMALE STUFE" if maximum else ("AB KAPITÄNSSTUFE %d" % ((stage-2)*3) if stage>=castle_cap() else ("AM HAFEN ANDOCKEN" if not docked else ("ES FEHLEN %d GOLD" % maxi(0,cost-int(player.gold)) if int(player.gold)<cost else "")))
+	return {"stage":stage,"next":next,"cost":cost,"rows":rows,"reason":reason,"can_upgrade":reason.is_empty()}
 
 func buy_upgrade(key: String) -> bool:
 	var cost = upgrade_cost(key)

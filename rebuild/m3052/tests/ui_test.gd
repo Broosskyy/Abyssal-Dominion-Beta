@@ -582,6 +582,7 @@ func _run() -> void:
 		await process_frame
 		var description: Label=game.modal_body.find_child("FeaturedMenuDescription",true,false) as Label
 		check(description!=null and description.size.x>=game.modal_scroll.size.x*.75,"portrait banner has full-width readable copy in "+kind)
+		if kind=="Markt":check(game.modal_body.find_child("CatalogProductRow",true,false)==null,"portrait product titles use full-width copy instead of a narrow side column")
 	# Two uploaded comparison videos show item artwork, a price, and one
 	# unmistakable action per item. Validate the actual Godot catalog layout
 	# on a compact landscape phone and a normal tablet/desktop viewport.
@@ -659,6 +660,13 @@ func _run() -> void:
 		check(game.modal_body.find_child("DeckBuy_cannon",true,false)!=null,"gold deck store has its own illustrated buy buttons")
 		game._switch_tab("Kastelle","KASTELLE")
 		check(game.modal_body.find_child("CastleUpgrade_cannon",true,false)!=null,"castle gallery exposes named upgrade actions")
+		for key: String in game.CONTENT.UPGRADE_KEYS:
+			var projection: Label=game.modal_body.find_child("CastlePreview_"+key,true,false) as Label
+			var purchase: Button=game.modal_body.find_child("CastleUpgrade_"+key,true,false) as Button
+			var expected: Dictionary=game.sim.castle_upgrade_preview(key)
+			check(projection!=null and projection.text.contains("→") and purchase.disabled==not bool(expected.can_upgrade),"castle card shows projection and actual purchase eligibility: "+key+str(device))
+			if not bool(expected.can_upgrade):check(purchase.text==str(expected.reason),"blocked castle action states its actual reason: "+key)
+
 		game._switch_tab("Kastelle","TALENTE")
 		check(game.modal_body.find_child("Talent_gunnery",true,false)!=null,"talent gallery exposes named skill point action")
 	game._switch_tab("Kastelle","KASTELLE")

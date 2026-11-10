@@ -46,3 +46,12 @@ Für unser Spiel abgeleitet: Auf der Seekarte die wichtigsten Informationen dire
 - Ausbau: Vorher/Nachher-Werte, Kostenkurve und verständliche Erwerbswege für Decks, Kanonen und Talente.
 - Grafik: einzelne Schiffsansichten, Hafen-/Inselränder, Monster und Salven über reale Spielsituationen prüfen; nur gezielt fehlende eigene Assets erzeugen.
 - Multiplayer: nach Bereitstellung eines öffentlichen Servers persistente Konten, Gruppen, Freundschaften, Gilden und serverautorisierte Kämpfe/Wirtschaft ausbauen.
+
+## Folgepaket: Ausbauvorschau
+
+- Alle sechs Kastelle zeigen aktuelle und nächste Werte anhand der vorhandenen Ausrüstung. Vollkugelschaden und Harpunen sind ausdrücklich unterschieden.
+- Hafen-, Stufen- und Goldvoraussetzungen werden an der Kaufaktion genannt; maximale Stufen bieten keinen weiteren Kauf.
+- Talentkarten zeigen den aktuellen und nächsten Talentbonus und erklären fehlende Punkte.
+- Kastelle verlinken Hafen, Decks und Kanonenmontage.
+- Die Prognosen werden gegen echte Käufe einschließlich aktiver Segnung und Talenten geprüft. Vorschau darf weder Gold noch Rumpfzustand ändern.
+- Auf sehr schmalen Panels werden Katalogbilder und Produkttexte untereinander statt in einer gequetschten Seitenzeile angeordnet.
