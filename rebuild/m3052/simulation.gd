@@ -47,6 +47,8 @@ var claimed := false
 var map_id := 0
 var docked := false
 var level := 1
+var pearls: int=0
+var crystals: int=0
 var xp := 0
 var quest_index := 0
 var loot_collected := 0
@@ -1766,7 +1768,7 @@ func export_save() -> Dictionary:
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
-	return {"schema":8,"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	return {"schema":8,"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"pearls":pearls,"crystals":crystals,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"talents":talents.duplicate(),"battle_pass_claimed":battle_pass_claimed.duplicate(),
@@ -1796,6 +1798,8 @@ func restore_save(data: Dictionary) -> bool:
 	var stored_id := str(data.get("captain_id","")).strip_edges().to_upper()
 	if stored_id.length()==12 and stored_id.is_valid_hex_number():captain_id=stored_id
 	player.gold=clampi(int(data.get("gold",240)),0,99999999)
+	pearls=clampi(int(data.get("pearls",0)),0,99999999)
+	crystals=clampi(int(data.get("crystals",0)),0,99999999)
 	# Never interpret old skin 1 from schema 1-4 as the new Elite-Design 1.
 	# Save schema 5 introduced separate Black Crown test skin 1.
 	# Skins 2-11 extend it with ten actual Elite V2 albedo variants.

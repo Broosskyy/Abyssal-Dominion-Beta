@@ -96,6 +96,16 @@ var island_textures: Dictionary = {}
 var icons: Dictionary = {}
 var beast: Texture2D
 var font: Font = ThemeDB.fallback_font
+var currency_wallet: Control
+var currency_titles: Array[Label]=[]
+var pearl_label: Label
+var crystal_label: Label
+var pearl_icon: TextureRect
+var crystal_icon: TextureRect
+var profile_button: Button
+var profile_avatar: TextureRect
+var profile_name: Label
+var profile_level: Label
 var captain_meters: Control
 var player_bp: ProgressBar
 var bp_numbers: Label
@@ -1581,7 +1591,20 @@ func _build_ui() -> void:
 	chrome=_panel(ui)
 	for name in ["gold_coins","kills_skull"]:
 		var icon=_portrait(chrome);icon.texture=painted[name];wallet_icons.append(icon)
-	gold_label=_text(chrome,"",15,Color("ffe2a0"))
+	currency_wallet=Control.new();currency_wallet.name="ThreeCurrencyWallet";chrome.add_child(currency_wallet)
+	wallet_icons[0].reparent(currency_wallet)
+	gold_label=_text(currency_wallet,"",12,Color("ffe2a0"))
+	pearl_label=_text(currency_wallet,"",12,Color("e9edf5"))
+	crystal_label=_text(currency_wallet,"",12,Color("cfb6ff"))
+	pearl_icon=_portrait(currency_wallet);pearl_icon.texture=preload("res://assets/ui/icons/pearl.svg")
+	crystal_icon=_portrait(currency_wallet);crystal_icon.texture=preload("res://assets/ui/icons/crystal.svg")
+	for title: String in ["GOLD","PERLEN","KRISTALLE"]:currency_titles.append(_text(currency_wallet,title,8,Color("c4b893")))
+	for amount: Label in [gold_label,pearl_label,crystal_label]:amount.clip_text=true
+	profile_button=_button(chrome,"",func():_open_modal("Profil"))
+	profile_button.name="PirateProfileButton";profile_button.clip_contents=true
+	profile_avatar=_portrait(profile_button);profile_avatar.texture=preload("res://assets/ui/icons/pirate_profile.svg")
+	profile_name=_text(profile_button,"",12,Color("f4dfb5"));profile_name.clip_text=true
+	profile_level=_text(profile_button,"",8,Color("9fc5ce"));profile_level.clip_text=true
 	kills_label=_text(chrome,"",12,Color("eadfc6"))
 	for label in [gold_label,kills_label]:label.clip_text=true;label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
 	# Sea HUD is a combat overlay, not a second inventory dashboard.
@@ -1787,32 +1810,43 @@ func _layout() -> void:
 		camera.zoom=Vector2.ONE*desired_zoom
 	water.size=viewport_size
 	_place(ruler,0,0,s.x,s.y)
-	# Captain meters and navigation share the screen center on both renderers.
-	# Two compact meter rows keep progression visible without side-biased HP.
+	# Wallet/profile occupy the upper-left utility row. HP and shield flank
+	# the centered menus on the left; progression mirrors them on the right.
 	var header: float=86.0 if compact else 92.0
 	_place(chrome,0,0,s.x,header)
-	var wallet: float=102.0 if compact else 118.0
+	_place(currency_wallet,6,2,282,36)
+	var amounts: Array[Label]=[gold_label,pearl_label,crystal_label]
+	var money_icons: Array[TextureRect]=[wallet_icons[0],pearl_icon,crystal_icon]
+	for i in 3:
+		var slot: float=float(i)*94.0
+		_place(money_icons[i],slot,6,24,24)
+		_place(currency_titles[i],slot+28,0,64,14)
+		_place(amounts[i],slot+28,13,64,21)
+	_place(wallet_icons[1],0,0,0,0)
+	_place(kills_label,0,0,0,0)
+	_place(profile_button,300,2,minf(196.0,s.x-312.0),36)
+	_place(profile_avatar,3,2,32,32)
+	_place(profile_name,41,1,profile_button.size.x-47,20)
+	_place(profile_level,41,20,profile_button.size.x-47,14)
 	var nav_y: float=42.0 if compact else 46.0
 	var nav_h: float=header-nav_y-3.0
-	_place(wallet_icons[0],6,nav_y+4,nav_h-8,nav_h-8)
-	_place(wallet_icons[1],0,0,0,0)
-	_place(gold_label,nav_h+2,nav_y,wallet-nav_h-4,nav_h)
-	_place(kills_label,0,0,0,0)
-	var meters: float=minf(440.0,s.x-32.0)
-	_place(captain_meters,(s.x-meters)*.5,4,meters,nav_y-8)
+	var nav_span: float=minf(400.0,maxf(332.0,s.x*.40))
 	var meter_gap: float=8.0
-	var meter_w: float=(meters-meter_gap)*.5
-	var meter_h: float=(captain_meters.size.y-4.0)*.5
+	var meter_w: float=minf(208.0,(s.x-nav_span-32.0)*.5)
+	var group_w: float=nav_span+2.0*(meter_w+meter_gap)
+	_place(captain_meters,(s.x-group_w)*.5,nav_y,group_w,nav_h)
+	var meter_h: float=(nav_h-3.0)*.5
 	var bars: Array[ProgressBar]=[player_hp,player_shield,player_xp,player_bp]
 	var readouts: Array[Label]=[player_numbers,shield_numbers,xp_numbers,bp_numbers]
 	for i in bars.size():
 		bars[i].show();readouts[i].show()
-		_place(bars[i],float(i%2)*(meter_w+meter_gap),float(i/2)*(meter_h+4.0),meter_w,meter_h)
+		var x: float=0.0 if i<2 else meter_w+nav_span+2.0*meter_gap
+		_place(bars[i],x,float(i%2)*(meter_h+3.0),meter_w,meter_h)
 		_place(readouts[i],0,0,meter_w,meter_h)
+		readouts[i].add_theme_font_size_override("font_size",11)
 	for tag: Label in meter_tags:tag.hide()
 	var pill_w: float=minf(220.0,s.x*.3)
 	_place(staff_pill,(s.x-pill_w)*.5,header+4,pill_w,22)
-	var nav_span: float=minf(480.0,s.x-2.0*(wallet+8.0))
 	_place(nav_scroll,(s.x-nav_span)*.5,nav_y,nav_span,nav_h)
 	var nav_button_w: float=maxf(64.0,(nav_span-12.0)/float(nav_buttons.size()))
 	for nav: Button in nav_buttons:
@@ -1845,9 +1879,11 @@ func _layout() -> void:
 	_place(buff_bar,left,target_y+card_h+46,column,26)
 	# Chart with corner controls, as on classic sea-chart clients.
 	var mw=136.0 if compact else 190.0
-	var mh=118.0 if compact else 160.0
+	var map_bottom: float=(46.0 if compact else 50.0)+22.0+(118.0 if compact else 160.0)
+	var map_top: float=header+12.0
+	var mh: float=maxf(94.0,map_bottom-map_top)
 	var mx=s.x-mw-20
-	var my=(46.0 if compact else 50.0)+22.0
+	var my=map_top
 	_place(chart_mini,mx,my,mw,mh)
 	var z=32.0 if compact else 36.0
 	_place(zoom_out,mx-z*.3,my-z*.3,z,z)
@@ -1964,7 +2000,13 @@ func _refresh_ui() -> void:
 				badge="!" if alert else ""
 		nav.set("quantity",badge);nav.set("badge_alert",alert)
 		nav.set("latched",modal.visible and modal_kind==kind);nav.queue_redraw()
-	gold_label.text=_thousands(int(sim.player.gold))
+	gold_label.text=_wallet_amount(int(sim.player.gold))
+	pearl_label.text=_wallet_amount(sim.pearls)
+	crystal_label.text=_wallet_amount(sim.crystals)
+	currency_wallet.tooltip_text="Gold: %s · Perlen: %s · Kristalle: %s" % [_thousands(int(sim.player.gold)),_thousands(sim.pearls),_thousands(sim.crystals)]
+	profile_name.text=sim.captain_name
+	profile_level.text="LV. %d · PROFIL ÖFFNEN" % sim.level
+	profile_button.tooltip_text="Piratenprofil öffnen · %s · ID %s" % [sim.captain_name,sim.captain_id]
 	kills_label.text="%s versenkt" % _thousands(sim.kills)
 	player_hp.max_value=sim.player.max_hp
 	player_hp.value=sim.player.hp
@@ -4708,8 +4750,12 @@ func _open_consumables() -> void:
 		button.disabled=sim.docked or int(sim.player.hp)<=0 or wait>0 or (int(sim.supplies[key])<=0 and not active)
 	_note("Nachschub über MARKT > ITEMS – auch unterwegs. Pulver und Platten bleiben bis zum Abschalten aktiv.")
 
+func _wallet_amount(amount: int) -> String:
+	return ("%.1f M" % (float(amount)/1000000.0)).replace(".",",") if amount>=1000000 else _thousands(amount)
+
 func _open_profile() -> void:
-	_banner_card(painted.nav_ranking,"SPIELERPROFIL",sim.captain_name+" · ID "+sim.captain_id)
+	_banner_card(profile_avatar.texture,"PIRATENPROFIL",sim.captain_name+" · ID "+sim.captain_id)
+	_note("Gold %s · Perlen %s · Kristalle %s" % [_thousands(int(sim.player.gold)),_thousands(sim.pearls),_thousands(sim.crystals)])
 	_row(painted.nav_guild,"[%s] %s" % [str(sim.guild.get("tag","–")),sim.captain_name],48,Color("ffd26d"))
 	var name_field=_line_edit("Spielername · 2 bis 24 Zeichen",24)
 	name_field.text=sim.captain_name

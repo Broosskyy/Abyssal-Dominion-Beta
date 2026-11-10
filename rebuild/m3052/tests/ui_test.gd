@@ -297,7 +297,7 @@ func _run() -> void:
 		game._refresh_ui()
 		check(game.nav_buttons.size()==5 and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Decks") and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Menü"),"five clean primary HUD shortcuts preserve Decks and grouped Menu at "+str(dimensions))
 		check(game._hud_contains(game.render_toggle.get_global_rect().get_center()),"mobile touch on graphics switch is reserved for its button, never treated as a sailing tap")
-		check(game.nav_scroll!=null and game.nav_scroll.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and absf(game.nav_scroll.get_global_rect().get_center().x-float(dimensions.x)*.5)<1.0 and game.nav_scroll.get_global_rect().position.y>=game.captain_meters.get_global_rect().end.y,"navigation is centered beneath captain meters at "+str(dimensions))
+		check(game.nav_scroll!=null and game.nav_scroll.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and absf(game.nav_scroll.get_global_rect().get_center().x-float(dimensions.x)*.5)<1.0 and game.player_hp.get_global_rect().end.x<=game.nav_scroll.get_global_rect().position.x and game.player_xp.get_global_rect().position.x>=game.nav_scroll.get_global_rect().end.x,"centered menus are flanked by health on the left and progression on the right at "+str(dimensions))
 		check(game.nav_strip.get_combined_minimum_size().x<=game.nav_scroll.size.x+8,"five top-level buttons fit without horizontal scrolling at "+str(dimensions))
 		for nav: Button in game.nav_buttons:
 			check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
@@ -309,6 +309,9 @@ func _run() -> void:
 		for i in controls.size():
 			for j in range(i+1,controls.size()):
 				check(not controls[i].get_global_rect().intersects(controls[j].get_global_rect()),"independent touch targets %s / %s at %s"%[controls[i].name,controls[j].name,dimensions])
+		for meter: Control in [game.player_hp,game.player_shield,game.player_xp,game.player_bp]:
+			for map_control: Control in [game.chart_mini,game.zoom_in,game.zoom_out,game.settings_button,game.center_button]:
+				check(not meter.get_global_rect().intersects(map_control.get_global_rect()),"map and corner controls never cover captain bars at "+str(dimensions))
 		check(not game.quest_panel.get_global_rect().intersects(game.target_panel.get_global_rect()),"quest bar and target card do not overlap")
 		check(game.quest_panel.size.y<=44 and not game.quest_panel.get_global_rect().intersects(game.camera_pad.get_global_rect()),"quest bar stays a compact strip clear of the joystick at "+str(dimensions))
 		var center_water=Rect2(Vector2(dimensions)*.5-Vector2(80,90),Vector2(160,155))
@@ -329,7 +332,7 @@ func _run() -> void:
 		check(str(game.attack.get("art").resource_path).ends_with("cannon_action.png") and game.attack.get("hero"),"fire control uses the dedicated cannon graphic")
 		check(game.player_hp.get_parent()==game.captain_meters and game.player_xp.visible and game.player_bp.visible and absf(game.captain_meters.get_global_rect().get_center().x-float(dimensions.x)*.5)<1.0,"all four captain meters remain visible in the screen center")
 		check(not game.kills_label.visible and not game.wallet_icons[1].visible,"top HUD hides redundant kill counter, still available in logbook")
-		check(not game.player_shield.get_global_rect().intersects(game.player_hp.get_global_rect()) and game.player_xp.get_global_rect().position.y>=game.player_hp.get_global_rect().end.y and not game.player_bp.get_global_rect().intersects(game.player_xp.get_global_rect()),"HP and shield sit above separate EXP and BP bars at "+str(dimensions))
+		check(not game.player_shield.get_global_rect().intersects(game.player_hp.get_global_rect()) and game.player_shield.get_global_rect().position.y>=game.player_hp.get_global_rect().end.y and game.player_bp.get_global_rect().position.y>=game.player_xp.get_global_rect().end.y and not game.player_bp.get_global_rect().intersects(game.player_xp.get_global_rect()),"HP/shield and EXP/BP form two readable stacks beside menus at "+str(dimensions))
 		check(game.supply_selector.visible and game.supply_buttons.values().all(func(item):return not item.visible),"one consumable selector replaces persistent supply orbs")
 		check(game.chart_mini.get_global_rect().encloses(Rect2(game.zoom_in.get_global_rect().get_center(),Vector2.ONE)) and game.chart_mini.get_global_rect().encloses(Rect2(game.settings_button.get_global_rect().get_center(),Vector2.ONE)),"map controls sit on the chart frame corners")
 		var details=game.target_numbers.get_rect()
@@ -426,6 +429,18 @@ func _run() -> void:
 			else:
 				check(game.modal.get_global_rect().size.x<dimensions.x*.85,"combat ammunition retains compact popup instead of full page")
 			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
+	var wallet_before: Array=[game.sim.pearls,game.sim.crystals,game.sim.captain_name]
+	game.sim.pearls=1250;game.sim.crystals=64;game.sim.captain_name="Testpirat"
+	game._refresh_ui()
+	check(game.pearl_label.text=="1.250" and game.crystal_label.text=="64","three-currency HUD reads actual pearl and crystal balances")
+	check(game.profile_name.text=="Testpirat" and game.profile_avatar.texture!=null,"pirate shortcut shows current captain name and portrait")
+	check(game._hud_contains(game.profile_button.get_global_rect().get_center()),"profile touch is reserved for UI instead of sailing")
+	check(not game.currency_wallet.get_global_rect().intersects(game.profile_button.get_global_rect()),"far-left currency block and profile do not overlap")
+	game.profile_button.pressed.emit()
+	check(game.modal_kind=="Profil" and game.modal.visible,"tapping pirate portrait/name opens real profile")
+	game._close_modal()
+	game.sim.pearls=wallet_before[0];game.sim.crystals=wallet_before[1];game.sim.captain_name=wallet_before[2]
+	game._refresh_ui()
 	var hud_level: int=game.sim.level
 	var hud_xp: int=game.sim.xp
 	var hud_bp: int=game.sim.battle_points

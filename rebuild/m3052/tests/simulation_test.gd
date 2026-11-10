@@ -132,6 +132,16 @@ func _initialize() -> void:
 		for body: Dictionary in sim.npcs:
 			if sim.blocked(body.pos,15):invariant=false
 	check(invariant,"one minute of real NPC movement stays outside islands and bounds")
+	var wallet=SIM.new()
+	wallet.pearls=1234;wallet.crystals=56
+	var wallet_save: Dictionary=wallet.export_save()
+	var loaded_wallet=SIM.new()
+	check(loaded_wallet.restore_save(wallet_save) and loaded_wallet.pearls==1234 and loaded_wallet.crystals==56,"pearl and crystal balances survive a save/restart")
+	wallet_save.erase("pearls");wallet_save.erase("crystals")
+	check(loaded_wallet.restore_save(wallet_save) and loaded_wallet.pearls==0 and loaded_wallet.crystals==0,"old saves migrate without inventing premium balances")
+	wallet_save["pearls"]=-50;wallet_save["crystals"]=999999999
+	loaded_wallet.restore_save(wallet_save)
+	check(loaded_wallet.pearls==0 and loaded_wallet.crystals==99999999,"currency restore rejects negative and out-of-range balances")
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	var f=FileAccess.open("user://simulation_results.json",FileAccess.WRITE)

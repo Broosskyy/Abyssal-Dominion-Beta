@@ -830,6 +830,21 @@
       "path": "assets/ui/abyssal/supply_healing.svg",
       "sha256": "09d72bc0ae492c502e5273e84c64a3da1f2767b28f0e147c0ff5ca3fcb0f4b16",
       "source": "Original project SVG icon"
+    },
+    {
+      "path": "assets/ui/icons/pearl.svg",
+      "sha256": "c72d28c15f6a4a7fe61f968f13fc57557f541458d195d8b4c9a68fdedd50f1b4",
+      "source": "Original project SVG icon 2026-11-10"
+    },
+    {
+      "path": "assets/ui/icons/crystal.svg",
+      "sha256": "8fd524ec3d73d1d81d0ac1f343f043e5fe39d7ca5142b917eb846ffce5ec332e",
+      "source": "Original project SVG icon 2026-11-10"
+    },
+    {
+      "path": "assets/ui/icons/pirate_profile.svg",
+      "sha256": "95be1bb7e803596ee971e1d6dbad6cccd918865c285b4697cfc46b0939534736",
+      "source": "Original project SVG icon 2026-11-10"
     }
   ]
 }

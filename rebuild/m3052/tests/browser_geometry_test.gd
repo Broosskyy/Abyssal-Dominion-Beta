@@ -86,7 +86,7 @@ func _run() -> void:
 		var meters: Array=[game.player_hp,game.player_shield,game.player_xp,game.player_bp]
 		for index in meters.size():
 			var rect: Rect2=meters[index].get_global_rect()
-			check(meters[index].is_visible_in_tree() and rect.position.x>=0 and rect.end.x<=dimensions.x and rect.end.y<game.nav_scroll.get_global_rect().position.y,"browser progress meter remains visible above navigation")
+			check(meters[index].is_visible_in_tree() and rect.position.x>=0 and rect.end.x<=dimensions.x and not rect.intersects(game.nav_scroll.get_global_rect()),"browser progress meter remains visible beside navigation")
 			for other in range(index+1,meters.size()):check(not rect.intersects(meters[other].get_global_rect()),"browser progress bars never overlap")
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)
