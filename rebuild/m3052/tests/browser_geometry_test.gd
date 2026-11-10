@@ -51,5 +51,31 @@ func _run() -> void:
 				actor.heading=Vector2.UP.rotated(direction*PI*.25)
 				check(anchor.distance_to(game._plate_screen_anchor(actor))<.01,"caption stays stable while the ship turns")
 	check(float(game.classic_monster_bottoms.tiamat)<40.0,"monster caption uses visible atlas bounds instead of the old 72-unit gap")
+	# Pick the rendered frame, including upper sails, at phone zoom levels.
+	var originals: Array[Dictionary]=game.sim.npcs.duplicate(true)
+	var water_cases: int=0
+	for ship: Dictionary in originals:
+		if str(ship.get("kind",""))!="ship":continue
+		game.sim.npcs.clear()
+		game.sim.npcs.append(ship)
+		ship.pos=game.sim.player.pos+Vector2(250,0)
+		for zoom in [.5,1.0,1.8]:
+			game.camera.zoom=Vector2.ONE*zoom
+			game.camera.force_update_scroll()
+			for direction in 8:
+				ship.heading=Vector2.UP.rotated(direction*PI*.25)
+				var rect: Rect2=game._browser_ship_screen_rect(ship)
+				check(rect.has_area(),"NPC has baked pick bounds: "+str(ship.visual_key))
+				if not rect.has_area():continue
+				check(game._enemy_at_screen(rect.get_center())==int(ship.id),"visible ship center selects at each heading and zoom")
+				check(game._enemy_at_screen(Vector2(rect.get_center().x,rect.position.y+2))==int(ship.id),"upper sail area is selectable")
+				var padding: Rect2=game._browser_ship_touch_rect(rect)
+				check(padding.size.x>=68 and padding.size.y>=68,"small ships retain a phone-sized touch target")
+				var outside: Vector2=Vector2(padding.end.x+3,padding.get_center().y)
+				check(game._enemy_at_screen(outside)==-1,"water beside the frame is not captured by an oversized circle")
+				var old_center: Vector2=game.get_canvas_transform()*(ship.pos-Vector2(0,25))
+				if outside.distance_to(old_center)<clampf(game._actor_visual_length(ship)*zoom*.57,78.0,116.0):water_cases+=1
+	check(water_cases>0,"regression covers water that the old hit circle incorrectly selected")
+	game.sim.npcs=originals
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)

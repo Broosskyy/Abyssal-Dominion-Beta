@@ -1620,7 +1620,7 @@ func _build_ui() -> void:
 	target_panel=_panel(ui)
 	target_clear=_button(target_panel,"×",_cancel_target,"danger")
 	target_clear.name="TargetClearButton"
-	target_clear.tooltip_text="Anvisieren abbrechen · ESC · Ziel erneut antippen"
+	target_clear.tooltip_text="Anvisieren abbrechen · × oder ESC"
 	target_clear.focus_mode=Control.FOCUS_NONE
 	target_clear.add_theme_font_size_override("font_size",18)
 	target_portrait=_portrait(target_panel)
@@ -4356,6 +4356,20 @@ func _hud_contains(screen: Vector2) -> bool:
 
 # Ships have different projected hull lengths. Hit-test them directly in
 # screen pixels, otherwise zoom and off-center 3D sails make selection fail.
+func _browser_ship_screen_rect(actor: Dictionary) -> Rect2:
+	var entry: Dictionary=classic_geometry.get(_classic_atlas_key(actor),{})
+	if not browser_classic or entry.is_empty() or str(actor.get("kind",""))!="ship":return Rect2()
+	var frame: Dictionary=entry.frames[_classic_frame_for_actor(actor)]
+	var spec: Dictionary=VISUALS.geometry(frame,_actor_visual_length(actor))
+	var world: Rect2=spec.destination
+	world.position+=_visual_actor_pos(actor)
+	return get_canvas_transform()*world
+
+func _browser_ship_touch_rect(visible: Rect2) -> Rect2:
+	# Fixed screen-pixel tolerance keeps small zoomed-out ships tappable.
+	var size: Vector2=visible.size.max(Vector2(48,48))+Vector2(20,20)
+	return Rect2(visible.get_center()-size*.5,size)
+
 func _enemy_at_screen(screen: Vector2) -> int:
 	var candidate_id: int=-1
 	var closest: float=INF
@@ -4363,13 +4377,23 @@ func _enemy_at_screen(screen: Vector2) -> int:
 	var zoom: float=camera.zoom.x if camera!=null else 1.0
 	for npc: Dictionary in sim.npcs:
 		if float(npc.hp)<=0.0:continue
-		var projected: Vector2=canvas*(npc.pos-Vector2(0,25))
+		var visible: Rect2=_browser_ship_screen_rect(npc)
+		if visible.has_area():
+			if not _browser_ship_touch_rect(visible).has_point(screen):continue
+			# Actual artwork wins over a neighbouring ship's touch padding.
+			var inside: bool=visible.has_point(screen)
+			var normalized: Vector2=(screen-visible.get_center())/visible.size.max(Vector2.ONE)
+			var score: float=normalized.length_squared()+(0.0 if inside else 100.0)
+			if score<closest:closest=score;candidate_id=int(npc.id)
+			continue
+		var projected: Vector2=canvas*(_visual_actor_pos(npc)-Vector2(0,25))
 		var length: float=_actor_visual_length(npc)
 		var radius: float=clampf(length*zoom*.57,78.0,116.0)
 		if str(npc.get("kind","ship"))=="tower":radius=clampf(radius,72.0,95.0)
 		var dist: float=screen.distance_to(projected)
-		if dist<=radius and dist<closest:
-			closest=dist
+		var score: float=dist+200.0
+		if dist<=radius and score<closest:
+			closest=score
 			candidate_id=int(npc.id)
 	return candidate_id
 
