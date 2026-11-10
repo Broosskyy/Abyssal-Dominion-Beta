@@ -1,5 +1,6 @@
 extends ProgressBar
 ## Value remains authoritative; only the painted fill and loss trail interpolate.
+var damage_feedback := true
 var motion_enabled := true
 var display_ratio := 0.0
 var trail_ratio := 0.0
@@ -15,7 +16,7 @@ func _ready() -> void:
 	value_changed.connect(_changed)
 func _changed(_value: float) -> void:
 	if not initialized:return
-	loss=ratio<display_ratio
+	loss=damage_feedback and ratio<display_ratio
 	feedback=1.0 if motion_enabled else 0.0
 	trail_hold=.30 if loss else 0.0
 	queue_redraw()
@@ -35,7 +36,8 @@ func _process(delta: float) -> void:
 	display_ratio=lerpf(display_ratio,target,1.0-exp(-delta*14.0))
 	if absf(display_ratio-target)<.001:display_ratio=target
 	trail_hold=maxf(0.0,trail_hold-delta)
-	if trail_ratio<display_ratio:trail_ratio=display_ratio
+	if not damage_feedback:trail_ratio=display_ratio
+	elif trail_ratio<display_ratio:trail_ratio=display_ratio
 	elif trail_hold<=0.0:trail_ratio=lerpf(trail_ratio,display_ratio,1.0-exp(-delta*5.0))
 	feedback=maxf(0.0,feedback-delta*2.0)
 	redraw_clock+=delta

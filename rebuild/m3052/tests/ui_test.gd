@@ -472,6 +472,8 @@ func _run() -> void:
 	game.sim.battle_points=0;game.sim.level=20;game._refresh_ui()
 	check(game.player_bp.value==0 and game.bp_numbers.text.contains("0 / 100"),"no PvP points displays honest empty BP progress")
 	check(game.player_xp.value==game.player_xp.max_value and game.xp_numbers.text.contains("MAX"),"level cap displays completed EXP instead of empty progress")
+	game.player_xp.feedback=0.0;game._refresh_ui()
+	check(game.player_xp.feedback==0.0,"repeated max-level refresh does not fake another XP gain pulse")
 	game.sim.level=hud_level;game.sim.xp=hud_xp;game.sim.battle_points=hud_bp
 	game._refresh_ui()
 	# Only authenticated room snapshots produce remote ships.

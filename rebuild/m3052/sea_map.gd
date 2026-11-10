@@ -1641,11 +1641,13 @@ func _build_ui() -> void:
 	captain_meters=Control.new();captain_meters.name="CenteredCaptainMeters"
 	captain_meters.mouse_filter=Control.MOUSE_FILTER_IGNORE;chrome.add_child(captain_meters)
 	player_xp=_bar(captain_meters)
+	player_xp.set("damage_feedback",false)
 	var xp_style: StyleBoxFlat=player_xp.get_theme_stylebox("fill").duplicate();xp_style.bg_color=Color("c79a3f");player_xp.add_theme_stylebox_override("fill",xp_style)
 	player_hp=_bar(captain_meters)
 	player_shield=_bar(captain_meters)
 	var shield_style: StyleBoxFlat=player_shield.get_theme_stylebox("fill").duplicate();shield_style.bg_color=Color("2f7fd0");player_shield.add_theme_stylebox_override("fill",shield_style)
 	player_bp=_bar(captain_meters)
+	player_bp.set("damage_feedback",false)
 	var bp_style: StyleBoxFlat=player_bp.get_theme_stylebox("fill").duplicate();bp_style.bg_color=Color("a470d8");player_bp.add_theme_stylebox_override("fill",bp_style)
 	var bp_background: StyleBoxFlat=player_bp.get_theme_stylebox("background").duplicate();bp_background.border_color=Color("765296");player_bp.add_theme_stylebox_override("background",bp_background)
 	bp_numbers=_text(player_bp,"",10,Color.WHITE)
@@ -2029,7 +2031,7 @@ func _refresh_ui() -> void:
 	buff_bar.visible=sim.powder_on or sim.plates_on or sim.has_blessing() or float(sim.buffs.tide_deck)>0 or float(sim.buffs.storm_deck)>0 or float(sim.buffs.salvage_deck)>0 or sim.guild_island_held()
 	buff_bar.queue_redraw()
 	player_xp.max_value=maxi(1,sim.xp_required())
-	player_xp.value=sim.xp
+	player_xp.value=player_xp.max_value if sim.level>=20 else sim.xp
 	xp_numbers.text="EXP  %s / %s" % [_thousands(sim.xp),_thousands(sim.xp_required())]
 	player_xp.tooltip_text="Erfahrung %d / %d" % [sim.xp,sim.xp_required()]
 	if sim.level>=20:
