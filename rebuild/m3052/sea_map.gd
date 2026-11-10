@@ -180,6 +180,9 @@ var modal_title: Label
 var modal_close: Button
 var modal_back: Button
 var menu_history: Array[String]=[]
+# Navigation state belongs to a page and category, only for this open menu session.
+var menu_scroll_positions: Dictionary={}
+var menu_page_key := ""
 var quick_bar: Control
 var quick_page := 0
 var quick_edit_slot := 0
@@ -1760,6 +1763,7 @@ func _build_ui() -> void:
 	modal_tabs_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_AUTO
 	modal_tabs_scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
 	modal_tabs_scroll.follow_focus=true
+	SKIN.scrollbar(modal_tabs_scroll.get_h_scroll_bar())
 	modal_tabs_scroll.visible=false
 	modal.add_child(modal_tabs_scroll)
 	modal_tabs=HBoxContainer.new()
@@ -2261,13 +2265,16 @@ func _open_modal(kind: String,remember: bool=true) -> void:
 				_refresh_ui()
 				return
 			_refresh_ship_catalog()
+	if modal.visible and not menu_page_key.is_empty():
+		menu_scroll_positions[menu_page_key]=modal_scroll.scroll_vertical
+	elif not modal.visible:
+		menu_scroll_positions.clear()
 	if modal.visible and modal_kind!=kind and remember:
 		menu_history.append(modal_kind)
 		if menu_history.size()>16:menu_history.pop_front()
 	elif not modal.visible and remember:menu_history.clear()
 	_reset_enemy_tap()
 	camera_pad.release()
-	var scroll_position=modal_scroll.scroll_vertical if modal.visible and modal_kind==kind else 0
 	modal_kind=kind
 	modal.plain=kind in ["Munition","Verbrauch"]
 	modal_backdrop.color=Color(0,0,0,0) if kind in ["Munition","Verbrauch"] else Color(0.002,0.009,0.018,0.56)
@@ -2286,6 +2293,8 @@ func _open_modal(kind: String,remember: bool=true) -> void:
 		modal_body.remove_child(child)
 		child.queue_free()
 	_build_tabs(kind)
+	menu_page_key=kind+"/"+_tab(kind)
+	var scroll_position: int=int(menu_scroll_positions.get(menu_page_key,0))
 	_layout()
 	match kind:
 		"Schiff":_open_ship()
@@ -2328,6 +2337,8 @@ func _close_modal() -> void:
 	modal.hide()
 	modal_backdrop.hide()
 	menu_history.clear()
+	menu_scroll_positions.clear()
+	menu_page_key=""
 	suppress_tap_until=Time.get_ticks_msec()+250
 	_save_progress()
 
@@ -2364,6 +2375,13 @@ func _build_tabs(kind: String) -> void:
 		if tab_art!=null:
 			_with_icon(button,tab_art)
 			button.add_theme_constant_override("icon_max_width",38)
+		if tab==current:_reveal_menu_tab.call_deferred(button)
+
+# Wait until the rebuilt category row has its final container measurements.
+func _reveal_menu_tab(button: Control) -> void:
+	await get_tree().process_frame
+	if is_instance_valid(button) and button.is_inside_tree() and button.get_parent()==modal_tabs:
+		modal_tabs_scroll.ensure_control_visible(button)
 
 # Genuine game artwork, not text-only placeholder icons: each category
 # provides a directly recognizable pictogram beside its active pill.
@@ -2397,7 +2415,6 @@ func _menu_tab_art(kind: String,tab: String) -> Texture2D:
 
 func _switch_tab(kind: String,tab: String) -> void:
 	modal_tab[kind]=tab
-	modal_scroll.scroll_vertical=0
 	_open_modal(kind)
 
 func _tab(kind: String) -> String:
@@ -2605,7 +2622,12 @@ func _banner_card(texture: Texture2D,title: String,text: String,accent: Color=Co
 	row.name="FeaturedMenuContent"
 	row.add_theme_constant_override("separation",14)
 	row.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	banner.add_child(row)
+	var content=VBoxContainer.new()
+	content.add_theme_constant_override("separation",10)
+	content.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	banner.add_child(content)
+	content.add_child(row)
+	var narrow: bool=modal_scroll.size.x<420.0
 	var compact: bool=modal_scroll.size.x<510.0
 	if texture!=null:
 		var art_stage=PanelContainer.new()
@@ -2626,12 +2648,15 @@ func _banner_card(texture: Texture2D,title: String,text: String,accent: Color=Co
 	row.add_child(column)
 	var eyebrow=_text(column,"ABYSSAL DOMINION  /  KAPITÄNSMENÜ",10,Color("9fd0cf"))
 	eyebrow.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var label=_text(column,title,18 if compact else 22,Color("ffe2a0"))
+	eyebrow.visible=not narrow
+	var label=_text(column,title,16 if narrow else (18 if compact else 22),Color("ffe2a0"))
 	label.name="FeaturedMenuTitle"
 	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	label.add_theme_color_override("font_outline_color",Color("081a20"))
 	label.add_theme_constant_override("outline_size",3)
-	var body=_text(column,text,13 if compact else 14,Color("d5e4e4"))
+	# Portrait copy uses the full panel width instead of a thin column beside the art.
+	var body=_text(content if narrow else column,text,13 if compact else 14,Color("d5e4e4"))
+	body.name="FeaturedMenuDescription"
 	body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	return column
 
@@ -3993,6 +4018,24 @@ func _open_display() -> void:
 			choice.disabled=selected
 		_note("Intensiv ist der Standard. Leicht reduziert Zeichnung und Partikel auf schwächeren Smartphones; Extrem liefert stärkere Treffer und sichtbare Folgewellen.",Color("bfcbdf"))
 
+func _menu_hub_art(kind: String) -> Texture2D:
+	match kind:
+		"Hafen":return painted.nav_harbor
+		"Werft":return painted.nav_shipyard
+		"Kastelle":return painted.nav_castles
+		"Munition":return icons.cannonball
+		"Kessel":return painted.nav_kessel
+		"Logbuch":return painted.nav_quests
+		"Bonuskarten","Battle Pass":return painted.nav_bonus
+		"Gilde","Freunde":return painted.nav_guild
+		"Monster":return painted.boss_wave
+		"Events":return painted.ammo_pumpkin
+		"Profil","Rangliste":return painted.nav_ranking
+		"Belohnungen":return painted.reward_chest
+		"Bewaffnung":return extra_icons.cannon_0
+		"Anzeige":return hud_icons.gear
+		_:return painted.nav_menu
+
 func _open_menu_hub() -> void:
 	# One compact, grouped index instead of 11 persistent nav buttons.
 	# All existing functional panels remain directly reachable.
@@ -4001,23 +4044,35 @@ func _open_menu_hub() -> void:
 	else:
 		_note("LOKALE BETA · Online-Anmeldung und WebSocket-Test können auf der Startseite unter Einstellungen & Konto eingerichtet werden. Es läuft noch kein öffentlicher MMO-Server.",Color("9fb9ba"))
 	_section("SCHNELLZUGRIFF")
-	var quick=_grid(3)
+	var quick=_grid(clampi(int(modal_scroll.size.x/210.0),1,3))
 	for item in [["HAFEN","Hafen"],["WERFT","Werft"],["KASTELLE","Kastelle"],["MUNITION","Munition"],["KESSEL","Kessel"],["LOGBUCH","Logbuch"]]:
 		var destination: String=str(item[1])
 		var button=_action(str(item[0]),func():_open_modal(destination),"normal",quick)
 		button.name="MenuShortcut_"+destination
+		_with_icon(button,_menu_hub_art(destination))
+		button.add_theme_constant_override("icon_max_width",36)
+		button.custom_minimum_size.y=62
+		button.add_theme_font_size_override("font_size",14)
 	_section("WELT & SOZIALES")
-	var world=_grid(3)
+	var world=_grid(clampi(int(modal_scroll.size.x/210.0),1,3))
 	for item in [["BONUSKARTEN","Bonuskarten"],["GILDE","Gilde"],["MONSTER","Monster"],["EVENTS","Events"],["FREUNDE","Freunde"],["RANGLISTE","Rangliste"]]:
 		var destination: String=str(item[1])
 		var button=_action(str(item[0]),func():_open_modal(destination),"normal",world)
 		button.name="MenuShortcut_"+destination
+		_with_icon(button,_menu_hub_art(destination))
+		button.add_theme_constant_override("icon_max_width",36)
+		button.custom_minimum_size.y=62
+		button.add_theme_font_size_override("font_size",14)
 	_section("KAPITÄN & SYSTEM")
-	var captain=_grid(3)
+	var captain=_grid(clampi(int(modal_scroll.size.x/210.0),1,3))
 	for item in [["PROFIL","Profil"],["BELOHNUNGEN","Belohnungen"],["ARSENAL","Bewaffnung"],["ANZEIGE","Anzeige"],["HILFE","Spielinfo"],["SAISONPASS","Battle Pass"]]:
 		var destination: String=str(item[1])
 		var button=_action(str(item[0]),func():_open_modal(destination),"normal",captain)
 		button.name="MenuShortcut_"+destination
+		_with_icon(button,_menu_hub_art(destination))
+		button.add_theme_constant_override("icon_max_width",36)
+		button.custom_minimum_size.y=62
+		button.add_theme_font_size_override("font_size",14)
 	_action("ZUR STARTSEITE",func():_save_progress();get_tree().change_scene_to_file("res://start_hub.tscn"))
 
 func _open_help() -> void:

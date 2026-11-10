@@ -513,6 +513,36 @@ func _run() -> void:
 	game._open_modal("Menü")
 	for destination in ["Hafen","Werft","Kastelle","Munition","Kessel","Logbuch","Bonuskarten","Gilde","Monster","Events","Freunde","Rangliste","Profil","Belohnungen","Bewaffnung","Anzeige","Spielinfo","Battle Pass"]:
 		check(game.modal_body.find_child("MenuShortcut_"+destination,true,false)!=null,"compact menu links to "+destination)
+	# Browsing deep lists should survive nested navigation and category changes.
+	for button: Button in game.modal_body.find_children("MenuShortcut_*","Button",true,false):
+		check(button.icon!=null and button.custom_minimum_size.y>=60,"menu shortcut has readable artwork and a touch-sized action")
+	await process_frame
+	await process_frame
+	game.modal_scroll.pending=-1
+	game.modal_scroll.scroll_vertical=mini(140,game.modal_scroll.max_scroll())
+	var hub_offset: int=game.modal_scroll.scroll_vertical
+	game._open_modal("Markt")
+	await process_frame
+	await process_frame
+	game.modal_scroll.pending=-1
+	game.modal_scroll.scroll_vertical=mini(170,game.modal_scroll.max_scroll())
+	var market_offset: int=game.modal_scroll.scroll_vertical
+	game._switch_tab("Markt","ITEMS")
+	await process_frame
+	await process_frame
+	check(game.modal_scroll.scroll_vertical==0,"new category starts at its own first item")
+	var selected_category: Button=null
+	for tab_button: Button in game.modal_tabs.get_children():
+		if tab_button.get_meta("menu_tab")=="ITEMS":selected_category=tab_button
+	check(selected_category!=null and selected_category.get_global_rect().position.x>=game.modal_tabs_scroll.get_global_rect().position.x-1 and selected_category.get_global_rect().end.x<=game.modal_tabs_scroll.get_global_rect().end.x+1,"selected category is revealed inside the horizontal strip")
+	game._switch_tab("Markt","AUSRÜSTUNG")
+	await process_frame
+	await process_frame
+	check(market_offset>0 and absi(game.modal_scroll.scroll_vertical-market_offset)<=1,"returning category restores its previous list position")
+	game._back_modal()
+	await process_frame
+	await process_frame
+	check(game.modal_kind=="Menü" and hub_offset>0 and absi(game.modal_scroll.scroll_vertical-hub_offset)<=1,"Back restores the actual menu index position")
 	var harbor_button: Button=game.modal_body.find_child("MenuShortcut_Hafen",true,false) as Button
 	if harbor_button!=null:harbor_button.pressed.emit()
 	check(game.modal.visible and game.modal_kind=="Hafen" and game.menu_history.has("Menü"),"shortcut opens its actual panel and keeps an accessible Back path")
@@ -542,6 +572,16 @@ func _run() -> void:
 		game._open_modal("Monster")
 		game._hunt_monster(int(hunt_target.id))
 		check(not game.modal.visible and not game.modal_backdrop.visible and game.menu_history.is_empty(),"monster hunt releases touch blocker and menu history")
+	# Portrait headers must leave their descriptive copy the full content width.
+	root.size=Vector2i(390,844)
+	await process_frame
+	game._layout()
+	for kind in ["Markt","Werft","Kastelle","Decks"]:
+		game._open_modal(kind)
+		await process_frame
+		await process_frame
+		var description: Label=game.modal_body.find_child("FeaturedMenuDescription",true,false) as Label
+		check(description!=null and description.size.x>=game.modal_scroll.size.x*.75,"portrait banner has full-width readable copy in "+kind)
 	# Two uploaded comparison videos show item artwork, a price, and one
 	# unmistakable action per item. Validate the actual Godot catalog layout
 	# on a compact landscape phone and a normal tablet/desktop viewport.

@@ -92,7 +92,8 @@ static func note() -> StyleBox:
 	return style
 
 static func scrollbar(bar: ScrollBar) -> void:
-	bar.custom_minimum_size.x=12
+	if bar is HScrollBar:bar.custom_minimum_size.y=8
+	else:bar.custom_minimum_size.x=12
 	var track=StyleBoxFlat.new();track.bg_color=Color(.02,.06,.08,.85);track.set_corner_radius_all(6)
 	track.border_color=Color("4f4130");track.set_border_width_all(1);track.content_margin_left=5;track.content_margin_right=5
 	bar.add_theme_stylebox_override("scroll",track);bar.add_theme_stylebox_override("scroll_focus",track)
