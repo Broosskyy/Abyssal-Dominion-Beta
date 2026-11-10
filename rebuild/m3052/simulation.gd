@@ -1401,6 +1401,12 @@ func ammo_pack(index: int) -> int:
 	if index<0 or index>=AMMO_NAMES.size():return 0
 	return [150,60,40,12,8,12,8][index] if index<7 else 12
 
+## Presentation of the existing 100-point PvP rank steps. No reward authority.
+func battle_point_progress() -> Dictionary:
+	var total: int=maxi(0,battle_points)
+	var step: int=total/100
+	return {"total":total,"current":total%100,"required":100,"next":(step+1)*100,"rank":0 if total==0 else step+1}
+
 func xp_required() -> int:
 	return 100 + (level - 1) * 70
 

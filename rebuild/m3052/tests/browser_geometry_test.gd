@@ -77,5 +77,16 @@ func _run() -> void:
 				if outside.distance_to(old_center)<clampf(game._actor_visual_length(ship)*zoom*.57,78.0,116.0):water_cases+=1
 	check(water_cases>0,"regression covers water that the old hit circle incorrectly selected")
 	game.sim.npcs=originals
+	for dimensions in [Vector2i(1280,720),Vector2i(844,390),Vector2i(720,405)]:
+		root.size=dimensions
+		await process_frame
+		game._layout()
+		game._refresh_ui()
+		check(absf(game.captain_meters.get_global_rect().get_center().x-float(dimensions.x)*.5)<1.0,"browser captain HUD stays centered at "+str(dimensions))
+		var meters: Array=[game.player_hp,game.player_shield,game.player_xp,game.player_bp]
+		for index in meters.size():
+			var rect: Rect2=meters[index].get_global_rect()
+			check(meters[index].is_visible_in_tree() and rect.position.x>=0 and rect.end.x<=dimensions.x and rect.end.y<game.nav_scroll.get_global_rect().position.y,"browser progress meter remains visible above navigation")
+			for other in range(index+1,meters.size()):check(not rect.intersects(meters[other].get_global_rect()),"browser progress bars never overlap")
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)

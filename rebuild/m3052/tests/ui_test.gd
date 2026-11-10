@@ -297,7 +297,7 @@ func _run() -> void:
 		game._refresh_ui()
 		check(game.nav_buttons.size()==5 and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Decks") and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Menü"),"five clean primary HUD shortcuts preserve Decks and grouped Menu at "+str(dimensions))
 		check(game._hud_contains(game.render_toggle.get_global_rect().get_center()),"mobile touch on graphics switch is reserved for its button, never treated as a sailing tap")
-		check(game.nav_scroll!=null and game.nav_scroll.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and game.nav_scroll.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x,"swipeable navigation viewport stays between wallet and captain meters at "+str(dimensions))
+		check(game.nav_scroll!=null and game.nav_scroll.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and absf(game.nav_scroll.get_global_rect().get_center().x-float(dimensions.x)*.5)<1.0 and game.nav_scroll.get_global_rect().position.y>=game.captain_meters.get_global_rect().end.y,"navigation is centered beneath captain meters at "+str(dimensions))
 		check(game.nav_strip.get_combined_minimum_size().x<=game.nav_scroll.size.x+8,"five top-level buttons fit without horizontal scrolling at "+str(dimensions))
 		for nav: Button in game.nav_buttons:
 			check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
@@ -311,7 +311,7 @@ func _run() -> void:
 				check(not controls[i].get_global_rect().intersects(controls[j].get_global_rect()),"independent touch targets %s / %s at %s"%[controls[i].name,controls[j].name,dimensions])
 		check(not game.quest_panel.get_global_rect().intersects(game.target_panel.get_global_rect()),"quest bar and target card do not overlap")
 		check(game.quest_panel.size.y<=44 and not game.quest_panel.get_global_rect().intersects(game.camera_pad.get_global_rect()),"quest bar stays a compact strip clear of the joystick at "+str(dimensions))
-		var center_water=Rect2(Vector2(dimensions)*.5-Vector2(80,120),Vector2(160,185))
+		var center_water=Rect2(Vector2(dimensions)*.5-Vector2(80,90),Vector2(160,155))
 		var clear_center=true
 		var surroundings: Array=[game.chrome,game.target_panel,game.chart_mini,game.quest_panel,game.interact]
 		surroundings.append_array(controls)
@@ -327,15 +327,15 @@ func _run() -> void:
 		check(game.attack.get_global_rect().position.x>dimensions.x*.7 and ring,"cannon stays bottom-right with ammunition and repair within thumb reach")
 		check(game.loadout_button.get_global_rect().end.x<game.ammo_selector.get_global_rect().position.x and is_equal_approx(game.loadout_button.get_global_rect().position.y,game.ammo_selector.get_global_rect().position.y),"utility slots continue the bottom row left of the cannon")
 		check(str(game.attack.get("art").resource_path).ends_with("cannon_action.png") and game.attack.get("hero"),"fire control uses the dedicated cannon graphic")
-		check(game.player_hp.get_parent()==game.chrome and game.player_xp.get_parent()==game.chrome and game.player_shield.get_parent()==game.chrome and not game.player_xp.visible,"captain hull/shield remain while XP moves out of crowded top HUD")
+		check(game.player_hp.get_parent()==game.captain_meters and game.player_xp.visible and game.player_bp.visible and absf(game.captain_meters.get_global_rect().get_center().x-float(dimensions.x)*.5)<1.0,"all four captain meters remain visible in the screen center")
 		check(not game.kills_label.visible and not game.wallet_icons[1].visible,"top HUD hides redundant kill counter, still available in logbook")
-		check(game.player_shield.get_global_rect().position.y>=game.player_hp.get_global_rect().end.y-1 and game.player_shield.get_global_rect().end.y<=game.chrome.get_global_rect().end.y+1,"shield meter stacks below hull inside the top bar at "+str(dimensions))
+		check(not game.player_shield.get_global_rect().intersects(game.player_hp.get_global_rect()) and game.player_xp.get_global_rect().position.y>=game.player_hp.get_global_rect().end.y and not game.player_bp.get_global_rect().intersects(game.player_xp.get_global_rect()),"HP and shield sit above separate EXP and BP bars at "+str(dimensions))
 		check(game.supply_selector.visible and game.supply_buttons.values().all(func(item):return not item.visible),"one consumable selector replaces persistent supply orbs")
 		check(game.chart_mini.get_global_rect().encloses(Rect2(game.zoom_in.get_global_rect().get_center(),Vector2.ONE)) and game.chart_mini.get_global_rect().encloses(Rect2(game.settings_button.get_global_rect().get_center(),Vector2.ONE)),"map controls sit on the chart frame corners")
 		var details=game.target_numbers.get_rect()
 		var card=game.target_panel.size
 		check(details.position.x>=-1 and details.position.y>=-1 and details.end.x<=card.x+1 and details.end.y<=card.y+1,"target details stay inside the target card")
-		if dimensions.y<560:check(not game.status.get_global_rect().intersects(center_water),"status stays off the centered ship on short displays")
+		if dimensions.y<560:check(not game.status.get_global_rect().intersects(game._actor_screen_bounds(game.sim.player)),"status stays off the actual ship bounds on short displays")
 		game.loadout_button.pressed.emit()
 		check(game.modal_kind=="Bewaffnung" and game.modal.visible,"quick weapons control opens real ammunition and cannon information")
 		game.modal.hide()
@@ -426,6 +426,20 @@ func _run() -> void:
 			else:
 				check(game.modal.get_global_rect().size.x<dimensions.x*.85,"combat ammunition retains compact popup instead of full page")
 			check(game.modal_close.get_global_rect().end.x<=game.modal.get_global_rect().end.x,"close control stays inside panel: "+kind)
+	var hud_level: int=game.sim.level
+	var hud_xp: int=game.sim.xp
+	var hud_bp: int=game.sim.battle_points
+	game.sim.level=2;game.sim.xp=85;game.sim.battle_points=99
+	game._refresh_ui()
+	check(game.player_xp.value==85 and game.player_xp.max_value==170 and game.xp_numbers.text.contains("LV. 2"),"EXP meter displays real current-level progress")
+	check(game.player_bp.value==99 and game.player_bp.max_value==100 and game.bp_numbers.text.contains("99 / 100"),"BP meter displays stored PvP points before rank boundary")
+	game.sim.battle_points=100;game._refresh_ui()
+	check(game.player_bp.value==100 and game.player_bp.min_value==100 and game.player_bp.max_value==200 and game.bp_numbers.text.contains("100 / 200"),"BP progress advances to the next 100-point step")
+	game.sim.battle_points=0;game.sim.level=20;game._refresh_ui()
+	check(game.player_bp.value==0 and game.bp_numbers.text.contains("0 / 100"),"no PvP points displays honest empty BP progress")
+	check(game.player_xp.value==game.player_xp.max_value and game.xp_numbers.text.contains("MAX"),"level cap displays completed EXP instead of empty progress")
+	game.sim.level=hud_level;game.sim.xp=hud_xp;game.sim.battle_points=hud_bp
+	game._refresh_ui()
 	# Only authenticated room snapshots produce remote ships.
 	var base_rumpf: float=float(game.sim.player.hp)
 	var base_coins: int=int(game.sim.player.gold)

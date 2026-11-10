@@ -96,6 +96,9 @@ var island_textures: Dictionary = {}
 var icons: Dictionary = {}
 var beast: Texture2D
 var font: Font = ThemeDB.fallback_font
+var captain_meters: Control
+var player_bp: ProgressBar
+var bp_numbers: Label
 var chrome: Panel
 var gold_label: Label
 var kills_label: Label
@@ -1606,15 +1609,21 @@ func _build_ui() -> void:
 		button.set_meta("modal",kind);nav_buttons.append(button)
 	for tag in ["EXP","HP","SCHILD"]:
 		var label=_text(chrome,tag,9,Color("ecd29a"));label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER;meter_tags.append(label)
-	player_xp=_bar(chrome)
+	captain_meters=Control.new();captain_meters.name="CenteredCaptainMeters"
+	captain_meters.mouse_filter=Control.MOUSE_FILTER_IGNORE;chrome.add_child(captain_meters)
+	player_xp=_bar(captain_meters)
 	var xp_style: StyleBoxFlat=player_xp.get_theme_stylebox("fill").duplicate();xp_style.bg_color=Color("c79a3f");player_xp.add_theme_stylebox_override("fill",xp_style)
-	player_hp=_bar(chrome)
-	player_shield=_bar(chrome)
+	player_hp=_bar(captain_meters)
+	player_shield=_bar(captain_meters)
 	var shield_style: StyleBoxFlat=player_shield.get_theme_stylebox("fill").duplicate();shield_style.bg_color=Color("2f7fd0");player_shield.add_theme_stylebox_override("fill",shield_style)
-	xp_numbers=_text(player_xp,"",9,Color.WHITE)
-	player_numbers=_text(player_hp,"",9,Color.WHITE)
-	shield_numbers=_text(player_shield,"",9,Color.WHITE)
-	for readout: Label in [xp_numbers,player_numbers,shield_numbers]:
+	player_bp=_bar(captain_meters)
+	var bp_style: StyleBoxFlat=player_bp.get_theme_stylebox("fill").duplicate();bp_style.bg_color=Color("a470d8");player_bp.add_theme_stylebox_override("fill",bp_style)
+	var bp_background: StyleBoxFlat=player_bp.get_theme_stylebox("background").duplicate();bp_background.border_color=Color("765296");player_bp.add_theme_stylebox_override("background",bp_background)
+	bp_numbers=_text(player_bp,"",10,Color.WHITE)
+	xp_numbers=_text(player_xp,"",10,Color.WHITE)
+	player_numbers=_text(player_hp,"",10,Color.WHITE)
+	shield_numbers=_text(player_shield,"",10,Color.WHITE)
+	for readout: Label in [xp_numbers,player_numbers,shield_numbers,bp_numbers]:
 		readout.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;readout.vertical_alignment=VERTICAL_ALIGNMENT_CENTER;readout.clip_text=true
 		readout.add_theme_color_override("font_outline_color",Color("06121a"));readout.add_theme_constant_override("outline_size",3)
 	target_panel=_panel(ui)
@@ -1778,41 +1787,36 @@ func _layout() -> void:
 		camera.zoom=Vector2.ONE*desired_zoom
 	water.size=viewport_size
 	_place(ruler,0,0,s.x,s.y)
-	# Top bar: wallet left, full-width navigation, captain meters right.
-	var header=46.0 if compact else 50.0
+	# Captain meters and navigation share the screen center on both renderers.
+	# Two compact meter rows keep progression visible without side-biased HP.
+	var header: float=86.0 if compact else 92.0
 	_place(chrome,0,0,s.x,header)
-	var wallet=102.0 if compact else 118.0
-	_place(wallet_icons[0],6,6,header-12,header-12)
+	var wallet: float=102.0 if compact else 118.0
+	var nav_y: float=42.0 if compact else 46.0
+	var nav_h: float=header-nav_y-3.0
+	_place(wallet_icons[0],6,nav_y+4,nav_h-8,nav_h-8)
 	_place(wallet_icons[1],0,0,0,0)
-	_place(gold_label,header-3,5,wallet-header+1,header-10)
+	_place(gold_label,nav_h+2,nav_y,wallet-nav_h-4,nav_h)
 	_place(kills_label,0,0,0,0)
-	var meters=150.0 if compact else 185.0
-	var meter_x=s.x-meters-8
-	var meter_row=(header-8)/2.0
-	# Only the combat-critical hull and shield bars remain in the top HUD.
-	# Level and experience stay in captain profile and ship menu.
-	player_xp.hide()
-	meter_tags[0].hide()
-	xp_numbers.hide()
-	_place(player_xp,0,0,0,0)
-	_place(meter_tags[0],0,0,0,0)
-	_place(xp_numbers,0,0,0,0)
-	var bars: Array[ProgressBar]=[player_hp,player_shield]
-	var readouts: Array[Label]=[player_numbers,shield_numbers]
-	for i in 2:
-		_place(meter_tags[i+1],meter_x,3+i*meter_row,42,meter_row)
-		_place(bars[i],meter_x+42,4+i*meter_row,meters-42,meter_row-2)
-		_place(readouts[i],0,0,bars[i].size.x,bars[i].size.y)
-	var pill_w=minf(220.0,s.x*.3)
+	var meters: float=minf(440.0,s.x-32.0)
+	_place(captain_meters,(s.x-meters)*.5,4,meters,nav_y-8)
+	var meter_gap: float=8.0
+	var meter_w: float=(meters-meter_gap)*.5
+	var meter_h: float=(captain_meters.size.y-4.0)*.5
+	var bars: Array[ProgressBar]=[player_hp,player_shield,player_xp,player_bp]
+	var readouts: Array[Label]=[player_numbers,shield_numbers,xp_numbers,bp_numbers]
+	for i in bars.size():
+		bars[i].show();readouts[i].show()
+		_place(bars[i],float(i%2)*(meter_w+meter_gap),float(i/2)*(meter_h+4.0),meter_w,meter_h)
+		_place(readouts[i],0,0,meter_w,meter_h)
+	for tag: Label in meter_tags:tag.hide()
+	var pill_w: float=minf(220.0,s.x*.3)
 	_place(staff_pill,(s.x-pill_w)*.5,header+4,pill_w,22)
-	var nav_left=wallet+8
-	var nav_span=maxf(1.0,meter_x-10-nav_left)
-	_place(nav_scroll,nav_left,1,nav_span,header-2)
-	# The HBox owns child positions; width is never reduced below a
-	# readable 64px touch target even when only one fits at a time.
-	var nav_button_w=minf(96.0,maxf(64.0,nav_span/float(nav_buttons.size())-4.0))
+	var nav_span: float=minf(480.0,s.x-2.0*(wallet+8.0))
+	_place(nav_scroll,(s.x-nav_span)*.5,nav_y,nav_span,nav_h)
+	var nav_button_w: float=maxf(64.0,(nav_span-12.0)/float(nav_buttons.size()))
 	for nav: Button in nav_buttons:
-		nav.custom_minimum_size=Vector2(nav_button_w,header-4)
+		nav.custom_minimum_size=Vector2(nav_button_w,nav_h-2.0)
 		nav.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
 	# Left column sits inside the row-letter ruler.
 	var left=22.0
@@ -1843,7 +1847,7 @@ func _layout() -> void:
 	var mw=136.0 if compact else 190.0
 	var mh=118.0 if compact else 160.0
 	var mx=s.x-mw-20
-	var my=header+22
+	var my=(46.0 if compact else 50.0)+22.0
 	_place(chart_mini,mx,my,mw,mh)
 	var z=32.0 if compact else 36.0
 	_place(zoom_out,mx-z*.3,my-z*.3,z,z)
@@ -1964,17 +1968,28 @@ func _refresh_ui() -> void:
 	kills_label.text="%s versenkt" % _thousands(sim.kills)
 	player_hp.max_value=sim.player.max_hp
 	player_hp.value=sim.player.hp
-	player_numbers.text="%s / %s" % [_thousands(int(sim.player.hp)),_thousands(int(sim.player.max_hp))]
+	player_numbers.text="HP  %s / %s" % [_thousands(int(sim.player.hp)),_thousands(int(sim.player.max_hp))]
 	player_shield.max_value=maxf(1.0,float(sim.player.max_shield))
 	player_shield.value=sim.player.shield
-	shield_numbers.text="%s / %s" % [_thousands(int(sim.player.shield)),_thousands(int(sim.player.max_shield))]
+	shield_numbers.text="SCHILD  %s / %s" % [_thousands(int(sim.player.shield)),_thousands(int(sim.player.max_shield))]
 	quick_bar.refresh()
 	buff_bar.visible=sim.powder_on or sim.plates_on or sim.has_blessing() or float(sim.buffs.tide_deck)>0 or float(sim.buffs.storm_deck)>0 or float(sim.buffs.salvage_deck)>0 or sim.guild_island_held()
 	buff_bar.queue_redraw()
 	player_xp.max_value=maxi(1,sim.xp_required())
 	player_xp.value=sim.xp
-	xp_numbers.text="LV. %d · %s / %s" % [sim.level,_thousands(sim.xp),_thousands(sim.xp_required())]
+	xp_numbers.text="EXP  LV. %d · %s / %s" % [sim.level,_thousands(sim.xp),_thousands(sim.xp_required())]
 	player_xp.tooltip_text="Erfahrung %d / %d" % [sim.xp,sim.xp_required()]
+	if sim.level>=20:
+		player_xp.value=player_xp.max_value
+		xp_numbers.text="EXP  LV. %d · MAX" % sim.level
+		player_xp.tooltip_text="Maximale Kapitänsstufe dieser Beta erreicht"
+	var bp: Dictionary=sim.battle_point_progress()
+	player_bp.min_value=bp.total-bp.current
+	player_bp.max_value=bp.next
+	player_bp.value=bp.total
+	bp_numbers.text="BP  %s / %s" % [_thousands(bp.total),_thousands(bp.next)]
+	player_bp.tooltip_text="Battle Points: %s · nächste Fortschrittsstufe bei %s BP. Nur PvP; NPCs vergeben keine Battle Points." % [_thousands(bp.total),_thousands(bp.next)]
+
 	var selected =sim.actor(sim.target)
 	target_panel.visible=not selected.is_empty() and sim.target>0 and int(selected.hp)>0
 	if target_panel.visible:
