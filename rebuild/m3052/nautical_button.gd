@@ -7,6 +7,7 @@ var nav_mode=false
 var latched=false
 var cooldown=0.0
 var state_label=""
+var state_color: Color=Color("edc68c")
 var hero:=false
 var pager:=false
 var badge_alert:=false
@@ -91,7 +92,7 @@ func _draw() -> void:
 		if latched:draw_arc(center,radius-5,0,TAU,48,Color("ff9b5a"),2.6,true)
 		if not state_label.is_empty():
 			var fs=10 if diameter<120 else 12
-			_outlined(font,state_label,Vector2(center.x,center.y-radius*.56),fs,Color("80e3dc") if state_label=="BEREIT" else Color("edc68c"))
+			_outlined(font,state_label,Vector2(center.x,center.y-radius*.56),fs,state_color)
 		if not caption.is_empty():
 			var fs=16 if diameter>100 else 13
 			_outlined(font,caption,Vector2(center.x,diameter-9),fs,Color("f3e0b6"))

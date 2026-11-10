@@ -95,6 +95,7 @@ func _run() -> void:
 	hub._show("friends")
 	check(hub.body.find_child("InviteCopy",true,false)!=null,"friends page has a working copy invitation control")
 	check(hub._invite_text().contains("github.com/Broosskyy/Abyssal-Dominion-Beta/releases"),"invitation points to a real public download page")
+	check(hub._invite_text()==preload("res://share_links.gd").invitation() and hub._invite_text().find("abyssal-dominion-browser.vercel.app")<hub._invite_text().find("github.com/"),"home and sea share the same browser-first cross-platform invitation")
 	var disabled_friends: bool=false
 	for button: Button in hub.body.find_children("*","Button",true,false):
 		if button.text.contains("FREUNDESLISTE"):disabled_friends=button.disabled

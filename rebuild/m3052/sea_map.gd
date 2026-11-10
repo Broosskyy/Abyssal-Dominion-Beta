@@ -9,6 +9,7 @@ const LOADING=preload("res://loading_screen.gd")
 const CONTENT = preload("res://content.gd")
 const VISUALS = preload("res://ship_visuals.gd")
 const SKIN = preload("res://ui_skin.gd")
+const SHARE = preload("res://share_links.gd")
 const TOUCH_SCROLL = preload("res://touch_scroll.gd")
 const ORNATE = preload("res://ornate_frame.gd")
 const SEA_MARKS = preload("res://sea_marks.gd")
@@ -121,6 +122,7 @@ var target_panel: Panel
 var target_clear: Button
 var target_name: Label
 var target_hp: ProgressBar
+var target_shield: ProgressBar
 var target_numbers: Label
 var status: Label
 var attack: Button
@@ -1674,8 +1676,15 @@ func _build_ui() -> void:
 	target_name=_text(target_panel,"",14,Color("ffdf9d"));target_name.clip_text=true
 	target_hp=_bar(target_panel)
 	target_health_skin=target_hp.get_theme_stylebox("fill").duplicate();target_hp.add_theme_stylebox_override("fill",target_health_skin)
+	target_shield=_bar(target_panel)
+	target_shield.name="TargetShield"
+	var target_shield_skin: StyleBoxFlat=target_shield.get_theme_stylebox("fill").duplicate()
+	target_shield_skin.bg_color=Color("358fd0")
+	target_shield.add_theme_stylebox_override("fill",target_shield_skin)
+	target_shield.hide()
 	target_numbers=_text(target_panel,"",10)
 	target_numbers.clip_text=true
+	target_numbers.add_theme_constant_override("line_spacing",0)
 	target_numbers.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	# Topmost and touch-owning: never let portraits, text or bars cover cancel.
 	target_clear.move_to_front()
@@ -1883,7 +1892,7 @@ func _layout() -> void:
 	_place(quest_open,0,0,column,quest_h)
 	_place(quest_claim,column-78,(quest_h-26)*.5,72,26)
 	var target_y=top+(quest_h+6 if journal_visible else 0)
-	var card_h=60.0 if compact else 66.0
+	var card_h=72.0 if compact else 78.0
 	# Enemy HP/shield and the close button need their own readable space.
 	# Do not expand the quest panel or cover the central sea/action corner.
 	var target_w: float=minf(256.0 if compact else 308.0,s.x*.42)
@@ -1893,7 +1902,9 @@ func _layout() -> void:
 	_place(target_clear,target_w-46,4,40,32)
 	_place(target_name,tx,3,target_w-tx-52,18)
 	_place(target_hp,tx,22,target_w-tx-51,8)
-	_place(target_numbers,tx,31,target_w-tx-51,card_h-33)
+	_place(target_shield,tx,32,target_w-tx-51,6)
+	var target_stats_y: float=41.0 if target_shield.visible else 31.0
+	_place(target_numbers,tx,target_stats_y,target_w-tx-51,card_h-target_stats_y-2)
 	_place(interact,left,target_y+card_h+6,column,34)
 	_place(buff_bar,left,target_y+card_h+46,column,26)
 	# Chart with corner controls, as on classic sea-chart clients.
@@ -1957,9 +1968,12 @@ func _layout() -> void:
 	else:_place(modal,(menu_size.x-visual_w)*.5,(menu_size.y-visual_h)*.5,width,height)
 	var head=42.0 if modal_kind in ["Munition","Verbrauch"] else (46.0 if height<420 else 52.0)
 	modal.header=head
-	var title_w=width-150 if modal_kind in ["Munition","Verbrauch"] else clampf(font.get_string_size(modal_title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,21).x+70,minf(150,width-210),width-210)
+	var title_w=width-150 if modal_kind in ["Munition","Verbrauch"] else clampf(font.get_string_size(modal_title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,21).x+70,minf(150,width-170),width-170)
 	modal.ribbon=Rect2(94,3,title_w,head-6) if modal_kind in ["Munition","Verbrauch"] else Rect2((width-title_w)*.5,8,title_w,head-14)
 	_place(modal_title,modal.ribbon.position.x+8,modal.ribbon.position.y,title_w-16,modal.ribbon.size.y)
+	var title_font: int=18 if modal_kind in ["Munition","Verbrauch"] else 21
+	while title_font>13 and font.get_string_size(modal_title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,title_font).x>title_w-16:title_font-=1
+	modal_title.add_theme_font_size_override("font_size",title_font)
 	var close=head-12
 	_place(modal_close,width-close-12,6,close,close)
 	_place(modal_back,10,8,82,30)
@@ -2015,7 +2029,7 @@ func _refresh_ui() -> void:
 			"Gilde":
 				badge="%d'" % ceili(sim.fortress_hold/60.0) if sim.guild_island_held() else ""
 			"Menü":
-				alert=quest_ready or sim.free_flask_ready(today)
+				alert=quest_ready or sim.free_flask_ready(today) or sim.rewards.daily_available() or sim.rewards.afk_gold()>0
 				badge="!" if alert else ""
 		nav.set("quantity",badge);nav.set("badge_alert",alert)
 		nav.set("latched",modal.visible and modal_kind==kind);nav.queue_redraw()
@@ -2066,6 +2080,13 @@ func _refresh_ui() -> void:
 		target_name.text=("[%s] " % sim.tower_tag() if selected.kind=="tower" else "")+str(selected.name)
 		target_hp.max_value=selected.max_hp
 		target_hp.value=selected.hp
+		var shield_present: bool=float(selected.get("max_shield",0))>0
+		if target_shield.visible!=shield_present:
+			target_shield.visible=shield_present
+			_layout()
+		target_shield.max_value=maxf(1.0,float(selected.get("max_shield",0)))
+		target_shield.value=float(selected.get("shield",0))
+		target_shield.tooltip_text="Schutzschild: %s / %s" % [_thousands(int(selected.get("shield",0))),_thousands(int(selected.get("max_shield",0)))]
 		var disposition="IM KAMPF" if sim.npc_engages(selected) else ("FEINDLICH" if CONTENT.MAPS[sim.map_id].npc_hostile else "NEUTRAL")
 		if selected.kind=="tower" and sim.tower_friendly():disposition="GILDENTURM"
 		target_health_skin.bg_color=Color("c9573f") if bool(selected.aggressive) or bool(CONTENT.MAPS[sim.map_id].npc_hostile) else Color("cfae55")
@@ -2083,7 +2104,10 @@ func _refresh_ui() -> void:
 	attack.disabled=not target_panel.visible or int(sim.player.hp)<=0 or sim.docked
 	_set_orb(attack,extra_icons.cannon_action,"",sim.firing,attack.text)
 	attack.set("cooldown",float(sim.player.reload)/sim.reload_time())
-	attack.set("state_label",_combat_state())
+	var combat_state: String=_combat_state()
+	attack.set("state_label",combat_state)
+	attack.set("state_color",_combat_state_color(combat_state))
+	attack.tooltip_text=combat_state+" · FEUER startet, STOPP beendet den Angriff. Keine automatische Verfolgung."
 	repair.disabled=sim.docked
 	repair.text="STOPP" if sim.repairing else "REPARATUR"
 	_set_orb(repair,extra_icons.upgrade_hull,"",sim.repairing,"STOPP" if sim.repairing else "REP")
@@ -2191,6 +2215,12 @@ func _combat_state() -> String:
 	if float(sim.player.reload)>0:return ("LÄDT %.1f s" % float(sim.player.reload)).replace(".",",")
 	return "BEREIT"
 
+func _combat_state_color(state: String) -> Color:
+	if state=="BEREIT":return Color("80e3dc")
+	if state.begins_with("LÄDT"):return Color("e8c980")
+	if state in ["WAFFE WECHSELN","MUNITION LEER","ZU WEIT","INSEL IM WEG","VERSENKT"]:return Color("ff9b81")
+	return Color("c5d3d6")
+
 func _toggle_fire() -> void:
 	if sim.target<1:return
 	sim.firing=not sim.firing
@@ -2251,7 +2281,7 @@ func _clock_text(seconds: float) -> String:
 	var minutes=floori((total%3600)/60.0)
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
-const MODAL_TABS := {"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
+const MODAL_TABS := {"Logbuch":["AKTUELL","VERLAUF"],"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
 const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Menü":"Spielmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Freunde":"Freunde & Einladungen","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
@@ -2628,7 +2658,8 @@ func _banner_card(texture: Texture2D,title: String,text: String,accent: Color=Co
 	banner.add_child(content)
 	content.add_child(row)
 	var narrow: bool=modal_scroll.size.x<420.0
-	var compact: bool=modal_scroll.size.x<510.0
+	var short_panel: bool=modal_scroll.size.y<280.0
+	var compact: bool=modal_scroll.size.x<510.0 or short_panel
 	if texture!=null:
 		var art_stage=PanelContainer.new()
 		art_stage.name="FeaturedMenuArtStage"
@@ -2648,8 +2679,8 @@ func _banner_card(texture: Texture2D,title: String,text: String,accent: Color=Co
 	row.add_child(column)
 	var eyebrow=_text(column,"ABYSSAL DOMINION  /  KAPITÄNSMENÜ",10,Color("9fd0cf"))
 	eyebrow.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	eyebrow.visible=not narrow
-	var label=_text(column,title,16 if narrow else (18 if compact else 22),Color("ffe2a0"))
+	eyebrow.visible=not narrow and not short_panel
+	var label=_text(column,title,14 if narrow else (18 if compact else 22),Color("ffe2a0"))
 	label.name="FeaturedMenuTitle"
 	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	label.add_theme_color_override("font_outline_color",Color("081a20"))
@@ -3181,18 +3212,33 @@ func _open_harbor() -> void:
 		get_tree().change_scene_to_file("res://updater/launcher.tscn"))
 
 func _open_logbook() -> void:
-	_banner_card(painted.nav_quests,"KAPITÄNSLOGBUCH · AUFTRÄGE & FORTSCHRITT","Lv. %d · Erfahrung %d / %d · %d geborgene Kisten · %d besiegte Seeungeheuer" % [sim.level,sim.xp,sim.xp_required(),sim.loot_collected,sim.monster_kills])
-	for i in CONTENT.QUESTS.size():
-		var q: Dictionary = CONTENT.QUESTS[i]
-		if i < sim.quest_index:
-			_row(null,"ERLEDIGT · %s\n%s" % [q.name,q.description],48,Color("6fd37a"))
-		elif i==sim.quest_index:
-			var column=_row(painted.reward_chest,"AKTIV · %s\n%s · %d/%d\nBelohnung: %d Gold und %d EP" % [q.name,q.description,mini(sim.quest_progress(),int(q.goal)),q.goal,q.gold,q.xp],56,Color("ffd27a"))
-			var claim = _row_button(column,"BELOHNUNG ABHOLEN",func():sim.claim_quest();_save_progress();_open_modal("Logbuch");_refresh_ui(),sim.quest_progress()<int(q.goal),"primary")
-			claim.custom_minimum_size.y=44
+	_info("KAMPAGNE · LV. %d · %d/%d AUFTRÄGE ERLEDIGT" % [sim.level,mini(sim.quest_index,CONTENT.QUESTS.size()),CONTENT.QUESTS.size()],CYAN)
+	if _tab("Logbuch")=="VERLAUF":
+		_section("ABGESCHLOSSENE AUFTRÄGE")
+		if sim.quest_index==0:_note("Noch kein Auftrag abgeschlossen. Deinen nächsten Schritt findest du unter AKTUELL.")
+		for i in mini(sim.quest_index,CONTENT.QUESTS.size()):
+			var q: Dictionary=CONTENT.QUESTS[i]
+			_row(painted.nav_quests,"ERLEDIGT · %s\n%s" % [q.name,q.description],48,Color("6fd37a"))
+	else:
+		var q: Dictionary=sim.current_quest()
+		if q.is_empty():
+			_section("KAMPAGNE ABGESCHLOSSEN")
+			_note("Alle bisherigen Aufträge sind erledigt. Bonuskarten, Seeungeheuer und Veranstaltungen bleiben verfügbar.")
+			_action("BONUSKARTEN ÖFFNEN",func():_open_modal("Bonuskarten"))
 		else:
-			var label: Label=_row(null,"%d · %s\n%s" % [i+1,q.name,q.description],48).get_child(0)
-			label.add_theme_color_override("font_color",Color("84999c"))
+			_section("DEIN AKTIVER AUFTRAG")
+			var progress: int=mini(sim.quest_progress(),int(q.goal))
+			var column=_row(painted.nav_quests,"AKTIV · %s\n%s\nBelohnung: %d Gold · %d EP · %d Essenz" % [q.name,q.description,q.gold,q.xp,q.essence],56,Color("ffd27a"))
+			column.name="ActiveQuest"
+			_meter("FORTSCHRITT",progress,int(q.goal),Color("62bdae"),"%d / %d" % [progress,q.goal])
+			var claim=_primary("BELOHNUNG ABHOLEN",func():sim.claim_quest();_save_progress();_open_modal("Logbuch");_refresh_ui())
+			claim.name="QuestClaim";claim.disabled=progress<int(q.goal)
+			if progress<int(q.goal):
+				var destination: String="Monster" if str(q.stat)=="monsters" else ("Seekarten" if str(q.stat) in ["north","abyss"] else "Hilfe")
+				_action("MONSTER FINDEN" if destination=="Monster" else ("ROUTE AUF DER WELTKARTE" if destination=="Seekarten" else "HINWEISE ZUR SEEKARTE"),func():_open_modal(destination))
+			if sim.quest_index+1<CONTENT.QUESTS.size():
+				var next: Dictionary=CONTENT.QUESTS[sim.quest_index+1]
+				_note("DANACH · %s\n%s" % [next.name,next.description],Color("94abad"))
 	_section("LETZTE MELDUNGEN")
 	var recent=message_history.duplicate();recent.reverse()
 	_note("\n".join(recent) if not recent.is_empty() else "Noch keine Meldungen",Color("d6e2e4"))
@@ -3890,7 +3936,7 @@ func _chart_details(index: int) -> void:
 		var exits: Array[String]=[]
 		for neighbor in CONTENT.sea_neighbors(index):exits.append(str(CONTENT.MAPS[neighbor].code))
 		lines.append("Hafen: ja · Portale: "+", ".join(exits))
-		lines.append("16 Patrouillen, davon Elite-Schiffe · Seeungeheuer Tiamat · Gegnerstärke ×%s" % str(region.enemy_scale).replace(".",","))
+		lines.append("Patrouillen, Elite-Schiffe und Seeungeheuer · Gegnerstärke ×%s" % str(region.enemy_scale).replace(".",","))
 		if CONTENT.has_guild_island(index):
 			lines.append("Gildeninsel mit 12 Türmen · Eigentümer [%s]" % sim.guild_owner_tag(index))
 	var column=_row(extra_icons.world_chart,"\n".join(lines),64,Color("a02818") if hostile else Color("2f6b3a"))
@@ -4069,6 +4115,9 @@ func _open_menu_hub() -> void:
 		var destination: String=str(item[1])
 		var button=_action(str(item[0]),func():_open_modal(destination),"normal",captain)
 		button.name="MenuShortcut_"+destination
+		if destination=="Belohnungen" and (sim.rewards.daily_available() or sim.rewards.afk_gold()>0):
+			button.text+=" · BEREIT"
+			SKIN.dress(button,"primary")
 		_with_icon(button,_menu_hub_art(destination))
 		button.add_theme_constant_override("icon_max_width",36)
 		button.custom_minimum_size.y=62
@@ -4858,25 +4907,37 @@ func _wallet_amount(amount: int) -> String:
 func _open_profile() -> void:
 	_banner_card(profile_avatar.texture,"PIRATENPROFIL",sim.captain_name+" · ID "+sim.captain_id)
 	_note("Gold %s · Perlen %s · Kristalle %s" % [_thousands(int(sim.player.gold)),_thousands(sim.pearls),_thousands(sim.crystals)])
-	_row(painted.nav_guild,"[%s] %s" % [str(sim.guild.get("tag","–")),sim.captain_name],48,Color("ffd26d"))
+	_info("GILDE · [%s] %s" % [str(sim.guild.get("tag","–")),str(sim.guild.get("name",""))] if not sim.guild.is_empty() else "KEINE GILDE",GOLD)
+	_note("Piratenrang %d · Kapitänsstufe %d\nBattle Points %d · %s" % [clampi(floori((sim.level-1)/4.0)+1,1,5),sim.level,sim.battle_points,"Noch ohne PvP-Rang" if sim.battle_points==0 else "PvP-Rang "+str(1+sim.battle_points/100)])
+	_section("DEIN FORTSCHRITT")
+	_meter("ERFAHRUNG",sim.xp_required() if sim.level>=20 else sim.xp,sim.xp_required(),Color("c59e45"),"MAX" if sim.level>=20 else "%s / %s" % [_thousands(sim.xp),_thousands(sim.xp_required())])
+	var bp: Dictionary=sim.battle_point_progress()
+	_meter("BATTLE POINTS",bp.current,bp.next-(bp.total-bp.current),Color("9a78bd"),"%s / %s BP" % [_thousands(bp.total),_thousands(bp.next)])
+	var statistics=_grid(2)
+	_stat(statistics,"SCHIFFE VERSENKT",_thousands(sim.kills),painted.nav_ship)
+	_stat(statistics,"SEEUNGEHEUER",_thousands(sim.monster_kills),painted.boss_wave)
+	_stat(statistics,"AUFTRÄGE","%d / %d" % [mini(sim.quest_index,CONTENT.QUESTS.size()),CONTENT.QUESTS.size()],painted.nav_quests)
+	_stat(statistics,"SEEGEBIETE","%d / %d" % [sim.visited.count(true),CONTENT.SEA_MAP_COUNT],painted.nav_charts)
+	var links=_grid(2)
+	_action("GILDE VERWALTEN",func():_open_modal("Gilde"),"normal",links)
+	_action("AUFTRÄGE",func():_open_modal("Logbuch"),"normal",links)
+	_action("SEEKARTEN",func():_open_modal("Seekarten"),"normal",links)
+	_action("BELOHNUNGEN",func():_open_modal("Belohnungen"),"normal",links)
+
+	_section("NAMEN ÄNDERN")
 	var name_field=_line_edit("Spielername · 2 bis 24 Zeichen",24)
 	name_field.text=sim.captain_name
 	_action("NAMEN SPEICHERN",func():
 		var value: String=name_field.text.strip_edges()
 		if value.length()>=2:sim.captain_name=value;_save_progress();_open_modal("Profil");_refresh_ui())
-	_section("PIRATENRANG & BATTLE POINTS")
-	_note("Piratenrang %d · Kapitänsstufe %d\nBattle Points %d · %s" % [clampi(floori((sim.level-1)/4.0)+1,1,5),sim.level,sim.battle_points,"Noch ohne PvP-Rang" if sim.battle_points==0 else "PvP-Rang "+str(1+sim.battle_points/100)])
-	_note("Auf See: Piratenrang · gelbes Gildenkürzel · Spielername · Battle-Point-Abzeichen. NPC-Abschüsse vergeben keine Battle Points.")
-	_action("GILDE VERWALTEN",func():_open_modal("Gilde"))
 
 func _invite_share_text() -> String:
-	# A real downloadable link, not a fabricated unique referral code.
-	return "Komm mit mir auf See bei Abyssal Dominion! Beta spielen: https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases"
+	return SHARE.invitation()
 
 func _open_friends() -> void:
 	_banner_card(painted.nav_guild,"FREUNDE & EINLADUNGEN","Teile die Beta mit anderen Piraten. Eine echte Freundesliste mit gemeinsamen Online-Spielern wird erst nach der Account- und Serveranbindung verfügbar.")
 	_section("FREUNDE ZUR BETA EINLADEN")
-	var invitation=_catalog_tile(_catalog_grid(1),painted.nav_charts,"KAPITÄNE ANHEUERN","Schicke deinen Freunden den Download-Link per Messenger, E-Mail oder Discord.","ÖFFENTLICHER BETA-LINK",Color("8ea29b"))
+	var invitation=_catalog_tile(_catalog_grid(1),painted.nav_charts,"KAPITÄNE ANHEUERN","Teile den Browser-Link: direkt testen, ohne Installation. Der Android-Download ist zusätzlich enthalten.","ÖFFENTLICHER BETA-LINK",Color("8ea29b"))
 	var copy=_catalog_action(invitation,"SPIELELINK KOPIEREN",func():
 		DisplayServer.clipboard_set(_invite_share_text())
 		sim.message="Spielelink in die Zwischenablage kopiert"

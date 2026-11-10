@@ -613,6 +613,7 @@ func _run() -> void:
 		var featured: Node=game.modal_body.find_child("FeaturedMenuBanner",true,false)
 		var menu_art: TextureRect=game.modal_body.find_child("FeaturedMenuArtwork",true,false) as TextureRect
 		check(featured!=null and menu_art!=null and menu_art.custom_minimum_size.x>=88,"Market menu begins with a full-width illustrated feature banner "+str(device))
+		if game.modal_scroll.size.y<280.0:check(menu_art.custom_minimum_size.x==88.0,"short landscape menu limits decorative art to leave room for products")
 		var category_button: Button=game.modal_tabs.find_child("*",true,false) as Button
 		check(category_button!=null and category_button.custom_minimum_size.y>=58 and category_button.icon!=null,"Market has prominent illustrated category tabs instead of text-only chips "+str(device))
 		game._switch_tab("Markt","ITEMS")
@@ -667,6 +668,31 @@ func _run() -> void:
 	game._open_modal("Freunde")
 	check(game.modal_body.find_child("InviteCopy",true,false)!=null,"sea captain menu includes copyable friend invitation")
 	check(game._invite_share_text().contains("github.com/Broosskyy/Abyssal-Dominion-Beta/releases"),"sea invitation links to actual public beta download")
+	check(game._invite_share_text().find("abyssal-dominion-browser.vercel.app")<game._invite_share_text().find("github.com/"),"shared invitation offers instant browser play before the optional download")
+	var quest_before: int=game.sim.quest_index
+	game.sim.quest_index=4
+	game._switch_tab("Logbuch","AKTUELL")
+	var active_quest: Node=game.modal_body.find_child("ActiveQuest",true,false)
+	check(active_quest!=null,"active quest remains immediately reachable after four campaign completions")
+	await process_frame;await process_frame
+	check(active_quest.get_global_rect().position.y<game.modal_scroll.get_global_rect().end.y,"actual active quest is visible before scrolling past decorative headers")
+	var archived_leak: bool=false
+	for label: Label in game.modal_body.find_children("*","Label",true,false):
+		archived_leak=archived_leak or label.text.begins_with("ERLEDIGT")
+	check(not archived_leak,"current quest is not buried under completed quests")
+	check(game.modal_body.find_child("QuestClaim",true,false)!=null,"active quest keeps the real reward action")
+	game._switch_tab("Logbuch","VERLAUF")
+	var completed_count: int=0
+	for label: Label in game.modal_body.find_children("*","Label",true,false):
+		if label.text.begins_with("ERLEDIGT"):completed_count+=1
+	check(completed_count==4,"quest archive contains actual completed campaign entries")
+	check(game.sim.quest_index==4,"viewing campaign history never advances or pays a quest")
+	game.sim.quest_index=quest_before
+	game._switch_tab("Logbuch","AKTUELL")
+	game._open_modal("Profil")
+	check(game.modal_body.find_children("*","ProgressBar",true,false).size()==2,"profile shows actual experience and battle progress meters")
+	game._close_modal()
+
 	game._open_modal("Belohnungen")
 	check(game.modal_body.find_child("DailyDay1",true,false)!=null and game.modal_body.find_child("DailyDay7",true,false)!=null,"sea rewards show full seven-day illustrated calendar")
 	check(game.modal_body.find_child("DailyClaim",true,false)!=null and game.modal_body.find_child("AfkClaim",true,false)!=null,"daily and AFK claim buttons are kept visible from main sea menu")
@@ -951,11 +977,23 @@ func _run() -> void:
 	var victim: Dictionary=game.sim.npcs[0];victim.pos=game.sim.player.pos+Vector2(200,0);victim.hp=victim.max_hp
 	game.sim.select(victim.id);game._refresh_ui()
 	check(str(game.attack.get("state_label"))=="BEREIT","fire button reports a real reachable ship with loaded cannon ammunition")
+	check(game.attack.get("state_color")==Color("80e3dc"),"ready cannon state uses a distinct teal feedback color")
+	var previous_shield: Array=[victim.shield,victim.max_shield]
+	victim.max_shield=600;victim.shield=250;game._refresh_ui()
+	check(game.target_shield.visible and game.target_shield.value==250 and game.target_shield.max_value==600,"selected opponent shield has its own truthful blue meter")
+	await process_frame;await process_frame
+	check(game.target_numbers.get_visible_line_count()==2,"both target health and disposition/distance lines remain visible with a shield")
+	check(game.target_shield.get_rect().end.y<=game.target_numbers.position.y and game.target_numbers.get_rect().end.x<=game.target_clear.position.x,"target shield, numeric detail and cancel stay separate")
+	victim.max_shield=0;victim.shield=0;game._refresh_ui()
+	check(not game.target_shield.visible,"unshielded targets never show an invented shield")
+	victim.shield=previous_shield[0];victim.max_shield=previous_shield[1];game._refresh_ui()
+
 	var stock: int=game.sim.player.ammo[0]
 	game._refresh_ui();game._refresh_ui()
 	check(int(game.sim.player.ammo[0])==stock,"refreshing readiness never consumes ammunition")
 	victim.pos=game.sim.player.pos+Vector2(700,0);game._refresh_ui()
 	check(str(game.attack.get("state_label"))=="ZU WEIT" and game.sim.player.path.is_empty(),"range warning does not issue an automatic pursuit course")
+	check(game.attack.get("state_color")==Color("ff9b81"),"unreachable target has a distinct warning color without changing the firing rules")
 	victim.pos=game.sim.player.pos+Vector2(200,0);game.sim.set_ammo(2);game._refresh_ui()
 	check(str(game.attack.get("state_label"))=="WAFFE WECHSELN","ship selected with harpoons gives a weapon warning before firing")
 	game.sim.set_ammo(0);game.sim.player.ammo[0]=2;game._refresh_ui()

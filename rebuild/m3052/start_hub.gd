@@ -18,7 +18,8 @@ const NEWS_FRAMES=[
 	{"title":"GEZEITENKESSEL & BONUSKARTEN","tag":"BELOHNUNGEN","description":"Sammle Bonuskartenfragmente, stelle Schriftrollen zusammen und kämpfe dich durch fünf Wellen.","art":2,"action":"Bonuskarten","button":"BONUSKARTEN ÖFFNEN"},
 	{"title":"ERKUNDE DEINE WELTKARTE","tag":"SEEKARTEN","description":"Von den Küsten bis zu den Schattengewässern: Deine Route bestimmst du selbst.","art":3,"action":"start","button":"JETZT IN SEE STECHEN"}
 ]
-const FRIEND_SHARE_URL="https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases"
+const SHARE=preload("res://share_links.gd")
+const FRIEND_SHARE_URL=SHARE.BROWSER
 var sea_time := 0.0
 var backdrop: TextureRect
 var sim=SIM.new()
@@ -219,9 +220,7 @@ func _featured_shift(direction: int) -> void:
 		featured_action.text=str(spec.button)
 
 func _invite_text() -> String:
-	# Share a real, reachable download page; do not invent referral rewards
-	# or expose private account identifiers without a server-backed opt-in.
-	return "Komm mit mir auf See bei Abyssal Dominion! Teste die Beta und werde Piratenkapitän: "+FRIEND_SHARE_URL
+	return SHARE.invitation()
 
 func _copy_invite() -> void:
 	DisplayServer.clipboard_set(_invite_text())
@@ -488,7 +487,8 @@ func _show_friends() -> void:
 	image.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	body.add_child(image)
 	_label("BETA MIT FREUNDEN TEILEN",true)
-	_hint(body,FRIEND_SHARE_URL,13,Color("aadbd7"))
+	_hint(body,"Direkt im Browser spielen: "+FRIEND_SHARE_URL,13,Color("aadbd7"))
+	_hint(body,"Android-Download ist ebenfalls im kopierten Link enthalten.",12)
 	_button("EINLADUNG KOPIEREN",_copy_invite,true).name="InviteCopy"
 	if not status_text.is_empty() and status_text.contains("Spielelink"):
 		_hint(body,status_text,13,Color("a6dfbd"))
