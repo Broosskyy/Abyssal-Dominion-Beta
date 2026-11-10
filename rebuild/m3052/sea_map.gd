@@ -1604,6 +1604,7 @@ func _build_ui() -> void:
 	profile_button.name="PirateProfileButton";profile_button.clip_contents=true
 	profile_avatar=_portrait(profile_button);profile_avatar.texture=preload("res://assets/ui/icons/pirate_profile.svg")
 	profile_name=_text(profile_button,"",12,Color("f4dfb5"));profile_name.clip_text=true
+	profile_name.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 	profile_level=_text(profile_button,"",8,Color("9fc5ce"));profile_level.clip_text=true
 	kills_label=_text(chrome,"",12,Color("eadfc6"))
 	for label in [gold_label,kills_label]:label.clip_text=true;label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
@@ -1810,45 +1811,49 @@ func _layout() -> void:
 		camera.zoom=Vector2.ONE*desired_zoom
 	water.size=viewport_size
 	_place(ruler,0,0,s.x,s.y)
-	# Wallet/profile occupy the upper-left utility row. HP and shield flank
-	# the centered menus on the left; progression mirrors them on the right.
-	var header: float=86.0 if compact else 92.0
+	# One compact row: profile | health | centered menus | progress | wallet.
+	var header: float=54.0 if compact else 60.0
 	_place(chrome,0,0,s.x,header)
-	_place(currency_wallet,6,2,282,36)
+	var nav_y: float=4.0
+	var nav_h: float=header-8.0
+	var gap: float=6.0
+	var utility_w: float=clampf(s.x*.13,100.0,132.0)
+	var nav_span: float=clampf(s.x*.33,252.0,400.0)
+	var meter_w: float=minf(208.0,(s.x-nav_span-2.0*utility_w-4.0*gap-16.0)*.5)
+	var group_w: float=nav_span+2.0*(meter_w+gap)
+	var group_x: float=(s.x-group_w)*.5
+	_place(captain_meters,group_x,nav_y,group_w,nav_h)
+	_place(profile_button,group_x-gap-utility_w,nav_y,utility_w,nav_h)
+	_place(profile_avatar,3,(nav_h-32.0)*.5,32,32)
+	_place(profile_name,40,(nav_h-32.0)*.5,utility_w-45,19)
+	_place(profile_level,40,(nav_h-32.0)*.5+19,utility_w-45,13)
+	profile_name.add_theme_font_size_override("font_size",11)
+	_place(currency_wallet,group_x+group_w+gap,nav_y,utility_w,nav_h)
 	var amounts: Array[Label]=[gold_label,pearl_label,crystal_label]
 	var money_icons: Array[TextureRect]=[wallet_icons[0],pearl_icon,crystal_icon]
+	var money_h: float=nav_h/3.0
 	for i in 3:
-		var slot: float=float(i)*94.0
-		_place(money_icons[i],slot,6,24,24)
-		_place(currency_titles[i],slot+28,0,64,14)
-		_place(amounts[i],slot+28,13,64,21)
+		_place(money_icons[i],0,float(i)*money_h,16,money_h)
+		_place(amounts[i],22,float(i)*money_h,utility_w-24,money_h)
+		amounts[i].add_theme_font_size_override("font_size",11)
+		currency_titles[i].hide()
+		money_icons[i].tooltip_text=["Gold","Perlen","Kristalle"][i]
 	_place(wallet_icons[1],0,0,0,0)
 	_place(kills_label,0,0,0,0)
-	_place(profile_button,300,2,minf(196.0,s.x-312.0),36)
-	_place(profile_avatar,3,2,32,32)
-	_place(profile_name,41,1,profile_button.size.x-47,20)
-	_place(profile_level,41,20,profile_button.size.x-47,14)
-	var nav_y: float=42.0 if compact else 46.0
-	var nav_h: float=header-nav_y-3.0
-	var nav_span: float=minf(400.0,maxf(332.0,s.x*.40))
-	var meter_gap: float=8.0
-	var meter_w: float=minf(208.0,(s.x-nav_span-32.0)*.5)
-	var group_w: float=nav_span+2.0*(meter_w+meter_gap)
-	_place(captain_meters,(s.x-group_w)*.5,nav_y,group_w,nav_h)
 	var meter_h: float=(nav_h-3.0)*.5
 	var bars: Array[ProgressBar]=[player_hp,player_shield,player_xp,player_bp]
 	var readouts: Array[Label]=[player_numbers,shield_numbers,xp_numbers,bp_numbers]
 	for i in bars.size():
 		bars[i].show();readouts[i].show()
-		var x: float=0.0 if i<2 else meter_w+nav_span+2.0*meter_gap
+		var x: float=0.0 if i<2 else meter_w+nav_span+2.0*gap
 		_place(bars[i],x,float(i%2)*(meter_h+3.0),meter_w,meter_h)
 		_place(readouts[i],0,0,meter_w,meter_h)
-		readouts[i].add_theme_font_size_override("font_size",11)
+		readouts[i].add_theme_font_size_override("font_size",10 if meter_w<160.0 else 11)
 	for tag: Label in meter_tags:tag.hide()
 	var pill_w: float=minf(220.0,s.x*.3)
 	_place(staff_pill,(s.x-pill_w)*.5,header+4,pill_w,22)
 	_place(nav_scroll,(s.x-nav_span)*.5,nav_y,nav_span,nav_h)
-	var nav_button_w: float=maxf(64.0,(nav_span-12.0)/float(nav_buttons.size()))
+	var nav_button_w: float=maxf(48.0,(nav_span-12.0)/float(nav_buttons.size()))
 	for nav: Button in nav_buttons:
 		nav.custom_minimum_size=Vector2(nav_button_w,nav_h-2.0)
 		nav.size_flags_horizontal=Control.SIZE_SHRINK_BEGIN
@@ -1899,7 +1904,7 @@ func _layout() -> void:
 	# Combat corner: cannon bottom-right, quick slots in an L around it, utilities continue the bottom row.
 	var fire=112.0 if compact else 140.0
 	var orb=50.0 if compact else 60.0
-	var gap=8.0
+	gap=8.0
 	var fx=s.x-fire-10
 	var fy=s.y-fire-10
 	_place(attack,fx,fy,fire,fire)
@@ -2005,7 +2010,7 @@ func _refresh_ui() -> void:
 	crystal_label.text=_wallet_amount(sim.crystals)
 	currency_wallet.tooltip_text="Gold: %s · Perlen: %s · Kristalle: %s" % [_thousands(int(sim.player.gold)),_thousands(sim.pearls),_thousands(sim.crystals)]
 	profile_name.text=sim.captain_name
-	profile_level.text="LV. %d · PROFIL ÖFFNEN" % sim.level
+	profile_level.text="LV. %d · PROFIL" % sim.level
 	profile_button.tooltip_text="Piratenprofil öffnen · %s · ID %s" % [sim.captain_name,sim.captain_id]
 	kills_label.text="%s versenkt" % _thousands(sim.kills)
 	player_hp.max_value=sim.player.max_hp
@@ -2019,11 +2024,11 @@ func _refresh_ui() -> void:
 	buff_bar.queue_redraw()
 	player_xp.max_value=maxi(1,sim.xp_required())
 	player_xp.value=sim.xp
-	xp_numbers.text="EXP  LV. %d · %s / %s" % [sim.level,_thousands(sim.xp),_thousands(sim.xp_required())]
+	xp_numbers.text="EXP  %s / %s" % [_thousands(sim.xp),_thousands(sim.xp_required())]
 	player_xp.tooltip_text="Erfahrung %d / %d" % [sim.xp,sim.xp_required()]
 	if sim.level>=20:
 		player_xp.value=player_xp.max_value
-		xp_numbers.text="EXP  LV. %d · MAX" % sim.level
+		xp_numbers.text="EXP  MAX"
 		player_xp.tooltip_text="Maximale Kapitänsstufe dieser Beta erreicht"
 	var bp: Dictionary=sim.battle_point_progress()
 	player_bp.min_value=bp.total-bp.current

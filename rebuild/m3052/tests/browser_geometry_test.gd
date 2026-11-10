@@ -83,6 +83,8 @@ func _run() -> void:
 		game._layout()
 		game._refresh_ui()
 		check(absf(game.captain_meters.get_global_rect().get_center().x-float(dimensions.x)*.5)<1.0,"browser captain HUD stays centered at "+str(dimensions))
+		check(game.profile_button.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x and game.currency_wallet.get_global_rect().position.x>=game.player_xp.get_global_rect().end.x,"browser profile and wallet bookend the compact HUD")
+		check(game.gold_label.get_global_rect().end.y<=game.pearl_label.get_global_rect().position.y+1 and game.pearl_label.get_global_rect().end.y<=game.crystal_label.get_global_rect().position.y+1,"browser currencies are stacked rather than spread over an extra row")
 		var meters: Array=[game.player_hp,game.player_shield,game.player_xp,game.player_bp]
 		for index in meters.size():
 			var rect: Rect2=meters[index].get_global_rect()

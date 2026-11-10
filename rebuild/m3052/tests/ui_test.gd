@@ -297,11 +297,14 @@ func _run() -> void:
 		game._refresh_ui()
 		check(game.nav_buttons.size()==5 and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Decks") and game.nav_buttons.any(func(nav):return nav.get_meta("modal")=="Menü"),"five clean primary HUD shortcuts preserve Decks and grouped Menu at "+str(dimensions))
 		check(game._hud_contains(game.render_toggle.get_global_rect().get_center()),"mobile touch on graphics switch is reserved for its button, never treated as a sailing tap")
-		check(game.nav_scroll!=null and game.nav_scroll.get_global_rect().position.x>=game.gold_label.get_global_rect().end.x and absf(game.nav_scroll.get_global_rect().get_center().x-float(dimensions.x)*.5)<1.0 and game.player_hp.get_global_rect().end.x<=game.nav_scroll.get_global_rect().position.x and game.player_xp.get_global_rect().position.x>=game.nav_scroll.get_global_rect().end.x,"centered menus are flanked by health on the left and progression on the right at "+str(dimensions))
+		check(game.nav_scroll!=null and absf(game.nav_scroll.get_global_rect().get_center().x-float(dimensions.x)*.5)<1.0 and game.player_hp.get_global_rect().end.x<=game.nav_scroll.get_global_rect().position.x and game.player_xp.get_global_rect().position.x>=game.nav_scroll.get_global_rect().end.x,"centered menus are flanked by health on the left and progression on the right at "+str(dimensions))
+		check(game.profile_button.get_global_rect().end.x<=game.player_hp.get_global_rect().position.x and game.currency_wallet.get_global_rect().position.x>=game.player_xp.get_global_rect().end.x,"profile and vertical wallet sit outside both meter stacks")
+		check(game.chrome.size.y<=60 and absf(game.profile_button.position.y-game.nav_scroll.position.y)<1,"header uses one compact row without a utility row")
+		check(game.gold_label.get_global_rect().end.y<=game.pearl_label.get_global_rect().position.y+1 and game.pearl_label.get_global_rect().end.y<=game.crystal_label.get_global_rect().position.y+1,"gold, pearls and crystals stack vertically on the right")
 		check(game.nav_strip.get_combined_minimum_size().x<=game.nav_scroll.size.x+8,"five top-level buttons fit without horizontal scrolling at "+str(dimensions))
 		for nav: Button in game.nav_buttons:
 			check(label_fits(nav),"navigation caption fits without clipping: "+nav.text+" at "+str(dimensions))
-			check(nav.get_parent()==game.nav_strip and nav.custom_minimum_size.x>=64.0,"navigation is swipe-reachable with readable touch width: "+nav.text+" at "+str(dimensions))
+			check(nav.get_parent()==game.nav_strip and nav.custom_minimum_size.x>=48.0,"navigation is swipe-reachable with readable touch width: "+nav.text+" at "+str(dimensions))
 		var controls: Array=[game.attack,game.repair,game.zoom_in,game.zoom_out,game.center_button,game.settings_button,game.render_toggle,game.interact,game.loadout_button,game.ammo_selector,game.camera_pad,game.target_cycle,game.supply_selector]
 		for control: Control in controls:
 			var rect=control.get_global_rect()
@@ -435,7 +438,7 @@ func _run() -> void:
 	check(game.pearl_label.text=="1.250" and game.crystal_label.text=="64","three-currency HUD reads actual pearl and crystal balances")
 	check(game.profile_name.text=="Testpirat" and game.profile_avatar.texture!=null,"pirate shortcut shows current captain name and portrait")
 	check(game._hud_contains(game.profile_button.get_global_rect().get_center()),"profile touch is reserved for UI instead of sailing")
-	check(not game.currency_wallet.get_global_rect().intersects(game.profile_button.get_global_rect()),"far-left currency block and profile do not overlap")
+	check(not game.currency_wallet.get_global_rect().intersects(game.profile_button.get_global_rect()),"right-side currency stack and profile do not overlap")
 	game.profile_button.pressed.emit()
 	check(game.modal_kind=="Profil" and game.modal.visible,"tapping pirate portrait/name opens real profile")
 	game._close_modal()
@@ -446,7 +449,7 @@ func _run() -> void:
 	var hud_bp: int=game.sim.battle_points
 	game.sim.level=2;game.sim.xp=85;game.sim.battle_points=99
 	game._refresh_ui()
-	check(game.player_xp.value==85 and game.player_xp.max_value==170 and game.xp_numbers.text.contains("LV. 2"),"EXP meter displays real current-level progress")
+	check(game.player_xp.value==85 and game.player_xp.max_value==170 and game.xp_numbers.text.contains("85 / 170") and game.profile_level.text.contains("LV. 2"),"EXP meter displays real current-level progress")
 	check(game.player_bp.value==99 and game.player_bp.max_value==100 and game.bp_numbers.text.contains("99 / 100"),"BP meter displays stored PvP points before rank boundary")
 	game.sim.battle_points=100;game._refresh_ui()
 	check(game.player_bp.value==100 and game.player_bp.min_value==100 and game.player_bp.max_value==200 and game.bp_numbers.text.contains("100 / 200"),"BP progress advances to the next 100-point step")
