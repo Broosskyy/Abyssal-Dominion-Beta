@@ -10,6 +10,7 @@ var account: Dictionary={}
 var request: HTTPRequest
 var socket := WebSocketPeer.new()
 var joined := false
+var hello_sent := false
 var connecting := false
 var sequence := 0
 var connect_started := 0
@@ -28,7 +29,7 @@ func authenticate(email: String,password: String,username: String="",register: b
 	var error: int=request.request(server_url.trim_suffix("/")+("/v1/register" if register else "/v1/login"),["Content-Type: application/json"],HTTPClient.METHOD_POST,JSON.stringify(payload))
 	if error!=OK:auth_completed.emit(false,"Verbindung konnte nicht gestartet werden.")
 func _auth_result(result: int,code: int,_headers: PackedStringArray,body: PackedByteArray) -> void:
-	var value: Variant=JSON.parse_string(body.get_string_from_utf8())
+	var value: Variant=JSON.parse_string(body.get_string_from_utf8()) if result==HTTPRequest.RESULT_SUCCESS and not body.is_empty() else null
 	if result!=HTTPRequest.RESULT_SUCCESS or not value is Dictionary:
 		auth_completed.emit(false,"Server nicht erreichbar. Dein Gastspiel bleibt verfügbar.");return
 	if code!=200:
@@ -42,24 +43,38 @@ func connect_world(map_id: int) -> Error:
 	if token.is_empty() or not valid_server(server_url):return ERR_UNCONFIGURED
 	var ws_url: String=server_url.replace("https://","wss://").replace("http://","ws://").trim_suffix("/")+"/v1/world"
 	var error: Error=socket.connect_to_url(ws_url)
-	if error==OK:connecting=true;connect_started=Time.get_ticks_msec();set_meta("map_id",map_id)
+	if error==OK:sequence=0;hello_sent=false;connecting=true;connect_started=Time.get_ticks_msec();set_meta("map_id",map_id)
 	return error
 func _process(_delta: float) -> void:
 	if not connecting and not joined:return
+	if connecting and not joined and Time.get_ticks_msec()-connect_started>12000:
+		leave_world();return
 	socket.poll()
 	var state: int=socket.get_ready_state()
 	if state==WebSocketPeer.STATE_OPEN:
-		if not joined:
-			socket.send_text(JSON.stringify({"type":"join","protocol":PROTOCOL,"token":token,"map_id":get_meta("map_id",0)}));joined=true;connection_changed.emit(true)
+		if not hello_sent:
+			hello_sent=true
+			socket.send_text(JSON.stringify({"type":"join","protocol":PROTOCOL,"token":token,"map_id":get_meta("map_id",0)}))
 		while socket.get_available_packet_count()>0:
 			var value: Variant=JSON.parse_string(socket.get_packet().get_string_from_utf8())
-			if value is Dictionary:snapshot_received.emit(value)
+			if value is Dictionary:
+				if value.get("type")=="welcome" and int(value.get("protocol",-1))==PROTOCOL:
+					joined=true;connecting=false;connection_changed.emit(true)
+				snapshot_received.emit(value)
 	elif state==WebSocketPeer.STATE_CLOSED or (not joined and Time.get_ticks_msec()-connect_started>12000):
 		connecting=false;joined=false;socket.close();connection_changed.emit(false)
-func send_course(point: Vector2) -> void:
+func send_course(point: Vector2,route: Array=[]) -> void:
 	if not joined or not point.is_finite():return
 	sequence+=1
-	socket.send_text(JSON.stringify({"type":"course","sequence":sequence,"x":point.x,"y":point.y}))
+	var payload: Dictionary={"type":"course","sequence":sequence,"x":point.x,"y":point.y}
+	if not route.is_empty():
+		var points: Array=[]
+		for waypoint: Vector2 in route:points.append([waypoint.x,waypoint.y])
+		payload["route"]=points
+	socket.send_text(JSON.stringify(payload))
+
+func send_appearance(skin: int,hp: int,maximum: int) -> void:
+	if joined:socket.send_text(JSON.stringify({"type":"appearance","skin":skin,"hp":hp,"max_hp":maximum}))
 ## Switch between room snapshots without losing the authenticated session.
 func leave_world() -> void:
 	if connecting or joined:socket.close()
@@ -67,6 +82,8 @@ func leave_world() -> void:
 	socket=WebSocketPeer.new()
 	connecting=false
 	joined=false
+	hello_sent=false
+	sequence=0
 	connection_changed.emit(false)
 
 func sign_out() -> void:

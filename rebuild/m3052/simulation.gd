@@ -745,6 +745,7 @@ func step(delta: float) -> void:
 	if events.size() > 120: events = events.slice(events.size() - 120)
 
 func _move(body: Dictionary, delta: float) -> void:
+	if bool(body.get("network_motion",false)):return
 	var slow_rate = float(body.get("slow_rate", 0.55)) if float(body.slow) > 0 else 1.0
 	var travel = float(body.speed) * slow_rate * delta * (1.25 if int(body.id)==0 and float(buffs.get("wind_draught",0))>0 else 1.0)
 	var phasing := int(body.id) == 0 and staff.flag("no_collision")

@@ -139,8 +139,10 @@ jobs:
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           python3 -c 'import socket,time; time.sleep(1); socket.create_connection(("127.0.0.1",8787),timeout=5).close()'
           XDG_DATA_HOME="$(mktemp -d)" /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path rebuild/m3052 --script tests/network_client_test.gd > "$RUNNER_TEMP/network-client.log" 2>&1
+          XDG_DATA_HOME="$(mktemp -d)" /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path rebuild/m3052 --script tests/online_ships_test.gd > "$RUNNER_TEMP/online-ships.log" 2>&1
+          cat "$RUNNER_TEMP/online-ships.log"
           cat "$RUNNER_TEMP/network-client.log"
-          if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|"status":"FAIL"' "$RUNNER_TEMP/network-client.log"; then exit 1; fi
+          if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|"status":"FAIL"' "$RUNNER_TEMP/network-client.log" "$RUNNER_TEMP/online-ships.log"; then exit 1; fi
       - name: Test game, signed data pack and optional native APK
         env:
           SHELL_NEEDED: ${{ steps.plan.outputs.shell_needed }}

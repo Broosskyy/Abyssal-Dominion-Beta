@@ -29,10 +29,31 @@ class World:
             id TEXT PRIMARY KEY, email TEXT UNIQUE NOT NULL, username TEXT NOT NULL,
             salt BLOB NOT NULL, password BLOB NOT NULL);
             CREATE TABLE IF NOT EXISTS sessions (
-            digest TEXT PRIMARY KEY, account TEXT NOT NULL, expires INTEGER NOT NULL);''')
+            digest TEXT PRIMARY KEY, account TEXT NOT NULL, expires INTEGER NOT NULL);
+            CREATE TABLE IF NOT EXISTS characters (
+            account TEXT NOT NULL, map_id INTEGER NOT NULL, x REAL NOT NULL, y REAL NOT NULL,
+            heading REAL NOT NULL, skin INTEGER NOT NULL, PRIMARY KEY(account,map_id));''')
         self.peers = {}
         self.rates = defaultdict(deque)
         self.tick = 0
+
+    def save_character(self, peer):
+        self.db.execute('INSERT OR REPLACE INTO characters VALUES (?,?,?,?,?,?)',
+            (peer['id'],peer['map_id'],peer['x'],peer['y'],peer['heading'],peer['skin']))
+        self.db.commit()
+
+    @staticmethod
+    def route(data):
+        route = data.get('route', [[data.get('x'), data.get('y')]])
+        if not isinstance(route,list) or not 1 <= len(route) <= 128: return None
+        result = []
+        for point in route:
+            if not isinstance(point,list) or len(point)!=2: return None
+            x,y=point
+            if type(x) not in (int,float) or type(y) not in (int,float): return None
+            if not math.isfinite(x) or not math.isfinite(y) or not (40<=x<=4360 and 40<=y<=3160): return None
+            result.append((float(x),float(y)))
+        return result
 
     def limited(self, key, limit=12, span=60):
         now = time.monotonic()
@@ -97,7 +118,7 @@ class World:
     async def websocket(self, request):
         if len(self.peers)>=MAX_CLIENTS or self.limited(('ws',request.remote),30):
             return web.json_response({'error':'Server ausgelastet'},status=429)
-        ws = web.WebSocketResponse(heartbeat=20,max_msg_size=4096)
+        ws = web.WebSocketResponse(heartbeat=20,max_msg_size=16384)
         await ws.prepare(request)
         peer = None
         try:
@@ -106,26 +127,42 @@ class World:
             account = self.session(hello.get('token'))
             map_id = hello.get('map_id')
             if not account or type(map_id) is not int or map_id not in SEA_IDS: raise ValueError('auth/map')
-            if any(p['id']==account['id'] for p in self.peers.values()): raise ValueError('already online')
+            for previous,active in list(self.peers.items()):
+                if active['id']==account['id']:
+                    self.save_character(active)
+                    await previous.close(code=1000,message=b'Session resumed elsewhere')
+                    self.peers.pop(previous,None)
             if sum(p['map_id']==map_id for p in self.peers.values())>=MAX_ROOM: raise ValueError('room full')
-            peer = dict(**account,map_id=map_id,x=2100.,y=1600.,goal=None,sequence=0,expires=time.monotonic()+max(0,account['expires_at']-time.time()))
+            saved = self.db.execute('SELECT x,y,heading,skin FROM characters WHERE account=? AND map_id=?',(account['id'],map_id)).fetchone()
+            peer = dict(**account,map_id=map_id,x=saved[0] if saved else 2100.,y=saved[1] if saved else 1450.,
+                heading=saved[2] if saved else math.pi,skin=saved[3] if saved else 0,
+                hp=2400,max_hp=2400,route=[],sequence=0,expires=time.monotonic()+max(0,account['expires_at']-time.time()))
             self.peers[ws] = peer
-            await ws.send_json({'type':'welcome','protocol':PROTOCOL,'account_id':account['id'],'map_id':map_id,'tick_rate':20,'scope':'presence-preview'})
+            await ws.send_json({'type':'welcome','protocol':PROTOCOL,'account_id':account['id'],'map_id':map_id,'tick_rate':20,'player':{k:peer[k] for k in ('x','y','heading','skin')},'scope':'presence-preview'})
             async for msg in ws:
                 if msg.type!=WSMsgType.TEXT: continue
                 if self.limited(('input',account['id']),40,1): continue
                 try:
                     data=json.loads(msg.data)
-                    if not isinstance(data,dict) or data.get('type')!='course': continue
-                    seq,x,y=data.get('sequence'),data.get('x'),data.get('y')
+                    if not isinstance(data,dict): continue
+                    if data.get('type')=='appearance':
+                        # Cosmetic preview only. Never grants inventory, damage or rewards.
+                        skin,hp,maximum=data.get('skin'),data.get('hp'),data.get('max_hp')
+                        if type(skin) is int and 0<=skin<=13: peer['skin']=skin
+                        if type(hp) is int and type(maximum) is int and 1<=maximum<=10000000 and 0<=hp<=maximum:
+                            peer.update(hp=hp,max_hp=maximum)
+                        continue
+                    if data.get('type')!='course': continue
+                    seq=data.get('sequence')
                     if type(seq) is not int or seq<=peer['sequence'] or seq>2**31: continue
-                    if type(x) not in (int,float) or type(y) not in (int,float): continue
-                    if not math.isfinite(x) or not math.isfinite(y) or not (40<=x<=4360 and 40<=y<=3160): continue
-                    peer.update(sequence=seq,goal=(float(x),float(y)))
+                    route=self.route(data)
+                    if route is None: continue
+                    peer.update(sequence=seq,route=route)
                 except (ValueError,TypeError): continue
         except (ValueError,TypeError,KeyError,asyncio.TimeoutError):
             await ws.close(code=1008,message=b'Invalid session or map')
         finally:
+            if peer is not None: self.save_character(peer)
             self.peers.pop(ws,None)
         return ws
 
@@ -138,23 +175,32 @@ class World:
                 self.tick+=1
                 for ws,peer in list(self.peers.items()):
                     if peer['expires']<=now: await ws.close(code=1008,message=b'Session expired');continue
-                    if peer['goal']:
-                        dx,dy=peer['goal'][0]-peer['x'],peer['goal'][1]-peer['y']
-                        distance=math.hypot(dx,dy); step=min(distance,120*delta)
-                        if distance>.001: peer['x']+=dx/distance*step;peer['y']+=dy/distance*step
-                        if distance<=step: peer['goal']=None
+                    travel=165*delta
+                    while peer['route'] and travel>0:
+                        dx,dy=peer['route'][0][0]-peer['x'],peer['route'][0][1]-peer['y']
+                        distance=math.hypot(dx,dy); step=min(distance,travel)
+                        if distance>.001:
+                            peer['heading']=math.atan2(dy,dx)
+                            peer['x']+=dx/distance*step;peer['y']+=dy/distance*step
+                        travel-=step
+                        if distance<=step: peer['route'].pop(0)
+                        else: break
+                    if self.tick%100==0: self.save_character(peer)
                 rooms={p['map_id'] for p in self.peers.values()}
                 snapshots={room: {'type':'snapshot','tick':self.tick,'map_id':room,'players':[
-                    {k:p[k] for k in ('id','username','x','y','sequence')} for p in self.peers.values() if p['map_id']==room]} for room in rooms}
+                    dict({k:p[k] for k in ('id','username','x','y','sequence','heading','skin','hp','max_hp')},moving=bool(p['route'])) for p in self.peers.values() if p['map_id']==room]} for room in rooms}
                 for ws,peer in list(self.peers.items()):
                     try: await asyncio.wait_for(ws.send_json(snapshots[peer['map_id']]),timeout=.2)
-                    except (ConnectionError,RuntimeError,asyncio.TimeoutError): self.peers.pop(ws,None)
+                    except (ConnectionError,RuntimeError,asyncio.TimeoutError):
+                        self.save_character(peer); self.peers.pop(ws,None); await ws.close()
         task=asyncio.create_task(loop())
         yield
         task.cancel()
         try: await task
         except asyncio.CancelledError: pass
-        for ws in list(self.peers): await ws.close(code=1001,message=b'Server stopping')
+        for ws,peer in list(self.peers.items()):
+            self.save_character(peer)
+            await ws.close(code=1001,message=b'Server stopping')
         self.db.close()
 
 @web.middleware
@@ -162,12 +208,12 @@ async def headers(request,handler):
     # Explicit browser origin for hosted web crossplay, never reflect arbitrary origins.
     allowed=request.app['allowed_origin']
     origin=request.headers.get('Origin','')
-    if origin and origin!=allowed: return web.json_response({'error':'Origin denied'},status=403)
+    if origin and origin not in allowed: return web.json_response({'error':'Origin denied'},status=403)
     response=web.Response(status=204) if request.method=='OPTIONS' else await handler(request)
     response.headers['Cache-Control']='no-store'
     response.headers['X-Content-Type-Options']='nosniff'
     if origin:
-        response.headers['Access-Control-Allow-Origin']=allowed
+        response.headers['Access-Control-Allow-Origin']=origin
         response.headers['Access-Control-Allow-Headers']='Content-Type'
         response.headers['Access-Control-Allow-Methods']='GET, POST, OPTIONS'
         response.headers['Vary']='Origin'
@@ -175,7 +221,7 @@ async def headers(request,handler):
 
 def create_app(database='abyssal.sqlite3',allowed_origin=''):
     app=web.Application(client_max_size=8192,middlewares=[headers])
-    world=World(database);app['world']=world;app['allowed_origin']=allowed_origin
+    world=World(database);app['world']=world;app['allowed_origin']={item.strip() for item in allowed_origin.split(',') if item.strip()}
     app.router.add_post('/v1/register',world.auth);app.router.add_post('/v1/login',world.auth)
     app.router.add_get('/v1/world',world.websocket)
     async def health(_): return web.json_response({'status':'ready','protocol':PROTOCOL,'scope':'presence-preview'})

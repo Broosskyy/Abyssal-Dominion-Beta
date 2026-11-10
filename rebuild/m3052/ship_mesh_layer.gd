@@ -237,7 +237,7 @@ func set_render_mode(requested: String) -> void:
 
 func can_render_actor(actor: Dictionary) -> bool:
 	if not visible:return false
-	if int(actor.get("id",-1))==0:return model_scenes.has(player_key_for_skin(int(actor.get("skin",-1))))
+	if int(actor.get("id",-1))==0 or bool(actor.get("remote_player",false)):return model_scenes.has(player_key_for_skin(int(actor.get("skin",-1))))
 	return int(actor.get("id",0))>0 and str(actor.get("kind",""))=="ship" and model_scenes.has(str(actor.get("visual_key","")))
 
 # Lower-hull envelope from the source GLB bounds, not the eight-angle sprite.
@@ -345,7 +345,7 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	owner.add_child(pivot)
 	pivot.add_child(model)
 	# Keep original GLBs untouched; taper only the actual B/C player hull instances.
-	if key=="schattenkriegsschiff_shaded" and int(actor.id)==0:
+	if key=="schattenkriegsschiff_shaded" and (int(actor.id)==0 or bool(actor.get("remote_player",false))):
 		STERN_TAPER.apply_to_scene(model)
 	var scale_factor=float(host._actor_visual_length(actor))/maxf(float(info[0]),0.1)
 	model.rotation_degrees=Vector3.ZERO # Original Meshy glTF already uses Y-up.
@@ -353,11 +353,11 @@ func _create_ship(actor: Dictionary,key: String) -> Node3D:
 	# Pull the test ship keel a little deeper into the sea surface. Source
 	# bounds include the sails; sinking to the old 13% of total height made
 	# the player hull look detached from the flat 2D ocean underneath it.
-	var immersion: float=_player_immersion(key) if int(actor.id)==0 else 0.13
+	var immersion: float=_player_immersion(key) if int(actor.id)==0 or bool(actor.get("remote_player",false)) else 0.13
 	model.position=Vector3(-float(info[3])*scale_factor,(-float(info[1])-float(info[2])*immersion)*scale_factor,-float(info[4])*scale_factor)
 	model_instances[int(actor.id)]=owner
 	model_instance_keys[int(actor.id)]=key
-	if int(actor.id)==0:
+	if int(actor.id)==0 or bool(actor.get("remote_player",false)):
 		model_instance_skins[int(actor.id)]=int(actor.get("skin",0))
 		_configure_gameplay_surfaces(owner,key)
 		if elite_texture_level(int(actor.get("skin",0)))>0:
@@ -416,9 +416,9 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 	for actor: Dictionary in fleet:
 		if int(actor.get("hp",0))<=0 or not can_render_actor(actor):continue
 		var id=int(actor.id)
-		var key: String=player_key_for_skin(int(actor.get("skin",-1))) if id==0 else str(actor.get("visual_key",""))
+		var key: String=player_key_for_skin(int(actor.get("skin",-1))) if id==0 or bool(actor.get("remote_player",false)) else str(actor.get("visual_key",""))
 		var node: Node3D=model_instances.get(id)
-		var skin_changed: bool=id==0 and int(model_instance_skins.get(id,-1))!=int(actor.get("skin",0))
+		var skin_changed: bool=(id==0 or bool(actor.get("remote_player",false))) and int(model_instance_skins.get(id,-1))!=int(actor.get("skin",0))
 		# A mesh is recreated only when changing actual hull types (starter vs
 		# Corsair), never when swapping Corsair textures 01–10 or original.
 		var newly_instanced: bool=node==null or model_instance_keys.get(id,"")!=key
@@ -427,7 +427,7 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 				node.visible=false
 				node.queue_free()
 			node=_create_ship(actor,key)
-		elif skin_changed and id==0:
+		elif skin_changed:
 			var next_skin: int=int(actor.get("skin",0))
 			if _apply_elite_texture(node,elite_texture_level(next_skin)):
 				model_instance_skins[id]=next_skin

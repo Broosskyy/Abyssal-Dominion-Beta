@@ -153,6 +153,12 @@ var online_client: Node
 var online_players: Array[Dictionary]=[]
 var online_population: int=0
 var online_connected: bool=false
+var online_actor_ids: Dictionary={}
+var online_next_actor_id: int=-1000
+var online_profile_age: float=0.0
+var online_own_target: Vector2
+var online_own_heading: Vector2=Vector2.LEFT
+var online_has_position: bool=false
 var quest_panel: Panel
 var quest_text: Label
 var quest_claim: Button
@@ -374,11 +380,26 @@ func _join_online_room() -> void:
 
 func _online_connection_changed(connected: bool) -> void:
 	online_connected=connected
+	sim.player["network_motion"]=connected
 	if not connected:
 		online_players.clear()
 		online_population=0
+		online_has_position=false
+		sim.player.path.clear()
 
 func _online_snapshot(packet: Dictionary) -> void:
+	if str(packet.get("type",""))=="welcome" and packet.get("player") is Dictionary:
+		var spawn: Dictionary=packet.player
+		sim.player.pos=Vector2(float(spawn.x),float(spawn.y))
+		sim.player.heading=Vector2.from_angle(float(spawn.heading))
+		sim.player.skin=clampi(int(spawn.skin),0,13)
+		sim.player.path.clear()
+		online_own_target=sim.player.pos
+		online_own_heading=sim.player.heading
+		online_has_position=true
+		sim.captain_name=str(online_client.account.get("username",sim.captain_name))
+		sim.captain_id=str(online_client.account.get("id",sim.captain_id))
+		return
 	if str(packet.get("type",""))!="snapshot" or int(packet.get("map_id",-1))!=sim.map_id:return
 	var entries: Variant=packet.get("players",[])
 	if not entries is Array:return
@@ -388,31 +409,53 @@ func _online_snapshot(packet: Dictionary) -> void:
 	var my_id: String=str(online_client.account.get("id","")) if online_client!=null else ""
 	for candidate in all_players.slice(0,32):
 		if not candidate is Dictionary:continue
-		if str(candidate.get("id",""))==my_id:continue
 		var x: float=float(candidate.get("x",-1))
 		var y: float=float(candidate.get("y",-1))
 		if not Vector2(x,y).is_finite() or x<0 or x>sim.WORLD.x or y<0 or y>sim.WORLD.y:continue
-		others.append({"id":str(candidate.get("id","")), "username":str(candidate.get("username","Kapitän")).left(24),
-			"x":x,"y":y})
+		var heading: Vector2=Vector2.from_angle(float(candidate.get("heading",PI)))
+		if str(candidate.get("id",""))==my_id:
+			online_own_target=Vector2(x,y)
+			online_own_heading=heading
+			if not bool(candidate.get("moving",true)):sim.player.path.clear()
+			continue
+		var uid: String=str(candidate.get("id",""))
+		if uid.is_empty():continue
+		if not online_actor_ids.has(uid):
+			online_actor_ids[uid]=online_next_actor_id
+			online_next_actor_id-=1
+		var point: Vector2=Vector2(x,y)
+		for previous: Dictionary in online_players:
+			if str(previous.player_uid)==uid:point=previous.pos;break
+		others.append({"id":int(online_actor_ids[uid]),"player_uid":uid,"is_player":true,"remote_player":true,
+			"name":str(candidate.get("username","Kapitän")).left(24),"kind":"ship",
+			"pos":point,"network_target":Vector2(x,y),"heading":heading,"skin":clampi(int(candidate.get("skin",0)),0,13),
+			"hp":clampi(int(candidate.get("hp",2400)),0,10000000),"max_hp":clampi(int(candidate.get("max_hp",2400)),1,10000000),
+			"shield":0,"max_shield":0,"speed":165.0,"slow":0.0,"path":[],"elite":false})
 	online_players=others
+	# Drop identities of departed players to bound caches during long sessions.
+	var active: Dictionary={}
+	for other: Dictionary in others:active[str(other.player_uid)]=true
+	for uid: String in online_actor_ids.keys():
+		if not active.has(uid):
+			classic_heading_cache.erase(int(online_actor_ids[uid]))
+			online_actor_ids.erase(uid)
 
 func _send_online_course(point: Vector2) -> void:
 	if online_client!=null and is_instance_valid(online_client) and online_connected:
-		online_client.send_course(point)
+		online_client.send_course(point,sim.player.path)
 
-func _draw_online_presence(view: Rect2) -> void:
-	# Distinct cyan *test markers*, not fake synchronized ship meshes.
-	# A real server-backed ship renderer will replace them when combat and
-	# collisions become authoritative. No collision or hitbox is added.
-	for other in online_players:
-		var pos: Vector2=Vector2(float(other.x),float(other.y))
-		if not view.has_point(pos):continue
-		var back: Vector2=pos+Vector2(0,13)
-		draw_arc(back,25,0,TAU,32,Color("6fe7f3",.72),2.0,true)
-		draw_colored_polygon(PackedVector2Array([pos+Vector2(0,-17),pos+Vector2(13,12),pos+Vector2(-13,12)]),Color("1f9eb5",.75))
-		draw_line(pos+Vector2(0,-18),pos+Vector2(0,14),Color("d8feff",.85),2)
-		_label(pos+Vector2(0,-37),str(other.username),13,Color("a4f3fa"))
-		_label(pos+Vector2(0,-23),"ONLINE · TEST",10,Color("63c6da"))
+func _update_online_ships(delta: float) -> void:
+	if not online_connected:return
+	var blend: float=1.0-exp(-delta*18.0)
+	if online_has_position:
+		sim.player.pos=sim.player.pos.lerp(online_own_target,blend)
+		sim.player.heading=online_own_heading
+	for other: Dictionary in online_players:
+		other.pos=Vector2(other.pos).lerp(Vector2(other.network_target),blend)
+	online_profile_age+=delta
+	if online_profile_age>=.5:
+		online_profile_age=0.0
+		online_client.send_appearance(int(sim.player.skin),int(sim.player.hp),int(sim.player.max_hp))
 
 func _sharp_zoom() -> float:
 	return desired_zoom * clampf(get_viewport_rect().size.y / 720.0, 1.0, 1.7)
@@ -517,6 +560,7 @@ func _update_wake_tracks(delta: float) -> void:
 	var boats: Array[Dictionary]=[sim.player]
 	for npc: Dictionary in sim.npcs:
 		if int(npc.hp)>0 and str(npc.get("kind","ship"))=="ship":boats.append(npc)
+	boats.append_array(online_players)
 	for actor: Dictionary in boats:
 		if int(actor.hp)<=0:continue
 		var id: int=int(actor.id)
@@ -634,6 +678,7 @@ func _process(delta: float) -> void:
 	if previous_region!=sim.map_id:
 		wake_tracks.clear()
 		_sync_region()
+	_update_online_ships(delta)
 	_update_wake_tracks(delta)
 	if loading_left>0:_advance_loading(delta)
 	if camera_pad.visible and not modal.visible:_pan_camera(camera_pad.value,delta)
@@ -744,13 +789,14 @@ func _draw() -> void:
 	fleet.append(sim.player)
 	for npc in sim.npcs:
 		if view.has_point(npc.pos): fleet.append(npc)
+	for other: Dictionary in online_players:
+		if view.has_point(other.pos):fleet.append(other)
 	fleet.sort_custom(func(a,b):return a.pos.y < b.pos.y)
 	# Foam is rendered below each real GLB and sprite: 2D map still owns water.
 	for actor: Dictionary in fleet:
 		if int(actor.hp)>0:_draw_wake(actor)
 	for actor: Dictionary in fleet:
 		if int(actor.hp)>0: _draw_actor(actor)
-	_draw_online_presence(view)
 	# Name/HP/shield/decks are rendered in a screen-space CanvasLayer,
 	# already synced during _process(), never sourced from an old draw pass.
 	# Original M3100 missile silhouettes, contrails, sparks and shadow arcs.
@@ -869,7 +915,7 @@ func _npc_ship_texture(_actor: Dictionary) -> Texture2D:
 	return painted.nav_ship
 
 func _actor_visual_length(actor: Dictionary) -> float:
-	if int(actor.id)==0:return 180.0 if int(actor.get("skin",0))>=1 and int(actor.get("skin",0))<=13 else FINAL_SHIP_LENGTH
+	if int(actor.id)==0 or bool(actor.get("remote_player",false)):return 180.0 if int(actor.get("skin",0))>=1 and int(actor.get("skin",0))<=13 else FINAL_SHIP_LENGTH
 	if str(actor.get("visual_key",""))=="black_crown_corsair_elite_test":return 180.0
 	if actor.kind=="ship":return float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
 	return 150.0
@@ -1072,7 +1118,7 @@ func _classic_ship_texture(actor: Dictionary) -> Texture2D:
 	return CLASSIC_SLOOP if choice==0 else CLASSIC_BRIG if choice==1 else CLASSIC_GALLEON
 
 func _classic_atlas_key(actor: Dictionary) -> String:
-	if int(actor.get("id",-1))==0:
+	if int(actor.get("id",-1))==0 or bool(actor.get("remote_player",false)):
 		var skin: int=int(actor.get("skin",0))
 		if skin==0:return "schattenkriegsschiff_shaded"
 		if skin==1:return "black_crown_corsair_elite_test"
@@ -1219,7 +1265,7 @@ func _plate_screen_anchor(actor: Dictionary) -> Vector2:
 			return Vector2(point.x,point.y+bottom*zoom+21.0*pixels)
 	# The player 3D plate follows a constant hull envelope. Its position
 	# is independent of yaw while still tracking camera zoom every frame.
-	if player and mesh_layer!=null and mesh_layer.can_render_actor(actor):
+	if (player or bool(actor.get("remote_player",false))) and mesh_layer!=null and mesh_layer.can_render_actor(actor):
 		var drop: float=mesh_layer.stable_player_plate_drop(actor,camera.zoom.y,pixels)
 		return Vector2(point.x,point.y+drop)
 	var minimum=point.y+(CAPTAIN_PLATE_OFFSET if player else OTHER_PLATE_OFFSET)*pixels
@@ -1254,6 +1300,8 @@ func _sync_plate_overlay() -> void:
 	var fleet: Array[Dictionary]=[sim.player]
 	for npc: Dictionary in sim.npcs:
 		if int(npc.hp)>0 and view.has_point(_visual_actor_pos(npc)):fleet.append(npc)
+	for other: Dictionary in online_players:
+		if view.has_point(other.pos):fleet.append(other)
 	plate_fleet=fleet
 	# Projection must use THIS frame's ship transforms before laying out labels.
 	if mesh_layer!=null:mesh_layer.sync_fleet(fleet,camera,get_viewport_rect().size)
@@ -3875,7 +3923,7 @@ func _open_menu_hub() -> void:
 	# One compact, grouped index instead of 11 persistent nav buttons.
 	# All existing functional panels remain directly reachable.
 	if online_client!=null and online_connected:
-		_note("ONLINE-PRÄSENZTEST · %d Kapitäne auf dieser Karte. Türkise Testmarkierungen zeigen andere angemeldete Spieler. Kampf, Schaden und Beute sind noch lokal." % online_population,Color("8bd7db"))
+		_note("ONLINE-PRÄSENZTEST · %d Kapitäne auf dieser Karte. Andere Kapitäne sind mit Schiff, Design und HP-Anzeige sichtbar. Kampf, Schaden und Beute sind noch lokal." % online_population,Color("8bd7db"))
 	else:
 		_note("LOKALE BETA · Online-Anmeldung und WebSocket-Test können auf der Startseite unter Einstellungen & Konto eingerichtet werden. Es läuft noch kein öffentlicher MMO-Server.",Color("9fb9ba"))
 	_section("SCHNELLZUGRIFF")
