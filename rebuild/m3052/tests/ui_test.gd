@@ -210,6 +210,29 @@ func _run() -> void:
 	game.sim.select(previous_target)
 	check(game.wake_motion_strength(0.0,165.0)==0.0,"idle player produces no false wake")
 	check(game.wake_motion_strength(82.5,165.0)>.49,"movement produces gradual wake")
+	# A stopped ship sheds no new foam, but its existing wake keeps fading.
+	var saved_wake_tracks: Dictionary=game.wake_tracks.duplicate(true)
+	var saved_wake_elapsed: float=game.elapsed
+	var saved_wake_position: Vector2=game.sim.player.pos
+	game.wake_tracks.clear()
+	game.sim.player.pos=Vector2(2100,1450)
+	game.elapsed=10.0;game._update_wake_tracks(.12)
+	for step in 4:
+		game.elapsed+=.12;game.sim.player.pos+=Vector2(19.8,0);game._update_wake_tracks(.12)
+	var moving_wake: Array=game.wake_tracks[0].points.duplicate(true)
+	check(not moving_wake.is_empty() and float(moving_wake.back().get("strength",0))>0,"wake captures its actual cruising strength")
+	var remaining_before: float=game.VISUALS.wake_sample_strength(moving_wake.back(),game.elapsed,game.WAKE_LIFETIME)
+	var emitted: int=moving_wake.size()
+	for step in 3:
+		game.elapsed+=.12;game._update_wake_tracks(.12)
+	var remaining_after: float=game.VISUALS.wake_sample_strength(moving_wake.back(),game.elapsed,game.WAKE_LIFETIME)
+	check(remaining_after>0 and remaining_after<remaining_before,"shed wake fades smoothly after the ship stops")
+	check(game.wake_tracks[0].points.size()==emitted,"idle ship emits no fresh wake samples")
+	game.elapsed+=game.WAKE_LIFETIME+.1;game._update_wake_tracks(.12)
+	check(game.wake_tracks[0].points.is_empty(),"stopped wake expires completely")
+	game.sim.player.pos+=Vector2(600,0);game.elapsed+=.12;game._update_wake_tracks(.12)
+	check(game.wake_tracks[0].points.is_empty() and float(game.wake_tracks[0].speed)==0,"teleport does not create a false trail")
+	game.sim.player.pos=saved_wake_position;game.elapsed=saved_wake_elapsed;game.wake_tracks=saved_wake_tracks
 	var migration=game.SIM.new()
 	var before_legacy=migration.export_save()
 	before_legacy.skin=30

@@ -36,6 +36,12 @@ static func geometry(frame: Dictionary,length: float) -> Dictionary:
 	var pivot=Vector2(float(frame.pivot[0]),float(frame.pivot[1]))*scale
 	return {"source":source,"destination":Rect2(-pivot,source.size*scale),"scale":scale,"pivot":pivot}
 
+## A shed wake belongs to its own sampled speed, not today's vessel speed.
+static func wake_sample_strength(sample: Dictionary,now: float,lifetime: float) -> float:
+	var age: float=now-float(sample.get("time",now))
+	if lifetime<=0.0 or age<0.0 or age>=lifetime:return 0.0
+	return clampf(float(sample.get("strength",1.0)),0.0,1.0)*pow(1.0-age/lifetime,1.5)
+
 static func world_rect(frame: Dictionary,point: Vector2,length: float,flipped: bool) -> Rect2:
 	var spec=geometry(frame,length)
 	var local: Rect2=spec.destination

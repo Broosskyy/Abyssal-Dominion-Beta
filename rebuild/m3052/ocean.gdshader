@@ -20,12 +20,12 @@ void fragment(){
   // Calm teal sea: a world-anchored tile and a drifting swell sample,
   // no per-pixel trig, no procedural hash, no particle/reflection passes.
   vec3 tile=texture(sea_tile,world/610.+vec2(sea_time*.0015,-sea_time*.001)).rgb;
-  vec2 swell=texture(wave_noise,world/340.+vec2(sea_time*.011,-sea_time*.007)).rg;
-  float crest=smoothstep(.52,.72,swell.r);
+  vec2 swell=texture(wave_noise,world/460.+vec2(sea_time*.011,-sea_time*.007)).rg;
+  float crest=smoothstep(.57,.78,swell.r);
   float trough=smoothstep(.28,.54,swell.g);
   float detail=dot(tile,vec3(.213,.715,.072));
   vec3 sea=vec3(.026,.192,.313)+vec3(.072,.097,.111)*(detail-.32);
-  sea+=vec3(.014,.032,.040)*crest-vec3(.006,.012,.016)*(1.-trough);
+  sea+=vec3(.010,.023,.031)*crest-vec3(.006,.012,.016)*(1.-trough);
   sea*=mix(vec3(1.),region_tint/vec3(.75,1.14,1.12),.38);
   COLOR=vec4(clamp(sea,0.,1.),1.);
  }else if(web_fast){
@@ -55,11 +55,11 @@ void fragment(){
  sea+=(detail-.28)*vec3(.092,.166,.182);
  // Two animated, intersecting small waves give water a surface rather than
  // looking like a flat wallpaper. The broad underlying sea remains calm.
- float wave_a=texture(wave_noise,world/240.+vec2(sea_time*.013,-sea_time*.006)).g;
- float wave_b=texture(wave_noise,turn*world/405.-vec2(sea_time*.006,sea_time*.004)).r;
- float crest=smoothstep(.54,.76,wave_a*.61+wave_b*.39);
+ float wave_a=texture(wave_noise,world/340.+vec2(sea_time*.013,-sea_time*.006)).g;
+ float wave_b=texture(wave_noise,turn*world/560.-vec2(sea_time*.006,sea_time*.004)).r;
+ float crest=smoothstep(.59,.79,wave_a*.61+wave_b*.39);
  float mid=smoothstep(.42,.75,wave_b);
- sea+=vec3(.042,.071,.079)*crest+vec3(.006,.013,.019)*(mid-.35);
+ sea+=vec3(.028,.046,.055)*crest+vec3(.006,.013,.019)*(mid-.35);
  // Dark troughs reinforce the visible high-water crests without
  // scattering bright noise over the whole screen on mobile.
  sea-=vec3(.008,.014,.018)*(1.-depth);

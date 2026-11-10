@@ -606,10 +606,10 @@ func _update_wake_tracks(delta: float) -> void:
 			if not history.is_empty():
 				var displacement: Vector2=point-Vector2(history.back().pos)
 				if displacement.length()>2.0:
-					history.append({"pos":point,"time":elapsed,"course":displacement.normalized()})
+					history.append({"pos":point,"time":elapsed,"course":displacement.normalized(),"strength":wake_motion_strength(float(state.speed),nominal)})
 			elif measured>2.5:
 				var course: Vector2=Vector2(actor.get("heading",Vector2.RIGHT)).normalized()
-				history.append({"pos":point,"time":elapsed,"course":course})
+				history.append({"pos":point,"time":elapsed,"course":course,"strength":wake_motion_strength(float(state.speed),nominal)})
 		while history.size()>16:history.pop_front()
 		state["points"]=history
 		wake_tracks[id]=state
@@ -620,21 +620,21 @@ func _draw_wake(actor: Dictionary) -> void:
 	if not wake_effects_enabled or str(actor.get("kind","ship"))!="ship":return
 	var state: Dictionary=wake_tracks.get(int(actor.id),{})
 	if state.is_empty():return
-	var intensity: float=_wake_intensity_for(actor)
 	var history: Array=state.get("points",[])
 	if history.is_empty():return
 	var length: float=_actor_visual_length(actor)
 	for sample in history:
 		var age: float=elapsed-float(sample.time)
 		if age<0.06 or age>WAKE_LIFETIME:continue
-		var fade: float=pow(1.0-age/WAKE_LIFETIME,1.5)*intensity
+		var fade: float=VISUALS.wake_sample_strength(sample,elapsed,WAKE_LIFETIME)
 		if fade<0.014:continue
 		var direction: Vector2=Vector2(sample.course).normalized()
 		if direction.length_squared()<0.1:continue
 		var cross: Vector2=Vector2(-direction.y,direction.x)
 		var back: Vector2=Vector2(sample.pos)-direction*length*.34
 		var spread: float=length*(.075+age*.10)
-		var scatter: float=sin(elapsed*7.0+age*11.0+float(actor.id))*(1.1+age*1.4)
+		var ripple_clock: float=elapsed if ambient_motion_enabled else 0.0
+		var scatter: float=sin(ripple_clock*3.0+age*7.0+float(actor.id))*(.8+age*1.0)
 		for sign_value in [-1.0,1.0]:
 			var shore: Vector2=back+cross*(spread+scatter)*sign_value
 			var trailing: Vector2=shore-direction*(8.0+age*6.5)
@@ -643,11 +643,12 @@ func _draw_wake(actor: Dictionary) -> void:
 
 # M3094: wave contact reaches the actual dark hull's outer edge, not
 # the hidden narrow centerline under the 3D scene. No thick platform.
-func _draw_glb_waterline(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
+func _draw_ship_waterline(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
 	if heading.length_squared()<0.5:return
 	var moving: float=_wake_intensity_for(actor) if wake_effects_enabled else 0.0
-	var alpha: float=0.17+moving*0.22
-	var half_width: float=length*(.175 if int(actor.get("id",-1))==0 and int(actor.get("skin",0))>=1 and int(actor.get("skin",0))<=13 else .137)
+	var alpha: float=(0.11 if browser_classic else 0.17)+moving*0.22
+	var ripple_clock: float=elapsed if ambient_motion_enabled else 0.0
+	var half_width: float=length*(.175 if (int(actor.get("id",-1))==0 or bool(actor.get("remote_player",false))) and int(actor.get("skin",0))>=1 and int(actor.get("skin",0))<=13 else .137)
 	draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
 	for side in [-1.0,1.0]:
 		var side_sign: float=side
@@ -656,7 +657,9 @@ func _draw_glb_waterline(actor: Dictionary,point: Vector2,heading: Vector2,lengt
 			var progress: float=float(segment)/9.0
 			var longitudinal: float=length*(-.36+.72*progress)
 			var taper: float=pow(maxf(0.0,1.0-pow(absf(progress*2.0-1.0),2.2)),.7)
-			var moving_foam: float=sin(elapsed*5.1-progress*15.0+side_sign)*moving*1.7
+			var moving_foam: float=sin(ripple_clock*5.1-progress*15.0+side_sign)*moving*1.7
+			var swell: float=sin(ripple_clock*1.7-progress*7.0+side_sign+float(actor.id)*.37)*.35*taper
+			moving_foam+=swell
 			waterline.append(Vector2(longitudinal,side_sign*(half_width*taper+moving_foam)))
 		draw_polyline(waterline,Color(.68,.87,.93,alpha),1.45,true)
 		if moving>.2:
@@ -1056,9 +1059,8 @@ func _draw_actor(actor: Dictionary) -> void:
 	var point: Vector2=_visual_actor_pos(actor)
 	var heading: Vector2=actor.heading
 	var length=_actor_visual_length(actor)
-	# Classic ships use the same world positions and interactions; keep their
-	# wake limited to the sampled trails, without expensive crest polygons.
-	if not browser_classic:_draw_bow_spray(actor,point,heading,length)
+	# Both renderers use cheap line/circle foam at the same water footprint.
+	_draw_bow_spray(actor,point,heading,length)
 	# Mesh ships are lit in their own SubViewport. Do not add the previous
 	# oversized opaque 2D oval beneath their hulls.
 	var mesh_ship=mesh_layer!=null and mesh_layer.can_render_actor(actor)
@@ -1068,9 +1070,10 @@ func _draw_actor(actor: Dictionary) -> void:
 		draw_set_transform(point+Vector2(0,3),heading.angle(),Vector2.ONE)
 		_ellipse(Vector2.ZERO,Vector2(length*.34,length*.09),Color(.002,.018,.03,.25))
 		draw_set_transform(Vector2.ZERO)
-		_draw_glb_waterline(actor,point,heading,length)
+		_draw_ship_waterline(actor,point,heading,length)
 	else:
-		_ellipse(point+Vector2(0,4),Vector2(length*0.34,length*0.09),Color(0.0,0.02,0.04,0.34))
+		_ellipse(point+Vector2(0,4),Vector2(length*0.32,length*0.085),Color(0.0,0.02,0.04,0.25))
+		if browser_classic and str(actor.get("kind",""))=="ship":_draw_ship_waterline(actor,point,heading,length)
 	_draw_ship_selection_ring(actor,point)
 	if is_player and sim.plates_on:
 		_ellipse_line(point,Vector2(length*.48,length*.22),Color("90c9ee",.45+.15*sin(elapsed*2)),2.5)
