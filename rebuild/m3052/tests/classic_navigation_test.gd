@@ -25,6 +25,16 @@ func _run() -> void:
 	await process_frame
 	game.set_process(false)
 	game.loading_left=0.0
+	check(game._is_mobile_hud(Vector2(844,390),false),"compact landscape uses the mobile-first HUD even without native mobile flags")
+	check(game._is_mobile_hud(Vector2(2340,1080),true),"large physical touch screen still receives the mobile-first layout")
+	check(not game._is_mobile_hud(Vector2(1280,720),false),"normal desktop viewport keeps the independent mouse/keyboard layout")
+	check(not game.quick_bar.mobile_first and game.quick_bar.tabs[0].size.y==25.0,"desktop keeps a compact quickbar tab rail")
+	check(game.quick_bar.position.x<game.get_viewport_rect().size.x/game.hud_scale*.42,"desktop quickbar lives left of center, away from the cannon")
+	var desktop_page: int=game.quick_page
+	_press(game,KEY_Q)
+	check(game.quick_page==(desktop_page+1)%3,"Q cycles the shared custom quickbar pages on desktop")
+	game.quick_page=desktop_page
+	game.quick_bar.refresh()
 	var starting_pos: Vector2=game.sim.player.pos
 	var ammo: Array=game.sim.player.ammo.duplicate()
 	check(game._classic_chart_center().distance_to(starting_pos)<0.01,"locked chart center equals captain position")
@@ -53,7 +63,18 @@ func _run() -> void:
 	check(game.sim.repairing==repairing_before,"keyboard repair cannot activate behind a settings dialog")
 	_press(game,KEY_K)
 	check(game.sim.player.path.is_empty(),"keyboard course cannot activate behind a settings dialog")
+	var page_behind_modal: int=game.quick_page
+	_press(game,KEY_Q)
+	check(game.quick_page==page_behind_modal,"desktop quickbar page cannot change behind a menu")
 	game._close_modal()
+	root.size=Vector2i(844,390)
+	await process_frame
+	game._layout()
+	check(game.quick_bar.mobile_first and game.quick_bar.tabs[0].size.y>=44.0,"phone quickbar pages have 44px touch tabs")
+	check(not game.quick_bar.get_global_rect().intersects(game.attack.get_global_rect()),"mobile quickbar never covers the primary fire action")
+	var mobile_page: int=game.quick_page
+	_press(game,KEY_Q)
+	check(game.quick_page==mobile_page,"touch HUD does not require desktop-only Q hotkey")
 	_press(game,KEY_M)
 	check(game.modal.visible and game.modal_kind=="Menü","M opens the real game menu")
 	check(game.sim.player.pos==starting_pos,"navigation shortcuts never move the simulated ship")
