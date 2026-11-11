@@ -39,13 +39,18 @@ func _run() -> void:
 		check(remote.remote_player and int(remote.id)<0,"remote identity cannot collide with NPC combat ids")
 		check(game._actor_visual_length(remote)==game._actor_visual_length(game.sim.player),"same hull scale as local captain")
 		clients[1].send_appearance(13,1200,2400)
-		clients[1].send_course(Vector2(4500,2900),game.sim.classic_path(Vector2(4200,2900),Vector2(4500,2900)))
-		var sides: Dictionary={}
+		# Online motion is now identical for all rendering modes: a straight
+		# west/east course must NEVER use the removed Classic zigzag helper.
+		var remote_goal: Vector2=Vector2(4500,2900)
+		var real_route: Array[Vector2]=game.sim.plan_path(Vector2(4200,2900),remote_goal)
+		check(not real_route.is_empty(),"online captain receives a valid real-world direct route")
+		clients[1].send_course(remote_goal,real_route)
+		var straight: bool=true
 		for tick in 20:
 			await create_timer(.1).timeout
 			remote=game.online_players[0]
-			if absf(Vector2(remote.heading).y)>.5:sides[signf(Vector2(remote.heading).y)]=true
-		check(sides.size()==2,"second client receives both real diagonal course directions")
+			straight=straight and absf(Vector2(remote.heading).y)<0.05
+		check(straight,"remote captain sails straight horizontally without any synthetic zigzag")
 		remote=game.online_players[0]
 		check(int(remote.skin)==13 and int(remote.hp)==1200,"live design and HP reach the game actor")
 		check(game._classic_atlas_key(remote)=="event_columbus","browser resolves correct eight-view design")
@@ -54,7 +59,7 @@ func _run() -> void:
 			check(game.mesh_layer.model_instances.has(int(remote.id)),"native remote GLB is instantiated in the visible fleet")
 		elif game.classic_atlases.has("event_columbus"):
 			check(game.classic_atlases.event_columbus!=null,"browser remote uses a loaded atlas")
-		check(Vector2(remote.pos).x>4200 and absf(absf(Vector2(remote.heading).x)-absf(Vector2(remote.heading).y))<.05,"remote hull moves and faces its course")
+		check(Vector2(remote.pos).x>4200 and absf(Vector2(remote.heading).y)<.05,"remote hull moves east with its actual direct course")
 		var mesh=load("res://ship_mesh_layer.gd").new()
 		check(mesh.player_key_for_skin(int(remote.skin))=="black_crown_corsair_elite_test" and mesh.elite_texture_level(int(remote.skin))==12,"native renderer resolves same hull and finish")
 		mesh.free()
