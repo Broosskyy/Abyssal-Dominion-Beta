@@ -791,11 +791,20 @@ func _draw() -> void:
 		_draw_sparkle(sparkle.pos,float(sparkle.id))
 	_draw_sea_edges(view)
 	if not sim.player.path.is_empty():
-		var before: Vector2 = sim.player.pos
-		for point: Vector2 in sim.player.path:
-			draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
-			before = point
 		var goal: Vector2 = sim.player.path.back()
+		if sim.classic_steering:
+			# Four-heading "dancing" is a movement detail, not an exposed
+			# 300-piece zigzag polyline. Draw the captain's intended bearing,
+			# not every tiny corrective step (mobile/WebGL performance).
+			if sim.segment_free(sim.player.pos,goal):
+				draw_dashed_line(sim.player.pos,goal,Color(0.50,0.83,0.80,0.28),1.1,16.0)
+			else:
+				draw_dashed_line(sim.player.pos,sim.player.path[0],Color(0.50,0.83,0.80,0.22),1.1,16.0)
+		else:
+			var before: Vector2=sim.player.pos
+			for point: Vector2 in sim.player.path:
+				draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
+				before=point
 		draw_arc(goal,16+sin(elapsed*3)*2,0,TAU,32,Color(0.54,0.92,0.85,0.7),1.7,true)
 		draw_line(goal-Vector2(22,0),goal+Vector2(22,0),Color(0.5,0.9,0.84,0.5),1.0)
 		draw_line(goal-Vector2(0,16),goal+Vector2(0,16),Color(0.5,0.9,0.84,0.5),1.0)
