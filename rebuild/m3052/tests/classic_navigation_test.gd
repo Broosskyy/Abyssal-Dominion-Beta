@@ -70,8 +70,10 @@ func _run() -> void:
 	root.size=Vector2i(844,390)
 	await process_frame
 	game._layout()
-	check(game.quick_bar.mobile_first and game.quick_bar.tabs[0].size.y>=44.0,"phone quickbar pages have 44px touch tabs")
+	check(game.quick_bar.mobile_first and game.quick_bar.tabs[0].size.y>=44.0 and game.quick_bar.tabs[0].size.x>=44.0,"phone quickbar pages have at least 44x44 logical-pixel touch tabs")
+	check(game.quick_bar.slots.all(func(button):return button.size.x>=50.0),"three mobile quick slots remain thumb-sized")
 	check(not game.quick_bar.get_global_rect().intersects(game.attack.get_global_rect()),"mobile quickbar never covers the primary fire action")
+	check(not game.quick_bar.get_global_rect().intersects(game.supply_selector.get_global_rect()),"mobile quickbar stays clear of consumables")
 	var mobile_page: int=game.quick_page
 	_press(game,KEY_Q)
 	check(game.quick_page==mobile_page,"touch HUD does not require desktop-only Q hotkey")
