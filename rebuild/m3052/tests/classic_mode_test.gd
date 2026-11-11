@@ -17,7 +17,11 @@ func run() -> void:
 	check(valid and cursor==Vector2(8800,0),"fine coastal legs cannot truncate a full expanded-world crossing")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
 	var goal:=Vector2(1200,500)
-	check(sim.course(goal),"water tap creates a classic course")
+	check(not sim.classic_steering,"native default is direct steering, not classic zigzag")
+	check(sim.course(goal),"water tap creates a course")
+	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"2.5D and 3D retain direct open-water navigation")
+	sim.set_classic_steering(true)
+	check(sim.classic_steering and sim.player.path.back()==goal,"entering Classic mid-voyage rebuilds route to the same destination")
 	var previous: Vector2=sim.player.pos
 	var last_side: float=0.0
 	var changes: int=0
@@ -26,7 +30,8 @@ func run() -> void:
 		check(absf(absf(gap.x)-absf(gap.y))<.01,"open-sea legs are diagonal, never a rotating sprite on a straight path")
 		if last_side!=0 and signf(gap.y)!=last_side:changes+=1
 		last_side=signf(gap.y);previous=waypoint
-	check(changes>=4 and previous==goal,"eastbound travel alternates diagonal legs and reaches the exact tap")
+	check(changes>=2 and previous==goal,"Classic 2D alternates discrete diagonal legs and reaches the exact tap")
+	check(sim.player.path.size()<=8,"Classic long legs do not twitch every few dozen units")
 	var stock: Array=sim.player.ammo.duplicate()
 	for step in 900:
 		sim._move(sim.player,1.0/60.0)
@@ -36,17 +41,32 @@ func run() -> void:
 	var corner: Vector2=sim.player.pos
 	check(sim.course(Vector2(300,850)) and sim.player.path.back()==Vector2(300,850),"new tap immediately replaces the previous zigzag course")
 	sim._move(sim.player,.01)
-	check(sim.player.heading.x<0 and sim.player.pos.distance_to(corner)<2,"new direction takes effect without turning circle or teleport")
+	check(sim.player.heading.x<0 and sim.player.pos.distance_to(corner)<2,"new Classic direction takes effect without turning circle or teleport")
+	var changing_goal: Vector2=sim.player.path.back()
+	var switch_origin: Vector2=sim.player.pos
+	sim.set_classic_steering(false)
+	check(not sim.classic_steering and sim.player.pos==switch_origin and sim.player.path.back()==changing_goal,"returning to 3D preserves exact position and existing destination")
+	check(sim.player.path.size()<=2,"native 2.5D / 3D returns to the old direct path, not zigzag")
+	var npc_body: Dictionary={"pos":Vector2(500,500),"heading":Vector2.RIGHT,"kind":"ship"}
+	var npc_direct: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
+	check(npc_direct.size()==1 and npc_direct[0]==Vector2(1200,500),"3D NPC patrol ship uses original direct routes")
+	sim.set_classic_steering(true)
+	var npc_classic: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
+	check(npc_classic.size()>2,"Classic 2D NPC ship uses discrete diagonal steps")
+	var monster: Dictionary={"pos":Vector2(500,500),"heading":Vector2.RIGHT,"kind":"monster"}
+	check(sim.plan_actor_path(monster,Vector2(1200,500))==npc_direct,"sea monsters keep direct navigation in every mode")
 	root.content_scale_size=Vector2i.ZERO;root.size=Vector2i(1280,720)
 	var game=load("res://sea_map.tscn").instantiate();root.add_child(game);current_scene=game
 	await process_frame;game.set_process(false)
 	var before: Dictionary=game.sim.export_save()
+	check(not game.sim.classic_steering and game.render_mode!="classic","native initial 2.5D / 3D graphics use direct steering")
 	game.sim.course(game.sim.player.pos+Vector2(600,0))
+	var destination: Vector2=game.sim.player.path.back()
 	var course: Array=game.sim.player.path.duplicate()
 	game._set_render_mode("classic");await process_frame
 	check(game.browser_classic and game.render_mode=="classic" and game.mesh_layer==null,"native Classic disables and removes the 3D fleet viewport")
 	check(game._classic_fleet_ready(),"native 2D loads all 23 ship and paint atlases")
-	check(game.sim.player.path==course and game.sim.player.pos==Vector2(before.position[0],before.position[1]),"switching graphics preserves position and current course")
+	check(game.sim.classic_steering and game.sim.player.path.back()==destination and game.sim.player.path!=course and game.sim.player.pos==Vector2(before.position[0],before.position[1]),"Classic 2D re-plans the remaining route as diagonal steps without moving the captain")
 	check(game.sim.player.gold==int(before.gold) and game.sim.player.skin==int(before.skin) and game.sim.player.ammo==before.ammo,"graphics switch preserves ship, wallet and ammunition")
 	game._open_modal("Anzeige")
 	var options: Array[String]=[]
@@ -57,9 +77,9 @@ func run() -> void:
 	await process_frame;reloaded.set_process(false)
 	check(reloaded.browser_classic and reloaded.render_mode=="classic" and reloaded.mesh_layer==null,"saved Classic preference starts natively without constructing 3D")
 	reloaded._set_render_mode("3d");await process_frame
-	check(not reloaded.browser_classic and reloaded.mesh_layer!=null and reloaded.mesh_layer.has_complete_fleet() and reloaded.render_mode=="3d","native captain can restore the complete original 3D fleet")
+	check(not reloaded.browser_classic and not reloaded.sim.classic_steering and reloaded.mesh_layer!=null and reloaded.mesh_layer.has_complete_fleet() and reloaded.render_mode=="3d","3D restores original direct steering and complete native fleet")
 	reloaded._set_render_mode("classic");await process_frame
 	reloaded._set_render_mode("hybrid");await process_frame
-	check(not reloaded.browser_classic and reloaded.render_mode=="hybrid" and reloaded.mesh_layer!=null,"repeated 2D/3D/2.5D switches leave one working renderer")
+	check(not reloaded.browser_classic and not reloaded.sim.classic_steering and reloaded.render_mode=="hybrid" and reloaded.mesh_layer!=null,"2.5D restores direct steering and one working renderer")
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)
