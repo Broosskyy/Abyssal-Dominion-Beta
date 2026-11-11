@@ -4,7 +4,7 @@ The active Godot 4.7.2 project remains in `rebuild/m3052/` to preserve the exist
 
 ## M3059 foundations
 
-One final bootstrap APK adds RSA-authenticated game-data ZIP updates: compatible game code/graphics can update without Android installation. Native/updater changes still require an APK. Legacy four-view NPCs sail actual alternating diagonals, while eight-view and future 3D metadata retain free courses. Measured island silhouettes replace displaced circular collisions, large island overlays are removed, water waves animate directionally and ammunition buttons show type/stock/selection. See [behavior and acceptance limits](../../docs/m3059/FOUNDATION.md).
+One final bootstrap APK adds RSA-authenticated game-data ZIP updates: compatible game code/graphics can update without Android installation. Native/updater changes still require an APK. Classic 2D (Browser und optional in der App) fährt diskrete diagonale 45°-Teilstrecken mit acht vorberechneten Schiffsansichten. Native 2,5D und 3D behalten dagegen die ursprüngliche direkte Tap-to-Sail-Navigation. Beim Wechsel mitten auf See werden nur die verbleibenden Wegpunkte zum bisherigen Ziel neu geplant; Schiff, Kampfwerte und Position bleiben erhalten. Measured island silhouettes replace displaced circular collisions, large island overlays are removed, water waves animate directionally and ammunition buttons show type/stock/selection. See [behavior and acceptance limits](../../docs/m3059/FOUNDATION.md).
 
 ## M3058 video regressions
 
