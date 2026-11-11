@@ -1,6 +1,6 @@
 extends RefCounted
-## Classic steering: short diagonal courses with immediate direction changes.
-## Shared by sprites and GLB presentation so crossplay follows identical paths.
+## Classic 2D steering only: alternating 45-degree sea-chart legs with immediate heading snaps.
+## Native 2.5D/3D keep direct navigation; network shares the sender's actual waypoint path.
 static func diagonal_leg(start: Vector2,goal: Vector2,max_leg: float=96,first_side: int=1) -> Array[Vector2]:
 	max_leg=maxf(1.0,max_leg)
 	var result: Array[Vector2]=[]
