@@ -6,6 +6,8 @@ var host
 var tabs: Array[Button]=[]
 var slots: Array[Button]=[]
 var edit: Button
+# Large, independent tabs on mobile; desktop keeps a smaller mouse-oriented rail.
+var mobile_first: bool=true
 func _ready() -> void:
 	for page in 3:
 		var index: int=page
@@ -20,11 +22,15 @@ func _ready() -> void:
 	resized.connect(_layout);_layout()
 func _layout() -> void:
 	if edit==null:return
+	var tab_height: float=44.0 if mobile_first else 25.0
 	var side: float=(size.x-16.0)/3.0
 	for i in 3:
-		tabs[i].position=Vector2(i*(size.x-32)/3.0,0);tabs[i].size=Vector2((size.x-32)/3.0-3,25)
-		slots[i].position=Vector2(i*(side+8),29);slots[i].size=Vector2(side,side)
-	edit.position=Vector2(size.x-28,0);edit.size=Vector2(28,25)
+		tabs[i].position=Vector2(i*(size.x-32)/3.0,0)
+		tabs[i].size=Vector2((size.x-32)/3.0-3,tab_height)
+		slots[i].position=Vector2(i*(side+8),tab_height+4.0)
+		slots[i].size=Vector2(side,side)
+	edit.position=Vector2(size.x-28,0)
+	edit.size=Vector2(28,tab_height)
 func refresh() -> void:
 	if slots.size()!=3:return
 	for i in 3:
