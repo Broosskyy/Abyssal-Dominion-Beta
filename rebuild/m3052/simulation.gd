@@ -1,7 +1,6 @@
 extends RefCounted
 const CONTENT = preload("res://content.gd")
 const CONTRACTS = preload("res://sea_contracts.gd")
-const NAV=preload("res://navigation.gd")
 const STAFF=preload("res://staff.gd")
 const GUILD_OPS = preload("res://sim_guild_ops.gd")
 const BONUS_OPS = preload("res://sim_bonus_ops.gd")
@@ -26,8 +25,8 @@ const START := Vector2(4200, 2900)
 const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice", "fire", "poison", "shrapnel", "lightning", "holy", "shadow", "wind", "earth", "water", "cursed", "bleed", "necro", "gold", "crystal", "explosive", "arcane", "spectral", "lava", "light", "armor_piercing", "gas"]
 const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein", "Feuerkugeln geladen · Grafik-Beta", "Giftkugeln geladen · Grafik-Beta", "Schrapnellkugeln geladen · Grafik-Beta", "Blitzkugeln geladen · Grafik-Beta", "Heilige Kugeln geladen · Grafik-Beta", "Schattenkugeln geladen · Grafik-Beta", "Wirbelkugeln geladen · Grafik-Beta", "Erdkugeln geladen · Grafik-Beta", "Wasserkugeln geladen · Grafik-Beta", "Fluchkugeln geladen · Grafik-Beta", "Blutkugeln geladen · Grafik-Beta", "Nekrokugeln geladen · Grafik-Beta", "Goldkugeln geladen · Grafik-Beta", "Kristallkugeln geladen · Grafik-Beta", "Explosivkugeln geladen · Grafik-Beta", "Arkankugeln geladen · Grafik-Beta", "Geisterkugeln geladen · Grafik-Beta", "Lavakugeln geladen · Grafik-Beta", "Lichtkugeln geladen · Grafik-Beta", "Panzerbrecher geladen · Grafik-Beta", "Gaskugeln geladen · Grafik-Beta"]
 var player: Dictionary
-# Classic 2D alone uses stepped 45° ship courses. 2.5D and 3D retain
-# unrestricted straight-line / obstacle-avoiding steering from before M3059.
+# Rendering-only Classic presentation flag. The actual simulation route is
+# identical across Classic 2D, native 2.5D and 3D (no artificial zigzag).
 var classic_steering: bool=false
 # Retired historical skins 0-30 migrate to shaded ship (skin 0).
 # Only schema 5+ saves can select separate Corsair test skin 1 and ten new Elite color skins 2-11.
@@ -277,76 +276,15 @@ func plan_path(start: Vector2, goal: Vector2) -> Array[Vector2]:
 	if segment_free(current, goal): result.append(goal)
 	return result
 
-func classic_path(start: Vector2,goal: Vector2,heading: Vector2=Vector2.RIGHT) -> Array[Vector2]:
-	# Four-way Classic steering is a tiny alternating correction around the
-	# captain's intended bearing, NOT an arbitrary 144-unit sawtooth.
-	# Near-diagonal taps hold one heading; other bearings switch only when
-	# necessary to keep within ~12 WORLD units of the desired course.
-	var base: Array[Vector2]=plan_path(start,goal)
-	var result: Array[Vector2]=[]
-	var before: Vector2=start
-	var chart_distance: float=0.0
-	for waypoint: Vector2 in base:
-		chart_distance+=maxf(absf(waypoint.x-before.x),absf(waypoint.y-before.y))
-		before=waypoint
-	# Keep the server's <=512 waypoint protocol even on a whole-world trip.
-	var lateral_limit: float=maxf(12.0,chart_distance/820.0)
-	before=start
-	for waypoint: Vector2 in base:
-		var accepted: bool=false
-		var cross_heading: float=heading.y if absf(waypoint.x-before.x)>=absf(waypoint.y-before.y) else heading.x
-		var preferred_side: int=1 if cross_heading>=0.0 else -1
-		for tolerance in [lateral_limit,lateral_limit*0.7,lateral_limit*0.4,2.0]:
-			for side in [preferred_side,-preferred_side]:
-				var legs: Array[Vector2]=NAV.classic_compass_leg(before,waypoint,tolerance,side)
-				if legs.is_empty() or result.size()+legs.size()+base.size()>480:continue
-				var cursor: Vector2=before
-				var safe: bool=true
-				for leg: Vector2 in legs:
-					if not segment_free(cursor,leg):safe=false;break
-					cursor=leg
-				if safe:
-					result.append_array(legs)
-					accepted=true
-					break
-			if accepted:break
-		if not accepted:
-			# A tight island berth may require a validated direct micro-leg.
-			# Never run a long zigzag onto land just to preserve four views.
-			result.append(waypoint)
-		before=waypoint
-	return result
-
 func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
-	# Monsters and native 2.5D/3D hulls follow the original direct paths.
-	if not classic_steering or str(body.get("kind",""))=="monster":
-		return plan_path(body.pos,goal)
-	return classic_path(body.pos,goal,body.heading)
+	# Physical movement is independent from the number of available ship views.
+	# The classic four-facing effect belongs exclusively in the sprite renderer.
+	return plan_path(body.pos,goal)
 
 func set_classic_steering(enabled: bool) -> void:
-	if classic_steering==enabled:return
+	# Retained API for renderer mode synchronization. Switching modes must
+	# NOT rewrite waypoints or broadcast a different movement route.
 	classic_steering=enabled
-	# Changing a graphic mode mid-voyage must not preserve the OLD steering
-	# model's waypoints. Keep the destination and exact current water position.
-	var bodies: Array[Dictionary]=[player]
-	for npc: Dictionary in npcs:
-		if str(npc.get("kind",""))=="ship":bodies.append(npc)
-	for body: Dictionary in bodies:
-		if bool(body.get("network_motion",false)):continue
-		var previous: Array=body.get("path",[])
-		if previous.is_empty():continue
-		var destination: Vector2=Vector2(previous.back())
-		if Vector2(body.pos).distance_to(destination)<.01:
-			body.path=[];continue
-		var route: Array[Vector2]=plan_actor_path(body,destination)
-		if int(body.get("id",-1))==0 and staff.flag("no_collision"):
-			if enabled:
-				var free_distance: Vector2=destination-Vector2(body.pos)
-				route=NAV.classic_compass_leg(body.pos,destination,maxf(12.0,maxf(absf(free_distance.x),absf(free_distance.y))/820.0))
-			else:
-				route.clear()
-				route.append(destination)
-		if not route.is_empty():body.path=route
 
 func course(point: Vector2) -> bool:
 	pending_portal=-1
@@ -355,10 +293,7 @@ func course(point: Vector2) -> bool:
 	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
 	var route: Array[Vector2] = []
 	if staff.flag("no_collision"):
-		if classic_steering:
-			var free_distance: Vector2=point-Vector2(player.pos)
-			route=NAV.classic_compass_leg(player.pos,point,maxf(12.0,maxf(absf(free_distance.x),absf(free_distance.y))/820.0))
-		else:route.append(point)
+		route.append(point)
 	else:
 		route=plan_actor_path(player,point)
 	if route.is_empty():
