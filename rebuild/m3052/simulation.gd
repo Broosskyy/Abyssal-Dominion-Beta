@@ -165,7 +165,7 @@ func _init() -> void:
 			"patrol":i%4,"aggressive":false,"slow":0.0,"respawn":0.0,
 			"reward":int(spec.reward) if meshy_ready else (110 if elite else 55),"art":i,"elite":elite,
 			"visual_key":str(spec.key),"view_count":4,"renderer":"mesh" if meshy_ready else "sprite",
-			"navigation":"classic_diagonal","last_hit":-100.0})
+			"navigation":"mode_adaptive","last_hit":-100.0})
 	npcs.append({"id": 100, "name": "Tiamat · Tiefenwächter", "kind": "monster", "pos": Vector2(2590, 1750),
 		"home": Vector2(2590, 1750), "heading": Vector2.LEFT, "path": [], "hp": 1650,
 		"max_hp": 1650, "shield": 0, "max_shield": 0, "speed": 28.0, "reload": 1.0, "repath": 0.0, "state": "patrol",
