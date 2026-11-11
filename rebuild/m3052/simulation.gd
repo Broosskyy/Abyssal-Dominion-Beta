@@ -278,30 +278,41 @@ func plan_path(start: Vector2, goal: Vector2) -> Array[Vector2]:
 	return result
 
 func classic_path(start: Vector2,goal: Vector2,heading: Vector2=Vector2.RIGHT) -> Array[Vector2]:
-	# Classic Seafight-style discrete diagonal heading changes are deliberately
-	# NOT the 2.5D/3D movement model. Longer sea legs avoid the 64-unit
-	# left-right twitch of the previous implementation (~0.5 s per switch).
+	# Four-way Classic steering is a tiny alternating correction around the
+	# captain's intended bearing, NOT an arbitrary 144-unit sawtooth.
+	# Near-diagonal taps hold one heading; other bearings switch only when
+	# necessary to keep within ~12 WORLD units of the desired course.
 	var base: Array[Vector2]=plan_path(start,goal)
 	var result: Array[Vector2]=[]
 	var before: Vector2=start
+	var chart_distance: float=0.0
+	for waypoint: Vector2 in base:
+		chart_distance+=maxf(absf(waypoint.x-before.x),absf(waypoint.y-before.y))
+		before=waypoint
+	# Keep the server's <=512 waypoint protocol even on a whole-world trip.
+	var lateral_limit: float=maxf(12.0,chart_distance/820.0)
+	before=start
 	for waypoint: Vector2 in base:
 		var accepted: bool=false
 		var cross_heading: float=heading.y if absf(waypoint.x-before.x)>=absf(waypoint.y-before.y) else heading.x
 		var preferred_side: int=1 if cross_heading>=0.0 else -1
-		for length in [144.0,112.0,80.0,48.0,24.0,12.0,6.0,3.0]:
+		for tolerance in [lateral_limit,lateral_limit*0.7,lateral_limit*0.4,2.0]:
 			for side in [preferred_side,-preferred_side]:
-				var legs: Array[Vector2]=NAV.diagonal_leg(before,waypoint,length,side)
+				var legs: Array[Vector2]=NAV.classic_compass_leg(before,waypoint,tolerance,side)
+				if legs.is_empty() or result.size()+legs.size()+base.size()>480:continue
 				var cursor: Vector2=before
 				var safe: bool=true
 				for leg: Vector2 in legs:
 					if not segment_free(cursor,leg):safe=false;break
 					cursor=leg
-				if safe and result.size()+legs.size()+base.size()<=512:
-					result.append_array(legs);accepted=true;break
+				if safe:
+					result.append_array(legs)
+					accepted=true
+					break
 			if accepted:break
 		if not accepted:
-			# Narrow coasts and ports: the validated original waypoint is safer
-			# than bouncing across a beach in search of another 45° leg.
+			# A tight island berth may require a validated direct micro-leg.
+			# Never run a long zigzag onto land just to preserve four views.
 			result.append(waypoint)
 		before=waypoint
 	return result
@@ -329,7 +340,9 @@ func set_classic_steering(enabled: bool) -> void:
 			body.path=[];continue
 		var route: Array[Vector2]=plan_actor_path(body,destination)
 		if int(body.get("id",-1))==0 and staff.flag("no_collision"):
-			if enabled:route=NAV.diagonal_leg(body.pos,destination,144.0)
+			if enabled:
+				var free_distance: Vector2=destination-Vector2(body.pos)
+				route=NAV.classic_compass_leg(body.pos,destination,maxf(12.0,maxf(absf(free_distance.x),absf(free_distance.y))/820.0))
 			else:
 				route.clear()
 				route.append(destination)
@@ -342,7 +355,9 @@ func course(point: Vector2) -> bool:
 	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
 	var route: Array[Vector2] = []
 	if staff.flag("no_collision"):
-		if classic_steering:route=NAV.diagonal_leg(player.pos,point,144.0)
+		if classic_steering:
+			var free_distance: Vector2=point-Vector2(player.pos)
+			route=NAV.classic_compass_leg(player.pos,point,maxf(12.0,maxf(absf(free_distance.x),absf(free_distance.y))/820.0))
 		else:route.append(point)
 	else:
 		route=plan_actor_path(player,point)
