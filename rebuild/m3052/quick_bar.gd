@@ -29,15 +29,15 @@ func tab_height() -> float:
 
 func _layout() -> void:
 	if edit==null:return
-	var tab_height: float=tab_height()
+	var tabs_h: float=tab_height()
 	var side: float=(size.x-16.0)/3.0
 	for i in 3:
 		tabs[i].position=Vector2(i*(size.x-32)/3.0,0)
-		tabs[i].size=Vector2((size.x-32)/3.0-3,tab_height)
-		slots[i].position=Vector2(i*(side+8),tab_height+4.0)
+		tabs[i].size=Vector2((size.x-32)/3.0-3,tabs_h)
+		slots[i].position=Vector2(i*(side+8),tabs_h+4.0)
 		slots[i].size=Vector2(side,side)
 	edit.position=Vector2(size.x-28,0)
-	edit.size=Vector2(28,tab_height)
+	edit.size=Vector2(28,tabs_h)
 func refresh() -> void:
 	if slots.size()!=3:return
 	for i in 3:
