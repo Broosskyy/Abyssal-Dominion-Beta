@@ -2,14 +2,14 @@ name: Abyssal Dominion – browser preview
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, feature/classic-seafight-navigation-330]
     paths:
       - 'rebuild/m3052/**'
       - 'server/**'
       - '.github/workflows/browser-preview.yml'
 
 concurrency:
-  group: abyssal-browser-preview
+  group: abyssal-browser-preview-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -157,6 +157,14 @@ jobs:
     permissions:
       contents: write
     steps:
+      # Feature branches must emit the validated release marker as their own
+      # second commit, so Vercel deploys only after the Godot export succeeds.
+      - uses: actions/checkout@v4
+        if: github.ref != 'refs/heads/main'
+        with:
+          sparse-checkout: |
+            web_preview
+          fetch-depth: 1
       - uses: actions/download-artifact@v4
         with:
           name: abyssal-browser-zip-${{ github.run_number }}
@@ -172,6 +180,33 @@ jobs:
             --repo "$REPO" --target "${GITHUB_SHA}" --prerelease \
             --title "Abyssal Dominion – Browser-Test ${REV}" \
             --notes "HTML5/WebGL2 guest preview of Abyssal Dominion. Download ZIP and host via HTTP(S); double-clicking index.html from a local file is not supported. Browser login needs an external HTTPS/WSS presence server; local guest gameplay is available without one."
+      - name: Notify Vercel when tested branch export is ready
+        if: github.ref == 'refs/heads/feature/classic-seafight-navigation-330'
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          REV: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          # No game files change in this follow-up commit. The remote source
+          # SHA in the release is the tested commit, not this marker commit.
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          p = Path("web_preview/export-ready.json")
+          p.parent.mkdir(parents=True, exist_ok=True)
+          p.write_text(json.dumps({
+              "source_sha": os.environ["SOURCE_SHA"],
+              "release": "browser-test-" + os.environ["REV"],
+          }, indent=2) + "\n", encoding="utf-8")
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add web_preview/export-ready.json
+          git commit -m "chore(browser): verified preview export ${REV} [skip ci]"
+          # A concurrent source update must not be overwritten: in that case
+          # the new push will run its own export workflow.
+          git -c pack.window=0 push origin "HEAD:${GITHUB_REF_NAME}"
 
   pages:
     name: Deploy playable GitHub Pages test
