@@ -4143,7 +4143,7 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: vier feste Seafight-artige Schiffsansichten, direkte Fahrt ohne künstlichen Zickzackkurs. 2,5D / 3D: gleiche direkte Steuerung mit 3D-Grafik.")
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Seafight-artiger Links-rechts-Ansichtswechsel während der Fahrt, ohne künstliche Umwege. 2,5D / 3D: normale direkte Steuerung mit 3D-Grafik.")
 	_note("DATENUPDATE %d · CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
 		if OS.has_feature("web"):
@@ -4157,7 +4157,7 @@ func _open_display() -> void:
 				var key: String=str(option[0])
 				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 				choice.disabled=render_mode==key
-			_note("Classic 2D: vier feste 2D-Schiffsansichten (NE/NW/SW/SE), kein erzwungenes Zickzack. Alle Grafikmodi nutzen dieselbe direkte Fahrt und dieselbe Küstenumfahrung; Umschalten verändert niemals den aktiven Kurs.")
+			_note("Classic 2D: vier 2D-Ansichten; während gerader Fahrt abwechselnd links/rechts geneigt wie bei altem Seafight. Das Schiff selbst fährt ohne Zickzack direkt zum Ziel. Alle Modi benutzen denselben Kurs; beim Umschalten bleibt er erhalten.")
 		_section("SCHIFFE & SEEKARTE")
 		var ship_grid=_grid(2)
 		_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
@@ -4289,7 +4289,7 @@ func _open_menu_hub() -> void:
 
 func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
-	_note("Browser: Classic 2D mit vier festen Schiffsansichten, direkter Fahrt ohne künstliches Zickzack. App/Desktop: Classic 2D, 2,5D und 3D benutzen identische Schiffskurse. Gleiche Schiffswerte und gemeinsamer Online-Spielstand.",Color("9be4df"))
+	_note("Browser: Classic 2D mit Links-rechts-Wechsel der vier Schiffsansichten, echte Fahrt ohne seitliche Umwege. App/Desktop: Classic 2D, 2,5D und 3D benutzen identische Schiffskurse. Gleiche Schiffswerte und gemeinsamer Online-Spielstand.",Color("9be4df"))
 	if not OS.has_feature("web"):
 		var modes=_grid(3)
 		for option in [["classic","CLASSIC 2D"],["hybrid","2,5D"],["3d","3D"]]:
