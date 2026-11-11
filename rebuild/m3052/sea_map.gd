@@ -714,6 +714,7 @@ func _process(delta: float) -> void:
 	_update_wake_tracks(delta)
 	if loading_left>0:_advance_loading(delta)
 	if camera_pad.visible and not modal.visible:_pan_camera(camera_pad.value,delta)
+	_classic_keyboard_pan(delta)
 	var render_player: Vector2=_visual_actor_pos(sim.player)
 	var goal: Vector2=render_player if camera_locked else camera_anchor
 	pan=goal-render_player
@@ -4109,6 +4110,12 @@ func _open_display() -> void:
 		_note("Standard: Gegner antippen wählt nur das Ziel, niemals automatisch feuern. FEUER startet den Angriff, STOPP beendet ihn. Optional kannst du einen bewusst gesetzten Doppeltipp als Angriff aktivieren. Mit × oder Esc das Ziel vollständig abwählen.",Color("a3c9cf"))
 		var double_grid=_grid(2)
 		_action("DOPPELTIPP-ANGRIFF: "+("EIN" if double_tap_attack_enabled else "AUS · SICHER"),_toggle_double_tap_attack,"tab_on" if double_tap_attack_enabled else "normal",double_grid)
+		_section("KLASSISCHE SEEKARTEN-NAVIGATION")
+		_note("PFEILTASTEN: sichtbare Seekarte verschieben, ohne den Schiffskurs zu ändern. C: zum Schiff zurück und Kamera folgen lassen. K: Kurs zum Mittelpunkt des erkundeten Kartenausschnitts setzen. M: Hauptmenü. A: Munitionswahl. Leertaste: Feuer. Esc: Abbrechen.",Color("a3c9cf"))
+		var classic_controls=_grid(3)
+		_action("ZUM SCHIFF · C",func():_close_modal();_recenter_camera(),"normal",classic_controls)
+		_action("KURS SETZEN · K",func():_close_modal();_classic_center_course(),"normal",classic_controls)
+		_action("MUNITION · A",func():_close_modal();_toggle_ammo(),"normal",classic_controls)
 	if _tab("Anzeige")=="HUD":
 		_section("FENSTERGRÖSSE · ADAPTIV")
 		var menu_grid=_grid(3)
@@ -4596,12 +4603,26 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 		_shift_camera(-event.relative/camera.zoom)
 	elif event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode==KEY_TAB:_cycle_target();get_viewport().set_input_as_handled()
-		if event.keycode==KEY_SPACE:_toggle_fire()
+		# A text field or open menu owns keyboard input. Never fire, repair,
+		# steer or consume ammunition while the captain edits a form.
 		if event.keycode==KEY_ESCAPE:
 			if modal.visible:_back_modal()
 			elif sim.target>0:_cancel_target()
 			get_viewport().set_input_as_handled()
+			return
+		if modal.visible or loading_left>0.0:return
+		var focused: Control=get_viewport().gui_get_focus_owner()
+		if focused is LineEdit or focused is TextEdit:return
+		if event.keycode==KEY_C:
+			_recenter_camera();get_viewport().set_input_as_handled();return
+		if event.keycode==KEY_K:
+			_classic_center_course();get_viewport().set_input_as_handled();return
+		if event.keycode==KEY_M:
+			_open_modal("Menü");get_viewport().set_input_as_handled();return
+		if event.keycode==KEY_A:
+			_toggle_ammo();get_viewport().set_input_as_handled();return
+		if event.keycode==KEY_TAB:_cycle_target();get_viewport().set_input_as_handled()
+		if event.keycode==KEY_SPACE:_toggle_fire()
 		if event.keycode==KEY_R:sim.toggle_repair()
 		if event.keycode==KEY_1:sim.set_ammo(0)
 		if event.keycode==KEY_2:sim.set_ammo(1)
@@ -4944,6 +4965,27 @@ func _set_display(size_index: int,show_journal: bool) -> void:
 func _pan_camera(direction: Vector2,delta: float) -> void:
 	if direction==Vector2.ZERO:return
 	_shift_camera(direction*620.0*maxf(delta,0.0)/camera.zoom)
+
+func _classic_keyboard_pan(delta: float) -> void:
+	# The old sea chart let arrow keys inspect the map without steering.
+	# Reuse the camera thumbpad speed and bounds; never affect ship physics.
+	if modal==null or modal.visible or loading_left>0.0:return
+	var focused: Control=get_viewport().gui_get_focus_owner()
+	if focused is LineEdit or focused is TextEdit:return
+	var direction:=Vector2(
+		int(Input.is_key_pressed(KEY_RIGHT))-int(Input.is_key_pressed(KEY_LEFT)),
+		int(Input.is_key_pressed(KEY_DOWN))-int(Input.is_key_pressed(KEY_UP)))
+	if direction!=Vector2.ZERO:_pan_camera(direction.normalized(),delta)
+
+func _classic_chart_center() -> Vector2:
+	var view_center: Vector2=sim.player.pos if camera_locked else camera_anchor
+	return view_center.clamp(Vector2(8,8),sim.WORLD-Vector2(8,8))
+
+func _classic_center_course() -> void:
+	# K navigates to the inspected chart center; C resumes normal follow.
+	if modal.visible or loading_left>0.0:return
+	var destination: Vector2=_classic_chart_center()
+	if destination.distance_to(sim.player.pos)>=1.0:_chart_course(destination)
 
 func _shift_camera(offset: Vector2) -> void:
 	if camera_locked:camera_anchor=sim.player.pos+pan
