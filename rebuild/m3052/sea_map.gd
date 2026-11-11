@@ -1837,6 +1837,11 @@ func _place(c: Control,x: float,y: float,w: float,h: float) -> void:
 	c.size=Vector2(maxf(w,1),maxf(h,1))
 
 # Reusable measurement helper; the ammunition picker is separately anchored.
+# A separate touch-first layout is selected by input hardware or a narrow
+# viewport. Desktop gets a mouse/keyboard rail, not an enlarged mobile HUD.
+func _is_mobile_hud(viewport: Vector2,touch_available: bool=false) -> bool:
+	return touch_available or viewport.x<1024.0
+
 func _menu_layout_fractions(viewport: Vector2,layout: String) -> Vector2:
 	var portrait: bool=viewport.y>viewport.x*1.13
 	match layout:
@@ -1861,6 +1866,7 @@ func _layout() -> void:
 	ui.scale=Vector2.ONE*hud_scale
 	var s=viewport_size/hud_scale
 	ui.size=s
+	var mobile_hud: bool=_is_mobile_hud(viewport_size,OS.has_feature("mobile") or DisplayServer.is_touchscreen_available())
 	var compact=viewport_size.y<560 or viewport_size.x<1000
 	if compact and elapsed<0.1:
 		desired_zoom=0.78
@@ -1971,7 +1977,16 @@ func _layout() -> void:
 	# Supplies retain their own functions; every ammunition type uses one selector.
 	_place(supply_selector,fx-orb-gap,fy-orb-gap,orb,orb)
 	for item: Button in supply_buttons.values():item.hide()
-	_place(quick_bar,fx-4*(orb+gap),s.y-orb-10-(orb+29)-8,orb*3+gap*2,orb+29)
+	# One shared, persistent set of three configurable bars, two layouts.
+	# On touch devices the slots remain beside the cannon, with 44px tabs.
+	# On desktop they form a separate mouse/keyboard rail along bottom-left.
+	quick_bar.mobile_first=mobile_hud
+	var quick_w: float=orb*3.0+gap*2.0
+	var quick_h: float=orb+(48.0 if mobile_hud else 29.0)
+	var quick_x: float=fx-4.0*(orb+gap) if mobile_hud else left+column-20.0
+	var quick_y: float=s.y-quick_h-18.0 if mobile_hud else s.y-quick_h-10.0
+	_place(quick_bar,quick_x,quick_y,quick_w,quick_h)
+	quick_bar._layout()
 	var hot: Array[Button]=[target_cycle,loadout_button]
 	for i in hot.size():_place(hot[hot.size()-1-i],ammo_selector.position.x-(i+1)*(orb+gap),s.y-orb-10,orb,orb)
 	var toast_w=maxf(60.0,minf(380.0,s.x-2.0*(left+column+12)))
@@ -4111,12 +4126,18 @@ func _open_display() -> void:
 		var double_grid=_grid(2)
 		_action("DOPPELTIPP-ANGRIFF: "+("EIN" if double_tap_attack_enabled else "AUS · SICHER"),_toggle_double_tap_attack,"tab_on" if double_tap_attack_enabled else "normal",double_grid)
 		_section("KLASSISCHE SEEKARTEN-NAVIGATION")
-		_note("PFEILTASTEN: sichtbare Seekarte verschieben, ohne den Schiffskurs zu ändern. C: zum Schiff zurück und Kamera folgen lassen. K: Kurs zum Mittelpunkt des erkundeten Kartenausschnitts setzen. M: Hauptmenü. A: Munitionswahl. Leertaste: Feuer. Esc: Abbrechen.",Color("a3c9cf"))
-		var classic_controls=_grid(3)
+		var touch_layout: bool=_is_mobile_hud(get_viewport_rect().size,OS.has_feature("mobile") or DisplayServer.is_touchscreen_available())
+		if touch_layout:
+			_note("HANDY / TABLET: Schiff und Ziele direkt antippen. Kamera per Wischen oder Kamerapad verschieben, Ziel über × abwählen, Munition und Items rechts unten wählen. Kein Gedrückthalten einer Tastaturtaste nötig.",Color("a3c9cf"))
+		else:
+			_note("DESKTOP: Pfeiltasten verschieben die Karte, C zentriert das Schiff, K setzt einen Kurs zur Kartenmitte, M öffnet das Menü, A die Munition. Z / X / V benutzen die drei belegten Schnellplätze, Q wechselt ihre Seite. Leertaste feuert, Esc bricht ab.",Color("a3c9cf"))
+		var classic_controls=_grid(1 if touch_layout else 3)
 		_action("ZUM SCHIFF · C",func():_close_modal();_recenter_camera(),"normal",classic_controls)
 		_action("KURS SETZEN · K",func():_close_modal();_classic_center_course(),"normal",classic_controls)
 		_action("MUNITION · A",func():_close_modal();_toggle_ammo(),"normal",classic_controls)
 	if _tab("Anzeige")=="HUD":
+		_section("MOBILE FIRST / DESKTOP")
+		_note("Touch: große Kampfaktionen rechts, drei frei belegbare Schnellplätze mit größeren Seitenreitern, Kamerapad links. Desktop: eigene Schnellleiste unten links plus Tastenkürzel. Inhalte, Belegung und Spielstand bleiben in beiden Ansichten gleich.",Color("a3c9cf"))
 		_section("FENSTERGRÖSSE · ADAPTIV")
 		var menu_grid=_grid(3)
 		for option in [["compact","KOMPAKT"],["balanced","STANDARD"],["large","GROSS"]]:
@@ -4621,6 +4642,18 @@ func _unhandled_input(event: InputEvent) -> void:
 			_open_modal("Menü");get_viewport().set_input_as_handled();return
 		if event.keycode==KEY_A:
 			_toggle_ammo();get_viewport().set_input_as_handled();return
+		# Desktop-only physical keyboard bindings; the touch HUD doesn't need
+		# a keyboard overlay or press-and-hold navigation widget.
+		if not _is_mobile_hud(get_viewport_rect().size,OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()):
+			if event.keycode==KEY_Q:
+				quick_page=(quick_page+1)%3
+				_persist_display_preferences()
+				quick_bar.refresh()
+				get_viewport().set_input_as_handled();return
+			var desktop_slot_keys: Array=[KEY_Z,KEY_X,KEY_V]
+			if event.keycode in desktop_slot_keys:
+				_desktop_quick_action(desktop_slot_keys.find(event.keycode))
+				get_viewport().set_input_as_handled();return
 		if event.keycode==KEY_TAB:_cycle_target();get_viewport().set_input_as_handled()
 		if event.keycode==KEY_SPACE:_toggle_fire()
 		if event.keycode==KEY_R:sim.toggle_repair()
@@ -4965,6 +4998,13 @@ func _set_display(size_index: int,show_journal: bool) -> void:
 func _pan_camera(direction: Vector2,delta: float) -> void:
 	if direction==Vector2.ZERO:return
 	_shift_camera(direction*620.0*maxf(delta,0.0)/camera.zoom)
+
+func _desktop_quick_action(slot: int) -> void:
+	# Uses exactly the same saved slot as its corresponding touch button.
+	# Never bypass the visible cooldown, docking or out-of-stock state.
+	if slot<0 or slot>=quick_bar.slots.size() or modal.visible:return
+	if quick_bar.slots[slot].disabled:return
+	_use_supply(str(quick_pages[quick_page][slot]))
 
 func _classic_keyboard_pan(delta: float) -> void:
 	# The old sea chart let arrow keys inspect the map without steering.
