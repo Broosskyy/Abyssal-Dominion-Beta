@@ -1,0 +1,61 @@
+# Abyssal Dominion — Classic Seafight 2008–2014/16 reference pass
+
+**Baseline:** Browser Test 34 / signed game-data update 329 (2026-11-11). This document separates verified historical evidence from proposed implementation and pending visual review. It is not a claim of completed frame-by-frame analysis.
+
+## User-selected video references (visual review still pending)
+
+1. https://youtu.be/oDPsBMtFbdc
+2. https://youtu.be/TU1vfdJyGWM
+3. https://youtu.be/anvSZmTncG4
+4. https://youtu.be/P_z28R5JL9M
+5. https://youtu.be/PRry_iZN0S8
+
+The linked YouTube playback/transcript could not be accessed from this session, so **none** of their individual scenes, headings, UI widgets or timings has been asserted as an observed fact. A frame-by-frame acceptance comparison requires playable media or user-supplied captures. Avoid guessing what happens at particular timestamps.
+
+## Period-grounded sources
+
+- German official 2013 sea-chart options: https://board-de.seafight.com/threads/die-seekarte-die-optionen.855/
+- German official 2013 action toolbar: https://board-de.seafight.com/threads/die-seekarte-die-menueleisten.857/
+- English official 2013 toolbars: https://board-en.seafight.com/threads/sea-chart-toolbars.1042/
+- English official 2013 keyboard/graphics options: https://board-en.seafight.com/threads/options-overview.1858/
+- Contemporary overview of simple four-direction movement: https://spiele.woxikon.de/browsergames/seafight
+- Official 2014 pumpkin event: https://board-en.seafight.com/threads/the-pumpkin-festival-2014.53687/
+
+Historical behavior, not an obligation to reuse trademarks, art, textures or exact layouts:
+- A mouse click sets course; the chart can be panned independently and recentered on the ship.
+- Graphical ship presentation uses few discrete headings; the 2010-era image should be readable at small scale.
+- A fixed combat action strip coexists with user-configurable item slots.
+- Dedicated attack/cancel, cannonball, harpoon, action item, bonus map and repair controls.
+- Options cover configuring toolbars, keyboard shortcuts, map-scrolling behavior, visual quality and animation toggles.
+- An accessible minimap, coordinates and target indicators accompany the ship rather than covering the sea.
+- Harbor and equipment upgrades have deliberate, discoverable categories rather than a full-screen HUD permanently obscuring the ocean.
+
+## Implementation trace / order
+
+| Priority | Area | Existing baseline | Acceptance for a close classic feel |
+| --- | --- | --- | --- |
+| P0 | Sailing | Update 329 real alternating diagonal segments; common simulation | Compare headings and visual leg length to supplied video frames; immediate new course replaces old; no turning arc; no snapping of labels, wake or ring; avoid absurd long zigzags or drift |
+| P0 | 2D browser ships | 23 baked GLB-derived atlases and 2D monster motion | Every hull retains identity, matched waterline, anchored shadow, four/eight readable headings and correct selection ring; no full 3D mesh load at browser startup |
+| P0 | Combat | One-tap select, fire toggle, ammo menu, existing salvo FX | Single tap = select, explicit fire; optional double tap = fire; immediate stop/cancel; clustered cannonballs and impact FX with readable volley damage; no stat changes from FX settings |
+| P1 | HUD | Compact header, ship plates, minimap, quick item slots | Sea occupies most screen; target/HP/shield and 10 decks legible; fixed combat actions distinct from configurable items; portrait and landscape mobile without overlap |
+| P1 | Chart navigation | Previous tap-to-sail, camera pad and recenter | **This branch:** arrows pan view, C follows ship, K courses to inspected center, A opens ammo, M menu, shortcuts never fire behind forms; tested independently of ship/cannon systems |
+| P1 | Menus | Separate docks, market, yard, decks, castles, quests, settings | Consistent back navigation, tabs, large media/cards where useful, short route to every core action; no copying of original art or UI skin |
+| P1 | World | 40 connected seas with whole-edge crossings | Clearly legible map coordinates, island/harbor silhouettes, crossing borders, more distinctive region layouts without giant portal decorations |
+| P1 | Graphics performance | Web Classic 2D with 60 FPS cap, signed data | Measure cold and repeat downloads, GPU/CPU frame pacing, touch-to-response latency and memory across actual Android/Web devices; budget imagery and avoid claiming 60 FPS without field measurements |
+| P2 | Economy/content | Shipyard/market, guild islands, events, bonus charts | Clear equipment and progression loops, historically inspired event cadence, own currencies/balance/graphics; no fake public-server groups or auctions |
+| P2 | Social/crossplay | local player progress and 2-client protocol tests | Verify real accounts and multiplayer only after authenticated public server is deployed; no simulated online claims |
+
+## Test checklist for next release
+
+1. Same account/course on browser and Android Classic; positional simulation/path and combat outcomes identical.
+2. Pan chart without moving player; K sets a valid course to the inspected map center; C recenters and follows; shortcuts ignored while entering a name or a menu is open.
+3. Tap sea, select NPC, fire, change ammo, cancel target and repair with both touchscreen and mouse.
+4. Twenty close-range heading flips, zero waterline/label detachment or image inversion.
+5. 360-degree eight-view inspection for 11 original models and 10 elite variants; draw one ship from one complete transparent atlas, no off-center icon gaps.
+6. HUD/click targets at 1280×720, 844×390, 2340×1080 and 3840×2160; no lost quickbar or covered close button.
+7. Cold browser download, second visit cache, FPS/long frame times, input responsiveness and memory logged from real devices.
+8. Native renderer switching Classic → Hybrid → 3D → Classic does not create duplicate meshes or alter the guest captain save.
+
+## Non-goals and safeguards
+
+No original Seafight logo, proprietary ship pixels, copied icon assets, pixel-identical menu artwork, or identical protected text; mechanics and general period look are adapted using original Abyssal assets. No silent new economy rules, gameplay damage alterations, server deployment or Android shell version bump in this navigation patch. The standalone QA script must pass before merging. CI on the feature branch is not equivalent to a published signed data release.
