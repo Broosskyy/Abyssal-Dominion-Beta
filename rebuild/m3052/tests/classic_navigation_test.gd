@@ -28,7 +28,7 @@ func _run() -> void:
 	check(game._is_mobile_hud(Vector2(844,390),false),"compact landscape uses the mobile-first HUD even without native mobile flags")
 	check(game._is_mobile_hud(Vector2(2340,1080),true),"large physical touch screen still receives the mobile-first layout")
 	check(not game._is_mobile_hud(Vector2(1280,720),false),"normal desktop viewport keeps the independent mouse/keyboard layout")
-	check(not game.quick_bar.mobile_first and game.quick_bar.tabs[0].size.y==25.0,"desktop keeps a compact quickbar tab rail")
+	check(not game.quick_bar.mobile_first and is_equal_approx(game.quick_bar.tabs[0].size.y,game.quick_bar.tab_height()) and game.quick_bar.slots[0].position.y>=game.quick_bar.tabs[0].size.y+3.0,"desktop tabs and slots respect the actual theme minimum with no overlap")
 	check(game.quick_bar.position.x<game.get_viewport_rect().size.x/game.hud_scale*.42,"desktop quickbar lives left of center, away from the cannon")
 	var desktop_page: int=game.quick_page
 	_press(game,KEY_Q)
