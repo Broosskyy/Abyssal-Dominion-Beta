@@ -1,5 +1,7 @@
 extends SceneTree
 const SIM=preload("res://simulation.gd")
+const NAV=preload("res://navigation.gd")
+const VISUALS=preload("res://ship_visuals.gd")
 var checks:=0
 var failures: Array[String]=[]
 func check(ok: bool,label: String) -> void:
@@ -15,6 +17,31 @@ func run() -> void:
 		valid=valid and absf(absf(gap.x)-absf(gap.y))<.01 and absf(gap.x)<=4.01
 		cursor=point
 	check(valid and cursor==Vector2(8800,0),"fine coastal legs cannot truncate a full expanded-world crossing")
+	var four_way: Array[Vector2]=NAV.classic_compass_leg(Vector2.ZERO,Vector2(700,0),12.0)
+	var origin: Vector2=Vector2.ZERO
+	var max_side_error: float=0.0
+	var four_headings: bool=not four_way.is_empty()
+	for point: Vector2 in four_way:
+		var leg: Vector2=point-origin
+		max_side_error=maxf(max_side_error,absf(point.y))
+		four_headings=four_headings and absf(absf(leg.x)-absf(leg.y))<0.01
+		four_headings=four_headings and VISUALS.heading_eight(leg,-1) in [1,3,5,7]
+		origin=point
+	check(four_headings and four_way.back()==Vector2(700,0),"classic compass has only four original 90-degree-separated headings")
+	check(max_side_error<=12.01 and four_way.size()>=20 and four_way.size()<=50,"old-Seafight dance stays within 12 world units, not 144-unit V detours")
+	var nearly_diagonal: Array[Vector2]=NAV.classic_compass_leg(Vector2.ZERO,Vector2(700,690),12.0)
+	check(nearly_diagonal.size()<=3 and nearly_diagonal.back()==Vector2(700,690),"diagonal destination holds one heading rather than wobbling on every step")
+	var whole_chart: Array[Vector2]=NAV.classic_compass_leg(Vector2.ZERO,Vector2(8800,0),12.0)
+	check(whole_chart.size()<=480 and whole_chart.back()==Vector2(8800,0),"four-way whole-chart route stays inside online waypoint cap")
+	for destination: Vector2 in [Vector2(-740,0),Vector2(0,-640),Vector2(-600,-230),Vector2(760,610),Vector2(-280,900)]:
+		var path: Array[Vector2]=NAV.classic_compass_leg(Vector2.ZERO,destination,12.0,-1)
+		var current: Vector2=Vector2.ZERO
+		var safe_headings: bool=not path.is_empty()
+		for leg_goal: Vector2 in path:
+			var leg: Vector2=leg_goal-current
+			safe_headings=safe_headings and absf(absf(leg.x)-absf(leg.y))<0.02
+			current=leg_goal
+		check(safe_headings and current.distance_to(destination)<0.01,"four compass headings reach arbitrary signed destination "+str(destination))
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
 	var goal:=Vector2(1200,500)
 	check(not sim.classic_steering,"native default is direct steering, not classic zigzag")
@@ -31,7 +58,11 @@ func run() -> void:
 		if last_side!=0 and signf(gap.y)!=last_side:changes+=1
 		last_side=signf(gap.y);previous=waypoint
 	check(changes>=2 and previous==goal,"Classic 2D alternates discrete diagonal legs and reaches the exact tap")
-	check(sim.player.path.size()<=8,"Classic long legs do not twitch every few dozen units")
+	check(sim.player.path.size()>20 and sim.player.path.size()<50,"Classic has short discreet compass steps rather than giant V-shaped legs")
+	var sidestep: float=0.0
+	for point: Vector2 in sim.player.path:
+		sidestep=maxf(sidestep,absf(point.y-500.0))
+	check(sidestep<=12.01,"actual Classic gameplay never veers more than 12 world units off a clear horizontal course")
 	var stock: Array=sim.player.ammo.duplicate()
 	for step in 900:
 		sim._move(sim.player,1.0/60.0)

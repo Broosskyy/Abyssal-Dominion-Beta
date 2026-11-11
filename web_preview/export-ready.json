@@ -1,4 +1,5 @@
 {
-  "source_sha": "565c0fc3cf25e3b976b07268a7c03cbac99a4f36",
-  "release": "browser-test-52"
+  "source_sha": "db365771018df77868e4ef74e28732f8de6563ef",
+  "release": "browser-test-61",
+  "branch": "fix/classic-4way-small-step-navigation-334"
 }

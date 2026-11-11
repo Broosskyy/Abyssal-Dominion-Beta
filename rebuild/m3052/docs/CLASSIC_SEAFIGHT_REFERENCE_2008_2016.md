@@ -12,6 +12,17 @@
 
 The linked YouTube playback/transcript could not be accessed from this session, so **none** of their individual scenes, headings, UI widgets or timings has been asserted as an observed fact. A frame-by-frame acceptance comparison requires playable media or user-supplied captures. Avoid guessing what happens at particular timestamps.
 
+## Verified Classic 4-heading movement correction (2026-11-11)
+
+The user's own 12-second screen recording `208796.mp4` exposes large V-shaped course deviations and long detour segments in the previous implementation (up to 144 world units). The linked YouTube ID `oDPsBMtFbdc` was not directly playable here; no timestamps from that video are claimed as inspected.
+
+An independent 2011 GameStar review explicitly describes Seafight ships not sailing directly to a clicked point but "dancing" along it, with four discrete headings that differ by 90 degrees:
+https://www.gamestar.de/artikel/seafight-browserspiel-oldie-unter-piratenflagge%2C2321007.html
+
+**Correction:** Classic 2D uses only the four diagonal compass headings NE/SE/SW/NW, selected dynamically to keep the physical ship within a narrow band (normally 12 *world* units) around the captain's requested bearing. Almost-diagonal courses maintain one heading. The previous fixed 144-unit zigzag threw the ship far away from the intended line and is removed. The actual course remains four-way, but the on-screen chart draws one simple goal guide to avoid a huge sawtooth overlay and unnecessary WebGL draw calls. On constrained island/port routes validated safe direct micro-segments remain allowed. Native 2.5D and 3D **continue to use direct motion without four-heading navigation**.
+
+The actual per-frame cadence remains subject to comparison against playable historical footage; do not label it a frame-exact match to a video that was inaccessible.
+
 ## Period-grounded sources
 
 - German official 2013 sea-chart options: https://board-de.seafight.com/threads/die-seekarte-die-optionen.855/

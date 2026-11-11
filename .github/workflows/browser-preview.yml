@@ -2,7 +2,7 @@ name: Abyssal Dominion – browser preview
 on:
   workflow_dispatch:
   push:
-    branches: [main, feature/classic-seafight-navigation-330]
+    branches: [main, feature/classic-seafight-navigation-330, fix/classic-4way-small-step-navigation-334]
     paths:
       - 'rebuild/m3052/**'
       - 'server/**'
@@ -98,7 +98,7 @@ jobs:
           "$engine" --headless --path rebuild/m3052 --editor --import --quit > /tmp/sprites-import.log 2>&1 || { tail -100 /tmp/sprites-import.log; exit 1; }
           # Verify native 2.5D/3D direct courses, Classic 2D diagonals and
           # mode changes before the stripped browser-only resources are built.
-          for suite in classic_mode_test classic_navigation_test ui_test; do
+          for suite in classic_mode_test classic_navigation_test navigation_test simulation_test ui_test; do
             XDG_DATA_HOME="$(mktemp -d)" "$engine" --headless --path rebuild/m3052 \
               --script "tests/${suite}.gd" > "/tmp/${suite}.log" 2>&1 || {
                 tail -120 "/tmp/${suite}.log"; exit 1;
@@ -193,7 +193,7 @@ jobs:
             --title "Abyssal Dominion – Browser-Test ${REV}" \
             --notes "HTML5/WebGL2 guest preview of Abyssal Dominion. Download ZIP and host via HTTP(S); double-clicking index.html from a local file is not supported. Browser login needs an external HTTPS/WSS presence server; local guest gameplay is available without one."
       - name: Notify Vercel when tested branch export is ready
-        if: github.ref == 'refs/heads/feature/classic-seafight-navigation-330'
+        if: github.ref != 'refs/heads/main'
         shell: bash
         env:
           SOURCE_SHA: ${{ github.sha }}
@@ -210,6 +210,7 @@ jobs:
           p.write_text(json.dumps({
               "source_sha": os.environ["SOURCE_SHA"],
               "release": "browser-test-" + os.environ["REV"],
+              "branch": os.environ["GITHUB_REF_NAME"],
           }, indent=2) + "\n", encoding="utf-8")
           PY
           git config user.name 'github-actions[bot]'
