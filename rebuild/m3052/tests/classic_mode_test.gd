@@ -59,7 +59,8 @@ func run() -> void:
 	var game=load("res://sea_map.tscn").instantiate();root.add_child(game);current_scene=game
 	await process_frame;game.set_process(false)
 	var before: Dictionary=game.sim.export_save()
-	check(not game.sim.classic_steering and game.render_mode!="classic","native initial 2.5D / 3D graphics use direct steering")
+	game._set_render_mode("hybrid");await process_frame
+	check(not game.sim.classic_steering and game.render_mode=="hybrid","native 2.5D uses direct steering")
 	game.sim.course(game.sim.player.pos+Vector2(600,0))
 	var destination: Vector2=game.sim.player.path.back()
 	var course: Array=game.sim.player.path.duplicate()
