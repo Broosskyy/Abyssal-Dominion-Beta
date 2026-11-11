@@ -6,6 +6,7 @@ on:
     paths:
       - 'rebuild/m3052/**'
       - 'server/**'
+      - 'web_preview/build.py'
       - '.github/workflows/browser-preview.yml'
 
 concurrency:
