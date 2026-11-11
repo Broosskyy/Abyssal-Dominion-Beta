@@ -791,20 +791,14 @@ func _draw() -> void:
 		_draw_sparkle(sparkle.pos,float(sparkle.id))
 	_draw_sea_edges(view)
 	if not sim.player.path.is_empty():
-		var goal: Vector2 = sim.player.path.back()
-		if sim.classic_steering:
-			# Four-heading "dancing" is a movement detail, not an exposed
-			# 300-piece zigzag polyline. Draw the captain's intended bearing,
-			# not every tiny corrective step (mobile/WebGL performance).
-			if sim.segment_free(sim.player.pos,goal):
-				draw_dashed_line(sim.player.pos,goal,Color(0.50,0.83,0.80,0.28),1.1,16.0)
-			else:
-				draw_dashed_line(sim.player.pos,sim.player.path[0],Color(0.50,0.83,0.80,0.22),1.1,16.0)
-		else:
-			var before: Vector2=sim.player.pos
-			for point: Vector2 in sim.player.path:
-				draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
-				before=point
+		var goal: Vector2=sim.player.path.back()
+		var before: Vector2=sim.player.pos
+		# The chart shows the real obstacle-aware path in ALL view modes.
+		# Classic changes only which four ship sprites are drawn, never
+		# navigation waypoints or world-space course geometry.
+		for point: Vector2 in sim.player.path:
+			draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
+			before=point
 		draw_arc(goal,16+sin(elapsed*3)*2,0,TAU,32,Color(0.54,0.92,0.85,0.7),1.7,true)
 		draw_line(goal-Vector2(22,0),goal+Vector2(22,0),Color(0.5,0.9,0.84,0.5),1.0)
 		draw_line(goal-Vector2(0,16),goal+Vector2(0,16),Color(0.5,0.9,0.84,0.5),1.0)
@@ -1200,7 +1194,7 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 	var id: int=int(actor.get("id",-1))
 	var before: int=int(classic_heading_cache.get(id,-1))
 	var heading: Vector2=actor.get("heading",Vector2.RIGHT)
-	var current: int=VISUALS.heading_eight(heading,before)
+	var current: int=VISUALS.heading_four(heading,before)
 	classic_heading_cache[id]=current
 	return current
 
@@ -1216,9 +1210,10 @@ func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length
 			target.position+=point
 			draw_texture_rect_region(atlas,target,spec.source)
 			return
-		# Frame 0 = North; 1 = NE; 2 = East; ... 7 = NW, exactly as
-		# ship_visuals.heading_eight and the offline Godot GLB renderer.
-		# The camera perspective is ALREADY baked for each heading:
+		# The eight baked frames stay available for future styles. Classic
+		# selects only NE/NW/SW/SE; actual ship position follows its direct
+		# simulated course, independently of how the hull is drawn.
+		# Camera perspective is ALREADY baked for each heading:
 		# never rotate 2D atlas frames or the sails become inaccurate.
 		var heading_index: int=_classic_frame_for_actor(actor)
 		var frame_width: float=float(atlas.get_width())/float(CLASSIC_ATLAS_COLUMNS)
@@ -1233,7 +1228,8 @@ func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length
 	var art: Texture2D=_classic_ship_texture(actor)
 	if art==null:return
 	var h: float=length*.667
-	draw_set_transform(point,heading.angle(),Vector2.ONE)
+	var classic_angle: float=float({1:-PI*.25,7:-PI*.75,5:PI*.75,3:PI*.25}.get(_classic_frame_for_actor(actor),heading.angle()))
+	draw_set_transform(point,classic_angle,Vector2.ONE)
 	draw_texture_rect(art,Rect2(Vector2(-length*.5,-h*.5),Vector2(length,h)),false)
 	draw_set_transform(Vector2.ZERO)
 
@@ -4115,7 +4111,7 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Seafight-artige diagonale Zickzack-Fahrt mit festen Schiffsansichten. 2,5D / 3D: direkte Kurse ohne Zickzack. Beim Umschalten bleibt das Ziel erhalten.")
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: vier feste Seafight-artige Schiffsansichten, direkte Fahrt ohne künstlichen Zickzackkurs. 2,5D / 3D: gleiche direkte Steuerung mit 3D-Grafik.")
 	_note("DATENUPDATE %d · CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
 		if OS.has_feature("web"):
@@ -4129,7 +4125,7 @@ func _open_display() -> void:
 				var key: String=str(option[0])
 				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 				choice.disabled=render_mode==key
-			_note("Classic 2D: gestufte 45°-Seerouten. 2,5D / 3D: normale direkte Schiffssteuerung. Umschalten berechnet die noch offene Strecke zum selben Ziel neu; Fortschritt und Position bleiben erhalten.")
+			_note("Classic 2D: vier feste 2D-Schiffsansichten (NE/NW/SW/SE), kein erzwungenes Zickzack. Alle Grafikmodi nutzen dieselbe direkte Fahrt und dieselbe Küstenumfahrung; Umschalten verändert niemals den aktiven Kurs.")
 		_section("SCHIFFE & SEEKARTE")
 		var ship_grid=_grid(2)
 		_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
@@ -4261,7 +4257,7 @@ func _open_menu_hub() -> void:
 
 func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
-	_note("Browser: Classic 2D mit diagonalem Fahrweg. App/Desktop: Classic 2D ebenfalls diagonal, 2,5D und 3D dagegen direkt. Gleiche Schiffswerte und gemeinsamer Online-Spielstand.",Color("9be4df"))
+	_note("Browser: Classic 2D mit vier festen Schiffsansichten, direkter Fahrt ohne künstliches Zickzack. App/Desktop: Classic 2D, 2,5D und 3D benutzen identische Schiffskurse. Gleiche Schiffswerte und gemeinsamer Online-Spielstand.",Color("9be4df"))
 	if not OS.has_feature("web"):
 		var modes=_grid(3)
 		for option in [["classic","CLASSIC 2D"],["hybrid","2,5D"],["3d","3D"]]:
@@ -4995,12 +4991,9 @@ func _set_render_mode(value: String) -> void:
 	else:
 		browser_classic=false;render_mode=value;_ensure_mesh_layer()
 		mesh_layer.set_render_mode(value);render_mode=mesh_layer.mode
-	# This is a gameplay steering choice, not merely a different renderer:
-	# active routes replan to their original destination immediately.
-	var steering_changed: bool=sim.classic_steering!=browser_classic
+	# Classic is a visual renderer choice. Never rewrite or resend the
+	# physical ship route when swapping 2D/2.5D/3D.
 	sim.set_classic_steering(browser_classic)
-	if steering_changed and not sim.player.path.is_empty():
-		_send_online_course(Vector2(sim.player.path.back()))
 	classic_heading_cache.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
