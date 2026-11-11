@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 import zipfile
 import base64
@@ -129,10 +130,21 @@ def main():
     for script in ['content.gd', 'simulation.gd', 'sim_staff_ops.gd', 'sim_bonus_ops.gd', 'sim_guild_ops.gd', 'ship_visuals.gd', 'updater/update_model.gd', 'updater/update_controller.gd', 'updater/launcher.gd', 'navigation.gd', 'updater/data_model.gd', 'updater/data_controller.gd', 'updater/data_boot.gd']:
         checked([engine, '--headless', '--path', str(ROOT), '--check-only', '--script', script], output.with_suffix('.'+script.replace('/', '_')+'.check.log'))
     checked([engine, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.import.log'))
+    # Bake after the source-art audit: the GLB importer creates embedded
+    # texture files which must not be mistaken for extra authored previews.
+    # Native Classic ships the exact same source-model atlases as the Web.
+    bake_env = dict(os.environ, LIBGL_ALWAYS_SOFTWARE='1')
+    baked = checked(['xvfb-run', '-a', '--server-args=-screen 0 1280x720x24', engine,
+                     '--audio-driver', 'Dummy', '--path', str(ROOT), '--script',
+                     'tools/bake_web_fleet.gd'], output.with_suffix('.classic-bake.log'), bake_env)
+    if 'WEB_SPRITES_READY' not in baked or '"status":"PASS"' not in baked:
+        raise RuntimeError('Missing verified native Classic fleet')
+    checked([sys.executable, str(ROOT/'tools/embed_native_classic.py')], output.with_suffix('.classic-index.log'))
+    checked([engine, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.classic-import.log'))
     if prepare_texture_quality(ROOT):
         checked([engine, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.texture-quality.log'))
     results = []
-    for name in ['download_recovery_test', 'expansion_test', 'frontier_test', 'simulation_test', 'progression_test', 'sea_edges_test', 'seafight_systems_test', 'ship_visual_test', 'stern_hull_taper_test', 'combat_fx_test', 'ui_test', 'start_hub_test', 'updater_test', 'navigation_test', 'chart_presentation_test', 'deck_progression_test', 'ammo_picker_test', 'content_update_test']:
+    for name in ['download_recovery_test', 'expansion_test', 'frontier_test', 'simulation_test', 'progression_test', 'sea_edges_test', 'classic_mode_test', 'seafight_systems_test', 'ship_visual_test', 'stern_hull_taper_test', 'combat_fx_test', 'ui_test', 'start_hub_test', 'updater_test', 'navigation_test', 'chart_presentation_test', 'deck_progression_test', 'ammo_picker_test', 'content_update_test']:
         with tempfile.TemporaryDirectory() as user_data:
             env = dict(os.environ, XDG_DATA_HOME=user_data)
             # UI navigation verifies deferred container layout across extra frames.

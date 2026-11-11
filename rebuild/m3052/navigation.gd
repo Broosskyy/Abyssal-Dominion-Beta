@@ -1,7 +1,8 @@
 extends RefCounted
-## Four authored diagonal views get matching real diagonal courses.
-## Eight/16-view sprites and future 3D renderers retain free navigation.
+## Classic steering: short diagonal courses with immediate direction changes.
+## Shared by sprites and GLB presentation so crossplay follows identical paths.
 static func diagonal_leg(start: Vector2,goal: Vector2,max_leg: float=96,first_side: int=1) -> Array[Vector2]:
+	max_leg=maxf(1.0,max_leg)
 	var result: Array[Vector2]=[]
 	var delta=goal-start
 	if delta.length()<0.01:return result
@@ -12,7 +13,7 @@ static func diagonal_leg(start: Vector2,goal: Vector2,max_leg: float=96,first_si
 	var budgets=[(absf(main)+cross)*0.5,(absf(main)-cross)*0.5]
 	var side=0 if first_side>=0 else 1
 	var point=start
-	for _i in 2000:
+	for _i in ceili(absf(main)/max_leg)+2:
 		if float(budgets[0])+float(budgets[1])<0.01:break
 		if float(budgets[side])<0.01:side=1-side
 		var amount=minf(max_leg,float(budgets[side]))

@@ -256,8 +256,7 @@ var projectile_visual_count := 3 # purely cosmetic per actual hit: 1, 3, 5 or 8
 const VFX_DEFAULT_FLAGS := {"enabled":true,"flight":true,"muzzle":true,"impact":true,"particles":true,"water":true,"flashes":true}
 var vfx_flags: Dictionary = VFX_DEFAULT_FLAGS.duplicate(true)
 var vfx_intensity := 1.35
-# Browser only. Native APK/desktop visuals keep their existing fidelity.
-# The player may opt back into full-quality WebGL2 from Anzeige → Grafik.
+# Classic is mandatory on Web and selectable on native. It uses no 3D stage.
 var browser_classic := OS.has_feature("web")
 var classic_atlases: Dictionary={}
 var classic_geometry: Dictionary={}
@@ -330,6 +329,7 @@ func _ready() -> void:
 	_load_progress()
 	_load_staff()
 	_load_display()
+	if browser_classic:_load_classic_atlases()
 	get_tree().set_meta("abyssal_ui_motion",ambient_motion_enabled)
 	previous_region=sim.map_id
 	camera = Camera2D.new()
@@ -487,11 +487,16 @@ func _sharp_zoom() -> float:
 func _load_classic_atlases() -> void:
 	if browser_classic:
 		var metadata_path: String=CLASSIC_ATLAS_ROOT+"manifest.json"
-		if FileAccess.file_exists(metadata_path):
-			var metadata=JSON.parse_string(FileAccess.get_file_as_string(metadata_path))
-			if metadata is Dictionary:
-				for entry: Dictionary in metadata.get("atlases",[]):classic_geometry[str(entry.name)]=entry
-				classic_monster_bottoms=metadata.get("monster_bottoms",{})
+		var metadata: Variant=null
+		if FileAccess.file_exists(metadata_path):metadata=JSON.parse_string(FileAccess.get_file_as_string(metadata_path))
+		else:
+			# Signed native exports include this index already; JSON sidecars
+			# need not alter the installed updater/bootstrap export settings.
+			var provenance: Variant=JSON.parse_string(FileAccess.get_file_as_string("res://assets/provenance.json"))
+			if provenance is Dictionary:metadata=provenance.get("classic_fleet")
+		if metadata is Dictionary:
+			for entry: Dictionary in metadata.get("atlases",[]):classic_geometry[str(entry.name)]=entry
+			classic_monster_bottoms=metadata.get("monster_bottoms",{})
 		var baked_keys: Array[String]=[]
 		for model_key: String in CLASSIC_MODEL_KEYS:baked_keys.append(model_key)
 		for index in range(1,11):baked_keys.append("elite_%02d" % index)
@@ -1598,20 +1603,23 @@ func _orb(parent: Node,semantic: String,texture: Texture2D,callback: Callable,ca
 func _set_orb(button: Button,texture: Texture2D,amount: String="",active: bool=false,caption: String="") -> void:
 	button.set("art",texture);button.set("quantity",amount);button.set("latched",active);button.set("caption",caption);button.queue_redraw()
 
+func _ensure_mesh_layer(layer: CanvasLayer=null) -> void:
+	if mesh_layer!=null:return
+	if layer==null:layer=ui.get_parent() as CanvasLayer
+	mesh_layer=load(MESH_SHIPS_PATH).new()
+	mesh_layer.name="Real3DNpcFleet";mesh_layer.host=self
+	layer.add_child(mesh_layer);layer.move_child(mesh_layer,0)
+	mesh_layer.set_render_mode(render_mode)
+	render_mode=mesh_layer.mode
+
+func _classic_fleet_ready() -> bool:
+	return classic_atlases.size()==23 and classic_geometry.size()==23
+
 func _build_ui() -> void:
 	var layer =CanvasLayer.new()
 	add_child(layer)
-	# Browser Classic: zero GLB instances, zero 3D draw passes, zero transparent
-	# screen-sized SubViewport. Native APK/Desktop keep their existing 3D fleet.
-	if browser_classic:
-		render_mode="classic"
-	else:
-		mesh_layer=load(MESH_SHIPS_PATH).new()
-		mesh_layer.name="Real3DNpcFleet"
-		mesh_layer.host=self
-		layer.add_child(mesh_layer)
-		mesh_layer.set_render_mode(render_mode)
-		render_mode=mesh_layer.mode
+	if browser_classic:render_mode="classic"
+	else:_ensure_mesh_layer(layer)
 	# Screen-space captain/NPC readouts, independent of all Camera2D zoom/pan.
 	plate_overlay=PLATE_OVERLAY.new()
 	plate_overlay.host=self
@@ -1733,7 +1741,7 @@ func _build_ui() -> void:
 	render_toggle.name="GraphicsModeToggle"
 	render_toggle.tooltip_text="Browser: klassisches 2D ohne 3D; App: echtes 2,5D/3D"
 	render_toggle.add_theme_font_size_override("font_size",10)
-	if browser_classic:render_toggle.hide()
+	if OS.has_feature("web"):render_toggle.hide()
 	attack=_orb(ui,"Feuer ein/aus",extra_icons.cannon_action,_toggle_fire,"FEUER");attack.name="FireButton"
 	attack.set("hero",true)
 	repair=_orb(ui,"Schiff reparieren",extra_icons.upgrade_hull,func():sim.toggle_repair();_refresh_ui(),"REP");repair.name="RepairButton"
@@ -2031,8 +2039,8 @@ func _refresh_ui() -> void:
 	if gold_label==null:return
 	if render_toggle!=null:
 		render_toggle.text="GRAFIK CLASSIC 2D" if browser_classic else {"hybrid":"GRAFIK 2,5D","3d":"GRAFIK 3D"}.get(render_mode,"GRAFIK 2,5D")
-		render_toggle.disabled=browser_classic or mesh_layer==null or not mesh_layer.has_complete_fleet()
-		render_toggle.visible=not browser_classic
+		render_toggle.disabled=false
+		render_toggle.visible=not OS.has_feature("web")
 	var today=Time.get_date_string_from_system()
 	var contracts_ready: bool=sim.sea_contracts.ready_count(sim)>0
 	var quest_ready=not sim.current_quest().is_empty() and sim.quest_progress()>=int(sim.current_quest().goal)
@@ -3023,7 +3031,7 @@ func _add_shipyard_card(index: int,container: Node,frames: Array[Control]) -> vo
 	var hint: String=str(skins[index].name).to_upper() if index>=12 else "ELITE %02d · %s" % [index-1,ELITE_V2_NAMES[index-2].to_upper()] if index>=2 else ("BLACK CROWN · ORIGINAL-TEST" if index==1 else "SCHATTENKRIEGSSCHIFF · STANDARD")
 	var description=_text(column,hint,13,accent)
 	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var details=_text(column,"Browser: Classic-2D-Schiff · App: 3D-Original" if browser_classic else ("Echtes 3D-GLB · 2,5D & 3D · Nur Design" if index>=2 else "Originalgeometrie · Gleiche Werte"),12,Color("c0d5d5"))
+	var details=_text(column,"Classic-2D-Ansichten aus dem Originalmodell" if browser_classic else ("Echtes 3D-GLB · 2,5D & 3D · Nur Design" if index>=2 else "Originalgeometrie · Gleiche Werte"),12,Color("c0d5d5"))
 	details.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	var label: String=str(skins[index].name).to_upper()+"\n"+("AKTIV · AUSGERÜSTET" if chosen else ("AUSRÜSTEN · TEST" if model_ok else "TEXTUR / MODELL FEHLT"))
 	var choose=_button(column,label,func():_equip(choice),"normal" if chosen else "primary")
@@ -4076,21 +4084,21 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Browser: leichte Classic-2D-Seekarte im Stil von 2010–2016, mit eigenen Schiffs-Grafiken. Die Android-App und Desktop nutzen weiterhin originale GLB-Schiffe." if browser_classic else "Zwei Grafikmodi: 2,5D oder 3D. Die originalen GLB-Schiffe bleiben erhalten.")
-	_note("DATENUPDATE %d · BROWSER CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: kurze diagonale Kurse mit direktem Ansichtswechsel. App und Desktop bieten zusätzlich 2,5D und 3D. Alle Modi verwenden dieselben Kurse und Spielwerte.")
+	_note("DATENUPDATE %d · CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
-		if browser_classic:
+		if OS.has_feature("web"):
 			_section("BROWSER CLASSIC · 2D")
 			_note("AKTIV · Originale 2D-Schiffsgrafiken, ruhiges Meeresmuster, keine 3D-Szene und kein WebGL-3D-Schattenpass.",Color("a1dacf"))
 			_note("FPS: %d · Schiffe: 2D · 3D-Berechnung: AUS" % Engine.get_frames_per_second(),Color("f1d39a"))
 			_note("Die Werft, Seekarten, Decks, Kämpfe und Steuerung funktionieren mit derselben Spielmechanik. 3D gibt es weiterhin in der APK/Desktop-Version.")
 		else:
 			_section("GRAFIKMODUS")
-			for option in [["hybrid","2,5D / HYBRID"],["3d","3D"]]:
+			for option in [["classic","CLASSIC 2D"],["hybrid","2,5D / HYBRID"],["3d","3D"]]:
 				var key: String=str(option[0])
 				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
-				choice.disabled=render_mode==key or (mesh_layer==null or not mesh_layer.has_complete_fleet())
-			_note("Zwei originale Spieler-GLBs, neun NPC-GLBs und zehn Materialvarianten des Black Crown Corsair. Gleiche Mechanik und Seekarten.")
+				choice.disabled=render_mode==key
+			_note("Classic 2D verwendet vorberechnete Ansichten deiner Originalmodelle und deaktiviert die 3D-Schiffsszene. Die Auswahl wird gespeichert; Schiff, Kurs und Fortschritt bleiben erhalten.")
 		_section("SCHIFFE & SEEKARTE")
 		var ship_grid=_grid(2)
 		_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
@@ -4210,13 +4218,13 @@ func _open_menu_hub() -> void:
 
 func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
-	_note("Browser: Classic-2D-Seekarte mit eigenen Schiffen. In App/Desktop stehen 2,5D und 3D zur Verfügung." if browser_classic else "Werft: Schattenkriegsschiff, Original-Corsair-Testmodell und Elite-Designs 01–10. Dazu neun NPC-GLBs.",Color("9be4df"))
-	if not browser_classic:
-		var modes=_grid(2)
-		for option in [["hybrid","2,5D"],["3d","3D"]]:
+	_note("Browser: Classic 2D. App/Desktop: Classic 2D, 2,5D oder 3D unter Anzeige > Grafik. Gleiche Schiffe, Kurse und Spielwerte.",Color("9be4df"))
+	if not OS.has_feature("web"):
+		var modes=_grid(3)
+		for option in [["classic","CLASSIC 2D"],["hybrid","2,5D"],["3d","3D"]]:
 			var key: String=str(option[0])
 			var button=_action(str(option[1])+(" ✓" if key==render_mode else ""),func():_set_render_mode(key),"tab_on" if key==render_mode else "normal",modes)
-			button.disabled=key==render_mode or (mesh_layer==null or not mesh_layer.has_complete_fleet())
+			button.disabled=key==render_mode
 	var links=_grid(2)
 	_with_icon(_action("SPIELERPROFIL",func():_open_modal("Profil"),"normal",links),painted.nav_ranking)
 	_with_icon(_action("TAGESBONUS & AFK",func():_open_modal("Belohnungen"),"normal",links),painted.reward_chest)
@@ -4738,7 +4746,9 @@ func _load_display() -> void:
 	hud_size=clampi(int(data.get("hud_size",1)),0,2)
 	journal_visible=bool(data.get("journal_visible",true))
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
-	render_mode="classic" if browser_classic else ("3d" if str(data.get("render_mode","hybrid"))=="3d" else "hybrid")
+	render_mode="classic" if OS.has_feature("web") else str(data.get("render_mode","hybrid"))
+	if not render_mode in ["classic","hybrid","3d"]:render_mode="hybrid"
+	browser_classic=render_mode=="classic"
 	projectile_visual_count=COMBAT_FX.visual_count(int(data.get("projectile_visual_count",3)))
 	var stored_flags: Variant=data.get("vfx_flags",{})
 	if stored_flags is Dictionary:
@@ -4759,8 +4769,8 @@ func _load_display() -> void:
 	quick_page=clampi(int(data.get("quick_page",0)),0,2)
 
 func _cycle_render_mode() -> void:
-	if browser_classic:return
-	_set_render_mode("3d" if render_mode=="hybrid" else "hybrid")
+	if OS.has_feature("web"):return
+	_set_render_mode({"classic":"hybrid","hybrid":"3d","3d":"classic"}.get(render_mode,"classic"))
 
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
@@ -4902,18 +4912,26 @@ func _set_projectile_visual_count(requested: int) -> void:
 	queue_redraw()
 
 func _set_render_mode(value: String) -> void:
-	if browser_classic:
+	if OS.has_feature("web"):value="classic"
+	if not value in ["classic","hybrid","3d"]:value="hybrid"
+	if value=="classic":
+		var previous: bool=browser_classic
+		browser_classic=true;_load_classic_atlases()
+		if not _classic_fleet_ready():
+			browser_classic=previous;sim.message="Classic-Schiffsdaten fehlen · bitte Datenupdate laden";return
 		render_mode="classic"
-		return
-	render_mode=value if value in ["hybrid","3d"] else "hybrid"
-	if mesh_layer!=null:
-		mesh_layer.set_render_mode(render_mode)
-		render_mode=mesh_layer.mode
-	_persist_display_preferences()
+		if mesh_layer!=null:
+			mesh_layer.hide();mesh_layer.stage.render_target_update_mode=SubViewport.UPDATE_DISABLED
+			mesh_layer.queue_free();mesh_layer=null
+	else:
+		browser_classic=false;render_mode=value;_ensure_mesh_layer()
+		mesh_layer.set_render_mode(value);render_mode=mesh_layer.mode
+	classic_heading_cache.clear()
+	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
+	_persist_display_preferences();_apply_web_performance()
 	if camera!=null:_sync_plate_overlay()
 	if modal.visible and modal_kind in ["Anzeige","Spielinfo"]:_open_modal(modal_kind)
-	_refresh_ui()
-	queue_redraw()
+	_refresh_ui();queue_redraw()
 
 func _set_display(size_index: int,show_journal: bool) -> void:
 	hud_size=clampi(size_index,0,2)

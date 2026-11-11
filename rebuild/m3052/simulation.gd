@@ -162,7 +162,7 @@ func _init() -> void:
 			"patrol":i%4,"aggressive":false,"slow":0.0,"respawn":0.0,
 			"reward":int(spec.reward) if meshy_ready else (110 if elite else 55),"art":i,"elite":elite,
 			"visual_key":str(spec.key),"view_count":4,"renderer":"mesh" if meshy_ready else "sprite",
-			"navigation":"free" if meshy_ready else "four_diagonal","last_hit":-100.0})
+			"navigation":"classic_diagonal","last_hit":-100.0})
 	npcs.append({"id": 100, "name": "Tiamat · Tiefenwächter", "kind": "monster", "pos": Vector2(2590, 1750),
 		"home": Vector2(2590, 1750), "heading": Vector2.LEFT, "path": [], "hp": 1650,
 		"max_hp": 1650, "shield": 0, "max_shield": 0, "speed": 28.0, "reload": 1.0, "repath": 0.0, "state": "patrol",
@@ -274,29 +274,37 @@ func plan_path(start: Vector2, goal: Vector2) -> Array[Vector2]:
 	if segment_free(current, goal): result.append(goal)
 	return result
 
-func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
-	var base=plan_path(body.pos,goal)
-	if int(body.get("view_count",8))!=4 or str(body.get("renderer","sprite"))!="sprite":return base
+func classic_path(start: Vector2,goal: Vector2,heading: Vector2=Vector2.RIGHT) -> Array[Vector2]:
+	# Real short diagonal legs, shared by every client and the presence server.
+	# Rendering mode never changes course length, hit position or movement speed.
+	var base: Array[Vector2]=plan_path(start,goal)
 	var result: Array[Vector2]=[]
-	var before: Vector2=body.pos
+	var before: Vector2=start
 	for waypoint: Vector2 in base:
-		var accepted=false
-		var cross_heading: float=body.heading.y if absf(waypoint.x-before.x)>=absf(waypoint.y-before.y) else body.heading.x
-		var preferred_side=1 if cross_heading>0.01 else (-1 if cross_heading< -0.01 else (1 if int(body.id)%2==0 else -1))
-		for size in [150.0,96.0,48.0,24.0,12.0]:
+		var accepted: bool=false
+		var cross_heading: float=heading.y if absf(waypoint.x-before.x)>=absf(waypoint.y-before.y) else heading.x
+		var preferred_side: int=1 if cross_heading>=0.0 else -1
+		for length in [64.0,32.0,16.0,8.0,4.0]:
 			for side in [preferred_side,-preferred_side]:
-				var legs=NAV.diagonal_leg(before,waypoint,size,side)
-				var cursor=before
-				var safe=true
+				var legs: Array[Vector2]=NAV.diagonal_leg(before,waypoint,length,side)
+				var cursor: Vector2=before
+				var safe: bool=true
 				for leg: Vector2 in legs:
 					if not segment_free(cursor,leg):safe=false;break
 					cursor=leg
-				if safe:
+				if safe and result.size()+legs.size()+base.size()<=512:
 					result.append_array(legs);accepted=true;break
 			if accepted:break
-		if not accepted:return []
+		if not accepted:
+			# Tight coast/berth: retain the already-validated short passage
+			# instead of blocking an otherwise reachable destination.
+			result.append(waypoint)
 		before=waypoint
 	return result
+
+func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
+	if str(body.get("kind",""))=="monster":return plan_path(body.pos,goal)
+	return classic_path(body.pos,goal,body.heading)
 
 func course(point: Vector2) -> bool:
 	pending_portal=-1
@@ -305,7 +313,7 @@ func course(point: Vector2) -> bool:
 	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
 	var route: Array[Vector2] = []
 	if staff.flag("no_collision"): route.append(point.clamp(Vector2(40, 40), WORLD - Vector2(40, 40)))
-	else: route = plan_path(player.pos, point)
+	else: route = classic_path(player.pos, point,player.heading)
 	if route.is_empty():
 		message = "Küste voraus · bitte freies Wasser wählen"
 		return false

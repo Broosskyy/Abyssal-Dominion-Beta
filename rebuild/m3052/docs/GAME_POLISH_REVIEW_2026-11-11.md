@@ -92,3 +92,13 @@ Für unser Spiel abgeleitet: Auf der Seekarte die wichtigsten Informationen dire
 - Der Animationsschalter friert auch den Tiamat ein. Treffflächen und Namensanker bleiben unabhängig von der Bewegung. Keine NPC- oder Spielerschiffsmodelle geändert.
 - Prüfung: 561 zusätzliche Simulation-/Animationschecks, 6 GPU-Bewegungsvergleiche (bewegte Monster verändern Pixel, ruhende bleiben identisch), bestehende UI-/Navigation-/Progressionsprüfungen sowie HTTP/WebSocket-Tests.
 - Weiterer Feinschliff: eigene gezeichnete Monster-Angriffs-/Trefferphasen, Küsten-/Hafenübergänge, regionsbezogene Begegnungsdichte und zusätzliche Umgebungsdetails.
+
+## Folgepaket: klassische Fahrbewegung und native 2D-Auswahl
+
+- Grundlage ist das vom Nutzer hochgeladene Bewegungsbeispiel `208771.mp4`: kurze diagonale Fahrstücke, sofortiger Ansichtswechsel, kein Wendebogen.
+- Spieler und Schiffspatrouillen verwenden gemeinsame echte diagonale Kurse mit bis zu 64 Einheiten pro Teilstrecke. Ein neuer Tipp ersetzt den bisherigen Kurs direkt. Acht vorhandene Modellansichten bleiben verfügbar; freies Wasser nutzt überwiegend die vier diagonalen Perspektiven.
+- An engen Küsten/Hafenpassagen bleibt ein bereits kollisionsgeprüfter kurzer Abschnitt zulässig, wenn kein diagonaler Ausschlag sicher ist. Monster behalten ihre eigene Navigation.
+- Die Physik ist für Browser, Android und alle Darstellungen gleich. Der Grafikmodus verändert weder Geschwindigkeit noch Treffpositionen oder den laufenden Kurs. Der Presence-Server folgt der vollständigen Wegpunktfolge und akzeptiert begrenzt bis zu 512 Punkte; zwei echte Godot-Clients prüfen wechselnde diagonale Richtungen.
+- Unter Anzeige > Grafik können native Nutzer Classic 2D, 2,5D oder 3D wählen. Classic entfernt die 3D-Flottenansicht vollständig und erstellt beim nächsten Start ebenfalls keinen 3D-Viewport. Zurückschalten stellt die originalen GLBs wieder her.
+- Native Pakete rendern die gleichen 23 originalmodellbasierten Atlanten wie der Browser vor. Ihre Geometrie-Metadaten sind im bereits exportierten Provenienzindex enthalten, sodass die vorhandene APK die Funktion über ein signiertes Datenupdate erhält. Kein zusätzlicher Schiffsgrafik-Download im Browser.
+- Prüfungen: neue Modus-/Kursregression, Wechsel während laufender Fahrt, gespeicherte Auswahl und Neustart, Flotte zurück in 3D, unabhängiger Start und Wechsel aus dem tatsächlichen signierten Datenpaket. Native 2D zusätzlich im echten OpenGL-Renderer visuell geprüft.

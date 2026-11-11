@@ -45,6 +45,8 @@ class CrossplayTest(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(World.route({'route':[[8700,6300]]}))
         self.assertIsNone(World.route({'route':[[8801,6300]]}))
         self.assertIsNone(World.route({'route':[[8700,6401]]}))
+        self.assertIsNotNone(World.route({'route':[[4200+i,2900] for i in range(200)]}))
+        self.assertIsNone(World.route({'route':[[4200,2900]]*513}))
         response=await self.client.post('/v1/login',json={'protocol':1,'email':'old@example.com','password':'test-password-937'})
         self.assertEqual(response.status,409)
         path=str(Path(self.temp.name)/'legacy.db')

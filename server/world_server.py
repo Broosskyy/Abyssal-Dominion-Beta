@@ -51,7 +51,7 @@ class World:
     @staticmethod
     def route(data):
         route = data.get('route', [[data.get('x'), data.get('y')]])
-        if not isinstance(route,list) or not 1 <= len(route) <= 128: return None
+        if not isinstance(route,list) or not 1 <= len(route) <= 512: return None
         result = []
         for point in route:
             if not isinstance(point,list) or len(point)!=2: return None
@@ -124,7 +124,7 @@ class World:
     async def websocket(self, request):
         if len(self.peers)>=MAX_CLIENTS or self.limited(('ws',request.remote),30):
             return web.json_response({'error':'Server ausgelastet'},status=429)
-        ws = web.WebSocketResponse(heartbeat=20,max_msg_size=16384)
+        ws = web.WebSocketResponse(heartbeat=20,max_msg_size=65536)
         await ws.prepare(request)
         peer = None
         try:

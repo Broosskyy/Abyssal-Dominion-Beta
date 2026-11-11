@@ -9,12 +9,12 @@ func _initialize() -> void:
 	var sim=SIM.new()
 	check(sim.npcs.size()==20,"16 ship patrols and four monsters exist")
 	var npc=sim.npcs[0]
-	check(str(npc.renderer)=="mesh" and str(npc.navigation)=="free","real GLB ships use unrestricted navigation rather than four-sprite zigzags")
+	check(str(npc.renderer)=="mesh" and str(npc.navigation)=="classic_diagonal","ship steering is classic diagonal regardless of GLB or sprite presentation")
 	check(float(npc.speed)<=40.0 and float(sim.npcs[8].speed)<=46.0,"normal and elite NPC speed is rebalanced")
 	var sample: Dictionary=npc.duplicate(true)
 	sample.pos=Vector2(400,400)
 	var free_goal:=Vector2(675,535)
-	check(sim.plan_actor_path(sample,free_goal)==sim.plan_path(sample.pos,free_goal),"GLB ships navigate directly without injected diagonal legs")
+	check(sim.plan_actor_path(sample,free_goal)==sim.classic_path(sample.pos,free_goal,sample.heading),"native GLBs share the same classic course as browser ships")
 	var rested: Dictionary=npc.duplicate(true)
 	rested.pos=Vector2(400,400)
 	rested.home=rested.pos

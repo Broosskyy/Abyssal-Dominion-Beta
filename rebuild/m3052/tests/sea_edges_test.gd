@@ -23,11 +23,17 @@ func _initialize() -> void:
 				var inward: Vector2={"east":Vector2.LEFT,"west":Vector2.RIGHT,"north":Vector2.DOWN,"south":Vector2.UP}[edge]
 				sim.player.pos=point+inward*140.0
 				check(sim.course(point) and sim.pending_portal==-1,"ordinary sailing accepts noncentral edge point")
-				for step in 60:
+				var exit_tangent: Vector2=point
+				for step in 90:
+					# Crossing may happen during the final diagonal leg; compare
+					# against the actual exit point, not the tap beyond the band.
+					var before_step: Vector2=sim.player.pos
 					sim.step(1.0/30.0)
+					if sim.map_id!=origin:
+						exit_tangent=before_step+sim.player.heading*minf(165.0/30.0,before_step.distance_to(point))
 					if sim.map_id!=origin:break
 				check(sim.map_id==dest,"entire %s edge crosses from %d at %.2f" % [edge,origin,tangent])
-				var preserved: bool=absf(sim.player.pos.y-point.y)<1 if edge in ["east","west"] else absf(sim.player.pos.x-point.x)<1
+				var preserved: bool=absf(sim.player.pos.y-exit_tangent.y)<1 if edge in ["east","west"] else absf(sim.player.pos.x-exit_tangent.x)<1
 				check(preserved and not sim.blocked(sim.player.pos),"opposite-side arrival preserves tangent in safe water")
 				check(sim.player.gold==before_gold and sim.player.ammo==stock and int(sim.player.shield)==777,"crossing preserves wallet, ammunition and shield")
 				sim.npcs.clear();sim.step(.1)

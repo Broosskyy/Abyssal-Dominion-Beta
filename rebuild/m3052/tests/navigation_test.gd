@@ -19,7 +19,7 @@ func _initialize() -> void:
 	var sim=SIM.new()
 	var body=sim.npcs[0];body.pos=Vector2(500,500)
 	var route=sim.plan_actor_path(body,Vector2(950,500))
-	check(str(body.renderer)=="mesh" and route==sim.plan_path(body.pos,Vector2(950,500)) and route.size()==1,"full Meshy GLBs navigate freely instead of alternating artificial diagonals")
+	check(str(body.renderer)=="mesh" and route==sim.classic_path(body.pos,Vector2(950,500),body.heading) and route.size()>1,"native GLB ships follow the shared classic diagonal course")
 	var before: Vector2=body.pos
 	var safe=true
 	for point: Vector2 in route:
@@ -27,10 +27,10 @@ func _initialize() -> void:
 	check(safe,"every GLB route segment remains coastline-safe")
 	body.path=route
 	var stable_course=true
-	for _i in 160:
+	for _i in 240:
 		sim._move(body,0.1)
-		if not body.path.is_empty():stable_course=stable_course and body.heading.dot(Vector2.RIGHT)>.999
-	check(stable_course and body.pos.distance_to(Vector2(950,500))<0.01,"free path sails directly toward the goal without artificial zigzags")
+		if not body.path.is_empty():stable_course=stable_course and absf(absf(body.heading.x)-absf(body.heading.y))<.001
+	check(stable_course and body.pos.distance_to(Vector2(950,500))<0.01,"classic path sails to the exact goal using diagonal headings")
 	# Legacy four-angle sprites still retain the old detour algorithm.
 	body.pos=Vector2(500,500)
 	body.renderer="sprite";body.view_count=4
@@ -43,9 +43,9 @@ func _initialize() -> void:
 		before=waypoint
 	check(diagonal_fallback and before.distance_to(Vector2(950,500))<0.01,"actual four-view sprite fallback keeps diagonal headings")
 	body.renderer="mesh";body.view_count=4
-	check(sim.plan_actor_path(body,Vector2(950,500)).size()==1,"3D ship renderer never inherits sprite zigzag restriction")
+	check(sim.plan_actor_path(body,Vector2(950,500)).size()>1,"3D presentation follows the same classic steering as 2D")
 	body.view_count=8
-	check(sim.plan_actor_path(body,Vector2(950,500)).size()==1,"eight-view ships retain free straight navigation")
+	check(sim.plan_actor_path(body,Vector2(950,500)).size()>1,"eight-view atlases follow shared four-direction sailing")
 	for map_index in [0,1,2]:
 		sim.configure_map(map_index)
 		sim.shots.clear()

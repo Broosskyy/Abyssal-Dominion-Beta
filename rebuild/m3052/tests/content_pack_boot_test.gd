@@ -30,6 +30,12 @@ func _run() -> void:
 	check(game.mesh_layer.has_player_ship() and game.mesh_layer.has_elite_1_ship(),"signed pack contains both original shaded and Elite 1 GLBs")
 	check(game.mesh_layer.model_scenes.size()==11,"original nine NPC plus two selectable player GLBs in runtime")
 	check(not ResourceLoader.exists("res://assets/player/test_ships/gemi11_uv.glb"),"signed pack excludes retired Gemi11")
+	var metadata: Variant=JSON.parse_string(FileAccess.get_file_as_string("res://assets/provenance.json"))
+	check(metadata is Dictionary and metadata.get("classic_fleet",{}).get("atlases",[]).size()==23,"native 2D metadata mounts from the exported provenance index")
+	var saved: Dictionary=game.sim.export_save()
+	game._set_render_mode("classic");await process_frame
+	check(game.mesh_layer==null and game._classic_fleet_ready() and game.render_mode=="classic","native Classic works from the actual signed pack without a 3D stage")
+	check(game.sim.player.gold==int(saved.gold) and game.sim.player.skin==int(saved.skin),"signed-pack graphics switch preserves captain and wallet")
 	var next_spec=JSON.parse_string(FileAccess.get_file_as_string("res://fixture.json"))
 	DirAccess.copy_absolute(ProjectSettings.globalize_path("res://fixture.zip"),ProjectSettings.globalize_path("user://content_a.zip"))
 	DirAccess.copy_absolute(ProjectSettings.globalize_path("res://fixture.zip"),ProjectSettings.globalize_path("user://content_b.zip"))
