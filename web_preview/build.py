@@ -46,10 +46,11 @@ def main() -> None:
     ready_tag = ""
     if baseline_preview:
         marker = Path(__file__).with_name("export-ready.json")
-        if marker.is_file():
-            # Written only after CI has baked, tested and published the exact
-            # branch release; the marker itself changes the Vercel commit SHA.
-            ready = json.loads(marker.read_text(encoding="utf-8"))
+        ready = json.loads(marker.read_text(encoding="utf-8")) if marker.is_file() else {}
+        # A new feature branch can inherit the old feature's ready marker
+        # through a squash merge. Never misrepresent an unrelated verified
+        # browser build as the new branch's gameplay code.
+        if ready.get("branch") == requested_branch:
             source_sha = str(ready.get("source_sha", ""))
             ready_tag = str(ready.get("release", ""))
             if not re.fullmatch(r"[0-9a-f]{40}", source_sha) or not re.fullmatch(r"browser-test-\d+", ready_tag):
