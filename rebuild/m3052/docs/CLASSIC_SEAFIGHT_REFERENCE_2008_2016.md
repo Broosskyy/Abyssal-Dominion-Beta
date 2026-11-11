@@ -45,6 +45,26 @@ Historical behavior, not an obligation to reuse trademarks, art, textures or exa
 | P2 | Economy/content | Shipyard/market, guild islands, events, bonus charts | Clear equipment and progression loops, historically inspired event cadence, own currencies/balance/graphics; no fake public-server groups or auctions |
 | P2 | Social/crossplay | local player progress and 2-client protocol tests | Verify real accounts and multiplayer only after authenticated public server is deployed; no simulated online claims |
 
+## Mandatory UI split: mobile first, desktop separately
+
+This requirement supersedes any attempt to shrink an old desktop Seafight UI onto a phone. The **game rules are shared** (same saved three configurable quickbar pages, same weapons, cooldowns and actions); only input ergonomics and layout differ.
+
+**Mobile / tablet / small viewport:**
+- Large primary fire/stop button at the bottom right, with one-tap ammo, repair and consumable selection within thumb reach.
+- Three configurable quick slots on the adjacent right combat rail; quickbar page tabs have a minimum 44 logical pixels of height before HUD scaling, including narrow landscape viewports.
+- Camera pad or touch-drag on the left; direct tap-to-sail and tap-to-select remain the principal interaction. No keyboard use required.
+- Menus use one-column direct actions on narrow screens, scroll and clear back/close controls; do not hide controls behind permanent wide panels.
+- Keep the center of the sea free of toolbars and avoid overlaps at 844×390, 720×405 and high-DPI Android landscape.
+
+**Desktop / mouse and keyboard:**
+- Separate configurable quickbar rail at bottom left, not copied from the phone's combat ring.
+- Main combat remains on the right; mouse click, right-drag and wheel continue to control navigation.
+- Z / X / V activate the three saved quick slots, Q changes quickbar page; arrow keys pan chart, C recenters, K sets a course to the inspected center, M opens main menu, A selects ammunition.
+- Shortcut actions never fire while a menu or text field has focus. Disabled supplies (cooldown, out of stock or docked) cannot be activated by hotkey.
+- Touchscreen laptops and narrow desktop windows use the responsive touch layout. Desktop keyboard shortcuts remain limited to the desktop input profile.
+
+**Current implementation patch**: `quick_bar.gd` and `sea_map.gd` have separate geometry paths; `classic_navigation_test.gd` covers layout selection, page-button height, screen placement, shortcuts and modal blocking. This is still branch-only code until Godot CI and actual phone/browser captures pass.
+
 ## Test checklist for next release
 
 1. Same account/course on browser and Android Classic; positional simulation/path and combat outcomes identical.
