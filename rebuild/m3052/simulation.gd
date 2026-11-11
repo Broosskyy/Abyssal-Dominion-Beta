@@ -26,6 +26,9 @@ const START := Vector2(4200, 2900)
 const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice", "fire", "poison", "shrapnel", "lightning", "holy", "shadow", "wind", "earth", "water", "cursed", "bleed", "necro", "gold", "crystal", "explosive", "arcane", "spectral", "lava", "light", "armor_piercing", "gas"]
 const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein", "Feuerkugeln geladen · Grafik-Beta", "Giftkugeln geladen · Grafik-Beta", "Schrapnellkugeln geladen · Grafik-Beta", "Blitzkugeln geladen · Grafik-Beta", "Heilige Kugeln geladen · Grafik-Beta", "Schattenkugeln geladen · Grafik-Beta", "Wirbelkugeln geladen · Grafik-Beta", "Erdkugeln geladen · Grafik-Beta", "Wasserkugeln geladen · Grafik-Beta", "Fluchkugeln geladen · Grafik-Beta", "Blutkugeln geladen · Grafik-Beta", "Nekrokugeln geladen · Grafik-Beta", "Goldkugeln geladen · Grafik-Beta", "Kristallkugeln geladen · Grafik-Beta", "Explosivkugeln geladen · Grafik-Beta", "Arkankugeln geladen · Grafik-Beta", "Geisterkugeln geladen · Grafik-Beta", "Lavakugeln geladen · Grafik-Beta", "Lichtkugeln geladen · Grafik-Beta", "Panzerbrecher geladen · Grafik-Beta", "Gaskugeln geladen · Grafik-Beta"]
 var player: Dictionary
+# Classic 2D alone uses stepped 45° ship courses. 2.5D and 3D retain
+# unrestricted straight-line / obstacle-avoiding steering from before M3059.
+var classic_steering: bool=false
 # Retired historical skins 0-30 migrate to shaded ship (skin 0).
 # Only schema 5+ saves can select separate Corsair test skin 1 and ten new Elite color skins 2-11.
 const FINAL_PLAYER_SKIN := 0
@@ -275,8 +278,9 @@ func plan_path(start: Vector2, goal: Vector2) -> Array[Vector2]:
 	return result
 
 func classic_path(start: Vector2,goal: Vector2,heading: Vector2=Vector2.RIGHT) -> Array[Vector2]:
-	# Real short diagonal legs, shared by every client and the presence server.
-	# Rendering mode never changes course length, hit position or movement speed.
+	# Classic Seafight-style discrete diagonal heading changes are deliberately
+	# NOT the 2.5D/3D movement model. Longer sea legs avoid the 64-unit
+	# left-right twitch of the previous implementation (~0.5 s per switch).
 	var base: Array[Vector2]=plan_path(start,goal)
 	var result: Array[Vector2]=[]
 	var before: Vector2=start
@@ -284,7 +288,7 @@ func classic_path(start: Vector2,goal: Vector2,heading: Vector2=Vector2.RIGHT) -
 		var accepted: bool=false
 		var cross_heading: float=heading.y if absf(waypoint.x-before.x)>=absf(waypoint.y-before.y) else heading.x
 		var preferred_side: int=1 if cross_heading>=0.0 else -1
-		for length in [64.0,32.0,16.0,8.0,4.0]:
+		for length in [144.0,112.0,80.0,48.0,24.0,12.0,6.0,3.0]:
 			for side in [preferred_side,-preferred_side]:
 				var legs: Array[Vector2]=NAV.diagonal_leg(before,waypoint,length,side)
 				var cursor: Vector2=before
@@ -296,15 +300,40 @@ func classic_path(start: Vector2,goal: Vector2,heading: Vector2=Vector2.RIGHT) -
 					result.append_array(legs);accepted=true;break
 			if accepted:break
 		if not accepted:
-			# Tight coast/berth: retain the already-validated short passage
-			# instead of blocking an otherwise reachable destination.
+			# Narrow coasts and ports: the validated original waypoint is safer
+			# than bouncing across a beach in search of another 45° leg.
 			result.append(waypoint)
 		before=waypoint
 	return result
 
 func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
-	if str(body.get("kind",""))=="monster":return plan_path(body.pos,goal)
+	# Monsters and native 2.5D/3D hulls follow the original direct paths.
+	if not classic_steering or str(body.get("kind",""))=="monster":
+		return plan_path(body.pos,goal)
 	return classic_path(body.pos,goal,body.heading)
+
+func set_classic_steering(enabled: bool) -> void:
+	if classic_steering==enabled:return
+	classic_steering=enabled
+	# Changing a graphic mode mid-voyage must not preserve the OLD steering
+	# model's waypoints. Keep the destination and exact current water position.
+	var bodies: Array[Dictionary]=[player]
+	for npc: Dictionary in npcs:
+		if str(npc.get("kind",""))=="ship":bodies.append(npc)
+	for body: Dictionary in bodies:
+		if bool(body.get("network_motion",false)):continue
+		var previous: Array=body.get("path",[])
+		if previous.is_empty():continue
+		var destination: Vector2=Vector2(previous.back())
+		if Vector2(body.pos).distance_to(destination)<.01:
+			body.path=[];continue
+		var route: Array[Vector2]=plan_actor_path(body,destination)
+		if int(body.get("id",-1))==0 and staff.flag("no_collision"):
+			if enabled:route=NAV.diagonal_leg(body.pos,destination,144.0)
+			else:
+				route.clear()
+				route.append(destination)
+		if not route.is_empty():body.path=route
 
 func course(point: Vector2) -> bool:
 	pending_portal=-1
@@ -312,8 +341,11 @@ func course(point: Vector2) -> bool:
 	if int(player.hp) <= 0: return false
 	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
 	var route: Array[Vector2] = []
-	if staff.flag("no_collision"): route.append(point.clamp(Vector2(40, 40), WORLD - Vector2(40, 40)))
-	else: route = classic_path(player.pos, point,player.heading)
+	if staff.flag("no_collision"):
+		if classic_steering:route=NAV.diagonal_leg(player.pos,point,144.0)
+		else:route.append(point)
+	else:
+		route=plan_actor_path(player,point)
 	if route.is_empty():
 		message = "Küste voraus · bitte freies Wasser wählen"
 		return false

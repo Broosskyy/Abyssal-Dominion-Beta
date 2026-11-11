@@ -329,6 +329,9 @@ func _ready() -> void:
 	_load_progress()
 	_load_staff()
 	_load_display()
+	# Browser is always Classic. Android/desktop use the saved graphics mode.
+	# Steering must be configured before any sea-chart route is created.
+	sim.set_classic_steering(browser_classic)
 	if browser_classic:_load_classic_atlases()
 	get_tree().set_meta("abyssal_ui_motion",ambient_motion_enabled)
 	previous_region=sim.map_id
@@ -714,6 +717,7 @@ func _process(delta: float) -> void:
 	_update_wake_tracks(delta)
 	if loading_left>0:_advance_loading(delta)
 	if camera_pad.visible and not modal.visible:_pan_camera(camera_pad.value,delta)
+	_classic_keyboard_pan(delta)
 	var render_player: Vector2=_visual_actor_pos(sim.player)
 	var goal: Vector2=render_player if camera_locked else camera_anchor
 	pan=goal-render_player
@@ -1836,6 +1840,11 @@ func _place(c: Control,x: float,y: float,w: float,h: float) -> void:
 	c.size=Vector2(maxf(w,1),maxf(h,1))
 
 # Reusable measurement helper; the ammunition picker is separately anchored.
+# A separate touch-first layout is selected by input hardware or a narrow
+# viewport. Desktop gets a mouse/keyboard rail, not an enlarged mobile HUD.
+func _is_mobile_hud(viewport: Vector2,touch_available: bool=false) -> bool:
+	return touch_available or viewport.x<1024.0
+
 func _menu_layout_fractions(viewport: Vector2,layout: String) -> Vector2:
 	var portrait: bool=viewport.y>viewport.x*1.13
 	match layout:
@@ -1860,6 +1869,7 @@ func _layout() -> void:
 	ui.scale=Vector2.ONE*hud_scale
 	var s=viewport_size/hud_scale
 	ui.size=s
+	var mobile_hud: bool=_is_mobile_hud(viewport_size,OS.has_feature("mobile") or DisplayServer.is_touchscreen_available())
 	var compact=viewport_size.y<560 or viewport_size.x<1000
 	if compact and elapsed<0.1:
 		desired_zoom=0.78
@@ -1970,7 +1980,19 @@ func _layout() -> void:
 	# Supplies retain their own functions; every ammunition type uses one selector.
 	_place(supply_selector,fx-orb-gap,fy-orb-gap,orb,orb)
 	for item: Button in supply_buttons.values():item.hide()
-	_place(quick_bar,fx-4*(orb+gap),s.y-orb-10-(orb+29)-8,orb*3+gap*2,orb+29)
+	# One shared, persistent set of three configurable bars, two layouts.
+	# On touch devices the slots remain beside the cannon, with 44px tabs.
+	# On desktop they form a separate mouse/keyboard rail along bottom-left.
+	quick_bar.mobile_first=mobile_hud
+	# Keep all three page tabs at least 44px wide as well as tall in
+	# compact landscape; grow the rail to the left, away from combat orbs.
+	var touch_extra: float=20.0 if mobile_hud else 0.0
+	var quick_w: float=orb*3.0+gap*2.0+touch_extra
+	var quick_h: float=orb+quick_bar.tab_height()+4.0
+	var quick_x: float=fx-4.0*(orb+gap)-touch_extra if mobile_hud else left+column-20.0
+	var quick_y: float=s.y-orb-10.0-quick_h-8.0 if mobile_hud else s.y-quick_h-10.0
+	_place(quick_bar,quick_x,quick_y,quick_w,quick_h)
+	quick_bar._layout()
 	var hot: Array[Button]=[target_cycle,loadout_button]
 	for i in hot.size():_place(hot[hot.size()-1-i],ammo_selector.position.x-(i+1)*(orb+gap),s.y-orb-10,orb,orb)
 	var toast_w=maxf(60.0,minf(380.0,s.x-2.0*(left+column+12)))
@@ -4084,7 +4106,7 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: kurze diagonale Kurse mit direktem Ansichtswechsel. App und Desktop bieten zusätzlich 2,5D und 3D. Alle Modi verwenden dieselben Kurse und Spielwerte.")
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Seafight-artige diagonale Zickzack-Fahrt mit festen Schiffsansichten. 2,5D / 3D: direkte Kurse ohne Zickzack. Beim Umschalten bleibt das Ziel erhalten.")
 	_note("DATENUPDATE %d · CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
 		if OS.has_feature("web"):
@@ -4098,7 +4120,7 @@ func _open_display() -> void:
 				var key: String=str(option[0])
 				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 				choice.disabled=render_mode==key
-			_note("Classic 2D verwendet vorberechnete Ansichten deiner Originalmodelle und deaktiviert die 3D-Schiffsszene. Die Auswahl wird gespeichert; Schiff, Kurs und Fortschritt bleiben erhalten.")
+			_note("Classic 2D: gestufte 45°-Seerouten. 2,5D / 3D: normale direkte Schiffssteuerung. Umschalten berechnet die noch offene Strecke zum selben Ziel neu; Fortschritt und Position bleiben erhalten.")
 		_section("SCHIFFE & SEEKARTE")
 		var ship_grid=_grid(2)
 		_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
@@ -4109,7 +4131,19 @@ func _open_display() -> void:
 		_note("Standard: Gegner antippen wählt nur das Ziel, niemals automatisch feuern. FEUER startet den Angriff, STOPP beendet ihn. Optional kannst du einen bewusst gesetzten Doppeltipp als Angriff aktivieren. Mit × oder Esc das Ziel vollständig abwählen.",Color("a3c9cf"))
 		var double_grid=_grid(2)
 		_action("DOPPELTIPP-ANGRIFF: "+("EIN" if double_tap_attack_enabled else "AUS · SICHER"),_toggle_double_tap_attack,"tab_on" if double_tap_attack_enabled else "normal",double_grid)
+		_section("KLASSISCHE SEEKARTEN-NAVIGATION")
+		var touch_layout: bool=_is_mobile_hud(get_viewport_rect().size,OS.has_feature("mobile") or DisplayServer.is_touchscreen_available())
+		if touch_layout:
+			_note("HANDY / TABLET: Schiff und Ziele direkt antippen. Kamera per Wischen oder Kamerapad verschieben, Ziel über × abwählen, Munition und Items rechts unten wählen. Kein Gedrückthalten einer Tastaturtaste nötig.",Color("a3c9cf"))
+		else:
+			_note("DESKTOP: Pfeiltasten verschieben die Karte, C zentriert das Schiff, K setzt einen Kurs zur Kartenmitte, M öffnet das Menü, A die Munition. Z / X / V benutzen die drei belegten Schnellplätze, Q wechselt ihre Seite. Leertaste feuert, Esc bricht ab.",Color("a3c9cf"))
+		var classic_controls=_grid(1 if touch_layout else 3)
+		_action("ZUM SCHIFF · C",func():_close_modal();_recenter_camera(),"normal",classic_controls)
+		_action("KURS SETZEN · K",func():_close_modal();_classic_center_course(),"normal",classic_controls)
+		_action("MUNITION · A",func():_close_modal();_toggle_ammo(),"normal",classic_controls)
 	if _tab("Anzeige")=="HUD":
+		_section("MOBILE FIRST / DESKTOP")
+		_note("Touch: große Kampfaktionen rechts, drei frei belegbare Schnellplätze mit größeren Seitenreitern, Kamerapad links. Desktop: eigene Schnellleiste unten links plus Tastenkürzel. Inhalte, Belegung und Spielstand bleiben in beiden Ansichten gleich.",Color("a3c9cf"))
 		_section("FENSTERGRÖSSE · ADAPTIV")
 		var menu_grid=_grid(3)
 		for option in [["compact","KOMPAKT"],["balanced","STANDARD"],["large","GROSS"]]:
@@ -4218,7 +4252,7 @@ func _open_menu_hub() -> void:
 
 func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
-	_note("Browser: Classic 2D. App/Desktop: Classic 2D, 2,5D oder 3D unter Anzeige > Grafik. Gleiche Schiffe, Kurse und Spielwerte.",Color("9be4df"))
+	_note("Browser: Classic 2D mit diagonalem Fahrweg. App/Desktop: Classic 2D ebenfalls diagonal, 2,5D und 3D dagegen direkt. Gleiche Schiffswerte und gemeinsamer Online-Spielstand.",Color("9be4df"))
 	if not OS.has_feature("web"):
 		var modes=_grid(3)
 		for option in [["classic","CLASSIC 2D"],["hybrid","2,5D"],["3d","3D"]]:
@@ -4596,12 +4630,38 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 		_shift_camera(-event.relative/camera.zoom)
 	elif event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode==KEY_TAB:_cycle_target();get_viewport().set_input_as_handled()
-		if event.keycode==KEY_SPACE:_toggle_fire()
+		# A text field or open menu owns keyboard input. Never fire, repair,
+		# steer or consume ammunition while the captain edits a form.
 		if event.keycode==KEY_ESCAPE:
 			if modal.visible:_back_modal()
 			elif sim.target>0:_cancel_target()
 			get_viewport().set_input_as_handled()
+			return
+		if modal.visible or loading_left>0.0:return
+		var focused: Control=get_viewport().gui_get_focus_owner()
+		if focused is LineEdit or focused is TextEdit:return
+		if event.keycode==KEY_C:
+			_recenter_camera();get_viewport().set_input_as_handled();return
+		if event.keycode==KEY_K:
+			_classic_center_course();get_viewport().set_input_as_handled();return
+		if event.keycode==KEY_M:
+			_open_modal("Menü");get_viewport().set_input_as_handled();return
+		if event.keycode==KEY_A:
+			_toggle_ammo();get_viewport().set_input_as_handled();return
+		# Desktop-only physical keyboard bindings; the touch HUD doesn't need
+		# a keyboard overlay or press-and-hold navigation widget.
+		if not _is_mobile_hud(get_viewport_rect().size,OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()):
+			if event.keycode==KEY_Q:
+				quick_page=(quick_page+1)%3
+				_persist_display_preferences()
+				quick_bar.refresh()
+				get_viewport().set_input_as_handled();return
+			var desktop_slot_keys: Array=[KEY_Z,KEY_X,KEY_V]
+			if event.keycode in desktop_slot_keys:
+				_desktop_quick_action(desktop_slot_keys.find(event.keycode))
+				get_viewport().set_input_as_handled();return
+		if event.keycode==KEY_TAB:_cycle_target();get_viewport().set_input_as_handled()
+		if event.keycode==KEY_SPACE:_toggle_fire()
 		if event.keycode==KEY_R:sim.toggle_repair()
 		if event.keycode==KEY_1:sim.set_ammo(0)
 		if event.keycode==KEY_2:sim.set_ammo(1)
@@ -4926,6 +4986,12 @@ func _set_render_mode(value: String) -> void:
 	else:
 		browser_classic=false;render_mode=value;_ensure_mesh_layer()
 		mesh_layer.set_render_mode(value);render_mode=mesh_layer.mode
+	# This is a gameplay steering choice, not merely a different renderer:
+	# active routes replan to their original destination immediately.
+	var steering_changed: bool=sim.classic_steering!=browser_classic
+	sim.set_classic_steering(browser_classic)
+	if steering_changed and not sim.player.path.is_empty():
+		_send_online_course(Vector2(sim.player.path.back()))
 	classic_heading_cache.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
@@ -4944,6 +5010,34 @@ func _set_display(size_index: int,show_journal: bool) -> void:
 func _pan_camera(direction: Vector2,delta: float) -> void:
 	if direction==Vector2.ZERO:return
 	_shift_camera(direction*620.0*maxf(delta,0.0)/camera.zoom)
+
+func _desktop_quick_action(slot: int) -> void:
+	# Uses exactly the same saved slot as its corresponding touch button.
+	# Never bypass the visible cooldown, docking or out-of-stock state.
+	if slot<0 or slot>=quick_bar.slots.size() or modal.visible:return
+	if quick_bar.slots[slot].disabled:return
+	_use_supply(str(quick_pages[quick_page][slot]))
+
+func _classic_keyboard_pan(delta: float) -> void:
+	# The old sea chart let arrow keys inspect the map without steering.
+	# Reuse the camera thumbpad speed and bounds; never affect ship physics.
+	if modal==null or modal.visible or loading_left>0.0:return
+	var focused: Control=get_viewport().gui_get_focus_owner()
+	if focused is LineEdit or focused is TextEdit:return
+	var direction:=Vector2(
+		int(Input.is_key_pressed(KEY_RIGHT))-int(Input.is_key_pressed(KEY_LEFT)),
+		int(Input.is_key_pressed(KEY_DOWN))-int(Input.is_key_pressed(KEY_UP)))
+	if direction!=Vector2.ZERO:_pan_camera(direction.normalized(),delta)
+
+func _classic_chart_center() -> Vector2:
+	var view_center: Vector2=sim.player.pos if camera_locked else camera_anchor
+	return view_center.clamp(Vector2(8,8),sim.WORLD-Vector2(8,8))
+
+func _classic_center_course() -> void:
+	# K navigates to the inspected chart center; C resumes normal follow.
+	if modal.visible or loading_left>0.0:return
+	var destination: Vector2=_classic_chart_center()
+	if destination.distance_to(sim.player.pos)>=1.0:_chart_course(destination)
 
 func _shift_camera(offset: Vector2) -> void:
 	if camera_locked:camera_anchor=sim.player.pos+pan

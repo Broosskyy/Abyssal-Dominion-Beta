@@ -6,6 +6,8 @@ var host
 var tabs: Array[Button]=[]
 var slots: Array[Button]=[]
 var edit: Button
+# Large, independent tabs on mobile; desktop keeps a smaller mouse-oriented rail.
+var mobile_first: bool=true
 func _ready() -> void:
 	for page in 3:
 		var index: int=page
@@ -18,13 +20,24 @@ func _ready() -> void:
 		var button=host._orb(self,"",null,func():used.emit(index),"")
 		slots.append(button)
 	resized.connect(_layout);_layout()
+func tab_height() -> float:
+	# Button themes can impose a minimum taller than the requested 25px.
+	# Keep slot spacing consistent with the actual rendered tab height.
+	if tabs.is_empty() or edit==null:return 44.0 if mobile_first else 25.0
+	var minimum: float=maxf(tabs[0].get_combined_minimum_size().y,edit.get_combined_minimum_size().y)
+	return maxf(44.0 if mobile_first else 25.0,minimum)
+
 func _layout() -> void:
 	if edit==null:return
+	var tabs_h: float=tab_height()
 	var side: float=(size.x-16.0)/3.0
 	for i in 3:
-		tabs[i].position=Vector2(i*(size.x-32)/3.0,0);tabs[i].size=Vector2((size.x-32)/3.0-3,25)
-		slots[i].position=Vector2(i*(side+8),29);slots[i].size=Vector2(side,side)
-	edit.position=Vector2(size.x-28,0);edit.size=Vector2(28,25)
+		tabs[i].position=Vector2(i*(size.x-32)/3.0,0)
+		tabs[i].size=Vector2((size.x-32)/3.0-3,tabs_h)
+		slots[i].position=Vector2(i*(side+8),tabs_h+4.0)
+		slots[i].size=Vector2(side,side)
+	edit.position=Vector2(size.x-28,0)
+	edit.size=Vector2(28,tabs_h)
 func refresh() -> void:
 	if slots.size()!=3:return
 	for i in 3:
