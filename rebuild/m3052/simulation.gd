@@ -329,7 +329,10 @@ func set_classic_steering(enabled: bool) -> void:
 			body.path=[];continue
 		var route: Array[Vector2]=plan_actor_path(body,destination)
 		if int(body.get("id",-1))==0 and staff.flag("no_collision"):
-			route=NAV.diagonal_leg(body.pos,destination,144.0) if enabled else [destination]
+			if enabled:route=NAV.diagonal_leg(body.pos,destination,144.0)
+			else:
+				route.clear()
+				route.append(destination)
 		if not route.is_empty():body.path=route
 
 func course(point: Vector2) -> bool:
@@ -339,7 +342,8 @@ func course(point: Vector2) -> bool:
 	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
 	var route: Array[Vector2] = []
 	if staff.flag("no_collision"):
-		route=NAV.diagonal_leg(player.pos,point,144.0) if classic_steering else [point]
+		if classic_steering:route=NAV.diagonal_leg(player.pos,point,144.0)
+		else:route.append(point)
 	else:
 		route=plan_actor_path(player,point)
 	if route.is_empty():
