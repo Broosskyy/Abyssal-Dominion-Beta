@@ -33,8 +33,22 @@ def response(url: str) -> bytes:
 
 
 def main() -> None:
-    source_sha = os.environ.get("VERCEL_GIT_COMMIT_SHA", "").strip()
+    requested_sha = os.environ.get("VERCEL_GIT_COMMIT_SHA", "").strip()
+    requested_branch = os.environ.get("VERCEL_GIT_COMMIT_REF", "main").strip()
+    # Browser exports are intentionally built by GitHub Actions on main only.
+    # Vercel also builds every feature branch: waiting for a matching release
+    # from a branch that has no export workflow will *always* time out.
+    # Serve the most recent verified main browser test as a visibly identified
+    # baseline preview instead. Never pretend it contains feature-branch code.
+    baseline_preview = bool(requested_sha and requested_branch != "main")
+    source_sha = "" if baseline_preview else requested_sha
     wait_for_source = False
+    if baseline_preview:
+        print(
+            f"Feature branch {requested_branch}: no Godot export for this SHA; "
+            "using the latest published browser-test as a BASELINE ONLY",
+            flush=True,
+        )
     if source_sha:
         commit = json.loads(response(f"https://api.github.com/repos/{REPOSITORY}/commits/{source_sha}"))
         wait_for_source = "[skip ci]" not in commit.get("commit", {}).get("message", "") and any(
@@ -105,10 +119,20 @@ def main() -> None:
     required |= {pack['file'] for pack in delivery.get('packs', {}).values()}
     if any(not (DEST / name).is_file() or (DEST / name).stat().st_size == 0 for name in required):
         raise RuntimeError("Browser release is incomplete")
+    exported_sha = str(release.get("target_commitish", ""))
     metadata = {
         "scope": "public-browser-test",
         "release": release["tag_name"],
-        "source": release.get("target_commitish", ""),
+        "source": exported_sha,
+        "requested_commit": requested_sha,
+        "requested_branch": requested_branch,
+        "contains_requested_commit": bool(requested_sha and requested_sha == exported_sha),
+        "preview_mode": "last-tested-main-baseline" if baseline_preview else "matched-godot-export",
+        "preview_notice": (
+            "Feature-branch HUD/controls are NOT yet contained in this baseline. "
+            "Only a published Godot browser-test build can validate them."
+            if baseline_preview else ""
+        ),
         "account_server": "external-https-wss-configuration-required",
         "live_combat": False,
     }
