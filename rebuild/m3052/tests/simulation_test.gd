@@ -9,12 +9,15 @@ func _initialize() -> void:
 	var sim=SIM.new()
 	check(sim.npcs.size()==20,"16 ship patrols and four monsters exist")
 	var npc=sim.npcs[0]
-	check(str(npc.renderer)=="mesh" and str(npc.navigation)=="classic_diagonal","ship steering is classic diagonal regardless of GLB or sprite presentation")
+	check(str(npc.renderer)=="mesh" and str(npc.navigation)=="mode_adaptive","NPC ship renderer is GLB-capable and its steering follows the chosen graphics mode")
 	check(float(npc.speed)<=40.0 and float(sim.npcs[8].speed)<=46.0,"normal and elite NPC speed is rebalanced")
 	var sample: Dictionary=npc.duplicate(true)
 	sample.pos=Vector2(400,400)
 	var free_goal:=Vector2(675,535)
-	check(sim.plan_actor_path(sample,free_goal)==sim.classic_path(sample.pos,free_goal,sample.heading),"native GLBs share the same classic course as browser ships")
+	check(not sim.classic_steering and sim.plan_actor_path(sample,free_goal)==sim.plan_path(sample.pos,free_goal),"native 2.5D/3D ships use original direct navigation")
+	sim.set_classic_steering(true)
+	check(sim.plan_actor_path(sample,free_goal)==sim.classic_path(sample.pos,free_goal,sample.heading),"Classic 2D switches the same ship to real diagonal legs")
+	sim.set_classic_steering(false)
 	var rested: Dictionary=npc.duplicate(true)
 	rested.pos=Vector2(400,400)
 	rested.home=rested.pos
