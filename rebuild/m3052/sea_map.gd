@@ -1990,7 +1990,7 @@ func _layout() -> void:
 	var quick_w: float=orb*3.0+gap*2.0+touch_extra
 	var quick_h: float=orb+(48.0 if mobile_hud else 29.0)
 	var quick_x: float=fx-4.0*(orb+gap)-touch_extra if mobile_hud else left+column-20.0
-	var quick_y: float=s.y-quick_h-18.0 if mobile_hud else s.y-quick_h-10.0
+	var quick_y: float=s.y-orb-10.0-quick_h-8.0 if mobile_hud else s.y-quick_h-10.0
 	_place(quick_bar,quick_x,quick_y,quick_w,quick_h)
 	quick_bar._layout()
 	var hot: Array[Button]=[target_cycle,loadout_button]
