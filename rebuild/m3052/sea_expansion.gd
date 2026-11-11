@@ -6,6 +6,53 @@ const MONSTERS := [
 	{"key":"crab","name":"Karapax · Tiefenpanzer","hp":1500,"reward":210,"speed":17.0,"width":195.0}
 ]
 const EVENT_NAMES := {"halloween":"Halloween · Kürbisflut","columbus":"Columbus · Entdeckerfahrt","off":"Keine Veranstaltung"}
+const EVENT_HUNTS := {"halloween":"Laternen-Korsar","columbus":"Nebel-Navigator"}
+const EVENT_TRADES := {
+	"pumpkin_ammo":{"event":"halloween","name":"10 Kürbiskugeln","cost":4,"ammo":4,"amount":10},
+	"voyage_ammo":{"event":"columbus","name":"25 Vollkugeln","cost":4,"ammo":0,"amount":25}
+}
+
+# Reuse one existing patrol hull; event toggles never spawn, heal or resurrect it.
+static func configure_event_hunt(s) -> void:
+	for actor: Dictionary in s.npcs:
+		if actor.has("event_base_name"):actor.name=actor.event_base_name
+		actor.erase("event_key")
+	if s.in_bonus_map() or not EVENT_HUNTS.has(s.event_mode):return
+	var chosen: Dictionary={}
+	for actor: Dictionary in s.npcs:
+		if str(actor.kind)!="ship" or bool(actor.get("staff_spawn",false)) or bool(actor.get("wave",false)) or int(actor.id)<1 or int(actor.id)>16:continue
+		if chosen.is_empty() or int(actor.id)>int(chosen.id):chosen=actor
+	if chosen.is_empty():return
+	if not chosen.has("event_base_name"):chosen["event_base_name"]=str(chosen.name)
+	chosen["event_key"]=s.event_mode
+	chosen.name="EVENT · %s · %s" % [EVENT_HUNTS[s.event_mode],s.CONTENT.MAPS[s.map_id].code]
+
+static func event_target(s) -> Dictionary:
+	for actor: Dictionary in s.npcs:
+		if str(actor.get("event_key",""))==s.event_mode and EVENT_HUNTS.has(s.event_mode):return actor
+	return {}
+
+static func hunt_token_reward(s) -> int:
+	return clampi(2+floori(float(s.CONTENT.MAPS[s.map_id].level)/5.0),2,5)
+
+static func award_event_hunt(s,victim: Dictionary) -> void:
+	var key: String=str(victim.get("event_key",""))
+	if not EVENT_HUNTS.has(key) or key!=s.event_mode:return
+	var amount: int=hunt_token_reward(s)
+	s.event_tokens[key]=int(s.event_tokens.get(key,0))+amount
+	s._event("event_loot",victim.pos,amount,0)
+	s.events.back()["label"]="Eventjagd · +%d %s" % [amount,"Kürbiszeichen" if key=="halloween" else "Kompasszeichen"]
+
+static func trade(s,key: String) -> bool:
+	if not EVENT_TRADES.has(key) or s.staff.active():return false
+	var offer: Dictionary=EVENT_TRADES[key]
+	var currency: String=str(offer.event)
+	if s.event_mode!=currency or int(s.event_tokens.get(currency,0))<int(offer.cost):return false
+	s.event_tokens[currency]-=int(offer.cost)
+	s.player.ammo[int(offer.ammo)]+=int(offer.amount)
+	s.message="Eventtausch · "+str(offer.name)+" erhalten"
+	return true
+
 const EVENT_SKINS := {"halloween":12,"columbus":13}
 const QUICK_DEFAULT := [["powder","plates","skyfire"],["repair_kit","healing_amulet","shield_charge"],["wind_draught","smoke_bomb","blessing_flask"]]
 
@@ -43,6 +90,7 @@ static func set_event(s,key: String) -> bool:
 	if not EVENT_NAMES.has(key):return false
 	s.event_mode=key
 	spawn_collectibles(s)
+	configure_event_hunt(s)
 	s.message=EVENT_NAMES[key]+" · Beta-Testmodus"
 	return true
 

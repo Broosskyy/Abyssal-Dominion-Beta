@@ -75,6 +75,10 @@ func _draw() -> void:
 			var hostile=bool(npc.aggressive) or bool(region.npc_hostile)
 			var color=Color("ff6d5c") if hostile else (Color("f0c35a") if npc.kind=="ship" else Color("d39cf0"))
 			draw_circle(p,2.2 if not bool(npc.get("boss",false)) else 3.4,color)
+		if not str(npc.get("event_key","")).is_empty():
+			var event_color: Color=Color("ffbf65") if str(npc.event_key)=="halloween" else Color("80e4dd")
+			var diamond=PackedVector2Array([p+Vector2(0,-4),p+Vector2(4,0),p+Vector2(0,4),p+Vector2(-4,0),p+Vector2(0,-4)])
+			draw_polyline(diamond,event_color,1.2,true)
 		if int(npc.id)==int(simulation.target):draw_circle(p,4.0,Color("fff0c0"),false,1.2,true)
 	for portal in simulation.portals:
 		var p: Vector2=r.position+portal.pos/simulation.WORLD*r.size

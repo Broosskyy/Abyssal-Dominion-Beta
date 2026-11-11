@@ -976,6 +976,8 @@ func _selection_ring_tint(actor: Dictionary) -> Color:
 	if int(actor.id)==0:return _ship_design_accent(int(actor.get("skin",0)))
 	if str(actor.get("kind",""))=="tower":
 		return Color("d8b06d") if sim.tower_friendly() else Color("f47d62")
+	if str(actor.get("event_key",""))=="halloween":return Color("eca655")
+	if str(actor.get("event_key",""))=="columbus":return Color("6dd0c6")
 	var hostile: bool=bool(actor.get("aggressive",false)) or bool(CONTENT.MAPS[sim.map_id].npc_hostile)
 	return Color("f47d62") if hostile else Color("e6b869")
 
@@ -2187,6 +2189,7 @@ func _refresh_ui() -> void:
 	else:
 		interact.text="KURS ZUM PORTAL" if sim.pending_portal>=0 else "KURS ZUM HAFEN"
 	if modal.visible and modal_kind=="Logbuch" and _tab("Logbuch")=="VERTRÄGE":_refresh_contract_rows()
+	if modal.visible and modal_kind=="Events":_refresh_event_controls()
 
 func _begin_loading(duration: float) -> void:
 	var region: Dictionary=CONTENT.MAPS[sim.map_id]
@@ -2284,7 +2287,7 @@ func _clock_text(seconds: float) -> String:
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
 const MODAL_TABS := {"Logbuch":["AKTUELL","VERTRÄGE","VERLAUF"],"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
-const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Menü":"Spielmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Freunde":"Freunde & Einladungen","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
+const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Menü":"Spielmenü","Events":"Events","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Freunde":"Freunde & Einladungen","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
 	if browser_classic and kind in ["Werft","Events"]:
@@ -5113,14 +5116,40 @@ func _open_quick_config() -> void:
 
 func _open_events() -> void:
 	var expansion=preload("res://sea_expansion.gd")
-	_section("VERANSTALTUNGEN · BETA-VORSCHAU")
-	_note("Halloween und Columbus sind hier frei testbar. Saisonzeiten, Belohnungen und Preise werden später abgestimmt. Es ist jeweils eine Sammelveranstaltung aktiv.")
+	_info("EVENTS · BETA-TESTMODUS",CYAN)
+	_note("Event wählen: Jagd, Sammelfunde und Tausch sind im Beta-Test frei zugänglich.")
 	var tabs=_grid(3)
+	tabs.columns=3
 	for key: String in ["halloween","columbus","off"]:
 		var choice: String=key
-		_action({"halloween":"HALLOWEEN","columbus":"COLUMBUS","off":"AUS"}[key],func():expansion.set_event(sim,choice);_save_progress();_open_modal("Events"),"tab_on" if sim.event_mode==key else "normal",tabs)
-	var art: Texture2D=expansion_art.pumpkin if sim.event_mode=="halloween" else expansion_art.glitter
-	_row(art,expansion.EVENT_NAMES[sim.event_mode]+"\nKürbiszeichen: %d · Kompasszeichen: %d" % [sim.event_tokens.halloween,sim.event_tokens.columbus],72)
+		var tab=_action({"halloween":"HALLOWEEN","columbus":"COLUMBUS","off":"AUS"}[key],func():expansion.set_event(sim,choice);_save_progress();_open_modal("Events"),"tab_on" if sim.event_mode==key else "normal",tabs)
+		tab.add_theme_font_size_override("font_size",12 if modal_scroll.size.x<420.0 else 14)
+	var currency=_info(_event_currency_text(),GOLD)
+	currency.name="EventCurrency"
+	if expansion.EVENT_HUNTS.has(sim.event_mode):
+		_section("EVENTJAGD · KANONEN")
+		var enemy: Dictionary=expansion.event_target(sim)
+		if not enemy.is_empty():
+			var alive: bool=int(enemy.hp)>0
+			var details: String=_event_hunt_details(enemy)
+			var hunt=_row(_npc_ship_texture(enemy),details,64,Color("dda759"))
+			hunt.name="EventHunt"
+			hunt.get_child(0).name="EventHuntDetails"
+			var choose=_row_button(hunt,"ANVISIEREN",func():_hunt_event_target(),not alive)
+			choose.name="EventHuntSelect"
+			var sail=_row_button(hunt,"HINFAHREN",func():_hunt_event_target(true),not alive or sim.docked)
+			sail.name="EventHuntSail"
+		_note("Nur der Abschuss des markierten Eventgegners gibt die zusätzliche Jagdprämie. Anvisieren und Hinfahren starten keinen Angriff.")
+		_section("EVENTTAUSCH · ZEICHEN EINLÖSEN")
+		for key: String in expansion.EVENT_TRADES:
+			var offer: Dictionary=expansion.EVENT_TRADES[key]
+			if str(offer.event)!=sim.event_mode:continue
+			var offer_key: String=key
+			var button=_primary("%s · %d ZEICHEN" % [offer.name,offer.cost],func():
+				expansion.trade(sim,offer_key);_save_progress();_open_modal("Events");_refresh_ui())
+			button.name="EventTrade_"+key
+			button.disabled=int(sim.event_tokens.get(str(offer.event),0))<int(offer.cost) or sim.staff.active()
+	_section("SAMMELFUNDE")
 	_note("Halloween: schwimmende Kürbisse sammeln → Kürbiszeichen, Gold und Himmelsbrand. Columbus: Entdeckerfunde sammeln → Kompasszeichen, Gold und Lebensamulett. Sammelfunde kehren nach 120 Sekunden zurück.")
 	if not sim.event_pickups.is_empty():
 		_primary("KURS ZUM NÄCHSTEN EVENTFUND",func():
@@ -5134,6 +5163,41 @@ func _open_events() -> void:
 	for index in [12,13]:_add_shipyard_card(index,cards,frames)
 	_start_shipyard_preview_motion(frames)
 	_note("Beide Event-Anstriche sind während der Beta kostenlos verfügbar und verändern deine Kampfwerte nicht.")
+
+func _event_currency_text() -> String:
+	return "Kürbiszeichen: %d · Kompasszeichen: %d" % [sim.event_tokens.halloween,sim.event_tokens.columbus]
+
+func _event_hunt_details(enemy: Dictionary) -> String:
+	var expansion=preload("res://sea_expansion.gd")
+	var details: String="%s\nHP %s/%s · %d m entfernt\nJagdprämie: %d %s" % [enemy.name,_thousands(int(enemy.hp)),_thousands(int(enemy.max_hp)),roundi(sim.player.pos.distance_to(Vector2(enemy.pos))),expansion.hunt_token_reward(sim),"Kürbiszeichen" if sim.event_mode=="halloween" else "Kompasszeichen"]
+	if int(enemy.hp)<=0:details+="\nRückkehr in %d s" % ceili(maxf(0,float(enemy.get("respawn",0))))
+	return details
+
+func _refresh_event_controls() -> void:
+	var expansion=preload("res://sea_expansion.gd")
+	var currency: Label=modal_body.find_child("EventCurrency",true,false) as Label
+	if currency!=null:currency.text=_event_currency_text()
+	var enemy: Dictionary=expansion.event_target(sim)
+	var alive: bool=not enemy.is_empty() and int(enemy.hp)>0
+	var details: Label=modal_body.find_child("EventHuntDetails",true,false) as Label
+	if details!=null and not enemy.is_empty():details.text=_event_hunt_details(enemy)
+	for control in ["EventHuntSelect","EventHuntSail"]:
+		var button: Button=modal_body.find_child(control,true,false) as Button
+		if button!=null:button.disabled=not alive or (control=="EventHuntSail" and sim.docked)
+	for key: String in expansion.EVENT_TRADES:
+		var button: Button=modal_body.find_child("EventTrade_"+key,true,false) as Button
+		var offer: Dictionary=expansion.EVENT_TRADES[key]
+		if button!=null:button.disabled=sim.event_mode!=str(offer.event) or int(sim.event_tokens.get(str(offer.event),0))<int(offer.cost) or sim.staff.active()
+
+func _hunt_event_target(sail: bool=false) -> void:
+	var enemy: Dictionary=preload("res://sea_expansion.gd").event_target(sim)
+	if enemy.is_empty() or int(enemy.hp)<=0:return
+	sim.firing=false;sim.select(int(enemy.id))
+	if sail and not sim.docked and sim.player.pos.distance_to(Vector2(enemy.pos))>485.0:
+		var direction: Vector2=sim.player.pos-Vector2(enemy.pos)
+		if direction.length_squared()<.01:direction=Vector2.RIGHT
+		sim.course(sim._free_water(Vector2(enemy.pos)+direction.normalized()*440.0))
+	_close_modal();_refresh_ui()
 
 # Active hunt roster is read from real NPCs, never a static fake catalog.
 # Choosing a monster only selects it, and sailing stops at harpoon range:

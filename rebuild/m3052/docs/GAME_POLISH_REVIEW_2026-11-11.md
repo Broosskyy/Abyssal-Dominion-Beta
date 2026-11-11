@@ -2,6 +2,8 @@
 
 Stand: 11. November 2026. Browser und Android bleiben Clients derselben Simulation. Dies ist eine Bestandsaufnahme mit priorisierten nächsten Arbeiten, keine Behauptung, dass alle Bereiche fertig sind.
 
+Verbindliche zeitliche Eingrenzung: [Referenzrichtung](REFERENCE_DIRECTION.md). Seafight hauptsächlich 2008–2014, höchstens ergänzend bis 2016/2018; Battle of Sea im aktuellen Stand.
+
 ## Referenzen und Ableitungen
 
 - Seafight, offizielle Seekartenübersicht: https://board-en.seafight.com/threads/sea-chart-overview.172255/ — getrennte Statusanzeigen, Aktionsleisten, Weltkarte, Ausrüstung und soziale Bereiche.
@@ -64,3 +66,11 @@ Für unser Spiel abgeleitet: Auf der Seekarte die wichtigsten Informationen dire
 - Aktive Runden und erfüllte Verträge werden im bestehenden Gastspielstand gespeichert. Alte Spielstände starten ohne erfundenen Vertragsfortschritt.
 - Keine Battle Points, Kalenderfristen oder Online-Belohnungen. Die kleinen Gold-/EP-/Essenzprämien sind Beta-Werte.
 - Nächster Content-Schritt: weitere Kampagnenkapitel, regionsbezogene Aufgaben und abwechslungsreichere Monster-/Eventbegegnungen.
+
+## Folgepaket: klassische Eventjagd
+
+- Halloween und Columbus erhalten je einen markierten Eventgegner auf normalen Seekarten; Auswahl und Hinfahren schießen nicht automatisch.
+- Echte Spielerabschüsse vergeben zusätzliche Zeichen, abgestuft nach Kartenlevel. Bestehende normale Beute bleibt erhalten.
+- Zeichen können im Eventmenü gegen feste Munitionspakete getauscht werden. Beta-Werte, keine bezahlten Freischaltungen.
+- Eventwechsel verändern weder Gegnerzahl noch Rumpf, Schild oder Respawnzeit. Gesunkene Gegner bleiben gesunken, bis der normale Timer endet.
+- Eventgegner werden auf der Minikarte markiert. Eigene vorhandene Schiffsgrafiken halten das Browser-Ladebudget klein.

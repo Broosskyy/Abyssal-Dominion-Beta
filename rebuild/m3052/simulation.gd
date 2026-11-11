@@ -1027,6 +1027,7 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 				message="%s zerstört · FESTUNG %d/%d" % [victim.name,destroyed,CONTENT.TOWERS.size()]
 				_check_fortress()
 				return
+			EXPANSION.award_event_hunt(self,victim)
 			kills += 1
 			if victim.kind == "monster": monster_kills += 1
 			elif victim.elite: elite_kills += 1
@@ -1789,6 +1790,7 @@ func configure_map(destination: int) -> void:
 	if not restored:EXPANSION.spawn_monsters(self)
 	_spawn_sparkles()
 	EXPANSION.spawn_collectibles(self)
+	EXPANSION.configure_event_hunt(self)
 
 func export_save() -> Dictionary:
 	_store_fortress_state()
