@@ -20,9 +20,16 @@ func _ready() -> void:
 		var button=host._orb(self,"",null,func():used.emit(index),"")
 		slots.append(button)
 	resized.connect(_layout);_layout()
+func tab_height() -> float:
+	# Button themes can impose a minimum taller than the requested 25px.
+	# Keep slot spacing consistent with the actual rendered tab height.
+	if tabs.is_empty() or edit==null:return 44.0 if mobile_first else 25.0
+	var minimum: float=maxf(tabs[0].get_combined_minimum_size().y,edit.get_combined_minimum_size().y)
+	return maxf(44.0 if mobile_first else 25.0,minimum)
+
 func _layout() -> void:
 	if edit==null:return
-	var tab_height: float=44.0 if mobile_first else 25.0
+	var tab_height: float=tab_height()
 	var side: float=(size.x-16.0)/3.0
 	for i in 3:
 		tabs[i].position=Vector2(i*(size.x-32)/3.0,0)
