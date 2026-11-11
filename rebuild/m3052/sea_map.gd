@@ -4252,7 +4252,7 @@ func _open_menu_hub() -> void:
 
 func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
-	_note("Browser: Classic 2D. App/Desktop: Classic 2D, 2,5D oder 3D unter Anzeige > Grafik. Gleiche Schiffe, Kurse und Spielwerte.",Color("9be4df"))
+	_note("Browser: Classic 2D mit diagonalem Fahrweg. App/Desktop: Classic 2D ebenfalls diagonal, 2,5D und 3D dagegen direkt. Gleiche Schiffswerte und gemeinsamer Online-Spielstand.",Color("9be4df"))
 	if not OS.has_feature("web"):
 		var modes=_grid(3)
 		for option in [["classic","CLASSIC 2D"],["hybrid","2,5D"],["3d","3D"]]:
