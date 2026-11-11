@@ -81,3 +81,14 @@ Für unser Spiel abgeleitet: Auf der Seekarte die wichtigsten Informationen dire
 - Wiedererscheinende Monster werden ohne erneutes Öffnen auswählbar. Anvisieren und Hinfahren bleiben getrennt vom Angriff.
 - Der Solo-Richtwert für Harpunen nutzt die gemeinsame Schadensbasis mit aktiver Ausrüstung, Elitebonus und Segnung; Markierung, Regeneration und fremde Treffer sind ausdrücklich nicht eingerechnet.
 - Harpunenladen ist eine bewusste Aktion ohne Munitionsverbrauch und ohne automatisches Feuern. Der Marktlink führt zur tatsächlichen Harpunenkarte; ein Kauf bleibt eine separate Entscheidung.
+
+## Folgepaket: große Seekarten, Randüberfahrten und Monsterbewegung
+
+- Seekarten von 4400 × 3200 auf 8800 × 6400 vergrößert (vierfache Fläche). Die Positionen der vorhandenen Inseln und Ausgangsflotten werden verteilt; Grafikgröße, Reichweiten und Schiffsgeschwindigkeit bleiben erhalten.
+- Einzelne Portalgrafiken und Tipp-Hotspots entfernt. Jede komplette offene Kante führt zur räumlichen Nachbarkarte: Ost/West entlang der Stufen, Süd von /1 nach /2, Nord zurück. Weltgrenzen und gesperrte Kanten sind anders markiert, auch auf der Minikarte.
+- Gewöhnliche Fahrbefehle lösen die Überfahrt aus. Ankunft auf der gegenüberliegenden Seite mit erhaltener Querposition und sicherem Abstand zum Rand; Stufen- und Kampfregeln bleiben gültig. Weltkartenkurse wählen einen passenden Punkt am gesamten Rand.
+- Alte lokale Positionen, Hafenlieger und Bonus-Rückkehrpunkte werden einmalig migriert. Crossplay-Protokoll 2 und Servergrenzen verwenden dieselbe Weltgröße; gespeicherte Serverpositionen werden ebenfalls einmalig umgerechnet. Der öffentliche MMO-Server bleibt ausstehend.
+- Krakenarme, Schlangenkörper/-schwanz und Krabbenbeine/-schere erhalten unterschiedliche, zwischengespeicherte 2D-Verformungszyklen und sanfte Wasserkontakte. Keine neuen Texturpakete oder 3D-Laufzeit nötig. Es handelt sich um prozedurale 2D-Animation vorhandener Grafiken, nicht um neu gezeichnete Tiamat-Einzelframes.
+- Der Animationsschalter friert auch den Tiamat ein. Treffflächen und Namensanker bleiben unabhängig von der Bewegung. Keine NPC- oder Spielerschiffsmodelle geändert.
+- Prüfung: 561 zusätzliche Simulation-/Animationschecks, 6 GPU-Bewegungsvergleiche (bewegte Monster verändern Pixel, ruhende bleiben identisch), bestehende UI-/Navigation-/Progressionsprüfungen sowie HTTP/WebSocket-Tests.
+- Weiterer Feinschliff: eigene gezeichnete Monster-Angriffs-/Trefferphasen, Küsten-/Hafenübergänge, regionsbezogene Begegnungsdichte und zusätzliche Umgebungsdetails.

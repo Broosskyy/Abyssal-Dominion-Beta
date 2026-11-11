@@ -40,5 +40,7 @@ func _run() -> void:
 			root.get_texture().get_image().save_png(output+"/"+filename)
 	var motion: Dictionary=await preload("res://tests/ocean_motion_probe.gd").run(self)
 	print(JSON.stringify(motion))
+	var monsters: Dictionary=await preload("res://tests/monster_motion_probe.gd").run(self)
+	print(JSON.stringify(monsters))
 	print("BROWSER_CAPTURES_READY "+output)
-	quit(0 if motion.status=="PASS" else 1)
+	quit(0 if motion.status=="PASS" and monsters.status=="PASS" else 1)

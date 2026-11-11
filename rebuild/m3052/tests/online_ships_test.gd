@@ -39,7 +39,7 @@ func _run() -> void:
 		check(remote.remote_player and int(remote.id)<0,"remote identity cannot collide with NPC combat ids")
 		check(game._actor_visual_length(remote)==game._actor_visual_length(game.sim.player),"same hull scale as local captain")
 		clients[1].send_appearance(13,1200,2400)
-		clients[1].send_course(Vector2(2100,1550))
+		clients[1].send_course(Vector2(4200,3000))
 		await create_timer(.6).timeout
 		remote=game.online_players[0]
 		check(int(remote.skin)==13 and int(remote.hp)==1200,"live design and HP reach the game actor")
@@ -49,7 +49,7 @@ func _run() -> void:
 			check(game.mesh_layer.model_instances.has(int(remote.id)),"native remote GLB is instantiated in the visible fleet")
 		elif game.classic_atlases.has("event_columbus"):
 			check(game.classic_atlases.event_columbus!=null,"browser remote uses a loaded atlas")
-		check(Vector2(remote.pos).y>1450 and Vector2(remote.heading).y>.9,"remote hull moves and faces its course")
+		check(Vector2(remote.pos).y>2900 and Vector2(remote.heading).y>.9,"remote hull moves and faces its course")
 		var mesh=load("res://ship_mesh_layer.gd").new()
 		check(mesh.player_key_for_skin(int(remote.skin))=="black_crown_corsair_elite_test" and mesh.elite_texture_level(int(remote.skin))==12,"native renderer resolves same hull and finish")
 		mesh.free()

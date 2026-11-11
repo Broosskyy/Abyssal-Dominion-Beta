@@ -952,7 +952,7 @@ func _run() -> void:
 	var down=InputEventScreenTouch.new();down.index=0;down.position=screen;down.pressed=true
 	var up=InputEventScreenTouch.new();up.index=0;up.position=screen;up.pressed=false
 	game._unhandled_input(down);game._unhandled_input(up)
-	check(game.sim.pending_portal==1 and not game.sim.player.path.is_empty(),"touching the rendered portal queues a real crossing")
+	check(game.sim.pending_portal==-1 and not game.sim.player.path.is_empty(),"touching the marked edge sets an ordinary course, without a portal hotspot")
 	for _i in 120:
 		game.sim.step(1.0/30.0)
 		if game.sim.map_id!=0:break

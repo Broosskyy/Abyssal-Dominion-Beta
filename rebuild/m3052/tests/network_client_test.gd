@@ -20,7 +20,7 @@ func _run() -> void:
 		if value.get("type")=="snapshot":
 			received=true
 			for player: Dictionary in value.get("players",[]):
-				if str(player.id)==str(client.account.get("id","")) and float(player.x)>2100.1:moved=true)
+				if str(player.id)==str(client.account.get("id","")) and float(player.x)>4200.1:moved=true)
 	if authenticated:
 		client.connect_world(0)
 		for _i in 150:
@@ -28,7 +28,7 @@ func _run() -> void:
 			await create_timer(.02).timeout
 		count+=1
 		if not received:failures.append("Godot WebSocket snapshot failed")
-		client.send_course(Vector2(2300,1600))
+		client.send_course(Vector2(4600,3200))
 		for _i in 100:
 			if moved:break
 			await create_timer(.02).timeout

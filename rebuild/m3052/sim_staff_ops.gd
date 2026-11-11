@@ -107,8 +107,8 @@ static func staff_ship(s, action: String) -> bool:
 static func staff_place_point(s, place: String) -> Vector2:
 	match place:
 		"harbor": return s.harbor + Vector2(70, 50)
-		"portal_east": return s.portals[0].pos - Vector2(170, 0) if s.portals.size() > 0 else s.START
-		"portal_west": return s.portals[1].pos + Vector2(170, 0) if s.portals.size() > 1 else s.START
+		"portal_east": return s.edge_point("east",s.WORLD*.5) - Vector2(170,0)
+		"portal_west": return s.edge_point("west",s.WORLD*.5) + Vector2(170,0)
 		"fortress":
 			var island = s.fortress_island()
 			if island.is_empty(): return Vector2(-1, -1)

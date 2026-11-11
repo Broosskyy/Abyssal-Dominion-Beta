@@ -9,7 +9,11 @@ const STAFF_OPS = preload("res://sim_staff_ops.gd")
 const LOOKALIKE := {"0":"O","1":"I","3":"E","4":"A","5":"S","7":"T","8":"B"}
 var island_shapes: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/island_collision.json")).entries
 ## Independent fixed-step sea simulation. No dependency on legacy map scripts.
-const WORLD := Vector2(4400, 3200)
+const WORLD := Vector2(8800, 6400)
+const WORLD_LAYOUT := 2
+const AUTHORED_SCALE := 2.0
+const EDGE_BAND := 96.0
+const EDGE_INSET := 240.0
 const CELL := 48
 const PLAYER_SPEED := 165.0
 const PLAYER_HP := 2400
@@ -18,7 +22,7 @@ const SHIELD_DELAY := 8.0
 const BASE_CANNON_SLOTS := 10
 const MAX_CANNONS := 350
 const BASE_RELOAD := 1.65
-const START := Vector2(2100, 1450)
+const START := Vector2(4200, 2900)
 const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice", "fire", "poison", "shrapnel", "lightning", "holy", "shadow", "wind", "earth", "water", "cursed", "bleed", "necro", "gold", "crystal", "explosive", "arcane", "spectral", "lava", "light", "armor_piercing", "gas"]
 const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein", "Feuerkugeln geladen · Grafik-Beta", "Giftkugeln geladen · Grafik-Beta", "Schrapnellkugeln geladen · Grafik-Beta", "Blitzkugeln geladen · Grafik-Beta", "Heilige Kugeln geladen · Grafik-Beta", "Schattenkugeln geladen · Grafik-Beta", "Wirbelkugeln geladen · Grafik-Beta", "Erdkugeln geladen · Grafik-Beta", "Wasserkugeln geladen · Grafik-Beta", "Fluchkugeln geladen · Grafik-Beta", "Blutkugeln geladen · Grafik-Beta", "Nekrokugeln geladen · Grafik-Beta", "Goldkugeln geladen · Grafik-Beta", "Kristallkugeln geladen · Grafik-Beta", "Explosivkugeln geladen · Grafik-Beta", "Arkankugeln geladen · Grafik-Beta", "Geisterkugeln geladen · Grafik-Beta", "Lavakugeln geladen · Grafik-Beta", "Lichtkugeln geladen · Grafik-Beta", "Panzerbrecher geladen · Grafik-Beta", "Gaskugeln geladen · Grafik-Beta"]
 var player: Dictionary
@@ -298,6 +302,7 @@ func course(point: Vector2) -> bool:
 	pending_portal=-1
 	if docked: return false
 	if int(player.hp) <= 0: return false
+	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
 	var route: Array[Vector2] = []
 	if staff.flag("no_collision"): route.append(point.clamp(Vector2(40, 40), WORLD - Vector2(40, 40)))
 	else: route = plan_path(player.pos, point)
@@ -723,10 +728,11 @@ func step(delta: float) -> void:
 			message = "Neuer Versuch · die Welle wartet" if in_bonus_map() else "Wieder auf See · Rumpf repariert"
 	else:
 		_move(player, delta)
-		if pending_portal>=0 and near_portal()==pending_portal:
+		var edge_destination: int=near_portal()
+		if edge_destination>=0:
 			if clock-float(player.last_hit)<6.0:
-				message="Portal wartet · noch %d Sekunden ohne Treffer" % ceili(6.0-clock+float(player.last_hit))
-			elif travel(pending_portal):return
+				message="Überfahrt wartet · noch %d Sekunden ohne Treffer" % ceili(6.0-clock+float(player.last_hit))
+			elif travel(edge_destination):return
 		if repairing:
 			player.hp = minf(float(player.max_hp), float(player.hp) + 90.0 * (1.5 if has_blessing() else 1.0) * delta)
 			if float(player.hp) >= float(player.max_hp): repairing = false
@@ -1593,10 +1599,33 @@ func harbor_repair() -> bool:
 	message = "Rumpf im Trockendock vollständig repariert"
 	return true
 
+func edge_point(edge: String, from: Vector2) -> Vector2:
+	var point: Vector2=from.clamp(Vector2(EDGE_INSET,EDGE_INSET),WORLD-Vector2(EDGE_INSET,EDGE_INSET))
+	match edge:
+		"east":point.x=WORLD.x-80.0
+		"west":point.x=80.0
+		"north":point.y=80.0
+		"south":point.y=WORLD.y-80.0
+	return point
+
+func edge_distance(point: Vector2,edge: String) -> float:
+	match edge:
+		"east":return WORLD.x-point.x
+		"west":return point.x
+		"north":return point.y
+		"south":return WORLD.y-point.y
+	return INF
+
 func near_portal() -> int:
-	for portal in portals:
-		if player.pos.distance_to(portal.pos) <= 135: return int(portal.destination)
-	return -1
+	# Legacy API retained for chart/staff callers. Proximity is to an entire
+	# edge, including its corners; there is no radial landmark hitbox.
+	var closest: float=EDGE_BAND+0.01
+	var destination: int=-1
+	for link in portals:
+		var distance: float=edge_distance(player.pos,str(link.edge))
+		if distance<=EDGE_BAND and distance<closest:
+			closest=distance;destination=int(link.destination)
+	return destination
 
 func request_portal(destination: int) -> bool:
 	pending_portal=-1
@@ -1606,24 +1635,24 @@ func request_portal(destination: int) -> bool:
 	if level<int(CONTENT.MAPS[destination].level):
 		message="%s: Kapitänsstufe %d benötigt" % [CONTENT.MAPS[destination].name,CONTENT.MAPS[destination].level]
 		return false
-	for portal in portals:
-		if int(portal.destination)!=destination:continue
-		if player.pos.distance_to(portal.pos)<=135:
+	for link in portals:
+		if int(link.destination)!=destination:continue
+		if near_portal()==destination:
 			if clock-float(player.last_hit)>=6.0:return travel(destination)
 			player.path=[];pending_portal=destination
-			message="Portal wartet · erst 6 Sekunden ohne Treffer"
+			message="Überfahrt wartet · erst 6 Sekunden ohne Treffer"
 			return true
-		if not course(portal.pos):return false
+		if not course(edge_point(str(link.edge),player.pos)):return false
 		pending_portal=destination
 		firing=false
-		message="Kurs zum Portal · %s" % CONTENT.MAPS[destination].name
+		message="Kurs zum Kartenrand · %s" % CONTENT.MAPS[destination].name
 		return true
 	return false
 
 func travel(destination: int) -> bool:
 	if destination < 0 or not destination in CONTENT.SEA_MAP_IDS or destination == map_id or docked or int(player.hp) <= 0: return false
 	if near_portal() != destination:
-		message = "Für den Kartenwechsel zum Portal fahren"
+		message = "Für den Kartenwechsel an den markierten Kartenrand fahren"
 		return false
 	if level < int(CONTENT.MAPS[destination].level):
 		message = "Dieses Seegebiet öffnet ab Kapitänsstufe %d" % CONTENT.MAPS[destination].level
@@ -1631,9 +1660,17 @@ func travel(destination: int) -> bool:
 	if clock - float(player.last_hit) < 6.0:
 		message = "Kartenwechsel erst 6 Sekunden ohne Treffer"
 		return false
+	var arrival: Vector2=player.pos.clamp(Vector2(EDGE_INSET,EDGE_INSET),WORLD-Vector2(EDGE_INSET,EDGE_INSET))
+	for link in portals:
+		if int(link.destination)!=destination:continue
+		match str(link.edge):
+			"east":arrival.x=EDGE_INSET
+			"west":arrival.x=WORLD.x-EDGE_INSET
+			"north":arrival.y=WORLD.y-EDGE_INSET
+			"south":arrival.y=EDGE_INSET
 	map_states[map_id] = {"npcs":npcs.duplicate(true),"drops":drops.duplicate(true)}
 	configure_map(destination)
-	_arrive(START)
+	_arrive(_free_water(arrival))
 	message = "%s erreicht · Karte %s" % [CONTENT.MAPS[map_id].name,CONTENT.MAPS[map_id].code]
 	return true
 
@@ -1692,6 +1729,7 @@ func _find_harbor_site() -> Vector2:
 	return primary
 
 func _map_point(point: Vector2) -> Vector2:
+	point *= AUTHORED_SCALE
 	match map_id%6:
 		1, 4: return Vector2(WORLD.x - point.x,point.y)
 		2, 5: return Vector2(point.x,WORLD.y - point.y)
@@ -1753,9 +1791,11 @@ func configure_map(destination: int) -> void:
 		_add_drop(START + Vector2(-170,130),25 + map_id * 15)
 		_add_drop(START + Vector2(220,-120),25 + map_id * 15)
 		_add_drop(_map_point(Vector2(2170,1780)),30 + map_id * 20)
-	var exits: Array[Vector2]=[Vector2(4070,1600),Vector2(330,1600),Vector2(2200,300)]
-	var neighbors: Array[int]=CONTENT.sea_neighbors(map_id)
-	for i in neighbors.size():portals.append({"pos":exits[i],"destination":neighbors[i]})
+	# Compatibility name: these are logical whole-edge links, never point portals.
+	for neighbor in CONTENT.sea_neighbors(map_id):
+		for edge: String in ["east","west","north","south"]:
+			if CONTENT.sea_edge_neighbor(map_id,edge)==neighbor:
+				portals.append({"pos":edge_point(edge,WORLD*.5),"destination":neighbor,"edge":edge})
 	if CONTENT.has_guild_island(map_id):
 		# A purpose-built island with integrated coastal walls, an open sea gate,
 		# navigable central harbor and twelve independent physical defenses.
@@ -1807,7 +1847,7 @@ func export_save() -> Dictionary:
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
-	return {"schema":8,"sea_contracts":sea_contracts.snapshot(),"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"pearls":pearls,"crystals":crystals,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	return {"schema":8,"world_layout":WORLD_LAYOUT,"sea_contracts":sea_contracts.snapshot(),"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"pearls":pearls,"crystals":crystals,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"talents":talents.duplicate(),"battle_pass_claimed":battle_pass_claimed.duplicate(),
@@ -1919,6 +1959,8 @@ func restore_save(data: Dictionary) -> bool:
 			bonus_runs+=1
 		else:
 			var origin_pos: Variant=run.get("origin_pos",[START.x,START.y])
+			if int(data.get("world_layout",1))<WORLD_LAYOUT and origin_pos is Array and origin_pos.size()==2 and run.has("origin_pos"):
+				origin_pos=[float(origin_pos[0])*AUTHORED_SCALE,float(origin_pos[1])*AUTHORED_SCALE]
 			bonus={"tier":clampi(int(run.get("tier",0)),0,CONTENT.BONUS_TIERS.size()-1),"wave":clampi(int(run.get("wave",0)),0,CONTENT.BONUS_WAVES.size()-1),
 				"state":"break","timer":3.0,"origin":int(run.get("origin",0)) if int(run.get("origin",0)) in CONTENT.SEA_MAP_IDS else 0,
 				"origin_pos":origin_pos if origin_pos is Array and origin_pos.size()==2 else [START.x,START.y]}
@@ -1957,6 +1999,7 @@ func restore_save(data: Dictionary) -> bool:
 	var position: Variant=data.get("position",[])
 	if position is Array and position.size()==2:
 		var point=Vector2(float(position[0]),float(position[1]))
+		if int(data.get("world_layout",1))<WORLD_LAYOUT:point*=AUTHORED_SCALE
 		if point.is_finite() and not blocked(point):player.pos=point
 	# Schema-8 saves written before deck HP did not include max_hp.
 	# Preserve their MISSING hull HP through migration instead of making
@@ -1970,6 +2013,9 @@ func restore_save(data: Dictionary) -> bool:
 	if int(player.hp)==0:player.respawn=8.0
 	powder_on=false
 	plates_on=false
+	# Old berth offsets were local to the harbor art, so resnap a migrated
+	# moored captain to the new safe berth instead of leaving them on land.
+	if bool(data.get("docked",false)) and int(data.get("world_layout",1))<WORLD_LAYOUT:player.pos=harbor
 	docked=bool(data.get("docked",false)) and can_dock()
 	return true
 

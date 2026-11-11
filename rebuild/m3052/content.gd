@@ -81,11 +81,24 @@ static func sea_neighbors(index: int) -> Array[int]:
 	var tier: int=int(config.get("tier",index+1))
 	var lane: int=int(config.get("lane",1))
 	var result: Array[int]=[]
-	# East/west progress through the same lane; north crosses to the paired sea.
+	# East/west progress through the same lane; north/south crosses to the paired sea.
 	if tier<20:result.append(sea_index(tier+1,lane))
 	if tier>1:result.append(sea_index(tier-1,lane))
 	result.append(sea_index(tier,3-lane))
 	return result
+
+# Spatial adjacency shared by the sea, minimap and crossing simulation.
+static func sea_edge_neighbor(index: int, edge: String) -> int:
+	if not index in SEA_MAP_IDS:return -1
+	var region: Dictionary=MAPS[index]
+	var tier: int=int(region.tier)
+	var lane: int=int(region.lane)
+	match edge:
+		"east":return sea_index(tier+1,lane)
+		"west":return sea_index(tier-1,lane)
+		"south":return sea_index(tier,2) if lane==1 else -1
+		"north":return sea_index(tier,1) if lane==2 else -1
+	return -1
 
 static func next_sea_on_route(origin: int,destination: int) -> int:
 	if not origin in SEA_MAP_IDS or not destination in SEA_MAP_IDS:return -1

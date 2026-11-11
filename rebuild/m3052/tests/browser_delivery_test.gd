@@ -29,7 +29,7 @@ func _run() -> void:
 	second.cache_root=content.cache_root
 	second.base_url=""
 	check(await second.ensure("ship_designs"),"catalog stays ready on scene changes without HTTP")
-	check(load("res://network_client.gd").PROTOCOL==1,"same cross-platform protocol retained in browser core")
+	check(load("res://network_client.gd").PROTOCOL==2,"same cross-platform protocol retained in browser core")
 	var game=load("res://sea_map.tscn").instantiate()
 	game.browser_classic=true
 	root.content_scale_size=Vector2i.ZERO

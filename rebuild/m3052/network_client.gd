@@ -3,7 +3,7 @@ extends Node
 signal auth_completed(ok: bool,message: String)
 signal snapshot_received(value: Dictionary)
 signal connection_changed(connected: bool)
-const PROTOCOL := 1
+const PROTOCOL := 2
 var server_url := ""
 var token := ""
 var account: Dictionary={}

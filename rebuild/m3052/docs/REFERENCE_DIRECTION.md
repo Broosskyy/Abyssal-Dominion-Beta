@@ -17,3 +17,9 @@ Vom Nutzer am 11. November 2026 präzisiert:
 ## Ableitung dieses Pakets
 
 Das alte Seafight-Kürbisfest verbindet markierte Eventgegner mit Sammelwährung und eintauschbaren Belohnungen. Für Abyssal Dominion wird daraus eine eigene lokale Beta-Spielschleife: Eventgegner finden → selbst angreifen → Zeichen erhalten → Munition eintauschen. Bestehende Sammelfunde bleiben ergänzend erhalten. Keine fremden Namen, Gegnergrafiken oder Originalpreise werden übernommen.
+
+## Asset- und Kartenpräzisierung vom 11. November 2026
+
+- Größere Seekarten und durchgehende markierte Randüberfahrten; einzelne Portale entfallen.
+- NPC- und Spielerschiffe erstellt der Nutzer separat als 3D-Modelle. Sonstige Umgebungs-, Monster-, Effekt- und UI-Assets dürfen als normale Grafiken erstellt und verbessert werden.
+- Monster sollen sich wie der animierte 2D-Tiamat lebendig anfühlen. Browser-Ladebudget und gemeinsame Android-Spielregeln bleiben verbindlich.

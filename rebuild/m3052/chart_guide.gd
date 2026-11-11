@@ -47,7 +47,7 @@ func _grid() -> void:
 
 func _legend() -> void:
 	var entries=[["player","Dein Schiff · Spitze = Fahrtrichtung"],["neutral","Neutrales Schiff"],["hostile","Feindlich oder im Kampf"],["monster","Seeungeheuer"],
-		["tower","Festungsturm · grün = deine Gilde"],["portal","Portal zur nächsten Seekarte"],["harbor","Hafen · andocken"],["sparkle","Glitzernde Strömung · Essenz"],["staff","Spielteam · offizieller Staff"]]
+		["tower","Festungsturm · grün = deine Gilde"],["edge","Kartenrand · Nachbarkarte"],["harbor","Hafen · andocken"],["sparkle","Glitzernde Strömung · Essenz"],["staff","Spielteam · offizieller Staff"]]
 	var columns=2 if size.x>520 else 1
 	var per=ceili(float(entries.size())/columns)
 	var col_w=size.x/columns
@@ -66,7 +66,7 @@ func _mark(kind: String,p: Vector2) -> void:
 		"tower":
 			draw_rect(Rect2(p-Vector2(4,4),Vector2(8,8)),Color("ff8a4c"))
 			draw_rect(Rect2(p-Vector2(4,4),Vector2(8,8)),Color("1a0c04"),false,1)
-		"portal":draw_arc(p,5,0,TAU,16,Color("a79edb"),1.6,true)
+		"edge":draw_line(p-Vector2(7,0),p+Vector2(7,0),Color("6ad7d2"),2.0,true)
 		"harbor":
 			draw_circle(p,4.5,Color("f4c56c"));draw_circle(p,4.5,Color("2a1a08"),false,1,true)
 		"sparkle":draw_circle(p,3,Color("7ff5e6"))

@@ -80,9 +80,14 @@ func _draw() -> void:
 			var diamond=PackedVector2Array([p+Vector2(0,-4),p+Vector2(4,0),p+Vector2(0,4),p+Vector2(-4,0),p+Vector2(0,-4)])
 			draw_polyline(diamond,event_color,1.2,true)
 		if int(npc.id)==int(simulation.target):draw_circle(p,4.0,Color("fff0c0"),false,1.2,true)
-	for portal in simulation.portals:
-		var p: Vector2=r.position+portal.pos/simulation.WORLD*r.size
-		draw_circle(p,3.2,Color("a79edb"),false,1.2,true)
+	# Whole edges replace the former individual portal dots.
+	if not simulation.in_bonus_map():
+		for edge: String in ["east","west","north","south"]:
+			var destination: int=CONTENT.sea_edge_neighbor(simulation.map_id,edge)
+			var color: Color=Color("6ad7d2") if destination>=0 else Color("7e8991")
+			if destination>=0 and simulation.level<int(CONTENT.MAPS[destination].level):color=Color("d9ab62")
+			var ends: Dictionary={"east":[Vector2(r.end.x,r.position.y),r.end],"west":[r.position,Vector2(r.position.x,r.end.y)],"north":[r.position,Vector2(r.end.x,r.position.y)],"south":[Vector2(r.position.x,r.end.y),r.end]}
+			draw_line(ends[edge][0],ends[edge][1],color,2.0,true)
 	if simulation.has_harbor():
 		var port: Vector2=r.position+simulation.harbor/simulation.WORLD*r.size
 		# A legible tiny harbor/berth silhouette, not another NPC dot.

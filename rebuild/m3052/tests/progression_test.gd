@@ -110,7 +110,7 @@ func _initialize() -> void:
 	sim.level=4;sim.player.pos=sim.portals[0].pos;sim.player.last_hit=sim.clock
 	check(sim.request_portal(1) and sim.map_id==0,"combat cooldown queues crossing without escaping immediately")
 	sim.step(3)
-	check(sim.map_id==0 and "Portal wartet" in sim.message,"portal waits while combat cooldown remains")
+	check(sim.map_id==0 and "Überfahrt wartet" in sim.message,"portal waits while combat cooldown remains")
 	sim.step(3.1)
 	check(sim.map_id==1,"waiting portal completes after six seconds without damage")
 	sim=SIM.new();sim.level=4

@@ -1,5 +1,6 @@
 extends Node2D
 const SIM = preload("res://simulation.gd")
+const MONSTER_MOTION=preload("res://monster_motion.gd")
 const MINI = preload("res://minimap.gd")
 const HUD=preload("res://nautical_button.gd")
 const HUD_PANEL=preload("res://nautical_panel.gd")
@@ -523,7 +524,7 @@ func _load_assets() -> void:
 		skin_previews.append(_ship_preview("res://assets/expansion/preview_"+("halloween" if skins.size()==13 else "columbus")+".webp"))
 	for name in ["tropical","rock","snow","snow2"]:
 		island_textures[name] = load("res://assets/reference/islands/"+name+".png")
-	for name in ["cannonball","harpoon","chain","repair_chest","portal"]:
+	for name in ["cannonball","harpoon","chain","repair_chest"]:
 		icons[name] = load(USER_ROOT+"ui/"+name+".png")
 	beast = load("res://assets/reference/monsters/tiamat.png")
 	for name in ["cannon_0","cannon_1","cannon_2","harpoon_0","harpoon_1","harpoon_2","loot_0","loot_1","loot_2","loot_3","upgrade_cannon","upgrade_harpoon","upgrade_hull","upgrade_sails","quest_book","world_chart"]:
@@ -779,15 +780,7 @@ func _draw() -> void:
 	for sparkle in sim.sparkles:
 		if float(sparkle.respawn)>0 or not view.has_point(sparkle.pos):continue
 		_draw_sparkle(sparkle.pos,float(sparkle.id))
-	for portal in sim.portals:
-		if not view.has_point(portal.pos): continue
-		var pp: Vector2 = portal.pos
-		var region: Dictionary = CONTENT.MAPS[int(portal.destination)]
-		_draw_portal_marker(pp,int(region.level)>sim.level)
-		if _landmark_label_visible(pp):
-			var locked=int(region.level)>sim.level
-			_label(pp+Vector2(0,100),"%s · AB LV. %d" % [region.name,region.level] if locked else str(region.name)+" · PORTAL",14,GOLD if locked else CYAN)
-			if not locked:_label(pp+Vector2(0,119),"Antippen: automatische Überfahrt",11,CYAN)
+	_draw_sea_edges(view)
 	if not sim.player.path.is_empty():
 		var before: Vector2 = sim.player.pos
 		for point: Vector2 in sim.player.path:
@@ -923,18 +916,42 @@ func _landmark_label_visible(point: Vector2) -> bool:
 	bodies.append_array(sim.npcs)
 	return VISUALS.landmark_label_visible(point,bodies)
 
-func _draw_portal_marker(point: Vector2,locked: bool) -> void:
-	# Transparent chart gate, not a repair chest or an opaque inventory tile.
-	var color=Color("a79c78") if locked else Color("66cddd")
-	_ellipse(point,Vector2(76,31),Color(color,0.07))
-	for i in 3:
-		var phase=fmod(elapsed*0.35+float(i)/3.0,1.0)
-		_ellipse_line(point,Vector2(42+phase*42,17+phase*17),Color(color,(1-phase)*0.6),2.0)
-	for i in 4:
-		var angle=float(i)*PI*0.5
-		var tip=point+Vector2(cos(angle)*85,sin(angle)*35)
-		var inner=point+Vector2(cos(angle)*70,sin(angle)*28)
-		draw_line(inner,tip,color,2.2,true)
+func _draw_sea_edges(view: Rect2) -> void:
+	if sim.in_bonus_map():return
+	for edge: String in ["east","west","north","south"]:
+		var vertical: bool=edge in ["east","west"]
+		var fixed: float=64.0 if edge in ["west","north"] else (sim.WORLD.x-64.0 if vertical else sim.WORLD.y-64.0)
+		if vertical and (fixed<view.position.x-100 or fixed>view.end.x+100):continue
+		if not vertical and (fixed<view.position.y-100 or fixed>view.end.y+100):continue
+		var low: float=maxf(64.0,view.position.y if vertical else view.position.x)
+		var high: float=minf((sim.WORLD.y if vertical else sim.WORLD.x)-64.0,view.end.y if vertical else view.end.x)
+		if high<low:continue
+		var destination: int=CONTENT.sea_edge_neighbor(sim.map_id,edge)
+		var locked: bool=destination>=0 and sim.level<int(CONTENT.MAPS[destination].level)
+		var color: Color=Color("6ad7d2") if destination>=0 else Color("7e8991")
+		if locked:color=Color("d9ab62")
+		var first: Vector2=Vector2(fixed,low) if vertical else Vector2(low,fixed)
+		var last: Vector2=Vector2(fixed,high) if vertical else Vector2(high,fixed)
+		draw_line(first,last,Color(color,.08),24.0,true)
+		draw_line(first,last,Color(color,.75),2.0,true)
+		var inward: Vector2={"east":Vector2.LEFT,"west":Vector2.RIGHT,"north":Vector2.DOWN,"south":Vector2.UP}[edge]
+		var tangent: Vector2=Vector2.DOWN if vertical else Vector2.RIGHT
+		for tick in range(ceili(low/160.0),floori(high/160.0)+1):
+			var at: Vector2=Vector2(fixed,tick*160.0) if vertical else Vector2(tick*160.0,fixed)
+			draw_line(at,at+inward*14.0,Color(color,.65),1.6,true)
+			if tick%2==0 and destination>=0:
+				var tip: Vector2=at+inward*24
+				draw_polyline(PackedVector2Array([tip+inward*10-tangent*7,tip,tip+inward*10+tangent*7]),color,2.0,true)
+		# Keep a single destination caption in the middle of the visible edge,
+		# rather than hiding the only repeated caption under the combat buttons.
+		var middle: float=(low+high)*.5
+		var at: Vector2=Vector2(fixed,middle) if vertical else Vector2(middle,fixed)
+		var label: String="WELTGRENZE"
+		if destination>=0:
+			var region: Dictionary=CONTENT.MAPS[destination]
+			label="%s · %s" % [region.code,region.name]
+			if locked:label+=" · AB LV. %d" % region.level
+		_label(at+inward*140+Vector2(0,5),label,13,color)
 
 func _npc_ship_texture(_actor: Dictionary) -> Texture2D:
 	# NPCs are 3D-only; a nautical UI icon replaces obsolete sprite portraits.
@@ -1103,12 +1120,17 @@ func _draw_actor(actor: Dictionary) -> void:
 		var key: String=str(actor.get("monster_key",""))
 		if expansion_art.has(key):
 			var tex: Texture2D=expansion_art[key]
-			var breath: float=sin(elapsed*1.8+float(actor.id)) if ship_animations_enabled else 0.0
-			var dims: Vector2=tex.get_size()*(225.0+breath*2.5)/maxf(tex.get_width(),tex.get_height())
-			draw_texture_rect(tex,Rect2(point-dims*.5+Vector2(0,breath*2),dims),false)
+			var dims: Vector2=tex.get_size()*225.0/maxf(tex.get_width(),tex.get_height())
+			if ship_animations_enabled:
+				# Soft surface rings connect the moving limbs to the sea.
+				for ring in 2:
+					var phase: float=fposmod(elapsed*.42+float(actor.id)*.19+ring*.5,1.0)
+					_ellipse_line(point+Vector2(0,dims.y*.22),Vector2(55+phase*60,12+phase*16),Color(.57,.85,.88,(1.0-phase)*.12),1.2)
+			var mesh: ArrayMesh=MONSTER_MOTION.frame(key,elapsed,int(actor.id),ship_animations_enabled)
+			draw_mesh(mesh,tex,Transform2D(0.0,dims,0.0,point))
 		else:
 			var col = posmod(roundi((heading.angle()+PI*0.25)/TAU*4),4)
-			var row = int(elapsed*6)%CONTENT.MONSTER_ROWS
+			var row = int(elapsed*6)%CONTENT.MONSTER_ROWS if ship_animations_enabled else 0
 			_draw_atlas(beast,point,210.0,col,row,CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS)
 	elif browser_classic and not monster:
 		_draw_classic_ship(actor,point,heading,length)
@@ -2181,13 +2203,13 @@ func _refresh_ui() -> void:
 		interact.text="ABLEGEN"
 	elif sim.near_portal()>=0:
 		var region: Dictionary=CONTENT.MAPS[sim.near_portal()]
-		interact.text=("AB LV. %d · %s" % [region.level,region.name]) if sim.level<int(region.level) else "PORTAL · "+str(region.name)
+		interact.text=("AB LV. %d · %s" % [region.level,region.name]) if sim.level<int(region.level) else "ÜBERFAHRT · "+str(region.name)
 	elif sim.pending_portal>=0:
-		interact.text="PORTALKURS ABBRECHEN"
+		interact.text="ÜBERFAHRT ABBRECHEN"
 	elif sim.can_dock():
 		interact.text="IM HAFEN ANDOCKEN"
 	else:
-		interact.text="KURS ZUM PORTAL" if sim.pending_portal>=0 else "KURS ZUM HAFEN"
+		interact.text="KURS ZUM KARTENRAND" if sim.pending_portal>=0 else "KURS ZUM HAFEN"
 	if modal.visible and modal_kind=="Logbuch" and _tab("Logbuch")=="VERTRÄGE":_refresh_contract_rows()
 	if modal.visible and modal_kind=="Events":_refresh_event_controls()
 	if modal.visible and modal_kind=="Monster":_refresh_monster_controls()
@@ -3993,11 +4015,11 @@ func _chart_details(index: int) -> void:
 	if bonus:
 		var tier=index-CONTENT.REGION_COUNT
 		lines.append("Nur mit %s-Schriftrolle · 5 Wellen bis zum Leviathan · Gegnerstärke ×%s" % [CONTENT.BONUS_TIERS[tier].name,str(region.enemy_scale).replace(".",",")])
-		lines.append("Kein Hafen, keine Portale · Ausgang über BONUSKARTE VERLASSEN")
+		lines.append("Kein Hafen, keine Randübergänge · Ausgang über BONUSKARTE VERLASSEN")
 	else:
 		var exits: Array[String]=[]
 		for neighbor in CONTENT.sea_neighbors(index):exits.append(str(CONTENT.MAPS[neighbor].code))
-		lines.append("Hafen: ja · Portale: "+", ".join(exits))
+		lines.append("Hafen: ja · Nachbarkarten: "+", ".join(exits))
 		lines.append("Patrouillen, Elite-Schiffe und Seeungeheuer · Gegnerstärke ×%s" % str(region.enemy_scale).replace(".",","))
 		if CONTENT.has_guild_island(index):
 			lines.append("Gildeninsel mit 12 Türmen · Eigentümer [%s]" % sim.guild_owner_tag(index))
@@ -4008,7 +4030,7 @@ func _chart_details(index: int) -> void:
 	elif index==sim.map_id:
 		_row_button(line,"DU BIST HIER",func():pass,true)
 	else:
-		var text="GESPERRT · LV. %d" % region.level if locked else ("PORTAL BETRETEN" if sim.near_portal()==index else "KURS ZUM PORTAL")
+		var text="GESPERRT · LV. %d" % region.level if locked else ("KARTE WECHSELN" if sim.near_portal()==index else "KURS ZUM KARTENRAND")
 		_row_button(line,text,func():_navigate_region(CONTENT.next_sea_on_route(sim.map_id,index)),locked or sim.docked or sim.in_bonus_map(),"primary")
 	if staff.active():
 		_row_button(line,"STAFF-TELEPORT",func():_staff(func():sim.staff_teleport(index,"start"),true),not staff.can("map" if index!=sim.map_id else "teleport") or index==sim.map_id,"staff")
@@ -4022,8 +4044,8 @@ func _open_chart_guide() -> void:
 	for map: Dictionary in CONTENT.MAPS:
 		codes.append("%s %s · ab Lv. %d · %s" % [map.code,map.name,map.level,"Bonuskarte, nur mit Schriftrolle" if bool(map.get("bonus",false)) else ("feindlich" if map.npc_hostile else "neutral")])
 	_note("\n".join(codes),Color("e2ecee"))
-	_section("PORTALE")
-	_note("Jede Seekarte hat ein Portal im Osten und eines im Westen; sie verbinden alle 40 Karten in zwei Spuren von 1/1 bis 20/2. Portal antippen setzt Kurs, beim Erreichen wechselt das Schiff automatisch. Nach einem Treffer wartet das Portal 6 Sekunden. Gesperrte Portale zeigen AB LV. und lassen dich erst mit der Kapitänsstufe hinüber.")
+	_section("KARTENRÄNDER & ÜBERFAHRT")
+	_note("Die gesamte markierte Kartenkante führt in die jeweilige Nachbarkarte. Einfach an den Rand fahren: Du kommst auf der gegenüberliegenden Seite an derselben Querposition an. Osten/Westen verbindet 1 bis 20; Süden führt von Reihe /1 nach /2, Norden zurück. Graue Ränder sind Weltgrenzen, goldene Ränder benötigen eine höhere Kapitänsstufe. Nach einem Treffer wartet die Überfahrt 6 Sekunden. Die Weltkarte kann einen Kurs zum passenden Rand setzen.")
 	_section("HAFEN & ANDOCKEN")
 	_note("Das goldene Anker-Symbol markiert den Hafen. Innerhalb von 160 m und nach 6 Sekunden ohne Treffer kannst du andocken: Trockendock, vorläufige Kastellausbauten, Deckwerft und Gezeitenkessel. Markt, Munition, Items und Talente sind überall über die Menüs erreichbar. Kanonenmontage geht auch auf See außerhalb von Gefechten. Angedockt bist du geschützt; ABLEGEN bringt dich zurück auf See.")
 	_section("NEUTRAL ODER FEINDLICH")
@@ -4307,7 +4329,7 @@ func _staff_teleport_tab() -> void:
 	var region: Dictionary=CONTENT.MAPS[sim.map_id]
 	_section("SPRUNGZIELE · %s %s" % [region.code,str(region.name).to_upper()])
 	var here=_grid(2)
-	var places=[["harbor","HAFEN"],["start","STARTPUNKT"],["portal_east","PORTAL OST"],["portal_west","PORTAL WEST"]]
+	var places=[["harbor","HAFEN"],["start","STARTPUNKT"],["portal_east","RAND OST"],["portal_west","RAND WEST"]]
 	if CONTENT.has_guild_island(sim.map_id):places.append(["fortress","KORSARENFESTUNG"])
 	for entry in places:
 		var place=str(entry[0])
@@ -4434,9 +4456,6 @@ func _navigate_region(destination: int) -> void:
 	_refresh_ui()
 
 func _chart_course(point: Vector2) -> void:
-	for portal in sim.portals:
-		if point.distance_to(portal.pos)<120:
-			_navigate_region(int(portal.destination));return
 	if sim.course(point):_send_online_course(point)
 	_refresh_ui()
 
@@ -4450,7 +4469,7 @@ func _interact() -> void:
 	elif sim.near_portal()>=0:
 		_navigate_region(sim.near_portal())
 	elif sim.pending_portal>=0:
-		sim.pending_portal=-1;sim.player.path=[];sim.message="Portalkurs abgebrochen"
+		sim.pending_portal=-1;sim.player.path=[];sim.message="Überfahrt abgebrochen"
 	elif sim.can_dock():
 		if sim.dock():_open_modal("Hafen")
 	else:
@@ -4675,9 +4694,6 @@ func _tap(screen: Vector2) -> void:
 		return
 	_reset_enemy_tap()
 	var point: Vector2=get_canvas_transform().affine_inverse()*screen
-	for portal in sim.portals:
-		if point.distance_to(portal.pos)<=maxf(85,45/camera.zoom.x):
-			_navigate_region(int(portal.destination));return
 	# A graphic water berth is a deliberate, small interactive landmark.
 	if sim.has_harbor() and point.distance_to(sim.harbor)<=maxf(84.0,45.0/maxf(.1,camera.zoom.x)):
 		if sim.docked:
@@ -5079,7 +5095,7 @@ func _open_info() -> void:
 		"WELT":
 			_section("WELT · GILDE · VERANSTALTUNGEN")
 			var grid=_catalog_grid(2)
-			_menu_shortcut(grid,painted.nav_charts,"WELTKARTE","Seekarten & Portale","Seekarten")
+			_menu_shortcut(grid,painted.nav_charts,"WELTKARTE","Seekarten & Übergänge","Seekarten")
 			_menu_shortcut(grid,painted.nav_bonus,"BONUSKARTEN","Fragmente, Wellen & Belohnungen","Bonuskarten")
 			_menu_shortcut(grid,painted.boss_wave,"MONSTERJAGD","Seeungeheuer & Harpunen","Monster")
 			_menu_shortcut(grid,painted.nav_guild,"GILDE","Heimatbasis & Gildeninsel","Gilde")

@@ -15,7 +15,7 @@ from collections import defaultdict, deque
 from pathlib import Path
 from aiohttp import web, WSMsgType
 
-PROTOCOL = 1
+PROTOCOL = 2
 SEA_IDS = {0, 1, 2, *range(6, 43)}
 SESSION_SECONDS = 86400
 MAX_CLIENTS = 128
@@ -33,6 +33,12 @@ class World:
             CREATE TABLE IF NOT EXISTS characters (
             account TEXT NOT NULL, map_id INTEGER NOT NULL, x REAL NOT NULL, y REAL NOT NULL,
             heading REAL NOT NULL, skin INTEGER NOT NULL, PRIMARY KEY(account,map_id));''')
+        # Upgrade persisted preview coordinates exactly once. Protocol 2 prevents
+        # older small-world clients joining the expanded-world rooms.
+        if self.db.execute('PRAGMA user_version').fetchone()[0] < 2:
+            self.db.execute('UPDATE characters SET x=x*2,y=y*2')
+            self.db.execute('PRAGMA user_version=2')
+            self.db.commit()
         self.peers = {}
         self.rates = defaultdict(deque)
         self.tick = 0
@@ -51,7 +57,7 @@ class World:
             if not isinstance(point,list) or len(point)!=2: return None
             x,y=point
             if type(x) not in (int,float) or type(y) not in (int,float): return None
-            if not math.isfinite(x) or not math.isfinite(y) or not (40<=x<=4360 and 40<=y<=3160): return None
+            if not math.isfinite(x) or not math.isfinite(y) or not (40<=x<=8760 and 40<=y<=6360): return None
             result.append((float(x),float(y)))
         return result
 
@@ -134,7 +140,7 @@ class World:
                     self.peers.pop(previous,None)
             if sum(p['map_id']==map_id for p in self.peers.values())>=MAX_ROOM: raise ValueError('room full')
             saved = self.db.execute('SELECT x,y,heading,skin FROM characters WHERE account=? AND map_id=?',(account['id'],map_id)).fetchone()
-            peer = dict(**account,map_id=map_id,x=saved[0] if saved else 2100.,y=saved[1] if saved else 1450.,
+            peer = dict(**account,map_id=map_id,x=saved[0] if saved else 4200.,y=saved[1] if saved else 2900.,
                 heading=saved[2] if saved else math.pi,skin=saved[3] if saved else 0,
                 hp=2400,max_hp=2400,route=[],sequence=0,expires=time.monotonic()+max(0,account['expires_at']-time.time()))
             self.peers[ws] = peer

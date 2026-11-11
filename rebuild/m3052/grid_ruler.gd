@@ -5,7 +5,7 @@ var world_to_screen:=Transform2D.IDENTITY
 var hud_scale:=1.0
 var top:=50.0
 var left_bottom:=300.0
-var world_size:=Vector2(4400,3200)
+var world_size:=Vector2(8800,6400)
 func _ready() -> void:mouse_filter=Control.MOUSE_FILTER_IGNORE
 func _hud(world: Vector2) -> Vector2:return world_to_screen*world/hud_scale
 func _draw() -> void:

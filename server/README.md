@@ -14,9 +14,9 @@ The default bind is `127.0.0.1:8787`. To expose a development instance, configur
 
 ## Protocol 1
 
-- `POST /v1/register`: `{protocol:1,email,password,username}`. Username 3–24 characters, password 10–128. The database stores scrypt hashes with independent random salts.
+- `POST /v1/register`: `{protocol:2,email,password,username}`. Username 3–24 characters, password 10–128. The database stores scrypt hashes with independent random salts.
 - `POST /v1/login`: same fields, username omitted. Both return `{protocol,token,account:{id,username},scope:"presence-preview"}`.
-- `GET /v1/world`: WebSocket; first message `{type:"join",protocol:1,token,map_id}`. Tokens go in the first frame, never a query string. Only the 40 public sea ids are admitted; bonus maps are separate local instances.
+- `GET /v1/world`: WebSocket; first message `{type:"join",protocol:2,token,map_id}`. Tokens go in the first frame, never a query string. Only the 40 public sea ids are admitted; bonus maps are separate local instances.
 - Course intent: `{type:"course",sequence,x,y}` or `{type:"course",sequence,route:[[x,y],...]}` (maximum 128 points). Server rejects duplicate/stale sequences, nonfinite/out-of-world points and excessive input. Clients never supply velocity, gold, rewards or privileges. `appearance` accepts a skin index 0–13 and bounded `hp`/`max_hp` solely for the visual presence preview; those HP are client-reported, never trusted for combat or persisted as character progression. Movement uses 165 world units/second; routes come from the client navigator, so coastline validation is not yet server authoritative.
 - Server replies `welcome`, then `snapshot` with tick, map id and room-local `{id,username,x,y,sequence,heading,skin,hp,max_hp,moving}` records. Welcome includes persisted spawn position, heading and design. A new authenticated connection replaces the old account connection so map changes can resume immediately. One active connection per account and at most 32 captains per room. A new token is held in memory by the client, not saved to guest files.
 
