@@ -16,6 +16,15 @@ static func heading_column(heading: Vector2,previous: int=-1) -> int:
 	var sector=posmod(roundi((heading.angle()+PI*0.25)/(PI*0.5)),4)
 	return CLOCKWISE_TO_ATLAS[sector]
 
+## The original four-view Classic look is *visual only*. Select one of
+## the four diagonal baked views, never change the physical ship course.
+## Eight-view atlas order is N, NE, E, SE, S, SW, W, NW.
+const CLASSIC_FOUR_VIEW_ATLAS := [1,7,5,3] # NE, NW, SW, SE
+
+static func heading_four(heading: Vector2,previous: int=-1) -> int:
+	var prior_column: int=CLASSIC_FOUR_VIEW_ATLAS.find(previous)
+	return CLASSIC_FOUR_VIEW_ATLAS[heading_column(heading,prior_column)]
+
 static func heading_eight(heading: Vector2,previous: int=-1) -> int:
 	if heading.length_squared()<0.0001:return previous if previous>=0 and previous<8 else 0
 	if previous>=0 and previous<8:
