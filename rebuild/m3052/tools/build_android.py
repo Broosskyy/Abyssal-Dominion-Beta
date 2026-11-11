@@ -144,7 +144,7 @@ def main():
     if prepare_texture_quality(ROOT):
         checked([engine, '--headless', '--path', str(ROOT), '--editor', '--import', '--quit'], output.with_suffix('.texture-quality.log'))
     results = []
-    for name in ['download_recovery_test', 'expansion_test', 'frontier_test', 'simulation_test', 'progression_test', 'sea_edges_test', 'classic_mode_test', 'seafight_systems_test', 'ship_visual_test', 'stern_hull_taper_test', 'combat_fx_test', 'ui_test', 'start_hub_test', 'updater_test', 'navigation_test', 'chart_presentation_test', 'deck_progression_test', 'ammo_picker_test', 'content_update_test']:
+    for name in ['download_recovery_test', 'expansion_test', 'frontier_test', 'simulation_test', 'progression_test', 'sea_edges_test', 'classic_mode_test', 'classic_navigation_test', 'seafight_systems_test', 'ship_visual_test', 'stern_hull_taper_test', 'combat_fx_test', 'ui_test', 'start_hub_test', 'updater_test', 'navigation_test', 'chart_presentation_test', 'deck_progression_test', 'ammo_picker_test', 'content_update_test']:
         with tempfile.TemporaryDirectory() as user_data:
             env = dict(os.environ, XDG_DATA_HOME=user_data)
             # UI navigation verifies deferred container layout across extra frames.
