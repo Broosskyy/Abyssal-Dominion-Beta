@@ -262,6 +262,10 @@ var classic_atlases: Dictionary={}
 var classic_geometry: Dictionary={}
 var classic_monster_bottoms: Dictionary={}
 var classic_heading_cache: Dictionary={}
+# Rendering-only per-ship progress for the old Seafight left/right visual
+# pendulum. Never applied to sim.player.pos, actor.heading or online waypoints.
+var classic_sailing_visual: Dictionary={}
+const CLASSIC_LEFT_RIGHT_CYCLE := 1.4
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
 # 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
@@ -465,6 +469,7 @@ func _online_snapshot(packet: Dictionary) -> void:
 	for uid: String in online_actor_ids.keys():
 		if not active.has(uid):
 			classic_heading_cache.erase(int(online_actor_ids[uid]))
+			classic_sailing_visual.erase(int(online_actor_ids[uid]))
 			online_actor_ids.erase(uid)
 
 func _send_online_course(point: Vector2) -> void:
@@ -1195,6 +1200,33 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 	var before: int=int(classic_heading_cache.get(id,-1))
 	var heading: Vector2=actor.get("heading",Vector2.RIGHT)
 	var current: int=VISUALS.heading_four(heading,before)
+	# Historical left/right effect: a ship travelling horizontally cycles
+	# between the two oblique four-view images. Its *world* motion follows
+	# its actual (possibly perfectly horizontal) route without any detour.
+	if actor.has("pos"):
+		var position: Vector2=actor.get("pos",Vector2.ZERO)
+		var motion: Dictionary=classic_sailing_visual.get(id,{})
+		var old_position: Vector2=motion.get("position",position)
+		var distance: float=position.distance_to(old_position)
+		var speed: float=maxf(20.0,float(actor.get("speed",165.0)))
+		var progress: float=float(motion.get("sail_seconds",0.0))
+		var last_moved: float=float(motion.get("last_moved",-1000.0))
+		if distance>0.03 and distance<maxf(60.0,speed*0.8):
+			# Distance, rather than raw frame count, drives the animation:
+			# standing still freezes the pose and frame rate cannot affect it.
+			progress+=distance/speed
+			last_moved=elapsed
+		if elapsed-last_moved<0.16:
+			current=VISUALS.classic_sailing_frame(heading,fposmod(progress,CLASSIC_LEFT_RIGHT_CYCLE)/CLASSIC_LEFT_RIGHT_CYCLE)
+		elif not motion.is_empty() and Vector2(motion.get("heading",heading)).distance_squared_to(heading)<0.001:
+			# Do not snap into a different facing as soon as the ship stops.
+			current=int(motion.get("frame",current))
+		else:
+			current=VISUALS.heading_four(heading,-1)
+		classic_sailing_visual[id]={
+			"position":position,"sail_seconds":progress,"last_moved":last_moved,
+			"heading":heading,"frame":current,
+		}
 	classic_heading_cache[id]=current
 	return current
 
@@ -4995,6 +5027,7 @@ func _set_render_mode(value: String) -> void:
 	# physical ship route when swapping 2D/2.5D/3D.
 	sim.set_classic_steering(browser_classic)
 	classic_heading_cache.clear()
+	classic_sailing_visual.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
 	if camera!=null:_sync_plate_overlay()
