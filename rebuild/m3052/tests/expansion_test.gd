@@ -81,6 +81,24 @@ func run() -> void:
 	cached_hunt.configure_map(int(SIM.CONTENT.SEA_MAP_IDS.back()))
 	check(EXTRA.hunt_token_reward(cached_hunt)>entry_reward,"late-region hunt token reward exceeds entry-region reward")
 	check(EXTRA.normalize_quick([["invalid","plates"]])[0]==["powder","plates","skyfire"],"bad shortcut saves fall back safely")
+	var forecast=SIM.new()
+	forecast.islands.clear();forecast.upgrades.war=2
+	forecast.activate_blessing(60)
+	var prey: Dictionary=forecast.actor(100)
+	prey.pos=forecast.player.pos+Vector2(200,0);prey.hp=1010;prey.shield=95
+	forecast.player.ammo[2]=100;forecast.ammo_mode=2;forecast.select(100)
+	var forecast_before: String=JSON.stringify([forecast.player,forecast.npcs,forecast.upgrades])
+	var plan: Dictionary=EXTRA.monster_hunt_info(forecast,"tiamat")
+	check(JSON.stringify([forecast.player,forecast.npcs,forecast.upgrades])==forecast_before,"monster forecast is read-only")
+	forecast._fire_player()
+	var harpoon: Dictionary=forecast.shots.back()
+	check(int(harpoon.damage)==int(plan.damage),"forecast hit value matches actual harpoon including elite and blessing bonuses")
+	for hit in int(plan.required)-1:forecast._hit(harpoon,prey)
+	check(int(prey.hp)>0,"one fewer harpoon than the estimate leaves the unmarked prey alive")
+	forecast._hit(harpoon,prey)
+	check(int(prey.hp)==0,"estimated harpoon count finishes the static unmarked prey including its shield")
+	check(not EXTRA.monster_hunt_info(forecast,"absent").present,"unknown species never fabricates a live target")
+	check(not EXTRA.monster_hunt_info(forecast,"").present,"empty species key never matches unrelated monsters")
 	var game=load("res://sea_map.tscn").instantiate();root.add_child(game);await process_frame;game.set_process(false)
 	game._open_modal("Events")
 	var event_ammo: Array=game.sim.player.ammo.duplicate()
@@ -117,6 +135,11 @@ func run() -> void:
 		check(game.modal_kind=="Spielinfo" and game.modal.visible,"back returns to parent menu")
 		check(not game.quick_bar.get_global_rect().intersects(game.attack.get_global_rect()),"quickbar leaves fire control clear")
 		check(not game.quick_bar.get_global_rect().intersects(game.ammo_selector.get_global_rect()),"quickbar leaves ammunition clear")
+	root.size=Vector2i(390,844);await process_frame;game._layout()
+	game._open_modal("Monster");await process_frame;await process_frame
+	for spec: Dictionary in EXTRA.monster_specs():
+		var portrait_copy: Label=game.modal_body.find_child("MonsterDetails_"+str(spec.key),true,false) as Label
+		check(portrait_copy!=null and portrait_copy.size.x>=game.modal_scroll.size.x*.7,"narrow monster card uses readable full-width text: "+str(spec.key))
 	game._set_shipyard_filter("event");game._open_modal("Werft");await process_frame
 	check(game.modal_body.find_children("ShipDesignPreview*","Panel",true,false).size()==2,"event shipyard filter shows only two seasonal designs")
 	# PvE hunting is a real live roster: Tiamat included, no dead target
@@ -137,6 +160,26 @@ func run() -> void:
 	for button: Button in game.modal_body.find_children("*","Button",true,false):
 		if button.text=="ANVISIEREN" and button.disabled:disabled_hunt=true
 	check(disabled_hunt,"dead monsters cannot be selected through hunt menu")
+	game.sim.actor(100).respawn=31.0;game._refresh_ui()
+	var returning: Label=game.modal_body.find_child("MonsterDetails_tiamat",true,false) as Label
+	check(returning!=null and returning.text.contains("31 s"),"monster roster shows actual respawn time while open")
+	game.sim._step_npc(game.sim.actor(100),32.0);game._refresh_ui()
+	var returned: Button=game.modal_body.find_child("MonsterSelect_tiamat",true,false) as Button
+	check(not returned.disabled and returning.text.contains("HP"),"respawned monster becomes selectable without rebuilding the menu")
+	game.sim.ammo_mode=0;game.sim.firing=true
+	var hunting_stock: Array=game.sim.player.ammo.duplicate()
+	var load_harpoons: Button=game.modal_body.find_child("LoadHuntHarpoons",true,false) as Button
+	load_harpoons.pressed.emit()
+	check(game.sim.ammo_mode==2 and not game.sim.firing and game.sim.player.ammo==hunting_stock,"explicit harpoon loading stops firing and never consumes stock")
+	var market_link: Button=game.modal_body.find_child("HuntHarpoonMarket",true,false) as Button
+	market_link.pressed.emit()
+	for frame in 5:await process_frame
+	var harpoon_purchase: Button=game.modal_body.find_child("MarketAmmo2",true,false) as Button
+	check(game.modal_kind=="Markt" and game._tab("Markt")=="MUNITION" and harpoon_purchase!=null,"hunt market shortcut opens real harpoon offer")
+	check(game.modal_scroll.scroll_vertical>0,"market shortcut scrolls directly to the harpoon card")
+	game._back_modal()
+	check(game.modal_kind=="Monster","market keeps a Back path to the hunt roster")
+	game.sim.actor(100).hp=0
 	game.sim.clear_target()
 	game._hunt_monster(100)
 	check(game.sim.target==-1 and not game.sim.firing,"expired monster selection never fires")

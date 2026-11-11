@@ -887,8 +887,7 @@ func _fire_player() -> void:
 		firing = false
 		return
 	if not unlimited: player.ammo[ammo_mode] -= count
-	var damage := float(weapon_damage(ammo_mode))
-	if bool(victim.elite) or victim.kind == "tower": damage *= 1.0 + 0.1 * float(upgrades.war)
+	var damage: float=base_projectile_damage(victim,ammo_mode)
 	var powdered := powder_on and ammo_mode < 2 and int(supplies.powder) > 0
 	if powdered:
 		damage *= 1.4
@@ -1456,6 +1455,12 @@ func weapon_damage(mode: int,castle_stages: Dictionary={}) -> int:
 	else: value *= 1.0 + deck_value("hunter") / 100.0
 	if has_blessing(): value *= 1.15
 	return roundi(value)
+
+## Shared unmarked hit value; consumable powder is applied only when actually firing.
+func base_projectile_damage(victim: Dictionary,mode: int) -> float:
+	var damage: float=float(weapon_damage(mode))
+	if bool(victim.get("elite",false)) or str(victim.get("kind",""))=="tower":damage*=1.0+.1*float(upgrades.war)
+	return damage
 
 func apply_upgrades() -> void:
 	var armor := 1.0 + deck_value("armor") / 100.0

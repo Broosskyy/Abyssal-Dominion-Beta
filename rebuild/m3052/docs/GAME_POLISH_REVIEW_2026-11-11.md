@@ -74,3 +74,10 @@ Für unser Spiel abgeleitet: Auf der Seekarte die wichtigsten Informationen dire
 - Zeichen können im Eventmenü gegen feste Munitionspakete getauscht werden. Beta-Werte, keine bezahlten Freischaltungen.
 - Eventwechsel verändern weder Gegnerzahl noch Rumpf, Schild oder Respawnzeit. Gesunkene Gegner bleiben gesunken, bis der normale Timer endet.
 - Eventgegner werden auf der Minikarte markiert. Eigene vorhandene Schiffsgrafiken halten das Browser-Ladebudget klein.
+
+## Folgepaket: Jagdvorbereitung und lebendige Monsterübersicht
+
+- Die Übersicht zeigt echte HP, Distanz und aktuelle Goldbeute. Besiegte Monster bleiben mit ihrer tatsächlichen Wiederkehrzeit sichtbar; fehlende Arten werden nicht als lebendig ausgegeben.
+- Wiedererscheinende Monster werden ohne erneutes Öffnen auswählbar. Anvisieren und Hinfahren bleiben getrennt vom Angriff.
+- Der Solo-Richtwert für Harpunen nutzt die gemeinsame Schadensbasis mit aktiver Ausrüstung, Elitebonus und Segnung; Markierung, Regeneration und fremde Treffer sind ausdrücklich nicht eingerechnet.
+- Harpunenladen ist eine bewusste Aktion ohne Munitionsverbrauch und ohne automatisches Feuern. Der Marktlink führt zur tatsächlichen Harpunenkarte; ein Kauf bleibt eine separate Entscheidung.

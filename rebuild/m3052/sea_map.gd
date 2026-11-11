@@ -2190,6 +2190,7 @@ func _refresh_ui() -> void:
 		interact.text="KURS ZUM PORTAL" if sim.pending_portal>=0 else "KURS ZUM HAFEN"
 	if modal.visible and modal_kind=="Logbuch" and _tab("Logbuch")=="VERTRÄGE":_refresh_contract_rows()
 	if modal.visible and modal_kind=="Events":_refresh_event_controls()
+	if modal.visible and modal_kind=="Monster":_refresh_monster_controls()
 
 func _begin_loading(duration: float) -> void:
 	var region: Dictionary=CONTENT.MAPS[sim.map_id]
@@ -2628,6 +2629,7 @@ func _catalog_tile(parent: Node,texture: Texture2D,title: String,details: String
 	heading.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	heading.custom_minimum_size.y=28
 	var description=_text(copy,details,14,Color("d6e5e6"))
+	description.name="CatalogDescription"
 	description.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT if side_by_side else HORIZONTAL_ALIGNMENT_CENTER
 	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	description.custom_minimum_size.y=38
@@ -5220,38 +5222,101 @@ func _hunt_monster(enemy_id: int, sail: bool=false) -> void:
 	_close_modal()
 	_refresh_ui()
 
-func _open_monsters() -> void:
-	_section("SEEUNGEHEUER · HARPUNENJAGD")
-	_note("Alle vier Monster werden anhand ihrer tatsächlichen Position auf der aktuellen Seekarte angezeigt. Anvisieren startet keinen Angriff. HINFAHREN hält Abstand für die Harpunenjagd; FEUER musst du anschließend selbst auslösen.")
-	var specs: Array[Dictionary]=[{"key":"tiamat","name":"Tiamat · Tiefenwächter","hp":1650,"reward":240}]
-	for entry: Dictionary in preload("res://sea_expansion.gd").MONSTERS:specs.append(entry)
+func _monster_details(info: Dictionary,name: String) -> String:
+	if not bool(info.present):return name+"\nNicht auf dieser Seekarte vorhanden"
+	if not bool(info.alive):return str(info.name)+"\nBesiegt · Rückkehr in %d s" % ceili(float(info.respawn))
+	return "%s\nHP %s/%s · %s m entfernt\nGoldbeute: %s" % [info.name,_thousands(int(info.hp)),_thousands(int(info.max_hp)),_thousands(int(info.distance)),_thousands(int(info.gold))]
+
+func _monster_readiness(info: Dictionary) -> String:
+	if not bool(info.present) or not bool(info.alive):return "Harpunen im Lager: %s" % _thousands(int(sim.player.ammo[2]))
+	return "%d Schaden/Harpune\nRichtwert: %d Harpunen · Vorrat: %s" % [info.damage,info.required,_thousands(int(sim.player.ammo[2]))]
+
+func _load_harpoons() -> void:
+	sim.firing=false
+	sim.set_ammo(2)
+	_save_progress();_open_modal("Monster");_refresh_ui()
+
+func _open_harpoon_market() -> void:
+	_switch_tab("Markt","MUNITION")
+	_focus_harpoon_offer.call_deferred()
+
+func _focus_harpoon_offer() -> void:
+	var offer: Control=modal_body.find_child("MarketAmmo2",true,false) as Control
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if not is_instance_valid(offer) or not offer.is_inside_tree() or not modal.visible or modal_kind!="Markt" or _tab("Markt")!="MUNITION":return
+	var card: Control=offer.get_parent().get_parent() as Control
+	var offset: Vector2=modal_scroll.get_global_transform().affine_inverse()*card.global_position
+	modal_scroll.restore(roundi(maxf(0,float(modal_scroll.scroll_vertical)+offset.y)))
+
+func _hunt_monster_key(key: String,sail: bool=false) -> void:
+	var info: Dictionary=preload("res://sea_expansion.gd").monster_hunt_info(sim,key)
+	if bool(info.alive):_hunt_monster(int(info.id),sail)
+	else:_refresh_ui()
+
+func _refresh_monster_controls() -> void:
+	var expansion=preload("res://sea_expansion.gd")
 	var living: int=0
-	for spec: Dictionary in specs:
+	for spec: Dictionary in expansion.monster_specs():
 		var key: String=str(spec.key)
-		var found: Dictionary={}
-		for actor: Dictionary in sim.npcs:
-			if str(actor.get("kind",""))!="monster" or int(actor.get("hp",0))<=0:continue
-			var match_key: bool=(int(actor.get("id",-1))==100) if key=="tiamat" else str(actor.get("monster_key",""))==key
-			if not match_key:continue
-			if found.is_empty() or sim.player.pos.distance_to(Vector2(actor.pos))<sim.player.pos.distance_to(Vector2(found.pos)):
-				found=actor
-		var active: bool=not found.is_empty()
-		if active:living+=1
-		var enemy_id: int=int(found.get("id",-1))
-		var distance: int=roundi(sim.player.pos.distance_to(Vector2(found.pos))) if active else 0
+		var info: Dictionary=expansion.monster_hunt_info(sim,key)
+		if bool(info.alive):living+=1
+		var details: Label=modal_body.find_child("MonsterDetails_"+key,true,false) as Label
+		if details!=null:details.text=_monster_details(info,str(spec.name))
+		var readiness: Label=modal_body.find_child("MonsterReadiness_"+key,true,false) as Label
+		if readiness!=null:
+			readiness.text=_monster_readiness(info)
+			readiness.add_theme_color_override("font_color",Color("eda780") if bool(info.alive) and int(sim.player.ammo[2])<int(info.required) and not sim.staff.flag("unlimited_ammo") else CYAN)
+		var bar: ProgressBar=modal_body.find_child("MonsterHP_"+key,true,false) as ProgressBar
+		if bar!=null:
+			bar.visible=bool(info.present)
+			bar.max_value=maxi(1,int(info.get("max_hp",1)));bar.value=int(info.get("hp",0))
+		for action in ["Select","Sail"]:
+			var button: Button=modal_body.find_child("Monster"+str(action)+"_"+key,true,false) as Button
+			if button!=null:button.disabled=not bool(info.alive) or (action=="Sail" and sim.docked)
+	var summary: Label=modal_body.find_child("MonsterSummary",true,false) as Label
+	if summary!=null:summary.text="%d/4 Monster lebendig · %s Harpunen im Lager" % [living,_thousands(int(sim.player.ammo[2]))]
+	var load: Button=modal_body.find_child("LoadHuntHarpoons",true,false) as Button
+	if load!=null:
+		load.disabled=sim.ammo_mode==2;load.text="HARPUNEN GELADEN" if sim.ammo_mode==2 else "HARPUNEN LADEN"
+
+func _open_monsters() -> void:
+	var expansion=preload("res://sea_expansion.gd")
+	_info("SEEUNGEHEUER · HARPUNENJAGD",CYAN)
+	var prep=_grid(2)
+	var load=_action("HARPUNEN LADEN",_load_harpoons,"normal",prep)
+	load.name="LoadHuntHarpoons"
+	var market=_action("ZUM HARPUNENMARKT",_open_harpoon_market,"normal",prep)
+	market.name="HuntHarpoonMarket"
+	_note("Bedarf: Solo-Richtwert mit aktueller Ausrüstung, ohne Zielmarkierung und Schildregeneration. Anvisieren und Hinfahren starten keinen Angriff.")
+	var summary=_info("",CYAN);summary.name="MonsterSummary"
+	var narrow: bool=modal_scroll.size.x<420.0
+	var gallery: Node=_catalog_grid(1) if narrow else modal_body
+	for spec: Dictionary in expansion.monster_specs():
+		var key: String=str(spec.key)
+		var info: Dictionary=expansion.monster_hunt_info(sim,key)
 		var monster_art: Texture2D
 		if key=="tiamat":
-			var preview=AtlasTexture.new()
-			preview.atlas=beast
+			var preview=AtlasTexture.new();preview.atlas=beast
 			preview.region=Rect2(Vector2.ZERO,beast.get_size()/Vector2(CONTENT.MONSTER_COLUMNS,CONTENT.MONSTER_ROWS))
 			monster_art=preview
+		else:monster_art=expansion_art[key]
+		var column: VBoxContainer
+		var details_label: Label
+		if narrow:
+			column=_catalog_tile(gallery,monster_art,"",_monster_details(info,str(spec.name)),"",Color("b58d56"))
+			column.find_child("CatalogTitle",true,false).hide()
+			column.find_child("CatalogStatus",true,false).hide()
+			details_label=column.find_child("CatalogDescription",true,false) as Label
 		else:
-			monster_art=expansion_art[key]
-		var details: String="%s\nHP %s/%s · %s m entfernt · Harpunen" % [spec.name,_thousands(int(found.hp)),_thousands(int(found.max_hp)),_thousands(distance)] if active else "%s\nMomentan nicht auf dieser Karte verfügbar" % spec.name
-		var column=_row(monster_art,details,80,Color("b58d56") if active else Color("515f68"))
-		var actions=HBoxContainer.new()
-		actions.add_theme_constant_override("separation",8)
-		column.add_child(actions)
-		_row_button(actions,"ANVISIEREN",func():_hunt_monster(enemy_id),not active)
-		_row_button(actions,"HINFAHREN",func():_hunt_monster(enemy_id,true),not active or sim.docked)
-	_note("%d/4 Monster aktuell lebendig · %s Harpunen im Lager. Monster-Angriffe bleiben auf den unteren Karten defensiv und zielbasiert." % [living,_thousands(int(sim.player.ammo[2]))],Color("9ac9c4"))
+			column=_row(monster_art,_monster_details(info,str(spec.name)),80,Color("b58d56"))
+			details_label=column.get_child(0) as Label
+		details_label.name="MonsterDetails_"+key
+		var bar=_bar(column);bar.name="MonsterHP_"+key;bar.custom_minimum_size.y=10
+		var readiness=_note(_monster_readiness(info),CYAN,column);readiness.name="MonsterReadiness_"+key
+		var actions=_grid(2,column)
+		var select=_row_button(actions,"ANVISIEREN",func():_hunt_monster_key(key),not bool(info.alive))
+		select.name="MonsterSelect_"+key
+		var sail=_row_button(actions,"HINFAHREN",func():_hunt_monster_key(key,true),not bool(info.alive) or sim.docked)
+		sail.name="MonsterSail_"+key
+	_refresh_monster_controls()

@@ -56,6 +56,30 @@ static func trade(s,key: String) -> bool:
 const EVENT_SKINS := {"halloween":12,"columbus":13}
 const QUICK_DEFAULT := [["powder","plates","skyfire"],["repair_kit","healing_amulet","shield_charge"],["wind_draught","smoke_bomb","blessing_flask"]]
 
+static func monster_specs() -> Array[Dictionary]:
+	var result: Array[Dictionary]=[{"key":"tiamat","name":"Tiamat · Tiefenwächter"}]
+	for spec: Dictionary in MONSTERS:result.append(spec.duplicate())
+	return result
+
+## Actual map roster, including the earliest returning creature when none is alive.
+static func monster_hunt_info(s,key: String) -> Dictionary:
+	if key!="tiamat" and not MONSTERS.any(func(spec):return str(spec.key)==key):return {"present":false,"alive":false,"id":-1}
+	var found: Dictionary={}
+	for actor: Dictionary in s.npcs:
+		if str(actor.get("kind",""))!="monster" or bool(actor.get("staff_spawn",false)):continue
+		if not ((key=="tiamat" and int(actor.id)==100) or (key!="tiamat" and str(actor.get("monster_key",""))==key)):continue
+		if found.is_empty():found=actor;continue
+		var alive: bool=int(actor.hp)>0
+		var previous_alive: bool=int(found.hp)>0
+		if alive and not previous_alive:found=actor
+		elif alive and previous_alive and s.player.pos.distance_squared_to(Vector2(actor.pos))<s.player.pos.distance_squared_to(Vector2(found.pos)):found=actor
+		elif not alive and not previous_alive and float(actor.get("respawn",0))<float(found.get("respawn",0)):found=actor
+	if found.is_empty():return {"present":false,"alive":false,"id":-1}
+	var alive: bool=int(found.hp)>0
+	var damage: int=maxi(1,roundi(s.base_projectile_damage(found,2)))
+	var required: int=ceili(float(int(found.hp)+int(found.get("shield",0)))/float(damage)) if alive else 0
+	return {"present":true,"alive":alive,"id":int(found.id),"name":str(found.name),"hp":int(found.hp),"max_hp":int(found.max_hp),"distance":roundi(s.player.pos.distance_to(Vector2(found.pos))),"respawn":maxf(0,float(found.get("respawn",0))),"damage":damage,"required":required,"gold":0 if s.staff.active() else s.loot_gold(int(found.reward))}
+
 static func spawn_monsters(s) -> void:
 	for i in MONSTERS.size():
 		var spec: Dictionary=MONSTERS[i]
