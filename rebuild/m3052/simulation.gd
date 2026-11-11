@@ -1,5 +1,6 @@
 extends RefCounted
 const CONTENT = preload("res://content.gd")
+const CONTRACTS = preload("res://sea_contracts.gd")
 const NAV=preload("res://navigation.gd")
 const STAFF=preload("res://staff.gd")
 const GUILD_OPS = preload("res://sim_guild_ops.gd")
@@ -51,6 +52,7 @@ var pearls: int=0
 var crystals: int=0
 var xp := 0
 var quest_index := 0
+var sea_contracts := CONTRACTS.new()
 var loot_collected := 0
 var monster_kills := 0
 var elite_kills := 0
@@ -1798,7 +1800,7 @@ func export_save() -> Dictionary:
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
-	return {"schema":8,"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"pearls":pearls,"crystals":crystals,"ammo":player.ammo.duplicate(),"skin":player.skin,
+	return {"schema":8,"sea_contracts":sea_contracts.snapshot(),"event_mode":event_mode,"event_tokens":event_tokens.duplicate(),"cooldowns":cooldowns.duplicate(),"captain_name":captain_name,"battle_points":battle_points,"rewards":rewards.snapshot(),"tower_levels":tower_levels.duplicate(),"guild_holdings":guild_holdings.duplicate(true),"captain_id":captain_id,"ammo_mode":ammo_mode,"gold":player.gold,"pearls":pearls,"crystals":crystals,"ammo":player.ammo.duplicate(),"skin":player.skin,
 		"kills":kills,"claimed":claimed,"quest_index":quest_index,"loot_collected":loot_collected,
 		"monster_kills":monster_kills,"elite_kills":elite_kills,"tower_kills":tower_kills,"level":level,"xp":xp,
 		"talents":talents.duplicate(),"battle_pass_claimed":battle_pass_claimed.duplicate(),
@@ -1843,6 +1845,7 @@ func restore_save(data: Dictionary) -> bool:
 	loot_collected=maxi(0,int(data.get("loot_collected",0)))
 	monster_kills=maxi(0,int(data.get("monster_kills",0)))
 	elite_kills=maxi(0,int(data.get("elite_kills",0)))
+	sea_contracts.restore(data.get("sea_contracts",{}),self)
 	tower_kills=maxi(0,int(data.get("tower_kills",0)))
 	level=clampi(int(data.get("level",1)),1,20)
 	xp=clampi(int(data.get("xp",0)),0,xp_required()-1)

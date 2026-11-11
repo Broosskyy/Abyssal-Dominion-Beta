@@ -172,6 +172,42 @@ func _initialize() -> void:
 	check(denied.castle_upgrade_preview("hull").reason.begins_with("AB KAPITÄNSSTUFE"),"castle preview states captain prerequisite")
 	denied.upgrades.hull=SIM.CONTENT.CASTLE_MAX
 	check(not denied.castle_upgrade_preview("hull").can_upgrade and denied.castle_upgrade_preview("hull").cost==-1,"maxed castle cannot quote another purchase")
+	# Repeatable contracts count only actions after a deliberate acceptance.
+	var contracts=SIM.new()
+	contracts.kills=20;contracts.monster_kills=3;contracts.loot_collected=12
+	for key: String in SIM.CONTRACTS.ORDER:
+		check(contracts.sea_contracts.accept(contracts,key),"contract can be accepted: "+key)
+		check(contracts.sea_contracts.info(contracts,key).progress==0,"historical totals never complete a new contract: "+key)
+		check(not contracts.sea_contracts.accept(contracts,key),"repeat acceptance cannot erase active progress: "+key)
+	contracts.kills+=1;contracts.monster_kills+=1
+	check(contracts.sea_contracts.info(contracts,"patrol").progress==0 and contracts.sea_contracts.info(contracts,"hunt").ready,"monster kill counts for hunt but never the ship contract")
+	var contract_gold: int=int(contracts.player.gold)
+	var contract_essence: int=contracts.essence
+	var contract_quest: int=contracts.quest_index
+	check(contracts.sea_contracts.claim(contracts,"hunt") and int(contracts.player.gold)==contract_gold+100 and contracts.essence==contract_essence+1,"contract pays its declared reward")
+	contract_gold=int(contracts.player.gold)
+	check(not contracts.sea_contracts.claim(contracts,"hunt") and int(contracts.player.gold)==contract_gold,"same contract round cannot pay twice")
+	check(contracts.quest_index==contract_quest and contracts.battle_points==0,"contracts do not claim campaign rewards or award PvP points")
+	check(contracts.sea_contracts.accept(contracts,"hunt") and contracts.sea_contracts.info(contracts,"hunt").progress==0,"new contract round starts from a fresh baseline")
+	contracts.loot_collected+=3
+	check(not contracts.sea_contracts.claim(contracts,"salvage"),"incomplete salvage contract cannot pay")
+	var contract_saved: Dictionary=JSON.parse_string(JSON.stringify(contracts.export_save()))
+	var contract_restored=SIM.new()
+	check(contract_restored.restore_save(contract_saved) and contract_restored.sea_contracts.info(contract_restored,"salvage").progress==3,"in-progress contract survives JSON save and reload")
+	check(contract_restored.sea_contracts.info(contract_restored,"hunt").completed==1,"completed contract rounds survive reload")
+	contract_restored.loot_collected+=1
+	check(contract_restored.sea_contracts.claim(contract_restored,"salvage") and not contract_restored.sea_contracts.claim(contract_restored,"salvage"),"restored progress pays exactly once when finished")
+	var old_contract_save: Dictionary=contract_saved.duplicate(true)
+	old_contract_save.erase("sea_contracts")
+	check(contract_restored.restore_save(old_contract_save) and contract_restored.sea_contracts.snapshot().is_empty(),"older saves migrate without invented contracts")
+	contract_restored.sea_contracts.restore({"patrol":{"active":true,"start":-50}},contract_restored)
+	check(not contract_restored.sea_contracts.info(contract_restored,"patrol").active,"invalid baseline cannot cash historical kills")
+	check(not contract_restored.sea_contracts.accept(contract_restored,"unknown") and not contract_restored.sea_contracts.claim(contract_restored,"unknown"),"unknown contract keys are rejected")
+	var natural=SIM.new();natural.npcs.clear()
+	natural.sea_contracts.accept(natural,"salvage")
+	natural.drops.append({"pos":natural.player.pos,"gold":15})
+	natural.step(.01)
+	check(natural.sea_contracts.info(natural,"salvage").progress==1,"actual sea pickup advances an accepted salvage contract")
 	var result={"status":"PASS" if failures.is_empty() else "FAIL","checks":count,"failures":failures}
 	print(JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)

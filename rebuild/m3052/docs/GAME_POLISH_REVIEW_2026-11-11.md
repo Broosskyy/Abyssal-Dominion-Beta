@@ -55,3 +55,12 @@ Für unser Spiel abgeleitet: Auf der Seekarte die wichtigsten Informationen dire
 - Kastelle verlinken Hafen, Decks und Kanonenmontage.
 - Die Prognosen werden gegen echte Käufe einschließlich aktiver Segnung und Talenten geprüft. Vorschau darf weder Gold noch Rumpfzustand ändern.
 - Auf sehr schmalen Panels werden Katalogbilder und Produkttexte untereinander statt in einer gequetschten Seitenzeile angeordnet.
+
+## Folgepaket: wiederholbare Seeverträge
+
+- Drei unabhängige PvE-Aufträge im Logbuch: vier NPC-Schiffe, vier geborgene Gegner-Beutekisten oder ein Seeungeheuer.
+- Verträge müssen ausdrücklich angenommen werden und zählen nur den danach erzielten Fortschritt. Mehrere Verträge dürfen parallel aktiv sein.
+- Nach einmaliger Auszahlung kann eine neue Runde angenommen werden; alte Abschüsse werden dabei nicht erneut gewertet.
+- Aktive Runden und erfüllte Verträge werden im bestehenden Gastspielstand gespeichert. Alte Spielstände starten ohne erfundenen Vertragsfortschritt.
+- Keine Battle Points, Kalenderfristen oder Online-Belohnungen. Die kleinen Gold-/EP-/Essenzprämien sind Beta-Werte.
+- Nächster Content-Schritt: weitere Kampagnenkapitel, regionsbezogene Aufgaben und abwechslungsreichere Monster-/Eventbegegnungen.

@@ -1695,7 +1695,7 @@ func _build_ui() -> void:
 	quest_text=_text(quest_panel,"",11);quest_text.clip_text=true;quest_text.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
 	quest_open=Button.new();quest_open.focus_mode=Control.FOCUS_NONE;quest_open.tooltip_text="Logbuch öffnen"
 	for state in ["normal","hover","pressed","hover_pressed","focus"]:quest_open.add_theme_stylebox_override(state,StyleBoxEmpty.new())
-	quest_open.pressed.connect(func():_open_modal("Logbuch"));quest_panel.add_child(quest_open)
+	quest_open.pressed.connect(func():_switch_tab("Logbuch","VERTRÄGE") if sim.current_quest().is_empty() else _open_modal("Logbuch"));quest_panel.add_child(quest_open)
 	quest_claim=_button(quest_panel,"ABHOLEN",func():sim.claim_quest();_save_progress();_refresh_ui());quest_claim.add_theme_font_size_override("font_size",10)
 	chart_mini=MINI.new();chart_mini.simulation=sim
 	chart_mini.course_requested.connect(func(point):_chart_course(point))
@@ -2010,6 +2010,7 @@ func _refresh_ui() -> void:
 		render_toggle.disabled=browser_classic or mesh_layer==null or not mesh_layer.has_complete_fleet()
 		render_toggle.visible=not browser_classic
 	var today=Time.get_date_string_from_system()
+	var contracts_ready: bool=sim.sea_contracts.ready_count(sim)>0
 	var quest_ready=not sim.current_quest().is_empty() and sim.quest_progress()>=int(sim.current_quest().goal)
 	for nav: Button in nav_buttons:
 		var kind=str(nav.get_meta("modal"))
@@ -2029,7 +2030,7 @@ func _refresh_ui() -> void:
 			"Gilde":
 				badge="%d'" % ceili(sim.fortress_hold/60.0) if sim.guild_island_held() else ""
 			"Menü":
-				alert=quest_ready or sim.free_flask_ready(today) or sim.rewards.daily_available() or sim.rewards.afk_gold()>0
+				alert=quest_ready or contracts_ready or sim.free_flask_ready(today) or sim.rewards.daily_available() or sim.rewards.afk_gold()>0
 				badge="!" if alert else ""
 		nav.set("quantity",badge);nav.set("badge_alert",alert)
 		nav.set("latched",modal.visible and modal_kind==kind);nav.queue_redraw()
@@ -2166,7 +2167,7 @@ func _refresh_ui() -> void:
 			_:quest_text.text="%s GESCHAFFT\nTruhe geborgen · Karte verlassen" % str(tier.name).to_upper()
 	else:
 		quest_icon.texture=painted.nav_quests
-		quest_text.text="ALLE AUFTRÄGE ERLEDIGT\nDas Logbuch bleibt offen" if quest.is_empty() else "%s · %d/%d\n%d Gold · %d EP" % [str(quest.name).to_upper(),mini(sim.quest_progress(),int(quest.goal)),quest.goal,quest.gold,quest.xp]
+		quest_text.text=("SEEVERTRÄGE BEREIT\nIm Logbuch abholen" if contracts_ready else "KAMPAGNE ERLEDIGT\nSeeverträge im Logbuch") if quest.is_empty() else "%s · %d/%d\n%d Gold · %d EP" % [str(quest.name).to_upper(),mini(sim.quest_progress(),int(quest.goal)),quest.goal,quest.gold,quest.xp]
 	quest_claim.visible=claimable
 	quest_claim.disabled=not claimable
 	quest_text.size.x=quest_panel.size.x-quest_panel.size.y-(86 if claimable else 8)
@@ -2185,6 +2186,7 @@ func _refresh_ui() -> void:
 		interact.text="IM HAFEN ANDOCKEN"
 	else:
 		interact.text="KURS ZUM PORTAL" if sim.pending_portal>=0 else "KURS ZUM HAFEN"
+	if modal.visible and modal_kind=="Logbuch" and _tab("Logbuch")=="VERTRÄGE":_refresh_contract_rows()
 
 func _begin_loading(duration: float) -> void:
 	var region: Dictionary=CONTENT.MAPS[sim.map_id]
@@ -2281,7 +2283,7 @@ func _clock_text(seconds: float) -> String:
 	var minutes=floori((total%3600)/60.0)
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
-const MODAL_TABS := {"Logbuch":["AKTUELL","VERLAUF"],"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
+const MODAL_TABS := {"Logbuch":["AKTUELL","VERTRÄGE","VERLAUF"],"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
 const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Menü":"Spielmenü","Events":"Veranstaltungen","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Freunde":"Freunde & Einladungen","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
@@ -2417,6 +2419,7 @@ func _reveal_menu_tab(button: Control) -> void:
 # provides a directly recognizable pictogram beside its active pill.
 func _menu_tab_art(kind: String,tab: String) -> Texture2D:
 	match kind:
+		"Logbuch":return painted.nav_ship if tab=="VERTRÄGE" else (painted.spyglass if tab=="VERLAUF" else painted.nav_quests)
 		"Markt":
 			match tab:
 				"AUSRÜSTUNG":return extra_icons.cannon_1
@@ -3213,6 +3216,9 @@ func _open_harbor() -> void:
 		get_tree().change_scene_to_file("res://updater/launcher.tscn"))
 
 func _open_logbook() -> void:
+	if _tab("Logbuch")=="VERTRÄGE":
+		_open_sea_contracts()
+		return
 	_info("KAMPAGNE · LV. %d · %d/%d AUFTRÄGE ERLEDIGT" % [sim.level,mini(sim.quest_index,CONTENT.QUESTS.size()),CONTENT.QUESTS.size()],CYAN)
 	if _tab("Logbuch")=="VERLAUF":
 		_section("ABGESCHLOSSENE AUFTRÄGE")
@@ -3225,6 +3231,7 @@ func _open_logbook() -> void:
 		if q.is_empty():
 			_section("KAMPAGNE ABGESCHLOSSEN")
 			_note("Alle bisherigen Aufträge sind erledigt. Bonuskarten, Seeungeheuer und Veranstaltungen bleiben verfügbar.")
+			_action("SEEVERTRÄGE ANNEHMEN",func():_switch_tab("Logbuch","VERTRÄGE"),"primary")
 			_action("BONUSKARTEN ÖFFNEN",func():_open_modal("Bonuskarten"))
 		else:
 			_section("DEIN AKTIVER AUFTRAG")
@@ -3243,6 +3250,40 @@ func _open_logbook() -> void:
 	_section("LETZTE MELDUNGEN")
 	var recent=message_history.duplicate();recent.reverse()
 	_note("\n".join(recent) if not recent.is_empty() else "Noch keine Meldungen",Color("d6e2e4"))
+
+func _open_sea_contracts() -> void:
+	_info("WIEDERHOLBARE SEEVERTRÄGE",CYAN)
+	_note("Fortschritt zählt ab Annahme. Drei Verträge parallel; nach dem Abholen erneut annehmen.")
+	for key: String in sim.CONTRACTS.ORDER:
+		var contract_key: String=key
+		var data: Dictionary=sim.sea_contracts.info(sim,key)
+		var column=_row(painted.boss_wave if key=="hunt" else (painted.reward_chest if key=="salvage" else painted.nav_ship),"%s\n%s\n%d Gold · %d EP · %d Essenz" % [data.name,data.description,data.gold,data.xp,data.essence],56,Color("70c3a7") if bool(data.ready) else GOLD)
+		column.name="SeaContract_"+key
+		var progress=_bar(column)
+		progress.name="SeaContractProgress_"+key
+		progress.custom_minimum_size.y=12;progress.max_value=int(data.goal);progress.value=int(data.progress)
+		var state: String="BEREIT ZUM ABHOLEN" if bool(data.ready) else ("IN ARBEIT · %d / %d" % [data.progress,data.goal] if bool(data.active) else "NOCH NICHT ANGENOMMEN")
+		var state_label=_note("%s · %d× erfüllt" % [state,data.completed],CYAN,column)
+		state_label.name="SeaContractState_"+key
+		var action=_row_button(column,"BELOHNUNG ABHOLEN" if bool(data.ready) else ("IN ARBEIT" if bool(data.active) else "ANNEHMEN"),func():
+			if bool(sim.sea_contracts.info(sim,contract_key).active):sim.sea_contracts.claim(sim,contract_key)
+			else:sim.sea_contracts.accept(sim,contract_key)
+			_save_progress();_open_modal("Logbuch");_refresh_ui(),(bool(data.active) and not bool(data.ready)) or sim.staff.active(),"primary")
+		action.name="SeaContractAction_"+key
+		if key=="hunt":_row_button(column,"MONSTER FINDEN",func():_open_modal("Monster"))
+	_note("Keine Battle Points: Diese Aufträge sind PvE-Inhalte. Sie sind unabhängig von Kampagne, Tagesbonus und Saisonpass.")
+
+func _refresh_contract_rows() -> void:
+	for key: String in sim.CONTRACTS.ORDER:
+		var action: Button=modal_body.find_child("SeaContractAction_"+key,true,false) as Button
+		if action==null:continue
+		var data: Dictionary=sim.sea_contracts.info(sim,key)
+		action.text="BELOHNUNG ABHOLEN" if bool(data.ready) else ("IN ARBEIT" if bool(data.active) else "ANNEHMEN")
+		action.disabled=(bool(data.active) and not bool(data.ready)) or sim.staff.active()
+		var progress: ProgressBar=modal_body.find_child("SeaContractProgress_"+key,true,false) as ProgressBar
+		if progress!=null:progress.value=int(data.progress)
+		var label: Label=modal_body.find_child("SeaContractState_"+key,true,false) as Label
+		if label!=null:label.text=("BEREIT ZUM ABHOLEN" if bool(data.ready) else ("IN ARBEIT · %d / %d" % [data.progress,data.goal] if bool(data.active) else "NOCH NICHT ANGENOMMEN"))+" · %d× erfüllt" % data.completed
 
 func _open_ranking() -> void:
 	var ranks=["Schiffsjunge","Matrose","Bootsmann","Steuermann","Leutnant","Kapitän","Kommodore","Admiral"]

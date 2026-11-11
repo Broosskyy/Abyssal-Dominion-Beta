@@ -677,6 +677,28 @@ func _run() -> void:
 	check(game.modal_body.find_child("InviteCopy",true,false)!=null,"sea captain menu includes copyable friend invitation")
 	check(game._invite_share_text().contains("github.com/Broosskyy/Abyssal-Dominion-Beta/releases"),"sea invitation links to actual public beta download")
 	check(game._invite_share_text().find("abyssal-dominion-browser.vercel.app")<game._invite_share_text().find("github.com/"),"shared invitation offers instant browser play before the optional download")
+	# All contract actions lead to their real simulation state and update while open.
+	var saved_contracts: Dictionary=game.sim.sea_contracts.snapshot()
+	var saved_contract_kills: int=game.sim.kills
+	var saved_contract_gold: int=int(game.sim.player.gold)
+	var saved_contract_essence: int=game.sim.essence
+	var saved_contract_level: int=game.sim.level
+	var saved_contract_xp: int=game.sim.xp
+	game._switch_tab("Logbuch","VERTRÄGE")
+	for key: String in game.sim.CONTRACTS.ORDER:
+		check(game.modal_body.find_child("SeaContractAction_"+key,true,false)!=null,"repeatable contract has an accessible action: "+key)
+	var accept_contract: Button=game.modal_body.find_child("SeaContractAction_patrol",true,false) as Button
+	accept_contract.pressed.emit()
+	check(game.sim.sea_contracts.info(game.sim,"patrol").active,"contract acceptance button starts the real patrol contract")
+	game.sim.kills+=4;game._refresh_ui()
+	var claim_contract: Button=game.modal_body.find_child("SeaContractAction_patrol",true,false) as Button
+	check(not claim_contract.disabled and claim_contract.text=="BELOHNUNG ABHOLEN","contract completion becomes claimable without reopening the logbook")
+	claim_contract.pressed.emit()
+	check(int(game.sim.player.gold)==saved_contract_gold+120 and game.sim.sea_contracts.info(game.sim,"patrol").completed==1,"claim action pays the declared reward and finishes this round")
+	game.sim.kills=saved_contract_kills;game.sim.player.gold=saved_contract_gold;game.sim.essence=saved_contract_essence;game.sim.level=saved_contract_level;game.sim.xp=saved_contract_xp
+	game.sim.sea_contracts.restore(saved_contracts,game.sim)
+	game.sim.apply_upgrades()
+	game._save_progress()
 	var quest_before: int=game.sim.quest_index
 	game.sim.quest_index=4
 	game._switch_tab("Logbuch","AKTUELL")
