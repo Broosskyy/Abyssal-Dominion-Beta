@@ -43,13 +43,27 @@ def main() -> None:
     baseline_preview = bool(requested_sha and requested_branch != "main")
     source_sha = "" if baseline_preview else requested_sha
     wait_for_source = False
+    ready_tag = ""
     if baseline_preview:
-        print(
-            f"Feature branch {requested_branch}: no Godot export for this SHA; "
-            "using the latest published browser-test as a BASELINE ONLY",
-            flush=True,
-        )
-    if source_sha:
+        marker = Path(__file__).with_name("export-ready.json")
+        if marker.is_file():
+            # Written only after CI has baked, tested and published the exact
+            # branch release; the marker itself changes the Vercel commit SHA.
+            ready = json.loads(marker.read_text(encoding="utf-8"))
+            source_sha = str(ready.get("source_sha", ""))
+            ready_tag = str(ready.get("release", ""))
+            if not re.fullmatch(r"[0-9a-f]{40}", source_sha) or not re.fullmatch(r"browser-test-\d+", ready_tag):
+                raise RuntimeError("Invalid verified browser-export marker")
+            baseline_preview = False
+            wait_for_source = True
+            print(f"Feature branch: using verified {ready_tag} ({source_sha[:10]})", flush=True)
+        else:
+            print(
+                f"Feature branch {requested_branch}: Godot export still pending; "
+                "serving the latest verified browser test as a BASELINE ONLY",
+                flush=True,
+            )
+    if source_sha and not ready_tag:
         commit = json.loads(response(f"https://api.github.com/repos/{REPOSITORY}/commits/{source_sha}"))
         wait_for_source = "[skip ci]" not in commit.get("commit", {}).get("message", "") and any(
             entry.get("filename", "").startswith(("rebuild/m3052/", "server/")) or
@@ -74,6 +88,7 @@ def main() -> None:
         versions = json.loads(response(RELEASES))
         if not wait_for_source or any(
             re.fullmatch(r"browser-test-\d+", str(item.get("tag_name", ""))) and
+            (not ready_tag or item.get("tag_name") == ready_tag) and
             item.get("target_commitish") == source_sha and item.get("assets")
             for item in versions
         ):
@@ -88,6 +103,8 @@ def main() -> None:
         if match is None or release.get("draft", False):
             continue
         if wait_for_source and release.get("target_commitish") != source_sha:
+            continue
+        if ready_tag and release.get("tag_name") != ready_tag:
             continue
         for asset in release.get("assets", []):
             if re.fullmatch(r"ABYSSAL_BROWSER_\d+\.zip", str(asset.get("name", ""))):
@@ -120,14 +137,21 @@ def main() -> None:
     if any(not (DEST / name).is_file() or (DEST / name).stat().st_size == 0 for name in required):
         raise RuntimeError("Browser release is incomplete")
     exported_sha = str(release.get("target_commitish", ""))
+    # The marker commit itself has no gameplay changes. A later source push
+    # can temporarily serve the previous verified build while new CI runs.
+    contains_requested = bool(requested_sha and requested_sha == exported_sha)
+    if ready_tag and requested_sha:
+        origin = json.loads(response(f"https://api.github.com/repos/{REPOSITORY}/commits/{requested_sha}"))
+        contains_requested = any(str(parent.get("sha", "")) == exported_sha for parent in origin.get("parents", []))
     metadata = {
         "scope": "public-browser-test",
         "release": release["tag_name"],
         "source": exported_sha,
         "requested_commit": requested_sha,
         "requested_branch": requested_branch,
-        "contains_requested_commit": bool(requested_sha and requested_sha == exported_sha),
-        "preview_mode": "last-tested-main-baseline" if baseline_preview else "matched-godot-export",
+        "contains_requested_commit": contains_requested,
+        "preview_mode": "last-tested-main-baseline" if baseline_preview else ("tested-feature-export" if ready_tag else "matched-godot-export"),
+        "verified_branch_export": bool(ready_tag),
         "preview_notice": (
             "Feature-branch HUD/controls are NOT yet contained in this baseline. "
             "Only a published Godot browser-test build can validate them."
