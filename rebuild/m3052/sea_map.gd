@@ -329,6 +329,9 @@ func _ready() -> void:
 	_load_progress()
 	_load_staff()
 	_load_display()
+	# Browser is always Classic. Android/desktop use the saved graphics mode.
+	# Steering must be configured before any sea-chart route is created.
+	sim.set_classic_steering(browser_classic)
 	if browser_classic:_load_classic_atlases()
 	get_tree().set_meta("abyssal_ui_motion",ambient_motion_enabled)
 	previous_region=sim.map_id
@@ -4103,7 +4106,7 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: kurze diagonale Kurse mit direktem Ansichtswechsel. App und Desktop bieten zusätzlich 2,5D und 3D. Alle Modi verwenden dieselben Kurse und Spielwerte.")
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Seafight-artige diagonale Zickzack-Fahrt mit festen Schiffsansichten. 2,5D / 3D: direkte Kurse ohne Zickzack. Beim Umschalten bleibt das Ziel erhalten.")
 	_note("DATENUPDATE %d · CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
 		if OS.has_feature("web"):
@@ -4117,7 +4120,7 @@ func _open_display() -> void:
 				var key: String=str(option[0])
 				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 				choice.disabled=render_mode==key
-			_note("Classic 2D verwendet vorberechnete Ansichten deiner Originalmodelle und deaktiviert die 3D-Schiffsszene. Die Auswahl wird gespeichert; Schiff, Kurs und Fortschritt bleiben erhalten.")
+			_note("Classic 2D: gestufte 45°-Seerouten. 2,5D / 3D: normale direkte Schiffssteuerung. Umschalten berechnet die noch offene Strecke zum selben Ziel neu; Fortschritt und Position bleiben erhalten.")
 		_section("SCHIFFE & SEEKARTE")
 		var ship_grid=_grid(2)
 		_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
@@ -4983,6 +4986,12 @@ func _set_render_mode(value: String) -> void:
 	else:
 		browser_classic=false;render_mode=value;_ensure_mesh_layer()
 		mesh_layer.set_render_mode(value);render_mode=mesh_layer.mode
+	# This is a gameplay steering choice, not merely a different renderer:
+	# active routes replan to their original destination immediately.
+	var steering_changed: bool=sim.classic_steering!=browser_classic
+	sim.set_classic_steering(browser_classic)
+	if steering_changed and not sim.player.path.is_empty():
+		_send_online_course(Vector2(sim.player.path.back()))
 	classic_heading_cache.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
