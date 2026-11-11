@@ -31,23 +31,24 @@ func _initialize() -> void:
 		sim._move(body,0.1)
 		if not body.path.is_empty():stable_course=stable_course and absf(body.heading.y)<.001
 	check(stable_course and body.pos.distance_to(Vector2(950,500))<0.01,"direct native route sails to the exact goal without alternating diagonal headings")
-	# Classic 2D alone enables 45-degree course legs, irrespective of the
-	# source GLB model from which its four/eight-view sprites were baked.
+	# The Classic 4-view look applies ONLY to hull drawing. Direct simulation
+	# movement must not bend into fake diagonal courses.
 	sim.set_classic_steering(true)
 	body.pos=Vector2(500,500)
 	body.renderer="sprite";body.view_count=4
-	var fallback=sim.plan_actor_path(body,Vector2(950,500))
-	var diagonal_fallback=fallback.size()>=4
-	before=body.pos
-	for waypoint: Vector2 in fallback:
-		var leg: Vector2=waypoint-before
-		diagonal_fallback=diagonal_fallback and absf(absf(leg.x)-absf(leg.y))<0.01
-		before=waypoint
-	check(diagonal_fallback and before.distance_to(Vector2(950,500))<0.01,"actual four-view sprite fallback keeps diagonal headings")
+	var classic_route=sim.plan_actor_path(body,Vector2(950,500))
+	check(classic_route==sim.plan_path(body.pos,Vector2(950,500)) and classic_route.size()==1,"four-view Classic follows the direct captain course, without artificial diagonal steps")
+	body.path=classic_route.duplicate()
+	var direct_in_classic: bool=true
+	for _i in 240:
+		sim._move(body,0.1)
+		if not body.path.is_empty():direct_in_classic=direct_in_classic and absf(float(body.pos.y)-500.0)<0.01 and absf(float(body.heading.y))<0.001
+	check(direct_in_classic and body.pos.distance_to(Vector2(950,500))<0.01,"four-view Classic never zigzags physically on horizontal water")
+	body.pos=Vector2(500,500)
 	body.renderer="mesh";body.view_count=4
-	check(sim.plan_actor_path(body,Vector2(950,500)).size()>1,"Classic 2D remains diagonal even for a source GLB hull")
+	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"source GLB versus sprite cannot alter actual sea navigation")
 	body.view_count=8
-	check(sim.plan_actor_path(body,Vector2(950,500)).size()>1,"eight-view atlases follow Classic-only four-direction sailing")
+	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"eight baked views remain available but never alter Classic navigation")
 	sim.set_classic_steering(false)
 	check(sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"switching back to native 3D/2.5D restores the direct route")
 	for map_index in [0,1,2]:

@@ -16,7 +16,7 @@ func _initialize() -> void:
 	var free_goal:=Vector2(675,535)
 	check(not sim.classic_steering and sim.plan_actor_path(sample,free_goal)==sim.plan_path(sample.pos,free_goal),"native 2.5D/3D ships use original direct navigation")
 	sim.set_classic_steering(true)
-	check(sim.plan_actor_path(sample,free_goal)==sim.classic_path(sample.pos,free_goal,sample.heading),"Classic 2D switches the same ship to real diagonal legs")
+	check(sim.plan_actor_path(sample,free_goal)==sim.plan_path(sample.pos,free_goal),"four-view Classic only changes hull presentation, never the physical navigation path")
 	sim.set_classic_steering(false)
 	var rested: Dictionary=npc.duplicate(true)
 	rested.pos=Vector2(400,400)
