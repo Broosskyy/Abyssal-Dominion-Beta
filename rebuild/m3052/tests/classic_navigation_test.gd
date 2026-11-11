@@ -74,6 +74,7 @@ func _run() -> void:
 	check(game.quick_bar.slots.all(func(button):return button.size.x>=50.0),"three mobile quick slots remain thumb-sized")
 	check(not game.quick_bar.get_global_rect().intersects(game.attack.get_global_rect()),"mobile quickbar never covers the primary fire action")
 	check(not game.quick_bar.get_global_rect().intersects(game.supply_selector.get_global_rect()),"mobile quickbar stays clear of consumables")
+	check(not game.quick_bar.get_global_rect().intersects(game.target_cycle.get_global_rect()) and not game.quick_bar.get_global_rect().intersects(game.loadout_button.get_global_rect()),"mobile quickbar stays above target and equipment controls")
 	var mobile_page: int=game.quick_page
 	_press(game,KEY_Q)
 	check(game.quick_page==mobile_page,"touch HUD does not require desktop-only Q hotkey")
