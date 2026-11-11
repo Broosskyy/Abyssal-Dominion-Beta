@@ -20,6 +20,7 @@ static func heading_column(heading: Vector2,previous: int=-1) -> int:
 ## the four diagonal baked views, never change the physical ship course.
 ## Eight-view atlas order is N, NE, E, SE, S, SW, W, NW.
 const CLASSIC_FOUR_VIEW_ATLAS := [1,7,5,3] # NE, NW, SW, SE
+const CLASSIC_CLOCKWISE_ATLAS := [1,3,5,7] # NE, SE, SW, NW
 
 static func heading_four(heading: Vector2,previous: int=-1) -> int:
 	var prior_column: int=CLASSIC_FOUR_VIEW_ATLAS.find(previous)
@@ -36,8 +37,8 @@ static func classic_sailing_frame(heading: Vector2,phase: float) -> int:
 	var rotated: float=fposmod(heading.angle()+PI*.25,TAU)
 	var sector: int=clampi(int(floor(rotated/quarter)),0,3)
 	var toward_next: float=(rotated-float(sector)*quarter)/quarter
-	var first: int=CLASSIC_FOUR_VIEW_ATLAS[(sector+0)%4]
-	var second: int=CLASSIC_FOUR_VIEW_ATLAS[(sector+1)%4]
+	var first: int=CLASSIC_CLOCKWISE_ATLAS[(sector+0)%4]
+	var second: int=CLASSIC_CLOCKWISE_ATLAS[(sector+1)%4]
 	# Preserve exact diagonal headings instead of injecting fake visual turns.
 	if toward_next<0.08:return first
 	if toward_next>0.92:return second
