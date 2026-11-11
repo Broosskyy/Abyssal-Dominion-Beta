@@ -19,7 +19,7 @@ func _initialize() -> void:
 	var sim=SIM.new()
 	var body=sim.npcs[0];body.pos=Vector2(500,500)
 	var route=sim.plan_actor_path(body,Vector2(950,500))
-	check(str(body.renderer)=="mesh" and route==sim.classic_path(body.pos,Vector2(950,500),body.heading) and route.size()>1,"native GLB ships follow the shared classic diagonal course")
+	check(str(body.renderer)=="mesh" and not sim.classic_steering and route==sim.plan_path(body.pos,Vector2(950,500)),"native GLB ships use original direct navigation")
 	var before: Vector2=body.pos
 	var safe=true
 	for point: Vector2 in route:
@@ -29,9 +29,11 @@ func _initialize() -> void:
 	var stable_course=true
 	for _i in 240:
 		sim._move(body,0.1)
-		if not body.path.is_empty():stable_course=stable_course and absf(absf(body.heading.x)-absf(body.heading.y))<.001
-	check(stable_course and body.pos.distance_to(Vector2(950,500))<0.01,"classic path sails to the exact goal using diagonal headings")
-	# Legacy four-angle sprites still retain the old detour algorithm.
+		if not body.path.is_empty():stable_course=stable_course and absf(body.heading.y)<.001
+	check(stable_course and body.pos.distance_to(Vector2(950,500))<0.01,"direct native route sails to the exact goal without alternating diagonal headings")
+	# Classic 2D alone enables 45-degree course legs, irrespective of the
+	# source GLB model from which its four/eight-view sprites were baked.
+	sim.set_classic_steering(true)
 	body.pos=Vector2(500,500)
 	body.renderer="sprite";body.view_count=4
 	var fallback=sim.plan_actor_path(body,Vector2(950,500))
@@ -43,9 +45,11 @@ func _initialize() -> void:
 		before=waypoint
 	check(diagonal_fallback and before.distance_to(Vector2(950,500))<0.01,"actual four-view sprite fallback keeps diagonal headings")
 	body.renderer="mesh";body.view_count=4
-	check(sim.plan_actor_path(body,Vector2(950,500)).size()>1,"3D presentation follows the same classic steering as 2D")
+	check(sim.plan_actor_path(body,Vector2(950,500)).size()>1,"Classic 2D remains diagonal even for a source GLB hull")
 	body.view_count=8
-	check(sim.plan_actor_path(body,Vector2(950,500)).size()>1,"eight-view atlases follow shared four-direction sailing")
+	check(sim.plan_actor_path(body,Vector2(950,500)).size()>1,"eight-view atlases follow Classic-only four-direction sailing")
+	sim.set_classic_steering(false)
+	check(sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"switching back to native 3D/2.5D restores the direct route")
 	for map_index in [0,1,2]:
 		sim.configure_map(map_index)
 		sim.shots.clear()
