@@ -10,7 +10,7 @@ func check(ok: bool,label: String) -> void:
 func _initialize() -> void:call_deferred("run")
 func run() -> void:
 	# The four historical Classic facings use the diagonal frames from the
-	# eight baked 2D sprites. Four views change only visual orientation.
+	# eight baked 2D sprites. Each frame follows a true diagonal leg.
 	for heading: Vector2 in [Vector2(1,-1),Vector2(-1,-1),Vector2(-1,1),Vector2(1,1)]:
 		var expected: int=[1,7,5,3][[Vector2(1,-1),Vector2(-1,-1),Vector2(-1,1),Vector2(1,1)].find(heading)]
 		check(VISUALS.heading_four(heading)==expected,"four-way Classic graphic selects correct baked diagonal "+str(heading))
@@ -136,7 +136,7 @@ func run() -> void:
 		previous_point=point
 	check(shown.has(1) and shown.has(3),"renderer displays correct NE/SE for genuinely changing course")
 	check(game.sim.player.path==original_route and game.sim.player.pos==original_pos,"rendering never alters physical world coordinates or navigation path")
-		check(game.sim.player.gold==int(before.gold) and game.sim.player.skin==int(before.skin) and game.sim.player.ammo==before.ammo,"graphics switch preserves ship, wallet and ammunition")
+	check(game.sim.player.gold==int(before.gold) and game.sim.player.skin==int(before.skin) and game.sim.player.ammo==before.ammo,"graphics switch preserves ship, wallet and ammunition")
 	game._open_modal("Anzeige")
 	var options: Array[String]=[]
 	for button in game.modal_body.find_children("*","Button",true,false):options.append(button.text)
