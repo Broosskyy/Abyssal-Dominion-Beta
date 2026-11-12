@@ -69,6 +69,8 @@ func run() -> void:
 	var before: Dictionary=game.sim.export_save()
 	game._set_render_mode("hybrid");await process_frame
 	check(not game.sim.classic_steering and game.render_mode=="hybrid","native 2.5D uses direct steering")
+	var native_player_length: float=game._actor_visual_length(game.sim.player)
+	var native_npc_length: float=game._actor_visual_length(game.sim.npcs[0])
 	game.sim.course(game.sim.player.pos+Vector2(600,0))
 	var destination: Vector2=game.sim.player.path.back()
 	var course: Array=game.sim.player.path.duplicate()
@@ -76,6 +78,32 @@ func run() -> void:
 	check(game.browser_classic and game.render_mode=="classic" and game.mesh_layer==null,"native Classic disables and removes the 3D fleet viewport")
 	check(game._classic_fleet_ready(),"native 2D loads all 23 ship and paint atlases")
 	check(game.sim.classic_steering and game.sim.player.path.back()==destination and game.sim.player.path==course and game.sim.player.pos==Vector2(before.position[0],before.position[1]),"Classic 2D preserves existing physical waypoint path and position while changing only sprite views")
+	check(is_equal_approx(game._actor_visual_length(game.sim.player),native_player_length*game.CLASSIC_HULL_SCALE),"Classic uses a smaller on-screen captain hull without altering game physics")
+	check(is_equal_approx(game._actor_visual_length(game.sim.npcs[0]),native_npc_length*game.CLASSIC_HULL_SCALE),"Classic scales NPC hulls with the captain instead of dwarfing enemies")
+	var path_before_framing: Array=game.sim.player.path.duplicate()
+	var saved_position: Vector2=game.sim.player.pos
+	for viewport_size: Vector2i in [Vector2i(844,390),Vector2i(2340,1080)]:
+		root.size=viewport_size
+		await process_frame
+		var expected_boost: float=clampf(float(viewport_size.y)/720.0,1.0,game.CLASSIC_VIEWPORT_ZOOM_BOOST_MAX)
+		check(is_equal_approx(game._sharp_zoom(),game.desired_zoom*expected_boost),"Classic no longer magnifies ships by desktop-density viewport scaling at "+str(viewport_size))
+		game.camera.position=game.sim.player.pos
+		game.camera.zoom=Vector2.ONE*game._sharp_zoom()
+		game.camera.force_update_scroll()
+		var center: Vector2=game.get_canvas_transform()*game._visual_actor_pos(game.sim.player)
+		check(center.distance_to(game.get_viewport_rect().size*.5)<1.0,"Classic locked follow keeps captain centered at "+str(viewport_size))
+		var atlas_meta: Dictionary=game.classic_geometry.get(game._classic_atlas_key(game.sim.player),{})
+		check(not atlas_meta.is_empty(),"Classic retains stable baked hull metadata at "+str(viewport_size))
+		if not atlas_meta.is_empty():
+			var expected_drop: float=float(atlas_meta.stable_bottom)*game._actor_visual_length(game.sim.player)/float(atlas_meta.reference_extent)*game.camera.zoom.x+game.CLASSIC_LABEL_CLEARANCE_PX*game._plate_pixels()
+			var actual_drop: float=game._plate_screen_anchor(game.sim.player).y-center.y
+			check(absf(actual_drop-expected_drop)<1.1,"Classic labels are close and anchored to the scaled hull at "+str(viewport_size))
+	check(game.sim.player.path==path_before_framing and game.sim.player.pos==saved_position,"framing changes cannot alter current course or game world coordinates")
+	root.size=Vector2i(1280,720)
+	await process_frame
+	game.camera.zoom=Vector2.ONE*game._sharp_zoom()
+	game.camera.position=game.sim.player.pos
+	game.camera.force_update_scroll()
 	game.sim.player.heading=Vector2(1,-1)
 	check(game._classic_frame_for_actor(game.sim.player)==1,"Classic renderer draws the expected NE atlas frame from the preserved eight-view collection")
 	game.sim.player.heading=Vector2(1,1)
@@ -106,6 +134,7 @@ func run() -> void:
 	check(reloaded.browser_classic and reloaded.render_mode=="classic" and reloaded.mesh_layer==null,"saved Classic preference starts natively without constructing 3D")
 	reloaded._set_render_mode("3d");await process_frame
 	check(not reloaded.browser_classic and not reloaded.sim.classic_steering and reloaded.mesh_layer!=null and reloaded.mesh_layer.has_complete_fleet() and reloaded.render_mode=="3d","3D restores original direct steering and complete native fleet")
+	check(is_equal_approx(reloaded._actor_visual_length(reloaded.sim.player),native_player_length),"3D captain hull size remains exactly unchanged")
 	reloaded._set_render_mode("classic");await process_frame
 	reloaded._set_render_mode("hybrid");await process_frame
 	check(not reloaded.browser_classic and not reloaded.sim.classic_steering and reloaded.render_mode=="hybrid" and reloaded.mesh_layer!=null,"2.5D restores direct steering and one working renderer")
