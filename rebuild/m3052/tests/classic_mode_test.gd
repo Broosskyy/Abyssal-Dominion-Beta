@@ -25,6 +25,15 @@ func run() -> void:
 		check(first!=second and first in [1,3,5,7] and second in [1,3,5,7],"straight travel alternates two oblique Classic facings without changing movement "+str(sample))
 	check(VISUALS.classic_sailing_frame(Vector2.RIGHT,0.25)==1 and VISUALS.classic_sailing_frame(Vector2.RIGHT,0.75)==3,"eastbound ship switches NE / SE visually (left-right)")
 	check(VISUALS.classic_sailing_frame(Vector2.LEFT,0.25)==5 and VISUALS.classic_sailing_frame(Vector2.LEFT,0.75)==7,"westbound ship switches SW / NW visually (left-right)")
+	# Newly uploaded 31.5 s Skull Crusher reference shows quick, uneven
+	# 2D left/right switches. These are explicit timing approximations, not
+	# a claim of frame-identical extraction. They must not be a 1.4 s metronome.
+	var reference_times := [0.20,0.60,0.95,1.52,1.95,2.30,2.75,3.25,3.62]
+	var reference_frames := [1,3,1,3,1,3,1,3,1]
+	for i in reference_times.size():
+		var drawn: int=VISUALS.classic_sailing_frame(Vector2.RIGHT,float(reference_times[i]))
+		check(drawn==int(reference_frames[i]),"reference-inspired left/right frame at elapsed sailing time "+str(reference_times[i]))
+	check(is_equal_approx(VISUALS.CLASSIC_FACING_PATTERN_DURATION,3.44),"irregular facing sequence has a stable seamless loop")
 	for diagonal: Vector2 in [Vector2(1,-1),Vector2(1,1),Vector2(-1,1),Vector2(-1,-1)]:
 		check(VISUALS.classic_sailing_frame(diagonal,0.1)==VISUALS.classic_sailing_frame(diagonal,0.8),"precisely diagonal courses hold their correct graphical facing")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
