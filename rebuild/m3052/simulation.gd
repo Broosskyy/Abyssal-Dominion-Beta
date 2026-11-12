@@ -340,7 +340,8 @@ func set_classic_steering(enabled: bool) -> void:
 		var destination: Vector2=Vector2(previous.back())
 		var next_route: Array[Vector2]=[]
 		if int(body.get("id",-1))==0 and staff.flag("no_collision"):
-			next_route=NAV.classic_compass_leg(body.pos,destination,CLASSIC_MAX_CROSS_OFFSET) if enabled else [destination] as Array[Vector2]
+			if enabled:next_route=NAV.classic_compass_leg(body.pos,destination,CLASSIC_MAX_CROSS_OFFSET)
+			else:next_route.append(destination)
 			if next_route.is_empty():next_route.append(destination)
 		else:next_route=plan_actor_path(body,destination)
 		if not next_route.is_empty():body.path=next_route
