@@ -36,6 +36,31 @@ This pass changes **presentation only**:
 
 The target is a more legible 2009–2014-style sea composition without claiming exact original Seafight pixel measurements.
 
+## Directly reviewed Skull Crusher sailing video (2026-11-12)
+
+The user uploaded **SeaFight 2024 - New season Design - Skull Crusher.mp4**
+(31.486 seconds) after reporting that the latest accessible Abyssal Browser
+Test still looked wrong. Adjacent frames were inspected in 0.25-second
+increments between 00:02.50 and 00:08.00, rather than relying on a static
+contact sheet. The moving ship repeatedly changes between the two oblique
+on-screen facings with **noticeably uneven short holds**: several observed
+changes fall between roughly 0.25 and 0.55 seconds. This is an approximate
+visual observation, not frame-exact reconstruction of the original engine.
+
+The previous Abyssal Classic 2D renderer used an identical 1.4-second complete
+alternation cycle (0.7 seconds per facing on a cardinal course). That regular
+pendulum appeared mechanical. This revision uses an eight-hold, nonuniform
+3.44-second *visual-only* pattern with 0.30–0.54 second poses while moving.
+Progress remains distance-driven, and pause freezes the latest image. Physical
+waypoints, obstacle avoidance, client/server movement, collision, camera
+tracking, and native 2.5D/3D steering **must not change**. Exact diagonal
+headings continue to show a single diagonal image.
+
+**Acceptance remains pending** until this *exact new source commit* is exported
+by Godot, a matching verified browser release is published and the user reviews
+its actual motion. Do not substitute the previous live baseline in a feature
+branch and label it as the new movement.
+
 ## Period-grounded sources
 
 - German official 2013 sea-chart options: https://board-de.seafight.com/threads/die-seekarte-die-optionen.855/
