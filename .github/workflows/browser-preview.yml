@@ -2,7 +2,7 @@ name: Abyssal Dominion – browser preview
 on:
   workflow_dispatch:
   push:
-    branches: [main, feature/classic-seafight-navigation-330, fix/classic-4way-small-step-navigation-334, fix/classic-four-view-visual-only-335, fix/classic-left-right-sailing-336, fix/classic-framing-scale-337]
+    branches: [main, feature/classic-seafight-navigation-330, fix/classic-4way-small-step-navigation-334, fix/classic-four-view-visual-only-335, fix/classic-left-right-sailing-336, fix/classic-framing-scale-337, fix/classic-video-left-right-cadence-338, fix/classic-physical-visual-sail-339]
     paths:
       - 'rebuild/m3052/**'
       - 'server/**'

@@ -265,7 +265,6 @@ var classic_heading_cache: Dictionary={}
 # Rendering-only per-ship progress for the old Seafight left/right visual
 # pendulum. Never applied to sim.player.pos, actor.heading or online waypoints.
 var classic_sailing_visual: Dictionary={}
-const CLASSIC_LEFT_RIGHT_CYCLE := 1.4
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
 # 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
@@ -579,14 +578,29 @@ func _visual_snapshot() -> Dictionary:
 	return positions
 
 func _visual_actor_pos(actor: Dictionary) -> Vector2:
-	var id=int(actor.id)
+	var id: int=int(actor.id)
 	var current: Vector2=actor.pos
-	if not visual_before.has(id) or not visual_after.has(id):return current
-	var previous: Vector2=visual_before[id]
-	var latest: Vector2=visual_after[id]
-	# Don't interpolate teleports, respawns, or externally changed positions.
-	if current.distance_squared_to(latest)>.01 or previous.distance_to(latest)>200.0:return current
-	return previous.lerp(latest,clampf(accumulator/SIMULATION_TICK,0.0,1.0))
+	var point: Vector2=current
+	if visual_before.has(id) and visual_after.has(id):
+		var previous: Vector2=visual_before[id]
+		var latest: Vector2=visual_after[id]
+		# Don't interpolate teleports, respawns, or externally changed positions.
+		if current.distance_squared_to(latest)<=.01 and previous.distance_to(latest)<=200.0:
+			point=previous.lerp(latest,clampf(accumulator/SIMULATION_TICK,0.0,1.0))
+	# In Classic 2D the four-view hull actually makes SHORT left/right
+	# visual steps while travelling. Unlike the older fake long zigzag,
+	# this does NOT move physics, attack range, routing or network state.
+	# The same point is used for hull, wake, ring, camera and nameplate;
+	# a sprite-only offset would leave those elements visibly behind.
+	if browser_classic and str(actor.get("kind","ship"))=="ship":
+		_classic_frame_for_actor(actor)
+		var motion: Dictionary=classic_sailing_visual.get(id,{})
+		if bool(motion.get("ever_moved",false)):
+			point+=VISUALS.classic_sailing_offset(
+				Vector2(actor.get("heading",Vector2.RIGHT)),
+				float(motion.get("sail_seconds",0.0))
+			)
+	return point
 
 # Ships must leave trails only while actually moving; using 'path' alone
 # painted foam even when a hull was blocked by islands or sitting in port.
@@ -1216,9 +1230,9 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 	var before: int=int(classic_heading_cache.get(id,-1))
 	var heading: Vector2=actor.get("heading",Vector2.RIGHT)
 	var current: int=VISUALS.heading_four(heading,before)
-	# Historical left/right effect: a ship travelling horizontally cycles
-	# between the two oblique four-view images. Its *world* motion follows
-	# its actual (possibly perfectly horizontal) route without any detour.
+	# Reproduce short, irregular left/right oblique pose swaps while sailing.
+	# This only changes the atlas frame; position, heading, path and online
+	# course remain the exact actual movement, with no fake sideways detours.
 	if actor.has("pos"):
 		var position: Vector2=actor.get("pos",Vector2.ZERO)
 		var motion: Dictionary=classic_sailing_visual.get(id,{})
@@ -1227,13 +1241,20 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 		var speed: float=maxf(20.0,float(actor.get("speed",165.0)))
 		var progress: float=float(motion.get("sail_seconds",0.0))
 		var last_moved: float=float(motion.get("last_moved",-1000.0))
-		if distance>0.03 and distance<maxf(60.0,speed*0.8):
-			# Distance, rather than raw frame count, drives the animation:
-			# standing still freezes the pose and frame rate cannot affect it.
-			progress+=distance/speed
+		var ever_moved: bool=bool(motion.get("ever_moved",false))
+		if distance>=maxf(60.0,speed*0.8):
+			# Respawn / map crossing is not 80 m of quick zigzag motion.
+			progress=0.0
+			ever_moved=false
+			last_moved=-1000.0
+		elif distance>0.03:
+			# Distance, rather than raw frame count, drives both facing
+			# and its small lateral footprint movement.
+			progress=fposmod(progress+distance/speed,VISUALS.CLASSIC_FACING_PATTERN_DURATION)
 			last_moved=elapsed
+			ever_moved=true
 		if elapsed-last_moved<0.16:
-			current=VISUALS.classic_sailing_frame(heading,fposmod(progress,CLASSIC_LEFT_RIGHT_CYCLE)/CLASSIC_LEFT_RIGHT_CYCLE)
+			current=VISUALS.classic_sailing_frame(heading,progress)
 		elif not motion.is_empty() and Vector2(motion.get("heading",heading)).distance_squared_to(heading)<0.001:
 			# Do not snap into a different facing as soon as the ship stops.
 			current=int(motion.get("frame",current))
@@ -1241,7 +1262,7 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 			current=VISUALS.heading_four(heading,-1)
 		classic_sailing_visual[id]={
 			"position":position,"sail_seconds":progress,"last_moved":last_moved,
-			"heading":heading,"frame":current,
+			"ever_moved":ever_moved,"heading":heading,"frame":current,
 		}
 	classic_heading_cache[id]=current
 	return current

@@ -25,6 +25,26 @@ func run() -> void:
 		check(first!=second and first in [1,3,5,7] and second in [1,3,5,7],"straight travel alternates two oblique Classic facings without changing movement "+str(sample))
 	check(VISUALS.classic_sailing_frame(Vector2.RIGHT,0.25)==1 and VISUALS.classic_sailing_frame(Vector2.RIGHT,0.75)==3,"eastbound ship switches NE / SE visually (left-right)")
 	check(VISUALS.classic_sailing_frame(Vector2.LEFT,0.25)==5 and VISUALS.classic_sailing_frame(Vector2.LEFT,0.75)==7,"westbound ship switches SW / NW visually (left-right)")
+	# Newly uploaded 31.5 s Skull Crusher reference shows quick, uneven
+	# 2D left/right switches. These are explicit timing approximations, not
+	# a claim of frame-identical extraction. They must not be a 1.4 s metronome.
+	var reference_times := [0.20,0.60,0.95,1.52,1.95,2.30,2.75,3.25,3.62]
+	var reference_frames := [1,3,1,3,1,3,1,3,1]
+	for i in reference_times.size():
+		var drawn: int=VISUALS.classic_sailing_frame(Vector2.RIGHT,float(reference_times[i]))
+		check(drawn==int(reference_frames[i]),"reference-inspired left/right frame at elapsed sailing time "+str(reference_times[i]))
+	check(is_equal_approx(VISUALS.CLASSIC_FACING_PATTERN_DURATION,3.44),"irregular facing sequence has a stable seamless loop")
+	# A visual-only frame swap is insufficient: each pose must now include
+	# the corresponding small, continuous left/right *rendered* movement.
+	var a: Vector2=VISUALS.classic_sailing_offset(Vector2.RIGHT,0.0)
+	var b: Vector2=VISUALS.classic_sailing_offset(Vector2.RIGHT,0.45-0.00001)
+	var c: Vector2=VISUALS.classic_sailing_offset(Vector2.RIGHT,0.45)
+	check(a.y< -7.9 and b.y>7.9 and c.distance_to(b)<0.005,"short NE->SE shift moves the hull laterally without snapping at the frame boundary")
+	check(VISUALS.classic_sailing_offset(Vector2.RIGHT,0.82-0.00001).distance_to(VISUALS.classic_sailing_offset(Vector2.RIGHT,0.82))<0.005,"the reverse side-step stays continuous")
+	check(VISUALS.classic_sailing_offset(Vector2.RIGHT,3.44-0.00001).distance_to(VISUALS.classic_sailing_offset(Vector2.RIGHT,0.0))<0.005,"loop boundary returns to the same visual water footprint")
+	check(VISUALS.classic_sailing_offset(Vector2.RIGHT,0.5).length()<=VISUALS.CLASSIC_LATERAL_SWAY+0.001,"Classic deviation remains under eight world units, never a huge physical V")
+	for diagonal: Vector2 in [Vector2(1,-1),Vector2(1,1),Vector2(-1,1),Vector2(-1,-1)]:
+		check(VISUALS.classic_sailing_offset(diagonal,0.33).length()<0.001,"diagonal routes need no artificial sideways step")
 	for diagonal: Vector2 in [Vector2(1,-1),Vector2(1,1),Vector2(-1,1),Vector2(-1,-1)]:
 		check(VISUALS.classic_sailing_frame(diagonal,0.1)==VISUALS.classic_sailing_frame(diagonal,0.8),"precisely diagonal courses hold their correct graphical facing")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
@@ -119,6 +139,9 @@ func run() -> void:
 		motion_probe.pos+=Vector2(12,0)
 		shown[game._classic_frame_for_actor(motion_probe)]=true
 	check(shown.has(1) and shown.has(3),"sailing actor alternates NE and SE views while its world Y remains exactly 500")
+	var shifted_visual: Vector2=game._visual_actor_pos(motion_probe)
+	check(absf(shifted_visual.y-500.0)>0.1 and absf(shifted_visual.y-500.0)<=VISUALS.CLASSIC_LATERAL_SWAY+.01,"Classic moves the rendered ship slightly sideways, not only its sprite direction")
+	check(motion_probe.pos.y==500.0,"Classic never applies the visible side-step to real ship collision or online coordinates")
 	check(game.sim.player.path==actual_route and game.sim.player.pos==actual_position,"sprite pendulum never writes the gameplay path or moves the captain")
 	var stopped_view: int=game._classic_frame_for_actor(motion_probe)
 	game.elapsed+=0.3
