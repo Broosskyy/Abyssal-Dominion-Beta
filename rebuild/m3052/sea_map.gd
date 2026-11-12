@@ -5010,9 +5010,13 @@ func _set_render_mode(value: String) -> void:
 	else:
 		browser_classic=false;render_mode=value;_ensure_mesh_layer()
 		mesh_layer.set_render_mode(value);render_mode=mesh_layer.mode
-	# Classic is a visual renderer choice. Never rewrite or resend the
-	# physical ship route when swapping 2D/2.5D/3D.
+	# A mode change now replaces the REMAINING sailing legs but keeps
+	# the live world position and final clicked destination. Re-send the
+	# actual new course if a real multiplayer session is connected.
+	var was_classic: bool=sim.classic_steering
 	sim.set_classic_steering(browser_classic)
+	if was_classic!=sim.classic_steering and online_connected and not sim.player.path.is_empty():
+		_send_online_course(Vector2(sim.player.path.back()))
 	classic_heading_cache.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
