@@ -1,6 +1,7 @@
 extends SceneTree
 const SIM=preload("res://simulation.gd")
 const VISUALS=preload("res://ship_visuals.gd")
+const NAV=preload("res://navigation.gd")
 var checks:=0
 var failures: Array[String]=[]
 func check(ok: bool,label: String) -> void:
@@ -15,37 +16,50 @@ func run() -> void:
 		check(VISUALS.heading_four(heading)==expected,"four-way Classic graphic selects correct baked diagonal "+str(heading))
 	for heading: Vector2 in [Vector2.RIGHT,Vector2.UP,Vector2.LEFT,Vector2.DOWN,Vector2(5,2),Vector2(-8,1)]:
 		check(VISUALS.heading_four(heading) in [1,3,5,7],"every ordinary captain heading chooses exactly one of the four Classic frames")
-	var east_frame: int=VISUALS.heading_four(Vector2.RIGHT)
-	check(VISUALS.heading_four(Vector2(1,-0.07),east_frame)==east_frame and VISUALS.heading_four(Vector2(1,0.07),east_frame)==east_frame,"Classic sprite hysteresis prevents flickering when sailing nearly east")
-	# Reference 208797.mp4: chart Y stays BY, X changes 51 -> 48; the
-	# visible ship alternates left/right while travelling horizontally.
-	for sample: Vector2 in [Vector2.RIGHT,Vector2.LEFT,Vector2.UP,Vector2.DOWN]:
-		var first: int=VISUALS.classic_sailing_frame(sample,0.25)
-		var second: int=VISUALS.classic_sailing_frame(sample,0.75)
-		check(first!=second and first in [1,3,5,7] and second in [1,3,5,7],"straight travel alternates two oblique Classic facings without changing movement "+str(sample))
-	check(VISUALS.classic_sailing_frame(Vector2.RIGHT,0.25)==1 and VISUALS.classic_sailing_frame(Vector2.RIGHT,0.75)==3,"eastbound ship switches NE / SE visually (left-right)")
-	check(VISUALS.classic_sailing_frame(Vector2.LEFT,0.25)==5 and VISUALS.classic_sailing_frame(Vector2.LEFT,0.75)==7,"westbound ship switches SW / NW visually (left-right)")
+	# Four rendered directions are derived from actual 45-degree travel legs.
+	for heading: Vector2 in [Vector2.RIGHT,Vector2.UP,Vector2.LEFT,Vector2.DOWN]:
+		check(VISUALS.heading_four(heading) in [1,3,5,7],"cardinal lookups have a safe static fallback")
+	var compass: Array[Vector2]=NAV.classic_compass_leg(Vector2(500,500),Vector2(1200,500),SIM.CLASSIC_MAX_CROSS_OFFSET)
+	check(compass.size()>=6 and compass.back()==Vector2(1200,500),"short real diagonal legs connect a horizontal tap to its exact destination")
+	var cursor: Vector2=Vector2(500,500)
+	var diagonals: Dictionary={}
+	var peak_offset: float=0.0
+	for waypoint: Vector2 in compass:
+		var delta: Vector2=waypoint-cursor
+		check(absf(absf(delta.x)-absf(delta.y))<0.02,"every ordinary Classic leg moves exactly 45 degrees")
+		diagonals[VISUALS.heading_four(delta)]=true
+		peak_offset=maxf(peak_offset,absf(waypoint.y-500.0))
+		cursor=waypoint
+	check(diagonals.has(1) and diagonals.has(3),"Classic alternates real NE and SE travel rather than faking a sprite flip")
+	check(peak_offset<=SIM.CLASSIC_MAX_CROSS_OFFSET+0.01 and peak_offset>=SIM.CLASSIC_MAX_CROSS_OFFSET-0.01,"physical deviation stays bounded around the tapped course")
 	for diagonal: Vector2 in [Vector2(1,-1),Vector2(1,1),Vector2(-1,1),Vector2(-1,-1)]:
-		check(VISUALS.classic_sailing_frame(diagonal,0.1)==VISUALS.classic_sailing_frame(diagonal,0.8),"precisely diagonal courses hold their correct graphical facing")
+		var direct_diagonal: Array[Vector2]=NAV.classic_compass_leg(Vector2(500,500),Vector2(500,500)+diagonal*350,SIM.CLASSIC_MAX_CROSS_OFFSET)
+		check(direct_diagonal.size()==1,"an exactly diagonal course keeps one facing without fake turns")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
 	var goal:=Vector2(1200,500)
 	check(not sim.classic_steering,"native default uses direct navigation")
 	check(sim.course(goal),"water tap creates a course")
 	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"native open water follows one direct line")
-	var initial_route: Array=sim.player.path.duplicate()
 	var initial_pos: Vector2=sim.player.pos
 	sim.set_classic_steering(true)
-	check(sim.classic_steering and sim.player.path==initial_route and sim.player.pos==initial_pos,"switching to Classic never rewrites the physical route or teleports the captain")
-	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"Classic horizontal sailing has no synthetic diagonal zigzags")
+	check(sim.classic_steering and sim.player.pos==initial_pos,"switching to Classic never teleports the captain")
+	check(sim.player.path.size()>4 and sim.player.path.back()==goal,"Classic replans as real short diagonal sailing legs")
 	var stock: Array=sim.player.ammo.duplicate()
-	var horizontal_track: bool=true
+	var seen_headings: Dictionary={}
+	var maximum_drift: float=0.0
 	for step in 900:
 		sim._move(sim.player,1.0/60.0)
-		horizontal_track=horizontal_track and absf(float(sim.player.pos.y)-500.0)<0.01
+		if not sim.player.path.is_empty():
+			var heading: Vector2=sim.player.heading
+			check(absf(absf(heading.x)-absf(heading.y))<0.01,"a real Classic captain moves along a diagonal heading")
+			seen_headings[VISUALS.heading_four(heading)]=true
+		maximum_drift=maxf(maximum_drift,absf(float(sim.player.pos.y)-500.0))
 		if sim.player.path.is_empty():break
-	check(horizontal_track and sim.player.pos.distance_to(goal)<.01 and sim.player.ammo==stock,"Classic physically sails dead straight toward a horizontal click, without spending ammo")
+	check(seen_headings.has(1) and seen_headings.has(3),"real Classic sailing faces NE and SE during a horizontal trip")
+	check(maximum_drift>5 and maximum_drift<=SIM.CLASSIC_MAX_CROSS_OFFSET+0.02,"physical course actually changes diagonally but remains close to the tapped line")
+	check(sim.player.pos.distance_to(goal)<0.01 and sim.player.ammo==stock,"Classic reaches precise destination without using ammunition")
 	var diagonal_goal:=Vector2(1600,850)
-	check(sim.course(diagonal_goal) and sim.player.path==sim.plan_path(sim.player.pos,diagonal_goal),"Classic follows a direct diagonal tap using ordinary simulation physics")
+	check(sim.course(diagonal_goal) and sim.player.path.back()==diagonal_goal and sim.player.path.size()>1,"Classic preserves arbitrary diagonal target while using only four real diagonal headings")
 	sim._move(sim.player,0.25)
 	var corner: Vector2=sim.player.pos
 	check(sim.course(Vector2(300,850)) and sim.player.path.back()==Vector2(300,850),"new tap immediately replaces the course")
@@ -54,13 +68,13 @@ func run() -> void:
 	var changing_route: Array=sim.player.path.duplicate()
 	var switch_origin: Vector2=sim.player.pos
 	sim.set_classic_steering(false)
-	check(not sim.classic_steering and sim.player.pos==switch_origin and sim.player.path==changing_route,"returning to 3D leaves the exact active course and location intact")
+	check(not sim.classic_steering and sim.player.pos==switch_origin and sim.player.path.back()==changing_route.back() and sim.player.path==sim.plan_path(switch_origin,changing_route.back()),"returning to 3D replans DIRECT movement without moving the captain")
 	var npc_body: Dictionary={"pos":Vector2(500,500),"heading":Vector2.RIGHT,"kind":"ship"}
 	var npc_direct: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
 	check(npc_direct.size()==1 and npc_direct[0]==Vector2(1200,500),"native NPC patrol ship follows direct courses")
 	sim.set_classic_steering(true)
 	var npc_classic: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
-	check(npc_classic==npc_direct,"Classic NPC sprites follow exact same physical paths as native NPCs")
+	check(npc_classic.size()>3 and npc_classic.back()==npc_direct.back(),"Classic NPC ships follow real diagonal legs to the same final goal")
 	var monster: Dictionary={"pos":Vector2(500,500),"heading":Vector2.RIGHT,"kind":"monster"}
 	check(sim.plan_actor_path(monster,Vector2(1200,500))==npc_direct,"sea monsters keep direct navigation in every mode")
 	root.content_scale_size=Vector2i.ZERO;root.size=Vector2i(1280,720)
@@ -77,7 +91,7 @@ func run() -> void:
 	game._set_render_mode("classic");await process_frame
 	check(game.browser_classic and game.render_mode=="classic" and game.mesh_layer==null,"native Classic disables and removes the 3D fleet viewport")
 	check(game._classic_fleet_ready(),"native 2D loads all 23 ship and paint atlases")
-	check(game.sim.classic_steering and game.sim.player.path.back()==destination and game.sim.player.path==course and game.sim.player.pos==Vector2(before.position[0],before.position[1]),"Classic 2D preserves existing physical waypoint path and position while changing only sprite views")
+	check(game.sim.classic_steering and game.sim.player.path.back()==destination and game.sim.player.path!=course and game.sim.player.pos==Vector2(before.position[0],before.position[1]),"Classic 2D replans real four-heading legs without teleporting the player")
 	check(is_equal_approx(game._actor_visual_length(game.sim.player),native_player_length*game.CLASSIC_HULL_SCALE),"Classic uses a smaller on-screen captain hull without altering game physics")
 	check(is_equal_approx(game._actor_visual_length(game.sim.npcs[0]),native_npc_length*game.CLASSIC_HULL_SCALE),"Classic scales NPC hulls with the captain instead of dwarfing enemies")
 	var path_before_framing: Array=game.sim.player.path.duplicate()
@@ -108,22 +122,21 @@ func run() -> void:
 	check(game._classic_frame_for_actor(game.sim.player)==1,"Classic renderer draws the expected NE atlas frame from the preserved eight-view collection")
 	game.sim.player.heading=Vector2(1,1)
 	check(game._classic_frame_for_actor(game.sim.player)==3,"Classic renderer changes facing without changing simulated world coordinates")
-	# Exercise the real ship sprite resolver, not only the pure helper:
-	# moved WORLD position drives the facing pendulum, not a zigzag path.
+	# Verify ACTUAL leg headings drive the atlas. No timer, no fake sway.
+	var compass_probe: Array[Vector2]=NAV.classic_compass_leg(Vector2(500,500),Vector2(1200,500),SIM.CLASSIC_MAX_CROSS_OFFSET)
 	var motion_probe: Dictionary={"id":9318,"pos":Vector2(500,500),"speed":100.0,"heading":Vector2.RIGHT}
-	game._classic_frame_for_actor(motion_probe)
 	var shown: Dictionary={}
-	var actual_route: Array=game.sim.player.path.duplicate()
-	var actual_position: Vector2=game.sim.player.pos
-	for step in 13:
-		motion_probe.pos+=Vector2(12,0)
+	var original_route: Array=game.sim.player.path.duplicate()
+	var original_pos: Vector2=game.sim.player.pos
+	var previous_point: Vector2=motion_probe.pos
+	for point: Vector2 in compass_probe:
+		motion_probe.heading=(point-previous_point).normalized()
+		motion_probe.pos=point
 		shown[game._classic_frame_for_actor(motion_probe)]=true
-	check(shown.has(1) and shown.has(3),"sailing actor alternates NE and SE views while its world Y remains exactly 500")
-	check(game.sim.player.path==actual_route and game.sim.player.pos==actual_position,"sprite pendulum never writes the gameplay path or moves the captain")
-	var stopped_view: int=game._classic_frame_for_actor(motion_probe)
-	game.elapsed+=0.3
-	check(game._classic_frame_for_actor(motion_probe)==stopped_view,"standing still freezes the last left/right sailing sprite")
-	check(game.sim.player.gold==int(before.gold) and game.sim.player.skin==int(before.skin) and game.sim.player.ammo==before.ammo,"graphics switch preserves ship, wallet and ammunition")
+		previous_point=point
+	check(shown.has(1) and shown.has(3),"renderer displays correct NE/SE for genuinely changing course")
+	check(game.sim.player.path==original_route and game.sim.player.pos==original_pos,"rendering never alters physical world coordinates or navigation path")
+		check(game.sim.player.gold==int(before.gold) and game.sim.player.skin==int(before.skin) and game.sim.player.ammo==before.ammo,"graphics switch preserves ship, wallet and ammunition")
 	game._open_modal("Anzeige")
 	var options: Array[String]=[]
 	for button in game.modal_body.find_children("*","Button",true,false):options.append(button.text)
