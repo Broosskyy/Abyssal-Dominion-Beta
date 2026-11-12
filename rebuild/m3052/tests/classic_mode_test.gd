@@ -32,6 +32,22 @@ func run() -> void:
 		cursor=waypoint
 	check(diagonals.has(1) and diagonals.has(3),"Classic alternates real NE and SE travel rather than faking a sprite flip")
 	check(peak_offset<=SIM.CLASSIC_MAX_CROSS_OFFSET+0.01 and peak_offset>=SIM.CLASSIC_MAX_CROSS_OFFSET-0.01,"physical deviation stays bounded around the tapped course")
+	# Comparison with user's 208797 reference: ~0.20 s repeated swaps
+	# mixed with 1+ second stable oblique voyages. This emerges from
+	# spatial correction to the tapped course, NOT a frame clock pattern.
+	var horizontal_interior_leg: Vector2=compass[2]-compass[1]
+	var horizontal_dwell: float=horizontal_interior_leg.length()/SIM.PLAYER_SPEED
+	check(absf(horizontal_dwell-0.206)<0.025,"horizontal Classic heading changes about every 0.2 seconds at the captain's nominal sailing speed")
+	var slanted: Array[Vector2]=NAV.classic_compass_leg(Vector2(500,500),Vector2(1000,925),SIM.CLASSIC_MAX_CROSS_OFFSET)
+	var last: Vector2=Vector2(500,500)
+	var short_duration: float=10000.0
+	var long_duration: float=0.0
+	for target_point: Vector2 in slanted:
+		var leg_seconds: float=(target_point-last).length()/SIM.PLAYER_SPEED
+		short_duration=minf(short_duration,leg_seconds)
+		long_duration=maxf(long_duration,leg_seconds)
+		last=target_point
+	check(slanted.back()==Vector2(1000,925) and short_duration<0.2 and long_duration>1.0,"angled courses produce quick corrections and long steady facings without a fixed pose timer")
 	for diagonal: Vector2 in [Vector2(1,-1),Vector2(1,1),Vector2(-1,1),Vector2(-1,-1)]:
 		var direct_diagonal: Array[Vector2]=NAV.classic_compass_leg(Vector2(500,500),Vector2(500,500)+diagonal*350,SIM.CLASSIC_MAX_CROSS_OFFSET)
 		check(direct_diagonal.size()==1,"an exactly diagonal course keeps one facing without fake turns")
