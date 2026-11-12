@@ -5,6 +5,7 @@ const STAFF=preload("res://staff.gd")
 const GUILD_OPS = preload("res://sim_guild_ops.gd")
 const BONUS_OPS = preload("res://sim_bonus_ops.gd")
 const STAFF_OPS = preload("res://sim_staff_ops.gd")
+const NAV = preload("res://navigation.gd")
 const LOOKALIKE := {"0":"O","1":"I","3":"E","4":"A","5":"S","7":"T","8":"B"}
 var island_shapes: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/visuals/island_collision.json")).entries
 ## Independent fixed-step sea simulation. No dependency on legacy map scripts.
@@ -28,6 +29,13 @@ var player: Dictionary
 # Rendering-only Classic presentation flag. The actual simulation route is
 # identical across Classic 2D, native 2.5D and 3D (no artificial zigzag).
 var classic_steering: bool=false
+# Actual short diagonal travel legs in Classic, NOT a cosmetic frame pendulum.
+# Reference 208797.mp4: multiple fast 0.20-0.25s switches alternating
+# with long holds. At 165 wu/s the full horizontal 24-unit dither leg
+# takes ~0.206s; oblique destinations naturally cause longer holds.
+# A sprite flip is never driven by a timer independent of ship motion.
+const CLASSIC_MAX_CROSS_OFFSET := 12.0
+const CLASSIC_PATH_LIMIT := 480
 # Retired historical skins 0-30 migrate to shaded ship (skin 0).
 # Only schema 5+ saves can select separate Corsair test skin 1 and ten new Elite color skins 2-11.
 const FINAL_PLAYER_SKIN := 0
@@ -276,15 +284,70 @@ func plan_path(start: Vector2, goal: Vector2) -> Array[Vector2]:
 	if segment_free(current, goal): result.append(goal)
 	return result
 
+## This is real four-heading sailing, rather than rotating ship artwork
+## above a direct path. Each leg is NE, SE, SW or NW (45° in the chart).
+## The distance to the ideal line remains small; no 144-unit fake detours.
+## Exact diagonals stay diagonal; cardinal directions use short alternating
+## diagonals. Obstacle-safe fallbacks preserve reachability by a dock.
+func classic_path(start: Vector2,goal: Vector2,heading: Vector2=Vector2.RIGHT) -> Array[Vector2]:
+	var base: Array[Vector2]=plan_path(start,goal)
+	if base.is_empty():return base
+	var result: Array[Vector2]=[]
+	var current: Vector2=start
+	for waypoint: Vector2 in base:
+		var leg: Array[Vector2]=[]
+		var delta: Vector2=waypoint-current
+		var cross_heading: float=heading.y if absf(delta.x)>=absf(delta.y) else heading.x
+		var first_side: int=1 if cross_heading>=0.0 else -1
+		# Decrease lateral step near obstacles. Check *every* generated
+		# diagonal, not only its final destination or an island's center.
+		for offset: float in [CLASSIC_MAX_CROSS_OFFSET,9.0,6.0,3.0]:
+			var candidate: Array[Vector2]=NAV.classic_compass_leg(current,waypoint,offset,first_side)
+			if candidate.is_empty() or result.size()+candidate.size()>CLASSIC_PATH_LIMIT:continue
+			var cursor: Vector2=current
+			var clear: bool=true
+			for next_point: Vector2 in candidate:
+				if not segment_free(cursor,next_point):
+					clear=false
+					break
+				cursor=next_point
+			if clear:
+				leg=candidate
+				break
+		if leg.is_empty():
+			# At a narrow coast entry the safe direct segment wins.
+			leg.append(waypoint)
+		if result.size()+leg.size()>CLASSIC_PATH_LIMIT:return base
+		result.append_array(leg)
+		current=waypoint
+	return result
+
 func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
-	# Physical movement is independent from the number of available ship views.
-	# The classic four-facing effect belongs exclusively in the sprite renderer.
-	return plan_path(body.pos,goal)
+	# Monsters have their own navigation; 2.5D/3D remain direct.
+	if classic_steering and str(body.get("kind","ship"))=="ship":
+		return classic_path(Vector2(body.pos),goal,Vector2(body.get("heading",Vector2.RIGHT)))
+	return plan_path(Vector2(body.pos),goal)
 
 func set_classic_steering(enabled: bool) -> void:
-	# Retained API for renderer mode synchronization. Switching modes must
-	# NOT rewrite waypoints or broadcast a different movement route.
+	if classic_steering==enabled:return
 	classic_steering=enabled
+	# Preserve current world position and clicked destination, but replace
+	# old-mode legs. Otherwise leaving Classic could keep a zigzag in 3D.
+	var bodies: Array[Dictionary]=[player]
+	for npc: Dictionary in npcs:
+		if str(npc.get("kind",""))=="ship":bodies.append(npc)
+	for body: Dictionary in bodies:
+		if bool(body.get("network_motion",false)):continue
+		var previous: Array=body.get("path",[])
+		if previous.is_empty():continue
+		var destination: Vector2=Vector2(previous.back())
+		var next_route: Array[Vector2]=[]
+		if int(body.get("id",-1))==0 and staff.flag("no_collision"):
+			if enabled:next_route=NAV.classic_compass_leg(body.pos,destination,CLASSIC_MAX_CROSS_OFFSET)
+			else:next_route.append(destination)
+			if next_route.is_empty():next_route.append(destination)
+		else:next_route=plan_actor_path(body,destination)
+		if not next_route.is_empty():body.path=next_route
 
 func course(point: Vector2) -> bool:
 	pending_portal=-1
@@ -293,7 +356,10 @@ func course(point: Vector2) -> bool:
 	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
 	var route: Array[Vector2] = []
 	if staff.flag("no_collision"):
-		route.append(point)
+		if classic_steering:
+			route=NAV.classic_compass_leg(player.pos,point,CLASSIC_MAX_CROSS_OFFSET)
+			if route.size()>CLASSIC_PATH_LIMIT:route.clear()
+		if route.is_empty():route.append(point)
 	else:
 		route=plan_actor_path(player,point)
 	if route.is_empty():
