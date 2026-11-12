@@ -26,23 +26,35 @@ static func heading_four(heading: Vector2,previous: int=-1) -> int:
 	var prior_column: int=CLASSIC_FOUR_VIEW_ATLAS.find(previous)
 	return CLASSIC_FOUR_VIEW_ATLAS[heading_column(heading,prior_column)]
 
-## Historical Classic 2D "links / rechts" sailing: when the captain sails
-## straight west/east/north/south, the old ship art alternates between
-## the two adjacent oblique facings. The ACTOR NEVER zigzags; only its
-## 4-frame drawing changes. A diagonal course holds its single facing.
-## phase is distance sailed / nominal speed modulo one visual cycle.
+## Reference video (Seafight Skull Crusher, 2024, 00:03-00:08):
+## A travelling hull snaps between neighboring *drawn* oblique views at
+## short, uneven intervals. World position, course and velocity never wobble.
+## Values below are observational approximations, not a frame-perfect trace.
+## There are eight intervals, an even count, so the loop repeats without
+## adding two identical left or right poses at its boundary.
+const CLASSIC_FACING_DWELLS := [0.45,0.37,0.54,0.35,0.48,0.30,0.53,0.42]
+const CLASSIC_FACING_PATTERN_DURATION := 3.44
+
+## phase = accumulated *seconds of actual sailing* (distance / ship speed).
+## The visual pose freezes during a stop. A diagonal course keeps its
+## own single facing; straight cardinal courses alternate left / right.
 static func classic_sailing_frame(heading: Vector2,phase: float) -> int:
 	if heading.length_squared()<0.0001:return CLASSIC_FOUR_VIEW_ATLAS[0]
 	var quarter: float=PI*.5
 	var rotated: float=fposmod(heading.angle()+PI*.25,TAU)
 	var sector: int=clampi(int(floor(rotated/quarter)),0,3)
 	var toward_next: float=(rotated-float(sector)*quarter)/quarter
-	var first: int=CLASSIC_CLOCKWISE_ATLAS[(sector+0)%4]
+	var first: int=CLASSIC_CLOCKWISE_ATLAS[sector]
 	var second: int=CLASSIC_CLOCKWISE_ATLAS[(sector+1)%4]
-	# Preserve exact diagonal headings instead of injecting fake visual turns.
+	# Avoid false twitching near a perfectly diagonal sailing direction.
 	if toward_next<0.08:return first
 	if toward_next>0.92:return second
-	return first if fposmod(phase,1.0)<1.0-toward_next else second
+	var remaining: float=fposmod(maxf(phase,0.0),CLASSIC_FACING_PATTERN_DURATION)
+	for i in CLASSIC_FACING_DWELLS.size():
+		var dwell: float=float(CLASSIC_FACING_DWELLS[i])
+		if remaining<dwell:return first if i%2==0 else second
+		remaining-=dwell
+	return first
 
 static func heading_eight(heading: Vector2,previous: int=-1) -> int:
 	if heading.length_squared()<0.0001:return previous if previous>=0 and previous<8 else 0
