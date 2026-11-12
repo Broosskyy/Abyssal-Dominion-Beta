@@ -56,6 +56,35 @@ static func classic_sailing_frame(heading: Vector2,phase: float) -> int:
 		remaining-=dwell
 	return first
 
+## Seafight-style short left/right movement of the *drawn* hull.
+## A timed atlas swap alone looks like a stationary spinning ship.
+## We also move the complete visual footprint by at most 8 world units
+## sideways, at the SAME cadence as the four-direction hull facings.
+## The net simulated course and network coordinates stay unchanged.
+## Each odd interval starts exactly where the preceding even one ended,
+## including the loop boundary: no teleport or sawtooth reset.
+const CLASSIC_LATERAL_SWAY := 8.0
+
+static func classic_sailing_offset(heading: Vector2,phase: float) -> Vector2:
+	if heading.length_squared()<0.0001:return Vector2.ZERO
+	var normalized: Vector2=heading.normalized()
+	var quarter: float=PI*.5
+	var rotated: float=fposmod(normalized.angle()+PI*.25,TAU)
+	var sector_fraction: float=fposmod(rotated,quarter)/quarter
+	# Exact diagonal course = one frame, no artificial side-stepping.
+	# Cardinal course = full, visibly alternating left/right steps.
+	var strength: float=1.0-absf(2.0*sector_fraction-1.0)
+	if strength<0.08:return Vector2.ZERO
+	var remaining: float=fposmod(maxf(phase,0.0),CLASSIC_FACING_PATTERN_DURATION)
+	for i in CLASSIC_FACING_DWELLS.size():
+		var dwell: float=float(CLASSIC_FACING_DWELLS[i])
+		if remaining<dwell:
+			var traverse: float=2.0*remaining/dwell-1.0
+			if i%2==1:traverse=-traverse
+			return Vector2(-normalized.y,normalized.x)*(CLASSIC_LATERAL_SWAY*strength*traverse)
+		remaining-=dwell
+	return Vector2(-normalized.y,normalized.x)*(-CLASSIC_LATERAL_SWAY*strength)
+
 static func heading_eight(heading: Vector2,previous: int=-1) -> int:
 	if heading.length_squared()<0.0001:return previous if previous>=0 and previous<8 else 0
 	if previous>=0 and previous<8:
