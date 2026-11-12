@@ -31,26 +31,38 @@ func _initialize() -> void:
 		sim._move(body,0.1)
 		if not body.path.is_empty():stable_course=stable_course and absf(body.heading.y)<.001
 	check(stable_course and body.pos.distance_to(Vector2(950,500))<0.01,"direct native route sails to the exact goal without alternating diagonal headings")
-	# The Classic 4-view look applies ONLY to hull drawing. Direct simulation
-	# movement must not bend into fake diagonal courses.
+	# Classic physics uses genuine four-direction movement. Renderer choice
+	# does not invent the headings; it displays the travelled direction.
 	sim.set_classic_steering(true)
 	body.pos=Vector2(500,500)
 	body.renderer="sprite";body.view_count=4
-	var classic_route=sim.plan_actor_path(body,Vector2(950,500))
-	check(classic_route==sim.plan_path(body.pos,Vector2(950,500)) and classic_route.size()==1,"four-view Classic follows the direct captain course, without artificial diagonal steps")
+	var classic_route: Array[Vector2]=sim.plan_actor_path(body,Vector2(950,500))
+	check(classic_route.size()>3 and classic_route.back()==Vector2(950,500),"Classic plans short alternating 45-degree waypoints to exact target")
+	var cursor: Vector2=body.pos
+	var leg_directions: Dictionary={}
+	var all_safe: bool=true
+	for point: Vector2 in classic_route:
+		var direction: Vector2=point-cursor
+		if absf(direction.x)>0.01 or absf(direction.y)>0.01:
+			check(absf(absf(direction.x)-absf(direction.y))<0.01,"Classic physical course consists of diagonal legs")
+			leg_directions[signf(direction.y)]=true
+		all_safe=all_safe and sim.segment_free(cursor,point)
+		cursor=point
+	check(all_safe and leg_directions.has(1.0) and leg_directions.has(-1.0),"course alternates true diagonal directions without hitting coastal collisions")
 	body.path=classic_route.duplicate()
-	var direct_in_classic: bool=true
+	var maximum_drift: float=0.0
 	for _i in 240:
 		sim._move(body,0.1)
-		if not body.path.is_empty():direct_in_classic=direct_in_classic and absf(float(body.pos.y)-500.0)<0.01 and absf(float(body.heading.y))<0.001
-	check(direct_in_classic and body.pos.distance_to(Vector2(950,500))<0.01,"four-view Classic never zigzags physically on horizontal water")
+		maximum_drift=maxf(maximum_drift,absf(float(body.pos.y)-500.0))
+	check(maximum_drift>5 and maximum_drift<=sim.CLASSIC_MAX_CROSS_OFFSET+0.01 and body.pos.distance_to(Vector2(950,500))<0.01,"Classic navigates by short real diagonal legs around the intended straight line")
 	body.pos=Vector2(500,500)
 	body.renderer="mesh";body.view_count=4
-	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"source GLB versus sprite cannot alter actual sea navigation")
+	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"artwork source does not change actual four-heading navigation")
 	body.view_count=8
-	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"eight baked views remain available but never alter Classic navigation")
+	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"eight baked views remain available but Classic uses four heading physics")
 	sim.set_classic_steering(false)
-	check(sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"switching back to native 3D/2.5D restores the direct route")
+	check(sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"native 3D/2.5D reverts to direct sailing")
+
 	for map_index in [0,1,2]:
 		sim.configure_map(map_index)
 		sim.shots.clear()
