@@ -140,7 +140,7 @@ func run() -> void:
 		shown[game._classic_frame_for_actor(motion_probe)]=true
 	check(shown.has(1) and shown.has(3),"sailing actor alternates NE and SE views while its world Y remains exactly 500")
 	var shifted_visual: Vector2=game._visual_actor_pos(motion_probe)
-	check(absf(shifted_visual.y-500.0)>0.1 and absf(shifted_visual.y-500.0)<=game.VISUALS.CLASSIC_LATERAL_SWAY+.01,"Classic moves the rendered ship slightly sideways, not only its sprite direction")
+	check(absf(shifted_visual.y-500.0)>0.1 and absf(shifted_visual.y-500.0)<=VISUALS.CLASSIC_LATERAL_SWAY+.01,"Classic moves the rendered ship slightly sideways, not only its sprite direction")
 	check(motion_probe.pos.y==500.0,"Classic never applies the visible side-step to real ship collision or online coordinates")
 	check(game.sim.player.path==actual_route and game.sim.player.pos==actual_position,"sprite pendulum never writes the gameplay path or moves the captain")
 	var stopped_view: int=game._classic_frame_for_actor(motion_probe)
