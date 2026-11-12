@@ -265,7 +265,6 @@ var classic_heading_cache: Dictionary={}
 # Rendering-only per-ship progress for the old Seafight left/right visual
 # pendulum. Never applied to sim.player.pos, actor.heading or online waypoints.
 var classic_sailing_visual: Dictionary={}
-const CLASSIC_LEFT_RIGHT_CYCLE := 1.4
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
 # 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
@@ -1216,9 +1215,9 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 	var before: int=int(classic_heading_cache.get(id,-1))
 	var heading: Vector2=actor.get("heading",Vector2.RIGHT)
 	var current: int=VISUALS.heading_four(heading,before)
-	# Historical left/right effect: a ship travelling horizontally cycles
-	# between the two oblique four-view images. Its *world* motion follows
-	# its actual (possibly perfectly horizontal) route without any detour.
+	# Reproduce short, irregular left/right oblique pose swaps while sailing.
+	# This only changes the atlas frame; position, heading, path and online
+	# course remain the exact actual movement, with no fake sideways detours.
 	if actor.has("pos"):
 		var position: Vector2=actor.get("pos",Vector2.ZERO)
 		var motion: Dictionary=classic_sailing_visual.get(id,{})
@@ -1230,10 +1229,10 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 		if distance>0.03 and distance<maxf(60.0,speed*0.8):
 			# Distance, rather than raw frame count, drives the animation:
 			# standing still freezes the pose and frame rate cannot affect it.
-			progress+=distance/speed
+			progress=fposmod(progress+distance/speed,VISUALS.CLASSIC_FACING_PATTERN_DURATION)
 			last_moved=elapsed
 		if elapsed-last_moved<0.16:
-			current=VISUALS.classic_sailing_frame(heading,fposmod(progress,CLASSIC_LEFT_RIGHT_CYCLE)/CLASSIC_LEFT_RIGHT_CYCLE)
+			current=VISUALS.classic_sailing_frame(heading,progress)
 		elif not motion.is_empty() and Vector2(motion.get("heading",heading)).distance_squared_to(heading)<0.001:
 			# Do not snap into a different facing as soon as the ship stops.
 			current=int(motion.get("frame",current))
