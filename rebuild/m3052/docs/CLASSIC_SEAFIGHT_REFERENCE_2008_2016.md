@@ -23,6 +23,19 @@ https://www.gamestar.de/artikel/seafight-browserspiel-oldie-unter-piratenflagge%
 
 The actual per-frame cadence remains subject to comparison against playable historical footage; do not label it a frame-exact match to a video that was inaccessible.
 
+## Classic-only framing adjustment (2026-11-12)
+
+The user-provided Seafight recording `208797.mp4` and current Abyssal `208809.mp4` were reviewed side by side. In the old footage the ship is much smaller relative to the sea and its name is close beneath the hull; its left/right-facing changes are irregular, not a predictable one-second metronome. Therefore, **do not change physical steering or further tune the left/right cycle merely from a contact sheet.** Exact motion cadence requires actual contiguous footage/playback confirmation.
+
+This pass changes **presentation only**:
+- Classic ship atlases, selection-waterline graphics and on-screen hull hit geometry share a 0.62x visual length scale; native 2.5D and 3D models stay at their original size, and NPC ship stats and collision remain unchanged.
+- On large landscape viewports the automatic Classic zoom boost is capped at 1.15 rather than 1.7; the user's manual zoom controls continue to work.
+- The existing heading-independent nameplate anchor uses the same scaled atlas envelope and a reduced 11px (UI scale) gap rather than 22px. Rank, HP, shield and decks all retain the shared stable anchor.
+- Camera lock still follows the render-interpolated captain each frame. Manually panned camera remains independently panned until the user recenters it. No forced camera recentering or course change is introduced.
+- Regressions check 844x390 and 2340x1080 viewports and verify that gameplay path, captain position, 3D model size and four-view selection are unchanged.
+
+The target is a more legible 2009–2014-style sea composition without claiming exact original Seafight pixel measurements.
+
 ## Period-grounded sources
 
 - German official 2013 sea-chart options: https://board-de.seafight.com/threads/die-seekarte-die-optionen.855/
