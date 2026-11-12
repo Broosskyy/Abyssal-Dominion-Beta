@@ -30,8 +30,11 @@ var player: Dictionary
 # identical across Classic 2D, native 2.5D and 3D (no artificial zigzag).
 var classic_steering: bool=false
 # Actual short diagonal travel legs in Classic, NOT a cosmetic frame pendulum.
-# At 165 wu/s, a full 48-unit cross-width leg takes roughly 0.41s.
-const CLASSIC_MAX_CROSS_OFFSET := 24.0
+# Reference 208797.mp4: multiple fast 0.20-0.25s switches alternating
+# with long holds. At 165 wu/s the full horizontal 24-unit dither leg
+# takes ~0.206s; oblique destinations naturally cause longer holds.
+# A sprite flip is never driven by a timer independent of ship motion.
+const CLASSIC_MAX_CROSS_OFFSET := 12.0
 const CLASSIC_PATH_LIMIT := 480
 # Retired historical skins 0-30 migrate to shaded ship (skin 0).
 # Only schema 5+ saves can select separate Corsair test skin 1 and ten new Elite color skins 2-11.
@@ -298,7 +301,7 @@ func classic_path(start: Vector2,goal: Vector2,heading: Vector2=Vector2.RIGHT) -
 		var first_side: int=1 if cross_heading>=0.0 else -1
 		# Decrease lateral step near obstacles. Check *every* generated
 		# diagonal, not only its final destination or an island's center.
-		for offset: float in [CLASSIC_MAX_CROSS_OFFSET,18.0,12.0,6.0]:
+		for offset: float in [CLASSIC_MAX_CROSS_OFFSET,9.0,6.0,3.0]:
 			var candidate: Array[Vector2]=NAV.classic_compass_leg(current,waypoint,offset,first_side)
 			if candidate.is_empty() or result.size()+candidate.size()>CLASSIC_PATH_LIMIT:continue
 			var cursor: Vector2=current
