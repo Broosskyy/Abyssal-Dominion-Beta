@@ -56,6 +56,7 @@ func _initialize() -> void:
 		maximum_drift=maxf(maximum_drift,absf(float(body.pos.y)-500.0))
 	check(maximum_drift>5 and maximum_drift<=sim.CLASSIC_MAX_CROSS_OFFSET+0.01 and body.pos.distance_to(Vector2(950,500))<0.01,"Classic navigates by short real diagonal legs around the intended straight line")
 	body.pos=Vector2(500,500)
+	body.heading=Vector2.RIGHT # Keep the same initial facing when comparing art sources.
 	body.renderer="mesh";body.view_count=4
 	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"artwork source does not change actual four-heading navigation")
 	body.view_count=8
