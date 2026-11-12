@@ -315,6 +315,12 @@ const SHIPYARD_SEA_TILE: Texture2D=preload("res://assets/ui/painted/sea_tile.png
 const SHIPYARD_STUDIO_KEY: Shader=preload("res://shipyard_preview_key.gdshader")
 const FINAL_SHIP_LENGTH := 158.0
 const NPC_VISUAL_SCALE := 0.90
+# Only the Classic 2D presentation scales down the enormous player/NPC
+# sprites seen at 2340x1080. The world body, hitbox, NPC speed, waypoints and
+# native 2.5D/3D mesh sizes stay exactly as before.
+const CLASSIC_HULL_SCALE := 0.62
+const CLASSIC_VIEWPORT_ZOOM_BOOST_MAX := 1.15
+const CLASSIC_LABEL_CLEARANCE_PX := 11.0
 var plate_fleet: Array[Dictionary] = []
 ## Keep the maximum artwork extent stable across all rendered headings.
 var status_age := 0.0
@@ -490,7 +496,8 @@ func _update_online_ships(delta: float) -> void:
 		online_client.send_appearance(int(sim.player.skin),int(sim.player.hp),int(sim.player.max_hp))
 
 func _sharp_zoom() -> float:
-	return desired_zoom * clampf(get_viewport_rect().size.y / 720.0, 1.0, 1.7)
+	var max_boost: float=CLASSIC_VIEWPORT_ZOOM_BOOST_MAX if browser_classic else 1.7
+	return desired_zoom * clampf(get_viewport_rect().size.y / 720.0, 1.0, max_boost)
 
 func _load_classic_atlases() -> void:
 	if browser_classic:
@@ -975,10 +982,19 @@ func _npc_ship_texture(_actor: Dictionary) -> Texture2D:
 	return painted.nav_ship
 
 func _actor_visual_length(actor: Dictionary) -> float:
-	if int(actor.id)==0 or bool(actor.get("remote_player",false)):return 180.0 if int(actor.get("skin",0))>=1 and int(actor.get("skin",0))<=13 else FINAL_SHIP_LENGTH
-	if str(actor.get("visual_key",""))=="black_crown_corsair_elite_test":return 180.0
-	if actor.kind=="ship":return float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
-	return 150.0
+	var length: float=150.0
+	if int(actor.id)==0 or bool(actor.get("remote_player",false)):
+		length=180.0 if int(actor.get("skin",0))>=1 and int(actor.get("skin",0))<=13 else FINAL_SHIP_LENGTH
+	elif str(actor.get("visual_key",""))=="black_crown_corsair_elite_test":
+		length=180.0
+	elif str(actor.get("kind",""))=="ship":
+		length=float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
+	# The renderer uses the same smaller size for shadows, wake/waterline,
+	# selection ring, actual atlas draw and visual hit rectangle. Only ships
+	# shrink; sea monsters, shore defenses and physical navigation do not.
+	if browser_classic and str(actor.get("kind","ship"))=="ship":
+		length*=CLASSIC_HULL_SCALE
+	return length
 
 # M3095: classic sea-combat selection circles are flat chart overlays.
 # They stay centered on the WATER footprint while the GLB rotates freely.
@@ -1348,7 +1364,7 @@ func _plate_screen_anchor(actor: Dictionary) -> Vector2:
 		var entry: Dictionary=classic_geometry.get(_classic_atlas_key(actor),{})
 		if not entry.is_empty() and str(actor.get("kind","ship"))=="ship":
 			var bottom: float=float(entry.stable_bottom)*_actor_visual_length(actor)/float(entry.reference_extent)
-			return Vector2(point.x,point.y+bottom*zoom+22.0*pixels)
+			return Vector2(point.x,point.y+bottom*zoom+CLASSIC_LABEL_CLEARANCE_PX*pixels)
 		if str(actor.get("kind",""))=="monster":
 			# The monster atlas is drawn around a 68% waterline pivot, not
 			# the old 72-world-unit 3D hull envelope used for every monster.
