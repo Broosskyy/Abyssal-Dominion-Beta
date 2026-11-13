@@ -27,13 +27,16 @@ static func heading_four(heading: Vector2,previous: int=-1) -> int:
 
 ## Frame-measured Seafight 208901: between video 3.85s and 5.18s,
 ## the GREEN CAPTAIN HP BAR follows a quantized TRIANGLE, not a sine.
-## At 2340x1080 pixels: +/-10px perpendicular to a straight westbound
-## world course; ~54px forward distance per cycle; ~0.436s observed cycle
-## at the captured ship speed. Frame-to-frame position differences are
-## about 2 px on EACH axis at ~59 fps. The ring, hull and HP share the pose.
-## This is only drawing/visual velocity: no routes, physics or network data.
+## At 2340x1080 pixels, the reference is +/-10px perpendicular to
+## westbound travel and ~0.436s per full cycle. The older distance-only
+## 54px wavelength was measured at the REFERENCE ship's screen velocity.
+## Clip 208930 showed Abyssal sailing ~2.3x faster in SCREEN pixels/second,
+## which makes the same 54px wavelength switch the hull far too often.
+## 125px (54 * 2.3) matches the recorded visual *cadence* without modifying
+## world speed, online movement, input, or changing our single sailing mode.
+## The frame and hull/selection/label offsets share the same raster path.
 const CLASSIC_REFERENCE_AMP_PX := 10.0
-const CLASSIC_REFERENCE_WAVELENGTH_PX := 54.0
+const CLASSIC_REFERENCE_WAVELENGTH_PX := 125.0
 
 static func classic_measured_step_pose(heading: Vector2,sailed_screen_px: float,amplitude_px: float=CLASSIC_REFERENCE_AMP_PX,wavelength_px: float=CLASSIC_REFERENCE_WAVELENGTH_PX) -> Dictionary:
 	if heading.length_squared()<0.0001:
