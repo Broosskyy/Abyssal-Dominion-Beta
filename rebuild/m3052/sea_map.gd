@@ -1288,7 +1288,10 @@ func _classic_actor_visual_offset(actor: Dictionary) -> Vector2:
 	# Frame-tracked reference 208901.mp4: a +/-10px triangle movement at
 	# 1080px height, ~54 visible pixels forward per cycle. Ring and plate
 	# follow the exact same stepping as the ship, physics never does.
-	if not browser_classic or not ship_animations_enabled:return Vector2.ZERO
+	# The measured Classic microdiagonals are part of 2D navigation
+	# presentation, not optional sail/water animation. Keep these steps
+	# even when an old user preference has ship_animations_enabled=false.
+	if not browser_classic:return Vector2.ZERO
 	# The captain has id=0 but intentionally no "kind" field.
 	if str(actor.get("kind",""))!="ship" and int(actor.get("id",-1))!=0 and not bool(actor.get("remote_player",false)):return Vector2.ZERO
 	var pose: Dictionary=classic_sailing_visual.get(int(actor.get("id",-1)),{})
