@@ -34,6 +34,13 @@ func run() -> void:
 		check(absf(px)<=VISUALS.CLASSIC_HULL_DRIFT_PX+0.01 and is_equal_approx(px,float(roundi(px))),"visual hull movement never exceeds three full screen pixels")
 		pixel_values[px]=true
 	check(pixel_values.size()>2,"the visible ship moves in several discrete one-pixel steps instead of an instantaneous image flip")
+	var low_drift: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,0.0,32.0,2.0)
+	var high_drift: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,0.0,32.0,5.0)
+	check(absf(float(low_drift.pixel_x))<absf(float(high_drift.pixel_x)),"pixel strength actually scales the moving ship instead of merely limiting it")
+	var fast_dwell: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,24.0,20.0,3.0)
+	var slow_dwell: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,24.0,48.0,3.0)
+	check(int(fast_dwell.frame)!=int(slow_dwell.frame),"pixel speed setting changes the actual four-view timing")
+
 	for diagonal: Vector2 in [Vector2(1,-1),Vector2(1,1),Vector2(-1,1),Vector2(-1,-1)]:
 		var pose_one: Dictionary=VISUALS.classic_pixel_pose(diagonal,5.0)
 		var pose_two: Dictionary=VISUALS.classic_pixel_pose(diagonal,135.0)
@@ -148,6 +155,13 @@ func run() -> void:
 		check(absf(screen_px)<=VISUALS.CLASSIC_HULL_DRIFT_PX+0.01,"only graphic moves within maximum three SCREEN pixels")
 	check(shown.has(1) and shown.has(3) and pixel_offsets.size()>1,"the rendered ship turns left/right and advances in tiny pixel steps")
 	check(untouched_world_y and game.sim.player.path==actual_route and game.sim.player.pos==actual_position,"pixel steps never change actual ship Y, gameplay waypoints or camera center")
+	var user_course: Array=game.sim.player.path.duplicate()
+	var user_world: Vector2=game.sim.player.pos
+	game._set_classic_pixel_motion(20.0,5.0)
+	check(is_equal_approx(game.classic_pixel_step_world,20.0) and is_equal_approx(game.classic_pixel_strength,5.0),"classic pixel movement can be tuned live from Grafik settings")
+	check(game.sim.player.path==user_course and game.sim.player.pos==user_world,"tuning Classic ship animation does not rewrite the real course or world coordinates")
+	game._set_classic_pixel_motion(32.0,3.0)
+
 	var stopped_view: int=game._classic_frame_for_actor(motion_probe)
 	game.elapsed+=0.3
 	check(game._classic_frame_for_actor(motion_probe)==stopped_view,"standing still freezes the last left/right sailing sprite")
