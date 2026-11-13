@@ -64,7 +64,7 @@ static func classic_pixel_pose(heading: Vector2,sailed_world: float,step_world: 
 	# This is not a world-coordinate sidestep; the ring, camera and
 	# nameplate stay on the unchanged simulated position.
 	var offset_px: float=float(roundi(clampf(
-		(correction-0.25*strength*strength)*8.0*strength,
+		(correction-0.25*strength*strength)*8.0*strength*(drift_px/CLASSIC_HULL_DRIFT_PX),
 		-drift_px,drift_px
 	)))
 	return {"frame":second if second_facing else first,"pixel_x":offset_px}
