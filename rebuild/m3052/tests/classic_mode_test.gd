@@ -63,7 +63,9 @@ func run() -> void:
 	var saw_left_peak: Dictionary=VISUALS.classic_measured_step_pose(Vector2.LEFT,13.5,10.0,54.0)
 	var saw_left_trough: Dictionary=VISUALS.classic_measured_step_pose(Vector2.LEFT,40.5,10.0,54.0)
 	check(is_equal_approx(float(saw_left_peak.pixel_x),10.0) and is_equal_approx(float(saw_left_trough.pixel_x),-10.0),"208901 reference yields +/-10 screen pixels and 20px peak-to-peak")
-	check(int(saw_left_peak.frame)==7 and int(saw_left_trough.frame)==5,"westbound triangular visual movement picks NW then SW diagonals from actual step derivative")
+	var rising_west: Dictionary=VISUALS.classic_measured_step_pose(Vector2.LEFT,6.75,10.0,54.0)
+	var falling_west: Dictionary=VISUALS.classic_measured_step_pose(Vector2.LEFT,20.25,10.0,54.0)
+	check(int(rising_west.frame)==7 and int(falling_west.frame)==5,"westbound triangle upslope is NW and downslope is SW; sprite changes precisely at the peak")
 	for direction: Vector2 in [Vector2.RIGHT,Vector2.UP,Vector2.LEFT,Vector2.DOWN]:
 		var last_px: float=float(VISUALS.classic_measured_step_pose(direction,0.0,10.0,54.0).pixel_x)
 		var directions_seen: Dictionary={}
