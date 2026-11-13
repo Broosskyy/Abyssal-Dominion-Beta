@@ -319,7 +319,7 @@ const NPC_VISUAL_SCALE := 0.90
 # Only the Classic 2D presentation scales down the enormous player/NPC
 # sprites seen at 2340x1080. The world body, hitbox, NPC speed, waypoints and
 # native 2.5D/3D mesh sizes stay exactly as before.
-const CLASSIC_HULL_SCALE := 0.62
+const CLASSIC_HULL_SCALE := 0.36
 const CLASSIC_VIEWPORT_ZOOM_BOOST_MAX := 1.15
 const CLASSIC_LABEL_CLEARANCE_PX := 11.0
 var plate_fleet: Array[Dictionary] = []
