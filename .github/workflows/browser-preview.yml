@@ -2,7 +2,7 @@ name: Abyssal Dominion – browser preview
 on:
   workflow_dispatch:
   push:
-    branches: [main, feature/classic-seafight-navigation-330, fix/classic-4way-small-step-navigation-334, fix/classic-four-view-visual-only-335, fix/classic-left-right-sailing-336, fix/classic-framing-scale-337, fix/classic-pixel-hull-only-dither-341]
+    branches: [main, feature/classic-seafight-navigation-330, fix/classic-4way-small-step-navigation-334, fix/classic-four-view-visual-only-335, fix/classic-left-right-sailing-336, fix/classic-framing-scale-337, fix/classic-pixel-hull-only-dither-341, fix/classic-mobile-scale-fourway-stall-339]
     paths:
       - 'rebuild/m3052/**'
       - 'server/**'
@@ -96,8 +96,8 @@ jobs:
           print('PASS: 23 actual GLB-derived atlases / 184 distinct heading renders')
           PY
           "$engine" --headless --path rebuild/m3052 --editor --import --quit > /tmp/sprites-import.log 2>&1 || { tail -100 /tmp/sprites-import.log; exit 1; }
-          # Verify physically direct ship routes and independent pixel-only Classic hull animation, and
-          # mode changes before the stripped browser-only resources are built.
+          # Verify real 48x32 diagonal Classic world movement, screen geometry and
+          # unchanged native 2.5D/3D navigation before stripping Web-only assets.
           for suite in classic_mode_test classic_navigation_test navigation_test simulation_test ui_test; do
             XDG_DATA_HOME="$(mktemp -d)" "$engine" --headless --path rebuild/m3052 \
               --script "tests/${suite}.gd" > "/tmp/${suite}.log" 2>&1 || {

@@ -316,10 +316,16 @@ const SHIPYARD_SEA_TILE: Texture2D=preload("res://assets/ui/painted/sea_tile.png
 const SHIPYARD_STUDIO_KEY: Shader=preload("res://shipyard_preview_key.gdshader")
 const FINAL_SHIP_LENGTH := 158.0
 const NPC_VISUAL_SCALE := 0.90
-# Only the Classic 2D presentation scales down the enormous player/NPC
-# sprites seen at 2340x1080. The world body, hitbox, NPC speed, waypoints and
-# native 2.5D/3D mesh sizes stay exactly as before.
+# Browser and Android have different physical viewport sizes. Test 338
+# applied the desktop-only 36% hull size on 709px-high Android screens,
+# making the hull tiny relative to islands, the selection ring and HUD.
+# Only the VISUAL Classic hull is calibrated separately. Physics, hitboxes,
+# content, crossplay and 2.5D/3D mesh geometry are unchanged.
 const CLASSIC_HULL_SCALE := 0.36
+const CLASSIC_HULL_SCALE_MOBILE := 0.62
+# The current default 1.08 world zoom makes mobile islands dominate the
+# entire center of the screenshot. Leave user pinch/zoom control intact.
+const CLASSIC_MOBILE_CAMERA_FACTOR := 0.78
 const CLASSIC_VIEWPORT_ZOOM_BOOST_MAX := 1.15
 const CLASSIC_LABEL_CLEARANCE_PX := 11.0
 var plate_fleet: Array[Dictionary] = []
@@ -511,7 +517,10 @@ static func _classic_edge_camera_goal(ship_world: Vector2,camera_world: Vector2,
 
 func _sharp_zoom() -> float:
 	var max_boost: float=CLASSIC_VIEWPORT_ZOOM_BOOST_MAX if browser_classic else 1.7
-	return desired_zoom * clampf(get_viewport_rect().size.y / 720.0, 1.0, max_boost)
+	# Classic mobile uses a wider chart view without shrinking the ship
+	# a second time. Native 2.5D/3D and desktop camera defaults are untouched.
+	var mobile_factor: float=CLASSIC_MOBILE_CAMERA_FACTOR if browser_classic and OS.has_feature("mobile") else 1.0
+	return desired_zoom*mobile_factor*clampf(get_viewport_rect().size.y/720.0,1.0,max_boost)
 
 func _load_classic_atlases() -> void:
 	if browser_classic:
@@ -1013,7 +1022,7 @@ func _actor_visual_length(actor: Dictionary) -> float:
 	# selection ring, actual atlas draw and visual hit rectangle. Only ships
 	# shrink; sea monsters, shore defenses and physical navigation do not.
 	if browser_classic and str(actor.get("kind","ship"))=="ship":
-		length*=CLASSIC_HULL_SCALE
+		length*=CLASSIC_HULL_SCALE_MOBILE if OS.has_feature("mobile") else CLASSIC_HULL_SCALE
 	return length
 
 # M3095: classic sea-combat selection circles are flat chart overlays.
