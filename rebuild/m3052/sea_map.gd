@@ -262,11 +262,9 @@ var classic_atlases: Dictionary={}
 var classic_geometry: Dictionary={}
 var classic_monster_bottoms: Dictionary={}
 var classic_heading_cache: Dictionary={}
-# One mandatory Classic 2D navigation visualization:
-# frame-measured diagonal pixel steps plus edge-scrolling chart camera.
-# No hidden alternate sailing modes and no saved motion-mode overrides.
-# Actual world route, NPC physics and multiplayer positions stay direct.
-var classic_sailing_visual: Dictionary={}
+# Classic-2D physically follows four short isometric grid legs,
+# chosen at the 30 Hz simulation tick. Sprite art follows actor.heading.
+# Native 2.5D / 3D retain their original direct motion.
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
 # 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
@@ -476,7 +474,6 @@ func _online_snapshot(packet: Dictionary) -> void:
 	for uid: String in online_actor_ids.keys():
 		if not active.has(uid):
 			classic_heading_cache.erase(int(online_actor_ids[uid]))
-			classic_sailing_visual.erase(int(online_actor_ids[uid]))
 			online_actor_ids.erase(uid)
 
 func _send_online_course(point: Vector2) -> void:
@@ -1231,71 +1228,12 @@ func _classic_atlas_key(actor: Dictionary) -> String:
 	return str(actor.get("visual_key",""))
 
 func _classic_frame_for_actor(actor: Dictionary) -> int:
+	# Exactly the one current PHYSICAL isometric leg chooses the baked
+	# four-view sprite. No separate clock, triangle, pose or pixel wobble.
 	var id: int=int(actor.get("id",-1))
-	var heading: Vector2=actor.get("heading",Vector2.RIGHT)
-	var current: int=VISUALS.heading_four(heading,int(classic_heading_cache.get(id,-1)))
-	if actor.has("pos"):
-		var position: Vector2=_visual_actor_pos(actor)
-		var motion: Dictionary=classic_sailing_visual.get(id,{})
-		var last_position: Vector2=motion.get("position",position)
-		var distance: float=position.distance_to(last_position)
-		var speed: float=maxf(20.0,float(actor.get("speed",165.0)))
-		var sailed_world: float=float(motion.get("sailed_world",0.0))
-		var last_heading: Vector2=motion.get("heading",heading)
-		var same_heading: bool=last_heading.distance_squared_to(heading)<0.001
-		if not motion.is_empty() and last_heading.normalized().dot(heading.normalized())<0.9:
-			# Immediate response to a new tap; no turn circle.
-			sailed_world=0.0
-		var moving: bool=distance>0.03 and distance<maxf(60.0,speed*0.8)
-		if moving:
-			# Measured interpolated travel, not elapsed time or FPS.
-			# A stopped ship freezes both its final pose and pixel offset.
-			sailed_world+=distance
-		elif distance>=maxf(60.0,speed*0.8):
-			# Teleports/map transitions cannot become a fake swaying voyage.
-			sailed_world=0.0
-		# Ship movement is resolved per delivered screen pixel, not a timer.
-		# The real captain path remains unmodified in every graphics mode.
-		var pixel_scale: float=maxf(get_viewport_rect().size.y/1080.0,0.25)
-		var visible_distance: float=sailed_world*get_canvas_transform().x.length()
-		var pose: Dictionary=VISUALS.classic_measured_step_pose(
-			heading,visible_distance,
-			VISUALS.CLASSIC_REFERENCE_AMP_PX*pixel_scale,
-			VISUALS.CLASSIC_REFERENCE_WAVELENGTH_PX*pixel_scale)
-		var pixel_x: float=float(pose.pixel_x)
-		if not moving and same_heading and not motion.is_empty():
-			current=int(motion.get("frame",current))
-			pixel_x=float(motion.get("pixel_x",0.0))
-		else:
-			# Four-view sprite selection uses the direction of the
-			# measured triangular visible step, not the world waypoint
-			# and not an independent sprite-flip animation.
-			current=int(pose.frame)
-			if not moving:pixel_x=0.0
-		classic_sailing_visual[id]={
-			"position":position,"sailed_world":sailed_world,
-			"heading":heading,"frame":current,"pixel_x":pixel_x,
-		}
-	classic_heading_cache[id]=current
-	return current
-
-func _classic_actor_visual_offset(actor: Dictionary) -> Vector2:
-	# Frame-tracked reference 208901.mp4: a +/-10px triangle movement at
-	# 1080px height, ~54 visible pixels forward per cycle. Ring and plate
-	# follow the exact same stepping as the ship, physics never does.
-	# The measured Classic microdiagonals are part of 2D navigation
-	# presentation, not optional sail/water animation. Keep these steps
-	# even when an old user preference has ship_animations_enabled=false.
-	if not browser_classic:return Vector2.ZERO
-	# The captain has id=0 but intentionally no "kind" field.
-	if str(actor.get("kind",""))!="ship" and int(actor.get("id",-1))!=0 and not bool(actor.get("remote_player",false)):return Vector2.ZERO
-	var pose: Dictionary=classic_sailing_visual.get(int(actor.get("id",-1)),{})
-	var px: float=float(pose.get("pixel_x",0.0))
-	var heading: Vector2=Vector2(actor.get("heading",Vector2.RIGHT)).normalized()
-	if heading.length_squared()<0.1:return Vector2.ZERO
-	var sideways: Vector2=Vector2(-heading.y,heading.x)
-	var canvas_zoom: float=maxf(get_canvas_transform().x.length(),0.05)
-	return sideways*(px/canvas_zoom)
+	var facing: int=VISUALS.heading_four(Vector2(actor.get("heading",Vector2.RIGHT)),int(classic_heading_cache.get(id,-1)))
+	classic_heading_cache[id]=facing
+	return facing
 
 func _classic_actor_render_pos(actor: Dictionary) -> Vector2:
 	# Classic: quantize WORLD movement to displayed pixels, as raster-era
@@ -1308,7 +1246,7 @@ func _classic_actor_render_pos(actor: Dictionary) -> Vector2:
 	var transform: Transform2D=get_canvas_transform()
 	var screen: Vector2=transform*actual_position
 	var snapped: Vector2=Vector2(roundf(screen.x),roundf(screen.y))
-	return transform.affine_inverse()*snapped+_classic_actor_visual_offset(actor)
+	return transform.affine_inverse()*snapped
 
 func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
 	# point is already the same pixel-stepped center used by the ring and
@@ -5084,7 +5022,6 @@ func _reset_display_preferences() -> void:
 	_apply_ambient_motion()
 	ship_animations_enabled=true
 	wake_effects_enabled=true
-	classic_sailing_visual.clear()
 	classic_heading_cache.clear()
 	menu_layout="balanced"
 	double_tap_attack_enabled=false
@@ -5116,7 +5053,6 @@ func _set_render_mode(value: String) -> void:
 	# physical ship route when swapping 2D/2.5D/3D.
 	sim.set_classic_steering(browser_classic)
 	classic_heading_cache.clear()
-	classic_sailing_visual.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
 	if camera!=null:_sync_plate_overlay()
