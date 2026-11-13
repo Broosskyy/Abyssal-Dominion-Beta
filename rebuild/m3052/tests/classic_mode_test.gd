@@ -17,16 +17,38 @@ func run() -> void:
 		check(VISUALS.heading_four(heading) in [1,3,5,7],"every ordinary captain heading chooses exactly one of the four Classic frames")
 	var east_frame: int=VISUALS.heading_four(Vector2.RIGHT)
 	check(VISUALS.heading_four(Vector2(1,-0.07),east_frame)==east_frame and VISUALS.heading_four(Vector2(1,0.07),east_frame)==east_frame,"Classic sprite hysteresis prevents flickering when sailing nearly east")
-	# Reference 208797.mp4: chart Y stays BY, X changes 51 -> 48; the
-	# visible ship alternates left/right while travelling horizontally.
-	for sample: Vector2 in [Vector2.RIGHT,Vector2.LEFT,Vector2.UP,Vector2.DOWN]:
-		var first: int=VISUALS.classic_sailing_frame(sample,0.25)
-		var second: int=VISUALS.classic_sailing_frame(sample,0.75)
-		check(first!=second and first in [1,3,5,7] and second in [1,3,5,7],"straight travel alternates two oblique Classic facings without changing movement "+str(sample))
-	check(VISUALS.classic_sailing_frame(Vector2.RIGHT,0.25)==1 and VISUALS.classic_sailing_frame(Vector2.RIGHT,0.75)==3,"eastbound ship switches NE / SE visually (left-right)")
-	check(VISUALS.classic_sailing_frame(Vector2.LEFT,0.25)==5 and VISUALS.classic_sailing_frame(Vector2.LEFT,0.75)==7,"westbound ship switches SW / NW visually (left-right)")
+	# The user showed that Seafight wiggles the HULL in screen pixels,
+	# NOT the real course, camera or world coordinates.
+	# Pixel-error diffusion alternates adjacent facings while a cardinal
+	# course is simulated as a perfectly direct navigation line.
+	var right_start: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,0.0)
+	var right_next: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,VISUALS.CLASSIC_PIXEL_STEP_WORLD)
+	check(int(right_start.frame)!=int(right_next.frame) and int(right_start.frame) in [1,3] and int(right_next.frame) in [1,3],"a horizontal course alternates visible NE/SE facings on short pixel legs")
+	var left_start: Dictionary=VISUALS.classic_pixel_pose(Vector2.LEFT,0.0)
+	var left_next: Dictionary=VISUALS.classic_pixel_pose(Vector2.LEFT,VISUALS.CLASSIC_PIXEL_STEP_WORLD)
+	check(int(left_start.frame)!=int(left_next.frame) and int(left_start.frame) in [5,7] and int(left_next.frame) in [5,7],"a westbound course alternates only visible SW/NW facings")
+	var pixel_values: Dictionary={}
+	for sample_index in 65:
+		var sample: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,float(sample_index))
+		var px: float=float(sample.pixel_x)
+		check(absf(px)<=VISUALS.CLASSIC_HULL_DRIFT_PX+0.01 and is_equal_approx(px,float(roundi(px))),"visual hull movement never exceeds three full screen pixels")
+		pixel_values[px]=true
+	check(pixel_values.size()>2,"the visible ship moves in several discrete one-pixel steps instead of an instantaneous image flip")
 	for diagonal: Vector2 in [Vector2(1,-1),Vector2(1,1),Vector2(-1,1),Vector2(-1,-1)]:
-		check(VISUALS.classic_sailing_frame(diagonal,0.1)==VISUALS.classic_sailing_frame(diagonal,0.8),"precisely diagonal courses hold their correct graphical facing")
+		var pose_one: Dictionary=VISUALS.classic_pixel_pose(diagonal,5.0)
+		var pose_two: Dictionary=VISUALS.classic_pixel_pose(diagonal,135.0)
+		check(int(pose_one.frame)==int(pose_two.frame) and float(pose_one.pixel_x)==0.0 and float(pose_two.pixel_x)==0.0,"exact diagonals keep their pose and have zero fake hull drift")
+	var shallow: Vector2=Vector2(8.0,-5.0)
+	var shallow_holds: bool=false
+	var last_frame: int=-1
+	var hold_count: int=0
+	for interval in 30:
+		var image: int=int(VISUALS.classic_pixel_pose(shallow,float(interval)*VISUALS.CLASSIC_PIXEL_STEP_WORLD).frame)
+		if image==last_frame:hold_count+=1
+		else:hold_count=0
+		if hold_count>=2:shallow_holds=true
+		last_frame=image
+	check(shallow_holds,"oblique courses naturally hold one ship pose for multiple steps without an animation timer")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
 	var goal:=Vector2(1200,500)
 	check(not sim.classic_steering,"native default uses direct navigation")
@@ -113,13 +135,19 @@ func run() -> void:
 	var motion_probe: Dictionary={"id":9318,"pos":Vector2(500,500),"speed":100.0,"heading":Vector2.RIGHT}
 	game._classic_frame_for_actor(motion_probe)
 	var shown: Dictionary={}
+	var pixel_offsets: Dictionary={}
 	var actual_route: Array=game.sim.player.path.duplicate()
 	var actual_position: Vector2=game.sim.player.pos
+	var untouched_world_y: bool=true
 	for step in 13:
 		motion_probe.pos+=Vector2(12,0)
 		shown[game._classic_frame_for_actor(motion_probe)]=true
-	check(shown.has(1) and shown.has(3),"sailing actor alternates NE and SE views while its world Y remains exactly 500")
-	check(game.sim.player.path==actual_route and game.sim.player.pos==actual_position,"sprite pendulum never writes the gameplay path or moves the captain")
+		var screen_px: float=game._classic_hull_pixel_offset(motion_probe).x*game.get_canvas_transform().x.length()
+		pixel_offsets[roundi(screen_px)]=true
+		untouched_world_y=untouched_world_y and is_equal_approx(motion_probe.pos.y,500.0)
+		check(absf(screen_px)<=VISUALS.CLASSIC_HULL_DRIFT_PX+0.01,"only graphic moves within maximum three SCREEN pixels")
+	check(shown.has(1) and shown.has(3) and pixel_offsets.size()>1,"the rendered ship turns left/right and advances in tiny pixel steps")
+	check(untouched_world_y and game.sim.player.path==actual_route and game.sim.player.pos==actual_position,"pixel steps never change actual ship Y, gameplay waypoints or camera center")
 	var stopped_view: int=game._classic_frame_for_actor(motion_probe)
 	game.elapsed+=0.3
 	check(game._classic_frame_for_actor(motion_probe)==stopped_view,"standing still freezes the last left/right sailing sprite")
