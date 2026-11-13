@@ -257,15 +257,16 @@ const VFX_DEFAULT_FLAGS := {"enabled":true,"flight":true,"muzzle":true,"impact":
 var vfx_flags: Dictionary = VFX_DEFAULT_FLAGS.duplicate(true)
 var vfx_intensity := 1.35
 # Classic is mandatory on Web and selectable on native. It uses no 3D stage.
-var browser_classic := OS.has_feature("web")
+# Browser, Android and iOS initially share one Classic 2D renderer.
+# Native 2.5D/3D remain selectable, but mobile's first launch chooses 2D.
+var browser_classic := OS.has_feature("web") or OS.has_feature("mobile")
 var classic_atlases: Dictionary={}
 var classic_geometry: Dictionary={}
 var classic_monster_bottoms: Dictionary={}
 var classic_heading_cache: Dictionary={}
-# Rendering-only per-ship progress for the old Seafight left/right visual
-# pendulum. Never applied to sim.player.pos, actor.heading or online waypoints.
-var classic_sailing_visual: Dictionary={}
-const CLASSIC_LEFT_RIGHT_CYCLE := 1.4
+# Classic-2D physically follows four short isometric grid legs,
+# chosen at the 30 Hz simulation tick. Sprite art follows actor.heading.
+# Native 2.5D / 3D retain their original direct motion.
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
 # 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
@@ -305,7 +306,7 @@ var ring_last_target := -1
 var ring_target_acquired_at := -100.0
 var plate_overlay: Control
 var mesh_layer
-var render_mode := "hybrid"
+var render_mode := "classic" if OS.has_feature("web") or OS.has_feature("mobile") else "hybrid"
 # 1 shaded starter, 1 untouched Corsair test, ten variants of one shared Corsair GLB.
 const ELITE_V2_NAMES := ["Obsidian","Bordeaux","Tiefblau","Waldgrün","Violett","Petrol","Elfenbein","Stahlblau","Karmesin","Knochen"]
 const ELITE_V2_ACCENTS := [Color("caa668"),Color("ce7b8f"),Color("669dd7"),Color("6bb28a"),Color("b392dc"),Color("5fc3b0"),Color("e1cda0"),Color("87aeda"),Color("e06f70"),Color("d5c9b5")]
@@ -318,7 +319,7 @@ const NPC_VISUAL_SCALE := 0.90
 # Only the Classic 2D presentation scales down the enormous player/NPC
 # sprites seen at 2340x1080. The world body, hitbox, NPC speed, waypoints and
 # native 2.5D/3D mesh sizes stay exactly as before.
-const CLASSIC_HULL_SCALE := 0.62
+const CLASSIC_HULL_SCALE := 0.36
 const CLASSIC_VIEWPORT_ZOOM_BOOST_MAX := 1.15
 const CLASSIC_LABEL_CLEARANCE_PX := 11.0
 var plate_fleet: Array[Dictionary] = []
@@ -339,7 +340,9 @@ func _ready() -> void:
 	_load_progress()
 	_load_staff()
 	_load_display()
-	# Browser is always Classic. Android/desktop use the saved graphics mode.
+	# Browser always uses Classic; Android/iOS start in the SAME Classic
+	# mode and four-direction physical steering, unless the captain later
+	# explicitly changes native graphics through the settings menu.
 	# Steering must be configured before any sea-chart route is created.
 	sim.set_classic_steering(browser_classic)
 	if browser_classic:_load_classic_atlases()
@@ -475,7 +478,6 @@ func _online_snapshot(packet: Dictionary) -> void:
 	for uid: String in online_actor_ids.keys():
 		if not active.has(uid):
 			classic_heading_cache.erase(int(online_actor_ids[uid]))
-			classic_sailing_visual.erase(int(online_actor_ids[uid]))
 			online_actor_ids.erase(uid)
 
 func _send_online_course(point: Vector2) -> void:
@@ -494,6 +496,18 @@ func _update_online_ships(delta: float) -> void:
 	if online_profile_age>=.5:
 		online_profile_age=0.0
 		online_client.send_appearance(int(sim.player.skin),int(sim.player.hp),int(sim.player.max_hp))
+
+static func _classic_edge_camera_goal(ship_world: Vector2,camera_world: Vector2,world_view: Vector2) -> Vector2:
+	# Leave ~16% viewport margin; old Seafight's ship travels freely
+	# through the middle ~68% before any edge scrolling.
+	var allowed: Vector2=world_view*0.34
+	var error: Vector2=ship_world-camera_world
+	var goal: Vector2=camera_world
+	if error.x>allowed.x:goal.x=ship_world.x-allowed.x
+	elif error.x< -allowed.x:goal.x=ship_world.x+allowed.x
+	if error.y>allowed.y:goal.y=ship_world.y-allowed.y
+	elif error.y< -allowed.y:goal.y=ship_world.y+allowed.y
+	return goal
 
 func _sharp_zoom() -> float:
 	var max_boost: float=CLASSIC_VIEWPORT_ZOOM_BOOST_MAX if browser_classic else 1.7
@@ -732,10 +746,16 @@ func _process(delta: float) -> void:
 	_classic_keyboard_pan(delta)
 	var render_player: Vector2=_visual_actor_pos(sim.player)
 	var goal: Vector2=render_player if camera_locked else camera_anchor
+	if browser_classic and camera_locked and loading_left<=0.0:
+		# During a region transition, _sync_region() recenters the camera
+		# before the edge-scrolling presentation resumes after loading.
+		# 208901 reference: captain crosses the screen; the map stays still.
+		# Only scroll once a visible safe-area edge is reached. Do NOT change
+		# player world coordinates, waypoint path or ship heading.
+		var world_view: Vector2=get_viewport_rect().size/maxf(camera.zoom.x,0.05)
+		goal=_classic_edge_camera_goal(render_player,camera.position,world_view)
+		camera_anchor=goal
 	pan=goal-render_player
-	# With follow-lock active, frame-interpolated ship and camera stay together.
-	# A one-pixel change in the captain plate is then *real* screen movement,
-	# not a 30 Hz simulation/camera mismatch amplified by high zoom.
 	if camera_locked:camera.position=goal
 	else:camera.position=camera.position.lerp(goal,1.0-exp(-delta*5.0))
 	camera.zoom = camera.zoom.lerp(Vector2.ONE*_sharp_zoom(),1.0-exp(-delta*8.0))
@@ -1113,7 +1133,7 @@ func _draw_actor(actor: Dictionary) -> void:
 		_draw_tower(actor)
 		return
 	var is_player = int(actor.id)==0
-	var point: Vector2=_visual_actor_pos(actor)
+	var point: Vector2=_classic_actor_render_pos(actor)
 	var heading: Vector2=actor.heading
 	var length=_actor_visual_length(actor)
 	# Both renderers use cheap line/circle foam at the same water footprint.
@@ -1212,72 +1232,57 @@ func _classic_atlas_key(actor: Dictionary) -> String:
 	return str(actor.get("visual_key",""))
 
 func _classic_frame_for_actor(actor: Dictionary) -> int:
+	# Exactly the one current PHYSICAL isometric leg chooses the baked
+	# four-view sprite. No separate clock, triangle, pose or pixel wobble.
 	var id: int=int(actor.get("id",-1))
-	var before: int=int(classic_heading_cache.get(id,-1))
-	var heading: Vector2=actor.get("heading",Vector2.RIGHT)
-	var current: int=VISUALS.heading_four(heading,before)
-	# Historical left/right effect: a ship travelling horizontally cycles
-	# between the two oblique four-view images. Its *world* motion follows
-	# its actual (possibly perfectly horizontal) route without any detour.
-	if actor.has("pos"):
-		var position: Vector2=actor.get("pos",Vector2.ZERO)
-		var motion: Dictionary=classic_sailing_visual.get(id,{})
-		var old_position: Vector2=motion.get("position",position)
-		var distance: float=position.distance_to(old_position)
-		var speed: float=maxf(20.0,float(actor.get("speed",165.0)))
-		var progress: float=float(motion.get("sail_seconds",0.0))
-		var last_moved: float=float(motion.get("last_moved",-1000.0))
-		if distance>0.03 and distance<maxf(60.0,speed*0.8):
-			# Distance, rather than raw frame count, drives the animation:
-			# standing still freezes the pose and frame rate cannot affect it.
-			progress+=distance/speed
-			last_moved=elapsed
-		if elapsed-last_moved<0.16:
-			current=VISUALS.classic_sailing_frame(heading,fposmod(progress,CLASSIC_LEFT_RIGHT_CYCLE)/CLASSIC_LEFT_RIGHT_CYCLE)
-		elif not motion.is_empty() and Vector2(motion.get("heading",heading)).distance_squared_to(heading)<0.001:
-			# Do not snap into a different facing as soon as the ship stops.
-			current=int(motion.get("frame",current))
-		else:
-			current=VISUALS.heading_four(heading,-1)
-		classic_sailing_visual[id]={
-			"position":position,"sail_seconds":progress,"last_moved":last_moved,
-			"heading":heading,"frame":current,
-		}
-	classic_heading_cache[id]=current
-	return current
+	var facing: int=VISUALS.heading_four(Vector2(actor.get("heading",Vector2.RIGHT)),int(classic_heading_cache.get(id,-1)))
+	classic_heading_cache[id]=facing
+	return facing
+
+func _classic_actor_render_pos(actor: Dictionary) -> Vector2:
+	# Classic: quantize WORLD movement to displayed pixels, as raster-era
+	# SeaFight did. When the camera is mostly stationary this makes each
+	# 1px movement visibly advance on the chart, without any fake wobble.
+	var actual_position: Vector2=_visual_actor_pos(actor)
+	if not browser_classic:return actual_position
+	if str(actor.get("kind",""))!="ship" and int(actor.get("id",-1))!=0 and not bool(actor.get("remote_player",false)):return actual_position
+	_classic_frame_for_actor(actor)
+	var transform: Transform2D=get_canvas_transform()
+	var screen: Vector2=transform*actual_position
+	var snapped: Vector2=Vector2(roundf(screen.x),roundf(screen.y))
+	return transform.affine_inverse()*snapped
 
 func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
+	# point is already the same pixel-stepped center used by the ring and
+	# ship label. Never apply a second, hull-only offset here.
+	var heading_index: int=_classic_frame_for_actor(actor)
+	var hull_point: Vector2=point
 	var key: String=_classic_atlas_key(actor)
 	var atlas: Texture2D=classic_atlases.get(key) as Texture2D
 	if atlas!=null:
 		var entry: Dictionary=classic_geometry.get(key,{})
 		if not entry.is_empty():
-			var frame: Dictionary=entry.frames[_classic_frame_for_actor(actor)]
+			var frame: Dictionary=entry.frames[heading_index]
 			var spec: Dictionary=VISUALS.geometry(frame,length)
 			var target: Rect2=spec.destination
-			target.position+=point
+			target.position+=hull_point
 			draw_texture_rect_region(atlas,target,spec.source)
 			return
-		# The eight baked frames stay available for future styles. Classic
-		# selects only NE/NW/SW/SE; actual ship position follows its direct
-		# simulated course, independently of how the hull is drawn.
-		# Camera perspective is ALREADY baked for each heading:
-		# never rotate 2D atlas frames or the sails become inaccurate.
-		var heading_index: int=_classic_frame_for_actor(actor)
+		# Camera perspective is baked into each of the eight GLB images.
+		# Do not rotate an atlas sprite; only select a diagonal facing.
 		var frame_width: float=float(atlas.get_width())/float(CLASSIC_ATLAS_COLUMNS)
 		var frame_height: float=float(atlas.get_height())
 		var side: float=length*1.38
-		var target: Rect2=Rect2(point-Vector2(side,side)*.5,Vector2(side,side))
+		var target: Rect2=Rect2(hull_point-Vector2(side,side)*.5,Vector2(side,side))
 		var source: Rect2=Rect2(float(heading_index)*frame_width,0.0,frame_width,frame_height)
 		draw_texture_rect_region(atlas,target,source)
 		return
-	# Editor/offline fallback only. Production browser CI rejects any missing
-	# baked atlas; it never substitutes hand-drawn hulls for the actual GLBs.
+	# Editor fallback only. Production CI requires the baked ship atlas.
 	var art: Texture2D=_classic_ship_texture(actor)
 	if art==null:return
 	var h: float=length*.667
-	var classic_angle: float=float({1:-PI*.25,7:-PI*.75,5:PI*.75,3:PI*.25}.get(_classic_frame_for_actor(actor),heading.angle()))
-	draw_set_transform(point,classic_angle,Vector2.ONE)
+	var classic_angle: float=float({1:-PI*.25,7:-PI*.75,5:PI*.75,3:PI*.25}.get(heading_index,heading.angle()))
+	draw_set_transform(hull_point,classic_angle,Vector2.ONE)
 	draw_texture_rect(art,Rect2(Vector2(-length*.5,-h*.5),Vector2(length,h)),false)
 	draw_set_transform(Vector2.ZERO)
 
@@ -1357,7 +1362,7 @@ func _plate_stable_hull_drop(actor: Dictionary) -> float:
 ## camera motion. Nearby ships never influence the captain's position.
 func _plate_screen_anchor(actor: Dictionary) -> Vector2:
 	var pixels=_plate_pixels()
-	var point: Vector2=get_canvas_transform()*_visual_actor_pos(actor)
+	var point: Vector2=get_canvas_transform()*_classic_actor_render_pos(actor)
 	var player=int(actor.id)==0
 	if browser_classic:
 		var zoom: float=absf(get_canvas_transform().y.y)
@@ -1394,7 +1399,7 @@ func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 	var pixels=_plate_pixels()
 	for actor: Dictionary in fleet:
 		if int(actor.hp)<=0:continue
-		var point: Vector2=get_canvas_transform()*_visual_actor_pos(actor)
+		var point: Vector2=get_canvas_transform()*_classic_actor_render_pos(actor)
 		if not get_viewport_rect().grow(180*pixels).has_point(point):continue
 		var player=int(actor.id)==0
 		var width=maxf((188.0 if player else 154.0)*pixels,
@@ -4159,7 +4164,7 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Seafight-artiger Links-rechts-Ansichtswechsel während der Fahrt, ohne künstliche Umwege. 2,5D / 3D: normale direkte Steuerung mit 3D-Grafik.")
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Dieselbe echte Vier-Wege-Rasterfahrt in Browser, Android und iOS. Schiffsansicht folgt dem gefahrenen Diagonalschritt; 2,5D/3D bleiben wählbar.")
 	_note("DATENUPDATE %d · CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
 		if OS.has_feature("web"):
@@ -4173,12 +4178,16 @@ func _open_display() -> void:
 				var key: String=str(option[0])
 				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 				choice.disabled=render_mode==key
-			_note("Classic 2D: vier 2D-Ansichten; während gerader Fahrt abwechselnd links/rechts geneigt wie bei altem Seafight. Das Schiff selbst fährt ohne Zickzack direkt zum Ziel. Alle Modi benutzen denselben Kurs; beim Umschalten bleibt er erhalten.")
+			_note("Classic 2D: echte kurze Diagonalschritte auf der Seekarte, identisch auf Browser, Android und iOS. 2,5D und 3D fahren unverändert.")
+		if browser_classic:
+			_section("CLASSIC 2D · EINHEITLICHE FAHRT")
+			_note("Eine feste Classic-Fahrt: Schiff, Ring und Name folgen denselben kleinen Diagonalschritten, die Seekarte scrollt erst am Rand. Kein separater Bewegungsmodus.",Color("a3c9cf"))
 		_section("SCHIFFE & SEEKARTE")
 		var ship_grid=_grid(2)
-		_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
+		if not browser_classic:
+			_action("3D-SCHIFFSEFFEKTE: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
 		_action("KIELWASSER: "+("EIN" if wake_effects_enabled else "AUS"),func():_set_ship_visual_toggle("wake"),"tab_on" if wake_effects_enabled else "normal",ship_grid)
-		_note("Schaukeln, Rollen und Wasserspuren lassen sich separat deaktivieren. Kurs, Kollision und Kampflogik bleiben unverändert.",Color("a3c9cf"))
+		_note("Hier werden nur zusätzliche Wasserspuren bzw. 3D-Effekte angepasst – niemals die Fahrtbewegung.",Color("a3c9cf"))
 	if _tab("Anzeige")=="STEUERUNG":
 		_section("KAMPFSTEUERUNG · ANTIPPEN")
 		_note("Standard: Gegner antippen wählt nur das Ziel, niemals automatisch feuern. FEUER startet den Angriff, STOPP beendet ihn. Optional kannst du einen bewusst gesetzten Doppeltipp als Angriff aktivieren. Mit × oder Esc das Ziel vollständig abwählen.",Color("a3c9cf"))
@@ -4305,7 +4314,7 @@ func _open_menu_hub() -> void:
 
 func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
-	_note("Browser: Classic 2D mit Links-rechts-Wechsel der vier Schiffsansichten, echte Fahrt ohne seitliche Umwege. App/Desktop: Classic 2D, 2,5D und 3D benutzen identische Schiffskurse. Gleiche Schiffswerte und gemeinsamer Online-Spielstand.",Color("9be4df"))
+	_note("Browser: In Classic 2D bewegt sich die ganze sichtbare Schiffseinheit um wenige Pixel seitlich zur Fahrt. Die echte Route bleibt direkt; Multiplayer-Koordinaten und Schiffsstatistiken bleiben unverändert.",Color("9be4df"))
 	if not OS.has_feature("web"):
 		var modes=_grid(3)
 		for option in [["classic","CLASSIC 2D"],["hybrid","2,5D"],["3d","3D"]]:
@@ -4742,7 +4751,9 @@ func _browser_ship_screen_rect(actor: Dictionary) -> Rect2:
 	var frame: Dictionary=entry.frames[_classic_frame_for_actor(actor)]
 	var spec: Dictionary=VISUALS.geometry(frame,_actor_visual_length(actor))
 	var world: Rect2=spec.destination
-	world.position+=_visual_actor_pos(actor)
+	# Hit-test where the Classic sprite is actually drawn, even while its
+	# visual footprint takes the small perpendicular pixel steps.
+	world.position+=_classic_actor_render_pos(actor)
 	return get_canvas_transform()*world
 
 func _browser_ship_touch_rect(visible: Rect2) -> Rect2:
@@ -4766,7 +4777,7 @@ func _enemy_at_screen(screen: Vector2) -> int:
 			var score: float=normalized.length_squared()+(0.0 if inside else 100.0)
 			if score<closest:closest=score;candidate_id=int(npc.id)
 			continue
-		var projected: Vector2=canvas*(_visual_actor_pos(npc)-Vector2(0,25))
+		var projected: Vector2=canvas*(_classic_actor_render_pos(npc)-Vector2(0,25))
 		var length: float=_actor_visual_length(npc)
 		var radius: float=clampf(length*zoom*.57,78.0,116.0)
 		if str(npc.get("kind","ship"))=="tower":radius=clampf(radius,72.0,95.0)
@@ -4859,8 +4870,12 @@ func _load_display() -> void:
 	hud_size=clampi(int(data.get("hud_size",1)),0,2)
 	journal_visible=bool(data.get("journal_visible",true))
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
-	render_mode="classic" if OS.has_feature("web") else str(data.get("render_mode","hybrid"))
-	if not render_mode in ["classic","hybrid","3d"]:render_mode="hybrid"
+	# Migrate historical native-app preferences once: prior releases
+	# defaulted to Hybrid and may have silently stored it. The first new
+	# mobile launch must use the same Classic 2D as the browser.
+	var prefer_mobile_classic: bool=OS.has_feature("mobile") and int(data.get("mobile_classic_revision",0))<1
+	render_mode="classic" if OS.has_feature("web") or prefer_mobile_classic else str(data.get("render_mode","classic" if OS.has_feature("mobile") else "hybrid"))
+	if not render_mode in ["classic","hybrid","3d"]:render_mode="classic" if OS.has_feature("mobile") else "hybrid"
 	browser_classic=render_mode=="classic"
 	projectile_visual_count=COMBAT_FX.visual_count(int(data.get("projectile_visual_count",3)))
 	var stored_flags: Variant=data.get("vfx_flags",{})
@@ -4871,6 +4886,8 @@ func _load_display() -> void:
 	ambient_motion_enabled=bool(data.get("ambient_motion_enabled",true))
 	ship_animations_enabled=bool(data.get("ship_animations_enabled",true))
 	wake_effects_enabled=bool(data.get("wake_effects_enabled",true))
+	# Ignore all old Classic motion/camera preferences. They belonged to
+	# experimental modes which no longer exist; retain other HUD options.
 	# All old true/false fullscreen preferences migrate to balanced windows.
 	menu_layout=str(data.get("menu_layout","balanced"))
 	if not menu_layout in ["compact","balanced","large"]:menu_layout="balanced"
@@ -4888,7 +4905,7 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ambient_motion_enabled":ambient_motion_enabled,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
+		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"mobile_classic_revision":1,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ambient_motion_enabled":ambient_motion_enabled,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
 		file.close()
 
 ## Browser-only render budget: no effect on collision, AI ticks, camera,
@@ -5013,6 +5030,7 @@ func _reset_display_preferences() -> void:
 	_apply_ambient_motion()
 	ship_animations_enabled=true
 	wake_effects_enabled=true
+	classic_heading_cache.clear()
 	menu_layout="balanced"
 	double_tap_attack_enabled=false
 	_reset_enemy_tap()
@@ -5043,7 +5061,6 @@ func _set_render_mode(value: String) -> void:
 	# physical ship route when swapping 2D/2.5D/3D.
 	sim.set_classic_steering(browser_classic)
 	classic_heading_cache.clear()
-	classic_sailing_visual.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
 	if camera!=null:_sync_plate_overlay()
@@ -5098,6 +5115,11 @@ func _shift_camera(offset: Vector2) -> void:
 
 func _recenter_camera() -> void:
 	pan=Vector2.ZERO;camera_locked=true;camera_anchor=sim.player.pos
+	# With Classic's free-travel camera, merely setting camera_locked no
+	# longer means "snap to captain". Honor the explicit recenter action.
+	if browser_classic and camera!=null:
+		camera.position=sim.player.pos
+		camera.force_update_scroll()
 	if camera_pad!=null:camera_pad.release()
 
 func _cancel_target() -> void:

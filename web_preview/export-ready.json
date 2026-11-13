@@ -1,5 +1,5 @@
 {
-  "source_sha": "c9350dd5c16f8df65ae80d6cf41f92cd5781b2f0",
-  "release": "browser-test-74",
-  "branch": "fix/classic-framing-scale-337"
+  "source_sha": "3f8872ba1702dd597039b6e61b73abbeaa13674e",
+  "release": "browser-test-117",
+  "branch": "fix/classic-pixel-hull-only-dither-341"
 }

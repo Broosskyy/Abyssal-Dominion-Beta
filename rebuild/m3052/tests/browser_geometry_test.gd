@@ -46,7 +46,11 @@ func _run() -> void:
 			var p: Vector2=game.get_canvas_transform()*game._visual_actor_pos(actor)
 			var bottom: float=p.y+float(entry.stable_bottom)*game._actor_visual_length(actor)/float(entry.reference_extent)*zoom
 			var anchor: Vector2=game._plate_screen_anchor(actor)
-			check(is_equal_approx(anchor.y-bottom,game.CLASSIC_LABEL_CLEARANCE_PX*game._plate_pixels()) and anchor.y>bottom,"captain caption uses the smaller explicit gap and clears the actual baked hull at each zoom")
+			# Classic's actual hull position is rounded to integer SCREEN
+			# pixels: allow half a pixel of raster rounding at the label.
+			var caption_gap: float=anchor.y-bottom
+			var expected_gap: float=game.CLASSIC_LABEL_CLEARANCE_PX*game._plate_pixels()
+			check(absf(caption_gap-expected_gap)<=0.55 and anchor.y>bottom,"captain caption clears the pixel-snapped sprite with consistent tight spacing")
 			for direction in 8:
 				actor.heading=Vector2.UP.rotated(direction*PI*.25)
 				check(anchor.distance_to(game._plate_screen_anchor(actor))<.01,"caption stays stable while the ship turns")

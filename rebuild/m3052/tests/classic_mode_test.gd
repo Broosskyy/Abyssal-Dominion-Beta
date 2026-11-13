@@ -17,16 +17,10 @@ func run() -> void:
 		check(VISUALS.heading_four(heading) in [1,3,5,7],"every ordinary captain heading chooses exactly one of the four Classic frames")
 	var east_frame: int=VISUALS.heading_four(Vector2.RIGHT)
 	check(VISUALS.heading_four(Vector2(1,-0.07),east_frame)==east_frame and VISUALS.heading_four(Vector2(1,0.07),east_frame)==east_frame,"Classic sprite hysteresis prevents flickering when sailing nearly east")
-	# Reference 208797.mp4: chart Y stays BY, X changes 51 -> 48; the
-	# visible ship alternates left/right while travelling horizontally.
-	for sample: Vector2 in [Vector2.RIGHT,Vector2.LEFT,Vector2.UP,Vector2.DOWN]:
-		var first: int=VISUALS.classic_sailing_frame(sample,0.25)
-		var second: int=VISUALS.classic_sailing_frame(sample,0.75)
-		check(first!=second and first in [1,3,5,7] and second in [1,3,5,7],"straight travel alternates two oblique Classic facings without changing movement "+str(sample))
-	check(VISUALS.classic_sailing_frame(Vector2.RIGHT,0.25)==1 and VISUALS.classic_sailing_frame(Vector2.RIGHT,0.75)==3,"eastbound ship switches NE / SE visually (left-right)")
-	check(VISUALS.classic_sailing_frame(Vector2.LEFT,0.25)==5 and VISUALS.classic_sailing_frame(Vector2.LEFT,0.75)==7,"westbound ship switches SW / NW visually (left-right)")
-	for diagonal: Vector2 in [Vector2(1,-1),Vector2(1,1),Vector2(-1,1),Vector2(-1,-1)]:
-		check(VISUALS.classic_sailing_frame(diagonal,0.1)==VISUALS.classic_sailing_frame(diagonal,0.8),"precisely diagonal courses hold their correct graphical facing")
+	# Isometric 48x32 movement: real diagonal world legs, no fake
+	# render-time triangle and no user-selectable movement variants.
+	check(is_equal_approx(SIM.CLASSIC_ISO_DIRECTIONS[0].x/SIM.CLASSIC_ISO_DIRECTIONS[0].y,-1.5),"48x32 slope is retained in the four real movement axes")
+	check(is_equal_approx(SIM.CLASSIC_ISO_LEG_WORLD,36.0),"Classic raster runs on short 3:2 diagonal legs")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
 	var goal:=Vector2(1200,500)
 	check(not sim.classic_steering,"native default uses direct navigation")
@@ -38,14 +32,26 @@ func run() -> void:
 	check(sim.classic_steering and sim.player.path==initial_route and sim.player.pos==initial_pos,"switching to Classic never rewrites the physical route or teleports the captain")
 	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"Classic horizontal sailing has no synthetic diagonal zigzags")
 	var stock: Array=sim.player.ammo.duplicate()
-	var horizontal_track: bool=true
+	var physical_steps: Dictionary={}
+	var lowest_y: float=500.0
+	var highest_y: float=500.0
+	var saw_real_diagonal: bool=false
 	for step in 900:
+		var old_pos: Vector2=sim.player.pos
 		sim._move(sim.player,1.0/60.0)
-		horizontal_track=horizontal_track and absf(float(sim.player.pos.y)-500.0)<0.01
+		var velocity: Vector2=Vector2(sim.player.pos)-old_pos
+		lowest_y=minf(lowest_y,sim.player.pos.y)
+		highest_y=maxf(highest_y,sim.player.pos.y)
+		if velocity.length()>0.01 and not sim.player.path.is_empty():
+			var heading: Vector2=sim.player.heading
+			physical_steps[VISUALS.heading_four(heading)]=true
+			saw_real_diagonal=saw_real_diagonal or (absf(velocity.x)>0.2 and absf(velocity.y)>0.2)
 		if sim.player.path.is_empty():break
-	check(horizontal_track and sim.player.pos.distance_to(goal)<.01 and sim.player.ammo==stock,"Classic physically sails dead straight toward a horizontal click, without spending ammo")
+	check(saw_real_diagonal and physical_steps.has(1) and physical_steps.has(3),"horizontal Classic route uses REAL alternating NE/SE 48x32 world steps, not animated pixels")
+	check(highest_y-lowest_y>15.0 and highest_y-lowest_y<25.0,"horizontal Classic ship physically moves through the ~20px isometric staircase")
+	check(sim.player.pos.distance_to(goal)<0.1 and sim.player.path.is_empty() and sim.player.ammo==stock,"true diagonal-step sailing arrives exactly at the requested point without changing ammunition")
 	var diagonal_goal:=Vector2(1600,850)
-	check(sim.course(diagonal_goal) and sim.player.path==sim.plan_path(sim.player.pos,diagonal_goal),"Classic follows a direct diagonal tap using ordinary simulation physics")
+	check(sim.course(diagonal_goal) and sim.player.path==sim.plan_path(sim.player.pos,diagonal_goal),"Classic navigation retains the requested destination; only the physical micro-legs are diagonals")
 	sim._move(sim.player,0.25)
 	var corner: Vector2=sim.player.pos
 	check(sim.course(Vector2(300,850)) and sim.player.path.back()==Vector2(300,850),"new tap immediately replaces the course")
@@ -60,7 +66,7 @@ func run() -> void:
 	check(npc_direct.size()==1 and npc_direct[0]==Vector2(1200,500),"native NPC patrol ship follows direct courses")
 	sim.set_classic_steering(true)
 	var npc_classic: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
-	check(npc_classic==npc_direct,"Classic NPC sprites follow exact same physical paths as native NPCs")
+	check(npc_classic==npc_direct,"Classic NPCs keep the same waypoints but travel them using four diagonals")
 	var monster: Dictionary={"pos":Vector2(500,500),"heading":Vector2.RIGHT,"kind":"monster"}
 	check(sim.plan_actor_path(monster,Vector2(1200,500))==npc_direct,"sea monsters keep direct navigation in every mode")
 	root.content_scale_size=Vector2i.ZERO;root.size=Vector2i(1280,720)
@@ -80,6 +86,16 @@ func run() -> void:
 	check(game.sim.classic_steering and game.sim.player.path.back()==destination and game.sim.player.path==course and game.sim.player.pos==Vector2(before.position[0],before.position[1]),"Classic 2D preserves existing physical waypoint path and position while changing only sprite views")
 	check(is_equal_approx(game._actor_visual_length(game.sim.player),native_player_length*game.CLASSIC_HULL_SCALE),"Classic uses a smaller on-screen captain hull without altering game physics")
 	check(is_equal_approx(game._actor_visual_length(game.sim.npcs[0]),native_npc_length*game.CLASSIC_HULL_SCALE),"Classic scales NPC hulls with the captain instead of dwarfing enemies")
+	# One non-selectable edge camera stays with the real ship motion.
+	var camera_start: Vector2=Vector2(800,500)
+	var world_view: Vector2=Vector2(1200,700)
+	var within: Vector2=game._classic_edge_camera_goal(camera_start+Vector2(300,170),camera_start,world_view)
+	check(within==camera_start,"Classic camera remains completely stationary while the captain moves inside the screen safe area")
+	var at_edge: Vector2=game._classic_edge_camera_goal(camera_start+Vector2(520,280),camera_start,world_view)
+	check(is_equal_approx(at_edge.x,camera_start.x+112.0) and is_equal_approx(at_edge.y,camera_start.y+42.0),"camera starts scrolling only when the captain crosses viewport border margins")
+	var restored: Vector2=game._classic_edge_camera_goal(camera_start,camera_start,world_view)
+	check(restored==camera_start,"Classic camera never invents an offset when the ship is stationary")
+	check(game._classic_edge_camera_goal(camera_start+Vector2(300,170),camera_start,world_view)==camera_start,"Classic camera mode is always edge-follow, not selectable")
 	var path_before_framing: Array=game.sim.player.path.duplicate()
 	var saved_position: Vector2=game.sim.player.pos
 	for viewport_size: Vector2i in [Vector2i(844,390),Vector2i(2340,1080)]:
@@ -108,26 +124,43 @@ func run() -> void:
 	check(game._classic_frame_for_actor(game.sim.player)==1,"Classic renderer draws the expected NE atlas frame from the preserved eight-view collection")
 	game.sim.player.heading=Vector2(1,1)
 	check(game._classic_frame_for_actor(game.sim.player)==3,"Classic renderer changes facing without changing simulated world coordinates")
-	# Exercise the real ship sprite resolver, not only the pure helper:
-	# moved WORLD position drives the facing pendulum, not a zigzag path.
-	var motion_probe: Dictionary={"id":9318,"pos":Vector2(500,500),"speed":100.0,"heading":Vector2.RIGHT}
-	game._classic_frame_for_actor(motion_probe)
+	# Renderer must read the physical actor.heading instead of generating
+	# its own 0.44s oscillation. Sprite and overlay share the exact world
+	# coordinates, apart from a harmless <=0.5px raster snap.
+	var motion_probe: Dictionary={"id":9318,"kind":"ship","pos":Vector2(500,500),"speed":100.0,"slow":0.0,"heading":Vector2.RIGHT,"path":[Vector2(1000,500)]}
 	var shown: Dictionary={}
-	var actual_route: Array=game.sim.player.path.duplicate()
-	var actual_position: Vector2=game.sim.player.pos
-	for step in 13:
-		motion_probe.pos+=Vector2(12,0)
+	var start_y: float=motion_probe.pos.y
+	var min_probe_y: float=start_y
+	var max_probe_y: float=start_y
+	var camera_before: Vector2=game.camera.position
+	for step in 30:
+		game.sim._move(motion_probe,1.0/30.0)
 		shown[game._classic_frame_for_actor(motion_probe)]=true
-	check(shown.has(1) and shown.has(3),"sailing actor alternates NE and SE views while its world Y remains exactly 500")
-	check(game.sim.player.path==actual_route and game.sim.player.pos==actual_position,"sprite pendulum never writes the gameplay path or moves the captain")
+		min_probe_y=minf(min_probe_y,motion_probe.pos.y)
+		max_probe_y=maxf(max_probe_y,motion_probe.pos.y)
+		var rendered: Vector2=game._classic_actor_render_pos(motion_probe)
+		var real: Vector2=game._visual_actor_pos(motion_probe)
+		var rounded_delta: Vector2=game.get_canvas_transform()*rendered-game.get_canvas_transform()*real
+		check(absf(rounded_delta.x)<=0.55 and absf(rounded_delta.y)<=0.55,"Classic render uses TRUE ship world position, with <=half pixel rounding only")
+	check(shown.has(1) and shown.has(3) and max_probe_y-min_probe_y>=15.0,"one 4-way controller moves the real NPC through alternating diagonal legs")
+	check(game.camera.position==camera_before,"drawing real isometric ship steps never invents a camera motion mode")
+	var original_pos: Vector2=game.sim.player.pos
+	var original_path: Array=game.sim.player.path.duplicate()
+	check(game.sim.player.path==original_path and game.sim.player.pos==original_pos,"isolated ship-motion test does not rewrite the captain destination")
+	# Legacy 2D camera/pixel options are intentionally NOT persisted anymore.
+	game._persist_display_preferences()
+	var display_data: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
+	check(display_data is Dictionary and not display_data.has("classic_pixel_strength") and not display_data.has("classic_pixel_step_world") and not display_data.has("classic_camera_follow"),"new saves do not expose old sailing-mode controls")
+	check(game.sim.player.path==original_path and game.sim.player.pos==original_pos,"one isometric sailing mode preserves the destination and actual captain state")
 	var stopped_view: int=game._classic_frame_for_actor(motion_probe)
 	game.elapsed+=0.3
-	check(game._classic_frame_for_actor(motion_probe)==stopped_view,"standing still freezes the last left/right sailing sprite")
+	check(game._classic_frame_for_actor(motion_probe)==stopped_view,"standing still cannot flip the ship sprite on an independent timer")
 	check(game.sim.player.gold==int(before.gold) and game.sim.player.skin==int(before.skin) and game.sim.player.ammo==before.ammo,"graphics switch preserves ship, wallet and ammunition")
 	game._open_modal("Anzeige")
 	var options: Array[String]=[]
 	for button in game.modal_body.find_children("*","Button",true,false):options.append(button.text)
-	check(options.any(func(text):return text.begins_with("CLASSIC 2D")) and options.any(func(text):return text.begins_with("2,5D")) and options.any(func(text):return text.begins_with("3D")),"native settings keep all three modes reachable from Classic")
+	check(options.any(func(text):return text.begins_with("CLASSIC 2D")) and options.any(func(text):return text.begins_with("2,5D")) and options.any(func(text):return text.begins_with("3D")),"native settings retain three GRAPHICS modes")
+	check(not options.any(func(text):return text.contains("PIXEL") or text.contains("VIDEO 901") or text.contains("KLASSISCHE KAMERA") or text.contains("SPIELER ZENTRIEREN") or text=="KURZ" or text=="LANG"),"Classic sailing no longer has alternative pixel, pace or camera mode buttons")
 	game.queue_free();await process_frame
 	var reloaded=load("res://sea_map.tscn").instantiate();root.add_child(reloaded);current_scene=reloaded
 	await process_frame;reloaded.set_process(false)
