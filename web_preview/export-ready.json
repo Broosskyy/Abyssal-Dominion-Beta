@@ -1,5 +1,5 @@
 {
-  "source_sha": "c96329de98ab89e6b9383beb2aeffc66eaa71473",
-  "release": "browser-test-110",
+  "source_sha": "15e50e2a8487a98019e451f07ff9a0243e72191d",
+  "release": "browser-test-116",
   "branch": "fix/classic-pixel-hull-only-dither-341"
 }
