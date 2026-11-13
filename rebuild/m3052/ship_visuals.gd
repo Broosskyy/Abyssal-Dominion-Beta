@@ -37,7 +37,7 @@ static func heading_four(heading: Vector2,previous: int=-1) -> int:
 const CLASSIC_PIXEL_STEP_WORLD := 32.0
 const CLASSIC_HULL_DRIFT_PX := 3.0
 
-static func classic_pixel_pose(heading: Vector2,sailed_world: float) -> Dictionary:
+static func classic_pixel_pose(heading: Vector2,sailed_world: float,step_world: float=CLASSIC_PIXEL_STEP_WORLD,drift_px: float=CLASSIC_HULL_DRIFT_PX) -> Dictionary:
 	if heading.length_squared()<0.0001:
 		return {"frame":CLASSIC_FOUR_VIEW_ATLAS[0],"pixel_x":0.0}
 	var quarter: float=PI*.5
@@ -48,7 +48,9 @@ static func classic_pixel_pose(heading: Vector2,sailed_world: float) -> Dictiona
 	var second: int=CLASSIC_CLOCKWISE_ATLAS[(sector+1)%4]
 	if share<0.025:return {"frame":first,"pixel_x":0.0}
 	if share>0.975:return {"frame":second,"pixel_x":0.0}
-	var progress: float=maxf(sailed_world,0.0)/CLASSIC_PIXEL_STEP_WORLD
+	step_world=clampf(step_world,12.0,80.0)
+	drift_px=clampf(drift_px,0.0,8.0)
+	var progress: float=maxf(sailed_world,0.0)/step_world
 	var leg: int=floori(progress)
 	var part: float=progress-float(leg)
 	# Round an accumulated pixel-line error, instead of flipping to
@@ -63,7 +65,7 @@ static func classic_pixel_pose(heading: Vector2,sailed_world: float) -> Dictiona
 	# nameplate stay on the unchanged simulated position.
 	var offset_px: float=float(roundi(clampf(
 		(correction-0.25*strength*strength)*8.0*strength,
-		-CLASSIC_HULL_DRIFT_PX,CLASSIC_HULL_DRIFT_PX
+		-drift_px,drift_px
 	)))
 	return {"frame":second if second_facing else first,"pixel_x":offset_px}
 
