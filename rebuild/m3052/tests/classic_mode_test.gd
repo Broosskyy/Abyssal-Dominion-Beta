@@ -43,6 +43,23 @@ func run() -> void:
 	for diagonal: Vector2 in [Vector2(1,-1),Vector2(-1,-1),Vector2(-1,1),Vector2(1,1)]:
 		var exact: Dictionary=VISUALS.classic_measured_step_pose(diagonal,97.0,10.0,54.0)
 		check(is_equal_approx(float(exact.pixel_x),0.0) and int(exact.frame)==VISUALS.heading_four(diagonal),"diagonal sailing retains its real diagonal view with no perpendicular jitter")
+	# 208930 browser capture moved about 300 actual screen px/sec while
+	# 208901 Seafight moved roughly 125-140 screen px/sec.
+	# The same 54px cycle would flip views too fast in our larger world.
+	# A 125px cycle at 300px/sec makes ~0.417s, matching the 0.436s
+	# reference within video timing/measurement variability.
+	var browser_screen_px_per_s: float=300.0
+	var measured_period: float=VISUALS.CLASSIC_REFERENCE_WAVELENGTH_PX/browser_screen_px_per_s
+	check(absf(measured_period-0.436)<0.04,"single sailing pose cycle now matches reference timing rather than flipping 2.3x too quickly")
+	var browser_pixel_variation: float=0.0
+	var previous_browser_offset: float=float(VISUALS.classic_measured_step_pose(Vector2.LEFT,0.0).pixel_x)
+	for frame_number in 1+60:
+		var travelled: float=browser_screen_px_per_s*float(frame_number)/60.0
+		var browser_pose: Dictionary=VISUALS.classic_measured_step_pose(Vector2.LEFT,travelled)
+		var delta_px: float=absf(float(browser_pose.pixel_x)-previous_browser_offset)
+		browser_pixel_variation=maxf(browser_pixel_variation,delta_px)
+		previous_browser_offset=float(browser_pose.pixel_x)
+	check(browser_pixel_variation<=2.1,"at 60fps the measured triangular ship and ring motion advances only 1-2 actual screen pixels per frame")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
 	var goal:=Vector2(1200,500)
 	check(not sim.classic_steering,"native default uses direct navigation")
@@ -98,7 +115,7 @@ func run() -> void:
 	check(is_equal_approx(game._actor_visual_length(game.sim.npcs[0]),native_npc_length*game.CLASSIC_HULL_SCALE),"Classic scales NPC hulls with the captain instead of dwarfing enemies")
 	# Compare reference 208901 (ship crosses a stable map) against 208902
 	# (permanent camera centering made all real 1px movement invisible).
-	check(is_equal_approx(VISUALS.CLASSIC_REFERENCE_AMP_PX,10.0) and is_equal_approx(VISUALS.CLASSIC_REFERENCE_WAVELENGTH_PX,54.0),"Classic uses one fixed reference-calibrated visual cadence")
+	check(is_equal_approx(VISUALS.CLASSIC_REFERENCE_AMP_PX,10.0) and is_equal_approx(VISUALS.CLASSIC_REFERENCE_WAVELENGTH_PX,125.0),"Classic uses one fixed browser-speed-corrected video cadence")
 	var camera_start: Vector2=Vector2(800,500)
 	var world_view: Vector2=Vector2(1200,700)
 	var within: Vector2=game._classic_edge_camera_goal(camera_start+Vector2(300,170),camera_start,world_view)
