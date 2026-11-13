@@ -262,11 +262,12 @@ var classic_atlases: Dictionary={}
 var classic_geometry: Dictionary={}
 var classic_monster_bottoms: Dictionary={}
 var classic_heading_cache: Dictionary={}
-# Only the visible Classic hull steps a few screen pixels left/right.
-# World position, wake, camera, nameplate, rings and collision never sway.
+# The complete Classic *drawn* ship unit (hull/ring/nameplates) moves by
+# a few real pixels perpendicular to its course, matching user reference.
+# The game-world position, wake history, camera and collisions never sway.
 var classic_sailing_visual: Dictionary={}
 # These two values only change the rendered Classic hull, not travel.
-var classic_pixel_strength: float=3.0
+var classic_pixel_strength: float=5.0
 var classic_pixel_step_world: float=32.0
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
@@ -1115,7 +1116,7 @@ func _draw_actor(actor: Dictionary) -> void:
 		_draw_tower(actor)
 		return
 	var is_player = int(actor.id)==0
-	var point: Vector2=_visual_actor_pos(actor)
+	var point: Vector2=_classic_actor_render_pos(actor)
 	var heading: Vector2=actor.heading
 	var length=_actor_visual_length(actor)
 	# Both renderers use cheap line/circle foam at the same water footprint.
@@ -1252,19 +1253,33 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 	classic_heading_cache[id]=current
 	return current
 
-func _classic_hull_pixel_offset(actor: Dictionary) -> Vector2:
-	# A SCREEN-space correction affects the ship graphic only. The
-	# selection ring, HP plate, camera and waterline keep their true center.
+func _classic_actor_visual_offset(actor: Dictionary) -> Vector2:
+	# Reference 208797.mp4: the green ring moves ~10 screen pixels up/down
+	# during ~0.2s NE/SE frame changes on an east/west-bound course.
+	# This is a PERPENDICULAR *display* offset, never a gameplay waypoint.
+	if not browser_classic or not ship_animations_enabled:return Vector2.ZERO
+	if str(actor.get("kind",""))!="ship":return Vector2.ZERO
 	var pose: Dictionary=classic_sailing_visual.get(int(actor.get("id",-1)),{})
 	var px: float=float(pose.get("pixel_x",0.0))
+	var heading: Vector2=Vector2(actor.get("heading",Vector2.RIGHT)).normalized()
+	if heading.length_squared()<0.1:return Vector2.ZERO
+	var sideways: Vector2=Vector2(-heading.y,heading.x)
 	var canvas_zoom: float=maxf(get_canvas_transform().x.length(),0.05)
-	return Vector2(px/canvas_zoom,0.0)
+	return sideways*(px/canvas_zoom)
+
+func _classic_actor_render_pos(actor: Dictionary) -> Vector2:
+	# Evaluate the visual pose first so ALL drawn ship elements share the
+	# same screen-pixel step. The camera uses _visual_actor_pos(), not this.
+	var actual_position: Vector2=_visual_actor_pos(actor)
+	if not browser_classic or str(actor.get("kind",""))!="ship":return actual_position
+	_classic_frame_for_actor(actor)
+	return actual_position+_classic_actor_visual_offset(actor)
 
 func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
-	# Resolve one state for this ship per draw: frame and X offset refer to
-	# exactly the same sailed-distance sample, without a second animation.
+	# point is already the same pixel-stepped center used by the ring and
+	# ship label. Never apply a second, hull-only offset here.
 	var heading_index: int=_classic_frame_for_actor(actor)
-	var hull_point: Vector2=point+_classic_hull_pixel_offset(actor)
+	var hull_point: Vector2=point
 	var key: String=_classic_atlas_key(actor)
 	var atlas: Texture2D=classic_atlases.get(key) as Texture2D
 	if atlas!=null:
@@ -1370,7 +1385,7 @@ func _plate_stable_hull_drop(actor: Dictionary) -> float:
 ## camera motion. Nearby ships never influence the captain's position.
 func _plate_screen_anchor(actor: Dictionary) -> Vector2:
 	var pixels=_plate_pixels()
-	var point: Vector2=get_canvas_transform()*_visual_actor_pos(actor)
+	var point: Vector2=get_canvas_transform()*_classic_actor_render_pos(actor)
 	var player=int(actor.id)==0
 	if browser_classic:
 		var zoom: float=absf(get_canvas_transform().y.y)
@@ -1407,7 +1422,7 @@ func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 	var pixels=_plate_pixels()
 	for actor: Dictionary in fleet:
 		if int(actor.hp)<=0:continue
-		var point: Vector2=get_canvas_transform()*_visual_actor_pos(actor)
+		var point: Vector2=get_canvas_transform()*_classic_actor_render_pos(actor)
 		if not get_viewport_rect().grow(180*pixels).has_point(point):continue
 		var player=int(actor.id)==0
 		var width=maxf((188.0 if player else 154.0)*pixels,
@@ -4172,7 +4187,7 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Das Schiff selbst macht kleine pixelgenaue Links/rechts-Schritte; Kurs, Name und Ring bleiben stabil. 2,5D / 3D fahren unverändert direkt.")
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Schiff, Ring und Name bewegen sich gemeinsam in kleinen Pixelschritten quer zur Fahrt. Die eigentliche Route bleibt direkt.")
 	_note("DATENUPDATE %d · CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
 		if OS.has_feature("web"):
@@ -4186,10 +4201,10 @@ func _open_display() -> void:
 				var key: String=str(option[0])
 				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 				choice.disabled=render_mode==key
-			_note("Classic 2D: vier schräge Schiffsgrafiken mit kleinen Links/rechts-Pixelschritten am Rumpf. Die eigentliche Fahrt bleibt direkt, ohne zusätzliche Zickzack-Wegpunkte. 2,5D und 3D sind unverändert.")
+			_note("Classic 2D: vier Schiffsansichten und kleine seitliche Pixelschritte der gesamten sichtbaren Schiffseinheit. Ohne zusätzliche Zickzack-Wegpunkte; 2,5D und 3D bleiben unverändert.")
 		if browser_classic:
 			_section("CLASSIC 2D · SCHIFFSBEWEGUNG")
-			_note("Nur der gezeichnete Rumpf bewegt sich links/rechts. Die echte Route, Kamera, Trefferzone und Namensanzeige bleiben unverändert.",Color("a3c9cf"))
+			_note("Schiff, Auswahlkreis und Name bewegen sich gemeinsam quer zur Fahrtrichtung. Spielkoordinaten, Trefferzone und Kamera bleiben auf dem echten Kurs.",Color("a3c9cf"))
 			_note("PIXELSTÄRKE · momentan %d px" % roundi(classic_pixel_strength))
 			var pixel_grid=_grid(3)
 			for amount in [2.0,3.0,5.0]:
@@ -4204,7 +4219,7 @@ func _open_display() -> void:
 				var active: bool=is_equal_approx(classic_pixel_step_world,tempo)
 				var pace_btn=_action(str(option[0]),func():_set_classic_pixel_motion(tempo,classic_pixel_strength),"tab_on" if active else "normal",pace_grid)
 				pace_btn.disabled=active
-			_note("Die Änderung gilt sofort und wird gespeichert. Dafür ist kein neuer Build nötig.",Color("a3c9cf"))
+			_note("Schiff, Ring und Name bewegen sich zusammen. Die Änderung gilt sofort und bleibt gespeichert.",Color("a3c9cf"))
 		_section("SCHIFFE & SEEKARTE")
 		var ship_grid=_grid(2)
 		_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
@@ -4336,7 +4351,7 @@ func _open_menu_hub() -> void:
 
 func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
-	_note("Browser: Der sichtbare Classic-Schiffsrumpf macht wenige Links/rechts-Bildschirmpixel-Schritte während echter direkter Fahrt. App/Desktop: Alle Grafikmodi behalten dieselben sicheren Schiffskurse und Online-Spielwerte.",Color("9be4df"))
+	_note("Browser: In Classic 2D bewegt sich die ganze sichtbare Schiffseinheit um wenige Pixel seitlich zur Fahrt. Die echte Route bleibt direkt; Multiplayer-Koordinaten und Schiffsstatistiken bleiben unverändert.",Color("9be4df"))
 	if not OS.has_feature("web"):
 		var modes=_grid(3)
 		for option in [["classic","CLASSIC 2D"],["hybrid","2,5D"],["3d","3D"]]:
@@ -4902,7 +4917,9 @@ func _load_display() -> void:
 	ambient_motion_enabled=bool(data.get("ambient_motion_enabled",true))
 	ship_animations_enabled=bool(data.get("ship_animations_enabled",true))
 	wake_effects_enabled=bool(data.get("wake_effects_enabled",true))
-	classic_pixel_strength=clampf(float(data.get("classic_pixel_strength",3.0)),0.0,8.0)
+	# Revision 1 tuned a hull-only horizontal nudge (often invisible). Start
+	# the new full-footprint/perpendicular animation at the reference 5px.
+	classic_pixel_strength=5.0 if int(data.get("classic_pixel_footprint_revision",0))<2 else clampf(float(data.get("classic_pixel_strength",5.0)),0.0,8.0)
 	classic_pixel_step_world=clampf(float(data.get("classic_pixel_step_world",32.0)),12.0,80.0)
 	# All old true/false fullscreen preferences migrate to balanced windows.
 	menu_layout=str(data.get("menu_layout","balanced"))
@@ -4921,7 +4938,7 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ambient_motion_enabled":ambient_motion_enabled,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"classic_pixel_strength":classic_pixel_strength,"classic_pixel_step_world":classic_pixel_step_world,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
+		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ambient_motion_enabled":ambient_motion_enabled,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"classic_pixel_strength":classic_pixel_strength,"classic_pixel_step_world":classic_pixel_step_world,"classic_pixel_footprint_revision":2,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
 		file.close()
 
 ## Browser-only render budget: no effect on collision, AI ticks, camera,
@@ -5056,7 +5073,7 @@ func _reset_display_preferences() -> void:
 	_apply_ambient_motion()
 	ship_animations_enabled=true
 	wake_effects_enabled=true
-	classic_pixel_strength=3.0
+	classic_pixel_strength=5.0
 	classic_pixel_step_world=32.0
 	classic_sailing_visual.clear()
 	menu_layout="balanced"
