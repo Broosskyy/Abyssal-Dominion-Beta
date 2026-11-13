@@ -4788,7 +4788,9 @@ func _browser_ship_screen_rect(actor: Dictionary) -> Rect2:
 	var frame: Dictionary=entry.frames[_classic_frame_for_actor(actor)]
 	var spec: Dictionary=VISUALS.geometry(frame,_actor_visual_length(actor))
 	var world: Rect2=spec.destination
-	world.position+=_visual_actor_pos(actor)
+	# Hit-test where the Classic sprite is actually drawn, even while its
+	# visual footprint takes the small perpendicular pixel steps.
+	world.position+=_classic_actor_render_pos(actor)
 	return get_canvas_transform()*world
 
 func _browser_ship_touch_rect(visible: Rect2) -> Rect2:
@@ -4812,7 +4814,7 @@ func _enemy_at_screen(screen: Vector2) -> int:
 			var score: float=normalized.length_squared()+(0.0 if inside else 100.0)
 			if score<closest:closest=score;candidate_id=int(npc.id)
 			continue
-		var projected: Vector2=canvas*(_visual_actor_pos(npc)-Vector2(0,25))
+		var projected: Vector2=canvas*(_classic_actor_render_pos(npc)-Vector2(0,25))
 		var length: float=_actor_visual_length(npc)
 		var radius: float=clampf(length*zoom*.57,78.0,116.0)
 		if str(npc.get("kind","ship"))=="tower":radius=clampf(radius,72.0,95.0)
