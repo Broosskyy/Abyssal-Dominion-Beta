@@ -217,6 +217,12 @@ func run() -> void:
 	var projected_visual: Vector2=game.get_canvas_transform()*moved_center-game.get_canvas_transform()*raw_center
 	check(absf(projected_visual.x)<=0.55 and absf(projected_visual.y-5.0)<=0.55,"optional ship and ring shift uses five true pixels across a horizontal course")
 	check((moved_label-baseline_label).distance_to(projected_visual)<0.15,"captain nameplate follows the SAME visual step as ship and ring")
+	# The 2D micro-diagonal is a navigational raster effect, not a water
+	# animation. Legacy users may have disabled other ship animations.
+	var ship_anim_before: bool=game.ship_animations_enabled
+	game.ship_animations_enabled=false
+	check(game._classic_actor_visual_offset(game.sim.player).length()>0.1,"sailing remains frame-measured even if optional ship FX were disabled in earlier tests")
+	game.ship_animations_enabled=ship_anim_before
 	check(game.sim.player.pos==actual_position and game.camera.position==raw_camera,"pixel movement NEVER enters world position, multiplayer physics, or locked camera")
 	game.classic_sailing_visual.erase(0)
 
