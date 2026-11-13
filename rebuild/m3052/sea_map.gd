@@ -1258,7 +1258,8 @@ func _classic_actor_visual_offset(actor: Dictionary) -> Vector2:
 	# during ~0.2s NE/SE frame changes on an east/west-bound course.
 	# This is a PERPENDICULAR *display* offset, never a gameplay waypoint.
 	if not browser_classic or not ship_animations_enabled:return Vector2.ZERO
-	if str(actor.get("kind",""))!="ship":return Vector2.ZERO
+	# The captain has id=0 but intentionally no "kind" field.
+	if str(actor.get("kind",""))!="ship" and int(actor.get("id",-1))!=0 and not bool(actor.get("remote_player",false)):return Vector2.ZERO
 	var pose: Dictionary=classic_sailing_visual.get(int(actor.get("id",-1)),{})
 	var px: float=float(pose.get("pixel_x",0.0))
 	var heading: Vector2=Vector2(actor.get("heading",Vector2.RIGHT)).normalized()
@@ -1271,7 +1272,8 @@ func _classic_actor_render_pos(actor: Dictionary) -> Vector2:
 	# Evaluate the visual pose first so ALL drawn ship elements share the
 	# same screen-pixel step. The camera uses _visual_actor_pos(), not this.
 	var actual_position: Vector2=_visual_actor_pos(actor)
-	if not browser_classic or str(actor.get("kind",""))!="ship":return actual_position
+	if not browser_classic:return actual_position
+	if str(actor.get("kind",""))!="ship" and int(actor.get("id",-1))!=0 and not bool(actor.get("remote_player",false)):return actual_position
 	_classic_frame_for_actor(actor)
 	return actual_position+_classic_actor_visual_offset(actor)
 
