@@ -17,45 +17,8 @@ func run() -> void:
 		check(VISUALS.heading_four(heading) in [1,3,5,7],"every ordinary captain heading chooses exactly one of the four Classic frames")
 	var east_frame: int=VISUALS.heading_four(Vector2.RIGHT)
 	check(VISUALS.heading_four(Vector2(1,-0.07),east_frame)==east_frame and VISUALS.heading_four(Vector2(1,0.07),east_frame)==east_frame,"Classic sprite hysteresis prevents flickering when sailing nearly east")
-	# The user showed that Seafight wiggles the HULL in screen pixels,
-	# NOT the real course, camera or world coordinates.
-	# Pixel-error diffusion alternates adjacent facings while a cardinal
-	# course is simulated as a perfectly direct navigation line.
-	var right_start: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,0.0)
-	var right_next: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,VISUALS.CLASSIC_PIXEL_STEP_WORLD)
-	check(int(right_start.frame)!=int(right_next.frame) and int(right_start.frame) in [1,3] and int(right_next.frame) in [1,3],"a horizontal course alternates visible NE/SE facings on short pixel legs")
-	var left_start: Dictionary=VISUALS.classic_pixel_pose(Vector2.LEFT,0.0)
-	var left_next: Dictionary=VISUALS.classic_pixel_pose(Vector2.LEFT,VISUALS.CLASSIC_PIXEL_STEP_WORLD)
-	check(int(left_start.frame)!=int(left_next.frame) and int(left_start.frame) in [5,7] and int(left_next.frame) in [5,7],"a westbound course alternates only visible SW/NW facings")
-	var pixel_values: Dictionary={}
-	for sample_index in 65:
-		var sample: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,float(sample_index))
-		var px: float=float(sample.pixel_x)
-		check(absf(px)<=VISUALS.CLASSIC_HULL_DRIFT_PX+0.01 and is_equal_approx(px,float(roundi(px))),"visual hull movement never exceeds three full screen pixels")
-		pixel_values[px]=true
-	check(pixel_values.size()>2,"the visible ship moves in several discrete one-pixel steps instead of an instantaneous image flip")
-	var low_drift: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,0.0,32.0,2.0)
-	var high_drift: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,0.0,32.0,5.0)
-	check(absf(float(low_drift.pixel_x))<absf(float(high_drift.pixel_x)),"pixel strength actually scales the moving ship instead of merely limiting it")
-	var fast_dwell: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,24.0,20.0,3.0)
-	var slow_dwell: Dictionary=VISUALS.classic_pixel_pose(Vector2.RIGHT,24.0,48.0,3.0)
-	check(int(fast_dwell.frame)!=int(slow_dwell.frame),"pixel speed setting changes the actual four-view timing")
-
-	for diagonal: Vector2 in [Vector2(1,-1),Vector2(1,1),Vector2(-1,1),Vector2(-1,-1)]:
-		var pose_one: Dictionary=VISUALS.classic_pixel_pose(diagonal,5.0)
-		var pose_two: Dictionary=VISUALS.classic_pixel_pose(diagonal,135.0)
-		check(int(pose_one.frame)==int(pose_two.frame) and float(pose_one.pixel_x)==0.0 and float(pose_two.pixel_x)==0.0,"exact diagonals keep their pose and have zero fake hull drift")
-	var shallow: Vector2=Vector2(8.0,-5.0)
-	var shallow_holds: bool=false
-	var last_frame: int=-1
-	var hold_count: int=0
-	for interval in 30:
-		var image: int=int(VISUALS.classic_pixel_pose(shallow,float(interval)*VISUALS.CLASSIC_PIXEL_STEP_WORLD).frame)
-		if image==last_frame:hold_count+=1
-		else:hold_count=0
-		if hold_count>=2:shallow_holds=true
-		last_frame=image
-	check(shallow_holds,"oblique courses naturally hold one ship pose for multiple steps without an animation timer")
+	# One Classic 2D visual method remains: measured four-direction steps.
+	# Obsolete 3px error-diffusion and its alternative timing modes are gone.
 	# Frame-by-frame source: 208901.mp4 3.85s-5.18s, 2340x1080
 	# and ~59.3 recorded fps. Green HP bar triangle has +/-10px amplitude,
 	# 0.436s period and 120px/s horizontal speed ~= 52-54px wavelength.
@@ -135,7 +98,7 @@ func run() -> void:
 	check(is_equal_approx(game._actor_visual_length(game.sim.npcs[0]),native_npc_length*game.CLASSIC_HULL_SCALE),"Classic scales NPC hulls with the captain instead of dwarfing enemies")
 	# Compare reference 208901 (ship crosses a stable map) against 208902
 	# (permanent camera centering made all real 1px movement invisible).
-	check(not game.classic_camera_follow and is_equal_approx(game.classic_pixel_strength,10.0) and is_equal_approx(game.classic_pixel_step_world,54.0),"Classic starts with stable map camera and measured 208901 micro-diagonals, not guessed sway")
+	check(is_equal_approx(VISUALS.CLASSIC_REFERENCE_AMP_PX,10.0) and is_equal_approx(VISUALS.CLASSIC_REFERENCE_WAVELENGTH_PX,54.0),"Classic uses one fixed reference-calibrated visual cadence")
 	var camera_start: Vector2=Vector2(800,500)
 	var world_view: Vector2=Vector2(1200,700)
 	var within: Vector2=game._classic_edge_camera_goal(camera_start+Vector2(300,170),camera_start,world_view)
@@ -144,12 +107,7 @@ func run() -> void:
 	check(is_equal_approx(at_edge.x,camera_start.x+112.0) and is_equal_approx(at_edge.y,camera_start.y+42.0),"camera starts scrolling only when the captain crosses viewport border margins")
 	var restored: Vector2=game._classic_edge_camera_goal(camera_start,camera_start,world_view)
 	check(restored==camera_start,"Classic camera never invents an offset when the ship is stationary")
-	var original_course: Array=game.sim.player.path.duplicate()
-	var world_anchor: Vector2=game.sim.player.pos
-	game._set_classic_camera_follow(true)
-	check(game.classic_camera_follow,"player can opt into original centered follow camera")
-	game._set_classic_camera_follow(false)
-	check(not game.classic_camera_follow and game.sim.player.path==original_course and game.sim.player.pos==world_anchor,"camera mode does not affect gameplay positions, path, or physics")
+	check(game._classic_edge_camera_goal(camera_start+Vector2(300,170),camera_start,world_view)==camera_start,"Classic camera mode is always edge-follow, not selectable")
 	var path_before_framing: Array=game.sim.player.path.duplicate()
 	var saved_position: Vector2=game.sim.player.pos
 	for viewport_size: Vector2i in [Vector2i(844,390),Vector2i(2340,1080)]:
@@ -178,8 +136,7 @@ func run() -> void:
 	check(game._classic_frame_for_actor(game.sim.player)==1,"Classic renderer draws the expected NE atlas frame from the preserved eight-view collection")
 	game.sim.player.heading=Vector2(1,1)
 	check(game._classic_frame_for_actor(game.sim.player)==3,"Classic renderer changes facing without changing simulated world coordinates")
-	# Optional synthetic motion can still be A/B tested; not the default.
-	game._set_classic_pixel_motion(32.0,5.0)
+	# Verify the only remaining 2D navigation visualization.
 	var motion_probe: Dictionary={"id":9318,"kind":"ship","pos":Vector2(500,500),"speed":100.0,"heading":Vector2.RIGHT}
 	game._classic_frame_for_actor(motion_probe)
 	var shown: Dictionary={}
@@ -195,7 +152,7 @@ func run() -> void:
 		var screen_px: Vector2=game.get_canvas_transform()*drawn-game.get_canvas_transform()*real
 		pixel_offsets[roundi(screen_px.y)]=true
 		untouched_world_y=untouched_world_y and is_equal_approx(motion_probe.pos.y,500.0)
-		check(absf(screen_px.x)<=0.55 and absf(screen_px.y)<=game.classic_pixel_strength+0.55,"optional sideways visual correction remains within pixel amplitude plus rounding")
+		check(absf(screen_px.x)<=0.55 and absf(screen_px.y)<=VISUALS.CLASSIC_REFERENCE_AMP_PX*float(root.size.y)/1080.0+0.55,"single Classic visual motion stays within measured screen-scale amplitude")
 	check(shown.has(1) and shown.has(3) and pixel_offsets.size()>1,"the ship plus selection ring moves across multiple pixel steps between adjacent diagonal views")
 	check(untouched_world_y and game.sim.player.path==actual_route and game.sim.player.pos==actual_position,"pixel steps never change actual ship Y, gameplay waypoints or camera center")
 	# Verify the ring and nameplate ride the SAME interpolated visual center;
@@ -215,7 +172,7 @@ func run() -> void:
 	var moved_center: Vector2=game._classic_actor_render_pos(game.sim.player)
 	var moved_label: Vector2=game._plate_screen_anchor(game.sim.player)
 	var projected_visual: Vector2=game.get_canvas_transform()*moved_center-game.get_canvas_transform()*raw_center
-	check(absf(projected_visual.x)<=0.55 and absf(projected_visual.y-5.0)<=0.55,"optional ship and ring shift uses five true pixels across a horizontal course")
+	check(absf(projected_visual.x)<=0.55 and absf(projected_visual.y-5.0)<=0.55,"ship and ring share exact five-pixel measured test displacement")
 	check((moved_label-baseline_label).distance_to(projected_visual)<0.15,"captain nameplate follows the SAME visual step as ship and ring")
 	# The 2D micro-diagonal is a navigational raster effect, not a water
 	# animation. Legacy users may have disabled other ship animations.
@@ -226,14 +183,11 @@ func run() -> void:
 	check(game.sim.player.pos==actual_position and game.camera.position==raw_camera,"pixel movement NEVER enters world position, multiplayer physics, or locked camera")
 	game.classic_sailing_visual.erase(0)
 
-	var user_course: Array=game.sim.player.path.duplicate()
-	var user_world: Vector2=game.sim.player.pos
-	game._set_classic_pixel_motion(20.0,5.0)
-	check(is_equal_approx(game.classic_pixel_step_world,20.0) and is_equal_approx(game.classic_pixel_strength,5.0),"classic pixel movement can be tuned live from Grafik settings")
-	check(game.sim.player.path==user_course and game.sim.player.pos==user_world,"tuning Classic ship animation does not rewrite the real course or world coordinates")
-	check(game.classic_camera_follow==false,"Classic screen-travel camera stays independent of experimental motion settings")
-	game._set_classic_pixel_motion(32.0,0.0)
-
+	# Legacy 2D camera/pixel options are intentionally NOT persisted anymore.
+	game._persist_display_preferences()
+	var display_data: Variant=JSON.parse_string(FileAccess.get_file_as_string(game.HUD_SAVE))
+	check(display_data is Dictionary and not display_data.has("classic_pixel_strength") and not display_data.has("classic_pixel_step_world") and not display_data.has("classic_camera_follow"),"new saves do not expose old sailing-mode controls")
+	check(game.sim.player.path==actual_route and game.sim.player.pos==actual_position,"single sailing renderer cannot rewrite the route or captain position")
 	var stopped_view: int=game._classic_frame_for_actor(motion_probe)
 	game.elapsed+=0.3
 	check(game._classic_frame_for_actor(motion_probe)==stopped_view,"standing still freezes the last left/right sailing sprite")
@@ -241,7 +195,8 @@ func run() -> void:
 	game._open_modal("Anzeige")
 	var options: Array[String]=[]
 	for button in game.modal_body.find_children("*","Button",true,false):options.append(button.text)
-	check(options.any(func(text):return text.begins_with("CLASSIC 2D")) and options.any(func(text):return text.begins_with("2,5D")) and options.any(func(text):return text.begins_with("3D")),"native settings keep all three modes reachable from Classic")
+	check(options.any(func(text):return text.begins_with("CLASSIC 2D")) and options.any(func(text):return text.begins_with("2,5D")) and options.any(func(text):return text.begins_with("3D")),"native settings retain three GRAPHICS modes")
+	check(not options.any(func(text):return text.contains("PIXEL") or text.contains("VIDEO 901") or text.contains("KLASSISCHE KAMERA") or text.contains("SPIELER ZENTRIEREN") or text=="KURZ" or text=="LANG"),"Classic sailing no longer has alternative pixel, pace or camera mode buttons")
 	game.queue_free();await process_frame
 	var reloaded=load("res://sea_map.tscn").instantiate();root.add_child(reloaded);current_scene=reloaded
 	await process_frame;reloaded.set_process(false)
