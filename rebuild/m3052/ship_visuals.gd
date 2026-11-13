@@ -20,56 +20,10 @@ static func heading_column(heading: Vector2,previous: int=-1) -> int:
 ## while the simulated ship follows the true direct course.
 ## Eight-view atlas order is N, NE, E, SE, S, SW, W, NW.
 const CLASSIC_FOUR_VIEW_ATLAS := [1,7,5,3] # NE, NW, SW, SE
-const CLASSIC_CLOCKWISE_ATLAS := [1,3,5,7] # NE, SE, SW, NW
 
 static func heading_four(heading: Vector2,previous: int=-1) -> int:
 	var prior_column: int=CLASSIC_FOUR_VIEW_ATLAS.find(previous)
 	return CLASSIC_FOUR_VIEW_ATLAS[heading_column(heading,prior_column)]
-
-## Legacy four-view SeaBattle/Seafight-style PIXEL movement.
-## The route is unchanged and the atlas is NEVER rotated.
-## The whole drawn ship footprint (hull/ring/labels) follows tiny screen-
-## pixel-wide steps PERPENDICULAR to the course. Unlike a sine timer or a
-## 1.4 s pendulum, the frame is chosen
-## with digital error diffusion against the desired course (similar to
-## rasterizing a straight line with only four possible diagonal directions).
-## 32 world units at the normal 165 wu/s captain speed = ~0.19 seconds.
-## Exact diagonals hold one pose; oblique headings naturally hold longer.
-const CLASSIC_PIXEL_STEP_WORLD := 32.0
-const CLASSIC_HULL_DRIFT_PX := 3.0
-
-static func classic_pixel_pose(heading: Vector2,sailed_world: float,step_world: float=CLASSIC_PIXEL_STEP_WORLD,drift_px: float=CLASSIC_HULL_DRIFT_PX) -> Dictionary:
-	if heading.length_squared()<0.0001:
-		return {"frame":CLASSIC_FOUR_VIEW_ATLAS[0],"pixel_x":0.0}
-	var quarter: float=PI*.5
-	var angle: float=fposmod(heading.angle()+PI*.25,TAU)
-	var sector: int=clampi(floori(angle/quarter),0,3)
-	var share: float=fposmod(angle,quarter)/quarter
-	var first: int=CLASSIC_CLOCKWISE_ATLAS[sector]
-	var second: int=CLASSIC_CLOCKWISE_ATLAS[(sector+1)%4]
-	if share<0.025:return {"frame":first,"pixel_x":0.0}
-	if share>0.975:return {"frame":second,"pixel_x":0.0}
-	step_world=clampf(step_world,12.0,80.0)
-	drift_px=clampf(drift_px,0.0,8.0)
-	var progress: float=maxf(sailed_world,0.0)/step_world
-	var leg: int=floori(progress)
-	var part: float=progress-float(leg)
-	# Round an accumulated pixel-line error, instead of flipping to
-	# a sprite every X seconds regardless of the destination.
-	var before: int=floori(float(leg)*share+0.5)
-	var after: int=floori(float(leg+1)*share+0.5)
-	var second_facing: bool=after>before
-	var correction: float=float(before)+(part if second_facing else 0.0)-(float(leg)+part)*share
-	var strength: float=sin(share*PI)
-	# Snapped pixel correction shared with hull, ring and labels.
-	# Video 208797 has about ten pixels of full ring movement per
-	# NE/SE alternation. A 5px amplitude on each side reproduces that
-	# observed visual magnitude without touching gameplay positions.
-	var offset_px: float=float(roundi(clampf(
-		(correction-0.25*strength*strength)*13.0*strength*(drift_px/CLASSIC_HULL_DRIFT_PX),
-		-drift_px,drift_px
-	)))
-	return {"frame":second if second_facing else first,"pixel_x":offset_px}
 
 ## Frame-measured Seafight 208901: between video 3.85s and 5.18s,
 ## the GREEN CAPTAIN HP BAR follows a quantized TRIANGLE, not a sine.
