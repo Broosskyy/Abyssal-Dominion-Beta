@@ -25,48 +25,9 @@ static func heading_four(heading: Vector2,previous: int=-1) -> int:
 	var prior_column: int=CLASSIC_FOUR_VIEW_ATLAS.find(previous)
 	return CLASSIC_FOUR_VIEW_ATLAS[heading_column(heading,prior_column)]
 
-## Frame-measured Seafight 208901: between video 3.85s and 5.18s,
-## the GREEN CAPTAIN HP BAR follows a quantized TRIANGLE, not a sine.
-## At 2340x1080 pixels, the reference is +/-10px perpendicular to
-## westbound travel and ~0.436s per full cycle. The older distance-only
-## 54px wavelength was measured at the REFERENCE ship's screen velocity.
-## Clip 208930 showed Abyssal sailing ~2.3x faster in SCREEN pixels/second,
-## which makes the same 54px wavelength switch the hull far too often.
-## 125px (54 * 2.3) matches the recorded visual *cadence* without modifying
-## world speed, online movement, input, or changing our single sailing mode.
-## The frame and hull/selection/label offsets share the same raster path.
-const CLASSIC_REFERENCE_AMP_PX := 10.0
-const CLASSIC_REFERENCE_WAVELENGTH_PX := 125.0
-
-static func classic_measured_step_pose(heading: Vector2,sailed_screen_px: float,amplitude_px: float=CLASSIC_REFERENCE_AMP_PX,wavelength_px: float=CLASSIC_REFERENCE_WAVELENGTH_PX) -> Dictionary:
-	if heading.length_squared()<0.0001:
-		return {"frame":CLASSIC_FOUR_VIEW_ATLAS[0],"pixel_x":0.0}
-	var direction: Vector2=heading.normalized()
-	var larger_axis: float=maxf(absf(direction.x),absf(direction.y))
-	var cardinal_strength: float=absf(absf(direction.x)-absf(direction.y))/maxf(larger_axis,0.0001)
-	# On a diagonal course, the actual 45-degree sprite can travel
-	# directly. The telltale alternation occurs on cardinal routes.
-	var strength: float=clampf(cardinal_strength*2.0,0.0,1.0)
-	var amplitude: float=clampf(amplitude_px,0.0,25.0)*strength
-	if amplitude<0.1:
-		return {"frame":heading_four(heading,-1),"pixel_x":0.0}
-	var wavelength: float=clampf(wavelength_px,8.0,180.0)
-	var phase: float=fposmod(maxf(sailed_screen_px,0.0),wavelength)/wavelength
-	var triangle: float=0.0
-	var side_slope: float=4.0*amplitude/wavelength
-	if phase<0.25:
-		triangle=4.0*phase
-	elif phase<0.75:
-		triangle=2.0-4.0*phase
-		side_slope= -side_slope
-	else:
-		triangle=4.0*phase-4.0
-	# The frame is determined by the actual visible *step velocity*,
-	# so a westbound ship uses NW/SW as the triangle rises/falls.
-	var cross: Vector2=Vector2(-direction.y,direction.x)
-	var visible_velocity: Vector2=direction+cross*side_slope
-	return {"frame":heading_four(visible_velocity,-1),"pixel_x":float(roundi(triangle*amplitude))}
-
+## In Classic 2D, four baked diagonal headings follow the *actual* four
+## physical vectors selected by Simulation._move_classic(). This renderer
+## has no independent pixel timer, triangle offsets or speed presets.
 static func heading_eight(heading: Vector2,previous: int=-1) -> int:
 	if heading.length_squared()<0.0001:return previous if previous>=0 and previous<8 else 0
 	if previous>=0 and previous<8:
