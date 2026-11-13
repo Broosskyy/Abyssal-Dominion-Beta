@@ -1,7 +1,7 @@
 {
   "engine": "4.7.2.stable.official.ed1daf0bf",
   "milestone": "M3059",
-  "source_commit": "a93d07f839b7c351e2b9c892a59c453334365fed",
+  "source_commit": "e9d217e1a014c9e2e1ec8ad18a363ed5cd16cfac",
   "bootstrap_sha256": "8e97bafe54793eb72410248af725c99324486557bf48c5040cc7a27025c88fde",
   "tests": [
     {
@@ -42,7 +42,7 @@
     },
     {
       "test": "classic_mode_test",
-      "checks": 60,
+      "checks": 92,
       "failures": [],
       "status": "PASS"
     },
@@ -98,7 +98,7 @@
     },
     {
       "test": "navigation_test",
-      "checks": 90,
+      "checks": 91,
       "failures": [],
       "status": "PASS"
     },
@@ -135,14 +135,14 @@
     }
   ],
   "data": {
-    "revision": 337,
+    "revision": 338,
     "abi": 1,
     "engine": "4.7.2.stable",
     "min_apk": 305903,
-    "bytes": 128922796,
-    "sha256": "a74d1f4e3a365020b67a55ec0baa0bb6e7ad09de99a78307f5e2908589d71b53",
-    "signature": "a9dGUhGAi9KNdSfZZFsMCSv8UxE55BUDZTt0SSZ41SFR/ws1+1iAT+DuPuvtegzPNhtMCdIugabIjjzPCIQdTitDpuvHx6TG7SU3jnEbi3/ibtiN7UIId9aBCySswltzSUrmTu6ss88vUOcPbH2dL1d2L7eODdGpD3oPBUudE6hH67ddm7J2HRwYMjNZPHehiS8WyVE1USVrhCvbFHNejVRyS6Dfj1lk3b74kUsiq3vPcEeN2fwY5altJVmAatruZpO8wor5pFx/w+NYXqX7Kc78dCZRfxMZJGVSioB1iegn079DvNY1gOjldmHAK7PQYDQZS5yyup5vvoAYkceNOA==",
-    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-337/ABYSSAL_DATA_337.zip"
+    "bytes": 128977999,
+    "sha256": "06a26fcd037328ab76afe021542f5ca240b591e19543cdc2fe00620ea3fd47a5",
+    "signature": "JCKT0Xk+Cyr8CzPNyU8xFydXFIniAib+6mnhx3HJ5Vu5dD2N/wEB5A8m631okuBJBNMYE6dcV+dLEZEgxQxOOoHcuB+2FFA6M1IuDMufg6+q1XJcHuj3Agh80zAE9ctF34hoZdS5cP9UuGkZa0sD55y2lDBPSnyymuFRuUKo46hws2lm3h76PMIfyoQm+Rngk7mInp6PWE7GQsw8Ii0mbSEWDfxEY/KGWMho8kJsxcL3yLY/pa7EBPdXCQqFbXy/vSc2wYUWxupDkeLt/bLYxv3ZXEkwAIKY4LZV+bBaT8RmQjre2qid90Yj2I+RbBSworNn8+qoR8liq2Lv+Zmb7Q==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-338/ABYSSAL_DATA_338.zip"
   },
   "audited_pngs": 44,
   "physical_android_test": "NOT_PERFORMED",
