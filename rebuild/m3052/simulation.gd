@@ -23,7 +23,7 @@ const CLASSIC_ISO_DIRECTIONS := [
 	Vector2(3.0,-2.0),Vector2(3.0,2.0),
 	Vector2(-3.0,2.0),Vector2(-3.0,-2.0)
 ]
-const CLASSIC_ISO_LEG_WORLD := 36.0
+const CLASSIC_ISO_LEG_WORLD := 32.0
 const CLASSIC_FINAL_APPROACH_WORLD := 25.0
 const PLAYER_HP := 2400
 const PLAYER_SHIELD := 1000
@@ -305,36 +305,59 @@ func set_classic_steering(enabled: bool) -> void:
 		if str(npc.get("kind",""))=="ship":_clear_classic_leg(npc)
 
 func _classic_choose_diagonal(body: Dictionary,goal: Vector2,leg_length: float,phasing: bool) -> Vector2:
-	# Quantized shortest-line tracker. At each real 3:2 diagonal tile
-	# segment, minimize perpendicular error from the requested route,
-	# rewarding forward motion to prevent oscillation without progress.
+	# A 48x32 isometric four-way grid has UNEVEN angular gaps.
+	# Choose the two headings which BRACKET the target bearing, not the
+	# two nearest by absolute angle. Otherwise oblique courses can drift
+	# away and bounce forever between non-forward-facing sprites.
 	var origin: Vector2=Vector2(body.get("_iso_guide_origin",body.pos))
 	var guide: Vector2=(goal-origin).normalized()
 	if guide.length_squared()<0.5:guide=(goal-Vector2(body.pos)).normalized()
+	if guide.length_squared()<0.5:return Vector2.ZERO
+	var left_heading: Vector2=Vector2.ZERO
+	var right_heading: Vector2=Vector2.ZERO
+	var aligned_heading: Vector2=Vector2.ZERO
+	var left_error: float=INF
+	var right_error: float=INF
+	for raw in CLASSIC_ISO_DIRECTIONS:
+		var direction: Vector2=Vector2(raw).normalized()
+		var error: float=wrapf(direction.angle()-guide.angle(),-PI,PI)
+		if absf(error)<0.0001:
+			aligned_heading=direction
+		elif error>0.0 and error<left_error:
+			left_heading=direction
+			left_error=error
+		elif error<0.0 and -error<right_error:
+			right_heading=direction
+			right_error= -error
+	var candidates: Array[Vector2]=[]
+	if aligned_heading.length_squared()>0.5:
+		candidates.append(aligned_heading)
+	else:
+		if left_heading.length_squared()>0.5:candidates.append(left_heading)
+		if right_heading.length_squared()>0.5:candidates.append(right_heading)
 	var best_direction: Vector2=Vector2.ZERO
 	var best_score: float=INF
-	for candidate in CLASSIC_ISO_DIRECTIONS:
-		var direction: Vector2=Vector2(candidate).normalized()
+	for direction: Vector2 in candidates:
 		var projected_end: Vector2=Vector2(body.pos)+direction*leg_length
-		# Keep real collision checks per actual diagonal. This naturally
-		# respects the A* route around islands and guild ports.
+		# Every REAL substep is checked against actual island collision.
 		if not phasing and not segment_free(body.pos,projected_end):continue
-		var along: float=(projected_end-origin).dot(guide)
-		var expected: Vector2=origin+guide*along
-		var lateral: float=projected_end.distance_squared_to(expected)
+		# Signed deviation from the requested line, Bresenham-like:
+		# e.g. east uses NE+SE, southeast-heavy uses SE+SW.
+		# A temporary backwards component on ONE axis is legal, but the
+		# line error cannot grow indefinitely as in the previous scoring.
+		var from_origin: Vector2=projected_end-origin
+		var line_error: float=from_origin.cross(guide)
 		var forward: float=direction.dot(guide)*leg_length
-		var overrun: float=maxf(0.0,along-origin.distance_to(goal))
-		var score: float=lateral-12.0*forward+8.0*overrun*overrun
+		var score: float=line_error*line_error-0.5*forward
 		if score<best_score-0.001:
 			best_score=score
 			best_direction=direction
 	return best_direction
 
 func _move_classic(body: Dictionary,travel: float,phasing: bool) -> void:
-	# All 4 headings below change the REAL world position each 30 Hz
-	# simulation tick. A 36-world-unit leg has (30,20) displacement,
-	# producing the recognizable +/-10px stair-step across a horizontal
-	# track, without moving an independent visual sprite.
+	# Real 4-way navigation at 30 Hz. Each isometric leg moves the
+	# actual captain location; it is never a separate sprite oscillation.
+	# A 32-world-unit leg has the same 3:2 direction as a 48x32 tile.
 	var iterations: int=0
 	while travel>0.01 and not body.path.is_empty() and iterations<24:
 		iterations+=1
@@ -371,7 +394,10 @@ func _move_classic(body: Dictionary,travel: float,phasing: bool) -> void:
 		var leg_left: float=float(body.get("_iso_leg_left",0.0))
 		var direction: Vector2=Vector2(body.get("_iso_leg_dir",Vector2.ZERO))
 		if leg_left<=0.01 or direction.length_squared()<0.5:
-			var requested_length: float=CLASSIC_ISO_LEG_WORLD* (0.5 if bool(body.get("_iso_first_leg",false)) else 1.0)
+			var requested_length: float=CLASSIC_ISO_LEG_WORLD*(0.5 if bool(body.get("_iso_first_leg",false)) else 1.0)
+			# Never step past the target and bounce around its perimeter.
+			# Leave one final small collision-checked arrival segment.
+			requested_length=minf(requested_length,maxf(3.0,gap.length()-CLASSIC_FINAL_APPROACH_WORLD*0.5))
 			body["_iso_first_leg"]=false
 			direction=_classic_choose_diagonal(body,goal,requested_length,phasing)
 			leg_left=requested_length
