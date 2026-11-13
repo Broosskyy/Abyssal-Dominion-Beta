@@ -139,7 +139,7 @@ func run() -> void:
 	check(game._classic_frame_for_actor(game.sim.player)==3,"Classic renderer changes facing without changing simulated world coordinates")
 	# Exercise the real ship sprite resolver, not only the pure helper:
 	# moved WORLD position drives the facing pendulum, not a zigzag path.
-	var motion_probe: Dictionary={"id":9318,"pos":Vector2(500,500),"speed":100.0,"heading":Vector2.RIGHT}
+	var motion_probe: Dictionary={"id":9318,"kind":"ship","pos":Vector2(500,500),"speed":100.0,"heading":Vector2.RIGHT}
 	game._classic_frame_for_actor(motion_probe)
 	var shown: Dictionary={}
 	var pixel_offsets: Dictionary={}
@@ -149,12 +149,36 @@ func run() -> void:
 	for step in 13:
 		motion_probe.pos+=Vector2(12,0)
 		shown[game._classic_frame_for_actor(motion_probe)]=true
-		var screen_px: float=game._classic_hull_pixel_offset(motion_probe).x*game.get_canvas_transform().x.length()
-		pixel_offsets[roundi(screen_px)]=true
+		var drawn: Vector2=game._classic_actor_render_pos(motion_probe)
+		var real: Vector2=game._visual_actor_pos(motion_probe)
+		var screen_px: Vector2=game.get_canvas_transform()*drawn-game.get_canvas_transform()*real
+		pixel_offsets[roundi(screen_px.y)]=true
 		untouched_world_y=untouched_world_y and is_equal_approx(motion_probe.pos.y,500.0)
-		check(absf(screen_px)<=VISUALS.CLASSIC_HULL_DRIFT_PX+0.01,"only graphic moves within maximum three SCREEN pixels")
-	check(shown.has(1) and shown.has(3) and pixel_offsets.size()>1,"the rendered ship turns left/right and advances in tiny pixel steps")
+		check(absf(screen_px.x)<0.15 and absf(screen_px.y)<=game.classic_pixel_strength+0.15,"an eastbound ship's ENTIRE visible footprint shifts vertically by only a few SCREEN pixels")
+	check(shown.has(1) and shown.has(3) and pixel_offsets.size()>1,"the ship plus selection ring moves across multiple pixel steps between adjacent diagonal views")
 	check(untouched_world_y and game.sim.player.path==actual_route and game.sim.player.pos==actual_position,"pixel steps never change actual ship Y, gameplay waypoints or camera center")
+	# Verify the ring and nameplate ride the SAME interpolated visual center;
+	# a fixed label beside a swaying sprite was the visible bug in Test 88.
+	game.sim.player.heading=Vector2.RIGHT
+	game.classic_sailing_visual.erase(0)
+	var raw_center: Vector2=game._visual_actor_pos(game.sim.player)
+	var raw_camera: Vector2=game.camera.position
+	var baseline_label: Vector2=game._plate_screen_anchor(game.sim.player)
+	game.classic_sailing_visual[0]={
+		"position":raw_center,
+		"heading":game.sim.player.heading,
+		"frame":VISUALS.heading_four(game.sim.player.heading),
+		"pixel_x":5.0,
+		"sailed_world":20.0,
+	}
+	var moved_center: Vector2=game._classic_actor_render_pos(game.sim.player)
+	var moved_label: Vector2=game._plate_screen_anchor(game.sim.player)
+	var projected_visual: Vector2=game.get_canvas_transform()*moved_center-game.get_canvas_transform()*raw_center
+	check(absf(projected_visual.x)<0.15 and absf(projected_visual.y-5.0)<0.15,"the PLAYER selection ring shifts 5 true pixels across a horizontal course")
+	check((moved_label-baseline_label).distance_to(projected_visual)<0.15,"captain nameplate follows the SAME visual step as ship and ring")
+	check(game.sim.player.pos==actual_position and game.camera.position==raw_camera,"pixel movement NEVER enters world position, multiplayer physics, or locked camera")
+	game.classic_sailing_visual.erase(0)
+
 	var user_course: Array=game.sim.player.path.duplicate()
 	var user_world: Vector2=game.sim.player.pos
 	game._set_classic_pixel_motion(20.0,5.0)
