@@ -15,6 +15,16 @@ const EDGE_BAND := 96.0
 const EDGE_INSET := 240.0
 const CELL := 48
 const PLAYER_SPEED := 165.0
+# Old-school Seafight-style 48x32 isometric navigation directions.
+# The physical legs use the same 3:2 slope at a sub-tile length; a
+# horizontal destination alternates NE/SE and an exact diagonal holds
+# one facing. This is actual world motion, not a render-only wobble.
+const CLASSIC_ISO_DIRECTIONS := [
+	Vector2(3.0,-2.0),Vector2(3.0,2.0),
+	Vector2(-3.0,2.0),Vector2(-3.0,-2.0)
+]
+const CLASSIC_ISO_LEG_WORLD := 36.0
+const CLASSIC_FINAL_APPROACH_WORLD := 25.0
 const PLAYER_HP := 2400
 const PLAYER_SHIELD := 1000
 const SHIELD_DELAY := 8.0
@@ -281,10 +291,110 @@ func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
 	# The classic four-facing effect belongs exclusively in the sprite renderer.
 	return plan_path(body.pos,goal)
 
+func _clear_classic_leg(body: Dictionary) -> void:
+	for key in ["_iso_waypoint","_iso_guide_origin","_iso_leg_dir","_iso_leg_left","_iso_first_leg"]:
+		body.erase(key)
+
 func set_classic_steering(enabled: bool) -> void:
-	# Retained API for renderer mode synchronization. Switching modes must
-	# NOT rewrite waypoints or broadcast a different movement route.
+	# One movement mode for Classic 2D. Switching graphics preserves the
+	# position, destination and online route; it discards an unfinished leg.
+	if classic_steering==enabled:return
 	classic_steering=enabled
+	_clear_classic_leg(player)
+	for npc in npcs:
+		if str(npc.get("kind",""))=="ship":_clear_classic_leg(npc)
+
+func _classic_choose_diagonal(body: Dictionary,goal: Vector2,leg_length: float,phasing: bool) -> Vector2:
+	# Quantized shortest-line tracker. At each real 3:2 diagonal tile
+	# segment, minimize perpendicular error from the requested route,
+	# rewarding forward motion to prevent oscillation without progress.
+	var origin: Vector2=Vector2(body.get("_iso_guide_origin",body.pos))
+	var guide: Vector2=(goal-origin).normalized()
+	if guide.length_squared()<0.5:guide=(goal-Vector2(body.pos)).normalized()
+	var best_direction: Vector2=Vector2.ZERO
+	var best_score: float=INF
+	for candidate in CLASSIC_ISO_DIRECTIONS:
+		var direction: Vector2=Vector2(candidate).normalized()
+		var projected_end: Vector2=Vector2(body.pos)+direction*leg_length
+		# Keep real collision checks per actual diagonal. This naturally
+		# respects the A* route around islands and guild ports.
+		if not phasing and not segment_free(body.pos,projected_end):continue
+		var along: float=(projected_end-origin).dot(guide)
+		var expected: Vector2=origin+guide*along
+		var lateral: float=projected_end.distance_squared_to(expected)
+		var forward: float=direction.dot(guide)*leg_length
+		var overrun: float=maxf(0.0,along-origin.distance_to(goal))
+		var score: float=lateral-12.0*forward+8.0*overrun*overrun
+		if score<best_score-0.001:
+			best_score=score
+			best_direction=direction
+	return best_direction
+
+func _move_classic(body: Dictionary,travel: float,phasing: bool) -> void:
+	# All 4 headings below change the REAL world position each 30 Hz
+	# simulation tick. A 36-world-unit leg has (30,20) displacement,
+	# producing the recognizable +/-10px stair-step across a horizontal
+	# track, without moving an independent visual sprite.
+	var iterations: int=0
+	while travel>0.01 and not body.path.is_empty() and iterations<24:
+		iterations+=1
+		var goal: Vector2=body.path[0]
+		var gap: Vector2=goal-Vector2(body.pos)
+		if gap.length()<0.08:
+			body.pos=goal
+			body.path.pop_front()
+			_clear_classic_leg(body)
+			continue
+		if not body.has("_iso_waypoint") or Vector2(body["_iso_waypoint"]).distance_squared_to(goal)>0.01:
+			_clear_classic_leg(body)
+			body["_iso_waypoint"]=goal
+			body["_iso_guide_origin"]=body.pos
+			body["_iso_first_leg"]=true
+		# Exact final arrival is mandatory for portal triggers and
+		# multiplayer; only the last <=25 world units are corrected.
+		if gap.length()<=CLASSIC_FINAL_APPROACH_WORLD:
+			var final_amount: float=minf(travel,gap.length())
+			var final_heading: Vector2=gap.normalized()
+			var final_next: Vector2=Vector2(body.pos)+final_heading*final_amount
+			if not phasing and not segment_free(body.pos,final_next):
+				body.path=[]
+				_clear_classic_leg(body)
+				return
+			body.heading=final_heading
+			body.pos=final_next
+			travel-=final_amount
+			if final_amount>=gap.length()-0.01:
+				body.pos=goal
+				body.path.pop_front()
+				_clear_classic_leg(body)
+			continue
+		var leg_left: float=float(body.get("_iso_leg_left",0.0))
+		var direction: Vector2=Vector2(body.get("_iso_leg_dir",Vector2.ZERO))
+		if leg_left<=0.01 or direction.length_squared()<0.5:
+			var requested_length: float=CLASSIC_ISO_LEG_WORLD* (0.5 if bool(body.get("_iso_first_leg",false)) else 1.0)
+			body["_iso_first_leg"]=false
+			direction=_classic_choose_diagonal(body,goal,requested_length,phasing)
+			leg_left=requested_length
+			if direction.length_squared()<0.5:
+				# Collision corridor smaller than one isometric tile:
+				# let the established A* path carry the ship safely through.
+				# It still uses ONE navigation system, not a user mode.
+				direction=gap.normalized()
+				leg_left=minf(travel,gap.length())
+			body["_iso_leg_dir"]=direction
+			body["_iso_leg_left"]=leg_left
+		var amount: float=minf(travel,leg_left)
+		var next: Vector2=Vector2(body.pos)+direction*amount
+		if not phasing and not segment_free(body.pos,next):
+			body.path=[]
+			_clear_classic_leg(body)
+			return
+		body.pos=next
+		body.heading=direction
+		travel-=amount
+		body["_iso_leg_left"]=maxf(0.0,leg_left-amount)
+	# No extra waypoints or per-frame time oscillators are generated.
+
 
 func course(point: Vector2) -> bool:
 	pending_portal=-1
@@ -750,6 +860,9 @@ func _move(body: Dictionary, delta: float) -> void:
 	var travel = float(body.speed) * slow_rate * delta * (1.25 if int(body.id)==0 and float(buffs.get("wind_draught",0))>0 else 1.0)
 	var phasing := int(body.id) == 0 and staff.flag("no_collision")
 	if int(body.id) == 0 and staff.flag("speed"): travel *= 2.5
+	if classic_steering and (int(body.get("id",-1))==0 or str(body.get("kind",""))=="ship"):
+		_move_classic(body,travel,phasing)
+		return
 	while travel > 0.01 and not body.path.is_empty():
 		var goal: Vector2 = body.path[0]
 		var gap: Vector2 = goal - body.pos
