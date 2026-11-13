@@ -5214,6 +5214,11 @@ func _shift_camera(offset: Vector2) -> void:
 
 func _recenter_camera() -> void:
 	pan=Vector2.ZERO;camera_locked=true;camera_anchor=sim.player.pos
+	# With Classic's free-travel camera, merely setting camera_locked no
+	# longer means "snap to captain". Honor the explicit recenter action.
+	if browser_classic and not classic_camera_follow and camera!=null:
+		camera.position=sim.player.pos
+		camera.force_update_scroll()
 	if camera_pad!=null:camera_pad.release()
 
 func _cancel_target() -> void:
