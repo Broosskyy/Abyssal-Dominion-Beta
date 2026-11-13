@@ -745,7 +745,9 @@ func _process(delta: float) -> void:
 	_classic_keyboard_pan(delta)
 	var render_player: Vector2=_visual_actor_pos(sim.player)
 	var goal: Vector2=render_player if camera_locked else camera_anchor
-	if browser_classic and camera_locked:
+	if browser_classic and camera_locked and loading_left<=0.0:
+		# During a region transition, _sync_region() recenters the camera
+		# before the edge-scrolling presentation resumes after loading.
 		# 208901 reference: captain crosses the screen; the map stays still.
 		# Only scroll once a visible safe-area edge is reached. Do NOT change
 		# player world coordinates, waypoint path or ship heading.
