@@ -20,8 +20,46 @@ func run() -> void:
 	# Isometric 48x32 movement: real diagonal world legs, no fake
 	# render-time triangle and no user-selectable movement variants.
 	check(is_equal_approx(SIM.CLASSIC_ISO_DIRECTIONS[0].x/SIM.CLASSIC_ISO_DIRECTIONS[0].y,-1.5),"48x32 slope is retained in the four real movement axes")
-	check(is_equal_approx(SIM.CLASSIC_ISO_LEG_WORLD,36.0),"Classic raster runs on short 3:2 diagonal legs")
+	check(is_equal_approx(SIM.CLASSIC_ISO_LEG_WORLD,32.0),"Classic raster uses 32-world-unit legs with unchanged 3:2 diagonal axes")
+	# Mobile Classic fixes are visual-only: physical touch coordinates and
+	# online world position must NOT scale with the viewport or ship image.
+	check(is_equal_approx(0.62*0.78/0.36,1.3433334),"on a 709px mobile viewport ship becomes ~34 percent larger while islands become ~22 percent smaller")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
+	# Regression: the old Test 338 bearing scorer gets stuck forever
+	# around (75,130) when asked to sail (300,500). Verify every octant,
+	# including shallow, steep and 45-degree angles, reaches exact goals
+	# without generating a 2-leg loop or wandering >36 units off course.
+	sim.set_classic_steering(true)
+	for heading_target: Vector2 in [
+		Vector2(300,500),Vector2(-300,500),
+		Vector2(300,-500),Vector2(-300,-500),
+		Vector2(650,650),Vector2(-650,650),
+		Vector2(650,-650),Vector2(-650,-650),
+		Vector2(700,0),Vector2(-700,0),
+		Vector2(0,700),Vector2(0,-700),
+		Vector2(40,600),Vector2(600,40)
+	]:
+		var trial: Dictionary={"id":0,"pos":Vector2.ZERO,"heading":Vector2.RIGHT,"path":[heading_target]}
+		var max_cross_track: float=0.0
+		var visited_steps: int=0
+		for tick in 1800:
+			if trial.path.is_empty():break
+			sim._move_classic(trial,165.0/30.0,true)
+			visited_steps+=1
+			max_cross_track=maxf(max_cross_track,absf(Vector2(trial.pos).cross(heading_target.normalized())))
+		check(trial.path.is_empty() and Vector2(trial.pos).distance_to(heading_target)<0.1,"all Classic tap directions reach the precise clicked target without oscillation: "+str(heading_target))
+		check(max_cross_track<36.0 and visited_steps<1800,"Classic Bresenham-style path stays within one isometric tile of intended course: "+str(heading_target))
+	# A new tap must discard the partially completed previous physical leg.
+	var retap_probe: Dictionary={"id":0,"pos":Vector2.ZERO,"heading":Vector2.RIGHT,"path":[Vector2(700,0)]}
+	for step in 40:sim._move_classic(retap_probe,165.0/30.0,true)
+	var retap_start: Vector2=retap_probe.pos
+	var new_goal: Vector2=retap_start+Vector2(-250,-400)
+	retap_probe.path=[new_goal]
+	for tick in 900:
+		if retap_probe.path.is_empty():break
+		sim._move_classic(retap_probe,165.0/30.0,true)
+	check(retap_probe.path.is_empty() and Vector2(retap_probe.pos).distance_to(new_goal)<0.1,"a new tap replaces a mid-leg course without stale direction or loops")
+	sim.set_classic_steering(false)
 	var goal:=Vector2(1200,500)
 	check(not sim.classic_steering,"native default uses direct navigation")
 	check(sim.course(goal),"water tap creates a course")
@@ -85,6 +123,8 @@ func run() -> void:
 	check(game._classic_fleet_ready(),"native 2D loads all 23 ship and paint atlases")
 	check(game.sim.classic_steering and game.sim.player.path.back()==destination and game.sim.player.path==course and game.sim.player.pos==Vector2(before.position[0],before.position[1]),"Classic 2D preserves existing physical waypoint path and position while changing only sprite views")
 	check(is_equal_approx(game._actor_visual_length(game.sim.player),native_player_length*game.CLASSIC_HULL_SCALE),"Classic uses a smaller on-screen captain hull without altering game physics")
+	check(is_equal_approx(game.CLASSIC_HULL_SCALE_MOBILE,0.62) and is_equal_approx(game.CLASSIC_MOBILE_CAMERA_FACTOR,0.78),"Android/iOS Classic calibrates ship footprint and world zoom separately from desktop and 3D")
+	check(game.CLASSIC_HULL_SCALE_MOBILE>game.CLASSIC_HULL_SCALE and game.CLASSIC_MOBILE_CAMERA_FACTOR<1.0,"ship increases while background map zooms out on mobile")
 	check(is_equal_approx(game._actor_visual_length(game.sim.npcs[0]),native_npc_length*game.CLASSIC_HULL_SCALE),"Classic scales NPC hulls with the captain instead of dwarfing enemies")
 	# One non-selectable edge camera stays with the real ship motion.
 	var camera_start: Vector2=Vector2(800,500)
