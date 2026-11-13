@@ -56,6 +56,28 @@ func run() -> void:
 		if hold_count>=2:shallow_holds=true
 		last_frame=image
 	check(shallow_holds,"oblique courses naturally hold one ship pose for multiple steps without an animation timer")
+	# Frame-by-frame source: 208901.mp4 3.85s-5.18s, 2340x1080
+	# and ~59.3 recorded fps. Green HP bar triangle has +/-10px amplitude,
+	# 0.436s period and 120px/s horizontal speed ~= 52-54px wavelength.
+	# The measured pixel trace has ~2px change in both axes each frame.
+	var saw_left_peak: Dictionary=VISUALS.classic_measured_step_pose(Vector2.LEFT,13.5,10.0,54.0)
+	var saw_left_trough: Dictionary=VISUALS.classic_measured_step_pose(Vector2.LEFT,40.5,10.0,54.0)
+	check(is_equal_approx(float(saw_left_peak.pixel_x),10.0) and is_equal_approx(float(saw_left_trough.pixel_x),-10.0),"208901 reference yields +/-10 screen pixels and 20px peak-to-peak")
+	check(int(saw_left_peak.frame)==7 and int(saw_left_trough.frame)==5,"westbound triangular visual movement picks NW then SW diagonals from actual step derivative")
+	for direction: Vector2 in [Vector2.RIGHT,Vector2.UP,Vector2.LEFT,Vector2.DOWN]:
+		var last_px: float=float(VISUALS.classic_measured_step_pose(direction,0.0,10.0,54.0).pixel_x)
+		var directions_seen: Dictionary={}
+		for frame_idx in 1+53:
+			var travelled: float=float(frame_idx)*2.0
+			var frame_pose: Dictionary=VISUALS.classic_measured_step_pose(direction,travelled,10.0,54.0)
+			var px: float=float(frame_pose.pixel_x)
+			check(absf(px-last_px)<=2.1 and absf(px)<=10.1 and is_equal_approx(px,float(roundi(px))),"at 60fps a 120px/s ship advances in 1-2 whole-pixel steps, no jump")
+			last_px=px
+			directions_seen[int(frame_pose.frame)]=true
+		check(directions_seen.size()==2,"cardinal sailing alternates exactly two adjacent diagonal sprites")
+	for diagonal: Vector2 in [Vector2(1,-1),Vector2(-1,-1),Vector2(-1,1),Vector2(1,1)]:
+		var exact: Dictionary=VISUALS.classic_measured_step_pose(diagonal,97.0,10.0,54.0)
+		check(is_equal_approx(float(exact.pixel_x),0.0) and int(exact.frame)==VISUALS.heading_four(diagonal),"diagonal sailing retains its real diagonal view with no perpendicular jitter")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
 	var goal:=Vector2(1200,500)
 	check(not sim.classic_steering,"native default uses direct navigation")
@@ -111,7 +133,7 @@ func run() -> void:
 	check(is_equal_approx(game._actor_visual_length(game.sim.npcs[0]),native_npc_length*game.CLASSIC_HULL_SCALE),"Classic scales NPC hulls with the captain instead of dwarfing enemies")
 	# Compare reference 208901 (ship crosses a stable map) against 208902
 	# (permanent camera centering made all real 1px movement invisible).
-	check(not game.classic_camera_follow and game.classic_pixel_strength==0.0,"new Classic defaults to authentic ship-on-map movement without synthetic sway")
+	check(not game.classic_camera_follow and is_equal_approx(game.classic_pixel_strength,10.0) and is_equal_approx(game.classic_pixel_step_world,54.0),"Classic starts with stable map camera and measured 208901 micro-diagonals, not guessed sway")
 	var camera_start: Vector2=Vector2(800,500)
 	var world_view: Vector2=Vector2(1200,700)
 	var within: Vector2=game._classic_edge_camera_goal(camera_start+Vector2(300,170),camera_start,world_view)
