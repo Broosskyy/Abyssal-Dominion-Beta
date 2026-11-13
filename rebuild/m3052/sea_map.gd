@@ -267,8 +267,10 @@ var classic_heading_cache: Dictionary={}
 # The game-world position, wake history, camera and collisions never sway.
 var classic_sailing_visual: Dictionary={}
 # These two values only change the rendered Classic hull, not travel.
-var classic_pixel_strength: float=0.0
-var classic_pixel_step_world: float=32.0
+# A *measured* 4-view triangle-step, captured from Seafight at 1080px high.
+# legacy step_world preference name now describes visible screen wavelength.
+var classic_pixel_strength: float=10.0
+var classic_pixel_step_world: float=54.0
 # Unlike the native modes, reference Seafight allows the captain to
 # traverse the screen before the camera scrolls at the viewport border.
 # This is the main visual difference between 208901 and our 208902.
@@ -1258,15 +1260,21 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 		elif distance>=maxf(60.0,speed*0.8):
 			# Teleports/map transitions cannot become a fake swaying voyage.
 			sailed_world=0.0
-		var pose: Dictionary=VISUALS.classic_pixel_pose(heading,sailed_world,classic_pixel_step_world,classic_pixel_strength)
+		# Ship movement is resolved per delivered screen pixel, not a timer.
+		# The real captain path remains unmodified in every graphics mode.
+		var pixel_scale: float=maxf(get_viewport_rect().size.y/1080.0,0.25)
+		var visible_distance: float=sailed_world*get_canvas_transform().x.length()
+		var pose: Dictionary=VISUALS.classic_measured_step_pose(
+			heading,visible_distance,classic_pixel_strength*pixel_scale,
+			classic_pixel_step_world*pixel_scale)
 		var pixel_x: float=float(pose.pixel_x)
 		if not moving and same_heading and not motion.is_empty():
 			current=int(motion.get("frame",current))
 			pixel_x=float(motion.get("pixel_x",0.0))
 		else:
-			# Natural raster-era motion: only change image when the ACTUAL
-			# heading changes. Synthetic left/right flipping is an optional
-			# comparison mode, disabled by default.
+			# Four-view sprite selection uses the direction of the
+			# measured triangular visible step, not the world waypoint
+			# and not an independent sprite-flip animation.
 			current=int(pose.frame) if classic_pixel_strength>0.0 else VISUALS.heading_four(heading,int(classic_heading_cache.get(id,-1)))
 			if not moving:pixel_x=0.0
 		classic_sailing_visual[id]={
@@ -1277,9 +1285,9 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 	return current
 
 func _classic_actor_visual_offset(actor: Dictionary) -> Vector2:
-	# Reference 208797.mp4: the green ring moves ~10 screen pixels up/down
-	# during ~0.2s NE/SE frame changes on an east/west-bound course.
-	# This is a PERPENDICULAR *display* offset, never a gameplay waypoint.
+	# Frame-tracked reference 208901.mp4: a +/-10px triangle movement at
+	# 1080px height, ~54 visible pixels forward per cycle. Ring and plate
+	# follow the exact same stepping as the ship, physics never does.
 	if not browser_classic or not ship_animations_enabled:return Vector2.ZERO
 	# The captain has id=0 but intentionally no "kind" field.
 	if str(actor.get("kind",""))!="ship" and int(actor.get("id",-1))!=0 and not bool(actor.get("remote_player",false)):return Vector2.ZERO
@@ -4216,7 +4224,7 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Das Schiff läuft pixelweise über die ruhige Seekarte; die Kamera folgt erst an den Bildschirmrändern. Der echte Kurs bleibt direkt.")
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Gemessene Vier-Richtungs-Pixelschritte aus deinem Referenzvideo. Gesamtkurs direkt, Kamera folgt erst am Bildrand.")
 	_note("DATENUPDATE %d · CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
 		if OS.has_feature("web"):
@@ -4233,28 +4241,28 @@ func _open_display() -> void:
 			_note("Classic 2D: pixelgenaue Fahrt über die Karte mit randgesteuerter Kamera. Kein künstliches Wackeln nötig. 2,5D und 3D bleiben unverändert.")
 		if browser_classic:
 			_section("CLASSIC 2D · SCHIFFSBEWEGUNG")
-			_note("Wie im Video 208901: Das Schiff bewegt sich über die Seekarte. Der Hintergrund bleibt zunächst stehen; erst am Rand folgt die Kamera.",Color("a3c9cf"))
+			_note("Gemessen in 208901: Schiff und Auswahlkreis bewegen sich in geraden Pixel-Schritten abwechselnd diagonal. Etwa ±10 px bei 1080p und 54 px pro kompletter Bewegungswelle.",Color("a3c9cf"))
 			var follow_grid=_grid(2)
 			var edge_cam=_action("KLASSISCHE KAMERA · AN" if not classic_camera_follow else "KLASSISCHE KAMERA · AUS",func():_set_classic_camera_follow(false),"tab_on" if not classic_camera_follow else "normal",follow_grid)
 			edge_cam.disabled=not classic_camera_follow
 			var follow_cam=_action("SPIELER ZENTRIEREN · AN" if classic_camera_follow else "SPIELER ZENTRIEREN · AUS",func():_set_classic_camera_follow(true),"tab_on" if classic_camera_follow else "normal",follow_grid)
 			follow_cam.disabled=classic_camera_follow
-			_note("KÜNSTLICHE RUMPELBEWEGUNG · AUS empfohlen (0 px). Nur zum Vergleich aktivierbar.",Color("a3c9cf"))
+			_note("CLASSIC 4-WEGE-SCHRITT · VIDEOREFERENZ: 10 PIXEL. 0 deaktiviert den Effekt nur zum Vergleich.",Color("a3c9cf"))
 			_note("PIXELSTÄRKE · momentan %d px" % roundi(classic_pixel_strength))
 			var pixel_grid=_grid(3)
-			for amount in [0.0,2.0,5.0]:
+			for amount in [0.0,5.0,10.0]:
 				var px: float=amount
 				var selected: bool=is_equal_approx(classic_pixel_strength,px)
-				var btn=_action("0 · ECHT" if px==0.0 else ("%d PIXEL · TEST" % roundi(px)),func():_set_classic_pixel_motion(classic_pixel_step_world,px),"tab_on" if selected else "normal",pixel_grid)
+				var btn=_action("0 · AUS" if px==0.0 else ("%d PIXEL" % roundi(px)),func():_set_classic_pixel_motion(classic_pixel_step_world,px),"tab_on" if selected else "normal",pixel_grid)
 				btn.disabled=selected
-			_note("WECHSEL-TEMPO · kürzere Schritte wechseln die Schiffsansicht häufiger")
+			_note("SCHRITTWEITE · Video 208901 entspricht 54 px je kompletter Dreieckbewegung")
 			var pace_grid=_grid(3)
-			for option in [["SCHNELL",20.0],["NORMAL",32.0],["RUHIG",48.0]]:
+			for option in [["KURZ",42.0],["VIDEO 901",54.0],["LANG",72.0]]:
 				var tempo: float=float(option[1])
 				var active: bool=is_equal_approx(classic_pixel_step_world,tempo)
 				var pace_btn=_action(str(option[0]),func():_set_classic_pixel_motion(tempo,classic_pixel_strength),"tab_on" if active else "normal",pace_grid)
 				pace_btn.disabled=active
-			_note("Schiff, Ring und Name bewegen sich zusammen. Die Änderung gilt sofort und bleibt gespeichert.",Color("a3c9cf"))
+			_note("Schiff, Ring und Name folgen derselben Diagonalphase. Kurs und Multiplayer-Daten bleiben unverändert.",Color("a3c9cf"))
 		_section("SCHIFFE & SEEKARTE")
 		var ship_grid=_grid(2)
 		_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
@@ -4954,11 +4962,10 @@ func _load_display() -> void:
 	ambient_motion_enabled=bool(data.get("ambient_motion_enabled",true))
 	ship_animations_enabled=bool(data.get("ship_animations_enabled",true))
 	wake_effects_enabled=bool(data.get("wake_effects_enabled",true))
-	# Prior builds stored synthetic swaying as the default. The 208901
-	# comparison demonstrates REAL pixel motion across a stationary map.
-	# Restore true non-wobbling Classic as the default on this migration.
-	classic_pixel_strength=0.0 if int(data.get("classic_camera_revision",0))<3 else clampf(float(data.get("classic_pixel_strength",0.0)),0.0,8.0)
-	classic_pixel_step_world=clampf(float(data.get("classic_pixel_step_world",32.0)),12.0,80.0)
+	# Revision 4 replaces guessed sway (and the disabled Test 97 effect)
+	# with the +/-10px, 54px wavelength traced frame-by-frame in 208901.
+	classic_pixel_strength=10.0 if int(data.get("classic_camera_revision",0))<4 else clampf(float(data.get("classic_pixel_strength",10.0)),0.0,20.0)
+	classic_pixel_step_world=54.0 if int(data.get("classic_camera_revision",0))<4 else clampf(float(data.get("classic_pixel_step_world",54.0)),20.0,160.0)
 	classic_camera_follow=bool(data.get("classic_camera_follow",false))
 	# All old true/false fullscreen preferences migrate to balanced windows.
 	menu_layout=str(data.get("menu_layout","balanced"))
@@ -4977,7 +4984,7 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ambient_motion_enabled":ambient_motion_enabled,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"classic_pixel_strength":classic_pixel_strength,"classic_pixel_step_world":classic_pixel_step_world,"classic_pixel_footprint_revision":2,"classic_camera_revision":3,"classic_camera_follow":classic_camera_follow,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
+		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ambient_motion_enabled":ambient_motion_enabled,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"classic_pixel_strength":classic_pixel_strength,"classic_pixel_step_world":classic_pixel_step_world,"classic_pixel_footprint_revision":2,"classic_camera_revision":4,"classic_camera_follow":classic_camera_follow,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
 		file.close()
 
 ## Browser-only render budget: no effect on collision, AI ticks, camera,
@@ -5085,8 +5092,8 @@ func _set_classic_camera_follow(follow: bool) -> void:
 
 func _set_classic_pixel_motion(step_world: float,drift_px: float) -> void:
 	# Classic pixel art only: affect neither ship world position nor course.
-	classic_pixel_step_world=clampf(step_world,12.0,80.0)
-	classic_pixel_strength=clampf(drift_px,0.0,8.0)
+	classic_pixel_step_world=clampf(step_world,20.0,160.0)
+	classic_pixel_strength=clampf(drift_px,0.0,20.0)
 	classic_sailing_visual.clear()
 	classic_heading_cache.clear()
 	_persist_display_preferences()
@@ -5125,8 +5132,8 @@ func _reset_display_preferences() -> void:
 	_apply_ambient_motion()
 	ship_animations_enabled=true
 	wake_effects_enabled=true
-	classic_pixel_strength=0.0
-	classic_pixel_step_world=32.0
+	classic_pixel_strength=10.0
+	classic_pixel_step_world=54.0
 	classic_camera_follow=false
 	classic_sailing_visual.clear()
 	menu_layout="balanced"
