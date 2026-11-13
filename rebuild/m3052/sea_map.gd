@@ -262,10 +262,9 @@ var classic_atlases: Dictionary={}
 var classic_geometry: Dictionary={}
 var classic_monster_bottoms: Dictionary={}
 var classic_heading_cache: Dictionary={}
-# Rendering-only per-ship progress for the old Seafight left/right visual
-# pendulum. Never applied to sim.player.pos, actor.heading or online waypoints.
+# Only the visible Classic hull steps a few screen pixels left/right.
+# World position, wake, camera, nameplate, rings and collision never sway.
 var classic_sailing_visual: Dictionary={}
-const CLASSIC_LEFT_RIGHT_CYCLE := 1.4
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
 # 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
@@ -1213,71 +1212,82 @@ func _classic_atlas_key(actor: Dictionary) -> String:
 
 func _classic_frame_for_actor(actor: Dictionary) -> int:
 	var id: int=int(actor.get("id",-1))
-	var before: int=int(classic_heading_cache.get(id,-1))
 	var heading: Vector2=actor.get("heading",Vector2.RIGHT)
-	var current: int=VISUALS.heading_four(heading,before)
-	# Historical left/right effect: a ship travelling horizontally cycles
-	# between the two oblique four-view images. Its *world* motion follows
-	# its actual (possibly perfectly horizontal) route without any detour.
+	var current: int=VISUALS.heading_four(heading,int(classic_heading_cache.get(id,-1)))
 	if actor.has("pos"):
-		var position: Vector2=actor.get("pos",Vector2.ZERO)
+		var position: Vector2=_visual_actor_pos(actor)
 		var motion: Dictionary=classic_sailing_visual.get(id,{})
-		var old_position: Vector2=motion.get("position",position)
-		var distance: float=position.distance_to(old_position)
+		var last_position: Vector2=motion.get("position",position)
+		var distance: float=position.distance_to(last_position)
 		var speed: float=maxf(20.0,float(actor.get("speed",165.0)))
-		var progress: float=float(motion.get("sail_seconds",0.0))
-		var last_moved: float=float(motion.get("last_moved",-1000.0))
-		if distance>0.03 and distance<maxf(60.0,speed*0.8):
-			# Distance, rather than raw frame count, drives the animation:
-			# standing still freezes the pose and frame rate cannot affect it.
-			progress+=distance/speed
-			last_moved=elapsed
-		if elapsed-last_moved<0.16:
-			current=VISUALS.classic_sailing_frame(heading,fposmod(progress,CLASSIC_LEFT_RIGHT_CYCLE)/CLASSIC_LEFT_RIGHT_CYCLE)
-		elif not motion.is_empty() and Vector2(motion.get("heading",heading)).distance_squared_to(heading)<0.001:
-			# Do not snap into a different facing as soon as the ship stops.
+		var sailed_world: float=float(motion.get("sailed_world",0.0))
+		var last_heading: Vector2=motion.get("heading",heading)
+		var same_heading: bool=last_heading.distance_squared_to(heading)<0.001
+		if not motion.is_empty() and last_heading.normalized().dot(heading.normalized())<0.9:
+			# Immediate response to a new tap; no turn circle.
+			sailed_world=0.0
+		var moving: bool=distance>0.03 and distance<maxf(60.0,speed*0.8)
+		if moving:
+			# Measured interpolated travel, not elapsed time or FPS.
+			# A stopped ship freezes both its final pose and pixel offset.
+			sailed_world+=distance
+		elif distance>=maxf(60.0,speed*0.8):
+			# Teleports/map transitions cannot become a fake swaying voyage.
+			sailed_world=0.0
+		var pose: Dictionary=VISUALS.classic_pixel_pose(heading,sailed_world)
+		var pixel_x: float=float(pose.pixel_x)
+		if not moving and same_heading and not motion.is_empty():
 			current=int(motion.get("frame",current))
+			pixel_x=float(motion.get("pixel_x",0.0))
 		else:
-			current=VISUALS.heading_four(heading,-1)
+			current=int(pose.frame)
+			if not moving:pixel_x=0.0
 		classic_sailing_visual[id]={
-			"position":position,"sail_seconds":progress,"last_moved":last_moved,
-			"heading":heading,"frame":current,
+			"position":position,"sailed_world":sailed_world,
+			"heading":heading,"frame":current,"pixel_x":pixel_x,
 		}
 	classic_heading_cache[id]=current
 	return current
 
+func _classic_hull_pixel_offset(actor: Dictionary) -> Vector2:
+	# A SCREEN-space correction affects the ship graphic only. The
+	# selection ring, HP plate, camera and waterline keep their true center.
+	var pose: Dictionary=classic_sailing_visual.get(int(actor.get("id",-1)),{})
+	var px: float=float(pose.get("pixel_x",0.0))
+	var canvas_zoom: float=maxf(get_canvas_transform().x.length(),0.05)
+	return Vector2(px/canvas_zoom,0.0)
+
 func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
+	# Resolve one state for this ship per draw: frame and X offset refer to
+	# exactly the same sailed-distance sample, without a second animation.
+	var heading_index: int=_classic_frame_for_actor(actor)
+	var hull_point: Vector2=point+_classic_hull_pixel_offset(actor)
 	var key: String=_classic_atlas_key(actor)
 	var atlas: Texture2D=classic_atlases.get(key) as Texture2D
 	if atlas!=null:
 		var entry: Dictionary=classic_geometry.get(key,{})
 		if not entry.is_empty():
-			var frame: Dictionary=entry.frames[_classic_frame_for_actor(actor)]
+			var frame: Dictionary=entry.frames[heading_index]
 			var spec: Dictionary=VISUALS.geometry(frame,length)
 			var target: Rect2=spec.destination
-			target.position+=point
+			target.position+=hull_point
 			draw_texture_rect_region(atlas,target,spec.source)
 			return
-		# The eight baked frames stay available for future styles. Classic
-		# selects only NE/NW/SW/SE; actual ship position follows its direct
-		# simulated course, independently of how the hull is drawn.
-		# Camera perspective is ALREADY baked for each heading:
-		# never rotate 2D atlas frames or the sails become inaccurate.
-		var heading_index: int=_classic_frame_for_actor(actor)
+		# Camera perspective is baked into each of the eight GLB images.
+		# Do not rotate an atlas sprite; only select a diagonal facing.
 		var frame_width: float=float(atlas.get_width())/float(CLASSIC_ATLAS_COLUMNS)
 		var frame_height: float=float(atlas.get_height())
 		var side: float=length*1.38
-		var target: Rect2=Rect2(point-Vector2(side,side)*.5,Vector2(side,side))
+		var target: Rect2=Rect2(hull_point-Vector2(side,side)*.5,Vector2(side,side))
 		var source: Rect2=Rect2(float(heading_index)*frame_width,0.0,frame_width,frame_height)
 		draw_texture_rect_region(atlas,target,source)
 		return
-	# Editor/offline fallback only. Production browser CI rejects any missing
-	# baked atlas; it never substitutes hand-drawn hulls for the actual GLBs.
+	# Editor fallback only. Production CI requires the baked ship atlas.
 	var art: Texture2D=_classic_ship_texture(actor)
 	if art==null:return
 	var h: float=length*.667
-	var classic_angle: float=float({1:-PI*.25,7:-PI*.75,5:PI*.75,3:PI*.25}.get(_classic_frame_for_actor(actor),heading.angle()))
-	draw_set_transform(point,classic_angle,Vector2.ONE)
+	var classic_angle: float=float({1:-PI*.25,7:-PI*.75,5:PI*.75,3:PI*.25}.get(heading_index,heading.angle()))
+	draw_set_transform(hull_point,classic_angle,Vector2.ONE)
 	draw_texture_rect(art,Rect2(Vector2(-length*.5,-h*.5),Vector2(length,h)),false)
 	draw_set_transform(Vector2.ZERO)
 
@@ -4159,7 +4169,7 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Seafight-artiger Links-rechts-Ansichtswechsel während der Fahrt, ohne künstliche Umwege. 2,5D / 3D: normale direkte Steuerung mit 3D-Grafik.")
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Das Schiff selbst macht kleine pixelgenaue Links/rechts-Schritte; Kurs, Name und Ring bleiben stabil. 2,5D / 3D fahren unverändert direkt.")
 	_note("DATENUPDATE %d · CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
 		if OS.has_feature("web"):
@@ -4173,7 +4183,7 @@ func _open_display() -> void:
 				var key: String=str(option[0])
 				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 				choice.disabled=render_mode==key
-			_note("Classic 2D: vier 2D-Ansichten; während gerader Fahrt abwechselnd links/rechts geneigt wie bei altem Seafight. Das Schiff selbst fährt ohne Zickzack direkt zum Ziel. Alle Modi benutzen denselben Kurs; beim Umschalten bleibt er erhalten.")
+			_note("Classic 2D: vier schräge Schiffsgrafiken mit kleinen Links/rechts-Pixelschritten am Rumpf. Die eigentliche Fahrt bleibt direkt, ohne zusätzliche Zickzack-Wegpunkte. 2,5D und 3D sind unverändert.")
 		_section("SCHIFFE & SEEKARTE")
 		var ship_grid=_grid(2)
 		_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
@@ -4305,7 +4315,7 @@ func _open_menu_hub() -> void:
 
 func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
-	_note("Browser: Classic 2D mit Links-rechts-Wechsel der vier Schiffsansichten, echte Fahrt ohne seitliche Umwege. App/Desktop: Classic 2D, 2,5D und 3D benutzen identische Schiffskurse. Gleiche Schiffswerte und gemeinsamer Online-Spielstand.",Color("9be4df"))
+	_note("Browser: Der sichtbare Classic-Schiffsrumpf macht wenige Links/rechts-Bildschirmpixel-Schritte während echter direkter Fahrt. App/Desktop: Alle Grafikmodi behalten dieselben sicheren Schiffskurse und Online-Spielwerte.",Color("9be4df"))
 	if not OS.has_feature("web"):
 		var modes=_grid(3)
 		for option in [["classic","CLASSIC 2D"],["hybrid","2,5D"],["3d","3D"]]:
