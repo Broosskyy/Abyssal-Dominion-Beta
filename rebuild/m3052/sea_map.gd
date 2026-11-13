@@ -257,7 +257,9 @@ const VFX_DEFAULT_FLAGS := {"enabled":true,"flight":true,"muzzle":true,"impact":
 var vfx_flags: Dictionary = VFX_DEFAULT_FLAGS.duplicate(true)
 var vfx_intensity := 1.35
 # Classic is mandatory on Web and selectable on native. It uses no 3D stage.
-var browser_classic := OS.has_feature("web")
+# Browser, Android and iOS initially share one Classic 2D renderer.
+# Native 2.5D/3D remain selectable, but mobile's first launch chooses 2D.
+var browser_classic := OS.has_feature("web") or OS.has_feature("mobile")
 var classic_atlases: Dictionary={}
 var classic_geometry: Dictionary={}
 var classic_monster_bottoms: Dictionary={}
@@ -304,7 +306,7 @@ var ring_last_target := -1
 var ring_target_acquired_at := -100.0
 var plate_overlay: Control
 var mesh_layer
-var render_mode := "hybrid"
+var render_mode := "classic" if OS.has_feature("web") or OS.has_feature("mobile") else "hybrid"
 # 1 shaded starter, 1 untouched Corsair test, ten variants of one shared Corsair GLB.
 const ELITE_V2_NAMES := ["Obsidian","Bordeaux","Tiefblau","Waldgrün","Violett","Petrol","Elfenbein","Stahlblau","Karmesin","Knochen"]
 const ELITE_V2_ACCENTS := [Color("caa668"),Color("ce7b8f"),Color("669dd7"),Color("6bb28a"),Color("b392dc"),Color("5fc3b0"),Color("e1cda0"),Color("87aeda"),Color("e06f70"),Color("d5c9b5")]
@@ -338,7 +340,9 @@ func _ready() -> void:
 	_load_progress()
 	_load_staff()
 	_load_display()
-	# Browser is always Classic. Android/desktop use the saved graphics mode.
+	# Browser always uses Classic; Android/iOS start in the SAME Classic
+	# mode and four-direction physical steering, unless the captain later
+	# explicitly changes native graphics through the settings menu.
 	# Steering must be configured before any sea-chart route is created.
 	sim.set_classic_steering(browser_classic)
 	if browser_classic:_load_classic_atlases()
@@ -4160,7 +4164,7 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Gemessene Vier-Richtungs-Pixelschritte aus deinem Referenzvideo. Gesamtkurs direkt, Kamera folgt erst am Bildrand.")
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Dieselbe echte Vier-Wege-Rasterfahrt in Browser, Android und iOS. Schiffsansicht folgt dem gefahrenen Diagonalschritt; 2,5D/3D bleiben wählbar.")
 	_note("DATENUPDATE %d · CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
 		if OS.has_feature("web"):
@@ -4174,7 +4178,7 @@ func _open_display() -> void:
 				var key: String=str(option[0])
 				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 				choice.disabled=render_mode==key
-			_note("Classic 2D: pixelgenaue Fahrt über die Karte mit randgesteuerter Kamera. Kein künstliches Wackeln nötig. 2,5D und 3D bleiben unverändert.")
+			_note("Classic 2D: echte kurze Diagonalschritte auf der Seekarte, identisch auf Browser, Android und iOS. 2,5D und 3D fahren unverändert.")
 		if browser_classic:
 			_section("CLASSIC 2D · EINHEITLICHE FAHRT")
 			_note("Eine feste Classic-Fahrt: Schiff, Ring und Name folgen denselben kleinen Diagonalschritten, die Seekarte scrollt erst am Rand. Kein separater Bewegungsmodus.",Color("a3c9cf"))
@@ -4866,8 +4870,12 @@ func _load_display() -> void:
 	hud_size=clampi(int(data.get("hud_size",1)),0,2)
 	journal_visible=bool(data.get("journal_visible",true))
 	camera_pad_visible=bool(data.get("camera_pad_visible",true))
-	render_mode="classic" if OS.has_feature("web") else str(data.get("render_mode","hybrid"))
-	if not render_mode in ["classic","hybrid","3d"]:render_mode="hybrid"
+	# Migrate historical native-app preferences once: prior releases
+	# defaulted to Hybrid and may have silently stored it. The first new
+	# mobile launch must use the same Classic 2D as the browser.
+	var prefer_mobile_classic: bool=OS.has_feature("mobile") and int(data.get("mobile_classic_revision",0))<1
+	render_mode="classic" if OS.has_feature("web") or prefer_mobile_classic else str(data.get("render_mode","classic" if OS.has_feature("mobile") else "hybrid"))
+	if not render_mode in ["classic","hybrid","3d"]:render_mode="classic" if OS.has_feature("mobile") else "hybrid"
 	browser_classic=render_mode=="classic"
 	projectile_visual_count=COMBAT_FX.visual_count(int(data.get("projectile_visual_count",3)))
 	var stored_flags: Variant=data.get("vfx_flags",{})
@@ -4897,7 +4905,7 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ambient_motion_enabled":ambient_motion_enabled,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
+		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"mobile_classic_revision":1,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ambient_motion_enabled":ambient_motion_enabled,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
 		file.close()
 
 ## Browser-only render budget: no effect on collision, AI ticks, camera,
