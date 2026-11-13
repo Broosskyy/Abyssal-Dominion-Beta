@@ -16,8 +16,8 @@ static func heading_column(heading: Vector2,previous: int=-1) -> int:
 	var sector=posmod(roundi((heading.angle()+PI*0.25)/(PI*0.5)),4)
 	return CLOCKWISE_TO_ATLAS[sector]
 
-## The original four-view Classic look is *visual only*. Select one of
-## the four diagonal baked views, never change the physical ship course.
+## Classic 2D uses four diagonal atlas views for a pixel-stepped hull
+## while the simulated ship follows the true direct course.
 ## Eight-view atlas order is N, NE, E, SE, S, SW, W, NW.
 const CLASSIC_FOUR_VIEW_ATLAS := [1,7,5,3] # NE, NW, SW, SE
 const CLASSIC_CLOCKWISE_ATLAS := [1,3,5,7] # NE, SE, SW, NW
@@ -26,23 +26,46 @@ static func heading_four(heading: Vector2,previous: int=-1) -> int:
 	var prior_column: int=CLASSIC_FOUR_VIEW_ATLAS.find(previous)
 	return CLASSIC_FOUR_VIEW_ATLAS[heading_column(heading,prior_column)]
 
-## Historical Classic 2D "links / rechts" sailing: when the captain sails
-## straight west/east/north/south, the old ship art alternates between
-## the two adjacent oblique facings. The ACTOR NEVER zigzags; only its
-## 4-frame drawing changes. A diagonal course holds its single facing.
-## phase is distance sailed / nominal speed modulo one visual cycle.
-static func classic_sailing_frame(heading: Vector2,phase: float) -> int:
-	if heading.length_squared()<0.0001:return CLASSIC_FOUR_VIEW_ATLAS[0]
+## Legacy four-view SeaBattle/Seafight-style PIXEL movement.
+## The route is unchanged and the atlas is NEVER rotated.
+## The drawn hull alone takes a few pixel-sized lateral steps as the player
+## sails. Unlike a sinusoidal sway or a 1.4 s pendulum, the frame is chosen
+## with digital error diffusion against the desired course (similar to
+## rasterizing a straight line with only four possible diagonal directions).
+## 32 world units at the normal 165 wu/s captain speed = ~0.19 seconds.
+## Exact diagonals hold one pose; oblique headings naturally hold longer.
+const CLASSIC_PIXEL_STEP_WORLD := 32.0
+const CLASSIC_HULL_DRIFT_PX := 3.0
+
+static func classic_pixel_pose(heading: Vector2,sailed_world: float) -> Dictionary:
+	if heading.length_squared()<0.0001:
+		return {"frame":CLASSIC_FOUR_VIEW_ATLAS[0],"pixel_x":0.0}
 	var quarter: float=PI*.5
-	var rotated: float=fposmod(heading.angle()+PI*.25,TAU)
-	var sector: int=clampi(int(floor(rotated/quarter)),0,3)
-	var toward_next: float=(rotated-float(sector)*quarter)/quarter
-	var first: int=CLASSIC_CLOCKWISE_ATLAS[(sector+0)%4]
+	var angle: float=fposmod(heading.angle()+PI*.25,TAU)
+	var sector: int=clampi(floori(angle/quarter),0,3)
+	var share: float=fposmod(angle,quarter)/quarter
+	var first: int=CLASSIC_CLOCKWISE_ATLAS[sector]
 	var second: int=CLASSIC_CLOCKWISE_ATLAS[(sector+1)%4]
-	# Preserve exact diagonal headings instead of injecting fake visual turns.
-	if toward_next<0.08:return first
-	if toward_next>0.92:return second
-	return first if fposmod(phase,1.0)<1.0-toward_next else second
+	if share<0.025:return {"frame":first,"pixel_x":0.0}
+	if share>0.975:return {"frame":second,"pixel_x":0.0}
+	var progress: float=maxf(sailed_world,0.0)/CLASSIC_PIXEL_STEP_WORLD
+	var leg: int=floori(progress)
+	var part: float=progress-float(leg)
+	# Round an accumulated pixel-line error, instead of flipping to
+	# a sprite every X seconds regardless of the destination.
+	var before: int=floori(float(leg)*share+0.5)
+	var after: int=floori(float(leg+1)*share+0.5)
+	var second_facing: bool=after>before
+	var correction: float=float(before)+(part if second_facing else 0.0)-(float(leg)+part)*share
+	var strength: float=sin(share*PI)
+	# Three actual SCREEN pixels at most, snapped to full pixels.
+	# This is not a world-coordinate sidestep; the ring, camera and
+	# nameplate stay on the unchanged simulated position.
+	var offset_px: float=float(roundi(clampf(
+		(correction-0.25*strength*strength)*8.0*strength,
+		-CLASSIC_HULL_DRIFT_PX,CLASSIC_HULL_DRIFT_PX
+	)))
+	return {"frame":second if second_facing else first,"pixel_x":offset_px}
 
 static func heading_eight(heading: Vector2,previous: int=-1) -> int:
 	if heading.length_squared()<0.0001:return previous if previous>=0 and previous<8 else 0
