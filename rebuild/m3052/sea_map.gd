@@ -265,6 +265,9 @@ var classic_heading_cache: Dictionary={}
 # Only the visible Classic hull steps a few screen pixels left/right.
 # World position, wake, camera, nameplate, rings and collision never sway.
 var classic_sailing_visual: Dictionary={}
+# These two values only change the rendered Classic hull, not travel.
+var classic_pixel_strength: float=3.0
+var classic_pixel_step_world: float=32.0
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
 # 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
@@ -1234,7 +1237,7 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 		elif distance>=maxf(60.0,speed*0.8):
 			# Teleports/map transitions cannot become a fake swaying voyage.
 			sailed_world=0.0
-		var pose: Dictionary=VISUALS.classic_pixel_pose(heading,sailed_world)
+		var pose: Dictionary=VISUALS.classic_pixel_pose(heading,sailed_world,classic_pixel_step_world,classic_pixel_strength)
 		var pixel_x: float=float(pose.pixel_x)
 		if not moving and same_heading and not motion.is_empty():
 			current=int(motion.get("frame",current))
@@ -4184,6 +4187,24 @@ func _open_display() -> void:
 				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 				choice.disabled=render_mode==key
 			_note("Classic 2D: vier schräge Schiffsgrafiken mit kleinen Links/rechts-Pixelschritten am Rumpf. Die eigentliche Fahrt bleibt direkt, ohne zusätzliche Zickzack-Wegpunkte. 2,5D und 3D sind unverändert.")
+		if browser_classic:
+			_section("CLASSIC 2D · SCHIFFSBEWEGUNG")
+			_note("Nur der gezeichnete Rumpf bewegt sich links/rechts. Die echte Route, Kamera, Trefferzone und Namensanzeige bleiben unverändert.",Color("a3c9cf"))
+			_note("PIXELSTÄRKE · momentan %d px" % roundi(classic_pixel_strength))
+			var pixel_grid=_grid(3)
+			for amount in [2.0,3.0,5.0]:
+				var px: float=amount
+				var selected: bool=is_equal_approx(classic_pixel_strength,px)
+				var btn=_action("%d PIXEL" % roundi(px),func():_set_classic_pixel_motion(classic_pixel_step_world,px),"tab_on" if selected else "normal",pixel_grid)
+				btn.disabled=selected
+			_note("WECHSEL-TEMPO · kürzere Schritte wechseln die Schiffsansicht häufiger")
+			var pace_grid=_grid(3)
+			for option in [["SCHNELL",20.0],["NORMAL",32.0],["RUHIG",48.0]]:
+				var tempo: float=float(option[1])
+				var active: bool=is_equal_approx(classic_pixel_step_world,tempo)
+				var pace_btn=_action(str(option[0]),func():_set_classic_pixel_motion(tempo,classic_pixel_strength),"tab_on" if active else "normal",pace_grid)
+				pace_btn.disabled=active
+			_note("Die Änderung gilt sofort und wird gespeichert. Dafür ist kein neuer Build nötig.",Color("a3c9cf"))
 		_section("SCHIFFE & SEEKARTE")
 		var ship_grid=_grid(2)
 		_action("SCHIFFSBEWEGUNG: "+("EIN" if ship_animations_enabled else "AUS"),func():_set_ship_visual_toggle("motion"),"tab_on" if ship_animations_enabled else "normal",ship_grid)
@@ -4881,6 +4902,8 @@ func _load_display() -> void:
 	ambient_motion_enabled=bool(data.get("ambient_motion_enabled",true))
 	ship_animations_enabled=bool(data.get("ship_animations_enabled",true))
 	wake_effects_enabled=bool(data.get("wake_effects_enabled",true))
+	classic_pixel_strength=clampf(float(data.get("classic_pixel_strength",3.0)),0.0,8.0)
+	classic_pixel_step_world=clampf(float(data.get("classic_pixel_step_world",32.0)),12.0,80.0)
 	# All old true/false fullscreen preferences migrate to balanced windows.
 	menu_layout=str(data.get("menu_layout","balanced"))
 	if not menu_layout in ["compact","balanced","large"]:menu_layout="balanced"
@@ -4898,7 +4921,7 @@ func _cycle_render_mode() -> void:
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
 	if file!=null:
-		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ambient_motion_enabled":ambient_motion_enabled,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
+		file.store_string(JSON.stringify({"quick_pages":quick_pages,"quick_page":quick_page,"hud_size":hud_size,"journal_visible":journal_visible,"camera_pad_visible":camera_pad_visible,"render_mode":render_mode,"web_fast_mode":web_fast_mode,"projectile_visual_count":projectile_visual_count,"vfx_flags":vfx_flags,"vfx_intensity":vfx_intensity,"ambient_motion_enabled":ambient_motion_enabled,"ship_animations_enabled":ship_animations_enabled,"wake_effects_enabled":wake_effects_enabled,"classic_pixel_strength":classic_pixel_strength,"classic_pixel_step_world":classic_pixel_step_world,"menu_layout":menu_layout,"combat_input_revision":2,"double_tap_attack_enabled":double_tap_attack_enabled}))
 		file.close()
 
 ## Browser-only render budget: no effect on collision, AI ticks, camera,
@@ -4991,6 +5014,16 @@ func _wallet_feedback(values: Array) -> void:
 			wallet_tweens[index]=pulse
 	wallet_previous.assign(values)
 
+func _set_classic_pixel_motion(step_world: float,drift_px: float) -> void:
+	# Classic pixel art only: affect neither ship world position nor course.
+	classic_pixel_step_world=clampf(step_world,12.0,80.0)
+	classic_pixel_strength=clampf(drift_px,0.0,8.0)
+	classic_sailing_visual.clear()
+	classic_heading_cache.clear()
+	_persist_display_preferences()
+	if modal!=null and modal.visible and modal_kind=="Anzeige":_open_modal("Anzeige")
+	queue_redraw()
+
 func _set_ship_visual_toggle(which: String) -> void:
 	if which=="motion":ship_animations_enabled=not ship_animations_enabled
 	elif which=="wake":wake_effects_enabled=not wake_effects_enabled
@@ -5023,6 +5056,9 @@ func _reset_display_preferences() -> void:
 	_apply_ambient_motion()
 	ship_animations_enabled=true
 	wake_effects_enabled=true
+	classic_pixel_strength=3.0
+	classic_pixel_step_world=32.0
+	classic_sailing_visual.clear()
 	menu_layout="balanced"
 	double_tap_attack_enabled=false
 	_reset_enemy_tap()
