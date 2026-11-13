@@ -28,8 +28,9 @@ static func heading_four(heading: Vector2,previous: int=-1) -> int:
 
 ## Legacy four-view SeaBattle/Seafight-style PIXEL movement.
 ## The route is unchanged and the atlas is NEVER rotated.
-## The drawn hull alone takes a few pixel-sized lateral steps as the player
-## sails. Unlike a sinusoidal sway or a 1.4 s pendulum, the frame is chosen
+## The whole drawn ship footprint (hull/ring/labels) follows tiny screen-
+## pixel-wide steps PERPENDICULAR to the course. Unlike a sine timer or a
+## 1.4 s pendulum, the frame is chosen
 ## with digital error diffusion against the desired course (similar to
 ## rasterizing a straight line with only four possible diagonal directions).
 ## 32 world units at the normal 165 wu/s captain speed = ~0.19 seconds.
@@ -60,11 +61,12 @@ static func classic_pixel_pose(heading: Vector2,sailed_world: float,step_world: 
 	var second_facing: bool=after>before
 	var correction: float=float(before)+(part if second_facing else 0.0)-(float(leg)+part)*share
 	var strength: float=sin(share*PI)
-	# Three actual SCREEN pixels at most, snapped to full pixels.
-	# This is not a world-coordinate sidestep; the ring, camera and
-	# nameplate stay on the unchanged simulated position.
+	# Snapped pixel correction shared with hull, ring and labels.
+	# Video 208797 has about ten pixels of full ring movement per
+	# NE/SE alternation. A 5px amplitude on each side reproduces that
+	# observed visual magnitude without touching gameplay positions.
 	var offset_px: float=float(roundi(clampf(
-		(correction-0.25*strength*strength)*8.0*strength*(drift_px/CLASSIC_HULL_DRIFT_PX),
+		(correction-0.25*strength*strength)*13.0*strength*(drift_px/CLASSIC_HULL_DRIFT_PX),
 		-drift_px,drift_px
 	)))
 	return {"frame":second if second_facing else first,"pixel_x":offset_px}
