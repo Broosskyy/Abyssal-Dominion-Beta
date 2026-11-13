@@ -140,7 +140,7 @@ func run() -> void:
 		max_probe_y=maxf(max_probe_y,motion_probe.pos.y)
 		var rendered: Vector2=game._classic_actor_render_pos(motion_probe)
 		var real: Vector2=game._visual_actor_pos(motion_probe)
-		var rounded_delta: Vector2=game.get_canvas_transform()*(rendered-real)
+		var rounded_delta: Vector2=game.get_canvas_transform()*rendered-game.get_canvas_transform()*real
 		check(absf(rounded_delta.x)<=0.55 and absf(rounded_delta.y)<=0.55,"Classic render uses TRUE ship world position, with <=half pixel rounding only")
 	check(shown.has(1) and shown.has(3) and max_probe_y-min_probe_y>=15.0,"one 4-way controller moves the real NPC through alternating diagonal legs")
 	check(game.camera.position==camera_before,"drawing real isometric ship steps never invents a camera motion mode")
