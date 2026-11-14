@@ -1962,7 +1962,7 @@ func _build_ui() -> void:
 	render_toggle=_button(ui,"GRAFIK: 2D / 3D",_cycle_render_mode,"normal")
 	render_toggle.name="GraphicsModeToggle"
 	render_toggle.tooltip_text="Browser: nur Classic 2D. App: Classic 2D oder echtes 3D. Der Schiffskurs bleibt derselbe."
-	render_toggle.add_theme_font_size_override("font_size",10)
+	render_toggle.add_theme_font_size_override("font_size",11)
 	if OS.has_feature("web"):render_toggle.hide()
 	attack=_orb(ui,"Feuer ein/aus",extra_icons.cannon_action,_toggle_fire,"FEUER");attack.name="FireButton"
 	attack.set("hero",true)
@@ -2159,7 +2159,8 @@ func _layout() -> void:
 	_place(target_panel,left,target_y,target_w,card_h)
 	_place(target_portrait,6,6,card_h-12,card_h-12)
 	var tx=card_h
-	_place(target_clear,target_w-46,4,40,32)
+	# Finger-sized cancel, always separate from target art and stats.
+	_place(target_clear,target_w-50,4,44,44)
 	_place(target_name,tx,3,target_w-tx-52,18)
 	_place(target_hp,tx,22,target_w-tx-51,8)
 	_place(target_shield,tx,32,target_w-tx-51,6)
@@ -2175,12 +2176,14 @@ func _layout() -> void:
 	var mx=s.x-mw-20
 	var my=map_top
 	_place(chart_mini,mx,my,mw,mh)
-	var z=32.0 if compact else 36.0
+	# Zoom, center and settings buttons used to be only 32px on
+	# landscape phones; 44px keeps all four comfortable to tap.
+	var z=44.0 if mobile_hud else 40.0
 	_place(zoom_out,mx-z*.3,my-z*.3,z,z)
 	_place(zoom_in,mx+mw-z*.7,my-z*.3,z,z)
 	_place(center_button,mx-z*.3,my+mh-z*.7,z,z)
 	_place(settings_button,mx+mw-z*.7,my+mh-z*.7,z,z)
-	_place(render_toggle,mx-122.0,my+mh-32.0,100.0,30.0)
+	_place(render_toggle,mx-122.0,my+mh-38.0,100.0,44.0)
 	var pad=92.0 if compact else 104.0
 	_place(camera_pad,12,s.y-pad-12,pad,pad)
 	camera_pad.visible=camera_pad_visible
@@ -2241,14 +2244,19 @@ func _layout() -> void:
 	var head=42.0 if modal_kind in ["Munition","Verbrauch"] else (46.0 if height<420 else 52.0)
 	modal.header=head
 	var title_w=width-150 if modal_kind in ["Munition","Verbrauch"] else clampf(font.get_string_size(modal_title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,21).x+70,minf(150,width-170),width-170)
-	modal.ribbon=Rect2(94,3,title_w,head-6) if modal_kind in ["Munition","Verbrauch"] else Rect2((width-title_w)*.5,8,title_w,head-14)
+	# Keep the long menu title clear of both the back and close hitboxes,
+	# especially in a narrow portrait window.
+	var ribbon_x: float=94.0 if modal_kind in ["Munition","Verbrauch"] else clampf((width-title_w)*.5,94.0,width-title_w-56.0)
+	modal.ribbon=Rect2(ribbon_x,3 if modal_kind in ["Munition","Verbrauch"] else 8,title_w,head-6 if modal_kind in ["Munition","Verbrauch"] else head-14)
 	_place(modal_title,modal.ribbon.position.x+8,modal.ribbon.position.y,title_w-16,modal.ribbon.size.y)
 	var title_font: int=18 if modal_kind in ["Munition","Verbrauch"] else 21
 	while title_font>13 and font.get_string_size(modal_title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,title_font).x>title_w-16:title_font-=1
 	modal_title.add_theme_font_size_override("font_size",title_font)
-	var close=head-12
-	_place(modal_close,width-close-12,6,close,close)
-	_place(modal_back,10,8,82,30)
+	# 44x44 minimum for X and Back on touch: controls are positioned
+	# inside the title bar without reducing the actual scrollable content.
+	var close: float=44.0
+	_place(modal_close,width-close-12,4,close,close)
+	_place(modal_back,10,4,82,44)
 	var inner_top=head+8
 	if modal_tabs.visible:
 		_place(modal_tabs_scroll,18,inner_top,width-36,62)
@@ -2278,7 +2286,7 @@ func _thousands(value: int) -> String:
 func _refresh_ui() -> void:
 	if gold_label==null:return
 	if render_toggle!=null:
-		render_toggle.text="GRAFIK CLASSIC 2D" if browser_classic else "GRAFIK 3D"
+		render_toggle.text="CLASSIC 2D" if browser_classic else "ECHTES 3D"
 		render_toggle.disabled=false
 		render_toggle.visible=not OS.has_feature("web")
 	var today=Time.get_date_string_from_system()
