@@ -63,10 +63,12 @@ func _process(_delta: float) -> void:
 				snapshot_received.emit(value)
 	elif state==WebSocketPeer.STATE_CLOSED or (not joined and Time.get_ticks_msec()-connect_started>12000):
 		connecting=false;joined=false;socket.close();connection_changed.emit(false)
-func send_course(point: Vector2,route: Array=[]) -> void:
+func send_course(point: Vector2,route: Array=[],navigation_mode: String="") -> void:
 	if not joined or not point.is_finite():return
 	sequence+=1
 	var payload: Dictionary={"type":"course","sequence":sequence,"x":point.x,"y":point.y}
+	if navigation_mode=="classic_48x32":
+		payload["navigation_mode"]="classic_48x32"
 	if not route.is_empty():
 		var points: Array=[]
 		for waypoint: Vector2 in route:points.append([waypoint.x,waypoint.y])
