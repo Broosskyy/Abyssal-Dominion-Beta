@@ -31,13 +31,19 @@ func _layout() -> void:
 	if edit==null:return
 	var tabs_h: float=tab_height()
 	var side: float=(size.x-16.0)/3.0
+	# On phone, the configure control was only 28px wide, making it
+	# very hard to hit beside the page tabs. Give all four controls
+	# independent >=44px hit targets without overlapping the slots below.
+	var edit_w: float=44.0 if mobile_first else 28.0
+	var tab_gap: float=3.0
+	var tab_w: float=(size.x-edit_w-2.0*tab_gap)/3.0
 	for i in 3:
-		tabs[i].position=Vector2(i*(size.x-32)/3.0,0)
-		tabs[i].size=Vector2((size.x-32)/3.0-3,tabs_h)
+		tabs[i].position=Vector2(i*(tab_w+tab_gap),0)
+		tabs[i].size=Vector2(tab_w,tabs_h)
 		slots[i].position=Vector2(i*(side+8),tabs_h+4.0)
 		slots[i].size=Vector2(side,side)
-	edit.position=Vector2(size.x-28,0)
-	edit.size=Vector2(28,tabs_h)
+	edit.position=Vector2(size.x-edit_w,0)
+	edit.size=Vector2(edit_w,tabs_h)
 func refresh() -> void:
 	if slots.size()!=3:return
 	for i in 3:
