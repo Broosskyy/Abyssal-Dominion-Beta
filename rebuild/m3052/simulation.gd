@@ -340,6 +340,19 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 			body["_iso_tick_segments"]=tick_segments
 			continue
 		if not body.has("_iso_goal") or Vector2(body["_iso_goal"]).distance_squared_to(goal)>0.01:
+			# NPC AI, scripted courses and tests may replace body.path
+			# directly, bypassing player.course(). They still must not
+			# originate a new diagonal halfway through an active tile.
+			if body.has("_iso_route"):
+				var prior: Array=body["_iso_route"]
+				var prior_index: int=int(body.get("_iso_route_index",0))
+				if prior_index>=0 and prior_index<prior.size():
+					var prior_step: Vector2=Vector2(prior[prior_index])
+					if Vector2(body.pos).distance_squared_to(prior_step)>0.0001 and NAV.classic_tile_center(NAV.classic_world_to_tile(prior_step)).distance_squared_to(prior_step)<0.001:
+						_clear_classic_raster_state(body)
+						body["_iso_tick_segments"]=tick_segments
+						body["_iso_committed_step"]=prior_step
+						continue
 			_clear_classic_raster_state(body)
 			body["_iso_tick_segments"]=tick_segments
 			var tiles: Array[Vector2]=NAV.classic_iso_route(body.pos,goal)
