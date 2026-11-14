@@ -63,6 +63,20 @@ func _run() -> void:
 		barrier.position+Vector2(0,barrier.size.y)])
 	sim.islands=[{"bounds":barrier,"outline":polygon}]
 	sim.player.pos=start
+	# The same island-safe four-way route must also apply to scripted
+	# movement and NPCs. Previously they silently fell back to a direct
+	# straight leg if their A* square-grid waypoint was obstructed.
+	var npc: Dictionary={"id":912,"kind":"ship","pos":start,"heading":Vector2.RIGHT,
+		"speed":SIM.PLAYER_SPEED,"slow":0.0,"path":[goal]}
+	sim._move(npc,1.0/30.0)
+	var npc_waypoints: Array=npc.get("_iso_route",[])
+	check(npc_waypoints.size()>old.size(),"scripted and NPC Classic voyages detour on true tile grid instead of straight island shortcut")
+	var npc_prior: Vector2=start
+	var npc_safe: bool=true
+	for tile: Vector2 in npc_waypoints:
+		npc_safe=npc_safe and sim.segment_free(npc_prior,tile)
+		npc_prior=tile
+	check(npc_safe,"scripted and NPC routes are physically coastline-safe at every tile step")
 	var underway: bool=sim.course(goal,true)
 	check(underway and sim.player.path.size()==1 and Vector2(sim.player.path.back())==goal,"click plans a single terminal marker with precomputed safe raster itinerary")
 	var planned: Array=sim.player.get("_iso_route",[])
