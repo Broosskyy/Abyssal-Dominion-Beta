@@ -216,10 +216,15 @@ func run() -> void:
 	game.camera.zoom=Vector2.ONE*game._sharp_zoom()
 	game.camera.position=game.sim.player.pos
 	game.camera.force_update_scroll()
-	game.sim.player.heading=Vector2(1,-1)
-	check(game._classic_frame_for_actor(game.sim.player)==1,"Classic renderer draws the expected NE atlas frame from the preserved eight-view collection")
-	game.sim.player.heading=Vector2(1,1)
-	check(game._classic_frame_for_actor(game.sim.player)==3,"Classic renderer changes facing without changing simulated world coordinates")
+	# Validate eight-view headings on a PARKED ship. An actively sailing
+	# Classic ship now intentionally displays the 24x16 diagonal raster
+	# microleg instead of its one authoritative direct world heading.
+	var parked_heading_probe: Dictionary={"id":9371,"kind":"ship","pos":game.sim.player.pos,
+		"heading":Vector2(1,-1),"path":[]}
+	check(game._classic_frame_for_actor(parked_heading_probe)==1,"parked Classic renderer selects the true NE atlas frame")
+	parked_heading_probe.heading=Vector2(1,1)
+	check(game._classic_frame_for_actor(parked_heading_probe)==3,"parked Classic renderer changes facing without changing world coordinates")
+	game.classic_heading_cache.erase(9371)
 	# Tick crosses an EXACT (24,-16) NE tile and a (24,+16) SE tile.
 	# Interpolation and facing must preserve the actual two corners.
 	var two_steps: Array[Dictionary]=[
