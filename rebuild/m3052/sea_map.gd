@@ -72,7 +72,7 @@ var water: ColorRect
 var ocean: ShaderMaterial
 var ui: Control
 var chart_mini: Control
-var desired_zoom := 1.08
+var desired_zoom := 1.12
 var pan := Vector2.ZERO
 var camera_anchor := Vector2.ZERO
 var camera_locked := true
@@ -320,11 +320,11 @@ const NPC_VISUAL_SCALE := 0.90
 # making the hull tiny relative to islands, the selection ring and HUD.
 # Only the VISUAL Classic hull is calibrated separately. Physics, hitboxes,
 # content, crossplay and 2.5D/3D mesh geometry are unchanged.
-const CLASSIC_HULL_SCALE := 0.36
-const CLASSIC_HULL_SCALE_MOBILE := 0.62
+const CLASSIC_HULL_SCALE := 0.45
+const CLASSIC_HULL_SCALE_MOBILE := 0.60
 # The current default 1.08 world zoom makes mobile islands dominate the
 # entire center of the screenshot. Leave user pinch/zoom control intact.
-const CLASSIC_MOBILE_CAMERA_FACTOR := 0.78
+const CLASSIC_MOBILE_CAMERA_FACTOR := 0.94
 const CLASSIC_VIEWPORT_ZOOM_BOOST_MAX := 1.15
 const CLASSIC_LABEL_CLEARANCE_PX := 11.0
 var plate_fleet: Array[Dictionary] = []
@@ -487,7 +487,10 @@ func _online_snapshot(packet: Dictionary) -> void:
 
 func _send_online_course(point: Vector2) -> void:
 	if online_client!=null and is_instance_valid(online_client) and online_connected:
-		online_client.send_course(point,sim.player.path)
+		# The sender and server must receive the same snapped chart tile
+		# as the locally simulated destination, not the raw pre-snap touch.
+		var destination: Vector2=Vector2(sim.player.path.back()) if not sim.player.path.is_empty() else point
+		online_client.send_course(destination,sim.player.path)
 
 func _update_online_ships(delta: float) -> void:
 	if not online_connected:return
@@ -514,11 +517,14 @@ static func _classic_edge_camera_goal(ship_world: Vector2,camera_world: Vector2,
 	elif error.y< -allowed.y:goal.y=ship_world.y+allowed.y
 	return goal
 
+func _classic_touch_display() -> bool:
+	# On Android/iOS browser, OS.mobile can differ from the installed APK.
+	# The same physical touchscreen must get the same hull/zoom calibration.
+	return OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()
+
 func _sharp_zoom() -> float:
 	var max_boost: float=CLASSIC_VIEWPORT_ZOOM_BOOST_MAX if browser_classic else 1.7
-	# Classic mobile uses a wider chart view without shrinking the ship
-	# a second time. Native 2.5D/3D and desktop camera defaults are untouched.
-	var mobile_factor: float=CLASSIC_MOBILE_CAMERA_FACTOR if browser_classic and OS.has_feature("mobile") else 1.0
+	var mobile_factor: float=CLASSIC_MOBILE_CAMERA_FACTOR if browser_classic and _classic_touch_display() else 1.0
 	return desired_zoom*mobile_factor*clampf(get_viewport_rect().size.y/720.0,1.0,max_boost)
 
 func _load_classic_atlases() -> void:
@@ -1059,7 +1065,7 @@ func _actor_visual_length(actor: Dictionary) -> float:
 	# selection ring, actual atlas draw and visual hit rectangle. Only ships
 	# shrink; sea monsters, shore defenses and physical navigation do not.
 	if browser_classic and str(actor.get("kind","ship"))=="ship":
-		length*=CLASSIC_HULL_SCALE_MOBILE if OS.has_feature("mobile") else CLASSIC_HULL_SCALE
+		length*=CLASSIC_HULL_SCALE_MOBILE if _classic_touch_display() else CLASSIC_HULL_SCALE
 	return length
 
 # M3095: classic sea-combat selection circles are flat chart overlays.
@@ -1975,9 +1981,9 @@ func _layout() -> void:
 	ui.size=s
 	var mobile_hud: bool=_is_mobile_hud(viewport_size,OS.has_feature("mobile") or DisplayServer.is_touchscreen_available())
 	var compact=viewport_size.y<560 or viewport_size.x<1000
-	if compact and elapsed<0.1:
-		desired_zoom=0.78
-		camera.zoom=Vector2.ONE*desired_zoom
+	# Do not overwrite the camera preference on initial phone layout.
+	# The old forced 0.78 zoom caused tiny hulls and distant seawater on
+	# mobile browser and APK despite the intended Classic size calibration.
 	water.size=viewport_size
 	_place(ruler,0,0,s.x,s.y)
 	# One compact row: profile | health | centered menus | progress | wallet.
@@ -4606,7 +4612,7 @@ func _navigate_region(destination: int) -> void:
 	_refresh_ui()
 
 func _chart_course(point: Vector2) -> void:
-	if sim.course(point):_send_online_course(point)
+	if sim.course(point,true):_send_online_course(point)
 	_refresh_ui()
 
 func _interact() -> void:
@@ -4652,7 +4658,7 @@ func _equip(index: int) -> void:
 	_refresh_ui()
 
 func _zoom(factor: float) -> void:
-	desired_zoom=clampf(desired_zoom*factor,0.5,1.4)
+	desired_zoom=clampf(desired_zoom*factor,0.65,1.8)
 
 # Godot delivers _input BEFORE GUI consumption. The former sea-input path
 # used _unhandled_input exclusively, so HUD Control nodes could swallow
@@ -4889,7 +4895,7 @@ func _tap(screen: Vector2) -> void:
 		sim.staff_teleport(sim.map_id,"",point)
 		_save_staff()
 	else:
-		if sim.course(point):_send_online_course(point)
+		if sim.course(point,true):_send_online_course(point)
 	_refresh_ui()
 
 func _save_progress() -> void:
