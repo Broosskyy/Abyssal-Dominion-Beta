@@ -16,8 +16,8 @@ static func heading_column(heading: Vector2,previous: int=-1) -> int:
 	var sector=posmod(roundi((heading.angle()+PI*0.25)/(PI*0.5)),4)
 	return CLOCKWISE_TO_ATLAS[sector]
 
-## Classic 2D has four diagonal atlas views while all ships move directly
-## along the actual continuous world route, including horizontal courses.
+## Classic 2D follows physical 48×32 tile-centre raster steps; every
+## sprite frame depicts the exact segment currently traversed.
 ## Eight-view atlas order is N, NE, E, SE, S, SW, W, NW.
 const CLASSIC_FOUR_VIEW_ATLAS := [1,7,5,3] # NE, NW, SW, SE
 
@@ -25,8 +25,8 @@ static func heading_four(heading: Vector2,previous: int=-1) -> int:
 	var prior_column: int=CLASSIC_FOUR_VIEW_ATLAS.find(previous)
 	return CLASSIC_FOUR_VIEW_ATLAS[heading_column(heading,prior_column)]
 
-## Eight-view geometry remains available for optional native modes.
-## Classic only selects images; it never quantizes physical movement.
+## Eight-view geometry remains available for native modes. Classic chooses
+## the original four diagonal images to match four grid-step bearings.
 static func heading_eight(heading: Vector2,previous: int=-1) -> int:
 	if heading.length_squared()<0.0001:return previous if previous>=0 and previous<8 else 0
 	if previous>=0 and previous<8:
@@ -34,30 +34,29 @@ static func heading_eight(heading: Vector2,previous: int=-1) -> int:
 		if absf(wrapf(heading.angle()-center,-PI,PI))<=PI*0.125+0.06:return previous
 	return posmod(roundi((heading.angle()+PI*0.5)/(PI*0.25)),8)
 
-## Only four historic diagonal ship images, but ANY straight world heading.
-## The old designs seem to rock between neighbouring facings as they sail.
-## Do this with travelled DISTANCE only: no fake position, clock, turning arc,
-## visual shove, screen-space path or network packet movement.
-const CLASSIC_VIEW_CYCLE_WORLD := 96.0
-static func heading_four_motion(heading: Vector2,distance: float,previous: int=-1) -> int:
-	if heading.length_squared()<0.0001:
-		return previous if previous in CLASSIC_FOUR_VIEW_ATLAS else 1
-	# True 48x32 chart angles, not compass 45-degree diagonals.
-	var tilt: float=atan2(32.0,48.0)
-	var angles: Array[float]=[-PI+tilt,-tilt,tilt,PI-tilt]
-	var frames: Array[int]=[7,1,3,5] # NW NE SE SW in angle order.
-	var bearing: float=wrapf(heading.angle(),-PI,PI)
-	if bearing<angles[0]:bearing+=TAU
-	for i in 4:
-		var lo: float=angles[i]
-		var hi: float=angles[i+1] if i<3 else angles[0]+TAU
-		if bearing>=lo and bearing<=hi:
-			var weight: float=clampf((bearing-lo)/(hi-lo),0.0,1.0)
-			if weight<=0.01:return frames[i]
-			if weight>=0.99:return frames[(i+1)%4]
-			var phase: float=fposmod(distance,CLASSIC_VIEW_CYCLE_WORLD)/CLASSIC_VIEW_CYCLE_WORLD
-			return frames[(i+1)%4] if phase<weight else frames[i]
-	return heading_four(heading,previous)
+## Draw along the SAME physical diagonal sublegs that the 30 Hz tile-grid simulation
+## traversed. Interpolating only the tick endpoints cuts corners and makes
+## the ship slide sideways whenever a tick straddles two raster legs.
+## No artificial sprite wobble, extra waypoints or independent timer.
+static func classic_trace_sample(segments: Array,progress: float) -> Dictionary:
+	if segments.is_empty():return {}
+	var total: float=0.0
+	for segment: Dictionary in segments:
+		total+=maxf(0.0,float(segment.get("distance",0.0)))
+	if total<=0.0001:return {}
+	var remaining: float=clampf(progress,0.0,1.0)*total
+	for segment: Dictionary in segments:
+		var distance: float=maxf(0.0,float(segment.get("distance",0.0)))
+		if distance<=0.0001:continue
+		if remaining<=distance:
+			var start: Vector2=Vector2(segment.get("start",Vector2.ZERO))
+			var finish: Vector2=Vector2(segment.get("end",start))
+			return {"pos":start.lerp(finish,clampf(remaining/distance,0.0,1.0)),
+				"heading":Vector2(segment.get("heading",finish-start))}
+		remaining-=distance
+	var last: Dictionary=segments.back()
+	return {"pos":Vector2(last.get("end",Vector2.ZERO)),
+		"heading":Vector2(last.get("heading",Vector2.RIGHT))}
 
 ## 0=intact, 1=damaged but afloat, 2=sunk. Damage threshold is a local test value.
 static func damage_state(hp: float,max_hp: float) -> int:
