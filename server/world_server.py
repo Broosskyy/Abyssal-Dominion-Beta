@@ -20,6 +20,97 @@ SEA_IDS = {0, 1, 2, *range(6, 43)}
 SESSION_SECONDS = 86400
 MAX_CLIENTS = 128
 MAX_ROOM = 32
+CLASSIC_TILE_HALF_X = 24.0
+CLASSIC_TILE_HALF_Y = 16.0
+
+def classic_tile_center(q, r):
+    # Same globally anchored staggered 48x32 grid as the Godot client.
+    return (CLASSIC_TILE_HALF_X * (1 + q - r), CLASSIC_TILE_HALF_Y * (1 + q + r))
+
+def classic_world_to_tile(x, y):
+    xx = (x - CLASSIC_TILE_HALF_X) / CLASSIC_TILE_HALF_X
+    yy = (y - CLASSIC_TILE_HALF_Y) / CLASSIC_TILE_HALF_Y
+    fq, fr = math.floor(.5 * (xx + yy)), math.floor(.5 * (yy - xx))
+    return min(((fq + i, fr + j) for i in range(3) for j in range(3)),
+               key=lambda cell: (classic_tile_center(*cell)[0] - x)**2 +
+                                (classic_tile_center(*cell)[1] - y)**2)
+
+def classic_segment_route(start, goal):
+    # Server runs precisely the same four-neighbour raster trajectory the
+    # offline client runs. Other clients continue using direct courses.
+    if math.dist(start, goal) < .0001:
+        return []
+    dx, dy = goal[0] - start[0], goal[1] - start[1]
+    length = math.hypot(dx, dy)
+    if length < CLASSIC_TILE_HALF_X:
+        return [goal]
+    ux, uy = dx / length, dy / length
+    start_tile = classic_world_to_tile(*start)
+    goal_tile = classic_world_to_tile(*goal)
+    # If destination isn't exactly a tile centre (A* intermediate point),
+    # choose a tile behind the clicked position, not beyond it.
+    if math.dist(classic_tile_center(*goal_tile), goal) > .0001:
+        gx = (goal[0] - CLASSIC_TILE_HALF_X) / CLASSIC_TILE_HALF_X
+        gy = (goal[1] - CLASSIC_TILE_HALF_Y) / CLASSIC_TILE_HALF_Y
+        qf, rf = math.floor(.5*(gx + gy)), math.floor(.5*(gy - gx))
+        best = float('inf')
+        for i in range(4):
+            for j in range(4):
+                cell = (qf - 1 + i, rf - 1 + j)
+                cx, cy = classic_tile_center(*cell)
+                rx, ry = goal[0] - cx, goal[1] - cy
+                if rx * ux + ry * uy < -.001:
+                    continue
+                error = abs((cx-start[0]) * uy - (cy-start[1]) * ux)
+                score = rx*rx + ry*ry + 2 * error*error
+                if score < best:
+                    best, goal_tile = score, cell
+    tile = start_tile
+    route = []
+    for _ in range(min(abs(goal_tile[0]-tile[0]) + abs(goal_tile[1]-tile[1]), 2048)):
+        use_q = tile[0] != goal_tile[0]
+        use_r = tile[1] != goal_tile[1]
+        if not use_q and not use_r:
+            break
+        q_next = (tile[0] + (1 if goal_tile[0]>tile[0] else -1),tile[1])
+        r_next = (tile[0], tile[1] + (1 if goal_tile[1]>tile[1] else -1))
+        choose_q = use_q
+        if use_q and use_r:
+            qx, qy = classic_tile_center(*q_next)
+            rx, ry = classic_tile_center(*r_next)
+            q_error = abs((qx-start[0])*uy - (qy-start[1])*ux)
+            r_error = abs((rx-start[0])*uy - (ry-start[1])*ux)
+            if r_error + .00001 < q_error:
+                choose_q = False
+            elif abs(q_error - r_error) < .00001:
+                choose_q = math.dist((qx,qy),goal) <= math.dist((rx,ry),goal)
+        elif use_r:
+            choose_q = False
+        tile = q_next if choose_q else r_next
+        route.append(classic_tile_center(*tile))
+    if not route or math.dist(route[-1], goal) > .0001:
+        route.append(goal)
+    return route
+
+def classic_expand_route(start, waypoints):
+    route, previous = [], start
+    direct_length, tile_length = 0.0, 0.0
+    for goal in waypoints:
+        segment = classic_segment_route(previous, goal)
+        # Bounds remain authoritative: a local coast/edge tile may not
+        # exist, so keep the original valid straight A* waypoint instead.
+        if any(not (40<=x<=8760 and 40<=y<=6360) for x,y in segment):
+            segment = [goal]
+        direct_length += math.dist(previous,goal)
+        for waypoint in segment:
+            tile_length += math.dist(route[-1] if route else start,waypoint)
+            route.append(waypoint)
+        previous = goal
+        if len(route) > 4096:
+            return None
+    # Same travel-time preservation as the Godot 48x32 micro-step mover.
+    scale = max(1.0,min(2.0,tile_length/max(.001,direct_length)))
+    return route, scale
 
 class World:
     def __init__(self, database):
@@ -163,7 +254,32 @@ class World:
                     if type(seq) is not int or seq<=peer['sequence'] or seq>2**31: continue
                     route=self.route(data)
                     if route is None: continue
-                    peer.update(sequence=seq,route=route)
+                    # Protocol 2 extension: Classic clients request a real
+                    # four-way chart course. The server expands/authorizes
+                    # it at the server's current position, then broadcasts
+                    # true shared world coordinates to 2D/2.5D/3D alike.
+                    mode=data.get('navigation_mode','')
+                    if mode not in ('','classic_48x32'): continue
+                    scale=1.0
+                    if mode=='classic_48x32':
+                        if data.get('raster_preexpanded') is True:
+                            # A newer client can transmit its already
+                            # collision-checked 48x32 micro-legs. Accepting
+                            # these keeps the same trajectory on *older*
+                            # protocol-2 servers, which ignore unknown fields
+                            # but follow the supplied route waypoints.
+                            total=math.dist((peer['x'],peer['y']),route[0])
+                            total+=sum(math.dist(p,q) for p,q in zip(route,route[1:]))
+                            direct=math.dist((peer['x'],peer['y']),route[-1])
+                            scale=max(1.,min(2.,total/max(.001,direct)))
+                        else:
+                            # Server-computed Classic route for large courses.
+                            # Limit untrusted input and expansion work.
+                            if len(route)>64: continue
+                            expanded=classic_expand_route((peer['x'],peer['y']),route)
+                            if expanded is None: continue
+                            route,scale=expanded
+                    peer.update(sequence=seq,route=route,speed_scale=scale)
                 except (ValueError,TypeError): continue
         except (ValueError,TypeError,KeyError,asyncio.TimeoutError):
             await ws.close(code=1008,message=b'Invalid session or map')
@@ -181,7 +297,7 @@ class World:
                 self.tick+=1
                 for ws,peer in list(self.peers.items()):
                     if peer['expires']<=now: await ws.close(code=1008,message=b'Session expired');continue
-                    travel=165*delta
+                    travel=165*delta*float(peer.get('speed_scale',1.0))
                     while peer['route'] and travel>0:
                         dx,dy=peer['route'][0][0]-peer['x'],peer['route'][0][1]-peer['y']
                         distance=math.hypot(dx,dy); step=min(distance,travel)

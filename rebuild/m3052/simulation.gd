@@ -1,5 +1,6 @@
 extends RefCounted
 const CONTENT = preload("res://content.gd")
+const NAV = preload("res://navigation.gd")
 const CONTRACTS = preload("res://sea_contracts.gd")
 const STAFF=preload("res://staff.gd")
 const GUILD_OPS = preload("res://sim_guild_ops.gd")
@@ -27,8 +28,9 @@ const START := Vector2(4200, 2900)
 const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice", "fire", "poison", "shrapnel", "lightning", "holy", "shadow", "wind", "earth", "water", "cursed", "bleed", "necro", "gold", "crystal", "explosive", "arcane", "spectral", "lava", "light", "armor_piercing", "gas"]
 const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein", "Feuerkugeln geladen · Grafik-Beta", "Giftkugeln geladen · Grafik-Beta", "Schrapnellkugeln geladen · Grafik-Beta", "Blitzkugeln geladen · Grafik-Beta", "Heilige Kugeln geladen · Grafik-Beta", "Schattenkugeln geladen · Grafik-Beta", "Wirbelkugeln geladen · Grafik-Beta", "Erdkugeln geladen · Grafik-Beta", "Wasserkugeln geladen · Grafik-Beta", "Fluchkugeln geladen · Grafik-Beta", "Blutkugeln geladen · Grafik-Beta", "Nekrokugeln geladen · Grafik-Beta", "Goldkugeln geladen · Grafik-Beta", "Kristallkugeln geladen · Grafik-Beta", "Explosivkugeln geladen · Grafik-Beta", "Arkankugeln geladen · Grafik-Beta", "Geisterkugeln geladen · Grafik-Beta", "Lavakugeln geladen · Grafik-Beta", "Lichtkugeln geladen · Grafik-Beta", "Panzerbrecher geladen · Grafik-Beta", "Gaskugeln geladen · Grafik-Beta"]
 var player: Dictionary
-# Legacy name retained for renderer compatibility only: all modes share
-# identical straight world navigation (including NPC patrol and portals).
+# Test branch 344: the Classic look traverses staggered 48x32 diamond tiles.
+# All modes keep identical click destinations, global coordinates and coastline
+# path planning; do not merge this experiment until visually calibrated.
 var classic_steering: bool=false
 # Retired historical skins 0-30 migrate to shaded ship (skin 0).
 # Only schema 5+ saves can select separate Corsair test skin 1 and ten new Elite color skins 2-11.
@@ -283,6 +285,83 @@ func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
 	# The classic four-facing effect belongs exclusively in the sprite renderer.
 	return plan_path(body.pos,goal)
 
+func _clear_classic_raster_state(body: Dictionary) -> void:
+	# No path regeneration or renderer-dependent teleport when retapping.
+	for key in ["_iso_waypoint","_iso_guide_origin","_iso_leg_dir","_iso_leg_left",
+		"_iso_first_leg","_iso_tick_segments","_iso_goal","_iso_route",
+		"_iso_route_index","_iso_speed_scale"]:
+		body.erase(key)
+
+
+func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
+	# 48x32 DIAMOND GRID, one precomputed itinerary per real path waypoint.
+	# Each tile-centre step is exactly (+/-24,+/-16) world units. A course
+	# follows those micro-legs; it is not a distance-based image flicker,
+	# arbitrary 32-unit zigzag or a newly scored heading on every tick.
+	var tick_segments: Array[Dictionary]=[]
+	body["_iso_tick_segments"]=tick_segments
+	var iterations: int=0
+	while travel>0.001 and not body.path.is_empty() and iterations<48:
+		iterations+=1
+		var goal: Vector2=Vector2(body.path[0])
+		if Vector2(body.pos).distance_squared_to(goal)<0.0001:
+			body.pos=goal
+			body.path.pop_front()
+			_clear_classic_raster_state(body)
+			body["_iso_tick_segments"]=tick_segments
+			continue
+		if not body.has("_iso_goal") or Vector2(body["_iso_goal"]).distance_squared_to(goal)>0.01:
+			_clear_classic_raster_state(body)
+			body["_iso_tick_segments"]=tick_segments
+			var tiles: Array[Vector2]=NAV.classic_iso_route(body.pos,goal)
+			var valid: bool=true
+			var origin: Vector2=body.pos
+			var length: float=0.0
+			for point: Vector2 in tiles:
+				if not phasing and not segment_free(origin,point):
+					valid=false
+					break
+				length+=origin.distance_to(point)
+				origin=point
+			# The old coastline-safe A* waypoint is the fallback when
+			# the little raster staircase brushes an island margin.
+			if not valid:tiles=[goal];length=Vector2(body.pos).distance_to(goal)
+			if tiles.is_empty():tiles=[goal];length=Vector2(body.pos).distance_to(goal)
+			body["_iso_goal"]=goal
+			body["_iso_route"]=tiles
+			body["_iso_route_index"]=0
+			body["_iso_speed_scale"]=clampf(length/maxf(Vector2(body.pos).distance_to(goal),0.001),1.0,2.0)
+		var route: Array=body["_iso_route"]
+		var index: int=int(body["_iso_route_index"])
+		if index>=route.size():
+			body.pos=goal
+			body.path.pop_front()
+			_clear_classic_raster_state(body)
+			body["_iso_tick_segments"]=tick_segments
+			continue
+		var segment_goal: Vector2=Vector2(route[index])
+		var segment: Vector2=segment_goal-Vector2(body.pos)
+		if segment.length_squared()<0.0001:
+			body["_iso_route_index"]=index+1
+			continue
+		var bearing: Vector2=segment.normalized()
+		var speed_scale: float=float(body["_iso_speed_scale"])
+		var move_amount: float=minf(travel*speed_scale,segment.length())
+		var next: Vector2=Vector2(body.pos)+bearing*move_amount
+		if not phasing and not segment_free(body.pos,next):
+			body.path=[]
+			_clear_classic_raster_state(body)
+			return
+		tick_segments.append({"start":Vector2(body.pos),"end":next,"heading":bearing,"distance":move_amount})
+		body.pos=next
+		body.heading=bearing
+		travel-=move_amount/speed_scale
+		if move_amount>=segment.length()-0.0001:
+			body.pos=segment_goal
+			body["_iso_route_index"]=index+1
+	# Unlike a grid-snap method there is NEVER a teleport to lattice origin.
+
+
 func set_classic_steering(enabled: bool) -> void:
 	# Compatibility flag for the Classic renderer ONLY. Never change physics,
 	# path nodes, speed, collision or networking when changing render modes.
@@ -293,15 +372,38 @@ func set_classic_steering(enabled: bool) -> void:
 	var vessels: Array[Dictionary]=[player]
 	vessels.append_array(npcs)
 	for body: Dictionary in vessels:
-		for key in ["_iso_waypoint","_iso_guide_origin","_iso_leg_dir","_iso_leg_left","_iso_first_leg","_iso_tick_segments"]:
-			body.erase(key)
+		_clear_classic_raster_state(body)
 
 
-func course(point: Vector2) -> bool:
+func _classic_clicked_target(point: Vector2) -> Vector2:
+	# Flash-era chart clicking selects a TILE, not an arbitrary screen pixel.
+	# Resolve the click to its global 48x32 diamond centre before pathfinding.
+	# If the clicked tile is occupied by shoreline, keep a valid nearby water
+	# centre; never send a visually shifted or unreachable target.
+	var best: Vector2=point
+	var best_distance: float=INF
+	var nearest: Vector2i=NAV.classic_world_to_tile(point)
+	for q in range(-2,3):
+		for r in range(-2,3):
+			var center: Vector2=NAV.classic_tile_center(nearest+Vector2i(q,r))
+			if blocked(center):continue
+			var distance: float=point.distance_squared_to(center)
+			if distance<best_distance:
+				best=center
+				best_distance=distance
+	# If the tap is already in navigable water, never redirect it more
+	# than one diamond away to "help" near a coastline.
+	if best_distance>576.0 and not blocked(point):
+		return point
+	return best
+
+func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 	pending_portal=-1
 	if docked: return false
 	if int(player.hp) <= 0: return false
 	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
+	if snap_click_to_classic_tile and classic_steering:
+		point=_classic_clicked_target(point)
 	var route: Array[Vector2] = []
 	if staff.flag("no_collision"):
 		route.append(point)
@@ -311,6 +413,7 @@ func course(point: Vector2) -> bool:
 		message = "Küste voraus · bitte freies Wasser wählen"
 		return false
 	player.path = route
+	_clear_classic_raster_state(player)
 	repairing = false
 	message = "Kurs gesetzt"
 	return true
@@ -764,9 +867,12 @@ func _move(body: Dictionary, delta: float) -> void:
 	_advance_world_course(body,travel,phasing)
 
 func _advance_world_course(body: Dictionary,travel: float,phasing: bool) -> void:
-	# Single physical mover for Classic 2D, 2.5D and 3D. It follows
-	# the exact requested straight segment, or A* coastline waypoints.
-	# Changing 2D sprite facings MUST NEVER move the captain sideways.
+	# Experimental old-school raster navigation in Classic only.
+	# It keeps the same high-level, coastline-safe route and arrival time.
+	# Native graphics still use the 342 continuous direct mover.
+	if classic_steering and (int(body.get("id",-1))==0 or str(body.get("kind",""))=="ship"):
+		_move_classic_tiles(body,travel,phasing)
+		return
 	while travel > 0.01 and not body.path.is_empty():
 		var goal: Vector2 = body.path[0]
 		var gap: Vector2 = goal - body.pos

@@ -9,6 +9,7 @@ const RULER=preload("res://grid_ruler.gd")
 const LOADING=preload("res://loading_screen.gd")
 const CONTENT = preload("res://content.gd")
 const VISUALS = preload("res://ship_visuals.gd")
+const NAV = preload("res://navigation.gd")
 const SKIN = preload("res://ui_skin.gd")
 const SHARE = preload("res://share_links.gd")
 const TOUCH_SCROLL = preload("res://touch_scroll.gd")
@@ -72,7 +73,7 @@ var water: ColorRect
 var ocean: ShaderMaterial
 var ui: Control
 var chart_mini: Control
-var desired_zoom := 1.08
+var desired_zoom := 1.12
 var pan := Vector2.ZERO
 var camera_anchor := Vector2.ZERO
 var camera_locked := true
@@ -264,9 +265,8 @@ var classic_atlases: Dictionary={}
 var classic_geometry: Dictionary={}
 var classic_monster_bottoms: Dictionary={}
 var classic_heading_cache: Dictionary={}
-# Renderer-only traveled distance for the old four-image facing change.
-# World position, heading, collision and networking are always continuous.
-var classic_visual_travel: Dictionary={}
+# The hull, wake and selection plate follow the SAME micro-steps as 30Hz
+# physics. Never invent view oscillation or offset independently of travel.
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
 # 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
@@ -321,11 +321,11 @@ const NPC_VISUAL_SCALE := 0.90
 # making the hull tiny relative to islands, the selection ring and HUD.
 # Only the VISUAL Classic hull is calibrated separately. Physics, hitboxes,
 # content, crossplay and 2.5D/3D mesh geometry are unchanged.
-const CLASSIC_HULL_SCALE := 0.36
-const CLASSIC_HULL_SCALE_MOBILE := 0.62
+const CLASSIC_HULL_SCALE := 0.45
+const CLASSIC_HULL_SCALE_MOBILE := 0.60
 # The current default 1.08 world zoom makes mobile islands dominate the
 # entire center of the screenshot. Leave user pinch/zoom control intact.
-const CLASSIC_MOBILE_CAMERA_FACTOR := 0.78
+const CLASSIC_MOBILE_CAMERA_FACTOR := 0.94
 const CLASSIC_VIEWPORT_ZOOM_BOOST_MAX := 1.15
 const CLASSIC_LABEL_CLEARANCE_PX := 11.0
 var plate_fleet: Array[Dictionary] = []
@@ -487,8 +487,39 @@ func _online_snapshot(packet: Dictionary) -> void:
 			online_actor_ids.erase(uid)
 
 func _send_online_course(point: Vector2) -> void:
-	if online_client!=null and is_instance_valid(online_client) and online_connected:
-		online_client.send_course(point,sim.player.path)
+	if online_client==null or not is_instance_valid(online_client) or not online_connected:return
+	var destination: Vector2=Vector2(sim.player.path.back()) if not sim.player.path.is_empty() else point
+	var outgoing: Array[Vector2]=[]
+	for waypoint: Vector2 in sim.player.path:outgoing.append(waypoint)
+	var raster_ready: bool=false
+	if browser_classic and not outgoing.is_empty():
+		# Older presence servers (protocol 2) ignore the new movement-mode
+		# hint. Send the actual *tile* route so even an older server follows
+		# the same real course instead of replacing it with a straight line.
+		var expanded: Array[Vector2]=[]
+		var current: Vector2=sim.player.pos
+		raster_ready=true
+		for waypoint: Vector2 in sim.player.path:
+			var micro: Array[Vector2]=NAV.classic_iso_route(current,waypoint)
+			var previous: Vector2=current
+			var safe: bool=true
+			for step: Vector2 in micro:
+				if not sim.segment_free(previous,step):
+					safe=false
+					break
+				previous=step
+			if not safe:
+				micro.clear();micro.append(waypoint) # Preserve coastline-safe A* leg.
+			if expanded.size()+micro.size()>512:
+				raster_ready=false # Old server limit; new server expands.
+				break
+			expanded.append_array(micro)
+			current=waypoint
+		if raster_ready and not expanded.is_empty():
+			outgoing=expanded
+		else:
+			raster_ready=false
+	online_client.send_course(destination,outgoing,"classic_48x32" if browser_classic else "",raster_ready)
 
 func _update_online_ships(delta: float) -> void:
 	if not online_connected:return
@@ -515,11 +546,14 @@ static func _classic_edge_camera_goal(ship_world: Vector2,camera_world: Vector2,
 	elif error.y< -allowed.y:goal.y=ship_world.y+allowed.y
 	return goal
 
+func _classic_touch_display() -> bool:
+	# On Android/iOS browser, OS.mobile can differ from the installed APK.
+	# The same physical touchscreen must get the same hull/zoom calibration.
+	return OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()
+
 func _sharp_zoom() -> float:
 	var max_boost: float=CLASSIC_VIEWPORT_ZOOM_BOOST_MAX if browser_classic else 1.7
-	# Classic mobile uses a wider chart view without shrinking the ship
-	# a second time. Native 2.5D/3D and desktop camera defaults are untouched.
-	var mobile_factor: float=CLASSIC_MOBILE_CAMERA_FACTOR if browser_classic and OS.has_feature("mobile") else 1.0
+	var mobile_factor: float=CLASSIC_MOBILE_CAMERA_FACTOR if browser_classic and _classic_touch_display() else 1.0
 	return desired_zoom*mobile_factor*clampf(get_viewport_rect().size.y/720.0,1.0,max_boost)
 
 func _load_classic_atlases() -> void:
@@ -601,30 +635,39 @@ func _visual_snapshot() -> Dictionary:
 	for actor: Dictionary in sim.npcs:positions[int(actor.id)]=actor.pos
 	return positions
 
-func _record_classic_visual_travel() -> void:
-	# Accumulate ACTUAL continuous world distance, never diagonal detours.
-	# The sprite cycle is optical only and will not run while standing still.
-	if not browser_classic:return
-	for id in visual_before:
-		if not visual_after.has(id):continue
-		var earlier: Vector2=Vector2(visual_before[id])
-		var later: Vector2=Vector2(visual_after[id])
-		var traveled: float=earlier.distance_to(later)
-		if traveled>0.0001 and traveled<100.0:
-			classic_visual_travel[id]=fposmod(float(classic_visual_travel.get(id,0.0))+traveled,VISUALS.CLASSIC_VIEW_CYCLE_WORLD)
+func _classic_tick_sample(actor: Dictionary) -> Dictionary:
+	# A single 30 Hz physics tick can cross more than one physical diagonal.
+	# Interpolating its endpoints erases the real corner and makes the ship
+	# appear to sail sideways. Render the original microlegs, in order.
+	if not browser_classic or not sim.classic_steering:return {}
+	var id: int=int(actor.get("id",-1))
+	if not visual_before.has(id) or not visual_after.has(id):return {}
+	var segments: Array=actor.get("_iso_tick_segments",[])
+	if segments.is_empty():return {}
+	var start: Vector2=Vector2(visual_before[id])
+	var finish: Vector2=Vector2(visual_after[id])
+	var live: Vector2=Vector2(actor.get("pos",finish))
+	# Ignore teleports, region transitions and stale network snapshots.
+	if finish.distance_squared_to(live)>0.04 or start.distance_to(finish)>200.0:return {}
+	var first: Dictionary=segments[0]
+	var last: Dictionary=segments.back()
+	if Vector2(first.get("start",start)).distance_squared_to(start)>0.04:return {}
+	if Vector2(last.get("end",finish)).distance_squared_to(finish)>0.04:return {}
+	return VISUALS.classic_trace_sample(segments,accumulator/SIMULATION_TICK)
 
 func _classic_display_heading(actor: Dictionary) -> Vector2:
-	# The displayed ship interpolates the previous physical tick; heading
-	# must come from that SAME straight segment, not the next simulation leg.
+	# The sprite must depict the current DISPLAYED tile micro-leg, not the
+	# NEXT tile already selected by the 30Hz simulation step.
+	var sample: Dictionary=_classic_tick_sample(actor)
+	if not sample.is_empty():return Vector2(sample.heading)
 	var heading: Vector2=Vector2(actor.get("heading",Vector2.RIGHT))
 	var id: int=int(actor.get("id",-1))
 	if browser_classic and visual_before.has(id) and visual_after.has(id):
-		var earlier: Vector2=Vector2(visual_before[id])
-		var later: Vector2=Vector2(visual_after[id])
-		var displacement: Vector2=later-earlier
-		var current: Vector2=Vector2(actor.get("pos",later))
-		if later.distance_squared_to(current)<0.04 and displacement.length_squared()>0.04 and displacement.length_squared()<10000.0:
-			return displacement.normalized()
+		var previous: Vector2=Vector2(visual_before[id])
+		var latest: Vector2=Vector2(visual_after[id])
+		var direction: Vector2=latest-previous
+		if direction.length_squared()>0.001 and direction.length_squared()<10000.0 and latest.distance_squared_to(Vector2(actor.get("pos",latest)))<0.04:
+			return direction.normalized()
 	return heading
 
 func _visual_actor_pos(actor: Dictionary) -> Vector2:
@@ -635,7 +678,9 @@ func _visual_actor_pos(actor: Dictionary) -> Vector2:
 	var latest: Vector2=visual_after[id]
 	# Don't interpolate teleports, respawns, or externally changed positions.
 	if current.distance_squared_to(latest)>.01 or previous.distance_to(latest)>200.0:return current
-	# Identical physical interpolation in Classic 2D, 2.5D and 3D.
+	# Never cut through a genuine 48x32 tile corner within one 30Hz tick.
+	var stepped: Dictionary=_classic_tick_sample(actor)
+	if not stepped.is_empty():return Vector2(stepped.pos)
 	return previous.lerp(latest,clampf(accumulator/SIMULATION_TICK,0.0,1.0))
 
 # Ships must leave trails only while actually moving; using 'path' alone
@@ -768,7 +813,6 @@ func _process(delta: float) -> void:
 		visual_before=_visual_snapshot()
 		sim.step(SIMULATION_TICK)
 		visual_after=_visual_snapshot()
-		_record_classic_visual_travel()
 		accumulator -= SIMULATION_TICK
 	if ring_last_target!=int(sim.target):
 		ring_last_target=int(sim.target)
@@ -862,12 +906,14 @@ func _draw() -> void:
 	if not sim.player.path.is_empty():
 		var goal: Vector2=sim.player.path.back()
 		var before: Vector2=sim.player.pos
-		# The chart shows the real obstacle-aware path in ALL view modes.
-		# Classic changes only which four ship sprites are drawn, never
-		# navigation waypoints or world-space course geometry.
-		for point: Vector2 in sim.player.path:
-			draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
-			before=point
+		# The original-era Classic ship follows real 48x32 raster steps,
+		# so a STRAIGHT route preview falsely suggests it will sail straight.
+		# Use a destination marker there, not an incompatible diagonal line.
+		# Native 2.5D/3D retain their original smooth course preview.
+		if not browser_classic:
+			for point: Vector2 in sim.player.path:
+				draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
+				before=point
 		draw_arc(goal,16+sin(elapsed*3)*2,0,TAU,32,Color(0.54,0.92,0.85,0.7),1.7,true)
 		draw_line(goal-Vector2(22,0),goal+Vector2(22,0),Color(0.5,0.9,0.84,0.5),1.0)
 		draw_line(goal-Vector2(0,16),goal+Vector2(0,16),Color(0.5,0.9,0.84,0.5),1.0)
@@ -1050,7 +1096,7 @@ func _actor_visual_length(actor: Dictionary) -> float:
 	# selection ring, actual atlas draw and visual hit rectangle. Only ships
 	# shrink; sea monsters, shore defenses and physical navigation do not.
 	if browser_classic and str(actor.get("kind","ship"))=="ship":
-		length*=CLASSIC_HULL_SCALE_MOBILE if OS.has_feature("mobile") else CLASSIC_HULL_SCALE
+		length*=CLASSIC_HULL_SCALE_MOBILE if _classic_touch_display() else CLASSIC_HULL_SCALE
 	return length
 
 # M3095: classic sea-combat selection circles are flat chart overlays.
@@ -1269,21 +1315,10 @@ func _classic_atlas_key(actor: Dictionary) -> String:
 	return str(actor.get("visual_key",""))
 
 func _classic_frame_for_actor(actor: Dictionary) -> int:
-	# The physical ship ALWAYS follows one direct world line per waypoint.
-	# The classic four-frame rocking is only a change of baked sprite images.
+	# No timer and no artificial picture oscillation: each of the four
+	# classic atlas images is bound to its ACTUAL raster movement segment.
 	var id: int=int(actor.get("id",-1))
-	var heading: Vector2=_classic_display_heading(actor)
-	var previous: int=int(classic_heading_cache.get(id,-1))
-	var facing: int=VISUALS.heading_four(heading,previous)
-	if browser_classic and classic_visual_travel.has(id) and visual_before.has(id) and visual_after.has(id):
-		var earlier: Vector2=Vector2(visual_before[id])
-		var later: Vector2=Vector2(visual_after[id])
-		var valid: bool=later.distance_squared_to(Vector2(actor.get("pos",later)))<0.04
-		var tick_distance: float=earlier.distance_to(later)
-		if valid and tick_distance>0.01 and tick_distance<100.0:
-			var alpha: float=clampf(accumulator/SIMULATION_TICK,0.0,1.0)
-			var travel: float=float(classic_visual_travel[id])-(1.0-alpha)*tick_distance
-			facing=VISUALS.heading_four_motion(heading,travel,previous)
+	var facing: int=VISUALS.heading_four(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
 	classic_heading_cache[id]=facing
 	return facing
 
@@ -1977,9 +2012,9 @@ func _layout() -> void:
 	ui.size=s
 	var mobile_hud: bool=_is_mobile_hud(viewport_size,OS.has_feature("mobile") or DisplayServer.is_touchscreen_available())
 	var compact=viewport_size.y<560 or viewport_size.x<1000
-	if compact and elapsed<0.1:
-		desired_zoom=0.78
-		camera.zoom=Vector2.ONE*desired_zoom
+	# Do not overwrite the camera preference on initial phone layout.
+	# The old forced 0.78 zoom caused tiny hulls and distant seawater on
+	# mobile browser and APK despite the intended Classic size calibration.
 	water.size=viewport_size
 	_place(ruler,0,0,s.x,s.y)
 	# One compact row: profile | health | centered menus | progress | wallet.
@@ -4608,7 +4643,7 @@ func _navigate_region(destination: int) -> void:
 	_refresh_ui()
 
 func _chart_course(point: Vector2) -> void:
-	if sim.course(point):_send_online_course(point)
+	if sim.course(point,true):_send_online_course(point)
 	_refresh_ui()
 
 func _interact() -> void:
@@ -4654,7 +4689,7 @@ func _equip(index: int) -> void:
 	_refresh_ui()
 
 func _zoom(factor: float) -> void:
-	desired_zoom=clampf(desired_zoom*factor,0.5,1.4)
+	desired_zoom=clampf(desired_zoom*factor,0.65,1.8)
 
 # Godot delivers _input BEFORE GUI consumption. The former sea-input path
 # used _unhandled_input exclusively, so HUD Control nodes could swallow
@@ -4891,7 +4926,7 @@ func _tap(screen: Vector2) -> void:
 		sim.staff_teleport(sim.map_id,"",point)
 		_save_staff()
 	else:
-		if sim.course(point):_send_online_course(point)
+		if sim.course(point,true):_send_online_course(point)
 	_refresh_ui()
 
 func _save_progress() -> void:
@@ -5109,7 +5144,6 @@ func _set_render_mode(value: String) -> void:
 	# physical ship route when swapping 2D/2.5D/3D.
 	sim.set_classic_steering(browser_classic)
 	classic_heading_cache.clear()
-	classic_visual_travel.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
 	if camera!=null:_sync_plate_overlay()

@@ -16,6 +16,77 @@ class CrossplayTest(unittest.IsolatedAsyncioTestCase):
         response=await self.client.post('/v1/register',json={'protocol':2,'email':email,'username':name,'password':'test-password-937'})
         self.assertEqual(response.status,200)
         return await response.json()
+    async def test_isometric_48x32_course_and_crossplay_snapshot(self):
+        from world_server import (classic_tile_center, classic_world_to_tile,
+                                  classic_segment_route, classic_expand_route)
+        start=(4200.,2900.)
+        for coordinates in ((5000.,2900.),(4200.,3500.),(3500.,2600.)):
+            tile=classic_world_to_tile(*coordinates)
+            goal=classic_tile_center(*tile)
+            raster=classic_segment_route(start,goal)
+            self.assertGreater(len(raster),2)
+            self.assertAlmostEqual(raster[-1][0],goal[0],delta=.001)
+            self.assertAlmostEqual(raster[-1][1],goal[1],delta=.001)
+            for previous,nxt in zip(raster,raster[1:]):
+                self.assertAlmostEqual(abs(nxt[0]-previous[0]),24,delta=.001)
+                self.assertAlmostEqual(abs(nxt[1]-previous[1]),16,delta=.001)
+            expanded=classic_expand_route(start,[goal])
+            self.assertIsNotNone(expanded)
+            self.assertGreaterEqual(expanded[1],1.0)
+            self.assertLessEqual(expanded[1],2.0)
+        a=await self.account('grid-user@example.com','TileCaptain')
+        b=await self.account('grid-observer@example.com','Observer')
+        ws=await self.client.ws_connect('/v1/world')
+        witness=await self.client.ws_connect('/v1/world')
+        try:
+            await ws.send_json({'type':'join','protocol':2,'token':a['token'],'map_id':0})
+            await ws.receive_json()
+            await witness.send_json({'type':'join','protocol':2,'token':b['token'],'map_id':0})
+            await witness.receive_json()
+            goal=classic_tile_center(*classic_world_to_tile(4900.,2900.))
+            await ws.send_json({'type':'course','sequence':1,'x':goal[0],'y':goal[1],
+                                'route':[[goal[0],goal[1]]],'navigation_mode':'classic_48x32'})
+            await asyncio.sleep(.07)
+            peer=next(p for p in self.client.server.app['world'].peers.values()
+                      if p['id']==a['account']['id'])
+            self.assertEqual(peer['sequence'],1)
+            self.assertGreater(len(peer['route']),2)
+            self.assertTrue(abs(peer['heading'])>.05,
+                            'Online captain must physically move on isometric tiles, not a straight east course')
+            self.assertGreater(peer['x'],4200)
+            received=False
+            for _ in range(20):
+                packet=await asyncio.wait_for(witness.receive_json(),timeout=2)
+                if packet.get('type')!='snapshot': continue
+                observer=next((p for p in packet['players'] if p['id']==a['account']['id']),None)
+                if observer and observer['x']>4200:
+                    received=True
+                    self.assertAlmostEqual(observer['x'],peer['x'],delta=25)
+                    break
+            self.assertTrue(received,'Other renderers must see one shared authoritative Classic raster ship')
+            # A client can pre-expand its collision-safe micro-legs.
+            # Legacy protocol-2 servers still follow these actual points.
+            starting=(peer['x'],peer['y'])
+            another=classic_tile_center(*classic_world_to_tile(peer['x']+520.,peer['y']))
+            preset=classic_segment_route(starting,another)
+            await ws.send_json({'type':'course','sequence':2,'x':another[0],'y':another[1],
+                                'route':[[x,y] for x,y in preset],
+                                'navigation_mode':'classic_48x32','raster_preexpanded':True})
+            await asyncio.sleep(.06)
+            self.assertEqual(peer['sequence'],2)
+            self.assertGreater(len(peer['route']),2)
+            self.assertLessEqual(len(peer['route']),len(preset),
+                                 'server must not expand the preexpanded tile sequence twice')
+            # Existing default/3D clients still send an ordinary straight course.
+            await ws.send_json({'type':'course','sequence':3,'x':4600,'y':2900})
+            await asyncio.sleep(.06)
+            self.assertEqual(peer['sequence'],3)
+            self.assertAlmostEqual(peer['speed_scale'],1.,delta=.001)
+            self.assertEqual(len(peer['route']),1)
+        finally:
+            await ws.close()
+            await witness.close()
+
     async def test_auth_isolation_sequence_and_speed(self):
         a=await self.account('one@example.com','One');b=await self.account('two@example.com','Two')
         bad=await self.client.post('/v1/login',json={'protocol':2,'email':'one@example.com','password':'incorrect-password'})

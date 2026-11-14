@@ -31,24 +31,24 @@ func _initialize() -> void:
 		sim._move(body,0.1)
 		if not body.path.is_empty():stable_course=stable_course and absf(body.heading.y)<.001
 	check(stable_course and body.pos.distance_to(Vector2(950,500))<0.01,"direct native route sails to the exact goal without alternating diagonal headings")
-	# Classic has only four visible 2D headings; the REAL world journey
-	# must match 2.5D/3D exactly, without a simulated isometric staircase.
+	# Four historic views now follow a 48×32 staggered diamond-grid path.
+	# The mainland high-level waypoint stays identical to native 3D.
 	sim.set_classic_steering(true)
 	body.pos=Vector2(500,500)
 	body.renderer="sprite";body.view_count=4
 	var classic_route=sim.plan_actor_path(body,Vector2(950,500))
-	check(classic_route==sim.plan_path(body.pos,Vector2(950,500)) and classic_route.size()==1,"four-view Classic retains the direct target waypoint, without fake route nodes")
+	check(classic_route==sim.plan_path(body.pos,Vector2(950,500)) and classic_route.size()==1,"Classic retains one exact destination waypoint without fake high-level nodes")
 	body.path=classic_route.duplicate()
 	var start_y: float=body.pos.y
-	var direct_heading: bool=true
 	var max_y_error: float=0.0
+	var diagonal_y: Dictionary={}
 	for _i in 240:
 		sim._move(body,0.1)
 		max_y_error=maxf(max_y_error,absf(float(body.pos.y)-start_y))
-		if not body.path.is_empty():direct_heading=direct_heading and absf(float(body.heading.y))<0.001
+		if not body.path.is_empty():diagonal_y[int(signf(float(body.heading.y)))]=true
 		if body.path.is_empty():break
-	check(max_y_error<0.01 and direct_heading,"four-view Classic physically sails one straight horizontal course, with zero zigzag")
-	check(body.pos.distance_to(Vector2(950,500))<0.1 and body.path.is_empty(),"straight Classic sailing reaches the original exact destination")
+	check(max_y_error>=8.0 and max_y_error<=32.0 and diagonal_y.has(-1) and diagonal_y.has(1),"Classic physically traverses four 24x16 tile bearings, never arbitrary 32-unit legs")
+	check(body.pos.distance_to(Vector2(950,500))<0.1 and body.path.is_empty(),"tile steps plus final exact arrival reach original clicked destination")
 	body.pos=Vector2(500,500)
 	body.renderer="mesh";body.view_count=4
 	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"source GLB versus sprite never changes the selected target waypoint")
