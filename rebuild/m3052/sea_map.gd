@@ -508,7 +508,7 @@ func _send_online_course(point: Vector2) -> void:
 			for i in range(index,prepared.size()):
 				if expanded.size()>=512:break
 				expanded.append(Vector2(prepared[i]))
-			if expanded.size()<=512 and expanded.back().distance_squared_to(destination)<0.001:
+			if not expanded.is_empty() and expanded.size()<=512 and expanded.back().distance_squared_to(destination)<0.001:
 				outgoing=expanded
 				raster_ready=true
 		else:
@@ -518,16 +518,13 @@ func _send_online_course(point: Vector2) -> void:
 			var current: Vector2=sim.player.pos
 			raster_ready=true
 			for waypoint: Vector2 in sim.player.path:
-				var micro: Array[Vector2]=NAV.classic_iso_route(current,waypoint)
-				var previous: Vector2=current
-				var safe: bool=true
-				for step: Vector2 in micro:
-					if not sim.segment_free(previous,step):
-						safe=false
-						break
-					previous=step
-				if not safe:
-					micro.clear();micro.append(waypoint)
+				# Scripted routes use the exact SAME safe coastal
+				# 48x32 pathfinder as the player; never send 3D a
+				# forbidden straight-line escape through an island.
+				var micro: Array[Vector2]=NAV.classic_safe_route(current,waypoint,Callable(sim,"segment_free"))
+				if micro.is_empty():
+					raster_ready=false
+					break
 				if expanded.size()+micro.size()>512:
 					raster_ready=false
 					break
@@ -920,15 +917,10 @@ func _draw() -> void:
 	_draw_sea_edges(view)
 	if not sim.player.path.is_empty():
 		var goal: Vector2=sim.player.path.back()
-		var before: Vector2=sim.player.pos
-		# The original-era Classic ship follows real 48x32 raster steps,
-		# so a STRAIGHT route preview falsely suggests it will sail straight.
-		# Use a destination marker there, not an incompatible diagonal line.
-		# Native 2.5D/3D retain their original smooth course preview.
-		if not browser_classic:
-			for point: Vector2 in sim.player.path:
-				draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
-				before=point
+		# Both 2D and 3D have the exact same isometric itinerary.
+		# A straight 3D-only course line would now MISREPRESENT the
+		# captain's physical route, so all renderers show the shared
+		# destination marker instead of inventing a direct shortcut.
 		draw_arc(goal,16+sin(elapsed*3)*2,0,TAU,32,Color(0.54,0.92,0.85,0.7),1.7,true)
 		draw_line(goal-Vector2(22,0),goal+Vector2(22,0),Color(0.5,0.9,0.84,0.5),1.0)
 		draw_line(goal-Vector2(0,16),goal+Vector2(0,16),Color(0.5,0.9,0.84,0.5),1.0)
@@ -4048,7 +4040,7 @@ func _open_guild_home() -> void:
 	var upgrade_cost: int=sim.guild_home_upgrade_cost()
 	_section("DAUERHAFTE GILDENHEIMAT · STUFE %d/5" % tier)
 	_row(painted.nav_guild,"[%s] %s · %s\nUnabhängig von eroberten Weltinseln" % [sim.guild.tag,sim.guild.name,tier_name],60,Color("b9dcce"))
-	_note("Diese Heimatbasis bleibt auch erhalten, wenn deine Gilde die umkämpfte Korsarenfestung verliert. Das ist die eigene lokale Basis gemäß Masterkonzept V3.8; eine befahrbare instanzierte 3D-/2,5D-Insel und Online-Mitgliederrechte werden separat umgesetzt.")
+	_note("Diese Heimatbasis bleibt auch erhalten, wenn deine Gilde die umkämpfte Korsarenfestung verliert. Das ist die eigene lokale Basis gemäß Masterkonzept V3.8; eine befahrbare instanzierte 3D-Insel und Online-Mitgliederrechte werden separat umgesetzt.")
 	_section("GILDENKASSE · %s / %s GOLD" % [_thousands(treasury),_thousands(capacity)])
 	_note("Einzahlungen und Auszahlungen verschieben vorhandenes Gold zwischen deinem Kapitän und der Gildenkasse. Es wird kein Gold erzeugt. Erweiterungen werden aus der Kasse bezahlt.",Color("b0cdcf"))
 	var cash=_grid(2)
@@ -4339,7 +4331,7 @@ func _open_display() -> void:
 			count_button.disabled=projectile_visual_count==amount
 		_note("Standard: 3 · Leuchtkugeln wechseln zwischen Rot, Blau, Grün, Gold und Violett.",Color("bfcbdf"))
 		_section("ANIMATIONEN & KAMPFEFFEKTE")
-		_note("Jede Einstellung ist rein optisch und wirkt sofort in 2,5D und 3D. Auch bei ausgeschalteten Effekten bleiben die echten Geschosse und Treffer sichtbar.",Color("a3c9cf"))
+		_note("Diese Einstellungen verändern nur die Optik im 3D-Modus, niemals die gemeinsame Kursberechnung. Echte Geschosse und Treffer bleiben sichtbar.",Color("a3c9cf"))
 		var effect_grid=_grid(2)
 		for option in [["enabled","ALLE EFFEKTE"],["flight","FLUGSPUREN"],["muzzle","MÜNDUNGSBLITZE"],["impact","TREFFERANIMATIONEN"],["particles","PARTIKEL & TRÜMMER"],["water","WASSERFONTÄNEN"],["flashes","LICHTBLITZE"]]:
 			var key: String=str(option[0])
