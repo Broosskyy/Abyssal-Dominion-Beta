@@ -33,7 +33,9 @@ func _initialize() -> void:
 		native_track.append(Vector2(body.pos))
 		if not body.path.is_empty():native_headings[int(signf(float(body.heading.y)))]=true
 		if body.path.is_empty():break
-	check(body.pos.distance_to(Vector2(950,500))<0.1 and native_track.all(func(point):return absf(point.y-500.0)<0.01),"3D GLB sails directly across clear water without zigzag")
+	var native_straight: bool=true
+	for point: Vector2 in native_track:native_straight=native_straight and absf(point.y-500.0)<0.01
+	check(body.pos.distance_to(Vector2(950,500))<0.1 and native_straight,"3D GLB sails directly across clear water without zigzag")
 	# Four historic views now follow a 48×32 staggered diamond-grid path.
 	# The mainland high-level waypoint stays identical to native 3D.
 	sim.set_classic_steering(true)
