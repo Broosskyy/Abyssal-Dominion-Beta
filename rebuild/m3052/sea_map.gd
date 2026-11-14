@@ -85,6 +85,9 @@ var visual_after: Dictionary = {}
 # Local visual-only water animation state; never written to saves or simulation.
 # Each entry stores recent interpolated positions and sampled movement speed.
 var wake_tracks: Dictionary = {}
+# 361: 2D ONLY. Keeps the old 48x32 visual raster separate from 3D,
+# multiplayer world positions, collision and shared ship movement.
+var classic_raster_visuals: Dictionary = {}
 const WAKE_LIFETIME := 1.35
 const WAKE_SAMPLE_INTERVAL := 0.11
 
@@ -1321,33 +1324,85 @@ func _classic_atlas_key(actor: Dictionary) -> String:
 		return "schattenkriegsschiff_shaded"
 	return str(actor.get("visual_key",""))
 
-func _classic_frame_for_actor(actor: Dictionary) -> int:
-	# Update 360: use ALL eight genuine GLB-baked compass views. In 359,
-	# the four-diagonal selector kept the SAME wrong-looking angle while
-	# a ship sailed horizontally/vertically on the correct straight course.
-	# The view follows the real current heading; no fake steering zigzag.
+## Display-only 48x32 micro-legs; actual physics and 3D stay identical.
+## Visible Classic sprites alternate authentic NE/SE/NW/SW neighbours,
+## but world coordinates, hitboxes and multiplayer remain untouched.
+func _classic_raster_visual(actor: Dictionary) -> Dictionary:
+	if not browser_classic or str(actor.get("kind","ship"))!="ship":return {}
 	var id: int=int(actor.get("id",-1))
-	var facing: int=VISUALS.heading_eight(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
+	var world: Vector2=_visual_actor_pos(actor)
+	var path: Array=actor.get("path",[])
+	if path.is_empty():
+		classic_raster_visuals.erase(id)
+		return {}
+	# Obstructed courses may have several safe segments; show the
+	# current segment's raster and never create new physical waypoints.
+	var goal: Vector2=Vector2(path[0])
+	var steps: Array=actor.get("_iso_route",[])
+	var index: int=int(actor.get("_iso_route_index",0))
+	if index>=0 and index<steps.size():goal=Vector2(steps[index])
+	if world.distance_squared_to(goal)<0.001:
+		classic_raster_visuals.erase(id)
+		return {}
+	var state: Dictionary=classic_raster_visuals.get(id,{})
+	var changed: bool=state.is_empty() or Vector2(state.get("goal",Vector2.ZERO)).distance_squared_to(goal)>0.01
+	if not changed and Vector2(state.get("last_world",world)).distance_to(world)>100.0:changed=true
+	if changed:
+		var visual_start: Vector2=world
+		if not state.is_empty():
+			var prior: Vector2=Vector2(state.get("visual",world))
+			# A retap must not jerk a half-finished visual raster leg back
+			# to the hidden authoritative straight line.
+			if prior.distance_to(world)<30.0:visual_start=prior
+		var path_2d: Array[Vector2]=NAV.classic_iso_route(visual_start,goal)
+		var trace: Array[Dictionary]=[]
+		var last: Vector2=visual_start
+		var total: float=0.0
+		for next: Vector2 in path_2d:
+			var gap: Vector2=next-last
+			var length: float=gap.length()
+			if length<=0.0001:continue
+			trace.append({"start":last,"end":next,"heading":gap/length,"distance":length})
+			total+=length
+			last=next
+		if trace.is_empty():return {}
+		state={"goal":goal,"world_start":world,"last_world":world,
+			"visual":visual_start,"trace":trace,"total":total}
+		classic_raster_visuals[id]=state
+	var world_start: Vector2=Vector2(state["world_start"])
+	var direct: Vector2=goal-world_start
+	var fraction: float=clampf((world-world_start).dot(direct)/maxf(direct.length_squared(),0.0001),0.0,1.0)
+	var sample: Dictionary=VISUALS.classic_trace_sample(state["trace"],fraction)
+	if sample.is_empty():return {}
+	state["visual"]=Vector2(sample.pos)
+	state["last_world"]=world
+	return sample
+
+func _classic_frame_for_actor(actor: Dictionary) -> int:
+	var id: int=int(actor.get("id",-1))
+	var sample: Dictionary=_classic_raster_visual(actor)
+	# While sailing Classic uses the four old diagonal sprite frames.
+	# Stopped ships retain their true 8-view heading from update 360.
+	var facing: int=VISUALS.heading_four(Vector2(sample.heading),int(classic_heading_cache.get(id,-1))) if not sample.is_empty() else VISUALS.heading_eight(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
 	classic_heading_cache[id]=facing
 	return facing
 
 func _classic_actor_render_pos(actor: Dictionary) -> Vector2:
-	# Classic: quantize WORLD movement to displayed pixels, as raster-era
-	# SeaFight did. When the camera is mostly stationary this makes each
-	# 1px movement visibly advance on the chart, without any fake wobble.
 	var actual_position: Vector2=_visual_actor_pos(actor)
 	if not browser_classic:return actual_position
 	if str(actor.get("kind",""))!="ship" and int(actor.get("id",-1))!=0 and not bool(actor.get("remote_player",false)):return actual_position
-	_classic_frame_for_actor(actor)
+	var raster: Dictionary=_classic_raster_visual(actor)
+	if not raster.is_empty():actual_position=Vector2(raster.pos)
+	# Authentic raster-style screen-pixel stepping. Draw only: the
+	# underlying world position and 3D mesh are never offset.
 	var transform: Transform2D=get_canvas_transform()
 	var screen: Vector2=transform*actual_position
 	var snapped: Vector2=Vector2(roundf(screen.x),roundf(screen.y))
 	return transform.affine_inverse()*snapped
 
 func _classic_sail_heel(actor: Dictionary) -> float:
-	# Sprite-only roll, less than 1 degree. A straight course must keep a
-	# fixed real compass direction (never fake NE/SE zigzags), but the hull
-	# may subtly respond to waves while underway, as the 3D model does.
+	# Additional tiny sprite roll over the original four-way raster motion.
+	# The roll never changes the world-space sailing heading.
 	if not ship_animations_enabled:return 0.0
 	var moving: bool=_wake_intensity_for(actor)>0.025 or not actor.get("path",[]).is_empty()
 	if not moving:return 0.0
@@ -5174,6 +5229,7 @@ func _set_render_mode(value: String) -> void:
 	# NO simulation navigation call here: 2D and 3D are PURE views.
 	# Preserve course, heading, world position, speed and zoom identically.
 	classic_heading_cache.clear()
+	classic_raster_visuals.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
 	if camera!=null:_sync_plate_overlay()
