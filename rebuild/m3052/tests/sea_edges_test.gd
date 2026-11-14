@@ -17,25 +17,42 @@ func _initialize() -> void:
 			for tangent in [.12,.41,.83]:
 				sim.configure_map(origin);sim.level=20;sim.npcs.clear();sim.drops.clear()
 				sim.player.hp=sim.player.max_hp;sim.player.shield=777;sim.player.last_hit=sim.clock-6.1
-				var before_gold: int=sim.player.gold
-				var stock: Array=sim.player.ammo.duplicate()
 				var point: Vector2=sim.edge_point(edge,sim.WORLD*tangent)
 				var inward: Vector2={"east":Vector2.LEFT,"west":Vector2.RIGHT,"north":Vector2.DOWN,"south":Vector2.UP}[edge]
 				sim.player.pos=point+inward*140.0
+				# This fixture manually jumps between different map/edge
+				# positions. Such a setup must not retain the previously
+				# driven 48x32 step, as a real world-map transition won't.
+				sim._clear_classic_raster_state(sim.player)
 				check(sim.course(point) and sim.pending_portal==-1,"ordinary sailing accepts noncentral edge point")
 				var exit_tangent: Vector2=point
-				for step in 90:
-					# Crossing may happen during the final diagonal leg; compare
-					# against the actual exit point, not the tap beyond the band.
+				var crossing_gold: int=sim.player.gold
+				var crossing_ammo: Array=sim.player.ammo.duplicate()
+				var crossing_shield: float=float(sim.player.shield)
+				# Classic is physically 76px/s along 24x16 tile legs, NOT
+				# the old 165px/s straight-line mover. Give the 140px
+				# approach enough time without altering real ship speed.
+				for step in 180:
 					var before_step: Vector2=sim.player.pos
+					crossing_gold=int(sim.player.gold)
+					crossing_ammo=sim.player.ammo.duplicate()
+					crossing_shield=float(sim.player.shield)
 					sim.step(1.0/30.0)
 					if sim.map_id!=origin:
-						exit_tangent=before_step+sim.player.heading*minf(165.0/30.0,before_step.distance_to(point))
-					if sim.map_id!=origin:break
+						# The opposite edge must preserve the REAL sailed
+						# tangent, not extrapolate an obsolete 165px/s
+						# straight line. Arrival is no more than one step
+						# beyond this captured pre-crossing position.
+						exit_tangent=before_step
+						break
 				check(sim.map_id==dest,"entire %s edge crosses from %d at %.2f" % [edge,origin,tangent])
-				var preserved: bool=absf(sim.player.pos.y-exit_tangent.y)<1 if edge in ["east","west"] else absf(sim.player.pos.x-exit_tangent.x)<1
-				check(preserved and not sim.blocked(sim.player.pos),"opposite-side arrival preserves tangent in safe water")
-				check(sim.player.gold==before_gold and sim.player.ammo==stock and int(sim.player.shield)==777,"crossing preserves wallet, ammunition and shield")
+				var tangent_drift: float=absf(sim.player.pos.y-exit_tangent.y) if edge in ["east","west"] else absf(sim.player.pos.x-exit_tangent.x)
+				check(tangent_drift<=5.0 and not sim.blocked(sim.player.pos),"opposite-side arrival preserves REAL tile tangent in safe water")
+				# Shield may naturally recharge during the longer physical
+				# voyage, so compare to the frame immediately before
+				# crossing, allowing just the normal one-tick recharge.
+				var max_tick_regen: float=float(sim.player.max_shield)*0.05/30.0+0.1
+				check(sim.player.gold==crossing_gold and sim.player.ammo==crossing_ammo and absf(float(sim.player.shield)-crossing_shield)<=max_tick_regen,"crossing preserves wallet, ammunition and shield (apart from natural one-tick regeneration)")
 				sim.npcs.clear();sim.step(.1)
 				check(sim.map_id==dest and sim.near_portal()==-1,"arrival inset prevents bounce-back")
 	sim=SIM.new();sim.npcs.clear();sim.player.pos=sim.edge_point("west",sim.WORLD*.4)
