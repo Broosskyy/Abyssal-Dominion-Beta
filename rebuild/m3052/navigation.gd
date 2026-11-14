@@ -1,80 +1,94 @@
 extends RefCounted
 ## Classic Seafight-era 48×32 isometric tile geometry. This is a
 ## SCREEN-SPACE DIAMOND lattice: neighbouring tile centres differ by
-## (24,+16), (-24,+16), (24,-16), or (-24,-16). It is NOT a
+## (+24,+16), (-24,+16), (+24,-16), or (-24,-16). It is NOT a
 ## "travel 32 units diagonally then recalculate" approximation.
 const ISO_TILE_WIDTH := 48.0
 const ISO_TILE_HEIGHT := 32.0
 const ISO_HALF_X := ISO_TILE_WIDTH*0.5
 const ISO_HALF_Y := ISO_TILE_HEIGHT*0.5
 
-## Convert a high-level, coast-safe waypoint into actual fixed isometric
-## micro-steps. The tile origin is the exact actor location when the leg
-## starts: no snap or teleport when a captain retaps or respawns.
-## The final short adjustment reaches the original clicked target exactly.
-## The sequence is generated ONCE per waypoint, not re-scored every frame.
+## Exact globally anchored staggered grid: centres are (r,c) with
+## x=(r % 2 ? 0 : 24)+48*c and y=16*(r+1), as in Sea Bandits.
+## An equivalent axial (q,r) basis gives the four 24×16 neighbours.
+## Unlike an actor-local lattice, clicking a new destination cannot shift
+## the raster itself or desync player and NPC tile geometry.
+static func classic_tile_center(cell: Vector2i) -> Vector2:
+	return Vector2(ISO_HALF_X*(1.0+float(cell.x-cell.y)),ISO_HALF_Y*(1.0+float(cell.x+cell.y)))
+
+static func classic_world_to_tile(world: Vector2) -> Vector2i:
+	var x: float=(world.x-ISO_HALF_X)/ISO_HALF_X
+	var y: float=(world.y-ISO_HALF_Y)/ISO_HALF_Y
+	var q: float=0.5*(x+y)
+	var r: float=0.5*(y-x)
+	var guess_q: int=floori(q)
+	var guess_r: int=floori(r)
+	var selected: Vector2i=Vector2i(guess_q,guess_r)
+	var best: float=INF
+	for q_step in 3:
+		for r_step in 3:
+			var candidate: Vector2i=Vector2i(guess_q+q_step,guess_r+r_step)
+			var error: float=classic_tile_center(candidate).distance_squared_to(world)
+			if error<best:
+				best=error
+				selected=candidate
+	return selected
+
+## High-level pathfinder handles blocked shorelines; this stage chooses
+## exactly one of four actual tile neighbours until the last small
+## correction to the clicked coordinate. No view animation or oscillation
+## of the underlying model can introduce an extra step.
 static func classic_iso_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
-	var result: Array[Vector2]=[]
+	var path: Array[Vector2]=[]
 	var delta: Vector2=goal-start
-	if delta.length_squared()<0.0001:return result
-	# Pick a final tile centre that lies BEHIND the requested target.
-	# Independent rounding can run one tile too far and then visibly reverse
-	# for the last 20 px (the bug seen with 700 px horizontal taps).
-	var desired_q: float=0.5*(delta.x/ISO_HALF_X+delta.y/ISO_HALF_Y)
-	var desired_r: float=0.5*(delta.y/ISO_HALF_Y-delta.x/ISO_HALF_X)
-	var options_q: Array[int]=[floori(desired_q),ceili(desired_q)]
-	var options_r: Array[int]=[floori(desired_r),ceili(desired_r)]
-	var cells_q: int=0
-	var cells_r: int=0
+	if delta.length_squared()<0.0001:return path
+	var direct: Vector2=delta.normalized()
+	if delta.length()<ISO_HALF_X:
+		path.append(goal)
+		return path
+	var origin_tile: Vector2i=classic_world_to_tile(start)
+	var goal_tile: Vector2i=classic_world_to_tile(goal)
+	var dx: float=(goal.x-ISO_HALF_X)/ISO_HALF_X
+	var dy: float=(goal.y-ISO_HALF_Y)/ISO_HALF_Y
+	var q_floor: int=floori(0.5*(dx+dy))
+	var r_floor: int=floori(0.5*(dy-dx))
+	# Pick a goal tile behind the clicked point along the intended ray:
+	# a nearest-centre round-up can overshoot and force a final U-turn.
 	var best_score: float=INF
-	var guide: Vector2=delta.normalized()
-	for q: int in options_q:
-		for r: int in options_r:
-			var candidate: Vector2=start+Vector2(float(q-r)*ISO_HALF_X,float(q+r)*ISO_HALF_Y)
-			var residual: Vector2=goal-candidate
-			if residual.dot(guide)<-0.001:continue
-			var lateral: float=absf((candidate-start).cross(guide))
-			var score: float=residual.length_squared()+3.0*lateral*lateral
+	for i in 4:
+		for j in 4:
+			var candidate: Vector2i=Vector2i(q_floor-1+i,r_floor-1+j)
+			var center: Vector2=classic_tile_center(candidate)
+			var residual: Vector2=goal-center
+			if residual.dot(direct)<-0.001:continue
+			var error: float=absf((center-start).cross(direct))
+			var score: float=residual.length_squared()+2.0*error*error
 			if score<best_score:
 				best_score=score
-				cells_q=q
-				cells_r=r
-	var q_step: int=1 if cells_q>=0 else -1
-	var r_step: int=1 if cells_r>=0 else -1
-	var used_q: int=0
-	var used_r: int=0
-	var chart_heading: Vector2=delta.normalized()
-	var current: Vector2=start
-	var tile_count: int=absi(cells_q)+absi(cells_r)
-	for i in mini(tile_count,2048):
-		var can_q: bool=used_q!=cells_q
-		var can_r: bool=used_r!=cells_r
-		if not can_q and not can_r:break
-		var q_next: Vector2=current+Vector2(ISO_HALF_X*float(q_step),ISO_HALF_Y*float(q_step))
-		var r_next: Vector2=current+Vector2(-ISO_HALF_X*float(r_step),ISO_HALF_Y*float(r_step))
-		var choose_q: bool=can_q
-		if can_q and can_r:
-			# Bresenham-like cross-track error measured against the WHOLE
-			# intended segment, never against a changing intermediate bearing.
-			var q_error: float=absf((q_next-start).cross(chart_heading))
-			var r_error: float=absf((r_next-start).cross(chart_heading))
+				goal_tile=candidate
+	var tile: Vector2i=origin_tile
+	var max_steps: int=absi(goal_tile.x-tile.x)+absi(goal_tile.y-tile.y)
+	for step in mini(max_steps,2048):
+		var move_q: bool=tile.x!=goal_tile.x
+		var move_r: bool=tile.y!=goal_tile.y
+		if not move_q and not move_r:break
+		var next_q: Vector2i=tile+Vector2i(1 if goal_tile.x>tile.x else -1,0)
+		var next_r: Vector2i=tile+Vector2i(0,1 if goal_tile.y>tile.y else -1)
+		var choose_q: bool=move_q
+		if move_q and move_r:
+			var q_point: Vector2=classic_tile_center(next_q)
+			var r_point: Vector2=classic_tile_center(next_r)
+			var q_error: float=absf((q_point-start).cross(direct))
+			var r_error: float=absf((r_point-start).cross(direct))
 			if r_error+0.00001<q_error:choose_q=false
 			elif absf(q_error-r_error)<0.00001:
-				# Deterministic forward progress when both lie equally far
-				# off the ray. On horizontal trips this gives Q,R,Q,R...
-				choose_q=q_next.distance_squared_to(goal)<=r_next.distance_squared_to(goal)
-		elif can_r:choose_q=false
-		if choose_q:
-			current=q_next
-			used_q+=q_step
-		else:
-			current=r_next
-			used_r+=r_step
-		result.append(current)
-	# Only the last sub-tile correction may have arbitrary bearing.
-	if result.is_empty() or result[-1].distance_squared_to(goal)>0.0001:
-		result.append(goal)
-	return result
+				choose_q=q_point.distance_squared_to(goal)<=r_point.distance_squared_to(goal)
+		elif move_r:choose_q=false
+		tile=next_q if choose_q else next_r
+		path.append(classic_tile_center(tile))
+	if path.is_empty() or path[-1].distance_squared_to(goal)>0.0001:
+		path.append(goal)
+	return path
 
 ## Classic 2D steering only: alternating 45-degree sea-chart legs with immediate heading snaps.
 ## Native 2.5D/3D keep direct navigation; network shares the sender's actual waypoint path.
