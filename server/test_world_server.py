@@ -82,12 +82,15 @@ class CrossplayTest(unittest.IsolatedAsyncioTestCase):
             self.assertGreater(len(peer['route']),2)
             self.assertLessEqual(len(peer['route']),len(preset),
                                  'server must not expand the preexpanded tile sequence twice')
-            # Existing default/3D clients still send an ordinary straight course.
+            # Legacy default-mode courses also run the shared world
+            # grid. Older 3D builds cannot bypass physics with a direct
+            # speed/path variant once the authoritative server is updated.
             await ws.send_json({'type':'course','sequence':3,'x':4600,'y':2900})
             await asyncio.sleep(.06)
             self.assertEqual(peer['sequence'],3)
             self.assertAlmostEqual(peer['speed_scale'],1.,delta=.001)
-            self.assertEqual(len(peer['route']),1)
+            self.assertEqual(peer['navigation_mode'],'classic_48x32')
+            self.assertGreater(len(peer['route']),2)
         finally:
             await ws.close()
             await witness.close()
@@ -215,7 +218,7 @@ class CrossplayTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(welcome['player']['y'],2900)
         await ws.send_json({'type':'appearance','skin':13,'hp':1200,'max_hp':2400})
         await ws.send_json({'type':'course','sequence':1,'route':[[4200,2910],[4210,2910]]})
-        await asyncio.sleep(.25)
+        await asyncio.sleep(.50)
         world=self.client.server.app['world']
         peer=next(iter(world.peers.values()))
         self.assertEqual(peer['skin'],13)
