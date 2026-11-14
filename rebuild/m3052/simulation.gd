@@ -365,10 +365,16 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 					break
 				length+=origin.distance_to(point)
 				origin=point
-			# The old coastline-safe A* waypoint is the fallback when
-			# the little raster staircase brushes an island margin.
-			if not valid:tiles=[goal];length=Vector2(body.pos).distance_to(goal)
-			if tiles.is_empty():tiles=[goal];length=Vector2(body.pos).distance_to(goal)
+			# Never escape a blocked isometric path by sailing straight
+			# through the chart. Scripted harbor/portal and NPC courses
+			# must use the SAME four-neighbour coastal A* if their greedy
+			# tile itinerary collides with an island margin.
+			if not valid:
+				tiles=NAV.classic_safe_route(body.pos,goal,Callable(self,"segment_free"))
+			if tiles.is_empty():
+				body.path=[]
+				_clear_classic_raster_state(body)
+				return
 			body["_iso_goal"]=goal
 			body["_iso_route"]=tiles
 			body["_iso_route_index"]=0
@@ -442,45 +448,63 @@ func _classic_clicked_target(point: Vector2) -> Vector2:
 			if distance<best_distance:
 				best=center
 				best_distance=distance
-	# If the tile centre touches the coast while the tap itself is still
-	# free water, do not reroute the captain multiple tiles unexpectedly.
-	if best_distance>576.0 and not blocked(point):return point
-	return best
+	# Never silently revert to a non-raster arbitrary pixel, even
+	# close to the coast. If all candidate tile centres are blocked,
+	# the regular blocked() check cleanly rejects the course.
+	return best if best_distance<INF else selected
 
 func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 	pending_portal=-1
-	if docked: return false
-	if int(player.hp) <= 0: return false
+	if docked:return false
+	if int(player.hp)<=0:return false
 	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
-	if snap_click_to_classic_tile and classic_steering:
-		point=_classic_clicked_target(point)
-	var route: Array[Vector2] = []
-	if staff.flag("no_collision"):
+	var classic_click: bool=snap_click_to_classic_tile and classic_steering
+	if classic_click:point=_classic_clicked_target(point)
+
+	# Keep an in-progress 24×16 step when the captain retaps. The NEW
+	# course must be planned FROM THAT NEXT TILE CENTRE, not the fractional
+	# position at which the UI touch happened.
+	var committed: Variant=null
+	if classic_steering and player.has("_iso_committed_step"):
+		committed=player["_iso_committed_step"]
+	elif classic_steering and player.has("_iso_route"):
+		var previous: Array=player["_iso_route"]
+		var index: int=int(player.get("_iso_route_index",0))
+		if index>=0 and index<previous.size():
+			var step: Vector2=Vector2(previous[index])
+			if player.pos.distance_squared_to(step)>0.0001 and NAV.classic_tile_center(NAV.classic_world_to_tile(step)).distance_squared_to(step)<0.001:
+				committed=step
+	var origin: Vector2=Vector2(committed) if committed!=null else Vector2(player.pos)
+
+	var route: Array[Vector2]=[]
+	var raster: Array[Vector2]=[]
+	if classic_click:
+		# One actual 48×32 route on the GLOBAL diamond lattice. Open
+		# water retains update 344's approved stepping and speed; only
+		# obstructed courses use coastal A* instead of square-grid
+		# waypoints with occasional straight-line escape legs.
+		raster=NAV.classic_iso_route(origin,point) if staff.flag("no_collision") else NAV.classic_safe_route(origin,point,Callable(self,"segment_free"))
+		if raster.is_empty() and origin.distance_squared_to(point)>0.001:
+			message="Küste voraus · kein befahrbarer Rasterkurs"
+			return false
 		route.append(point)
 	else:
-		route=plan_actor_path(player,point)
+		if staff.flag("no_collision"):route.append(point)
+		else:route=plan_actor_path(player,point)
 	if route.is_empty():
-		message = "Küste voraus · bitte freies Wasser wählen"
+		message="Küste voraus · bitte freies Wasser wählen"
 		return false
-	# A sailor cannot turn at an arbitrary fractional point between two
-	# raster centres. Finish ONLY the current selected tile leg, then
-	# retarget immediately on that center. No turning circle or teleport.
-	var committed: Variant=null
-	if classic_steering and player.has("_iso_route"):
-		var old_route: Array=player["_iso_route"]
-		var next_index: int=int(player.get("_iso_route_index",0))
-		if next_index>=0 and next_index<old_route.size():
-			var old_tile: Vector2=Vector2(old_route[next_index])
-			if player.pos.distance_squared_to(old_tile)>0.0001 and NAV.classic_tile_center(NAV.classic_world_to_tile(old_tile)).distance_squared_to(old_tile)<0.001:
-				committed=old_tile
-	elif classic_steering and player.has("_iso_committed_step"):
-		committed=player["_iso_committed_step"]
-	player.path = route
+
+	player.path=route
 	_clear_classic_raster_state(player)
-	if committed!=null:
-		player["_iso_committed_step"]=committed
-	repairing = false
-	message = "Kurs gesetzt"
+	if committed!=null:player["_iso_committed_step"]=committed
+	if classic_click:
+		player["_iso_goal"]=point
+		player["_iso_route"]=raster
+		player["_iso_route_index"]=0
+		player["_iso_speed_scale"]=1.0
+	repairing=false
+	message="Kurs gesetzt"
 	return true
 
 func actor(id: int) -> Dictionary:

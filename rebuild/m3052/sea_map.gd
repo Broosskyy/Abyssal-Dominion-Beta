@@ -493,32 +493,47 @@ func _send_online_course(point: Vector2) -> void:
 	for waypoint: Vector2 in sim.player.path:outgoing.append(waypoint)
 	var raster_ready: bool=false
 	if browser_classic and not outgoing.is_empty():
-		# Older presence servers (protocol 2) ignore the new movement-mode
-		# hint. Send the actual *tile* route so even an older server follows
-		# the same real course instead of replacing it with a straight line.
-		var expanded: Array[Vector2]=[]
-		var current: Vector2=sim.player.pos
-		raster_ready=true
-		for waypoint: Vector2 in sim.player.path:
-			var micro: Array[Vector2]=NAV.classic_iso_route(current,waypoint)
-			var previous: Vector2=current
-			var safe: bool=true
-			for step: Vector2 in micro:
-				if not sim.segment_free(previous,step):
-					safe=false
-					break
-				previous=step
-			if not safe:
-				micro.clear();micro.append(waypoint) # Preserve coastline-safe A* leg.
-			if expanded.size()+micro.size()>512:
-				raster_ready=false # Old server limit; new server expands.
-				break
-			expanded.append_array(micro)
-			current=waypoint
-		if raster_ready and not expanded.is_empty():
-			outgoing=expanded
+		# For tapped water courses use the EXACT same 48x32 itinerary
+		# already selected/validated by the offline ship mover. Previously
+		# online recomputed a greedy route from scratch and, if a coastline
+		# blocked it, replaced it with a STRAIGHT segment. That could send
+		# a different course to the server from the course the user saw.
+		var prepared: Array=sim.player.get("_iso_route",[])
+		var saved_goal: Vector2=Vector2(sim.player.get("_iso_goal",Vector2.ZERO))
+		if not prepared.is_empty() and saved_goal.distance_squared_to(destination)<0.001:
+			var expanded: Array[Vector2]=[]
+			if sim.player.has("_iso_committed_step"):
+				expanded.append(Vector2(sim.player["_iso_committed_step"]))
+			var index: int=int(sim.player.get("_iso_route_index",0))
+			for i in range(index,prepared.size()):
+				if expanded.size()>=512:break
+				expanded.append(Vector2(prepared[i]))
+			if expanded.size()<=512 and expanded.back().distance_squared_to(destination)<0.001:
+				outgoing=expanded
+				raster_ready=true
 		else:
-			raster_ready=false
+			# Scripted harbor and portal courses keep their earlier
+			# validated A* waypoint semantics.
+			var expanded: Array[Vector2]=[]
+			var current: Vector2=sim.player.pos
+			raster_ready=true
+			for waypoint: Vector2 in sim.player.path:
+				var micro: Array[Vector2]=NAV.classic_iso_route(current,waypoint)
+				var previous: Vector2=current
+				var safe: bool=true
+				for step: Vector2 in micro:
+					if not sim.segment_free(previous,step):
+						safe=false
+						break
+					previous=step
+				if not safe:
+					micro.clear();micro.append(waypoint)
+				if expanded.size()+micro.size()>512:
+					raster_ready=false
+					break
+				expanded.append_array(micro)
+				current=waypoint
+			if raster_ready and not expanded.is_empty():outgoing=expanded
 	online_client.send_course(destination,outgoing,"classic_48x32" if browser_classic else "",raster_ready)
 
 func _update_online_ships(delta: float) -> void:

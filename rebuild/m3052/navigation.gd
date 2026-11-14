@@ -105,6 +105,108 @@ static func classic_iso_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
 		path.append(goal)
 	return path
 
+## One tile-aware course for Classic gameplay, including coasts.
+## The old approach planned a path on a SQUARE 48px AStar grid, smoothed it
+## into arbitrary floating-point waypoints and then converted EACH waypoint
+## to diagonal motion. Whenever a tile microstep clipped an island it fell
+## back to a STRAIGHT segment: a hidden renderer/movement mismatch.
+## Use four-neighbour 48x32 diamond A* instead. Open sea keeps the exact
+## 344 greedy course (including its visual step rhythm) unchanged.
+static func classic_safe_route(start: Vector2,goal: Vector2,segment_clear: Callable,max_visited: int=16000) -> Array[Vector2]:
+	var direct: Array[Vector2]=classic_iso_route(start,goal)
+	var previous: Vector2=start
+	var viable: bool=true
+	for waypoint: Vector2 in direct:
+		if not bool(segment_clear.call(previous,waypoint)):
+			viable=false
+			break
+		previous=waypoint
+	if viable:return direct
+
+	var begin: Vector2i=classic_world_to_tile(start)
+	var target: Vector2i=classic_world_to_tile(goal)
+	var begin_center: Vector2=classic_tile_center(begin)
+	var target_center: Vector2=classic_tile_center(target)
+	if start.distance_squared_to(begin_center)>0.0001 and not bool(segment_clear.call(start,begin_center)):
+		return []
+	if target_center.distance_squared_to(goal)>0.0001 and not bool(segment_clear.call(target_center,goal)):
+		return []
+
+	var base_step: float=Vector2(ISO_HALF_X,ISO_HALF_Y).length()
+	var scores: Dictionary={}
+	scores[begin]=0.0
+	var parents: Dictionary={}
+	var frontier: Array=[]
+	_tile_heap_push(frontier,{"tile":begin,"g":0.0,
+		"priority":float(absi(target.x-begin.x)+absi(target.y-begin.y))*base_step})
+	var touched: int=0
+	var directions: Array[Vector2i]=[Vector2i(1,0),Vector2i(0,1),Vector2i(-1,0),Vector2i(0,-1)]
+	while not frontier.is_empty() and touched<max_visited:
+		var entry: Dictionary=_tile_heap_pop(frontier)
+		var cell: Vector2i=entry["tile"]
+		var known_cost: float=float(scores.get(cell,INF))
+		if float(entry["g"])>known_cost+0.001:continue
+		if cell==target:
+			var reverse: Array[Vector2]=[]
+			var cursor: Vector2i=target
+			while cursor!=begin:
+				reverse.append(classic_tile_center(cursor))
+				if not parents.has(cursor):return []
+				cursor=parents[cursor]
+			reverse.reverse()
+			var result: Array[Vector2]=[]
+			if start.distance_squared_to(begin_center)>0.0001:result.append(begin_center)
+			result.append_array(reverse)
+			if result.is_empty() or result[-1].distance_squared_to(goal)>0.0001:result.append(goal)
+			return result
+		touched+=1
+		var center: Vector2=classic_tile_center(cell)
+		for delta: Vector2i in directions:
+			var candidate: Vector2i=cell+delta
+			var position: Vector2=classic_tile_center(candidate)
+			if not bool(segment_clear.call(center,position)):continue
+			var cost: float=known_cost+base_step
+			if cost>=float(scores.get(candidate,INF))-0.001:continue
+			scores[candidate]=cost
+			parents[candidate]=cell
+			# Admissible A* with a tiny cross-track tiebreaker. This
+			# favours tidy Seafight-like courses when many shortest tile
+			# paths exist, without choosing an off-grid shortcut.
+			var estimate: float=float(absi(target.x-candidate.x)+absi(target.y-candidate.y))*base_step
+			var lateral: float=absf((position-start).cross((goal-start).normalized()))
+			_tile_heap_push(frontier,{"tile":candidate,"g":cost,
+				"priority":cost+estimate+lateral*0.0001})
+	return []
+
+
+static func _tile_heap_push(heap: Array,item: Dictionary) -> void:
+	heap.append(item)
+	var index: int=heap.size()-1
+	while index>0:
+		var parent: int=(index-1)/2
+		if float(heap[parent]["priority"])<=float(item["priority"]):break
+		heap[index]=heap[parent]
+		index=parent
+	heap[index]=item
+
+
+static func _tile_heap_pop(heap: Array) -> Dictionary:
+	var first: Dictionary=heap[0]
+	var last: Dictionary=heap.pop_back()
+	if heap.is_empty():return first
+	var index: int=0
+	while true:
+		var child: int=index*2+1
+		if child>=heap.size():break
+		if child+1<heap.size() and float(heap[child+1]["priority"])<float(heap[child]["priority"]):
+			child+=1
+		if float(last["priority"])<=float(heap[child]["priority"]):break
+		heap[index]=heap[child]
+		index=child
+	heap[index]=last
+	return first
+
+
 ## Classic 2D steering only: alternating 45-degree sea-chart legs with immediate heading snaps.
 ## Native 2.5D/3D keep direct navigation; network shares the sender's actual waypoint path.
 static func diagonal_leg(start: Vector2,goal: Vector2,max_leg: float=96,first_side: int=1) -> Array[Vector2]:
