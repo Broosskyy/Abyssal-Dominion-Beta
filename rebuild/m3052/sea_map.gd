@@ -1344,6 +1344,16 @@ func _classic_actor_render_pos(actor: Dictionary) -> Vector2:
 	var snapped: Vector2=Vector2(roundf(screen.x),roundf(screen.y))
 	return transform.affine_inverse()*snapped
 
+func _classic_sail_heel(actor: Dictionary) -> float:
+	# Sprite-only roll, less than 1 degree. A straight course must keep a
+	# fixed real compass direction (never fake NE/SE zigzags), but the hull
+	# may subtly respond to waves while underway, as the 3D model does.
+	if not ship_animations_enabled:return 0.0
+	var moving: bool=_wake_intensity_for(actor)>0.025 or not actor.get("path",[]).is_empty()
+	if not moving:return 0.0
+	var id: int=int(actor.get("id",0))
+	return deg_to_rad(0.8)*sin(elapsed*2.1+float(id)*1.37)
+
 func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length: float) -> void:
 	# point is already the same pixel-stepped center used by the ring and
 	# ship label. Never apply a second, hull-only offset here.
@@ -1356,9 +1366,12 @@ func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length
 		if not entry.is_empty():
 			var frame: Dictionary=entry.frames[heading_index]
 			var spec: Dictionary=VISUALS.geometry(frame,length)
-			var target: Rect2=spec.destination
-			target.position+=hull_point
-			draw_texture_rect_region(atlas,target,spec.source)
+			# Tiny under-sail heel animates the baked hull without ever
+			# changing its heading frame, chart position, ring or online route.
+			var heel: float=_classic_sail_heel(actor)
+			draw_set_transform(hull_point,heel,Vector2.ONE)
+			draw_texture_rect_region(atlas,spec.destination,spec.source)
+			draw_set_transform(Vector2.ZERO)
 			return
 		# Camera perspective is baked into all eight genuine GLB images.
 		# Do not rotate a mismatched diagonal; select its true compass view.
