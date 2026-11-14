@@ -94,14 +94,18 @@ func _initialize() -> void:
 		var original_gold: int=sim.player.gold
 		var destination: int=sim.portals[0].destination
 		check(sim.request_portal(destination) and sim.pending_portal==destination,"portal request queues route from region "+str(start_region))
-		for _i in 1800:
+		# Native 3D and Classic 2D now share the deliberately slower
+		# 76px/s physical tile path. Crossing the 8800px world may take
+		# more than the old 60s straight-line deadline (1800 frames).
+		# This is a time budget, NOT a movement-speed adjustment.
+		for _i in 4200:
 			sim.step(1.0/30.0)
 			if sim.map_id!=start_region:break
 		check(sim.map_id==destination and sim.pending_portal==-1 and sim.near_portal()==-1,"real sailing reaches portal and changes region exactly once: "+str(start_region))
 		check(sim.visited[destination] and sim.player.gold==original_gold,"automatic crossing preserves wallet and records destination")
 		sim.npcs.clear()
 		check(sim.request_portal(start_region),"return portal accepts route")
-		for _i in 1800:
+		for _i in 4200:
 			sim.step(1.0/30.0)
 			if sim.map_id==start_region:break
 		check(sim.map_id==start_region,"return crossing completes through actual sailing")
