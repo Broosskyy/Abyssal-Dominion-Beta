@@ -64,10 +64,23 @@ class CrossplayTest(unittest.IsolatedAsyncioTestCase):
                     self.assertAlmostEqual(observer['x'],peer['x'],delta=25)
                     break
             self.assertTrue(received,'Other renderers must see one shared authoritative Classic raster ship')
-            # Existing default/3D clients still send an ordinary straight course.
-            await ws.send_json({'type':'course','sequence':2,'x':4600,'y':2900})
+            # A client can pre-expand its collision-safe micro-legs.
+            # Legacy protocol-2 servers still follow these actual points.
+            starting=(peer['x'],peer['y'])
+            another=classic_tile_center(*classic_world_to_tile(peer['x']+520.,peer['y']))
+            preset=classic_segment_route(starting,another)
+            await ws.send_json({'type':'course','sequence':2,'x':another[0],'y':another[1],
+                                'route':[[x,y] for x,y in preset],
+                                'navigation_mode':'classic_48x32','raster_preexpanded':True})
             await asyncio.sleep(.06)
             self.assertEqual(peer['sequence'],2)
+            self.assertGreater(len(peer['route']),2)
+            self.assertLessEqual(len(peer['route']),len(preset),
+                                 'server must not expand the preexpanded tile sequence twice')
+            # Existing default/3D clients still send an ordinary straight course.
+            await ws.send_json({'type':'course','sequence':3,'x':4600,'y':2900})
+            await asyncio.sleep(.06)
+            self.assertEqual(peer['sequence'],3)
             self.assertAlmostEqual(peer['speed_scale'],1.,delta=.001)
             self.assertEqual(len(peer['route']),1)
         finally:
