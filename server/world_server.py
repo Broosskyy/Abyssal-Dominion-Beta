@@ -267,8 +267,14 @@ class World:
                     # four-way chart course. The server expands/authorizes
                     # it at the server's current position, then broadcasts
                     # true shared world coordinates to 2D Classic and 3D alike.
-                    mode=data.get('navigation_mode','')
-                    if mode not in ('','classic_48x32'): continue
+                    # One authoritative WORLD raster for everyone. The
+                    # client UI is never allowed to request direct sailing.
+                    # Legacy protocol-2 clients without a mode hint are
+                    # migrated to the same 48x32 tile geometry server-side,
+                    # so an older 3D captain cannot take a shortcut.
+                    mode=data.get('navigation_mode','classic_48x32')
+                    if mode=='': mode='classic_48x32'
+                    if mode!='classic_48x32': continue
                     scale=1.0
                     if mode=='classic_48x32':
                         if data.get('raster_preexpanded') is True:
@@ -310,7 +316,9 @@ class World:
                 self.tick+=1
                 for ws,peer in list(self.peers.items()):
                     if peer['expires']<=now: await ws.close(code=1008,message=b'Session expired');continue
-                    baseline=CLASSIC_SAIL_SPEED if peer.get('navigation_mode')=='classic_48x32' else 165.0
+                    # Sailing speed is a world rule, not a renderer or
+                    # old-version preference.
+                    baseline=CLASSIC_SAIL_SPEED
                     travel=baseline*delta*float(peer.get('speed_scale',1.0))
                     while peer['route'] and travel>0:
                         dx,dy=peer['route'][0][0]-peer['x'],peer['route'][0][1]-peer['y']
