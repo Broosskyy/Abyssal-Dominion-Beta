@@ -517,17 +517,8 @@ func _send_online_course(point: Vector2) -> void:
 			var current: Vector2=sim.player.pos
 			raster_ready=true
 			for waypoint: Vector2 in sim.player.path:
-				var micro: Array[Vector2]=NAV.classic_iso_route(current,waypoint)
-				var previous: Vector2=current
-				var safe: bool=true
-				for step: Vector2 in micro:
-					if not sim.segment_free(previous,step):
-						safe=false
-						break
-					previous=step
-				if not safe:
-					micro.clear();micro.append(waypoint)
-				if expanded.size()+micro.size()>512:
+				var micro: Array[Vector2]=NAV.classic_safe_route(current,waypoint,Callable(sim,"segment_free").bind(2.0))
+				if micro.is_empty() or expanded.size()+micro.size()>512:
 					raster_ready=false
 					break
 				expanded.append_array(micro)
