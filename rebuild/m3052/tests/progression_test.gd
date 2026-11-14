@@ -94,20 +94,26 @@ func _initialize() -> void:
 		var original_gold: int=sim.player.gold
 		var destination: int=sim.portals[0].destination
 		check(sim.request_portal(destination) and sim.pending_portal==destination,"portal request queues route from region "+str(start_region))
-		# Native 3D and Classic 2D now share the deliberately slower
-		# 76px/s physical tile path. Crossing the 8800px world may take
-		# more than the old 60s straight-line deadline (1800 frames).
-		# This is a time budget, NOT a movement-speed adjustment.
-		for _i in 4200:
+		# Both modes use the same slow 76px/s raster. Some portal-return
+		# lanes require an island-safe detour longer than 10,640px. Give
+		# the full 8,800x6,400 world diagonal (plus detours) a physically
+		# realistic 240s budget; never increase the actual ship speed.
+		for _i in 7200:
 			sim.step(1.0/30.0)
 			if sim.map_id!=start_region:break
 		check(sim.map_id==destination and sim.pending_portal==-1 and sim.near_portal()==-1,"real sailing reaches portal and changes region exactly once: "+str(start_region))
 		check(sim.visited[destination] and sim.player.gold==original_gold,"automatic crossing preserves wallet and records destination")
 		sim.npcs.clear()
 		check(sim.request_portal(start_region),"return portal accepts route")
-		for _i in 4200:
+		for _i in 7200:
 			sim.step(1.0/30.0)
 			if sim.map_id==start_region:break
+		if sim.map_id!=start_region:
+			print("RETURN_PORTAL_DEBUG "+JSON.stringify({"from":destination,"to":start_region,
+				"map":sim.map_id,"position":sim.player.pos,
+				"pending":sim.pending_portal,"route_nodes":sim.player.path.size(),
+				"target":sim.player.path.back() if not sim.player.path.is_empty() else Vector2.ZERO,
+				"message":sim.message}))
 		check(sim.map_id==start_region,"return crossing completes through actual sailing")
 	sim=SIM.new();sim.npcs.clear()
 	check(not sim.request_portal(1) and "stufe 2" in sim.message.to_lower() and sim.pending_portal==-1,"locked portal explains the actual level requirement")
