@@ -1,2 +1,2 @@
 Content-only release: all Godot regression and signed-data-pack tests passed. Sixteen actual renderer views include two animation phase pairs.
-Commit: ed84462e7f61a8ee07705e1fc56aba30bd12b4c2
+Commit: 44646301bf113f6f367e746bc8ea581869acd424
