@@ -262,12 +262,23 @@ class World:
                     if mode not in ('','classic_48x32'): continue
                     scale=1.0
                     if mode=='classic_48x32':
-                        # Bound CPU and memory for an untrusted WebSocket
-                        # client; the real A* chart normally sends <=8 nodes.
-                        if len(route)>64: continue
-                        expanded=classic_expand_route((peer['x'],peer['y']),route)
-                        if expanded is None: continue
-                        route,scale=expanded
+                        if data.get('raster_preexpanded') is True:
+                            # A newer client can transmit its already
+                            # collision-checked 48x32 micro-legs. Accepting
+                            # these keeps the same trajectory on *older*
+                            # protocol-2 servers, which ignore unknown fields
+                            # but follow the supplied route waypoints.
+                            total=math.dist((peer['x'],peer['y']),route[0])
+                            total+=sum(math.dist(p,q) for p,q in zip(route,route[1:]))
+                            direct=math.dist((peer['x'],peer['y']),route[-1])
+                            scale=max(1.,min(2.,total/max(.001,direct)))
+                        else:
+                            # Server-computed Classic route for large courses.
+                            # Limit untrusted input and expansion work.
+                            if len(route)>64: continue
+                            expanded=classic_expand_route((peer['x'],peer['y']),route)
+                            if expanded is None: continue
+                            route,scale=expanded
                     peer.update(sequence=seq,route=route,speed_scale=scale)
                 except (ValueError,TypeError): continue
         except (ValueError,TypeError,KeyError,asyncio.TimeoutError):
