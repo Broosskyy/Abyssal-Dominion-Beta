@@ -489,7 +489,8 @@ func _online_snapshot(packet: Dictionary) -> void:
 func _send_online_course(point: Vector2) -> void:
 	if online_client==null or not is_instance_valid(online_client) or not online_connected:return
 	var destination: Vector2=Vector2(sim.player.path.back()) if not sim.player.path.is_empty() else point
-	var outgoing: Array[Vector2]=sim.player.path.duplicate()
+	var outgoing: Array[Vector2]=[]
+	for waypoint: Vector2 in sim.player.path:outgoing.append(waypoint)
 	var raster_ready: bool=false
 	if browser_classic and not outgoing.is_empty():
 		# Older presence servers (protocol 2) ignore the new movement-mode
@@ -508,7 +509,7 @@ func _send_online_course(point: Vector2) -> void:
 					break
 				previous=step
 			if not safe:
-				micro=[waypoint] # Preserve coastline-safe A* leg.
+				micro.clear();micro.append(waypoint) # Preserve coastline-safe A* leg.
 			if expanded.size()+micro.size()>512:
 				raster_ready=false # Old server limit; new server expands.
 				break
