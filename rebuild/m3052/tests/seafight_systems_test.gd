@@ -42,8 +42,13 @@ func _staff_checks() -> void:
 	var ammo: int=sim.player.ammo[0];sim.player.reload=0;sim._fire_player()
 	check(int(sim.player.ammo[0])==ammo and is_equal_approx(float(sim.player.reload),0.25),"unlimited ammo and instant reload")
 	sim.staff_toggle("speed");sim.player.path=[sim.player.pos+Vector2(2000,0)];sim.player.pos=Vector2(500,900);sim.player.path=[Vector2(2000,900)]
+	var sprint_origin: Vector2=sim.player.pos
 	sim._move(sim.player,1.0)
-	check(is_equal_approx(float(sim.player.pos.x),500+sim.PLAYER_SPEED*2.5),"rush speed moves 2.5 times as far")
+	var actual_sprint: float=0.0
+	for segment: Dictionary in sim.player.get("_iso_tick_segments",[]):
+		actual_sprint+=float(segment.get("distance",0.0))
+	var sprint_expected: float=sim.CLASSIC_TILE_SAIL_SPEED*clampf(float(sim.player.speed)/sim.PLAYER_SPEED,0.65,sim.CLASSIC_SHIP_SPEED_BONUS_MAX)*2.5
+	check(absf(actual_sprint-sprint_expected)<0.25 and sim.player.pos.distance_to(sprint_origin)>5.0,"staff speed cheat multiplies the same real 48x32 sailed path by 2.5 in both 2D and 3D")
 	# Staff kills never score.
 	sim.select(npc.id);npc.hp=1;npc.shield=0
 	var gold: int=sim.player.gold
