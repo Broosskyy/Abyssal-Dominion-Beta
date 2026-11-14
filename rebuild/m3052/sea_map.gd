@@ -264,9 +264,8 @@ var classic_atlases: Dictionary={}
 var classic_geometry: Dictionary={}
 var classic_monster_bottoms: Dictionary={}
 var classic_heading_cache: Dictionary={}
-# Renderer-only traveled distance for the old four-image facing change.
-# World position, heading, collision and networking are always continuous.
-var classic_visual_travel: Dictionary={}
+# The hull, wake and selection plate follow the SAME micro-steps as 30Hz
+# physics. Never invent view oscillation or offset independently of travel.
 var web_fast_mode := OS.has_feature("web")
 # Browser quality controller samples actual presented frames only once per
 # 2.5 seconds. Deliberate hysteresis prevents constant GPU buffer resizes.
@@ -601,30 +600,39 @@ func _visual_snapshot() -> Dictionary:
 	for actor: Dictionary in sim.npcs:positions[int(actor.id)]=actor.pos
 	return positions
 
-func _record_classic_visual_travel() -> void:
-	# Accumulate ACTUAL continuous world distance, never diagonal detours.
-	# The sprite cycle is optical only and will not run while standing still.
-	if not browser_classic:return
-	for id in visual_before:
-		if not visual_after.has(id):continue
-		var earlier: Vector2=Vector2(visual_before[id])
-		var later: Vector2=Vector2(visual_after[id])
-		var traveled: float=earlier.distance_to(later)
-		if traveled>0.0001 and traveled<100.0:
-			classic_visual_travel[id]=fposmod(float(classic_visual_travel.get(id,0.0))+traveled,VISUALS.CLASSIC_VIEW_CYCLE_WORLD)
+func _classic_tick_sample(actor: Dictionary) -> Dictionary:
+	# A single 30 Hz physics tick can cross more than one physical diagonal.
+	# Interpolating its endpoints erases the real corner and makes the ship
+	# appear to sail sideways. Render the original microlegs, in order.
+	if not browser_classic or not sim.classic_steering:return {}
+	var id: int=int(actor.get("id",-1))
+	if not visual_before.has(id) or not visual_after.has(id):return {}
+	var segments: Array=actor.get("_iso_tick_segments",[])
+	if segments.is_empty():return {}
+	var start: Vector2=Vector2(visual_before[id])
+	var finish: Vector2=Vector2(visual_after[id])
+	var live: Vector2=Vector2(actor.get("pos",finish))
+	# Ignore teleports, region transitions and stale network snapshots.
+	if finish.distance_squared_to(live)>0.04 or start.distance_to(finish)>200.0:return {}
+	var first: Dictionary=segments[0]
+	var last: Dictionary=segments.back()
+	if Vector2(first.get("start",start)).distance_squared_to(start)>0.04:return {}
+	if Vector2(last.get("end",finish)).distance_squared_to(finish)>0.04:return {}
+	return VISUALS.classic_trace_sample(segments,accumulator/SIMULATION_TICK)
 
 func _classic_display_heading(actor: Dictionary) -> Vector2:
-	# The displayed ship interpolates the previous physical tick; heading
-	# must come from that SAME straight segment, not the next simulation leg.
+	# The sprite must depict the current DISPLAYED tile micro-leg, not the
+	# NEXT tile already selected by the 30Hz simulation step.
+	var sample: Dictionary=_classic_tick_sample(actor)
+	if not sample.is_empty():return Vector2(sample.heading)
 	var heading: Vector2=Vector2(actor.get("heading",Vector2.RIGHT))
 	var id: int=int(actor.get("id",-1))
 	if browser_classic and visual_before.has(id) and visual_after.has(id):
-		var earlier: Vector2=Vector2(visual_before[id])
-		var later: Vector2=Vector2(visual_after[id])
-		var displacement: Vector2=later-earlier
-		var current: Vector2=Vector2(actor.get("pos",later))
-		if later.distance_squared_to(current)<0.04 and displacement.length_squared()>0.04 and displacement.length_squared()<10000.0:
-			return displacement.normalized()
+		var previous: Vector2=Vector2(visual_before[id])
+		var latest: Vector2=Vector2(visual_after[id])
+		var direction: Vector2=latest-previous
+		if direction.length_squared()>0.001 and direction.length_squared()<10000.0 and latest.distance_squared_to(Vector2(actor.get("pos",latest)))<0.04:
+			return direction.normalized()
 	return heading
 
 func _visual_actor_pos(actor: Dictionary) -> Vector2:
@@ -635,7 +643,9 @@ func _visual_actor_pos(actor: Dictionary) -> Vector2:
 	var latest: Vector2=visual_after[id]
 	# Don't interpolate teleports, respawns, or externally changed positions.
 	if current.distance_squared_to(latest)>.01 or previous.distance_to(latest)>200.0:return current
-	# Identical physical interpolation in Classic 2D, 2.5D and 3D.
+	# Never cut through a genuine 48x32 tile corner within one 30Hz tick.
+	var stepped: Dictionary=_classic_tick_sample(actor)
+	if not stepped.is_empty():return Vector2(stepped.pos)
 	return previous.lerp(latest,clampf(accumulator/SIMULATION_TICK,0.0,1.0))
 
 # Ships must leave trails only while actually moving; using 'path' alone
@@ -768,7 +778,6 @@ func _process(delta: float) -> void:
 		visual_before=_visual_snapshot()
 		sim.step(SIMULATION_TICK)
 		visual_after=_visual_snapshot()
-		_record_classic_visual_travel()
 		accumulator -= SIMULATION_TICK
 	if ring_last_target!=int(sim.target):
 		ring_last_target=int(sim.target)
@@ -1269,21 +1278,10 @@ func _classic_atlas_key(actor: Dictionary) -> String:
 	return str(actor.get("visual_key",""))
 
 func _classic_frame_for_actor(actor: Dictionary) -> int:
-	# The physical ship ALWAYS follows one direct world line per waypoint.
-	# The classic four-frame rocking is only a change of baked sprite images.
+	# No timer and no artificial picture oscillation: each of the four
+	# classic atlas images is bound to its ACTUAL raster movement segment.
 	var id: int=int(actor.get("id",-1))
-	var heading: Vector2=_classic_display_heading(actor)
-	var previous: int=int(classic_heading_cache.get(id,-1))
-	var facing: int=VISUALS.heading_four(heading,previous)
-	if browser_classic and classic_visual_travel.has(id) and visual_before.has(id) and visual_after.has(id):
-		var earlier: Vector2=Vector2(visual_before[id])
-		var later: Vector2=Vector2(visual_after[id])
-		var valid: bool=later.distance_squared_to(Vector2(actor.get("pos",later)))<0.04
-		var tick_distance: float=earlier.distance_to(later)
-		if valid and tick_distance>0.01 and tick_distance<100.0:
-			var alpha: float=clampf(accumulator/SIMULATION_TICK,0.0,1.0)
-			var travel: float=float(classic_visual_travel[id])-(1.0-alpha)*tick_distance
-			facing=VISUALS.heading_four_motion(heading,travel,previous)
+	var facing: int=VISUALS.heading_four(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
 	classic_heading_cache[id]=facing
 	return facing
 
@@ -5109,7 +5107,6 @@ func _set_render_mode(value: String) -> void:
 	# physical ship route when swapping 2D/2.5D/3D.
 	sim.set_classic_steering(browser_classic)
 	classic_heading_cache.clear()
-	classic_visual_travel.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
 	if camera!=null:_sync_plate_overlay()
