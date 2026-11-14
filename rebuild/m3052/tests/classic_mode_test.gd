@@ -103,7 +103,7 @@ func run() -> void:
 	check(retap_probe.path.is_empty() and Vector2(retap_probe.pos).distance_to(new_goal)<0.1,"the redirected raster route reaches its new exact target")
 	sim.set_classic_steering(false)
 	var goal:=Vector2(1200,500)
-	check(not sim.classic_steering,"native default uses direct navigation")
+	check(sim.classic_steering,"all ship renderers use one default 48x32 navigation")
 	check(sim.course(goal),"water tap creates a course")
 	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"native open water follows one direct line")
 	var initial_route: Array=sim.player.path.duplicate()
@@ -157,7 +157,7 @@ func run() -> void:
 	var changing_route: Array=sim.player.path.duplicate()
 	var switch_origin: Vector2=sim.player.pos
 	sim.set_classic_steering(false)
-	check(not sim.classic_steering and sim.player.pos==switch_origin and sim.player.path==changing_route,"returning to 3D leaves the exact active course and location intact")
+	check(sim.classic_steering and sim.player.pos==switch_origin and sim.player.path==changing_route,"native 3D cannot disable 48x32 grid steering or change current course")
 	var npc_body: Dictionary={"pos":Vector2(500,500),"heading":Vector2.RIGHT,"kind":"ship"}
 	var npc_direct: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
 	check(npc_direct.size()==1 and npc_direct[0]==Vector2(1200,500),"native NPC patrol ship follows direct courses")
@@ -170,8 +170,8 @@ func run() -> void:
 	var game=load("res://sea_map.tscn").instantiate();root.add_child(game);current_scene=game
 	await process_frame;game.set_process(false)
 	var before: Dictionary=game.sim.export_save()
-	game._set_render_mode("hybrid");await process_frame
-	check(not game.sim.classic_steering and game.render_mode=="hybrid","native 2.5D uses direct steering")
+	game._set_render_mode("3d");await process_frame
+	check(game.sim.classic_steering and game.render_mode=="3d","native 3D uses identical raster steering")
 	var native_player_length: float=game._actor_visual_length(game.sim.player)
 	var native_npc_length: float=game._actor_visual_length(game.sim.npcs[0])
 	game.sim.course(game.sim.player.pos+Vector2(600,0))
@@ -195,7 +195,7 @@ func run() -> void:
 			var projected_angle: float=float(classic_frames[atlas_index].get("chart_angle_rad",999.0))
 			check(absf(wrapf(baked_angle-expected_yaw,-PI,PI))<0.001,"GLB yaw compensates for orthographic camera tilt: "+str(atlas_index))
 			check(absf(wrapf(projected_angle-expected_screen_angle,-PI,PI))<0.001,"baked Classic image projects to actual 48x32 on-screen move direction: "+str(atlas_index))
-	check(game.sim.classic_steering and game.sim.player.path.back()==destination and game.sim.player.path==course and game.sim.player.pos==Vector2(before.position[0],before.position[1]),"Classic 2D preserves existing physical waypoint path and position while changing only sprite views")
+	check(game.sim.classic_steering and game.sim.player.path.back()==destination and game.sim.player.path==course and game.sim.player.pos==Vector2(before.position[0],before.position[1]),"2D/3D render switch preserves raster path and captain position")
 	check(is_equal_approx(game._actor_visual_length(game.sim.player),native_player_length*game.CLASSIC_HULL_SCALE),"Classic uses a smaller on-screen captain hull without altering game physics")
 	check(is_equal_approx(game.CLASSIC_HULL_SCALE_MOBILE,0.60) and is_equal_approx(game.CLASSIC_MOBILE_CAMERA_FACTOR,0.94),"Android/iOS Classic calibrates ship footprint and world zoom separately from desktop and 3D")
 	check(game.CLASSIC_HULL_SCALE_MOBILE>game.CLASSIC_HULL_SCALE and game.CLASSIC_MOBILE_CAMERA_FACTOR<1.0,"ship increases while background map zooms out on mobile")
@@ -314,17 +314,17 @@ func run() -> void:
 	game._open_modal("Anzeige")
 	var options: Array[String]=[]
 	for button in game.modal_body.find_children("*","Button",true,false):options.append(button.text)
-	check(options.any(func(text):return text.begins_with("CLASSIC 2D")) and options.any(func(text):return text.begins_with("2,5D")) and options.any(func(text):return text.begins_with("3D")),"native settings retain three GRAPHICS modes")
+	check(options.any(func(text):return text.begins_with("CLASSIC 2D")) and options.any(func(text):return text.begins_with("ECHTES 3D")) and not options.any(func(text):return text.contains("2,5D") or text.contains("HYBRID")),"native settings offer ONLY Classic 2D and real 3D")
 	check(not options.any(func(text):return text.contains("PIXEL") or text.contains("VIDEO 901") or text.contains("KLASSISCHE KAMERA") or text.contains("SPIELER ZENTRIEREN") or text=="KURZ" or text=="LANG"),"Classic sailing no longer has alternative pixel, pace or camera mode buttons")
 	game.queue_free();await process_frame
 	var reloaded=load("res://sea_map.tscn").instantiate();root.add_child(reloaded);current_scene=reloaded
 	await process_frame;reloaded.set_process(false)
 	check(reloaded.browser_classic and reloaded.render_mode=="classic" and reloaded.mesh_layer==null,"saved Classic preference starts natively without constructing 3D")
 	reloaded._set_render_mode("3d");await process_frame
-	check(not reloaded.browser_classic and not reloaded.sim.classic_steering and reloaded.mesh_layer!=null and reloaded.mesh_layer.has_complete_fleet() and reloaded.render_mode=="3d","3D restores original direct steering and complete native fleet")
+	check(not reloaded.browser_classic and reloaded.sim.classic_steering and reloaded.mesh_layer!=null and reloaded.mesh_layer.has_complete_fleet() and reloaded.render_mode=="3d","3D uses the same global raster with complete GLB fleet")
 	check(is_equal_approx(reloaded._actor_visual_length(reloaded.sim.player),native_player_length),"3D captain hull size remains exactly unchanged")
 	reloaded._set_render_mode("classic");await process_frame
 	reloaded._set_render_mode("hybrid");await process_frame
-	check(not reloaded.browser_classic and not reloaded.sim.classic_steering and reloaded.render_mode=="hybrid" and reloaded.mesh_layer!=null,"2.5D restores direct steering and one working renderer")
+	check(not reloaded.browser_classic and reloaded.sim.classic_steering and reloaded.render_mode=="3d" and reloaded.mesh_layer!=null,"legacy 2.5D requests migrate to real 3D without changing sea navigation")
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)
