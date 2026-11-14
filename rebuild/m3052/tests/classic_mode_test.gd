@@ -324,7 +324,23 @@ func run() -> void:
 	check(not reloaded.browser_classic and reloaded.sim.classic_steering and reloaded.mesh_layer!=null and reloaded.mesh_layer.has_complete_fleet() and reloaded.render_mode=="3d","3D preserves tile physics and loads complete native fleet")
 	check(is_equal_approx(reloaded._actor_visual_length(reloaded.sim.player),native_player_length),"3D captain hull size remains exactly unchanged")
 	reloaded._set_render_mode("classic");await process_frame
-	reloaded._set_render_mode("hybrid");await process_frame
-	check(not reloaded.browser_classic and reloaded.sim.classic_steering and reloaded.render_mode=="3d" and reloaded.mesh_layer!=null,"legacy 2.5D requests safely migrate to the sole native 3D mode")
+	# A graphics toggle DURING a real in-progress 24x16 step must leave
+	# the world position, waypoints, next tile, and speed untouched.
+	var convoy_target: Vector2=reloaded.sim.player.pos+Vector2(430,85)
+	var voyage_ready: bool=reloaded.sim.course(convoy_target,true)
+	check(voyage_ready,"2D captain starts a real 48x32 voyage before switching the 3D renderer")
+	if voyage_ready:
+		reloaded.sim._move(reloaded.sim.player,1.0/12.0)
+		var voyage_pos: Vector2=reloaded.sim.player.pos
+		var voyage_path: Array=reloaded.sim.player.path.duplicate(true)
+		var voyage_steps: Array=reloaded.sim.player.get("_iso_route",[]).duplicate(true)
+		var voyage_index: int=int(reloaded.sim.player.get("_iso_route_index",0))
+		reloaded._set_render_mode("hybrid");await process_frame
+		check(not reloaded.browser_classic and reloaded.render_mode=="3d" and reloaded.mesh_layer!=null,"legacy 2.5D selection migrates to the only native 3D mode")
+		check(reloaded.sim.classic_steering and reloaded.sim.player.pos==voyage_pos and reloaded.sim.player.path==voyage_path and reloaded.sim.player.get("_iso_route",[])==voyage_steps and int(reloaded.sim.player.get("_iso_route_index",0))==voyage_index,"switching 2D→3D MID-STEP preserves pixel position, chosen itinerary and current tile index")
+		reloaded.sim._move(reloaded.sim.player,1.0/30.0)
+		check(reloaded.sim.player.pos.distance_to(voyage_pos)>0.01,"3D captain continues the same active tile instead of restarting the course")
+	else:
+		reloaded._set_render_mode("hybrid");await process_frame
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)
