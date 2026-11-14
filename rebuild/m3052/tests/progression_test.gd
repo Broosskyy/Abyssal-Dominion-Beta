@@ -112,6 +112,7 @@ func _initialize() -> void:
 			print("RETURN_PORTAL_DEBUG "+JSON.stringify({"from":destination,"to":start_region,
 				"map":sim.map_id,"position":sim.player.pos,
 				"pending":sim.pending_portal,"route_nodes":sim.player.path.size(),
+				"raster_abort":sim.last_raster_abort,
 				"target":sim.player.path.back() if not sim.player.path.is_empty() else Vector2.ZERO,
 				"message":sim.message}))
 		check(sim.map_id==start_region,"return crossing completes through actual sailing")
