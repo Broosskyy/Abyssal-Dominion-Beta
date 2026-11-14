@@ -1,3 +1,5 @@
+> **Überholt durch Classic 343 (14. November 2026).** Dieses Dokument beschreibt die *alte* physische 4-Wege-Zickzack-Logik der Updates 339–342. Sie wurde nach Spielerfeedback als Ursache der falschen Fahrt erkannt und entfernt. Seit [PR #56](https://github.com/Broosskyy/Abyssal-Dominion-Beta/pull/56) bewegen sich Schiffe in Classic 2D, 2,5D und 3D auf denselben tatsächlichen geraden, kollisionsgeprüften Fahrstrecken. Nur die historische 4-Ansichten-Grafik wechselt bei 2D auf Basis echter zurückgelegter Entfernung. Keine physischen 48×32-Schritte, keine `_move_classic`-Route und kein Zickzack mehr. Tests prüfen 14 gerade Kurse, sofortiges Retap, exakte Ankunft, NPCs und identische Weltkoordinaten. Verifiziert in Godot 4.7.2 Browser-Test 130; Geräteprüfung bleibt nötig.
+
 # Classic 2D – physical raster-tick rendering (342)
 
 Status: Godot 4.7.2 Classic/WebGL regression passed on `browser-test-128`. Implemented in the active `rebuild/m3052` source. This document tracks verification of the movement correction after the prior `data-339` and `data-340` calibration updates.
