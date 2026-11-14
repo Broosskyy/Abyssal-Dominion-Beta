@@ -22,6 +22,7 @@ MAX_CLIENTS = 128
 MAX_ROOM = 32
 CLASSIC_TILE_HALF_X = 24.0
 CLASSIC_TILE_HALF_Y = 16.0
+CLASSIC_SAIL_SPEED = 76.0  # Slow, fixed 48x32 tile cadence in world px/s
 
 def classic_tile_center(q, r):
     # Same globally anchored staggered 48x32 grid as the Godot client.
@@ -271,15 +272,19 @@ class World:
                             total=math.dist((peer['x'],peer['y']),route[0])
                             total+=sum(math.dist(p,q) for p,q in zip(route,route[1:]))
                             direct=math.dist((peer['x'],peer['y']),route[-1])
-                            scale=max(1.,min(2.,total/max(.001,direct)))
+                            # The old path-length compensation doubled
+                            # physical leg velocity. Tile sailing must be
+                            # paced along the REAL raster route instead.
+                            scale=1.0
                         else:
                             # Server-computed Classic route for large courses.
                             # Limit untrusted input and expansion work.
                             if len(route)>64: continue
                             expanded=classic_expand_route((peer['x'],peer['y']),route)
                             if expanded is None: continue
-                            route,scale=expanded
-                    peer.update(sequence=seq,route=route,speed_scale=scale)
+                            route,_unused_compensation=expanded
+                            scale=1.0
+                    peer.update(sequence=seq,route=route,speed_scale=scale,navigation_mode=mode)
                 except (ValueError,TypeError): continue
         except (ValueError,TypeError,KeyError,asyncio.TimeoutError):
             await ws.close(code=1008,message=b'Invalid session or map')
@@ -297,7 +302,8 @@ class World:
                 self.tick+=1
                 for ws,peer in list(self.peers.items()):
                     if peer['expires']<=now: await ws.close(code=1008,message=b'Session expired');continue
-                    travel=165*delta*float(peer.get('speed_scale',1.0))
+                    baseline=CLASSIC_SAIL_SPEED if peer.get('navigation_mode')=='classic_48x32' else 165.0
+                    travel=baseline*delta*float(peer.get('speed_scale',1.0))
                     while peer['route'] and travel>0:
                         dx,dy=peer['route'][0][0]-peer['x'],peer['route'][0][1]-peer['y']
                         distance=math.hypot(dx,dy); step=min(distance,travel)

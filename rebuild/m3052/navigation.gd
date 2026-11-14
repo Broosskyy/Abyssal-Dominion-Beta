@@ -17,6 +17,9 @@ static func classic_tile_center(cell: Vector2i) -> Vector2:
 	return Vector2(ISO_HALF_X*(1.0+float(cell.x-cell.y)),ISO_HALF_Y*(1.0+float(cell.x+cell.y)))
 
 static func classic_world_to_tile(world: Vector2) -> Vector2i:
+	# Use the actual DIAMOND that contains the click, not Euclidean
+	# distance to tile centres. Euclidean-nearest picks the WRONG square
+	# close to the corners of this 48x32 staggered chart (e.g. 15,4).
 	var x: float=(world.x-ISO_HALF_X)/ISO_HALF_X
 	var y: float=(world.y-ISO_HALF_Y)/ISO_HALF_Y
 	var q: float=0.5*(x+y)
@@ -28,9 +31,10 @@ static func classic_world_to_tile(world: Vector2) -> Vector2i:
 	for q_step in 3:
 		for r_step in 3:
 			var candidate: Vector2i=Vector2i(guess_q+q_step,guess_r+r_step)
-			var error: float=classic_tile_center(candidate).distance_squared_to(world)
-			if error<best:
-				best=error
+			var center: Vector2=classic_tile_center(candidate)
+			var diamond: float=absf(world.x-center.x)/ISO_HALF_X+absf(world.y-center.y)/ISO_HALF_Y
+			if diamond<best:
+				best=diamond
 				selected=candidate
 	return selected
 
@@ -71,6 +75,13 @@ static func classic_iso_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
 					best_score=score
 					goal_tile=candidate
 	var tile: Vector2i=origin_tile
+	# A restored or spawned captain may start a few pixels away from an
+	# authentic tile centre. Smoothly finish that short alignment once,
+	# then ALL following legs are exactly 24x16. The retap logic holds
+	# the current committed leg to its centre before planning a new path.
+	var origin_center: Vector2=classic_tile_center(origin_tile)
+	if start.distance_squared_to(origin_center)>0.0001:
+		path.append(origin_center)
 	var max_steps: int=absi(goal_tile.x-tile.x)+absi(goal_tile.y-tile.y)
 	for step in mini(max_steps,2048):
 		var move_q: bool=tile.x!=goal_tile.x

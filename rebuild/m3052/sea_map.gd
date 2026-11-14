@@ -2338,6 +2338,11 @@ func _refresh_ui() -> void:
 	if staff_pill.visible:
 		var presence="" if staff.presence=="official" else " · "+str(CONTENT.STAFF_PRESENCE[staff.presence].name)
 		staff_pill.text="%s%s · %s" % [staff.badge(),presence,CONTENT.STAFF_ENVIRONMENT]
+		if staff.flag("speed"):
+			staff_pill.text+=" · TEMPO-BOOST ×2,5"
+			staff_pill.tooltip_text="Achtung: Admin-Speed ist aktiv! Unter STAFF den Geschwindigkeitsboost für realistische Classic-Fahrttests ausschalten."
+		else:
+			staff_pill.tooltip_text="Admin-Test ist aktiv, der Tempo-Boost ist AUS."
 	if message_history.is_empty() or message_history.back()!=sim.message:
 		message_history.append(sim.message)
 		status_age=0.0
