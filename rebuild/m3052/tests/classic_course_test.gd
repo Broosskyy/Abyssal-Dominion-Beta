@@ -87,7 +87,7 @@ func _run() -> void:
 	check(sim.course(goal,true),"first coastal course accepted")
 	for frame in range(8):sim._move(sim.player,1.0/30.0)
 	var next_tile: Vector2=Vector2(sim.player["_iso_route"][int(sim.player["_iso_route_index"])])
-	var new_goal: Vector2=NAV.classic_tile_center(Vector2i(176,4))
+	var new_goal: Vector2=NAV.classic_tile_center(Vector2i(176,12))
 	var new_course: bool=sim.course(new_goal,true)
 	check(new_course and sim.player.has("_iso_committed_step") and Vector2(sim.player["_iso_committed_step"])==next_tile,"retap preserves the currently committed physical 24x16 step")
 	var retap_path: Array=sim.player.get("_iso_route",[])
