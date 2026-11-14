@@ -4,7 +4,7 @@ on:
     branches: ['fix/m360-classic-facing-size-zoom-parity']
     paths:
       - 'rebuild/m3052/**'
-      - '.github/workflows/m359-navigation-qa.yml'
+      - '.github/workflows/m360-visual-parity-qa.yml'
   workflow_dispatch:
 permissions:
   contents: read
