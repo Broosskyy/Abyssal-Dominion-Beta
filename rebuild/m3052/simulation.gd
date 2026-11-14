@@ -23,9 +23,9 @@ const PLAYER_SPEED := 165.0
 # comparing a FULL course against the original-era reference.
 const CLASSIC_TILE_SAIL_SPEED := 76.0
 const CLASSIC_SHIP_SPEED_BONUS_MAX := 1.35
-# One authoritative sea-chart route for ALL ship graphics: Classic 2D
-# atlases and native 3D GLBs traverse the SAME global 48x32 diamond tiles.
-# Changing only the rendering can never alter a live course or speed.
+# One authoritative sea-chart route for ALL ship graphics. 48x32 diamonds
+# select map targets; physical movement goes straight over clear water
+# and around coastline via shared smooth waypoints in both 2D and 3D.
 const PLAYER_HP := 2400
 const PLAYER_SHIELD := 1000
 const SHIELD_DELAY := 8.0
@@ -344,22 +344,11 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 			body["_iso_tick_segments"]=tick_segments
 			continue
 		if not body.has("_iso_goal") or Vector2(body["_iso_goal"]).distance_squared_to(goal)>0.01:
-			# NPC AI, scripted courses and tests may replace body.path
-			# directly, bypassing player.course(). They still must not
-			# originate a new diagonal halfway through an active tile.
-			if body.has("_iso_route"):
-				var prior: Array=body["_iso_route"]
-				var prior_index: int=int(body.get("_iso_route_index",0))
-				if prior_index>=0 and prior_index<prior.size():
-					var prior_step: Vector2=Vector2(prior[prior_index])
-					if Vector2(body.pos).distance_squared_to(prior_step)>0.0001 and NAV.classic_tile_center(NAV.classic_world_to_tile(prior_step)).distance_squared_to(prior_step)<0.001:
-						_clear_classic_raster_state(body)
-						body["_iso_tick_segments"]=tick_segments
-						body["_iso_committed_step"]=prior_step
-						continue
+			# NPC AI and scripts can replace body.path directly. Replan from
+			# the exact current world position, not an old committed tile.
 			_clear_classic_raster_state(body)
 			body["_iso_tick_segments"]=tick_segments
-			var tiles: Array[Vector2]=NAV.classic_iso_route(body.pos,goal)
+			var tiles: Array[Vector2]=NAV.classic_water_route(body.pos,goal)
 			var valid: bool=true
 			var origin: Vector2=body.pos
 			var length: float=0.0
@@ -418,9 +407,8 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 
 
 func set_classic_steering(_enabled: bool) -> void:
-	# Deprecated compatibility method. Do not let a graphics switch reset
-	# a committed 24x16 micro-step, path or heading. Both 2D and 3D
-	# *always* sail on the exact same 48x32 world grid.
+	# Renderer changes never reset world position, route, heading or speed.
+	# Both 2D and 3D use one shared course, independent of the chart grid.
 	classic_steering=true
 
 
@@ -459,29 +447,16 @@ func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 	var classic_click: bool=snap_click_to_classic_tile and classic_steering
 	if classic_click:point=_classic_clicked_target(point)
 
-	# Keep an in-progress 24×16 step when the captain retaps. The NEW
-	# course must be planned FROM THAT NEXT TILE CENTRE, not the fractional
-	# position at which the UI touch happened.
-	var committed: Variant=null
-	if classic_steering and player.has("_iso_committed_step"):
-		committed=player["_iso_committed_step"]
-	elif classic_steering and player.has("_iso_route"):
-		var previous: Array=player["_iso_route"]
-		var index: int=int(player.get("_iso_route_index",0))
-		if index>=0 and index<previous.size():
-			var step: Vector2=Vector2(previous[index])
-			if player.pos.distance_squared_to(step)>0.0001 and NAV.classic_tile_center(NAV.classic_world_to_tile(step)).distance_squared_to(step)<0.001:
-				committed=step
-	var origin: Vector2=Vector2(committed) if committed!=null else Vector2(player.pos)
+	# A new tap redirects immediately from the ship's CURRENT world point.
+	# Never lock a captain into a previous full tile/waypoint leg.
+	var origin: Vector2=Vector2(player.pos)
 
 	var route: Array[Vector2]=[]
 	var raster: Array[Vector2]=[]
 	if classic_click:
-		# One actual 48×32 route on the GLOBAL diamond lattice. Open
-		# water retains update 344's approved stepping and speed; only
-		# obstructed courses use coastal A* instead of square-grid
-		# waypoints with occasional straight-line escape legs.
-		raster=NAV.classic_iso_route(origin,point) if staff.flag("no_collision") else NAV.classic_safe_route(origin,point,Callable(self,"segment_free").bind(2.0))
+		# The 48x32 chart still selects the clicked tile. Physical travel
+		# stays straight on open water; only coasts introduce smooth bends.
+		raster=NAV.classic_water_route(origin,point) if staff.flag("no_collision") else NAV.classic_safe_route(origin,point,Callable(self,"segment_free").bind(2.0))
 		if raster.is_empty() and origin.distance_squared_to(point)>0.001:
 			message="Küste voraus · kein befahrbarer Rasterkurs"
 			return false
@@ -495,7 +470,6 @@ func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 
 	player.path=route
 	_clear_classic_raster_state(player)
-	if committed!=null:player["_iso_committed_step"]=committed
 	if classic_click:
 		player["_iso_goal"]=point
 		player["_iso_route"]=raster
