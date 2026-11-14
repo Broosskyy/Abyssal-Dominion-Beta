@@ -48,24 +48,28 @@ static func classic_iso_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
 		return path
 	var origin_tile: Vector2i=classic_world_to_tile(start)
 	var goal_tile: Vector2i=classic_world_to_tile(goal)
-	var dx: float=(goal.x-ISO_HALF_X)/ISO_HALF_X
-	var dy: float=(goal.y-ISO_HALF_Y)/ISO_HALF_Y
-	var q_floor: int=floori(0.5*(dx+dy))
-	var r_floor: int=floori(0.5*(dy-dx))
-	# Pick a goal tile behind the clicked point along the intended ray:
-	# a nearest-centre round-up can overshoot and force a final U-turn.
-	var best_score: float=INF
-	for i in 4:
-		for j in 4:
-			var candidate: Vector2i=Vector2i(q_floor-1+i,r_floor-1+j)
-			var center: Vector2=classic_tile_center(candidate)
-			var residual: Vector2=goal-center
-			if residual.dot(direct)<-0.001:continue
-			var error: float=absf((center-start).cross(direct))
-			var score: float=residual.length_squared()+2.0*error*error
-			if score<best_score:
-				best_score=score
-				goal_tile=candidate
+	# Real player clicks select a tile center. NEVER push their goal
+	# backward by one tile; the old "stay behind" heuristic created an
+	# unnecessary extra heading change at the very end of a tap course.
+	if classic_tile_center(goal_tile).distance_squared_to(goal)>0.0001:
+		var dx: float=(goal.x-ISO_HALF_X)/ISO_HALF_X
+		var dy: float=(goal.y-ISO_HALF_Y)/ISO_HALF_Y
+		var q_floor: int=floori(0.5*(dx+dy))
+		var r_floor: int=floori(0.5*(dy-dx))
+		# Pick a goal tile behind the clicked point along the intended ray:
+		# a nearest-centre round-up can overshoot and force a final U-turn.
+		var best_score: float=INF
+		for i in 4:
+			for j in 4:
+				var candidate: Vector2i=Vector2i(q_floor-1+i,r_floor-1+j)
+				var center: Vector2=classic_tile_center(candidate)
+				var residual: Vector2=goal-center
+				if residual.dot(direct)<-0.001:continue
+				var error: float=absf((center-start).cross(direct))
+				var score: float=residual.length_squared()+2.0*error*error
+				if score<best_score:
+					best_score=score
+					goal_tile=candidate
 	var tile: Vector2i=origin_tile
 	var max_steps: int=absi(goal_tile.x-tile.x)+absi(goal_tile.y-tile.y)
 	for step in mini(max_steps,2048):
