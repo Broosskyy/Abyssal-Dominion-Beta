@@ -761,6 +761,12 @@ func _move(body: Dictionary, delta: float) -> void:
 	var travel = float(body.speed) * slow_rate * delta * (1.25 if int(body.id)==0 and float(buffs.get("wind_draught",0))>0 else 1.0)
 	var phasing := int(body.id) == 0 and staff.flag("no_collision")
 	if int(body.id) == 0 and staff.flag("speed"): travel *= 2.5
+	_advance_world_course(body,travel,phasing)
+
+func _advance_world_course(body: Dictionary,travel: float,phasing: bool) -> void:
+	# Single physical mover for Classic 2D, 2.5D and 3D. It follows
+	# the exact requested straight segment, or A* coastline waypoints.
+	# Changing 2D sprite facings MUST NEVER move the captain sideways.
 	while travel > 0.01 and not body.path.is_empty():
 		var goal: Vector2 = body.path[0]
 		var gap: Vector2 = goal - body.pos
