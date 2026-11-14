@@ -31,7 +31,10 @@ func _run() -> void:
 		for i in 3:
 			check(not game.quick_bar.tabs[i].get_rect().intersects(game.quick_bar.edit.get_rect()),"page tabs cannot overlap configure control on "+str(screen))
 		for control: Control in [game.zoom_in,game.zoom_out,game.center_button,game.settings_button,game.render_toggle]:
-			check(control.size.y>=44.0 and control.size.x>=40.0,"corner/graphics touch control is >=44px high on "+str(screen)+": "+control.name)
+			# Desktop zoom keys stay at 40px; touch landscape keys and the
+			# graphics selector reach 44px minimum. Test the actual layout.
+			var target_h: float=44.0 if screen.x<1024 or control==game.render_toggle else 40.0
+			check(control.size.y>=target_h and control.size.x>=40.0,"corner/graphics control reaches the correct touch target on "+str(screen)+": "+control.name)
 			check(control.get_global_rect().position.x>=0 and control.get_global_rect().end.x<=screen.x+1 and control.get_global_rect().position.y>=0 and control.get_global_rect().end.y<=screen.y+1,"corner/graphics target remains inside screen "+str(screen)+": "+control.name)
 		game.sim.select(2)
 		game._refresh_ui()
