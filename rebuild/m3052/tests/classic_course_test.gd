@@ -25,6 +25,7 @@ func _run() -> void:
 	# four-direction approved grid itinerary, not a redesigned animation.
 	var start: Vector2=NAV.classic_tile_center(Vector2i(170,10))
 	var goal: Vector2=NAV.classic_tile_center(Vector2i(182,-2))
+	print("COURSE_TEST_STAGE: route")
 	var old: Array[Vector2]=NAV.classic_iso_route(start,goal)
 	var free: Array[Vector2]=NAV.classic_safe_route(start,goal,func(_a,_b):return true)
 	check(free==old,"unobstructed courses preserve the exact validated Classic 344 tile sequence")
@@ -35,6 +36,7 @@ func _run() -> void:
 		if not _clear_test_barrier(prior,tile):crossing=true
 		prior=tile
 	check(crossing,"test island really intersects the old direct route")
+	print("COURSE_TEST_STAGE: obstacle A-star")
 	var detour: Array[Vector2]=NAV.classic_safe_route(start,goal,Callable(self,"_clear_test_barrier"))
 	check(not detour.is_empty() and detour.back()==goal,"four-neighbour chart A* reaches requested clicked tile around island")
 	var real_tile_steps: bool=true
@@ -53,6 +55,7 @@ func _run() -> void:
 
 	# Integrate with live Simulation: plan before setting ship.path, keep
 	# clicked destination visible, and verify physical sailing finishes.
+	print("COURSE_TEST_STAGE: creating simulation")
 	var sim=SIM.new()
 	sim.npcs.clear()
 	sim.set_classic_steering(true)
@@ -61,11 +64,13 @@ func _run() -> void:
 		barrier.position+Vector2(barrier.size.x,0),
 		barrier.end,
 		barrier.position+Vector2(0,barrier.size.y)])
-	sim.islands=[{"bounds":barrier,"outline":polygon}]
+	sim.islands.clear()
+	sim.islands.append({"bounds":barrier,"outline":polygon})
 	sim.player.pos=start
 	# The same island-safe four-way route must also apply to scripted
 	# movement and NPCs. Previously they silently fell back to a direct
 	# straight leg if their A* square-grid waypoint was obstructed.
+	print("COURSE_TEST_STAGE: NPC path")
 	var npc: Dictionary={"id":912,"kind":"ship","pos":start,"heading":Vector2.RIGHT,
 		"speed":SIM.PLAYER_SPEED,"slow":0.0,"path":[goal]}
 	sim._move(npc,1.0/30.0)
@@ -77,6 +82,7 @@ func _run() -> void:
 		npc_safe=npc_safe and sim.segment_free(npc_prior,tile)
 		npc_prior=tile
 	check(npc_safe,"scripted and NPC routes are physically coastline-safe at every tile step")
+	print("COURSE_TEST_STAGE: click course")
 	var underway: bool=sim.course(goal,true)
 	check(underway and sim.player.path.size()==1 and Vector2(sim.player.path.back())==goal,"click plans a single terminal marker with precomputed safe raster itinerary")
 	var planned: Array=sim.player.get("_iso_route",[])
@@ -88,6 +94,7 @@ func _run() -> void:
 		prior=waypoint
 	check(all_safe,"actual simulation's coastline margin is checked for each preplanned raster segment")
 	# Sim speed (76px/s), sprite bearing and arrival must not change.
+	print("COURSE_TEST_STAGE: simulate full voyage")
 	var count: int=0
 	while not sim.player.path.is_empty() and count<1500:
 		sim._move(sim.player,1.0/30.0)
@@ -97,6 +104,7 @@ func _run() -> void:
 
 	# Mid-sail retap: plan from already committed NEXT tile centre, even
 	# though the hull is still at a fractional point within that leg.
+	print("COURSE_TEST_STAGE: retap")
 	sim.player.pos=start
 	check(sim.course(goal,true),"first coastal course accepted")
 	for frame in range(8):sim._move(sim.player,1.0/30.0)
