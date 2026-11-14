@@ -103,13 +103,13 @@ func run() -> void:
 	check(retap_probe.path.is_empty() and Vector2(retap_probe.pos).distance_to(new_goal)<0.1,"the redirected raster route reaches its new exact target")
 	sim.set_classic_steering(false)
 	var goal:=Vector2(1200,500)
-	check(not sim.classic_steering,"native default uses direct navigation")
+	check(sim.classic_steering,"all clients share authoritative 48x32 raster even when legacy renderer flag is disabled")
 	check(sim.course(goal),"water tap creates a course")
-	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"native open water follows one direct line")
+	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"all views share a single terminal world destination")
 	var initial_route: Array=sim.player.path.duplicate()
 	var initial_pos: Vector2=sim.player.pos
 	sim.set_classic_steering(true)
-	check(sim.classic_steering and sim.player.path==initial_route and sim.player.pos==initial_pos,"switching to Classic never rewrites the physical route or teleports the captain")
+	check(sim.classic_steering and sim.player.path==initial_route and sim.player.pos==initial_pos,"render mode API cannot disable the shared physical route or teleport the captain")
 	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"Classic horizontal sailing has no synthetic diagonal zigzags")
 	var stock: Array=sim.player.ammo.duplicate()
 	var horizontal_facings: Dictionary={}
@@ -157,7 +157,7 @@ func run() -> void:
 	var changing_route: Array=sim.player.path.duplicate()
 	var switch_origin: Vector2=sim.player.pos
 	sim.set_classic_steering(false)
-	check(not sim.classic_steering and sim.player.pos==switch_origin and sim.player.path==changing_route,"returning to 3D leaves the exact active course and location intact")
+	check(sim.classic_steering and sim.player.pos==switch_origin and sim.player.path==changing_route,"3D preserves the same 48x32 physical movement state and route")
 	var npc_body: Dictionary={"pos":Vector2(500,500),"heading":Vector2.RIGHT,"kind":"ship"}
 	var npc_direct: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
 	check(npc_direct.size()==1 and npc_direct[0]==Vector2(1200,500),"native NPC patrol ship follows direct courses")
@@ -170,8 +170,8 @@ func run() -> void:
 	var game=load("res://sea_map.tscn").instantiate();root.add_child(game);current_scene=game
 	await process_frame;game.set_process(false)
 	var before: Dictionary=game.sim.export_save()
-	game._set_render_mode("hybrid");await process_frame
-	check(not game.sim.classic_steering and game.render_mode=="hybrid","native 2.5D uses direct steering")
+	game._set_render_mode("3d");await process_frame
+	check(game.sim.classic_steering and game.render_mode=="3d","native 3D uses same 48x32 authoritative steering as Classic")
 	var native_player_length: float=game._actor_visual_length(game.sim.player)
 	var native_npc_length: float=game._actor_visual_length(game.sim.npcs[0])
 	game.sim.course(game.sim.player.pos+Vector2(600,0))
@@ -314,17 +314,17 @@ func run() -> void:
 	game._open_modal("Anzeige")
 	var options: Array[String]=[]
 	for button in game.modal_body.find_children("*","Button",true,false):options.append(button.text)
-	check(options.any(func(text):return text.begins_with("CLASSIC 2D")) and options.any(func(text):return text.begins_with("2,5D")) and options.any(func(text):return text.begins_with("3D")),"native settings retain three GRAPHICS modes")
+	check(options.any(func(text):return text.begins_with("CLASSIC 2D")) and options.any(func(text):return text.begins_with("3D")) and not options.any(func(text):return text.contains("2,5D") or text.contains("HYBRID")),"native settings offer ONLY Classic 2D and 3D")
 	check(not options.any(func(text):return text.contains("PIXEL") or text.contains("VIDEO 901") or text.contains("KLASSISCHE KAMERA") or text.contains("SPIELER ZENTRIEREN") or text=="KURZ" or text=="LANG"),"Classic sailing no longer has alternative pixel, pace or camera mode buttons")
 	game.queue_free();await process_frame
 	var reloaded=load("res://sea_map.tscn").instantiate();root.add_child(reloaded);current_scene=reloaded
 	await process_frame;reloaded.set_process(false)
 	check(reloaded.browser_classic and reloaded.render_mode=="classic" and reloaded.mesh_layer==null,"saved Classic preference starts natively without constructing 3D")
 	reloaded._set_render_mode("3d");await process_frame
-	check(not reloaded.browser_classic and not reloaded.sim.classic_steering and reloaded.mesh_layer!=null and reloaded.mesh_layer.has_complete_fleet() and reloaded.render_mode=="3d","3D restores original direct steering and complete native fleet")
+	check(not reloaded.browser_classic and reloaded.sim.classic_steering and reloaded.mesh_layer!=null and reloaded.mesh_layer.has_complete_fleet() and reloaded.render_mode=="3d","3D preserves tile physics and loads complete native fleet")
 	check(is_equal_approx(reloaded._actor_visual_length(reloaded.sim.player),native_player_length),"3D captain hull size remains exactly unchanged")
 	reloaded._set_render_mode("classic");await process_frame
 	reloaded._set_render_mode("hybrid");await process_frame
-	check(not reloaded.browser_classic and not reloaded.sim.classic_steering and reloaded.render_mode=="hybrid" and reloaded.mesh_layer!=null,"2.5D restores direct steering and one working renderer")
+	check(not reloaded.browser_classic and reloaded.sim.classic_steering and reloaded.render_mode=="3d" and reloaded.mesh_layer!=null,"legacy 2.5D requests safely migrate to the sole native 3D mode")
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)
