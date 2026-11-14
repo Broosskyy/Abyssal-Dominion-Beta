@@ -1,7 +1,7 @@
 extends TextureRect
-## Real 3D Meshy ships composited onto the existing 2D sea simulation.
-## GLB meshes are not replaced by fake sprites. 2.5D / 3D use the same fleet,
-## damage, collision, pathfinding, IDs, saves and nameplate screen anchors.
+## Native real-3D GLB visualization of the shared 48x32 sea simulation.
+## Graphics never own navigation: all 2D/3D captains use the same map tiles,
+## authoritative waypoints, physical speed, IDs and nameplate world anchors.
 const MODEL_ROOT := "res://assets/npc/meshy/models/"
 const PLAYER_MODEL_ROOT := "res://assets/player/"
 const STERN_TAPER=preload("res://stern_hull_taper.gd")
@@ -46,7 +46,7 @@ var model_scenes: Dictionary={}
 var model_instances: Dictionary={}
 var model_instance_keys: Dictionary={}
 var model_instance_skins: Dictionary={}
-var mode := "hybrid"
+var mode := "3d"
 var resolution_factor := 1.0
 # Browser WebGL2 previously rendered a FULL device-resolution alpha 3D pass
 # at 4x MSAA on top of the animated 2D ocean (2.5M pixels on 1080x2340 phones).
@@ -162,7 +162,7 @@ func _ready() -> void:
 		var scene=load(path)
 		if scene is PackedScene:model_scenes[key]=scene
 	texture=stage.get_texture()
-	set_render_mode("hybrid")
+	set_render_mode("3d")
 
 func has_complete_fleet() -> bool:
 	for key: String in REQUIRED_NPC_KEYS:
@@ -231,7 +231,8 @@ func has_elite_1_ship() -> bool:
 	return model_scenes.has("black_crown_corsair_elite_test")
 
 func set_render_mode(requested: String) -> void:
-	mode=requested if requested in ["hybrid","3d"] else "hybrid"
+	# Legacy callers requesting Hybrid are migrated to real 3D.
+	mode="3d"
 	visible=true
 	if stage!=null:stage.render_target_update_mode=SubViewport.UPDATE_ALWAYS
 

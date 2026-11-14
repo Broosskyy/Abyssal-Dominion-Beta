@@ -9,14 +9,14 @@ func _initialize() -> void:
 	var sim=SIM.new()
 	check(sim.npcs.size()==20,"16 ship patrols and four monsters exist")
 	var npc=sim.npcs[0]
-	check(str(npc.renderer)=="mesh" and str(npc.navigation)=="mode_adaptive","NPC ship renderer is GLB-capable and its steering follows the chosen graphics mode")
+	check(str(npc.renderer)=="mesh" and str(npc.navigation)=="shared_48x32","NPC GLB art does not change the common 48x32 steering")
 	check(float(npc.speed)<=40.0 and float(sim.npcs[8].speed)<=46.0,"normal and elite NPC speed is rebalanced")
 	var sample: Dictionary=npc.duplicate(true)
 	sample.pos=Vector2(400,400)
 	var free_goal:=Vector2(675,535)
-	check(not sim.classic_steering and sim.plan_actor_path(sample,free_goal)==sim.plan_path(sample.pos,free_goal),"native 2.5D/3D ships use original direct navigation")
+	check(sim.classic_steering and sim.plan_actor_path(sample,free_goal)==sim.plan_path(sample.pos,free_goal),"3D/2D ships use the same high-level waypoint and global raster")
 	sim.set_classic_steering(true)
-	check(sim.plan_actor_path(sample,free_goal)==sim.plan_path(sample.pos,free_goal),"four-view Classic only changes hull presentation, never the physical navigation path")
+	check(sim.plan_actor_path(sample,free_goal)==sim.plan_path(sample.pos,free_goal),"2D Classic only changes hull presentation, never the common 48x32 physical route")
 	sim.set_classic_steering(false)
 	var rested: Dictionary=npc.duplicate(true)
 	rested.pos=Vector2(400,400)
@@ -42,7 +42,7 @@ func _initialize() -> void:
 	check(safe,"all route segments clear coastal collisions")
 	sim.player.pos=left
 	check(sim.course(right),"click sets route")
-	for i in 500:sim._move(sim.player,1.0/30.0)
+	for i in 1500:sim._move(sim.player,1.0/30.0)
 	check(sim.player.pos.distance_to(right)<4,"ship reaches destination around island")
 	var land=Vector2.ZERO
 	for vertex: Vector2 in sim.islands[0].outline:land+=vertex

@@ -48,7 +48,7 @@ func _run() -> void:
 	game._shift_camera(Vector2(120,80))
 	var expected: Vector2=game._classic_chart_center()
 	game._classic_center_course()
-	check(game.sim.player.path.is_empty() or Vector2(game.sim.player.path.back()).distance_to(expected)<.01,"K course never silently targets another chart coordinate")
+	check(game.sim.player.path.is_empty() or Vector2(game.sim.player.path.back()).distance_to(game.sim._classic_clicked_target(expected))<.01,"K selects the exact containing 48x32 diamond on BOTH 2D and 3D charts")
 	check(game.sim.player.ammo==ammo,"K camera-course action cannot consume ammunition")
 	game.sim.player.path.clear()
 	game.modal_tab["Anzeige"]="STEUERUNG"

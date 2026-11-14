@@ -23,8 +23,9 @@ const PLAYER_SPEED := 165.0
 # comparing a FULL course against the original-era reference.
 const CLASSIC_TILE_SAIL_SPEED := 76.0
 const CLASSIC_SHIP_SPEED_BONUS_MAX := 1.35
-# Ship graphics may have 4 legacy facings, but all physical navigation
-# uses continuous direct world coordinates and collision-checked A* waypoints.
+# One authoritative sea-chart route for ALL ship graphics: Classic 2D
+# atlases and native 3D GLBs traverse the SAME global 48x32 diamond tiles.
+# Changing only the rendering can never alter a live course or speed.
 const PLAYER_HP := 2400
 const PLAYER_SHIELD := 1000
 const SHIELD_DELAY := 8.0
@@ -35,10 +36,10 @@ const START := Vector2(4200, 2900)
 const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice", "fire", "poison", "shrapnel", "lightning", "holy", "shadow", "wind", "earth", "water", "cursed", "bleed", "necro", "gold", "crystal", "explosive", "arcane", "spectral", "lava", "light", "armor_piercing", "gas"]
 const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein", "Feuerkugeln geladen · Grafik-Beta", "Giftkugeln geladen · Grafik-Beta", "Schrapnellkugeln geladen · Grafik-Beta", "Blitzkugeln geladen · Grafik-Beta", "Heilige Kugeln geladen · Grafik-Beta", "Schattenkugeln geladen · Grafik-Beta", "Wirbelkugeln geladen · Grafik-Beta", "Erdkugeln geladen · Grafik-Beta", "Wasserkugeln geladen · Grafik-Beta", "Fluchkugeln geladen · Grafik-Beta", "Blutkugeln geladen · Grafik-Beta", "Nekrokugeln geladen · Grafik-Beta", "Goldkugeln geladen · Grafik-Beta", "Kristallkugeln geladen · Grafik-Beta", "Explosivkugeln geladen · Grafik-Beta", "Arkankugeln geladen · Grafik-Beta", "Geisterkugeln geladen · Grafik-Beta", "Lavakugeln geladen · Grafik-Beta", "Lichtkugeln geladen · Grafik-Beta", "Panzerbrecher geladen · Grafik-Beta", "Gaskugeln geladen · Grafik-Beta"]
 var player: Dictionary
-# Test branch 344: the Classic look traverses staggered 48x32 diamond tiles.
-# All modes keep identical click destinations, global coordinates and coastline
-# path planning; do not merge this experiment until visually calibrated.
-var classic_steering: bool=false
+# Legacy flag name kept for existing scripts and add-on compatibility.
+# 346: real 48x32 ship navigation is ALWAYS on, in Classic 2D and 3D.
+# Only sea monsters and non-ship effects retain their independent movement.
+var classic_steering: bool=true
 # Retired historical skins 0-30 migrate to shaded ship (skin 0).
 # Only schema 5+ saves can select separate Corsair test skin 1 and ten new Elite color skins 2-11.
 const FINAL_PLAYER_SKIN := 0
@@ -175,7 +176,7 @@ func _init() -> void:
 			"patrol":i%4,"aggressive":false,"slow":0.0,"respawn":0.0,
 			"reward":int(spec.reward) if meshy_ready else (110 if elite else 55),"art":i,"elite":elite,
 			"visual_key":str(spec.key),"view_count":4,"renderer":"mesh" if meshy_ready else "sprite",
-			"navigation":"mode_adaptive","last_hit":-100.0})
+			"navigation":"shared_48x32","last_hit":-100.0})
 	npcs.append({"id": 100, "name": "Tiamat · Tiefenwächter", "kind": "monster", "pos": Vector2(2590, 1750),
 		"home": Vector2(2590, 1750), "heading": Vector2.LEFT, "path": [], "hp": 1650,
 		"max_hp": 1650, "shield": 0, "max_shield": 0, "speed": 28.0, "reload": 1.0, "repath": 0.0, "state": "patrol",
@@ -413,17 +414,11 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 	# Unlike a grid-snap method there is NEVER a teleport to lattice origin.
 
 
-func set_classic_steering(enabled: bool) -> void:
-	# Compatibility flag for the Classic renderer ONLY. Never change physics,
-	# path nodes, speed, collision or networking when changing render modes.
-	if classic_steering==enabled:return
-	classic_steering=enabled
-	# Drop transient fields from pre-343 builds so no old diagonal leg can
-	# survive a mode switch or persist on an NPC.
-	var vessels: Array[Dictionary]=[player]
-	vessels.append_array(npcs)
-	for body: Dictionary in vessels:
-		_clear_classic_raster_state(body)
+func set_classic_steering(_enabled: bool) -> void:
+	# Deprecated compatibility method. Do not let a graphics switch reset
+	# a committed 24x16 micro-step, path or heading. Both 2D and 3D
+	# *always* sail on the exact same 48x32 world grid.
+	classic_steering=true
 
 
 func _classic_clicked_target(point: Vector2) -> Vector2:
@@ -951,9 +946,8 @@ func _move(body: Dictionary, delta: float) -> void:
 	if bool(body.get("network_motion",false)):return
 	var slow_rate = float(body.get("slow_rate", 0.55)) if float(body.slow) > 0 else 1.0
 	var is_classic_ship: bool=classic_steering and (int(body.get("id",-1))==0 or str(body.get("kind",""))=="ship")
-	# Historical 2D step cadence is separated from the old continuous
-	# 165 world-units/s mover. Keep sail progression, but cap stacked
-	# upgrades so the starter-to-Elite speed is still recognizably tiled.
+	# Shared 2D/3D isometric sea cadence, independent of GLB vs atlas.
+	# Preserve the approved update-344 ship pace in BOTH visual modes.
 	var rate: float=float(body.speed)
 	if is_classic_ship:
 		rate=CLASSIC_TILE_SAIL_SPEED*clampf(rate/PLAYER_SPEED,0.65,CLASSIC_SHIP_SPEED_BONUS_MAX)
@@ -965,9 +959,8 @@ func _move(body: Dictionary, delta: float) -> void:
 	_advance_world_course(body,travel,phasing)
 
 func _advance_world_course(body: Dictionary,travel: float,phasing: bool) -> void:
-	# Experimental old-school raster navigation in Classic only.
-	# It keeps the same high-level, coastline-safe route and arrival time.
-	# Native graphics still use the 342 continuous direct mover.
+	# One authoritative raster course for all ship visual modes.
+	# Monster/non-ship units may still use independent direct navigation.
 	if classic_steering and (int(body.get("id",-1))==0 or str(body.get("kind",""))=="ship"):
 		_move_classic_tiles(body,travel,phasing)
 		return

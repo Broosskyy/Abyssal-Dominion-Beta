@@ -1,5 +1,5 @@
 {
-  "source_sha": "af74cf5aaf7dea7e1224db93ee5fc3ea0a3cb42c",
-  "release": "browser-test-160",
-  "branch": "fix/classic-isometric-safe-course-345"
+  "source_sha": "179ef436cace7cdd18c060c22d11c510a4087360",
+  "release": "browser-test-173",
+  "branch": "feat/shared-2d-3d-raster-navigation-346"
 }
