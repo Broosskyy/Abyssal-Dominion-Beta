@@ -1,4 +1,5 @@
 import asyncio
+import math
 import tempfile
 import unittest
 from pathlib import Path
@@ -53,7 +54,11 @@ class CrossplayTest(unittest.IsolatedAsyncioTestCase):
             self.assertGreater(len(peer['route']),2)
             self.assertTrue(abs(peer['heading'])>.05,
                             'Online captain must physically move on isometric tiles, not a straight east course')
-            self.assertGreater(peer['x'],4200)
+            # The shared world spawn (4200,2900) is four pixels
+            # off the staggered global grid. First finish that same
+            # short alignment in BOTH 2D and 3D, without teleporting.
+            self.assertNotEqual((peer['x'],peer['y']),(4200.0,2900.0))
+            self.assertLess(math.dist((peer['x'],peer['y']),(4200.,2900.)),10.0)
             received=False
             for _ in range(20):
                 packet=await asyncio.wait_for(witness.receive_json(),timeout=2)
@@ -86,6 +91,44 @@ class CrossplayTest(unittest.IsolatedAsyncioTestCase):
         finally:
             await ws.close()
             await witness.close()
+
+    async def test_two_renderers_use_identical_authoritative_tile_track(self):
+        # Visual mode is not even a navigation field. A 2D browser
+        # captain and a 3D native captain starting at the same global
+        # location with the same course must receive identical tile
+        # itineraries and step pace, not separate direct/zigzag routes.
+        from world_server import classic_world_to_tile,classic_tile_center,classic_segment_route,CLASSIC_SAIL_SPEED
+        self.assertEqual(classic_world_to_tile(15,4),(-1,0),
+                         'server and Godot agree which 48x32 diamond owns a corner tap')
+        first=await self.account('view2d@example.com','Captain2D')
+        second=await self.account('view3d@example.com','Captain3D')
+        two=await self.client.ws_connect('/v1/world')
+        three=await self.client.ws_connect('/v1/world')
+        try:
+            for ws,info in ((two,first),(three,second)):
+                await ws.send_json({'type':'join','protocol':2,'token':info['token'],'map_id':0})
+                self.assertEqual((await ws.receive_json())['type'],'welcome')
+            start=(4200.,2900.)
+            end=classic_tile_center(*classic_world_to_tile(4685.,3102.))
+            tiles=classic_segment_route(start,end)
+            self.assertGreater(len(tiles),2)
+            for ws,visual in ((two,'classic'),(three,'3d')):
+                await ws.send_json({'type':'course','sequence':1,
+                    'visual_mode':visual,'navigation_mode':'classic_48x32',
+                    'raster_preexpanded':True,'x':end[0],'y':end[1],
+                    'route':[[x,y] for x,y in tiles]})
+            await asyncio.sleep(.04)
+            peers={p['id']:p for p in self.client.server.app['world'].peers.values()}
+            a=peers[first['account']['id']]
+            b=peers[second['account']['id']]
+            self.assertEqual(a['route'],b['route'])
+            self.assertEqual(a['navigation_mode'],b['navigation_mode'])
+            self.assertEqual(a['speed_scale'],b['speed_scale'])
+            self.assertEqual(CLASSIC_SAIL_SPEED,76.0)
+            self.assertEqual(a['speed_scale'],1.0)
+        finally:
+            await two.close()
+            await three.close()
 
     async def test_auth_isolation_sequence_and_speed(self):
         a=await self.account('one@example.com','One');b=await self.account('two@example.com','Two')
