@@ -104,7 +104,8 @@ jobs:
           # Verify real 48x32 diagonal Classic world movement, screen geometry and
           # unchanged native 2.5D/3D navigation before stripping Web-only assets.
           for suite in classic_course_test classic_mode_test classic_navigation_test navigation_test simulation_test ui_test; do
-            XDG_DATA_HOME="$(mktemp -d)" "$engine" --headless --path rebuild/m3052 \
+            echo "START GODOT SUITE: ${suite}"
+            timeout --signal=TERM 120s env XDG_DATA_HOME="$(mktemp -d)" "$engine" --headless --path rebuild/m3052 \
               --script "tests/${suite}.gd" > "/tmp/${suite}.log" 2>&1 || {
                 tail -120 "/tmp/${suite}.log"; exit 1;
               }
