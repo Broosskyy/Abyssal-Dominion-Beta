@@ -365,10 +365,16 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 					break
 				length+=origin.distance_to(point)
 				origin=point
-			# The old coastline-safe A* waypoint is the fallback when
-			# the little raster staircase brushes an island margin.
-			if not valid:tiles=[goal];length=Vector2(body.pos).distance_to(goal)
-			if tiles.is_empty():tiles=[goal];length=Vector2(body.pos).distance_to(goal)
+			# Never escape a blocked isometric path by sailing straight
+			# through the chart. Scripted harbor/portal and NPC courses
+			# must use the SAME four-neighbour coastal A* if their greedy
+			# tile itinerary collides with an island margin.
+			if not valid:
+				tiles=NAV.classic_safe_route(body.pos,goal,Callable(self,"segment_free"))
+			if tiles.is_empty():
+				body.path=[]
+				_clear_classic_raster_state(body)
+				return
 			body["_iso_goal"]=goal
 			body["_iso_route"]=tiles
 			body["_iso_route_index"]=0
