@@ -375,11 +375,35 @@ func set_classic_steering(enabled: bool) -> void:
 		_clear_classic_raster_state(body)
 
 
-func course(point: Vector2) -> bool:
+func _classic_clicked_target(point: Vector2) -> Vector2:
+	# Flash-era chart clicking selects a TILE, not an arbitrary screen pixel.
+	# Resolve the click to its global 48x32 diamond centre before pathfinding.
+	# If the clicked tile is occupied by shoreline, keep a valid nearby water
+	# centre; never send a visually shifted or unreachable target.
+	var best: Vector2=point
+	var best_distance: float=INF
+	var nearest: Vector2i=NAV.classic_world_to_tile(point)
+	for q in range(-2,3):
+		for r in range(-2,3):
+			var center: Vector2=NAV.classic_tile_center(nearest+Vector2i(q,r))
+			if blocked(center):continue
+			var distance: float=point.distance_squared_to(center)
+			if distance<best_distance:
+				best=center
+				best_distance=distance
+	# If the tap is already in navigable water, never redirect it more
+	# than one diamond away to "help" near a coastline.
+	if best_distance>576.0 and not blocked(point):
+		return point
+	return best
+
+func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 	pending_portal=-1
 	if docked: return false
 	if int(player.hp) <= 0: return false
 	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
+	if snap_click_to_classic_tile and classic_steering:
+		point=_classic_clicked_target(point)
 	var route: Array[Vector2] = []
 	if staff.flag("no_collision"):
 		route.append(point)
