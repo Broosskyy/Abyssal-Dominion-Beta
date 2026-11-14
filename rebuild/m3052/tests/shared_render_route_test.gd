@@ -95,7 +95,7 @@ func _run() -> void:
 	var packet3d: Dictionary=transport.calls.back().duplicate(true)
 	check(packet2d==packet3d,"2D and 3D send bit-identical route, target, mode and preexpanded flag")
 	check(str(packet2d.get("mode",""))=="classic_48x32" and bool(packet2d.get("preexpanded",false)),"3D does not use the server's old 165px/s direct navigation")
-	check(packet2d.get("route",[]).size()>3 and packet2d.get("route",[]).back()==destination,"online payload carries actual per-tile route to the server")
+	check(packet2d.get("route",[]).size()==1 and packet2d.get("route",[]).back()==destination,"online payload carries exact direct open-water leg to the server")
 	# Legacy save or direct API request must not make a third mode.
 	game._set_render_mode("hybrid")
 	check(game.render_mode=="3d" and game.sim.classic_steering,"obsolete Hybrid request migrates to true 3D with same physical grid")
