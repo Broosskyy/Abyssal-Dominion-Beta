@@ -291,7 +291,7 @@ func _run() -> void:
 		var world_course:=Vector2(local_bow.x,local_bow.z).normalized()
 		check(world_course.distance_to(course)<0.001,"3D GLB physical bow matches simulated course "+str(course))
 	check(game.render_toggle is Button and game.render_toggle.visible,"graphics switch exists directly on the chart beside the minimap")
-	check(game.render_toggle.text.begins_with("GRAFIK"),"graphics switch shows its currently selected mode")
+	check(game.render_toggle.text==("CLASSIC 2D" if game.browser_classic else "ECHTES 3D"),"compact graphics switch identifies the currently selected mode")
 	check(game._active_data_revision()>=0,"display menu reports exact active signed data revision")
 	check(game.HARBOR_ISLAND!=null and game.HARBOR_ISLAND.get_width()>0,"real island-harbor SVG imports as a transparent Godot texture")
 	check(game.target_clear!=null and game.target_clear.get_parent()==game.target_panel,"selected target panel includes an independent touch-sized cancellation button")
