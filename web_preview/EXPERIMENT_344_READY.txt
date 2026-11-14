@@ -1,0 +1,5 @@
+Isolated, unmerged Classic 344 movement experiment.
+Verified GitHub Action: browser-test-132.
+Raster: 48x32 isometric tile, neighbouring centres 24x16; route computed once per tap / A* waypoint.
+This is a prototype for human gameplay comparison, not production and not a historical movement proof.
+Production remains data-342 unless separately approved.
