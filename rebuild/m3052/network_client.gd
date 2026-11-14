@@ -63,18 +63,22 @@ func _process(_delta: float) -> void:
 				snapshot_received.emit(value)
 	elif state==WebSocketPeer.STATE_CLOSED or (not joined and Time.get_ticks_msec()-connect_started>12000):
 		connecting=false;joined=false;socket.close();connection_changed.emit(false)
-func send_course(point: Vector2,route: Array=[],navigation_mode: String="",raster_preexpanded: bool=false) -> void:
-	if not joined or not point.is_finite():return
-	sequence+=1
-	var payload: Dictionary={"type":"course","sequence":sequence,"x":point.x,"y":point.y}
-	if navigation_mode=="classic_48x32":
-		payload["navigation_mode"]="classic_48x32"
-		if raster_preexpanded:payload["raster_preexpanded"]=true
+## This is a NAVIGATION protocol, never a graphic-mode flag.
+## All 2D and 3D clients send the same globally anchored raster itinerary.
+static func course_payload(point: Vector2,route: Array,number: int,raster_preexpanded: bool=false) -> Dictionary:
+	var payload: Dictionary={"type":"course","sequence":number,"x":point.x,"y":point.y,
+		"navigation_mode":"classic_48x32"}
+	if raster_preexpanded:payload["raster_preexpanded"]=true
 	if not route.is_empty():
 		var points: Array=[]
 		for waypoint: Vector2 in route:points.append([waypoint.x,waypoint.y])
 		payload["route"]=points
-	socket.send_text(JSON.stringify(payload))
+	return payload
+
+func send_course(point: Vector2,route: Array=[],_navigation_mode: String="classic_48x32",raster_preexpanded: bool=false) -> void:
+	if not joined or not point.is_finite():return
+	sequence+=1
+	socket.send_text(JSON.stringify(course_payload(point,route,sequence,raster_preexpanded)))
 
 func send_appearance(skin: int,hp: int,maximum: int) -> void:
 	if joined:socket.send_text(JSON.stringify({"type":"appearance","skin":skin,"hp":hp,"max_hp":maximum}))
