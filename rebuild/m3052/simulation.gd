@@ -1846,7 +1846,12 @@ func request_portal(destination: int) -> bool:
 			player.path=[];pending_portal=destination
 			message="Überfahrt wartet · erst 6 Sekunden ohne Treffer"
 			return true
-		if not course(edge_point(str(link.edge),player.pos)):return false
+		# Portal travel is a NORMAL SHIP VOYAGE, not a special straight
+		# line or square-grid route with fractional coastline waypoints.
+		# Plan the same complete island-safe 48x32 itinerary used by a
+		# normal map tap. 2D and 3D must take exactly this trail, and
+		# neither mode may silently abandon the portal at a coast.
+		if not course(edge_point(str(link.edge),player.pos),true):return false
 		pending_portal=destination
 		firing=false
 		message="Kurs zum Kartenrand · %s" % CONTENT.MAPS[destination].name
