@@ -425,9 +425,15 @@ func _classic_clicked_target(point: Vector2) -> Vector2:
 	# Resolve the click to its global 48x32 diamond centre before pathfinding.
 	# If the clicked tile is occupied by shoreline, keep a valid nearby water
 	# centre; never send a visually shifted or unreachable target.
+	var nearest: Vector2i=NAV.classic_world_to_tile(point)
+	var selected: Vector2=NAV.classic_tile_center(nearest)
+	# The TRUE clicked diamond owns the course. Never silently choose a
+	# neighbouring tile just because its centre is Euclidean-closer:
+	# for staggered 48x32 cells that is a different geometric rule.
+	if not blocked(selected):return selected
+	# Only for a blocked selected tile, find the nearest FREE tile.
 	var best: Vector2=point
 	var best_distance: float=INF
-	var nearest: Vector2i=NAV.classic_world_to_tile(point)
 	for q in range(-2,3):
 		for r in range(-2,3):
 			var center: Vector2=NAV.classic_tile_center(nearest+Vector2i(q,r))
@@ -436,10 +442,9 @@ func _classic_clicked_target(point: Vector2) -> Vector2:
 			if distance<best_distance:
 				best=center
 				best_distance=distance
-	# If the tap is already in navigable water, never redirect it more
-	# than one diamond away to "help" near a coastline.
-	if best_distance>576.0 and not blocked(point):
-		return point
+	# If the tile centre touches the coast while the tap itself is still
+	# free water, do not reroute the captain multiple tiles unexpectedly.
+	if best_distance>576.0 and not blocked(point):return point
 	return best
 
 func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
