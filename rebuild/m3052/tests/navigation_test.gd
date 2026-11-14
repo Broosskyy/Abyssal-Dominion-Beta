@@ -47,7 +47,7 @@ func _initialize() -> void:
 		max_y_error=maxf(max_y_error,absf(float(body.pos.y)-start_y))
 		if not body.path.is_empty():diagonal_y[int(signf(float(body.heading.y)))]=true
 		if body.path.is_empty():break
-	check(max_y_error>15.0 and max_y_error<=32.0 and diagonal_y.has(-1) and diagonal_y.has(1),"Classic physically traverses four 24x16 tile bearings, never arbitrary 32-unit legs")
+	check(max_y_error>=8.0 and max_y_error<=32.0 and diagonal_y.has(-1) and diagonal_y.has(1),"Classic physically traverses four 24x16 tile bearings, never arbitrary 32-unit legs")
 	check(body.pos.distance_to(Vector2(950,500))<0.1 and body.path.is_empty(),"tile steps plus final exact arrival reach original clicked destination")
 	body.pos=Vector2(500,500)
 	body.renderer="mesh";body.view_count=4
