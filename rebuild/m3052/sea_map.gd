@@ -321,11 +321,13 @@ const NPC_VISUAL_SCALE := 0.90
 # making the hull tiny relative to islands, the selection ring and HUD.
 # Only the VISUAL Classic hull is calibrated separately. Physics, hitboxes,
 # content, crossplay and 2.5D/3D mesh geometry are unchanged.
-const CLASSIC_HULL_SCALE := 0.45
-const CLASSIC_HULL_SCALE_MOBILE := 0.60
+# 2D atlas source GLB and live 3D mesh share one world-size metric.
+# A rendering mode must never shrink/enlarge the actual ship.
+const CLASSIC_HULL_SCALE := 1.0
+const CLASSIC_HULL_SCALE_MOBILE := 1.0
 # The current default 1.08 world zoom makes mobile islands dominate the
 # entire center of the screenshot. Leave user pinch/zoom control intact.
-const CLASSIC_MOBILE_CAMERA_FACTOR := 0.94
+const CLASSIC_MOBILE_CAMERA_FACTOR := 1.0
 const CLASSIC_VIEWPORT_ZOOM_BOOST_MAX := 1.15
 const CLASSIC_LABEL_CLEARANCE_PX := 11.0
 var plate_fleet: Array[Dictionary] = []
@@ -560,9 +562,9 @@ func _classic_touch_display() -> bool:
 	return OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()
 
 func _sharp_zoom() -> float:
-	var max_boost: float=CLASSIC_VIEWPORT_ZOOM_BOOST_MAX if browser_classic else 1.7
-	var mobile_factor: float=CLASSIC_MOBILE_CAMERA_FACTOR if browser_classic and _classic_touch_display() else 1.0
-	return desired_zoom*mobile_factor*clampf(get_viewport_rect().size.y/720.0,1.0,max_boost)
+	# A single physical screen, a single sea-chart zoom. Mode selection
+	# changes ONLY the visuals; neither 2D nor 3D receives a bonus factor.
+	return desired_zoom*clampf(get_viewport_rect().size.y/720.0,1.0,CLASSIC_VIEWPORT_ZOOM_BOOST_MAX)
 
 func _load_classic_atlases() -> void:
 	if browser_classic:
@@ -1100,11 +1102,8 @@ func _actor_visual_length(actor: Dictionary) -> float:
 		length=180.0
 	elif str(actor.get("kind",""))=="ship":
 		length=float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
-	# The renderer uses the same smaller size for shadows, wake/waterline,
-	# selection ring, actual atlas draw and visual hit rectangle. Only ships
-	# shrink; sea monsters, shore defenses and physical navigation do not.
-	if browser_classic and str(actor.get("kind","ship"))=="ship":
-		length*=CLASSIC_HULL_SCALE_MOBILE if _classic_touch_display() else CLASSIC_HULL_SCALE
+	# No rendering-mode scale multiplier. 2D atlas and 3D GLB both get
+	# the same intended hull length in physical world coordinates.
 	return length
 
 # M3095: classic sea-combat selection circles are flat chart overlays.
@@ -1323,10 +1322,12 @@ func _classic_atlas_key(actor: Dictionary) -> String:
 	return str(actor.get("visual_key",""))
 
 func _classic_frame_for_actor(actor: Dictionary) -> int:
-	# No timer and no artificial picture oscillation: each of the four
-	# classic atlas images is bound to its ACTUAL raster movement segment.
+	# Update 360: use ALL eight genuine GLB-baked compass views. In 359,
+	# the four-diagonal selector kept the SAME wrong-looking angle while
+	# a ship sailed horizontally/vertically on the correct straight course.
+	# The view follows the real current heading; no fake steering zigzag.
 	var id: int=int(actor.get("id",-1))
-	var facing: int=VISUALS.heading_four(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
+	var facing: int=VISUALS.heading_eight(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
 	classic_heading_cache[id]=facing
 	return facing
 
@@ -1359,8 +1360,8 @@ func _draw_classic_ship(actor: Dictionary,point: Vector2,heading: Vector2,length
 			target.position+=hull_point
 			draw_texture_rect_region(atlas,target,spec.source)
 			return
-		# Camera perspective is baked into each of the eight GLB images.
-		# Do not rotate an atlas sprite; only select a diagonal facing.
+		# Camera perspective is baked into all eight genuine GLB images.
+		# Do not rotate a mismatched diagonal; select its true compass view.
 		var frame_width: float=float(atlas.get_width())/float(CLASSIC_ATLAS_COLUMNS)
 		var frame_height: float=float(atlas.get_height())
 		var side: float=length*1.38
@@ -5158,8 +5159,7 @@ func _set_render_mode(value: String) -> void:
 		browser_classic=false;render_mode=value;_ensure_mesh_layer()
 		mesh_layer.set_render_mode(value);render_mode=mesh_layer.mode
 	# NO simulation navigation call here: 2D and 3D are PURE views.
-	# Preserves even a partially completed 24x16 step, its route index,
-	# full itinerary, captain position, heading and online coordinates.
+	# Preserve course, heading, world position, speed and zoom identically.
 	classic_heading_cache.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
