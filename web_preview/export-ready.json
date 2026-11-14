@@ -1,5 +1,5 @@
 {
-  "source_sha": "af74cf5aaf7dea7e1224db93ee5fc3ea0a3cb42c",
-  "release": "browser-test-160",
-  "branch": "fix/classic-isometric-safe-course-345"
+  "source_sha": "1bc60a6f08ad5d4b10d47dc3772de50321537f35",
+  "release": "browser-test-176",
+  "branch": "feature/shared-iso-2d-3d-only-346"
 }
