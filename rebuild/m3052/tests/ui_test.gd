@@ -93,10 +93,10 @@ func _run() -> void:
 	for i in range(2,12):
 		check(game.mesh_layer.player_key_for_skin(i)=="black_crown_corsair_elite_test" and game.mesh_layer.elite_texture_level(i)==i-1,"Elite skin %d shares original GLB and has unique material variant" % i)
 	check(game.mesh_layer._player_immersion("schattenkriegsschiff_shaded")==game.mesh_layer.GAMEPLAY_WATER_IMMERSION,"M3099 waterline retained")
-	check(game.mesh_layer.FLEET_CAMERA_TILT_DEGREES==40.0 and game.mesh_layer.FULL_3D_CAMERA_TILT_DEGREES>40.0,"M3099 2.5D and 3D camera variants are distinct")
+	check(game.mesh_layer.FLEET_CAMERA_TILT_DEGREES==40.0 and game.mesh_layer.FULL_3D_CAMERA_TILT_DEGREES>40.0,"native 3D camera tilt is separate from legacy 2.5D reference constant")
 	var original_mode: String=game.mesh_layer.mode
 	var one_ship: Array[Dictionary]=[game.sim.player]
-	for chosen_mode in ["hybrid","3d"]:
+	for chosen_mode in ["3d"]:
 		game.mesh_layer.set_render_mode(chosen_mode)
 		game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
 		check(game.mesh_layer.can_render_actor(game.sim.player),"M3099 real player GLB renders in "+chosen_mode)
@@ -104,9 +104,9 @@ func _run() -> void:
 		check(game.mesh_layer.gameplay_double_sided_count>0,"M3099 shaded sails are rendered on both sides")
 		var stable: float=game.mesh_layer.stable_player_plate_drop(game.sim.player,game.camera.zoom.y,game._plate_pixels())
 		check(stable>18.0 and stable<190.0,"M3099 readable 3D captain name anchor in "+chosen_mode)
-	# A real GLB must render bow-first and retain anchors in both supported modes.
+	# The real 3D GLB must render bow-first and retain the same model anchors.
 	game.sim.player.skin=1
-	for chosen_mode in ["hybrid","3d"]:
+	for chosen_mode in ["3d"]:
 		game.mesh_layer.set_render_mode(chosen_mode)
 		game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
 		check(game.mesh_layer.can_render_actor(game.sim.player),"Elite Design 1 renders in "+chosen_mode)
@@ -165,7 +165,7 @@ func _run() -> void:
 	game.sim.player.skin=0
 	game.mesh_layer.sync_fleet(one_ship,game.camera,game.get_viewport_rect().size)
 	game.mesh_layer.set_render_mode("classic")
-	check(game.mesh_layer.mode=="hybrid","M3099 legacy classic mode migrates to 2.5D")
+	check(game.mesh_layer.mode=="3d","internal GLB mode never exposes Hybrid/2.5D")
 	game.mesh_layer.set_render_mode(original_mode)
 	var expected_name: String=game._plate_title(game.sim.player)
 	check(expected_name.contains(game.sim.captain_name) and not expected_name.contains("TEST"),"captain displays player identity instead of selected hull design")
@@ -297,11 +297,11 @@ func _run() -> void:
 	check(game.target_clear!=null and game.target_clear.get_parent()==game.target_panel,"selected target panel includes an independent touch-sized cancellation button")
 	var before_mode: String=game.render_mode
 	game.mesh_layer.set_render_mode("hybrid")
-	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"hybrid 2.5D renders an actual GLB, not a directional image")
+	check(game.mesh_layer.mode=="3d" and game.mesh_layer.can_render_actor(game.sim.npcs[0]),"legacy 2.5D graphics request migrates to the same real 3D GLB")
 	game.mesh_layer.set_render_mode("3d")
 	check(game.mesh_layer.can_render_actor(game.sim.npcs[0]),"3D mode shares the NPC model and simulation")
 	game.mesh_layer.set_render_mode("classic")
-	check(game.mesh_layer.mode=="hybrid" and game.mesh_layer.can_render_actor(game.sim.npcs[0]),"legacy classic is redirected to approved 2.5D real-GLB mode")
+	check(game.mesh_layer.mode=="3d" and game.mesh_layer.can_render_actor(game.sim.npcs[0]),"mesh renderer never creates a third graphics mode")
 	game.mesh_layer.set_render_mode(before_mode)
 	check(game.CONTENT.NPC_MESHY_ROSTER.size()==9,"nine approved NPC visual designs and roles")
 	check(game.sim.npcs.filter(func(npc):return npc.kind=="ship").size()==16,"original sixteen ship spawn points are retained")
