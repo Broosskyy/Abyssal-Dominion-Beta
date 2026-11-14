@@ -18,18 +18,15 @@ func run() -> void:
 		check(VISUALS.heading_four(heading) in [1,3,5,7],"every ordinary captain heading chooses exactly one of the four Classic frames")
 	var east_frame: int=VISUALS.heading_four(Vector2.RIGHT)
 	check(VISUALS.heading_four(Vector2(1,-0.07),east_frame)==east_frame and VISUALS.heading_four(Vector2(1,0.07),east_frame)==east_frame,"Classic sprite hysteresis prevents flickering when sailing nearly east")
-	# Isometric 48x32 movement: real diagonal world legs, no fake
-	# render-time triangle and no user-selectable movement variants.
-	check(is_equal_approx(SIM.CLASSIC_ISO_DIRECTIONS[0].x/SIM.CLASSIC_ISO_DIRECTIONS[0].y,-1.5),"48x32 slope is retained in the four real movement axes")
-	check(is_equal_approx(SIM.CLASSIC_ISO_LEG_WORLD,32.0),"Classic raster uses 32-world-unit legs with unchanged 3:2 diagonal axes")
-	# Mobile Classic fixes are visual-only: physical touch coordinates and
-	# online world position must NOT scale with the viewport or ship image.
-	check(is_equal_approx(0.62*0.78/0.36,1.3433334),"on a 709px mobile viewport ship becomes ~34 percent larger while islands become ~22 percent smaller")
+	# Seafight's four view images are VISUAL ONLY. A clicked world course
+	# travels straight in every render mode; the world never stair-steps.
+	check(VISUALS.CLASSIC_VIEW_CYCLE_WORLD>=48.0,"legacy four-frame presentation is distance-driven, not time-driven")
+	check(VISUALS.heading_four_motion(Vector2.RIGHT,20.0)!=VISUALS.heading_four_motion(Vector2.RIGHT,70.0),"straight horizontal travel may alternate between two 2D sprite images")
+	for distance in [0.0,23.0,45.0,67.0,90.0]:
+		check(VISUALS.heading_four_motion(Vector2(3,-2),distance)==1,"true NE course keeps its matching image without oscillation")
+	# Mobile Classic fixes must affect only camera/ship presentation.
+	check(is_equal_approx(0.62*0.78/0.36,1.3433334),"mobile framing constants remain unchanged")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
-	# Regression: the old Test 338 bearing scorer gets stuck forever
-	# around (75,130) when asked to sail (300,500). Verify every octant,
-	# including shallow, steep and 45-degree angles, reaches exact goals
-	# without generating a 2-leg loop or wandering >36 units off course.
 	sim.set_classic_steering(true)
 	for heading_target: Vector2 in [
 		Vector2(300,500),Vector2(-300,500),
@@ -45,36 +42,25 @@ func run() -> void:
 		var visited_steps: int=0
 		for tick in 1800:
 			if trial.path.is_empty():break
-			sim._move_classic(trial,165.0/30.0,true)
+			sim._advance_world_course(trial,165.0/30.0,true)
 			visited_steps+=1
 			max_cross_track=maxf(max_cross_track,absf(Vector2(trial.pos).cross(heading_target.normalized())))
-		check(trial.path.is_empty() and Vector2(trial.pos).distance_to(heading_target)<0.1,"all Classic tap directions reach the precise clicked target without oscillation: "+str(heading_target))
-		check(max_cross_track<36.0 and visited_steps<1800,"Classic Bresenham-style path stays within one isometric tile of intended course: "+str(heading_target))
-	# A new tap must discard the partially completed previous physical leg.
+			if not trial.path.is_empty():
+				check(Vector2(trial.heading).distance_to(heading_target.normalized())<0.001,"physical heading always matches exact clicked bearing "+str(heading_target))
+		check(trial.path.is_empty() and Vector2(trial.pos).distance_to(heading_target)<0.1,"all Classic tap directions reach exact clicked target "+str(heading_target))
+		check(max_cross_track<0.01 and visited_steps<1800,"Classic course stays on the requested STRAIGHT line without zigzag "+str(heading_target))
+	# Re-tap mid-course must discard the old direction immediately.
 	var retap_probe: Dictionary={"id":0,"pos":Vector2.ZERO,"heading":Vector2.RIGHT,"path":[Vector2(700,0)]}
-	for step in 40:sim._move_classic(retap_probe,165.0/30.0,true)
+	for step in 40:sim._advance_world_course(retap_probe,165.0/30.0,true)
 	var retap_start: Vector2=retap_probe.pos
 	var new_goal: Vector2=retap_start+Vector2(-250,-400)
 	retap_probe.path=[new_goal]
+	sim._advance_world_course(retap_probe,165.0/30.0,true)
+	check(Vector2(retap_probe.heading).distance_to((new_goal-retap_start).normalized())<0.001,"clicking NW immediately replaces east heading, without any turning arc")
 	for tick in 900:
 		if retap_probe.path.is_empty():break
-		sim._move_classic(retap_probe,165.0/30.0,true)
-	check(retap_probe.path.is_empty() and Vector2(retap_probe.pos).distance_to(new_goal)<0.1,"a new tap replaces a mid-leg course without stale direction or loops")
-	# A fast tick straddles an NE-to-SE turn. The 60fps renderer must follow
-	# the actual two movements, never a straight chord between tick endpoints.
-	var cross_tick: Dictionary={"id":0,"pos":Vector2.ZERO,"heading":Vector2.RIGHT,"path":[Vector2(700,0)]}
-	sim._move_classic(cross_tick,48.0,true)
-	var leg_trace: Array=cross_tick.get("_iso_tick_segments",[])
-	check(leg_trace.size()>=2,"Classic physics records both actual diagonals when one simulation tick crosses a corner")
-	if leg_trace.size()>=2:
-		var quarter: Dictionary=VISUALS.classic_trace_sample(leg_trace,0.25)
-		var later: Dictionary=VISUALS.classic_trace_sample(leg_trace,0.75)
-		var chord: Vector2=Vector2(cross_tick.pos)*0.25
-		check(Vector2(quarter.pos).distance_to(chord)>4.0,"Classic interpolation preserves the physical bend instead of cutting the corner")
-		var first_trace_frame: int=VISUALS.heading_four(Vector2(leg_trace[0].heading))
-		var second_trace_frame: int=VISUALS.heading_four(Vector2(leg_trace[1].heading))
-		check(first_trace_frame in [1,3] and second_trace_frame in [1,3] and first_trace_frame!=second_trace_frame and VISUALS.heading_four(Vector2(quarter.heading))==first_trace_frame and VISUALS.heading_four(Vector2(later.heading))==second_trace_frame,"Classic sprite follows both actual diagonal legs rather than assuming NE or SE must be first")
-		check(Vector2(VISUALS.classic_trace_sample(leg_trace,1.0).pos).distance_to(cross_tick.pos)<0.01,"raster rendering and collision logic end each tick at the identical world point")
+		sim._advance_world_course(retap_probe,165.0/30.0,true)
+	check(retap_probe.path.is_empty() and Vector2(retap_probe.pos).distance_to(new_goal)<0.1,"the redirected straight course reaches its new target")
 	sim.set_classic_steering(false)
 	var goal:=Vector2(1200,500)
 	check(not sim.classic_steering,"native default uses direct navigation")
@@ -86,26 +72,19 @@ func run() -> void:
 	check(sim.classic_steering and sim.player.path==initial_route and sim.player.pos==initial_pos,"switching to Classic never rewrites the physical route or teleports the captain")
 	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"Classic horizontal sailing has no synthetic diagonal zigzags")
 	var stock: Array=sim.player.ammo.duplicate()
-	var physical_steps: Dictionary={}
-	var lowest_y: float=500.0
-	var highest_y: float=500.0
-	var saw_real_diagonal: bool=false
+	var horizontal_heading_ok: bool=true
+	var start_y: float=sim.player.pos.y
+	var max_y_error: float=0.0
 	for step in 900:
-		var old_pos: Vector2=sim.player.pos
 		sim._move(sim.player,1.0/60.0)
-		var velocity: Vector2=Vector2(sim.player.pos)-old_pos
-		lowest_y=minf(lowest_y,sim.player.pos.y)
-		highest_y=maxf(highest_y,sim.player.pos.y)
-		if velocity.length()>0.01 and not sim.player.path.is_empty():
-			var heading: Vector2=sim.player.heading
-			physical_steps[VISUALS.heading_four(heading)]=true
-			saw_real_diagonal=saw_real_diagonal or (absf(velocity.x)>0.2 and absf(velocity.y)>0.2)
+		max_y_error=maxf(max_y_error,absf(float(sim.player.pos.y)-start_y))
+		if not sim.player.path.is_empty():
+			horizontal_heading_ok=horizontal_heading_ok and absf(float(sim.player.heading.y))<0.001
 		if sim.player.path.is_empty():break
-	check(saw_real_diagonal and physical_steps.has(1) and physical_steps.has(3),"horizontal Classic route uses REAL alternating NE/SE 48x32 world steps, not animated pixels")
-	check(highest_y-lowest_y>15.0 and highest_y-lowest_y<25.0,"horizontal Classic ship physically moves through the ~20px isometric staircase")
-	check(sim.player.pos.distance_to(goal)<0.1 and sim.player.path.is_empty() and sim.player.ammo==stock,"true diagonal-step sailing arrives exactly at the requested point without changing ammunition")
+	check(max_y_error<0.01 and horizontal_heading_ok,"horizontal Classic travel has NO physical NE/SE oscillation, even by one world pixel")
+	check(sim.player.pos.distance_to(goal)<0.1 and sim.player.path.is_empty() and sim.player.ammo==stock,"straight Classic sailing arrives exactly without changing ammunition")
 	var diagonal_goal:=Vector2(1600,850)
-	check(sim.course(diagonal_goal) and sim.player.path==sim.plan_path(sim.player.pos,diagonal_goal),"Classic navigation retains the requested destination; only the physical micro-legs are diagonals")
+	check(sim.course(diagonal_goal) and sim.player.path==sim.plan_path(sim.player.pos,diagonal_goal),"Classic navigation retains exact straight waypoint destinations")
 	sim._move(sim.player,0.25)
 	var corner: Vector2=sim.player.pos
 	check(sim.course(Vector2(300,850)) and sim.player.path.back()==Vector2(300,850),"new tap immediately replaces the course")
@@ -120,7 +99,7 @@ func run() -> void:
 	check(npc_direct.size()==1 and npc_direct[0]==Vector2(1200,500),"native NPC patrol ship follows direct courses")
 	sim.set_classic_steering(true)
 	var npc_classic: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
-	check(npc_classic==npc_direct,"Classic NPCs keep the same waypoints but travel them using four diagonals")
+	check(npc_classic==npc_direct,"Classic NPCs keep the same physical waypoints, without zigzag")
 	var monster: Dictionary={"pos":Vector2(500,500),"heading":Vector2.RIGHT,"kind":"monster"}
 	check(sim.plan_actor_path(monster,Vector2(1200,500))==npc_direct,"sea monsters keep direct navigation in every mode")
 	root.content_scale_size=Vector2i.ZERO;root.size=Vector2i(1280,720)
@@ -195,25 +174,24 @@ func run() -> void:
 	check(game._classic_frame_for_actor(game.sim.player)==1,"Classic renderer draws the expected NE atlas frame from the preserved eight-view collection")
 	game.sim.player.heading=Vector2(1,1)
 	check(game._classic_frame_for_actor(game.sim.player)==3,"Classic renderer changes facing without changing simulated world coordinates")
-	# Explicit mid-tick raster transition: overlays, hull and the camera all
-	# use the same two true diagonal legs even when physics has already turned.
-	if leg_trace.size()>=2:
-		var frame_probe: Dictionary={"id":9316,"kind":"ship","pos":cross_tick.pos,"heading":Vector2.RIGHT,"_iso_tick_segments":leg_trace}
-		game.visual_before[9316]=Vector2.ZERO
-		game.visual_after[9316]=Vector2(cross_tick.pos)
-		var saved_fraction: float=game.accumulator
-		game.accumulator=game.SIMULATION_TICK*0.25
-		var first_display: Dictionary=game._classic_tick_sample(frame_probe)
-		var first_expected: int=VISUALS.heading_four(Vector2(leg_trace[0].heading))
-		check(not first_display.is_empty() and game._classic_frame_for_actor(frame_probe)==first_expected and game._visual_actor_pos(frame_probe).distance_to(Vector2(first_display.pos))<0.01,"first visual half-tick uses its real diagonal position and facing")
-		game.accumulator=game.SIMULATION_TICK*0.75
-		var second_display: Dictionary=game._classic_tick_sample(frame_probe)
-		var second_expected: int=VISUALS.heading_four(Vector2(leg_trace[1].heading))
-		check(not second_display.is_empty() and game._classic_frame_for_actor(frame_probe)==second_expected and game._visual_actor_pos(frame_probe).distance_to(Vector2(second_display.pos))<0.01,"second visual half-tick uses its real diagonal position and facing")
-		game.accumulator=saved_fraction
-		game.visual_before.erase(9316)
-		game.visual_after.erase(9316)
-		game.classic_heading_cache.erase(9316)
+	# The visual 2D hull can alternate its legacy four views, but a render
+	# frame at 25%/75% must remain on the exact same straight world segment.
+	var frame_probe: Dictionary={"id":9316,"kind":"ship","pos":Vector2(596,500),"heading":Vector2.RIGHT}
+	game.visual_before[9316]=Vector2(500,500)
+	game.visual_after[9316]=Vector2(596,500)
+	game.classic_visual_travel[9316]=96.0
+	var saved_fraction: float=game.accumulator
+	game.accumulator=game.SIMULATION_TICK*0.25
+	var first_position: Vector2=game._visual_actor_pos(frame_probe)
+	var first_frame: int=game._classic_frame_for_actor(frame_probe)
+	game.accumulator=game.SIMULATION_TICK*0.75
+	var second_position: Vector2=game._visual_actor_pos(frame_probe)
+	var second_frame: int=game._classic_frame_for_actor(frame_probe)
+	check(first_position.distance_to(Vector2(524,500))<0.01 and second_position.distance_to(Vector2(572,500))<0.01,"render interpolation NEVER moves the captain off a straight course")
+	check(first_frame!=second_frame and first_frame in [1,3] and second_frame in [1,3],"only original four-facing 2D images alternate during straight horizontal sailing")
+	game.accumulator=saved_fraction
+	game.visual_before.erase(9316);game.visual_after.erase(9316)
+	game.classic_visual_travel.erase(9316);game.classic_heading_cache.erase(9316)
 	# Regression: 30Hz simulation heading has already switched, but the
 	# 60fps rendered ship is still interpolating the PREVIOUS 30Hz segment.
 	# Hull should point along that displayed movement, not its NEXT leg.
@@ -230,25 +208,28 @@ func run() -> void:
 	game.visual_after.erase(9317)
 	game.classic_heading_cache.erase(9317)
 	check(game._classic_frame_for_actor(display_probe)==1,"without render snapshots Classic falls back to current actual physics heading")
-	# Renderer must read the physical actor.heading instead of generating
-	# its own 0.44s oscillation. Sprite and overlay share the exact world
-	# coordinates, apart from a harmless <=0.5px raster snap.
+	# Visual cycling uses travelled world distance (no independent clock).
+	# Both ship and selection ring use the true interpolated world point.
 	var motion_probe: Dictionary={"id":9318,"kind":"ship","pos":Vector2(500,500),"speed":100.0,"slow":0.0,"heading":Vector2.RIGHT,"path":[Vector2(1000,500)]}
 	var shown: Dictionary={}
-	var start_y: float=motion_probe.pos.y
-	var min_probe_y: float=start_y
-	var max_probe_y: float=start_y
+	var start_y_motion: float=motion_probe.pos.y
 	var camera_before: Vector2=game.camera.position
-	for step in 30:
+	for step in 40:
+		var before_motion: Vector2=motion_probe.pos
 		game.sim._move(motion_probe,1.0/30.0)
+		var step_distance: float=motion_probe.pos.distance_to(before_motion)
+		game.visual_before[9318]=before_motion
+		game.visual_after[9318]=motion_probe.pos
+		game.classic_visual_travel[9318]=float(game.classic_visual_travel.get(9318,0.0))+step_distance
+		game.accumulator=game.SIMULATION_TICK*0.5
 		shown[game._classic_frame_for_actor(motion_probe)]=true
-		min_probe_y=minf(min_probe_y,motion_probe.pos.y)
-		max_probe_y=maxf(max_probe_y,motion_probe.pos.y)
 		var rendered: Vector2=game._classic_actor_render_pos(motion_probe)
 		var real: Vector2=game._visual_actor_pos(motion_probe)
 		var rounded_delta: Vector2=game.get_canvas_transform()*rendered-game.get_canvas_transform()*real
-		check(absf(rounded_delta.x)<=0.55 and absf(rounded_delta.y)<=0.55,"Classic render uses TRUE ship world position, with <=half pixel rounding only")
-	check(shown.has(1) and shown.has(3) and max_probe_y-min_probe_y>=15.0,"one 4-way controller moves the real NPC through alternating diagonal legs")
+		check(absf(rounded_delta.x)<=0.55 and absf(rounded_delta.y)<=0.55,"Classic draw rounds only to nearest screen pixel; no physical or graphic lateral offset")
+		check(absf(float(motion_probe.pos.y)-start_y_motion)<0.01,"40 physical Classic movement ticks never zigzag off horizontal line")
+	check(shown.has(1) and shown.has(3),"the visual four-view cadence appears while the TRUE course remains straight")
+	game.visual_before.erase(9318);game.visual_after.erase(9318);game.classic_visual_travel.erase(9318)
 	check(game.camera.position==camera_before,"drawing real isometric ship steps never invents a camera motion mode")
 	var original_pos: Vector2=game.sim.player.pos
 	var original_path: Array=game.sim.player.path.duplicate()
