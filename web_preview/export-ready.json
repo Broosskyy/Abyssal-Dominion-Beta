@@ -1,5 +1,5 @@
 {
-  "source_sha": "3ae79cbce27daa6016202a3476409d1635173abc",
-  "release": "browser-test-137",
-  "branch": "experiment/classic-iso-tile-grid-344"
+  "source_sha": "92d462c7c294e2551537a8b9fbc9bc22fdfa7918",
+  "release": "browser-test-138",
+  "branch": "fix/classic-click-tile-course-zoom-345"
 }
