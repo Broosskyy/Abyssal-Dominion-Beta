@@ -35,6 +35,30 @@ static func heading_eight(heading: Vector2,previous: int=-1) -> int:
 		if absf(wrapf(heading.angle()-center,-PI,PI))<=PI*0.125+0.06:return previous
 	return posmod(roundi((heading.angle()+PI*0.5)/(PI*0.25)),8)
 
+## Draw along the SAME physical diagonal sublegs that the 30 Hz simulation
+## traversed. Interpolating only the tick endpoints cuts corners and makes
+## the ship slide sideways whenever a tick straddles two raster legs.
+## No artificial sprite wobble, extra waypoints or independent timer.
+static func classic_trace_sample(segments: Array,progress: float) -> Dictionary:
+	if segments.is_empty():return {}
+	var total: float=0.0
+	for segment: Dictionary in segments:
+		total+=maxf(0.0,float(segment.get("distance",0.0)))
+	if total<=0.0001:return {}
+	var remaining: float=clampf(progress,0.0,1.0)*total
+	for segment: Dictionary in segments:
+		var distance: float=maxf(0.0,float(segment.get("distance",0.0)))
+		if distance<=0.0001:continue
+		if remaining<=distance:
+			var start: Vector2=Vector2(segment.get("start",Vector2.ZERO))
+			var finish: Vector2=Vector2(segment.get("end",start))
+			return {"pos":start.lerp(finish,clampf(remaining/distance,0.0,1.0)),
+				"heading":Vector2(segment.get("heading",finish-start))}
+		remaining-=distance
+	var last: Dictionary=segments.back()
+	return {"pos":Vector2(last.get("end",Vector2.ZERO)),
+		"heading":Vector2(last.get("heading",Vector2.RIGHT))}
+
 ## 0=intact, 1=damaged but afloat, 2=sunk. Damage threshold is a local test value.
 static func damage_state(hp: float,max_hp: float) -> int:
 	if hp<=0:return 2
