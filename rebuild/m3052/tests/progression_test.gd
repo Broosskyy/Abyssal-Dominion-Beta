@@ -103,6 +103,11 @@ func _initialize() -> void:
 			if sim.map_id!=start_region:break
 		check(sim.map_id==destination and sim.pending_portal==-1 and sim.near_portal()==-1,"real sailing reaches portal and changes region exactly once: "+str(start_region))
 		check(sim.visited[destination] and sim.player.gold==original_gold,"automatic crossing preserves wallet and records destination")
+		# Regression: prior-map committed 24x16 microsteps must NEVER
+		# survive the instant 2D/3D world-map teleport. Graphics toggles
+		# still preserve the very same route within one chart.
+		check(not sim.player.has("_iso_committed_step") and not sim.player.has("_iso_route"),
+			"world crossing clears OLD MAP microsteps before computing return course")
 		sim.npcs.clear()
 		check(sim.request_portal(start_region),"return portal accepts route")
 		for _i in 4200:

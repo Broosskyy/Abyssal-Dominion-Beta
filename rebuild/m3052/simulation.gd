@@ -243,8 +243,11 @@ func on_land(point: Vector2) -> bool:
 		if island.bounds.has_point(point) and Geometry2D.is_point_in_polygon(point,island.outline):return true
 	return false
 
-func segment_free(a: Vector2, b: Vector2) -> bool:
-	var steps = maxi(1, ceili(a.distance_to(b) / 18.0))
+func segment_free(a: Vector2, b: Vector2, max_step: float=18.0) -> bool:
+	# Raster routes check coast at <=2px spacing, not only at the old
+	# 18px square-grid samples. Otherwise narrow land contacts could
+	# be missed at planning time and hit during actual movement.
+	var steps = maxi(1, ceili(a.distance_to(b) / maxf(1.0,max_step)))
 	for i in range(1, steps + 1):
 		if blocked(a.lerp(b, float(i) / steps)):
 			return false
@@ -321,7 +324,7 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 			var heading: Vector2=remaining.normalized()
 			var amount: float=minf(travel,remaining.length())
 			var next_pos: Vector2=Vector2(body.pos)+heading*amount
-			if not phasing and not segment_free(body.pos,next_pos):
+			if not phasing and not segment_free(body.pos,next_pos,2.0):
 				body.path=[]
 				_clear_classic_raster_state(body)
 				return
@@ -361,7 +364,7 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 			var origin: Vector2=body.pos
 			var length: float=0.0
 			for point: Vector2 in tiles:
-				if not phasing and not segment_free(origin,point):
+				if not phasing and not segment_free(origin,point,2.0):
 					valid=false
 					break
 				length+=origin.distance_to(point)
@@ -371,7 +374,7 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 			# must use the SAME four-neighbour coastal A* if their greedy
 			# tile itinerary collides with an island margin.
 			if not valid:
-				tiles=NAV.classic_safe_route(body.pos,goal,Callable(self,"segment_free"))
+				tiles=NAV.classic_safe_route(body.pos,goal,Callable(self,"segment_free").bind(2.0))
 			if tiles.is_empty():
 				body.path=[]
 				_clear_classic_raster_state(body)
@@ -400,7 +403,7 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 		var speed_scale: float=float(body["_iso_speed_scale"])
 		var move_amount: float=minf(travel*speed_scale,segment.length())
 		var next: Vector2=Vector2(body.pos)+bearing*move_amount
-		if not phasing and not segment_free(body.pos,next):
+		if not phasing and not segment_free(body.pos,next,2.0):
 			body.path=[]
 			_clear_classic_raster_state(body)
 			return
@@ -478,7 +481,7 @@ func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 		# water retains update 344's approved stepping and speed; only
 		# obstructed courses use coastal A* instead of square-grid
 		# waypoints with occasional straight-line escape legs.
-		raster=NAV.classic_iso_route(origin,point) if staff.flag("no_collision") else NAV.classic_safe_route(origin,point,Callable(self,"segment_free"))
+		raster=NAV.classic_iso_route(origin,point) if staff.flag("no_collision") else NAV.classic_safe_route(origin,point,Callable(self,"segment_free").bind(2.0))
 		if raster.is_empty() and origin.distance_squared_to(point)>0.001:
 			message="Küste voraus · kein befahrbarer Rasterkurs"
 			return false
@@ -1399,6 +1402,11 @@ func leave_bonus() -> bool:
 	return BONUS_OPS.leave_bonus(self)
 
 func _arrive(point: Vector2) -> void:
+	# ARRIVING ON A DIFFERENT MAP is the one place where a live tile
+	# microstep cannot survive. World portals preserve the captain's
+	# position/save, but the 48x32 course belonged to the OLD coastline.
+	# Graphics changes (2D<->3D) must NEVER call this reset.
+	_clear_classic_raster_state(player)
 	BONUS_OPS._arrive(self, point)
 
 func bonus_wave_alive() -> int:
@@ -1846,7 +1854,9 @@ func request_portal(destination: int) -> bool:
 			player.path=[];pending_portal=destination
 			message="Überfahrt wartet · erst 6 Sekunden ohne Treffer"
 			return true
-		if not course(edge_point(str(link.edge),player.pos)):return false
+		# Identical full 48x32 coast-safe course in 2D and 3D. Never
+		# route portals with obsolete square-grid intermediary shortcuts.
+		if not course(edge_point(str(link.edge),player.pos),true):return false
 		pending_portal=destination
 		firing=false
 		message="Kurs zum Kartenrand · %s" % CONTENT.MAPS[destination].name
