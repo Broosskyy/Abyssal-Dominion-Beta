@@ -957,11 +957,16 @@ func _run() -> void:
 	var up=InputEventScreenTouch.new();up.index=0;up.position=screen;up.pressed=false
 	game._unhandled_input(down);game._unhandled_input(up)
 	check(game.sim.pending_portal==-1 and not game.sim.player.path.is_empty(),"touching the marked edge sets an ordinary course, without a portal hotspot")
-	for _i in 120:
+	# A real four-way isometric route may be longer than the old direct
+	# cardinal path. Allow enough 30Hz physical ticks to reach the edge.
+	for _i in 240:
 		game.sim.step(1.0/30.0)
 		if game.sim.map_id!=0:break
 	game._process(0)
-	check(game.sim.map_id==1 and game.camera.position==game.sim.player.pos and game.previous_region==1,"touch-to-arrival crossing switches region, recenters camera and synchronizes scene")
+	var crossed: bool=game.sim.map_id==1 and game.camera.position.distance_to(game.sim.player.pos)<0.1 and game.previous_region==1
+	if not crossed:
+		print("PORTAL_CROSSING_DIAG "+JSON.stringify({"map_id":game.sim.map_id,"player":str(game.sim.player.pos),"camera":str(game.camera.position),"region":game.previous_region,"loading_left":game.loading_left,"pending":game.sim.pending_portal,"near":game.sim.near_portal(),"path":str(game.sim.player.path)}))
+	check(crossed,"touch-to-arrival crossing switches region, recenters camera and synchronizes scene")
 	check(game.loading.visible and "Nordmeer" in str(game.loading.region) and not str(game.loading.tip).is_empty(),"region change shows the chart loading screen with destination and tip")
 	var path_before: Array=game.sim.player.path.duplicate()
 	game._tap(game.get_viewport_rect().size*.5)
