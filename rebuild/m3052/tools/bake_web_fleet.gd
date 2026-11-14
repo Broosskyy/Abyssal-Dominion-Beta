@@ -162,9 +162,25 @@ func _render_atlas(key: String,paint: int,name: String) -> bool:
 	var reference_extent: float=float(FRAME)*float(MESH.MODEL_INFO[key][0])/CAMERA_SIZE
 	var stable_bottom: float=0.0
 	for heading_index in range(ANGLES):
-		# Exactly the 8 clockwise headings used by ship_visuals.heading_eight:
-		# N, NE, E, SE, S, SW, W, NW (index 0 points chart-north).
-		var heading_angle=-PI*.5+float(heading_index)*PI*.25
+		# Eight distinct baked model views: N, NE, E, SE, S, SW, W, NW.
+		# The FOUR legacy diagonal facings MUST match the actual 48x32
+		# chart step, not 45-degree compass facings. 45-degree frames
+		# looked like the ship was sideways/sliding during a 3:2 leg.
+		# This affects only 2D source-GLB atlas renders; native 3D is
+		# the same untouched GLB geometry.
+		var heading_angle: float=-PI*.5+float(heading_index)*PI*.25
+		# Isometric geometry specifies the SCREEN-space 48:32 slope.
+		# The model is rendered through a 40-degree tilted orthographic
+		# camera, which foreshortens world Z by cos(tilt). Bake the world
+		# yaw that will project to precisely atan(32/48) on the 2D chart.
+		var view_cos: float=cos(deg_to_rad(MESH.FLEET_CAMERA_TILT_DEGREES))
+		var iso_world_angle: float=atan2(32.0,48.0*view_cos)
+		match heading_index:
+			1:heading_angle= -iso_world_angle
+			3:heading_angle=iso_world_angle
+			5:heading_angle=PI-iso_world_angle
+			7:heading_angle= -PI+iso_world_angle
+		var chart_angle: float=atan2(sin(heading_angle)*view_cos,cos(heading_angle))
 		owner.rotation.y=wrapf(PI-heading_angle,-PI,PI)
 		for _i in 3:await process_frame
 		await RenderingServer.frame_post_draw
@@ -189,7 +205,8 @@ func _render_atlas(key: String,paint: int,name: String) -> bool:
 			owner.queue_free()
 			return false
 		frames.append({"rect":[heading_index*FRAME+bounds.position.x,bounds.position.y,bounds.size.x,bounds.size.y],
-			"pivot":[water_pivot.x-bounds.position.x,water_pivot.y-bounds.position.y],"reference_extent":reference_extent})
+			"pivot":[water_pivot.x-bounds.position.x,water_pivot.y-bounds.position.y],"reference_extent":reference_extent,
+			"heading_angle_rad":heading_angle,"chart_angle_rad":chart_angle})
 		stable_bottom=maxf(stable_bottom,float(bounds.end.y)-water_pivot.y)
 		atlas.blit_rect(capture,Rect2i(0,0,FRAME,FRAME),Vector2i(heading_index*FRAME,0))
 	owner.queue_free()
