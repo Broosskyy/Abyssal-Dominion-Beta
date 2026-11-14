@@ -71,7 +71,9 @@ func run() -> void:
 		var later: Dictionary=VISUALS.classic_trace_sample(leg_trace,0.75)
 		var chord: Vector2=Vector2(cross_tick.pos)*0.25
 		check(Vector2(quarter.pos).distance_to(chord)>4.0,"Classic interpolation preserves the physical bend instead of cutting the corner")
-		check(VISUALS.heading_four(Vector2(quarter.heading))==1 and VISUALS.heading_four(Vector2(later.heading))==3,"Classic sprite switches exactly when its physical diagonal turns")
+		var first_trace_frame: int=VISUALS.heading_four(Vector2(leg_trace[0].heading))
+		var second_trace_frame: int=VISUALS.heading_four(Vector2(leg_trace[1].heading))
+		check(first_trace_frame in [1,3] and second_trace_frame in [1,3] and first_trace_frame!=second_trace_frame and VISUALS.heading_four(Vector2(quarter.heading))==first_trace_frame and VISUALS.heading_four(Vector2(later.heading))==second_trace_frame,"Classic sprite follows both actual diagonal legs rather than assuming NE or SE must be first")
 		check(Vector2(VISUALS.classic_trace_sample(leg_trace,1.0).pos).distance_to(cross_tick.pos)<0.01,"raster rendering and collision logic end each tick at the identical world point")
 	sim.set_classic_steering(false)
 	var goal:=Vector2(1200,500)
@@ -202,10 +204,12 @@ func run() -> void:
 		var saved_fraction: float=game.accumulator
 		game.accumulator=game.SIMULATION_TICK*0.25
 		var first_display: Dictionary=game._classic_tick_sample(frame_probe)
-		check(not first_display.is_empty() and game._classic_frame_for_actor(frame_probe)==1 and game._visual_actor_pos(frame_probe).distance_to(Vector2(first_display.pos))<0.01,"first visual half-tick uses NE position and NE hull view")
+		var first_expected: int=VISUALS.heading_four(Vector2(leg_trace[0].heading))
+		check(not first_display.is_empty() and game._classic_frame_for_actor(frame_probe)==first_expected and game._visual_actor_pos(frame_probe).distance_to(Vector2(first_display.pos))<0.01,"first visual half-tick uses its real diagonal position and facing")
 		game.accumulator=game.SIMULATION_TICK*0.75
 		var second_display: Dictionary=game._classic_tick_sample(frame_probe)
-		check(not second_display.is_empty() and game._classic_frame_for_actor(frame_probe)==3 and game._visual_actor_pos(frame_probe).distance_to(Vector2(second_display.pos))<0.01,"second visual half-tick uses SE position and SE hull view")
+		var second_expected: int=VISUALS.heading_four(Vector2(leg_trace[1].heading))
+		check(not second_display.is_empty() and game._classic_frame_for_actor(frame_probe)==second_expected and game._visual_actor_pos(frame_probe).distance_to(Vector2(second_display.pos))<0.01,"second visual half-tick uses its real diagonal position and facing")
 		game.accumulator=saved_fraction
 		game.visual_before.erase(9316)
 		game.visual_after.erase(9316)
