@@ -259,7 +259,7 @@ var vfx_flags: Dictionary = VFX_DEFAULT_FLAGS.duplicate(true)
 var vfx_intensity := 1.35
 # Classic is mandatory on Web and selectable on native. It uses no 3D stage.
 # Browser, Android and iOS initially share one Classic 2D renderer.
-# Native 2.5D/3D remain selectable, but mobile's first launch chooses 2D.
+# Native 3D remains selectable, but mobile's first launch chooses 2D.
 var browser_classic := OS.has_feature("web") or OS.has_feature("mobile")
 var classic_atlases: Dictionary={}
 var classic_geometry: Dictionary={}
@@ -306,7 +306,7 @@ var ring_last_target := -1
 var ring_target_acquired_at := -100.0
 var plate_overlay: Control
 var mesh_layer
-var render_mode := "classic" if OS.has_feature("web") or OS.has_feature("mobile") else "hybrid"
+var render_mode := "classic" if OS.has_feature("web") or OS.has_feature("mobile") else "3d"
 # 1 shaded starter, 1 untouched Corsair test, ten variants of one shared Corsair GLB.
 const ELITE_V2_NAMES := ["Obsidian","Bordeaux","Tiefblau","Waldgrün","Violett","Petrol","Elfenbein","Stahlblau","Karmesin","Knochen"]
 const ELITE_V2_ACCENTS := [Color("caa668"),Color("ce7b8f"),Color("669dd7"),Color("6bb28a"),Color("b392dc"),Color("5fc3b0"),Color("e1cda0"),Color("87aeda"),Color("e06f70"),Color("d5c9b5")]
@@ -320,7 +320,7 @@ const NPC_VISUAL_SCALE := 0.90
 # applied the desktop-only 36% hull size on 709px-high Android screens,
 # making the hull tiny relative to islands, the selection ring and HUD.
 # Only the VISUAL Classic hull is calibrated separately. Physics, hitboxes,
-# content, crossplay and 2.5D/3D mesh geometry are unchanged.
+# content, crossplay and 3D mesh geometry are unchanged.
 const CLASSIC_HULL_SCALE := 0.45
 const CLASSIC_HULL_SCALE_MOBILE := 0.60
 # The current default 1.08 world zoom makes mobile islands dominate the
@@ -350,7 +350,7 @@ func _ready() -> void:
 	# mode and four-direction physical steering, unless the captain later
 	# explicitly changes native graphics through the settings menu.
 	# Steering must be configured before any sea-chart route is created.
-	sim.set_classic_steering(browser_classic)
+	sim.set_classic_steering(true)
 	if browser_classic:_load_classic_atlases()
 	get_tree().set_meta("abyssal_ui_motion",ambient_motion_enabled)
 	previous_region=sim.map_id
@@ -492,7 +492,7 @@ func _send_online_course(point: Vector2) -> void:
 	var outgoing: Array[Vector2]=[]
 	for waypoint: Vector2 in sim.player.path:outgoing.append(waypoint)
 	var raster_ready: bool=false
-	if browser_classic and not outgoing.is_empty():
+	if not outgoing.is_empty():
 		# For tapped water courses use the EXACT same 48x32 itinerary
 		# already selected/validated by the offline ship mover. Previously
 		# online recomputed a greedy route from scratch and, if a coastline
@@ -534,7 +534,7 @@ func _send_online_course(point: Vector2) -> void:
 				expanded.append_array(micro)
 				current=waypoint
 			if raster_ready and not expanded.is_empty():outgoing=expanded
-	online_client.send_course(destination,outgoing,"classic_48x32" if browser_classic else "",raster_ready)
+	online_client.send_course(destination,outgoing,"classic_48x32",raster_ready)
 
 func _update_online_ships(delta: float) -> void:
 	if not online_connected:return
@@ -1897,9 +1897,9 @@ func _build_ui() -> void:
 	center_button=_orb(ui,"Kamera zum Schiff",hud_icons.focus,_recenter_camera)
 	settings_button=_orb(ui,"Anzeige & Steuerung",hud_icons.gear,func():_open_modal("Anzeige"));settings_button.name="SettingsButton"
 	# Directly reachable beside the minimap: no hidden submenu or scrolling.
-	render_toggle=_button(ui,"GRAFIK: 2,5D / 3D",_cycle_render_mode,"normal")
+	render_toggle=_button(ui,"GRAFIK: CLASSIC 2D / 3D",_cycle_render_mode,"normal")
 	render_toggle.name="GraphicsModeToggle"
-	render_toggle.tooltip_text="Browser: klassisches 2D ohne 3D; App: echtes 2,5D/3D"
+	render_toggle.tooltip_text="Browser: nur Classic 2D; native App: 2D Classic oder 3D · identischer Kurs"
 	render_toggle.add_theme_font_size_override("font_size",10)
 	if OS.has_feature("web"):render_toggle.hide()
 	attack=_orb(ui,"Feuer ein/aus",extra_icons.cannon_action,_toggle_fire,"FEUER");attack.name="FireButton"
@@ -2216,7 +2216,7 @@ func _thousands(value: int) -> String:
 func _refresh_ui() -> void:
 	if gold_label==null:return
 	if render_toggle!=null:
-		render_toggle.text="GRAFIK CLASSIC 2D" if browser_classic else {"hybrid":"GRAFIK 2,5D","3d":"GRAFIK 3D"}.get(render_mode,"GRAFIK 2,5D")
+		render_toggle.text="GRAFIK CLASSIC 2D" if browser_classic else "GRAFIK 3D"
 		render_toggle.disabled=false
 		render_toggle.visible=not OS.has_feature("web")
 	var today=Time.get_date_string_from_system()
@@ -3214,7 +3214,7 @@ func _add_shipyard_card(index: int,container: Node,frames: Array[Control]) -> vo
 	var hint: String=str(skins[index].name).to_upper() if index>=12 else "ELITE %02d · %s" % [index-1,ELITE_V2_NAMES[index-2].to_upper()] if index>=2 else ("BLACK CROWN · ORIGINAL-TEST" if index==1 else "SCHATTENKRIEGSSCHIFF · STANDARD")
 	var description=_text(column,hint,13,accent)
 	description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var details=_text(column,"Classic-2D-Ansichten aus dem Originalmodell" if browser_classic else ("Echtes 3D-GLB · 2,5D & 3D · Nur Design" if index>=2 else "Originalgeometrie · Gleiche Werte"),12,Color("c0d5d5"))
+	var details=_text(column,"Classic-2D-Ansichten aus dem Originalmodell" if browser_classic else ("Echtes 3D-GLB · gleicher 48×32-Fahrtweg wie 2D Classic" if index>=2 else "Originalgeometrie · Gleiche Werte"),12,Color("c0d5d5"))
 	details.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	var label: String=str(skins[index].name).to_upper()+"\n"+("AKTIV · AUSGERÜSTET" if chosen else ("AUSRÜSTEN · TEST" if model_ok else "TEXTUR / MODELL FEHLT"))
 	var choose=_button(column,label,func():_equip(choice),"normal" if chosen else "primary")
@@ -4267,7 +4267,7 @@ func _active_data_revision() -> int:
 	return 0
 
 func _open_display() -> void:
-	_banner_card(hud_icons.gear,"ANZEIGE & HUD","Classic 2D: Dieselbe echte Vier-Wege-Rasterfahrt in Browser, Android und iOS. Schiffsansicht folgt dem gefahrenen Diagonalschritt; 2,5D/3D bleiben wählbar.")
+	_banner_card(hud_icons.gear,"ANZEIGE & HUD","2D Classic und echtes 3D sind nur Darstellungen. Beide fahren denselben 48×32-Kurs, dieselben Koordinaten und dieselbe Geschwindigkeit – auch im Multiplayer. Browser: nur 2D.")
 	_note("DATENUPDATE %d · CLASSIC 2D · 12 WERFT-DESIGNS" % _active_data_revision() if browser_classic else "DATENUPDATE %d · 11 GLB-RESSOURCEN · 12 WERFT-DESIGNS · %s" % [_active_data_revision(),render_mode.to_upper()],Color("97e0d5"))
 	if _tab("Anzeige")=="GRAFIK":
 		if OS.has_feature("web"):
@@ -4277,11 +4277,11 @@ func _open_display() -> void:
 			_note("Die Werft, Seekarten, Decks, Kämpfe und Steuerung funktionieren mit derselben Spielmechanik. 3D gibt es weiterhin in der APK/Desktop-Version.")
 		else:
 			_section("GRAFIKMODUS")
-			for option in [["classic","CLASSIC 2D"],["hybrid","2,5D / HYBRID"],["3d","3D"]]:
+			for option in [["classic","CLASSIC 2D"],["3d","3D"]]:
 				var key: String=str(option[0])
 				var choice=_action(str(option[1])+(" · AKTIV" if render_mode==key else ""),func():_set_render_mode(key),"tab_on" if render_mode==key else "normal")
 				choice.disabled=render_mode==key
-			_note("Classic 2D: echte kurze Diagonalschritte auf der Seekarte, identisch auf Browser, Android und iOS. 2,5D und 3D fahren unverändert.")
+			_note("Einheitliche Navigation: 2D Classic und 3D nutzen denselben 48×32-Rasterkurs. Ein Grafikwechsel verändert weder Weltkoordinaten noch die Route.")
 		if browser_classic:
 			_section("CLASSIC 2D · EINHEITLICHE FAHRT")
 			_note("Eine feste Classic-Fahrt: Schiff, Ring und Name folgen denselben kleinen Diagonalschritten, die Seekarte scrollt erst am Rand. Kein separater Bewegungsmodus.",Color("a3c9cf"))
@@ -4417,10 +4417,10 @@ func _open_menu_hub() -> void:
 
 func _open_help() -> void:
 	_section("GRAFIKMODUS · DATENUPDATE %d" % _active_data_revision())
-	_note("Browser: In Classic 2D bewegt sich die ganze sichtbare Schiffseinheit um wenige Pixel seitlich zur Fahrt. Die echte Route bleibt direkt; Multiplayer-Koordinaten und Schiffsstatistiken bleiben unverändert.",Color("9be4df"))
+	_note("Browser: ausschließlich 2D Classic. Android/Desktop/iOS: 2D Classic oder 3D. Alle Spieler bewegen sich auf derselben weltfesten 48×32-Spur.",Color("9be4df"))
 	if not OS.has_feature("web"):
-		var modes=_grid(3)
-		for option in [["classic","CLASSIC 2D"],["hybrid","2,5D"],["3d","3D"]]:
+		var modes=_grid(2)
+		for option in [["classic","CLASSIC 2D"],["3d","3D"]]:
 			var key: String=str(option[0])
 			var button=_action(str(option[1])+(" ✓" if key==render_mode else ""),func():_set_render_mode(key),"tab_on" if key==render_mode else "normal",modes)
 			button.disabled=key==render_mode
@@ -4977,8 +4977,9 @@ func _load_display() -> void:
 	# defaulted to Hybrid and may have silently stored it. The first new
 	# mobile launch must use the same Classic 2D as the browser.
 	var prefer_mobile_classic: bool=OS.has_feature("mobile") and int(data.get("mobile_classic_revision",0))<1
-	render_mode="classic" if OS.has_feature("web") or prefer_mobile_classic else str(data.get("render_mode","classic" if OS.has_feature("mobile") else "hybrid"))
-	if not render_mode in ["classic","hybrid","3d"]:render_mode="classic" if OS.has_feature("mobile") else "hybrid"
+	render_mode="classic" if OS.has_feature("web") or prefer_mobile_classic else str(data.get("render_mode","classic" if OS.has_feature("mobile") else "3d"))
+	if render_mode=="hybrid":render_mode="3d" # migrate saved obsolete 2.5D selection
+	if not render_mode in ["classic","3d"]:render_mode="classic" if OS.has_feature("mobile") else "3d"
 	browser_classic=render_mode=="classic"
 	projectile_visual_count=COMBAT_FX.visual_count(int(data.get("projectile_visual_count",3)))
 	var stored_flags: Variant=data.get("vfx_flags",{})
@@ -5003,7 +5004,7 @@ func _load_display() -> void:
 
 func _cycle_render_mode() -> void:
 	if OS.has_feature("web"):return
-	_set_render_mode({"classic":"hybrid","hybrid":"3d","3d":"classic"}.get(render_mode,"classic"))
+	_set_render_mode("3d" if render_mode=="classic" else "classic")
 
 func _persist_display_preferences() -> void:
 	var file=FileAccess.open(HUD_SAVE,FileAccess.WRITE)
@@ -5147,7 +5148,8 @@ func _set_projectile_visual_count(requested: int) -> void:
 
 func _set_render_mode(value: String) -> void:
 	if OS.has_feature("web"):value="classic"
-	if not value in ["classic","hybrid","3d"]:value="hybrid"
+	if value=="hybrid":value="3d"
+	if not value in ["classic","3d"]:value="classic"
 	if value=="classic":
 		var previous: bool=browser_classic
 		browser_classic=true;_load_classic_atlases()
@@ -5160,9 +5162,8 @@ func _set_render_mode(value: String) -> void:
 	else:
 		browser_classic=false;render_mode=value;_ensure_mesh_layer()
 		mesh_layer.set_render_mode(value);render_mode=mesh_layer.mode
-	# Classic is a visual renderer choice. Never rewrite or resend the
-	# physical ship route when swapping 2D/2.5D/3D.
-	sim.set_classic_steering(browser_classic)
+	# Graphics mode only: preserve exact active 48x32 world route, heading,
+	# tile step, and network navigation. NEVER change physics here.
 	classic_heading_cache.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
