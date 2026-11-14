@@ -926,7 +926,7 @@ func _draw() -> void:
 		# The original-era Classic ship follows real 48x32 raster steps,
 		# so a STRAIGHT route preview falsely suggests it will sail straight.
 		# Use a destination marker there, not an incompatible diagonal line.
-		# Native 2.5D/3D retain their original smooth course preview.
+		# Native 3D uses the exact same world course as Classic; only rendering differs.
 		if not browser_classic:
 			for point: Vector2 in sim.player.path:
 				draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
@@ -4341,7 +4341,7 @@ func _open_display() -> void:
 			count_button.disabled=projectile_visual_count==amount
 		_note("Standard: 3 · Leuchtkugeln wechseln zwischen Rot, Blau, Grün, Gold und Violett.",Color("bfcbdf"))
 		_section("ANIMATIONEN & KAMPFEFFEKTE")
-		_note("Jede Einstellung ist rein optisch und wirkt sofort in 2,5D und 3D. Auch bei ausgeschalteten Effekten bleiben die echten Geschosse und Treffer sichtbar.",Color("a3c9cf"))
+		_note("Jede Einstellung ist rein optisch und wirkt in Classic 2D und echtem 3D. Auch bei ausgeschalteten Effekten bleiben Geschosse und Treffer sichtbar.",Color("a3c9cf"))
 		var effect_grid=_grid(2)
 		for option in [["enabled","ALLE EFFEKTE"],["flight","FLUGSPUREN"],["muzzle","MÜNDUNGSBLITZE"],["impact","TREFFERANIMATIONEN"],["particles","PARTIKEL & TRÜMMER"],["water","WASSERFONTÄNEN"],["flashes","LICHTBLITZE"]]:
 			var key: String=str(option[0])
