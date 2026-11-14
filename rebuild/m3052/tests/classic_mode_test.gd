@@ -262,6 +262,7 @@ func run() -> void:
 	var shown: Dictionary={}
 	var start_y_motion: float=motion_probe.pos.y
 	var max_y_motion: float=0.0
+	var max_visual_raster_y: float=0.0
 	var camera_before: Vector2=game.camera.position
 	for step in 120:
 		var before_motion: Vector2=motion_probe.pos
@@ -271,11 +272,13 @@ func run() -> void:
 		game.accumulator=game.SIMULATION_TICK*0.5
 		shown[game._classic_frame_for_actor(motion_probe)]=true
 		var rendered: Vector2=game._classic_actor_render_pos(motion_probe)
-		var real: Vector2=game._visual_actor_pos(motion_probe)
-		var rounded_delta: Vector2=game.get_canvas_transform()*rendered-game.get_canvas_transform()*real
-		check(absf(rounded_delta.x)<=0.55 and absf(rounded_delta.y)<=0.55,"raster draw uses exact world position and <=0.5px screen-rounding")
+		var raster: Dictionary=game._classic_raster_visual(motion_probe)
+		var expected: Vector2=Vector2(raster.pos) if not raster.is_empty() else game._visual_actor_pos(motion_probe)
+		var rounded_delta: Vector2=game.get_canvas_transform()*rendered-game.get_canvas_transform()*expected
+		check(absf(rounded_delta.x)<=0.55 and absf(rounded_delta.y)<=0.55,"Classic snaps displayed RASTER position to <=0.5 screen pixels")
 		max_y_motion=maxf(max_y_motion,absf(float(motion_probe.pos.y)-start_y_motion))
-	check(max_y_motion<0.01,"four-way images render on a straight horizontal physical course without invented tile zigzag")
+		max_visual_raster_y=maxf(max_visual_raster_y,absf(rendered.y-start_y_motion))
+	check(max_y_motion<0.01 and max_visual_raster_y>=8.0 and shown.has(1) and shown.has(3),"Classic ship visually zigzags NE/SE between 24x16 tiles while real course stays straight")
 	game.visual_before.erase(9318);game.visual_after.erase(9318)
 	check(game.camera.position==camera_before,"drawing real isometric ship steps never invents a camera motion mode")
 	var original_pos: Vector2=game.sim.player.pos
