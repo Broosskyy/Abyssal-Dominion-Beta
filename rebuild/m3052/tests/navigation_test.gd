@@ -33,7 +33,7 @@ func _initialize() -> void:
 		native_track.append(Vector2(body.pos))
 		if not body.path.is_empty():native_headings[int(signf(float(body.heading.y)))]=true
 		if body.path.is_empty():break
-	check(body.pos.distance_to(Vector2(950,500))<0.1 and native_headings.has(-1) and native_headings.has(1),"3D GLB uses physical four-neighbour 24x16 chart steps, not a different direct line")
+	check(body.pos.distance_to(Vector2(950,500))<0.1 and native_track.all(func(point):return absf(point.y-500.0)<0.01),"3D GLB sails directly across clear water without zigzag")
 	# Four historic views now follow a 48×32 staggered diamond-grid path.
 	# The mainland high-level waypoint stays identical to native 3D.
 	sim.set_classic_steering(true)
@@ -50,7 +50,7 @@ func _initialize() -> void:
 		max_y_error=maxf(max_y_error,absf(float(body.pos.y)-start_y))
 		if not body.path.is_empty():diagonal_y[int(signf(float(body.heading.y)))]=true
 		if body.path.is_empty():break
-	check(max_y_error>=8.0 and max_y_error<=32.0 and diagonal_y.has(-1) and diagonal_y.has(1),"Classic physically traverses four 24x16 tile bearings, never arbitrary 32-unit legs")
+	check(max_y_error<0.01 and body.heading.is_equal_approx(Vector2.RIGHT),"Classic physically follows the same straight horizontal course")
 	check(body.pos.distance_to(Vector2(950,500))<0.1 and body.path.is_empty(),"tile steps plus final exact arrival reach original clicked destination")
 	# Compare actual trajectory samples, not just their common endpoint.
 	body.pos=Vector2(500,500);body.path=classic_route.duplicate()
