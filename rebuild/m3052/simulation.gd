@@ -35,10 +35,11 @@ const START := Vector2(4200, 2900)
 const AMMO_NAMES := ["cannon", "chain", "harpoon", "flare", "pumpkin", "snow", "ice", "fire", "poison", "shrapnel", "lightning", "holy", "shadow", "wind", "earth", "water", "cursed", "bleed", "necro", "gold", "crystal", "explosive", "arcane", "spectral", "lava", "light", "armor_piercing", "gas"]
 const AMMO_LABELS := ["Vollkugeln geladen", "Kettenkugeln geladen · verlangsamen Schiffe", "Harpunen geladen · gegen Seeungeheuer", "Leuchtkugeln geladen · markieren das Ziel", "Kürbismunition geladen · Splitter im Umkreis", "Schneemunition geladen · starke Verlangsamung", "Eismunition geladen · friert das Ziel ein", "Feuerkugeln geladen · Grafik-Beta", "Giftkugeln geladen · Grafik-Beta", "Schrapnellkugeln geladen · Grafik-Beta", "Blitzkugeln geladen · Grafik-Beta", "Heilige Kugeln geladen · Grafik-Beta", "Schattenkugeln geladen · Grafik-Beta", "Wirbelkugeln geladen · Grafik-Beta", "Erdkugeln geladen · Grafik-Beta", "Wasserkugeln geladen · Grafik-Beta", "Fluchkugeln geladen · Grafik-Beta", "Blutkugeln geladen · Grafik-Beta", "Nekrokugeln geladen · Grafik-Beta", "Goldkugeln geladen · Grafik-Beta", "Kristallkugeln geladen · Grafik-Beta", "Explosivkugeln geladen · Grafik-Beta", "Arkankugeln geladen · Grafik-Beta", "Geisterkugeln geladen · Grafik-Beta", "Lavakugeln geladen · Grafik-Beta", "Lichtkugeln geladen · Grafik-Beta", "Panzerbrecher geladen · Grafik-Beta", "Gaskugeln geladen · Grafik-Beta"]
 var player: Dictionary
-# Test branch 344: the Classic look traverses staggered 48x32 diamond tiles.
-# All modes keep identical click destinations, global coordinates and coastline
-# path planning; do not merge this experiment until visually calibrated.
-var classic_steering: bool=false
+# Authoritative SHARED movement contract (2D Classic, native 3D, browser,
+# Android and iOS). Presentation NEVER chooses ship physics or path nodes.
+# The 48x32 global diamond raster and its 76 px/s physical step cadence are
+# used by ALL player/ship vessels, including those rendered by GLB meshes.
+var classic_steering: bool=true
 # Retired historical skins 0-30 migrate to shaded ship (skin 0).
 # Only schema 5+ saves can select separate Corsair test skin 1 and ten new Elite color skins 2-11.
 const FINAL_PLAYER_SKIN := 0
@@ -413,17 +414,11 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 	# Unlike a grid-snap method there is NEVER a teleport to lattice origin.
 
 
-func set_classic_steering(enabled: bool) -> void:
-	# Compatibility flag for the Classic renderer ONLY. Never change physics,
-	# path nodes, speed, collision or networking when changing render modes.
-	if classic_steering==enabled:return
-	classic_steering=enabled
-	# Drop transient fields from pre-343 builds so no old diagonal leg can
-	# survive a mode switch or persist on an NPC.
-	var vessels: Array[Dictionary]=[player]
-	vessels.append_array(npcs)
-	for body: Dictionary in vessels:
-		_clear_classic_raster_state(body)
+func set_classic_steering(_enabled: bool) -> void:
+	# Deprecated renderer API: kept for existing code/test compatibility,
+	# but deliberately cannot disable the ONE authoritative tile mover.
+	# Do not clear committed steps on any graphics toggle.
+	classic_steering=true
 
 
 func _classic_clicked_target(point: Vector2) -> Vector2:
@@ -458,16 +453,16 @@ func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 	if docked:return false
 	if int(player.hp)<=0:return false
 	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
-	var classic_click: bool=snap_click_to_classic_tile and classic_steering
+	var classic_click: bool=snap_click_to_classic_tile
 	if classic_click:point=_classic_clicked_target(point)
 
 	# Keep an in-progress 24×16 step when the captain retaps. The NEW
 	# course must be planned FROM THAT NEXT TILE CENTRE, not the fractional
 	# position at which the UI touch happened.
 	var committed: Variant=null
-	if classic_steering and player.has("_iso_committed_step"):
+	if player.has("_iso_committed_step"):
 		committed=player["_iso_committed_step"]
-	elif classic_steering and player.has("_iso_route"):
+	elif player.has("_iso_route"):
 		var previous: Array=player["_iso_route"]
 		var index: int=int(player.get("_iso_route_index",0))
 		if index>=0 and index<previous.size():
@@ -950,7 +945,7 @@ func step(delta: float) -> void:
 func _move(body: Dictionary, delta: float) -> void:
 	if bool(body.get("network_motion",false)):return
 	var slow_rate = float(body.get("slow_rate", 0.55)) if float(body.slow) > 0 else 1.0
-	var is_classic_ship: bool=classic_steering and (int(body.get("id",-1))==0 or str(body.get("kind",""))=="ship")
+	var is_classic_ship: bool=int(body.get("id",-1))==0 or str(body.get("kind",""))=="ship"
 	# Historical 2D step cadence is separated from the old continuous
 	# 165 world-units/s mover. Keep sail progression, but cap stacked
 	# upgrades so the starter-to-Elite speed is still recognizably tiled.
@@ -965,10 +960,9 @@ func _move(body: Dictionary, delta: float) -> void:
 	_advance_world_course(body,travel,phasing)
 
 func _advance_world_course(body: Dictionary,travel: float,phasing: bool) -> void:
-	# Experimental old-school raster navigation in Classic only.
-	# It keeps the same high-level, coastline-safe route and arrival time.
-	# Native graphics still use the 342 continuous direct mover.
-	if classic_steering and (int(body.get("id",-1))==0 or str(body.get("kind",""))=="ship"):
+	# 2D and 3D always execute EXACTLY the same grid legs from the same
+	# world-coordinate course. Renderer mode must not influence movement.
+	if int(body.get("id",-1))==0 or str(body.get("kind",""))=="ship":
 		_move_classic_tiles(body,travel,phasing)
 		return
 	while travel > 0.01 and not body.path.is_empty():
