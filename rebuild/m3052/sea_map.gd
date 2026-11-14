@@ -877,12 +877,14 @@ func _draw() -> void:
 	if not sim.player.path.is_empty():
 		var goal: Vector2=sim.player.path.back()
 		var before: Vector2=sim.player.pos
-		# The chart shows the real obstacle-aware path in ALL view modes.
-		# Classic changes only which four ship sprites are drawn, never
-		# navigation waypoints or world-space course geometry.
-		for point: Vector2 in sim.player.path:
-			draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
-			before=point
+		# The original-era Classic ship follows real 48x32 raster steps,
+		# so a STRAIGHT route preview falsely suggests it will sail straight.
+		# Use a destination marker there, not an incompatible diagonal line.
+		# Native 2.5D/3D retain their original smooth course preview.
+		if not browser_classic:
+			for point: Vector2 in sim.player.path:
+				draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
+				before=point
 		draw_arc(goal,16+sin(elapsed*3)*2,0,TAU,32,Color(0.54,0.92,0.85,0.7),1.7,true)
 		draw_line(goal-Vector2(22,0),goal+Vector2(22,0),Color(0.5,0.9,0.84,0.5),1.0)
 		draw_line(goal-Vector2(0,16),goal+Vector2(0,16),Color(0.5,0.9,0.84,0.5),1.0)
