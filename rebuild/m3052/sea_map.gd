@@ -490,7 +490,7 @@ func _send_online_course(point: Vector2) -> void:
 		# The sender and server must receive the same snapped chart tile
 		# as the locally simulated destination, not the raw pre-snap touch.
 		var destination: Vector2=Vector2(sim.player.path.back()) if not sim.player.path.is_empty() else point
-		online_client.send_course(destination,sim.player.path)
+		online_client.send_course(destination,sim.player.path,"classic_48x32" if browser_classic else "")
 
 func _update_online_ships(delta: float) -> void:
 	if not online_connected:return
