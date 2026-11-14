@@ -1241,10 +1241,23 @@ func _classic_atlas_key(actor: Dictionary) -> String:
 	return str(actor.get("visual_key",""))
 
 func _classic_frame_for_actor(actor: Dictionary) -> int:
-	# Exactly the one current PHYSICAL isometric leg chooses the baked
-	# four-view sprite. No separate clock, triangle, pose or pixel wobble.
+	# The rendered ship is one simulation tick behind the latest physics:
+	# _visual_actor_pos interpolates between visual_before/visual_after.
+	# Using actor.heading (the NEWEST physics direction) here caused the
+	# hull to rotate BEFORE the visible ship actually reached that turn.
+	# That produced the sideways sliding seen in reference comparison.
+	# Choose the 4-view sprite from THIS displayed interpolation segment.
 	var id: int=int(actor.get("id",-1))
-	var facing: int=VISUALS.heading_four(Vector2(actor.get("heading",Vector2.RIGHT)),int(classic_heading_cache.get(id,-1)))
+	var display_heading: Vector2=Vector2(actor.get("heading",Vector2.RIGHT))
+	if browser_classic and visual_before.has(id) and visual_after.has(id):
+		var prior: Vector2=Vector2(visual_before[id])
+		var next: Vector2=Vector2(visual_after[id])
+		var segment: Vector2=next-prior
+		var current: Vector2=Vector2(actor.get("pos",next))
+		# Ignore teleport, network corrections and stale test snapshots.
+		if next.distance_squared_to(current)<0.04 and segment.length_squared()>0.04 and segment.length_squared()<10000.0:
+			display_heading=segment.normalized()
+	var facing: int=VISUALS.heading_four(display_heading,int(classic_heading_cache.get(id,-1)))
 	classic_heading_cache[id]=facing
 	return facing
 
