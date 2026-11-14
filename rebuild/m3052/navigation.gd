@@ -133,7 +133,8 @@ static func classic_safe_route(start: Vector2,goal: Vector2,segment_clear: Calla
 		return []
 
 	var base_step: float=Vector2(ISO_HALF_X,ISO_HALF_Y).length()
-	var scores: Dictionary={begin:0.0}
+	var scores: Dictionary={}
+	scores[begin]=0.0
 	var parents: Dictionary={}
 	var frontier: Array=[]
 	_tile_heap_push(frontier,{"tile":begin,"g":0.0,
