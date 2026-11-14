@@ -1239,14 +1239,14 @@ func _run() -> void:
 	game.sim.player.pos=course_point+Vector2(190,0)
 	game._input(tap_down)
 	game._input(tap_up)
-	check(not game.sim.player.path.is_empty() and game.sim.player.path.back().distance_to(course_point)<2,"Android first tap on open water sets destination")
+	check(not game.sim.player.path.is_empty() and game.sim.player.path.back().distance_to(game.sim._classic_clicked_target(course_point))<.01,"Android first tap targets the actual global 48x32 diamond in both 2D and 3D")
 	var next_screen: Vector2=tap_screen+Vector2(48,-40)
 	tap_down.position=next_screen
 	tap_up.position=next_screen
 	game._input(tap_down)
 	game._input(tap_up)
 	var other_course: Vector2=game.get_canvas_transform().affine_inverse()*next_screen
-	check(not game.sim.player.path.is_empty() and game.sim.player.path.back().distance_to(other_course)<2,"consecutive quick water taps update destination without timing suppression")
+	check(not game.sim.player.path.is_empty() and game.sim.player.path.back().distance_to(game.sim._classic_clicked_target(other_course))<.01,"consecutive quick water taps replan to each clicked diamond tile in both renderers")
 	game.sim.player.pos=before_pos
 	game.sim.player.path=[]
 	game.sim.harbor=saved_harbor
