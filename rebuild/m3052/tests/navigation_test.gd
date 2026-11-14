@@ -19,18 +19,21 @@ func _initialize() -> void:
 	var sim=SIM.new()
 	var body=sim.npcs[0];body.pos=Vector2(500,500)
 	var route=sim.plan_actor_path(body,Vector2(950,500))
-	check(str(body.renderer)=="mesh" and not sim.classic_steering and route==sim.plan_path(body.pos,Vector2(950,500)),"native GLB ships use original direct navigation")
+	check(str(body.renderer)=="mesh" and sim.classic_steering and route==sim.plan_path(body.pos,Vector2(950,500)),"native 3D GLB ships share Classic's destination and tile navigation")
 	var before: Vector2=body.pos
 	var safe=true
 	for point: Vector2 in route:
 		safe=safe and sim.segment_free(before,point);before=point
 	check(safe,"every GLB route segment remains coastline-safe")
 	body.path=route
-	var stable_course=true
+	var native_track: Array[Vector2]=[body.pos]
+	var native_headings: Dictionary={}
 	for _i in 240:
 		sim._move(body,0.1)
-		if not body.path.is_empty():stable_course=stable_course and absf(body.heading.y)<.001
-	check(stable_course and body.pos.distance_to(Vector2(950,500))<0.01,"direct native route sails to the exact goal without alternating diagonal headings")
+		native_track.append(Vector2(body.pos))
+		if not body.path.is_empty():native_headings[int(signf(float(body.heading.y)))]=true
+		if body.path.is_empty():break
+	check(body.pos.distance_to(Vector2(950,500))<0.1 and native_headings.has(-1) and native_headings.has(1),"3D GLB uses physical four-neighbour 24x16 chart steps, not a different direct line")
 	# Four historic views now follow a 48×32 staggered diamond-grid path.
 	# The mainland high-level waypoint stays identical to native 3D.
 	sim.set_classic_steering(true)
@@ -49,13 +52,25 @@ func _initialize() -> void:
 		if body.path.is_empty():break
 	check(max_y_error>=8.0 and max_y_error<=32.0 and diagonal_y.has(-1) and diagonal_y.has(1),"Classic physically traverses four 24x16 tile bearings, never arbitrary 32-unit legs")
 	check(body.pos.distance_to(Vector2(950,500))<0.1 and body.path.is_empty(),"tile steps plus final exact arrival reach original clicked destination")
+	# Compare actual trajectory samples, not just their common endpoint.
+	body.pos=Vector2(500,500);body.path=classic_route.duplicate()
+	body.erase("_iso_goal");body.erase("_iso_route");body.erase("_iso_route_index")
+	var classic_track: Array[Vector2]=[body.pos]
+	for _i in range(native_track.size()-1):
+		sim._move(body,0.1)
+		classic_track.append(Vector2(body.pos))
+	var same_track: bool=classic_track.size()==native_track.size()
+	if same_track:
+		for i in native_track.size():
+			if classic_track[i].distance_to(native_track[i])>0.001:same_track=false;break
+	check(same_track,"2D and 3D ships starting on the same world coordinates follow the EXACT SAME positions each tick")
 	body.pos=Vector2(500,500)
 	body.renderer="mesh";body.view_count=4
 	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"source GLB versus sprite never changes the selected target waypoint")
 	body.view_count=8
 	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"baked sprite count does not create an extra sailing mode")
 	sim.set_classic_steering(false)
-	check(sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"switching back to native 3D/2.5D restores the direct route")
+	check(sim.classic_steering and sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"legacy mode switch cannot switch off the authoritative raster route")
 	for map_index in [0,1,2]:
 		sim.configure_map(map_index)
 		sim.shots.clear()
