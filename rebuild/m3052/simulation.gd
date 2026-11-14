@@ -355,9 +355,11 @@ func _classic_choose_diagonal(body: Dictionary,goal: Vector2,leg_length: float,p
 	return best_direction
 
 func _move_classic(body: Dictionary,travel: float,phasing: bool) -> void:
-	# Real 4-way navigation at 30 Hz. Each isometric leg moves the
-	# actual captain location; it is never a separate sprite oscillation.
-	# A 32-world-unit leg has the same 3:2 direction as a 48x32 tile.
+	# Real 4-way navigation at 30 Hz. A single 30 Hz tick may straddle
+	# TWO diagonal legs; retain their physical order for 60/120 Hz drawing.
+	# This trace is presentation-only and is never sent over the network.
+	var tick_segments: Array[Dictionary]=[]
+	body["_iso_tick_segments"]=tick_segments
 	var iterations: int=0
 	while travel>0.01 and not body.path.is_empty() and iterations<24:
 		iterations+=1
@@ -383,6 +385,8 @@ func _move_classic(body: Dictionary,travel: float,phasing: bool) -> void:
 				body.path=[]
 				_clear_classic_leg(body)
 				return
+			if final_amount>0.0001:
+				tick_segments.append({"start":Vector2(body.pos),"end":final_next,"heading":final_heading,"distance":final_amount})
 			body.heading=final_heading
 			body.pos=final_next
 			travel-=final_amount
@@ -415,6 +419,8 @@ func _move_classic(body: Dictionary,travel: float,phasing: bool) -> void:
 			body.path=[]
 			_clear_classic_leg(body)
 			return
+		if amount>0.0001:
+			tick_segments.append({"start":Vector2(body.pos),"end":next,"heading":direction,"distance":amount})
 		body.pos=next
 		body.heading=direction
 		travel-=amount
