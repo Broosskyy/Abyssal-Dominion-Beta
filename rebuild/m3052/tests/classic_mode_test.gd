@@ -77,14 +77,26 @@ func run() -> void:
 				check(VISUALS.heading_four(trial.heading) in [1,3,5,7],"physical heading uses an actual four-way tile step "+str(heading_target))
 		check(trial.path.is_empty() and Vector2(trial.pos).distance_to(heading_target)<0.1,"all Classic tap directions reach exact clicked target "+str(heading_target))
 		check(max_cross_track<29.0 and visited_steps<1800,"isometric raster remains within one half-tile of the requested world line "+str(heading_target))
-	# Re-tap mid-course must discard the old direction immediately.
+	# Scripted retap (e.g. NPC path) during a tile completes that one
+	# already-selected physical leg, then starts the NEW course at its
+	# centre. Do not demand an impossible instant rotation mid-leg.
 	var retap_probe: Dictionary={"id":0,"pos":Vector2.ZERO,"heading":Vector2.RIGHT,"path":[Vector2(700,0)]}
 	for step in 40:sim._advance_world_course(retap_probe,165.0/30.0,true)
 	var retap_start: Vector2=retap_probe.pos
 	var new_goal: Vector2=retap_start+Vector2(-250,-400)
+	var old_step: Vector2=Vector2(retap_probe["_iso_route"][int(retap_probe["_iso_route_index"])])
 	retap_probe.path=[new_goal]
-	sim._advance_world_course(retap_probe,165.0/30.0,true)
-	check(retap_probe.heading.dot((new_goal-retap_start).normalized())>0.1 and retap_probe.pos.distance_to(retap_start)<10.0,"new click changes to a new valid tile direction immediately, no turning circle or teleport")
+	sim._advance_world_course(retap_probe,1.0,true)
+	check(retap_probe.has("_iso_committed_step") and Vector2(retap_probe["_iso_committed_step"])==old_step,"direct path replacement also preserves committed tile instead of steering diagonally off-grid")
+	var pivot_passed: bool=false
+	for tick in 60:
+		if not retap_probe.has("_iso_committed_step"):
+			pivot_passed=true
+			break
+		sim._advance_world_course(retap_probe,1.0,true)
+	check(pivot_passed and Vector2(retap_probe.pos).distance_to(old_step)<1.5,"direct retap finishes committed tile without teleport or premature mid-step course switch")
+	sim._advance_world_course(retap_probe,1.0,true)
+	check(retap_probe.heading.dot((new_goal-old_step).normalized())>0.0,"new course then chooses a valid bearing on the next tile")
 	for tick in 900:
 		if retap_probe.path.is_empty():break
 		sim._advance_world_course(retap_probe,165.0/30.0,true)
