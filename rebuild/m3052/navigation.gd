@@ -1,4 +1,61 @@
 extends RefCounted
+## Classic Seafight-era 48×32 isometric tile geometry. This is a
+## SCREEN-SPACE DIAMOND lattice: neighbouring tile centres differ by
+## (24,+16), (-24,+16), (24,-16), or (-24,-16). It is NOT a
+## "travel 32 units diagonally then recalculate" approximation.
+const ISO_TILE_WIDTH := 48.0
+const ISO_TILE_HEIGHT := 32.0
+const ISO_HALF_X := ISO_TILE_WIDTH*0.5
+const ISO_HALF_Y := ISO_TILE_HEIGHT*0.5
+
+## Convert a high-level, coast-safe waypoint into actual fixed isometric
+## micro-steps. The tile origin is the exact actor location when the leg
+## starts: no snap or teleport when a captain retaps or respawns.
+## The final short adjustment reaches the original clicked target exactly.
+## The sequence is generated ONCE per waypoint, not re-scored every frame.
+static func classic_iso_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
+	var result: Array[Vector2]=[]
+	var delta: Vector2=goal-start
+	if delta.length_squared()<0.0001:return result
+	var cells_q: int=roundi(0.5*(delta.x/ISO_HALF_X+delta.y/ISO_HALF_Y))
+	var cells_r: int=roundi(0.5*(delta.y/ISO_HALF_Y-delta.x/ISO_HALF_X))
+	var q_step: int=1 if cells_q>=0 else -1
+	var r_step: int=1 if cells_r>=0 else -1
+	var used_q: int=0
+	var used_r: int=0
+	var chart_heading: Vector2=delta.normalized()
+	var current: Vector2=start
+	var tile_count: int=absi(cells_q)+absi(cells_r)
+	for i in mini(tile_count,2048):
+		var can_q: bool=used_q!=cells_q
+		var can_r: bool=used_r!=cells_r
+		if not can_q and not can_r:break
+		var q_next: Vector2=current+Vector2(ISO_HALF_X*float(q_step),ISO_HALF_Y*float(q_step))
+		var r_next: Vector2=current+Vector2(-ISO_HALF_X*float(r_step),ISO_HALF_Y*float(r_step))
+		var choose_q: bool=can_q
+		if can_q and can_r:
+			# Bresenham-like cross-track error measured against the WHOLE
+			# intended segment, never against a changing intermediate bearing.
+			var q_error: float=absf((q_next-start).cross(chart_heading))
+			var r_error: float=absf((r_next-start).cross(chart_heading))
+			if r_error+0.00001<q_error:choose_q=false
+			elif absf(q_error-r_error)<0.00001:
+				# Deterministic forward progress when both lie equally far
+				# off the ray. On horizontal trips this gives Q,R,Q,R...
+				choose_q=q_next.distance_squared_to(goal)<=r_next.distance_squared_to(goal)
+		elif can_r:choose_q=false
+		if choose_q:
+			current=q_next
+			used_q+=q_step
+		else:
+			current=r_next
+			used_r+=r_step
+		result.append(current)
+	# Only the last sub-tile correction may have arbitrary bearing.
+	if result.is_empty() or result[-1].distance_squared_to(goal)>0.0001:
+		result.append(goal)
+	return result
+
 ## Classic 2D steering only: alternating 45-degree sea-chart legs with immediate heading snaps.
 ## Native 2.5D/3D keep direct navigation; network shares the sender's actual waypoint path.
 static func diagonal_leg(start: Vector2,goal: Vector2,max_leg: float=96,first_side: int=1) -> Array[Vector2]:
