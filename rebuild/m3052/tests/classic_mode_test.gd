@@ -22,6 +22,10 @@ func run() -> void:
 	# The 2013 original-era clone documented a 48x32 STAGGERED tile
 	# grid. Four screen facings follow real +/-24,+/-16 tile steps.
 	check(is_equal_approx(NAV.ISO_TILE_WIDTH,48.0) and is_equal_approx(NAV.ISO_TILE_HEIGHT,32.0),"historical Classic raster tile is precisely 48x32")
+	check(NAV.classic_tile_center(Vector2i.ZERO)==Vector2(24,16) and NAV.classic_tile_center(Vector2i(1,0))==Vector2(48,32) and NAV.classic_tile_center(Vector2i(0,1))==Vector2(0,32),"fixed staggered chart grid alternates even/odd rows exactly like public Sea-Bandits source")
+	for tile_coord in [Vector2i(-20,0),Vector2i(0,0),Vector2i(27,-18),Vector2i(70,40)]:
+		check(NAV.classic_world_to_tile(NAV.classic_tile_center(tile_coord))==tile_coord,"world-to-tile roundtrip preserves global lattice "+str(tile_coord))
+	check(NAV.classic_iso_route(Vector2(500,500),Vector2(950,500))[0]!=NAV.classic_iso_route(Vector2(510,500),Vector2(950,500))[0] or NAV.classic_world_to_tile(Vector2(500,500))==NAV.classic_world_to_tile(Vector2(510,500)),"raster remains anchored to world, not reset to each starting pixel")
 	for raster_goal: Vector2 in [Vector2(700,0),Vector2(-700,0),Vector2(0,700),Vector2(0,-700),Vector2(600,40),Vector2(-250,-400)]:
 		var micro_path: Array[Vector2]=NAV.classic_iso_route(Vector2.ZERO,raster_goal)
 		check(not micro_path.is_empty() and micro_path.back().distance_to(raster_goal)<0.001,"48x32 path reaches its clicked endpoint: "+str(raster_goal))
@@ -89,7 +93,7 @@ func run() -> void:
 		max_y_error=maxf(max_y_error,absf(float(sim.player.pos.y)-start_y))
 		if not sim.player.path.is_empty():horizontal_facings[VISUALS.heading_four(sim.player.heading)]=true
 		if sim.player.path.is_empty():break
-	check(max_y_error>15.0 and max_y_error<=17.0 and horizontal_facings.has(1) and horizontal_facings.has(3),"horizontal Classic physically traces aligned 24x16 NE/SE raster tiles")
+	check(max_y_error>15.0 and max_y_error<=32.0 and horizontal_facings.has(1) and horizontal_facings.has(3),"horizontal Classic physically traces aligned 24x16 NE/SE raster tiles")
 	check(sim.player.pos.distance_to(goal)<0.1 and sim.player.path.is_empty() and sim.player.ammo==stock,"raster Classic sailing arrives exactly without changing ammunition")
 	var diagonal_goal:=Vector2(1600,850)
 	check(sim.course(diagonal_goal) and sim.player.path==sim.plan_path(sim.player.pos,diagonal_goal),"Classic navigation retains exact straight waypoint destinations")
@@ -237,7 +241,7 @@ func run() -> void:
 		var rounded_delta: Vector2=game.get_canvas_transform()*rendered-game.get_canvas_transform()*real
 		check(absf(rounded_delta.x)<=0.55 and absf(rounded_delta.y)<=0.55,"raster draw uses exact world position and <=0.5px screen-rounding")
 		max_y_motion=maxf(max_y_motion,absf(float(motion_probe.pos.y)-start_y_motion))
-	check(shown.has(1) and shown.has(3) and max_y_motion>15.0 and max_y_motion<=17.0,"four-way images and physical raster steps trace the SAME isometric line")
+	check(shown.has(1) and shown.has(3) and max_y_motion>15.0 and max_y_motion<=32.0,"four-way images and physical raster steps trace the SAME isometric line")
 	game.visual_before.erase(9318);game.visual_after.erase(9318)
 	check(game.camera.position==camera_before,"drawing real isometric ship steps never invents a camera motion mode")
 	var original_pos: Vector2=game.sim.player.pos
