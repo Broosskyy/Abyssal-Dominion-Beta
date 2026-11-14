@@ -9,6 +9,7 @@ const RULER=preload("res://grid_ruler.gd")
 const LOADING=preload("res://loading_screen.gd")
 const CONTENT = preload("res://content.gd")
 const VISUALS = preload("res://ship_visuals.gd")
+const NAV = preload("res://navigation.gd")
 const SKIN = preload("res://ui_skin.gd")
 const SHARE = preload("res://share_links.gd")
 const TOUCH_SCROLL = preload("res://touch_scroll.gd")
@@ -486,11 +487,38 @@ func _online_snapshot(packet: Dictionary) -> void:
 			online_actor_ids.erase(uid)
 
 func _send_online_course(point: Vector2) -> void:
-	if online_client!=null and is_instance_valid(online_client) and online_connected:
-		# The sender and server must receive the same snapped chart tile
-		# as the locally simulated destination, not the raw pre-snap touch.
-		var destination: Vector2=Vector2(sim.player.path.back()) if not sim.player.path.is_empty() else point
-		online_client.send_course(destination,sim.player.path,"classic_48x32" if browser_classic else "")
+	if online_client==null or not is_instance_valid(online_client) or not online_connected:return
+	var destination: Vector2=Vector2(sim.player.path.back()) if not sim.player.path.is_empty() else point
+	var outgoing: Array[Vector2]=sim.player.path.duplicate()
+	var raster_ready: bool=false
+	if browser_classic and not outgoing.is_empty():
+		# Older presence servers (protocol 2) ignore the new movement-mode
+		# hint. Send the actual *tile* route so even an older server follows
+		# the same real course instead of replacing it with a straight line.
+		var expanded: Array[Vector2]=[]
+		var current: Vector2=sim.player.pos
+		raster_ready=true
+		for waypoint: Vector2 in sim.player.path:
+			var micro: Array[Vector2]=NAV.classic_iso_route(current,waypoint)
+			var previous: Vector2=current
+			var safe: bool=true
+			for step: Vector2 in micro:
+				if not sim.segment_free(previous,step):
+					safe=false
+					break
+				previous=step
+			if not safe:
+				micro=[waypoint] # Preserve coastline-safe A* leg.
+			if expanded.size()+micro.size()>512:
+				raster_ready=false # Old server limit; new server expands.
+				break
+			expanded.append_array(micro)
+			current=waypoint
+		if raster_ready and not expanded.is_empty():
+			outgoing=expanded
+		else:
+			raster_ready=false
+	online_client.send_course(destination,outgoing,"classic_48x32" if browser_classic else "",raster_ready)
 
 func _update_online_ships(delta: float) -> void:
 	if not online_connected:return
