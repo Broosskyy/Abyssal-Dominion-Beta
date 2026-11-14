@@ -16,6 +16,13 @@ const EDGE_BAND := 96.0
 const EDGE_INSET := 240.0
 const CELL := 48
 const PLAYER_SPEED := 165.0
+# Classic reference: a real 48×32 isometric tile-centre step measures
+# sqrt(24²+16²)=28.84 world px. At 76 px/s it lasts ~0.38 s/step
+# instead of 0.175 s at the former 165 px/s (and even faster with the
+# previous automatic path-length compensation). Adjust only after
+# comparing a FULL course against the original-era reference.
+const CLASSIC_TILE_SAIL_SPEED := 76.0
+const CLASSIC_SHIP_SPEED_BONUS_MAX := 1.35
 # Ship graphics may have 4 legacy facings, but all physical navigation
 # uses continuous direct world coordinates and collision-checked A* waypoints.
 const PLAYER_HP := 2400
@@ -289,20 +296,42 @@ func _clear_classic_raster_state(body: Dictionary) -> void:
 	# No path regeneration or renderer-dependent teleport when retapping.
 	for key in ["_iso_waypoint","_iso_guide_origin","_iso_leg_dir","_iso_leg_left",
 		"_iso_first_leg","_iso_tick_segments","_iso_goal","_iso_route",
-		"_iso_route_index","_iso_speed_scale"]:
+		"_iso_route_index","_iso_speed_scale","_iso_committed_step"]:
 		body.erase(key)
 
 
 func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
-	# 48x32 DIAMOND GRID, one precomputed itinerary per real path waypoint.
-	# Each tile-centre step is exactly (+/-24,+/-16) world units. A course
-	# follows those micro-legs; it is not a distance-based image flicker,
-	# arbitrary 32-unit zigzag or a newly scored heading on every tick.
+	# Real, globally anchored 48x32 diamond-tile navigation.
+	# A new tap during a tile step queues its new itinerary at the NEXT
+	# centre; switching the route must not start from arbitrary mid-tile
+	# fractional pixels and invent an incorrect first diagonal.
 	var tick_segments: Array[Dictionary]=[]
 	body["_iso_tick_segments"]=tick_segments
 	var iterations: int=0
 	while travel>0.001 and not body.path.is_empty() and iterations<48:
 		iterations+=1
+		if body.has("_iso_committed_step"):
+			var committed: Vector2=Vector2(body["_iso_committed_step"])
+			var remaining: Vector2=committed-Vector2(body.pos)
+			if remaining.length_squared()<=0.0001:
+				body.pos=committed
+				body.erase("_iso_committed_step")
+				continue
+			var heading: Vector2=remaining.normalized()
+			var amount: float=minf(travel,remaining.length())
+			var next_pos: Vector2=Vector2(body.pos)+heading*amount
+			if not phasing and not segment_free(body.pos,next_pos):
+				body.path=[]
+				_clear_classic_raster_state(body)
+				return
+			tick_segments.append({"start":Vector2(body.pos),"end":next_pos,"heading":heading,"distance":amount})
+			body.pos=next_pos
+			body.heading=heading
+			travel-=amount
+			if amount>=remaining.length()-0.0001:
+				body.pos=committed
+				body.erase("_iso_committed_step")
+			continue
 		var goal: Vector2=Vector2(body.path[0])
 		if Vector2(body.pos).distance_squared_to(goal)<0.0001:
 			body.pos=goal
@@ -330,7 +359,10 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 			body["_iso_goal"]=goal
 			body["_iso_route"]=tiles
 			body["_iso_route_index"]=0
-			body["_iso_speed_scale"]=clampf(length/maxf(Vector2(body.pos).distance_to(goal),0.001),1.0,2.0)
+			# Never accelerate diagonals to compensate for longer raster
+			# itineraries. Old code could make a visible hull leap twice
+			# as fast from one 24x16 tile to the next.
+			body["_iso_speed_scale"]=1.0
 		var route: Array=body["_iso_route"]
 		var index: int=int(body["_iso_route_index"])
 		if index>=route.size():
@@ -412,8 +444,23 @@ func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 	if route.is_empty():
 		message = "Küste voraus · bitte freies Wasser wählen"
 		return false
+	# A sailor cannot turn at an arbitrary fractional point between two
+	# raster centres. Finish ONLY the current selected tile leg, then
+	# retarget immediately on that center. No turning circle or teleport.
+	var committed: Variant=null
+	if classic_steering and player.has("_iso_route"):
+		var old_route: Array=player["_iso_route"]
+		var next_index: int=int(player.get("_iso_route_index",0))
+		if next_index>=0 and next_index<old_route.size():
+			var old_tile: Vector2=Vector2(old_route[next_index])
+			if player.pos.distance_squared_to(old_tile)>0.0001 and NAV.classic_tile_center(NAV.classic_world_to_tile(old_tile)).distance_squared_to(old_tile)<0.001:
+				committed=old_tile
+	elif classic_steering and player.has("_iso_committed_step"):
+		committed=player["_iso_committed_step"]
 	player.path = route
 	_clear_classic_raster_state(player)
+	if committed!=null:
+		player["_iso_committed_step"]=committed
 	repairing = false
 	message = "Kurs gesetzt"
 	return true
@@ -861,8 +908,17 @@ func step(delta: float) -> void:
 func _move(body: Dictionary, delta: float) -> void:
 	if bool(body.get("network_motion",false)):return
 	var slow_rate = float(body.get("slow_rate", 0.55)) if float(body.slow) > 0 else 1.0
-	var travel = float(body.speed) * slow_rate * delta * (1.25 if int(body.id)==0 and float(buffs.get("wind_draught",0))>0 else 1.0)
+	var is_classic_ship: bool=classic_steering and (int(body.get("id",-1))==0 or str(body.get("kind",""))=="ship")
+	# Historical 2D step cadence is separated from the old continuous
+	# 165 world-units/s mover. Keep sail progression, but cap stacked
+	# upgrades so the starter-to-Elite speed is still recognizably tiled.
+	var rate: float=float(body.speed)
+	if is_classic_ship:
+		rate=CLASSIC_TILE_SAIL_SPEED*clampf(rate/PLAYER_SPEED,0.65,CLASSIC_SHIP_SPEED_BONUS_MAX)
+	var travel: float=rate*slow_rate*delta*(1.25 if int(body.id)==0 and float(buffs.get("wind_draught",0))>0 else 1.0)
 	var phasing := int(body.id) == 0 and staff.flag("no_collision")
+	# Explicit developer speed cheats remain opt-in; the ADM test badge
+	# alone does NOT enable them.
 	if int(body.id) == 0 and staff.flag("speed"): travel *= 2.5
 	_advance_world_course(body,travel,phasing)
 
