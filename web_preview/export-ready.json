@@ -1,5 +1,5 @@
 {
-  "source_sha": "f057a3dd7e2e8454d8fc610d20fd15bc9e017f3f",
-  "release": "browser-test-125",
-  "branch": "fix/classic-heading-render-phase-341"
+  "source_sha": "1a535305ff92f895b252e8ba84f3339b2545cdbc",
+  "release": "browser-test-128",
+  "branch": "fix/classic-tick-raster-interpolation-342"
 }
