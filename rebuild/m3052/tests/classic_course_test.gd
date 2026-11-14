@@ -42,8 +42,8 @@ func _run() -> void:
 	var sim=SIM.new()
 	sim.npcs.clear()
 	sim.islands.clear()
-	var origin: Vector2=Vector2(500,500)
-	var target: Vector2=Vector2(1100,500)
+	var origin: Vector2=NAV.classic_tile_center(NAV.classic_world_to_tile(Vector2(500,500)))
+	var target: Vector2=origin+Vector2(576,0)
 	sim.player.pos=origin
 	check(sim.course(target,true),"clear-water captain course accepted")
 	var snapped: Vector2=sim._classic_clicked_target(target)
