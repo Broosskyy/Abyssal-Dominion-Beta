@@ -38,6 +38,8 @@ static func classic_world_to_tile(world: Vector2) -> Vector2i:
 				selected=candidate
 	return selected
 
+## Legacy exact 24x16 tile-walk, retained for historical QA reference only.
+## Live player and NPC sailing now use classic_water_route() instead.
 ## High-level pathfinder handles blocked shorelines; this stage chooses
 ## exactly one of four actual tile neighbours until the last small
 ## correction to the clicked coordinate. No view animation or oscillation
@@ -105,6 +107,14 @@ static func classic_iso_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
 		path.append(goal)
 	return path
 
+## The 48x32 lattice selects the clicked tile but never dictates the
+## physical ship trajectory. This one segment is shared by 2D and 3D.
+static func classic_water_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
+	var result: Array[Vector2]=[]
+	if start.distance_squared_to(goal)>0.0001:result.append(goal)
+	return result
+
+
 ## One tile-aware course for Classic gameplay, including coasts.
 ## The old approach planned a path on a SQUARE 48px AStar grid, smoothed it
 ## into arbitrary floating-point waypoints and then converted EACH waypoint
@@ -113,7 +123,7 @@ static func classic_iso_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
 ## Use four-neighbour 48x32 diamond A* instead. Open sea keeps the exact
 ## 344 greedy course (including its visual step rhythm) unchanged.
 static func classic_safe_route(start: Vector2,goal: Vector2,segment_clear: Callable,max_visited: int=16000) -> Array[Vector2]:
-	var direct: Array[Vector2]=classic_iso_route(start,goal)
+	var direct: Array[Vector2]=classic_water_route(start,goal)
 	var previous: Vector2=start
 	var viable: bool=true
 	for waypoint: Vector2 in direct:
@@ -158,7 +168,7 @@ static func classic_safe_route(start: Vector2,goal: Vector2,segment_clear: Calla
 			if start.distance_squared_to(begin_center)>0.0001:result.append(begin_center)
 			result.append_array(reverse)
 			if result.is_empty() or result[-1].distance_squared_to(goal)>0.0001:result.append(goal)
-			return result
+			return _smooth_coastal_route(start,result,segment_clear)
 		touched+=1
 		var center: Vector2=classic_tile_center(cell)
 		for delta: Vector2i in directions:
@@ -177,6 +187,27 @@ static func classic_safe_route(start: Vector2,goal: Vector2,segment_clear: Calla
 			_tile_heap_push(frontier,{"tile":candidate,"g":cost,
 				"priority":cost+estimate+lateral*0.0001})
 	return []
+
+
+## Collapse the island A* tile itinerary into long safe straight legs.
+## Keep the A* coastline clearance but never physically draw every diamond
+## grid edge. This also keeps online route packets compact (<=512 points).
+static func _smooth_coastal_route(start: Vector2,rough: Array[Vector2],segment_clear: Callable) -> Array[Vector2]:
+	var result: Array[Vector2]=[]
+	var anchor: Vector2=start
+	var cursor: int=0
+	while cursor<rough.size():
+		var furthest: int=-1
+		for probe in range(rough.size()-1,cursor-1,-1):
+			if bool(segment_clear.call(anchor,rough[probe])):
+				furthest=probe
+				break
+		if furthest<0:return []
+		if anchor.distance_squared_to(rough[furthest])>0.0001:
+			result.append(rough[furthest])
+		anchor=rough[furthest]
+		cursor=furthest+1
+	return result
 
 
 static func _tile_heap_push(heap: Array,item: Dictionary) -> void:
