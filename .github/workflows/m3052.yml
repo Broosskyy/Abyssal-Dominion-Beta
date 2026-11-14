@@ -2,7 +2,7 @@ name: M3059 signed content updates and sea movement
 on:
   workflow_dispatch:
   push:
-    branches: [main, fix/crossplay-portal-return-test-350]
+    branches: [main]
     paths:
       - 'rebuild/m3052/**'
       - 'server/**'
