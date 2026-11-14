@@ -97,6 +97,10 @@ def classic_expand_route(start, waypoints):
     direct_length, tile_length = 0.0, 0.0
     for goal in waypoints:
         segment = classic_segment_route(previous, goal)
+        # Bounds remain authoritative: a local coast/edge tile may not
+        # exist, so keep the original valid straight A* waypoint instead.
+        if any(not (40<=x<=8760 and 40<=y<=6360) for x,y in segment):
+            segment = [goal]
         direct_length += math.dist(previous,goal)
         for waypoint in segment:
             tile_length += math.dist(route[-1] if route else start,waypoint)
@@ -258,6 +262,9 @@ class World:
                     if mode not in ('','classic_48x32'): continue
                     scale=1.0
                     if mode=='classic_48x32':
+                        # Bound CPU and memory for an untrusted WebSocket
+                        # client; the real A* chart normally sends <=8 nodes.
+                        if len(route)>64: continue
                         expanded=classic_expand_route((peer['x'],peer['y']),route)
                         if expanded is None: continue
                         route,scale=expanded
