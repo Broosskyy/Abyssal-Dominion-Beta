@@ -19,18 +19,19 @@ func _initialize() -> void:
 	var sim=SIM.new()
 	var body=sim.npcs[0];body.pos=Vector2(500,500)
 	var route=sim.plan_actor_path(body,Vector2(950,500))
-	check(str(body.renderer)=="mesh" and not sim.classic_steering and route==sim.plan_path(body.pos,Vector2(950,500)),"native GLB ships use original direct navigation")
+	check(str(body.renderer)=="mesh" and sim.classic_steering and route==sim.plan_path(body.pos,Vector2(950,500)),"native GLB and Classic share the SAME authoritative raster steering")
 	var before: Vector2=body.pos
 	var safe=true
 	for point: Vector2 in route:
 		safe=safe and sim.segment_free(before,point);before=point
 	check(safe,"every GLB route segment remains coastline-safe")
 	body.path=route
-	var stable_course=true
+	var native_diagonals: Dictionary={}
 	for _i in 240:
 		sim._move(body,0.1)
-		if not body.path.is_empty():stable_course=stable_course and absf(body.heading.y)<.001
-	check(stable_course and body.pos.distance_to(Vector2(950,500))<0.01,"direct native route sails to the exact goal without alternating diagonal headings")
+		native_diagonals[int(signf(body.heading.y))]=true
+		if body.path.is_empty():break
+	check(native_diagonals.has(-1) and native_diagonals.has(1) and body.pos.distance_to(Vector2(950,500))<0.01,"native GLB voyage follows the SAME alternating 24x16 raster legs and exact goal as Classic 2D")
 	# Four historic views now follow a 48×32 staggered diamond-grid path.
 	# The mainland high-level waypoint stays identical to native 3D.
 	sim.set_classic_steering(true)
@@ -55,7 +56,7 @@ func _initialize() -> void:
 	body.view_count=8
 	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"baked sprite count does not create an extra sailing mode")
 	sim.set_classic_steering(false)
-	check(sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"switching back to native 3D/2.5D restores the direct route")
+	check(sim.classic_steering and sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"switching to 3D cannot disable the global tile mover or alter its destination")
 	for map_index in [0,1,2]:
 		sim.configure_map(map_index)
 		sim.shots.clear()
