@@ -77,30 +77,19 @@ func run() -> void:
 				check(VISUALS.heading_four(trial.heading) in [1,3,5,7],"physical heading uses an actual four-way tile step "+str(heading_target))
 		check(trial.path.is_empty() and Vector2(trial.pos).distance_to(heading_target)<0.1,"all Classic tap directions reach exact clicked target "+str(heading_target))
 		check(max_cross_track<29.0 and visited_steps<1800,"isometric raster remains within one half-tile of the requested world line "+str(heading_target))
-	# Scripted retap (e.g. NPC path) during a tile completes that one
-	# already-selected physical leg, then starts the NEW course at its
-	# centre. Do not demand an impossible instant rotation mid-leg.
+	# A new target changes the real course immediately with no compulsory
+	# 24x16 detour to an old tile centre or sudden teleport.
 	var retap_probe: Dictionary={"id":0,"pos":Vector2.ZERO,"heading":Vector2.RIGHT,"path":[Vector2(700,0)]}
 	for step in 40:sim._advance_world_course(retap_probe,165.0/30.0,true)
-	var retap_start: Vector2=retap_probe.pos
+	var retap_start: Vector2=Vector2(retap_probe.pos)
 	var new_goal: Vector2=retap_start+Vector2(-250,-400)
-	var old_step: Vector2=Vector2(retap_probe["_iso_route"][int(retap_probe["_iso_route_index"])])
 	retap_probe.path=[new_goal]
 	sim._advance_world_course(retap_probe,1.0,true)
-	check(retap_probe.has("_iso_committed_step") and Vector2(retap_probe["_iso_committed_step"])==old_step,"direct path replacement also preserves committed tile instead of steering diagonally off-grid")
-	var pivot_passed: bool=false
-	for tick in 60:
-		if not retap_probe.has("_iso_committed_step"):
-			pivot_passed=true
-			break
-		sim._advance_world_course(retap_probe,1.0,true)
-	check(pivot_passed and Vector2(retap_probe.pos).distance_to(old_step)<1.5,"direct retap finishes committed tile without teleport or premature mid-step course switch")
-	sim._advance_world_course(retap_probe,1.0,true)
-	check(retap_probe.heading.dot((new_goal-old_step).normalized())>0.0,"new course then chooses a valid bearing on the next tile")
+	check(not retap_probe.has("_iso_committed_step") and retap_probe.heading.dot((new_goal-retap_start).normalized())>0.99,"retap follows NEW direction immediately without tile-step lock")
 	for tick in 900:
 		if retap_probe.path.is_empty():break
 		sim._advance_world_course(retap_probe,165.0/30.0,true)
-	check(retap_probe.path.is_empty() and Vector2(retap_probe.pos).distance_to(new_goal)<0.1,"the redirected raster route reaches its new exact target")
+	check(retap_probe.path.is_empty() and Vector2(retap_probe.pos).distance_to(new_goal)<0.1,"redirected direct course reaches exact destination")
 	sim.set_classic_steering(false)
 	var goal:=Vector2(1200,500)
 	check(sim.classic_steering,"all ship renderers use one default 48x32 navigation")
@@ -120,7 +109,7 @@ func run() -> void:
 		max_y_error=maxf(max_y_error,absf(float(sim.player.pos.y)-start_y))
 		if not sim.player.path.is_empty():horizontal_facings[VISUALS.heading_four(sim.player.heading)]=true
 		if sim.player.path.is_empty():break
-	check(max_y_error>=8.0 and max_y_error<=32.0 and horizontal_facings.has(1) and horizontal_facings.has(3),"horizontal Classic physically traces aligned 24x16 NE/SE raster tiles")
+	check(max_y_error<0.01 and horizontal_facings.size()<=2,"horizontal Classic now stays on a straight line without NE/SE zigzags")
 	check(sim.player.pos.distance_to(goal)<0.1 and sim.player.path.is_empty() and sim.player.ammo==stock,"raster Classic sailing arrives exactly without changing ammunition")
 	# Clicking a chart position selects one deterministic isometric tile.
 	# Harbor/portal scripted routes continue accepting exact coordinates.
@@ -141,19 +130,9 @@ func run() -> void:
 	sim._move(sim.player,0.25)
 	var corner: Vector2=sim.player.pos
 	check(sim.course(Vector2(300,850)) and sim.player.path.back()==Vector2(300,850),"new tap immediately replaces the course")
-	check(sim.player.has("_iso_committed_step"),"retap mid-tile commits its current real tile step instead of inventing a new fractional diagonal")
-	var committed_step: Vector2=Vector2(sim.player["_iso_committed_step"])
+	check(not sim.player.has("_iso_committed_step"),"new click never locks old raster microstep")
 	sim._move(sim.player,.01)
-	check(sim.player.pos.distance_to(corner)<2.0 and sim.player.has("_iso_committed_step"),"retap does not teleport, reverse, or instantly rotate a ship in the middle of a tile")
-	var finished_committed: bool=false
-	for _t in 90:
-		if not sim.player.has("_iso_committed_step"):
-			finished_committed=true
-			break
-		sim._move(sim.player,1.0/30.0)
-	check(finished_committed and sim.player.pos.distance_to(committed_step)<2.0,"existing tile finishes at its exact centre before the new clicked course starts")
-	sim._move(sim.player,1.0/30.0)
-	check(sim.player.heading.x<0,"new direction starts at the very next tile without a turning circle")
+	check(sim.player.pos.distance_to(corner)<2.0 and sim.player.heading.dot((Vector2(300,850)-corner).normalized())>0.99,"ship instantly follows new direct heading without teleport or turning circle")
 	var changing_route: Array=sim.player.path.duplicate()
 	var switch_origin: Vector2=sim.player.pos
 	sim.set_classic_steering(false)
@@ -296,7 +275,7 @@ func run() -> void:
 		var rounded_delta: Vector2=game.get_canvas_transform()*rendered-game.get_canvas_transform()*real
 		check(absf(rounded_delta.x)<=0.55 and absf(rounded_delta.y)<=0.55,"raster draw uses exact world position and <=0.5px screen-rounding")
 		max_y_motion=maxf(max_y_motion,absf(float(motion_probe.pos.y)-start_y_motion))
-	check(shown.has(1) and shown.has(3) and max_y_motion>=8.0 and max_y_motion<=32.0,"four-way images and physical raster steps trace the SAME isometric line")
+	check(max_y_motion<0.01,"four-way images render on a straight horizontal physical course without invented tile zigzag")
 	game.visual_before.erase(9318);game.visual_after.erase(9318)
 	check(game.camera.position==camera_before,"drawing real isometric ship steps never invents a camera motion mode")
 	var original_pos: Vector2=game.sim.player.pos
