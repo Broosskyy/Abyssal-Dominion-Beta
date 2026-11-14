@@ -65,8 +65,17 @@ func _run() -> void:
 	s=SIM.new();s.player.pos=Vector2(500,500);s.player.path=[Vector2(900,500)]
 	for key: String in CONTENT.SUPPLY_KEYS:s.supplies[key]=2
 	check(s.use_supply("wind_draught"),"wind item activates")
-	var before: Vector2=s.player.pos;s._move(s.player,1)
-	check(is_equal_approx(s.player.pos.distance_to(before),float(s.player.speed)*1.25),"wind item changes movement")
+	var before: Vector2=s.player.pos
+	s._move(s.player,1)
+	# Shared 2D/3D steering follows +/-24, +/-16 diamond steps.
+	# Euclidean end-to-end displacement is shorter than the actual
+	# sailed path. Wind must affect real tile travel by 25%, NOT
+	# reproduce the retired straight-line 165px/s native movement.
+	var sailed_distance: float=0.0
+	for segment: Dictionary in s.player.get("_iso_tick_segments",[]):
+		sailed_distance+=float(segment.get("distance",0.0))
+	var base_tile_speed: float=s.CLASSIC_TILE_SAIL_SPEED*clampf(float(s.player.speed)/s.PLAYER_SPEED,0.65,s.CLASSIC_SHIP_SPEED_BONUS_MAX)
+	check(sailed_distance>0 and absf(sailed_distance-base_tile_speed*1.25)<0.2 and s.player.pos.distance_to(before)>1.0,"wind item adds 25% to the ACTUAL 2D/3D isometric sailed path")
 	check(not s.use_supply("wind_draught") and s.supplies.wind_draught==1,"cooldown rejects repeated consumption")
 	s._tick_timers(21);check(s.buffs.wind_draught==0,"wind expires in sea time")
 	s.player.slow=4;check(s.use_supply("cleansing_rum") and s.player.slow==0,"rum removes a real slow")
