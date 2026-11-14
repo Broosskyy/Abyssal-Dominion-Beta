@@ -123,15 +123,19 @@ func run() -> void:
 	check(game._classic_fleet_ready(),"native 2D loads all 23 ship and paint atlases")
 	# Original 48x32 isometric visual bearings are +/-atan(32/48)
 	# (~33.69 degrees), NOT +/-45-degree compass renders.
-	var expected_iso: float=atan2(32.0,48.0)
+	var expected_chart_iso: float=atan2(32.0,48.0)
+	var expected_model_yaw: float=atan2(32.0,48.0*cos(deg_to_rad(game.MESH.FLEET_CAMERA_TILT_DEGREES)))
 	var classic_frames: Array=game.classic_geometry.get("schattenkriegsschiff_shaded",{}).get("frames",[])
 	check(classic_frames.size()==8,"captain GLB is baked to eight distinct 2D frames")
 	if classic_frames.size()==8:
-		for angle_case: Array in [[1,-expected_iso],[3,expected_iso],[5,PI-expected_iso],[7,-PI+expected_iso]]:
+		for angle_case: Array in [[1,-expected_model_yaw,-expected_chart_iso],[3,expected_model_yaw,expected_chart_iso],[5,PI-expected_model_yaw,PI-expected_chart_iso],[7,-PI+expected_model_yaw,-PI+expected_chart_iso]]:
 			var atlas_index: int=int(angle_case[0])
-			var expected_angle: float=float(angle_case[1])
+			var expected_yaw: float=float(angle_case[1])
+			var expected_screen_angle: float=float(angle_case[2])
 			var baked_angle: float=float(classic_frames[atlas_index].get("heading_angle_rad",999.0))
-			check(absf(wrapf(baked_angle-expected_angle,-PI,PI))<0.001,"Classic GLB-facing matches physical 48x32 isometric direction: "+str(atlas_index))
+			var projected_angle: float=float(classic_frames[atlas_index].get("chart_angle_rad",999.0))
+			check(absf(wrapf(baked_angle-expected_yaw,-PI,PI))<0.001,"GLB yaw compensates for orthographic camera tilt: "+str(atlas_index))
+			check(absf(wrapf(projected_angle-expected_screen_angle,-PI,PI))<0.001,"baked Classic image projects to actual 48x32 on-screen move direction: "+str(atlas_index))
 	check(game.sim.classic_steering and game.sim.player.path.back()==destination and game.sim.player.path==course and game.sim.player.pos==Vector2(before.position[0],before.position[1]),"Classic 2D preserves existing physical waypoint path and position while changing only sprite views")
 	check(is_equal_approx(game._actor_visual_length(game.sim.player),native_player_length*game.CLASSIC_HULL_SCALE),"Classic uses a smaller on-screen captain hull without altering game physics")
 	check(is_equal_approx(game.CLASSIC_HULL_SCALE_MOBILE,0.62) and is_equal_approx(game.CLASSIC_MOBILE_CAMERA_FACTOR,0.78),"Android/iOS Classic calibrates ship footprint and world zoom separately from desktop and 3D")
