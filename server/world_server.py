@@ -32,9 +32,11 @@ def classic_world_to_tile(x, y):
     xx = (x - CLASSIC_TILE_HALF_X) / CLASSIC_TILE_HALF_X
     yy = (y - CLASSIC_TILE_HALF_Y) / CLASSIC_TILE_HALF_Y
     fq, fr = math.floor(.5 * (xx + yy)), math.floor(.5 * (yy - xx))
+    # Same containing-diamond hit-test as the Godot client (not nearest
+    # centre by Euclidean distance, which selects wrong tiles near tips).
     return min(((fq + i, fr + j) for i in range(3) for j in range(3)),
-               key=lambda cell: (classic_tile_center(*cell)[0] - x)**2 +
-                                (classic_tile_center(*cell)[1] - y)**2)
+               key=lambda cell: abs(classic_tile_center(*cell)[0] - x) / CLASSIC_TILE_HALF_X +
+                                abs(classic_tile_center(*cell)[1] - y) / CLASSIC_TILE_HALF_Y)
 
 def classic_segment_route(start, goal):
     # Server runs precisely the same four-neighbour raster trajectory the
@@ -68,6 +70,11 @@ def classic_segment_route(start, goal):
                     best, goal_tile = score, cell
     tile = start_tile
     route = []
+    # Pre-update saves may have a fractional starting position; Godot
+    # first sails to that tile centre, without teleportation.
+    origin = classic_tile_center(*start_tile)
+    if math.dist(origin, start) > .0001:
+        route.append(origin)
     for _ in range(min(abs(goal_tile[0]-tile[0]) + abs(goal_tile[1]-tile[1]), 2048)):
         use_q = tile[0] != goal_tile[0]
         use_r = tile[1] != goal_tile[1]
@@ -109,9 +116,10 @@ def classic_expand_route(start, waypoints):
         previous = goal
         if len(route) > 4096:
             return None
-    # Same travel-time preservation as the Godot 48x32 micro-step mover.
-    scale = max(1.0,min(2.0,tile_length/max(.001,direct_length)))
-    return route, scale
+    # The approved 76px/s tile cadence is constant on every physical
+    # leg; never accelerate long isometric zigzags to preserve a direct
+    # 3D arrival time. Render mode is irrelevant to this pace.
+    return route, 1.0
 
 class World:
     def __init__(self, database):
@@ -258,7 +266,7 @@ class World:
                     # Protocol 2 extension: Classic clients request a real
                     # four-way chart course. The server expands/authorizes
                     # it at the server's current position, then broadcasts
-                    # true shared world coordinates to 2D/2.5D/3D alike.
+                    # true shared world coordinates to 2D Classic and 3D alike.
                     mode=data.get('navigation_mode','')
                     if mode not in ('','classic_48x32'): continue
                     scale=1.0
