@@ -38,7 +38,7 @@ func run() -> void:
 		check(step_ok,"every actual intermediate step lands on a 24x16 iso tile neighbour: "+str(raster_goal))
 		check((raster_goal-from).dot(raster_goal.normalized())>=-0.001,"final short correction never reverses beyond clicked goal: "+str(raster_goal))
 	# Mobile Classic fixes must affect only camera/ship presentation.
-	check(is_equal_approx(0.62*0.78/0.36,1.3433334),"mobile framing constants remain unchanged")
+	check(is_equal_approx(0.60*0.94/0.45,1.2533333),"Classic touch/desktop framing is explicitly recalibrated for larger ships and closer zoom")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
 	sim.set_classic_steering(true)
 	for heading_target: Vector2 in [
@@ -95,6 +95,15 @@ func run() -> void:
 		if sim.player.path.is_empty():break
 	check(max_y_error>=8.0 and max_y_error<=32.0 and horizontal_facings.has(1) and horizontal_facings.has(3),"horizontal Classic physically traces aligned 24x16 NE/SE raster tiles")
 	check(sim.player.pos.distance_to(goal)<0.1 and sim.player.path.is_empty() and sim.player.ammo==stock,"raster Classic sailing arrives exactly without changing ammunition")
+	# Clicking a chart position selects one deterministic isometric tile.
+	# Harbor/portal scripted routes continue accepting exact coordinates.
+	var raw_click: Vector2=Vector2(1207,507)
+	var snapped: Vector2=sim._classic_clicked_target(raw_click)
+	check(snapped==NAV.classic_tile_center(NAV.classic_world_to_tile(raw_click)),"chart tap maps into nearest GLOBAL diamond-tile center")
+	check(sim.course(raw_click,true) and sim.player.path.back()==snapped,"tap course destination is the exact selected tile rather than raw fractional pixels")
+	var snapped_path: Array[Vector2]=NAV.classic_iso_route(sim.player.pos,snapped)
+	check(not snapped_path.is_empty() and snapped_path.back()==snapped and NAV.classic_world_to_tile(snapped_path.back())==NAV.classic_world_to_tile(raw_click),"tile course has no non-isometric final tail")
+	sim.player.path=[]
 	var diagonal_goal:=Vector2(1600,850)
 	check(sim.course(diagonal_goal) and sim.player.path==sim.plan_path(sim.player.pos,diagonal_goal),"Classic navigation retains exact straight waypoint destinations")
 	sim._move(sim.player,0.25)
@@ -145,7 +154,7 @@ func run() -> void:
 			check(absf(wrapf(projected_angle-expected_screen_angle,-PI,PI))<0.001,"baked Classic image projects to actual 48x32 on-screen move direction: "+str(atlas_index))
 	check(game.sim.classic_steering and game.sim.player.path.back()==destination and game.sim.player.path==course and game.sim.player.pos==Vector2(before.position[0],before.position[1]),"Classic 2D preserves existing physical waypoint path and position while changing only sprite views")
 	check(is_equal_approx(game._actor_visual_length(game.sim.player),native_player_length*game.CLASSIC_HULL_SCALE),"Classic uses a smaller on-screen captain hull without altering game physics")
-	check(is_equal_approx(game.CLASSIC_HULL_SCALE_MOBILE,0.62) and is_equal_approx(game.CLASSIC_MOBILE_CAMERA_FACTOR,0.78),"Android/iOS Classic calibrates ship footprint and world zoom separately from desktop and 3D")
+	check(is_equal_approx(game.CLASSIC_HULL_SCALE_MOBILE,0.60) and is_equal_approx(game.CLASSIC_MOBILE_CAMERA_FACTOR,0.94),"Android/iOS Classic calibrates ship footprint and world zoom separately from desktop and 3D")
 	check(game.CLASSIC_HULL_SCALE_MOBILE>game.CLASSIC_HULL_SCALE and game.CLASSIC_MOBILE_CAMERA_FACTOR<1.0,"ship increases while background map zooms out on mobile")
 	check(is_equal_approx(game._actor_visual_length(game.sim.npcs[0]),native_npc_length*game.CLASSIC_HULL_SCALE),"Classic scales NPC hulls with the captain instead of dwarfing enemies")
 	# One non-selectable edge camera stays with the real ship motion.
@@ -166,6 +175,9 @@ func run() -> void:
 		var expected_boost: float=clampf(float(viewport_size.y)/720.0,1.0,game.CLASSIC_VIEWPORT_ZOOM_BOOST_MAX)
 		check(is_equal_approx(game._sharp_zoom(),game.desired_zoom*expected_boost),"Classic no longer magnifies ships by desktop-density viewport scaling at "+str(viewport_size))
 		game.camera.position=game.sim.player.pos
+		var preserved_zoom: float=game.desired_zoom
+		game._layout()
+		check(is_equal_approx(game.desired_zoom,preserved_zoom) and preserved_zoom>1.0,"compact phone HUD never forces the old 0.78 zoom")
 		game.camera.zoom=Vector2.ONE*game._sharp_zoom()
 		game.camera.force_update_scroll()
 		var center: Vector2=game.get_canvas_transform()*game._visual_actor_pos(game.sim.player)
