@@ -17,8 +17,28 @@ static func classic_iso_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
 	var result: Array[Vector2]=[]
 	var delta: Vector2=goal-start
 	if delta.length_squared()<0.0001:return result
-	var cells_q: int=roundi(0.5*(delta.x/ISO_HALF_X+delta.y/ISO_HALF_Y))
-	var cells_r: int=roundi(0.5*(delta.y/ISO_HALF_Y-delta.x/ISO_HALF_X))
+	# Pick a final tile centre that lies BEHIND the requested target.
+	# Independent rounding can run one tile too far and then visibly reverse
+	# for the last 20 px (the bug seen with 700 px horizontal taps).
+	var desired_q: float=0.5*(delta.x/ISO_HALF_X+delta.y/ISO_HALF_Y)
+	var desired_r: float=0.5*(delta.y/ISO_HALF_Y-delta.x/ISO_HALF_X)
+	var options_q: Array[int]=[floori(desired_q),ceili(desired_q)]
+	var options_r: Array[int]=[floori(desired_r),ceili(desired_r)]
+	var cells_q: int=0
+	var cells_r: int=0
+	var best_score: float=INF
+	var guide: Vector2=delta.normalized()
+	for q: int in options_q:
+		for r: int in options_r:
+			var candidate: Vector2=start+Vector2(float(q-r)*ISO_HALF_X,float(q+r)*ISO_HALF_Y)
+			var residual: Vector2=goal-candidate
+			if residual.dot(guide)<-0.001:continue
+			var lateral: float=absf((candidate-start).cross(guide))
+			var score: float=residual.length_squared()+3.0*lateral*lateral
+			if score<best_score:
+				best_score=score
+				cells_q=q
+				cells_r=r
 	var q_step: int=1 if cells_q>=0 else -1
 	var r_step: int=1 if cells_r>=0 else -1
 	var used_q: int=0
