@@ -601,6 +601,26 @@ func _visual_snapshot() -> Dictionary:
 	for actor: Dictionary in sim.npcs:positions[int(actor.id)]=actor.pos
 	return positions
 
+func _classic_tick_sample(actor: Dictionary) -> Dictionary:
+	# A single 30 Hz physics tick can cross more than one physical diagonal.
+	# Interpolating its endpoints erases the real corner and makes the ship
+	# appear to sail sideways. Render the original microlegs, in order.
+	if not browser_classic or not sim.classic_steering:return {}
+	var id: int=int(actor.get("id",-1))
+	if not visual_before.has(id) or not visual_after.has(id):return {}
+	var segments: Array=actor.get("_iso_tick_segments",[])
+	if segments.is_empty():return {}
+	var start: Vector2=Vector2(visual_before[id])
+	var finish: Vector2=Vector2(visual_after[id])
+	var live: Vector2=Vector2(actor.get("pos",finish))
+	# Ignore teleports, region transitions and stale network snapshots.
+	if finish.distance_squared_to(live)>0.04 or start.distance_to(finish)>200.0:return {}
+	var first: Dictionary=segments[0]
+	var last: Dictionary=segments.back()
+	if Vector2(first.get("start",start)).distance_squared_to(start)>0.04:return {}
+	if Vector2(last.get("end",finish)).distance_squared_to(finish)>0.04:return {}
+	return VISUALS.classic_trace_sample(segments,accumulator/SIMULATION_TICK)
+
 func _visual_actor_pos(actor: Dictionary) -> Vector2:
 	var id=int(actor.id)
 	var current: Vector2=actor.pos
@@ -609,6 +629,8 @@ func _visual_actor_pos(actor: Dictionary) -> Vector2:
 	var latest: Vector2=visual_after[id]
 	# Don't interpolate teleports, respawns, or externally changed positions.
 	if current.distance_squared_to(latest)>.01 or previous.distance_to(latest)>200.0:return current
+	var stepped: Dictionary=_classic_tick_sample(actor)
+	if not stepped.is_empty():return Vector2(stepped.pos)
 	return previous.lerp(latest,clampf(accumulator/SIMULATION_TICK,0.0,1.0))
 
 # Ships must leave trails only while actually moving; using 'path' alone
@@ -1143,7 +1165,10 @@ func _draw_actor(actor: Dictionary) -> void:
 		return
 	var is_player = int(actor.id)==0
 	var point: Vector2=_classic_actor_render_pos(actor)
-	var heading: Vector2=actor.heading
+	var heading: Vector2=Vector2(actor.heading)
+	if browser_classic:
+		var stepped: Dictionary=_classic_tick_sample(actor)
+		if not stepped.is_empty():heading=Vector2(stepped.heading)
 	var length=_actor_visual_length(actor)
 	# Both renderers use cheap line/circle foam at the same water footprint.
 	_draw_bow_spray(actor,point,heading,length)
@@ -1249,7 +1274,10 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 	# Choose the 4-view sprite from THIS displayed interpolation segment.
 	var id: int=int(actor.get("id",-1))
 	var display_heading: Vector2=Vector2(actor.get("heading",Vector2.RIGHT))
-	if browser_classic and visual_before.has(id) and visual_after.has(id):
+	var stepped: Dictionary=_classic_tick_sample(actor)
+	if not stepped.is_empty():
+		display_heading=Vector2(stepped.heading)
+	elif browser_classic and visual_before.has(id) and visual_after.has(id):
 		var prior: Vector2=Vector2(visual_before[id])
 		var next: Vector2=Vector2(visual_after[id])
 		var segment: Vector2=next-prior

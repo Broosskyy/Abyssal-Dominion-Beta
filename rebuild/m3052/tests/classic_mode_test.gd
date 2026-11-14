@@ -60,6 +60,21 @@ func run() -> void:
 		if retap_probe.path.is_empty():break
 		sim._move_classic(retap_probe,165.0/30.0,true)
 	check(retap_probe.path.is_empty() and Vector2(retap_probe.pos).distance_to(new_goal)<0.1,"a new tap replaces a mid-leg course without stale direction or loops")
+	# A fast tick straddles an NE-to-SE turn. The 60fps renderer must follow
+	# the actual two movements, never a straight chord between tick endpoints.
+	var cross_tick: Dictionary={"id":0,"pos":Vector2.ZERO,"heading":Vector2.RIGHT,"path":[Vector2(700,0)]}
+	sim._move_classic(cross_tick,48.0,true)
+	var leg_trace: Array=cross_tick.get("_iso_tick_segments",[])
+	check(leg_trace.size()>=2,"Classic physics records both actual diagonals when one simulation tick crosses a corner")
+	if leg_trace.size()>=2:
+		var quarter: Dictionary=VISUALS.classic_trace_sample(leg_trace,0.25)
+		var later: Dictionary=VISUALS.classic_trace_sample(leg_trace,0.75)
+		var chord: Vector2=Vector2(cross_tick.pos)*0.25
+		check(Vector2(quarter.pos).distance_to(chord)>4.0,"Classic interpolation preserves the physical bend instead of cutting the corner")
+		var first_trace_frame: int=VISUALS.heading_four(Vector2(leg_trace[0].heading))
+		var second_trace_frame: int=VISUALS.heading_four(Vector2(leg_trace[1].heading))
+		check(first_trace_frame in [1,3] and second_trace_frame in [1,3] and first_trace_frame!=second_trace_frame and VISUALS.heading_four(Vector2(quarter.heading))==first_trace_frame and VISUALS.heading_four(Vector2(later.heading))==second_trace_frame,"Classic sprite follows both actual diagonal legs rather than assuming NE or SE must be first")
+		check(Vector2(VISUALS.classic_trace_sample(leg_trace,1.0).pos).distance_to(cross_tick.pos)<0.01,"raster rendering and collision logic end each tick at the identical world point")
 	sim.set_classic_steering(false)
 	var goal:=Vector2(1200,500)
 	check(not sim.classic_steering,"native default uses direct navigation")
@@ -180,6 +195,25 @@ func run() -> void:
 	check(game._classic_frame_for_actor(game.sim.player)==1,"Classic renderer draws the expected NE atlas frame from the preserved eight-view collection")
 	game.sim.player.heading=Vector2(1,1)
 	check(game._classic_frame_for_actor(game.sim.player)==3,"Classic renderer changes facing without changing simulated world coordinates")
+	# Explicit mid-tick raster transition: overlays, hull and the camera all
+	# use the same two true diagonal legs even when physics has already turned.
+	if leg_trace.size()>=2:
+		var frame_probe: Dictionary={"id":9316,"kind":"ship","pos":cross_tick.pos,"heading":Vector2.RIGHT,"_iso_tick_segments":leg_trace}
+		game.visual_before[9316]=Vector2.ZERO
+		game.visual_after[9316]=Vector2(cross_tick.pos)
+		var saved_fraction: float=game.accumulator
+		game.accumulator=game.SIMULATION_TICK*0.25
+		var first_display: Dictionary=game._classic_tick_sample(frame_probe)
+		var first_expected: int=VISUALS.heading_four(Vector2(leg_trace[0].heading))
+		check(not first_display.is_empty() and game._classic_frame_for_actor(frame_probe)==first_expected and game._visual_actor_pos(frame_probe).distance_to(Vector2(first_display.pos))<0.01,"first visual half-tick uses its real diagonal position and facing")
+		game.accumulator=game.SIMULATION_TICK*0.75
+		var second_display: Dictionary=game._classic_tick_sample(frame_probe)
+		var second_expected: int=VISUALS.heading_four(Vector2(leg_trace[1].heading))
+		check(not second_display.is_empty() and game._classic_frame_for_actor(frame_probe)==second_expected and game._visual_actor_pos(frame_probe).distance_to(Vector2(second_display.pos))<0.01,"second visual half-tick uses its real diagonal position and facing")
+		game.accumulator=saved_fraction
+		game.visual_before.erase(9316)
+		game.visual_after.erase(9316)
+		game.classic_heading_cache.erase(9316)
 	# Regression: 30Hz simulation heading has already switched, but the
 	# 60fps rendered ship is still interpolating the PREVIOUS 30Hz segment.
 	# Hull should point along that displayed movement, not its NEXT leg.
