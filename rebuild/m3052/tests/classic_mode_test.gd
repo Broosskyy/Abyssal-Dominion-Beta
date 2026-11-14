@@ -22,6 +22,9 @@ func run() -> void:
 	# The 2013 original-era clone documented a 48x32 STAGGERED tile
 	# grid. Four screen facings follow real +/-24,+/-16 tile steps.
 	check(is_equal_approx(NAV.ISO_TILE_WIDTH,48.0) and is_equal_approx(NAV.ISO_TILE_HEIGHT,32.0),"historical Classic raster tile is precisely 48x32")
+	# Euclidean-nearest centre is NOT the same as the diamond that owns
+	# the screen click. This formerly selected a neighbour near the tips.
+	check(NAV.classic_tile_center(NAV.classic_world_to_tile(Vector2(15,4)))==Vector2.ZERO,"diamond-corner click belongs to its actual 48x32 tile, not Euclidean-nearest neighbour")
 	check(NAV.classic_tile_center(Vector2i.ZERO)==Vector2(24,16) and NAV.classic_tile_center(Vector2i(1,0))==Vector2(48,32) and NAV.classic_tile_center(Vector2i(0,1))==Vector2(0,32),"fixed staggered chart grid alternates even/odd rows exactly like public Sea-Bandits source")
 	for tile_coord in [Vector2i(-20,0),Vector2i(0,0),Vector2i(27,-18),Vector2i(70,40)]:
 		check(NAV.classic_world_to_tile(NAV.classic_tile_center(tile_coord))==tile_coord,"world-to-tile roundtrip preserves global lattice "+str(tile_coord))
@@ -41,6 +44,18 @@ func run() -> void:
 	check(is_equal_approx(0.60*0.94/0.45,1.2533333),"Classic touch/desktop framing is explicitly recalibrated for larger ships and closer zoom")
 	var sim=SIM.new();sim.npcs.clear();sim.player.pos=Vector2(500,500)
 	sim.set_classic_steering(true)
+	# Motion speed is measured by actual path length, not straight-line
+	# displacement. Exactly 1s of baseline sailing should traverse ~76
+	# physical pixels regardless of how many diagonals are crossed.
+	check(is_equal_approx(SIM.CLASSIC_TILE_SAIL_SPEED,76.0),"Classic baseline equals calibrated slow tile cadence")
+	var pace_start: Vector2=NAV.classic_tile_center(NAV.classic_world_to_tile(Vector2(500,500)))
+	var pace_probe: Dictionary={"id":0,"kind":"ship","pos":pace_start,"heading":Vector2.RIGHT,"speed":SIM.PLAYER_SPEED,"slow":0.0,"path":[pace_start+Vector2(800,0)]}
+	var travel_distance: float=0.0
+	for frame in 30:
+		var before: Vector2=pace_probe.pos
+		sim._move(pace_probe,1.0/30.0)
+		travel_distance+=before.distance_to(Vector2(pace_probe.pos))
+	check(absf(travel_distance-SIM.CLASSIC_TILE_SAIL_SPEED)<2.0,"one second of Classic sailing advances 76px along real tile legs (not 165+ 2x speed multiplier)")
 	for heading_target: Vector2 in [
 		Vector2(300,500),Vector2(-300,500),
 		Vector2(300,-500),Vector2(-300,-500),
@@ -109,8 +124,19 @@ func run() -> void:
 	sim._move(sim.player,0.25)
 	var corner: Vector2=sim.player.pos
 	check(sim.course(Vector2(300,850)) and sim.player.path.back()==Vector2(300,850),"new tap immediately replaces the course")
+	check(sim.player.has("_iso_committed_step"),"retap mid-tile commits its current real tile step instead of inventing a new fractional diagonal")
+	var committed_step: Vector2=Vector2(sim.player["_iso_committed_step"])
 	sim._move(sim.player,.01)
-	check(sim.player.heading.x<0 and sim.player.pos.distance_to(corner)<2,"retap takes effect without turn circle or teleport")
+	check(sim.player.pos.distance_to(corner)<2.0 and sim.player.has("_iso_committed_step"),"retap does not teleport, reverse, or instantly rotate a ship in the middle of a tile")
+	var finished_committed: bool=false
+	for _t in 90:
+		if not sim.player.has("_iso_committed_step"):
+			finished_committed=true
+			break
+		sim._move(sim.player,1.0/30.0)
+	check(finished_committed and sim.player.pos.distance_to(committed_step)<2.0,"existing tile finishes at its exact centre before the new clicked course starts")
+	sim._move(sim.player,1.0/30.0)
+	check(sim.player.heading.x<0,"new direction starts at the very next tile without a turning circle")
 	var changing_route: Array=sim.player.path.duplicate()
 	var switch_origin: Vector2=sim.player.pos
 	sim.set_classic_steering(false)
