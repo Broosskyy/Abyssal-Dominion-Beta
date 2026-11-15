@@ -27,8 +27,8 @@ func _run() -> void:
 	three_d.set_classic_steering(false)
 	check(two_d.classic_steering and three_d.classic_steering,"render modes always share physics")
 	check(two_d.course(destination,true) and three_d.course(destination,true),"matching 2D and 3D courses accepted")
-	check(two_d.player.path==three_d.player.path and two_d.player.get("_iso_route",[])==three_d.player.get("_iso_route",[]),"both views select byte-identical direct route")
-	check(two_d.player.get("_iso_route",[]).size()==1,"free water is ONE physical segment, not 24x16 alternation")
+	check(two_d.player.path==three_d.player.path and two_d.player.get("_iso_route",[])==three_d.player.get("_iso_route",[]),"both views select byte-identical physical 48x32 route")
+	check(two_d.player.get("_iso_route",[]).size()>4,"free water traverses REAL 24x16 isometric diamond microsteps in both renderers")
 	var max_cross: float=0.0
 	var synchronized: bool=true
 	var frame: int=0
@@ -44,7 +44,7 @@ func _run() -> void:
 		synchronized=synchronized and two_d.player.pos.distance_to(three_d.player.pos)<0.0001
 		max_cross=maxf(max_cross,absf(two_d.player.pos.y-origin.y))
 		frame+=1
-	check(synchronized and frame<350 and max_cross<0.01,"every tick shares identical STRAIGHT sailing coordinates")
+	check(synchronized and frame<350 and max_cross>=8.0 and max_cross<35.0,"every tick shares identical physical NE/SE zigzag sailing coordinates")
 	check(two_d.player.pos.distance_to(destination)<0.001 and three_d.player.pos.distance_to(destination)<0.001,"both modes arrive at the same map coordinate")
 	check(is_equal_approx(SIM.CLASSIC_TILE_SAIL_SPEED,76.0),"movement speed unchanged")
 	# A reverse course should respond immediately instead of forcing another
