@@ -179,16 +179,22 @@ func run() -> void:
 	check(is_equal_approx(game.CLASSIC_HULL_SCALE_MOBILE,1.0) and is_equal_approx(game.CLASSIC_MOBILE_CAMERA_FACTOR,1.0),"Android/iOS Classic uses SAME baseline ship size and zoom as 3D")
 	check(is_equal_approx(game.CLASSIC_HULL_SCALE_MOBILE,game.CLASSIC_HULL_SCALE),"desktop and mobile Classic hull have no hidden size differential")
 	check(is_equal_approx(game._actor_visual_length(game.sim.npcs[0]),native_npc_length),"Classic and 3D NPC hulls use identical physical sizes")
-	# One non-selectable edge camera stays with the real ship motion.
-	var camera_start: Vector2=Vector2(800,500)
-	var world_view: Vector2=Vector2(1200,700)
-	var within: Vector2=game._classic_edge_camera_goal(camera_start+Vector2(300,170),camera_start,world_view)
-	check(within==camera_start,"Classic camera remains completely stationary while the captain moves inside the screen safe area")
-	var at_edge: Vector2=game._classic_edge_camera_goal(camera_start+Vector2(520,280),camera_start,world_view)
-	check(is_equal_approx(at_edge.x,camera_start.x+112.0) and is_equal_approx(at_edge.y,camera_start.y+42.0),"camera starts scrolling only when the captain crosses viewport border margins")
-	var restored: Vector2=game._classic_edge_camera_goal(camera_start,camera_start,world_view)
-	check(restored==camera_start,"Classic camera never invents an offset when the ship is stationary")
-	check(game._classic_edge_camera_goal(camera_start+Vector2(300,170),camera_start,world_view)==camera_start,"Classic camera mode is always edge-follow, not selectable")
+	# M367: the actual 2D camera MUST follow the captain exactly as
+	# native 3D does. In 366 the old edge-follow camera left the vessel
+	# drifting across the viewport, making tiny raster steps look curved.
+	var camera_start: Vector2=game._visual_actor_pos(game.sim.player)
+	game.camera_locked=true
+	game.camera.position=camera_start+Vector2(300,170)
+	game._process(0.0)
+	check(game.camera.position.distance_to(camera_start)<0.001,"2D Classic camera returns to exact captain world location like 3D")
+	game.camera.position=camera_start+Vector2(-520,-280)
+	game._process(0.0)
+	check(game.camera.position.distance_to(camera_start)<0.001,"2D Classic camera never waits for a screen-edge threshold")
+	game.camera_anchor=game.sim.player.pos
+	game._shift_camera(Vector2(180,90))
+	check(not game.camera_locked,"manual Classic camera-pad inspection still unlocks captain following")
+	game._recenter_camera()
+	check(game.camera_locked and game.camera.position.distance_to(game.sim.player.pos)<0.001,"recenter explicitly resumes identical 2D/3D following")
 	var path_before_framing: Array=game.sim.player.path.duplicate()
 	var saved_position: Vector2=game.sim.player.pos
 	for viewport_size: Vector2i in [Vector2i(844,390),Vector2i(2340,1080)]:
