@@ -1,5 +1,5 @@
 extends SceneTree
-## Update 372: identical physical 48x32 paths but calm GLB/camera display.
+## Update 373: 3D GLB and camera must follow exactly the true 48x32 course; only heading is visually calmed.
 ## Do not change the actual ship-world route, heading, speed or 2D sprites.
 const NAV=preload("res://navigation.gd")
 const SIM=preload("res://simulation.gd")
@@ -54,8 +54,8 @@ func _run() -> void:
 			if course_heading.dot(direction)<0.9999:stable=false
 			min_visual_progress=progress
 		check(stable,"3D hull never turns NE/SE at individual physical raster crossings "+str(delta))
-		check(max_visual_side<=10.0,"3D hull keeps a calm centerline and converges to true physical tile before arrival "+str(delta))
-		check(max_visual_gap<=20.01,"3D visuals stay <=20 world px from authoritative grid physics "+str(delta))
+		check(absf(max_visual_side-max_world_side)<0.001,"3D displayed hull follows EXACT physical raster, never a second visual path "+str(delta))
+		check(max_visual_gap<0.001,"3D GLB and hitbox/render position match perfectly, with no sideways projection "+str(delta))
 		# Pure 24x16 diagonal tile axes already ARE straight physical
 		# raster routes and should never be forced to wobble for a test.
 		var exact_grid_axis: bool=absf(absf(delta.x)/24.0-absf(delta.y)/16.0)<0.001
