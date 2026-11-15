@@ -2516,6 +2516,10 @@ func _toggle_ammo() -> void:
 func _close_ammo() -> void:
 	_close_modal()
 	_refresh_ui()
+	# Start release-tap protection AFTER repainting the 28-item picker.
+	# A slow phone can spend >250ms refreshing; starting the timer before
+	# the repaint caused the same finger-up to steer the ship underneath.
+	suppress_tap_until=maxi(suppress_tap_until,Time.get_ticks_msec()+350)
 
 func _choose_ammo(index: int) -> void:
 	sim.set_ammo(index)
