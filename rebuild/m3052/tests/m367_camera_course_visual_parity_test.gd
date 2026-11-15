@@ -23,6 +23,7 @@ func _run() -> void:
 	game.sim.player.path=[]
 	game.visual_before.clear()
 	game.visual_after.clear()
+	game.loading_left=0.0
 	for dims: Vector2i in [Vector2i(844,390),Vector2i(1280,720),Vector2i(2340,1080)]:
 		root.size=dims
 		await process_frame
