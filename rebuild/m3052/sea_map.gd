@@ -723,7 +723,11 @@ func _native_visual_pose(actor: Dictionary) -> Dictionary:
 		# Never jump a displayed hull 10-30px on the first stopped frame.
 		if not previous.has("rest_at"):
 			previous["rest_at"]=elapsed
-			previous["rest_origin"]=Vector2(previous.get("visual",world))
+			var prior_visual: Vector2=Vector2(previous.get("visual",world))
+			# At a normal tile arrival, the last travel frame is only
+			# ~2.53 world px away. Finish that normal-sized frame precisely;
+			# only larger offsets (unexpected stops) need visible easing.
+			previous["rest_origin"]=world if prior_visual.distance_to(world)<=3.5 else prior_visual
 		var rest_progress: float=clampf((elapsed-float(previous["rest_at"]))/0.22,0.0,1.0)
 		var eased: float=1.0-pow(1.0-rest_progress,3.0)
 		var stopped: Vector2=Vector2(previous["rest_origin"]).lerp(world,eased)
