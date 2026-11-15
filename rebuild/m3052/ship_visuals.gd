@@ -59,11 +59,16 @@ static func classic_tethered_raster(start: Vector2,goal: Vector2,world: Vector2,
 	# horizontally/vertically, tapering to 1.5px for diagonals.
 	var cardinality: float=absf(absf(forward.x)-absf(forward.y))
 	var size_factor: float=clampf((cardinality-0.12)/0.78,0.0,1.0)
-	var lateral: float=lerpf(1.5,9.0,size_factor)*triangle*edge_fade
-	# Keep continuity if a tap redirects the captain mid-sprite step.
+	var lateral_limit: float=lerpf(1.5,9.0,size_factor)
+	var lateral: float=lateral_limit*triangle*edge_fade
+	# Carry only a small previous visual offset after a retap. Clamping
+	# by the NEW course's allowable raster prevents the curved transient
+	# formerly seen when switching from horizontal to upper-right.
 	var old_fade: float=clampf(1.0-travelled/24.0,0.0,1.0)
 	var offset: Vector2=side*lateral+initial_offset*old_fade
-	if offset.length_squared()>100.0:offset=offset.normalized()*10.0
+	var display_limit: float=lateral_limit+0.3
+	if offset.length_squared()>display_limit*display_limit:
+		offset=offset.normalized()*display_limit
 	# 'heading' is ALWAYS the real route bearing. Its former synthetic
 	# +/-34-degree tangent made the hull visually steer around imaginary
 	# corners on a straight NE course, even though the world pose matched.
