@@ -179,22 +179,26 @@ func run() -> void:
 	check(is_equal_approx(game.CLASSIC_HULL_SCALE_MOBILE,1.0) and is_equal_approx(game.CLASSIC_MOBILE_CAMERA_FACTOR,1.0),"Android/iOS Classic uses SAME baseline ship size and zoom as 3D")
 	check(is_equal_approx(game.CLASSIC_HULL_SCALE_MOBILE,game.CLASSIC_HULL_SCALE),"desktop and mobile Classic hull have no hidden size differential")
 	check(is_equal_approx(game._actor_visual_length(game.sim.npcs[0]),native_npc_length),"Classic and 3D NPC hulls use identical physical sizes")
-	# M367: the actual 2D camera MUST follow the captain exactly as
-	# native 3D does. In 366 the old edge-follow camera left the vessel
-	# drifting across the viewport, making tiny raster steps look curved.
+	# M368: Only the authoritative course and world coordinates are
+	# shared. The Classic 2D camera deliberately uses edge-follow while
+	# native 3D is centered on the captain. Never assert matching cameras.
 	var camera_start: Vector2=game._visual_actor_pos(game.sim.player)
+	game.browser_classic=true
 	game.camera_locked=true
+	game.loading_left=0.0
 	game.camera.position=camera_start+Vector2(300,170)
+	var expected_first: Vector2=game._classic_edge_camera_goal(camera_start,game.camera.position,game.get_viewport_rect().size/maxf(game.camera.zoom.x,0.05))
 	game._process(0.0)
-	check(game.camera.position.distance_to(camera_start)<0.001,"2D Classic camera returns to exact captain world location like 3D")
+	check(game.camera.position.distance_to(expected_first)<0.001,"2D Classic camera retains independent edge framing inside the safe area")
 	game.camera.position=camera_start+Vector2(-520,-280)
+	var expected_second: Vector2=game._classic_edge_camera_goal(camera_start,game.camera.position,game.get_viewport_rect().size/maxf(game.camera.zoom.x,0.05))
 	game._process(0.0)
-	check(game.camera.position.distance_to(camera_start)<0.001,"2D Classic camera never waits for a screen-edge threshold")
+	check(game.camera.position.distance_to(expected_second)<0.001,"2D Classic camera only scrolls as needed at a viewport edge")
 	game.camera_anchor=game.sim.player.pos
 	game._shift_camera(Vector2(180,90))
 	check(not game.camera_locked,"manual Classic camera-pad inspection still unlocks captain following")
 	game._recenter_camera()
-	check(game.camera_locked and game.camera.position.distance_to(game.sim.player.pos)<0.001,"recenter explicitly resumes identical 2D/3D following")
+	check(game.camera_locked and game.camera.position.distance_to(game.sim.player.pos)<0.001,"recenter resumes Classic player view without rewriting the physical sailing course")
 	var path_before_framing: Array=game.sim.player.path.duplicate()
 	var saved_position: Vector2=game.sim.player.pos
 	for viewport_size: Vector2i in [Vector2i(844,390),Vector2i(2340,1080)]:
