@@ -61,6 +61,24 @@ func _run() -> void:
 			real_steps[VIS.heading_four(captain2.player.heading)]=true
 		check(identical and captain2.player.path.is_empty() and captain3.player.path.is_empty() and captain3.player.pos.distance_to(target)<0.001,"every 30Hz frame has matching real 2D/3D position, heading and endpoint: "+str(target))
 		check(real_steps.size()>=1 and real_steps.size()<=4,"3D hull really follows isometric microstep headings: "+str(target))
+	# Mid-leg retapping MUST NOT send the ship back to the previous
+	# raster centre. The immediate first partial leg is forward and every
+	# following step is one of the real 24x16 diamond neighbours.
+	var partial_start: Vector2=start+Vector2(12,8)
+	for new_course: Vector2 in [
+		start+Vector2(576,0),start+Vector2(-576,0),
+		start+Vector2(0,384),start+Vector2(0,-384),
+		start+Vector2(384,-256),start+Vector2(-384,256)]:
+		var retap_route: Array[Vector2]=NAV.classic_water_route(partial_start,new_course)
+		var first_step: Vector2=retap_route[0]-partial_start
+		var direction: Vector2=(new_course-partial_start).normalized()
+		check(first_step.dot(direction)>=-0.0001,"mid-microstep retap never briefly reverses away from newly clicked course: "+str(new_course))
+		check(retap_route.back()==new_course,"mid-step retap arrives at new globally selected tile: "+str(new_course))
+		var valid_following: bool=true
+		for j in range(1,retap_route.size()):
+			var micro: Vector2=retap_route[j]-retap_route[j-1]
+			valid_following=valid_following and absf(absf(micro.x)-24.0)<0.001 and absf(absf(micro.y)-16.0)<0.001
+		check(valid_following,"after initial retap alignment every following physical leg is 24x16: "+str(new_course))
 	# Coast: detour must also remain on the grid and avoid collision.
 	var coast_start: Vector2=NAV.classic_tile_center(Vector2i(57,20))
 	var coast_goal: Vector2=coast_start+Vector2(576,0)
