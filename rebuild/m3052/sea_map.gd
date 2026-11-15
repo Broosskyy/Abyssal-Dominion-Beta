@@ -701,99 +701,51 @@ func _visual_actor_pos(actor: Dictionary) -> Vector2:
 	if not stepped.is_empty():return Vector2(stepped.pos)
 	return previous.lerp(latest,clampf(accumulator/SIMULATION_TICK,0.0,1.0))
 
-## Native 3D presentation is a view of the REAL 48x32 physical route.
-## On clear water the large GLB hull may visually glide along the macro
-## bearing instead of rocking left/right at each 24x16 micro-step.
-## However, the display MUST converge to the true position BEFORE arrival,
-## and MUST NEVER shortcut through an island while the physics goes around.
-## Classic 2D keeps drawing its real raster points without any projection.
+## Native 3D follows the EXACT SAME real, interpolated 48x32 world
+## position as Classic 2D. Only its orientation is visually smoothed.
+## Never project the GLB onto a second straight course: doing so moved
+## the hull, nameplate, ring and camera away from hitbox/world coordinates
+## and caused side-sliding, route divergence and final-frame snapping.
+## A stable macro-heading is calculated from the ongoing route for 3D
+## while the underlying 24x16 raster headings continue driving physics.
 func _native_visual_pose(actor: Dictionary) -> Dictionary:
 	var world: Vector2=_visual_actor_pos(actor)
-	var physical_heading: Vector2=Vector2(actor.get("heading",Vector2.RIGHT))
+	var heading: Vector2=Vector2(actor.get("heading",Vector2.RIGHT))
 	var id: int=int(actor.get("id",-1))
 	if browser_classic or str(actor.get("kind","ship"))!="ship":
-		return {"pos":world,"heading":physical_heading}
+		return {"pos":world,"heading":heading}
 	var previous: Dictionary=native_course_poses.get(id,{})
 	var path: Array=actor.get("path",[])
 	if path.is_empty():
-		if previous.is_empty():
-			return {"pos":world,"heading":physical_heading}
-		var held_heading: Vector2=Vector2(previous.get("heading",physical_heading))
-		# A route can end unexpectedly (blocked coast, cancel, port).
-		# Never jump a displayed hull 10-30px on the first stopped frame.
-		if not previous.has("rest_at"):
-			previous["rest_at"]=elapsed
-			var prior_visual: Vector2=Vector2(previous.get("visual",world))
-			# At a normal tile arrival, the last travel frame is only
-			# ~2.53 world px away. Finish that normal-sized frame precisely;
-			# only larger offsets (unexpected stops) need visible easing.
-			previous["rest_origin"]=world if prior_visual.distance_to(world)<=3.5 else prior_visual
-		var rest_progress: float=clampf((elapsed-float(previous["rest_at"]))/0.22,0.0,1.0)
-		var eased: float=1.0-pow(1.0-rest_progress,3.0)
-		var stopped: Vector2=Vector2(previous["rest_origin"]).lerp(world,eased)
-		previous["visual"]=stopped
-		return {"pos":stopped,"heading":held_heading}
+		# Keep last macro-bearing when the ship stops instead of pointing
+		# toward the final short 24x16 microleg and suddenly flipping.
+		return {"pos":world,"heading":Vector2(previous.get("heading",heading))}
 	var goal: Vector2=Vector2(path[0])
-	var changed: bool=previous.is_empty() or Vector2(previous.get("goal",Vector2.ZERO)).distance_squared_to(goal)>0.01 or previous.has("rest_at")
+	var changed: bool=previous.is_empty() or Vector2(previous.get("goal",Vector2.ZERO)).distance_squared_to(goal)>0.01
 	if not changed and Vector2(previous.get("last_world",world)).distance_to(world)>120.0:
 		changed=true
 	if changed:
-		var carried_offset: Vector2=Vector2.ZERO
-		if not previous.is_empty():
-			var last_visible: Vector2=Vector2(previous.get("visual",world))
-			if last_visible.distance_to(world)<=24.0:
-				carried_offset=last_visible-world
-		# A new display is allowed to start after the first physics tick.
-		# Recover its actual first microleg origin rather than inventing an
-		# offset from the arbitrary screen-frame sampling time.
-		var physical_origin: Vector2=world
-		var tick_legs: Array=actor.get("_iso_tick_segments",[])
-		if previous.is_empty() and not tick_legs.is_empty():
-			var first_origin: Vector2=Vector2(tick_legs[0].get("start",world))
-			if first_origin.distance_to(world)<8.0:
-				physical_origin=first_origin
-		# Only project across open water. A straight projection on a
-		# coast A* detour makes the visible ship sail into solid islands.
-		var straight_clear: bool=sim.segment_free(physical_origin,goal,2.0)
-		previous={"goal":goal,"start":physical_origin,"last_world":world,
-			"visual":world+carried_offset,"carry":carried_offset,
-			"straight_clear":straight_clear,"heading":physical_heading}
+		# A new click changes only the visual long-range bearing;
+		# no re-centering, teleport, physical steering or offsets.
+		previous={"goal":goal,"start":world,"last_world":world,"heading":heading}
 		native_course_poses[id]=previous
 	var start: Vector2=Vector2(previous["start"])
-	var course: Vector2=goal-start
-	if course.length_squared()<=0.001:
-		return {"pos":world,"heading":physical_heading}
-	var forward: Vector2=course.normalized()
-	if not bool(previous.get("straight_clear",true)):
-		# Look several real raster steps forward, instead of snapping
-		# the GLB bow to each 0.38-second tile edge or through the coast.
+	var macro: Vector2=goal-start
+	if macro.length_squared()>0.001:
+		heading=macro.normalized()
+	if not sim.segment_free(start,goal,2.0):
+		# For a true A* island detour look a few physical grid steps ahead
+		# so the bow turns along the coast instead of pointing through it.
+		# Position STILL equals the current true 48x32 grid location.
 		var segments: Array=actor.get("_iso_route",[])
 		var index: int=int(actor.get("_iso_route_index",0))
 		if index>=0 and index<segments.size():
 			var future: Vector2=Vector2(segments[mini(index+7,segments.size()-1)])
 			if future.distance_squared_to(world)>0.001:
-				forward=(future-world).normalized()
-		previous["visual"]=world
-		previous["last_world"]=world
-		previous["heading"]=forward
-		return {"pos":world,"heading":forward}
-	var travelled: float=clampf((world-start).dot(forward),0.0,course.length())
-	var projected: Vector2=start+forward*travelled
-	# Fade the projection OUT before reaching the destination.
-	# This guarantees the visible mesh and physical hitbox meet precisely
-	# at the clicked tile instead of jumping there on the last frame.
-	var remaining: float=world.distance_to(goal)
-	var arrival_factor: float=clampf(remaining/48.0,0.0,1.0)
-	var displayed: Vector2=world.lerp(projected,arrival_factor)
-	var old_fade: float=clampf(1.0-travelled/32.0,0.0,1.0)
-	displayed+=Vector2(previous.get("carry",Vector2.ZERO))*old_fade*arrival_factor
-	# The mesh/hitbox offset is strictly visual and bounded.
-	if displayed.distance_to(world)>20.0:
-		displayed=world.move_toward(displayed,20.0)
-	previous["visual"]=displayed
+				heading=(future-world).normalized()
 	previous["last_world"]=world
-	previous["heading"]=forward
-	return {"pos":displayed,"heading":forward}
+	previous["heading"]=heading
+	return {"pos":world,"heading":heading}
 
 # Ships must leave trails only while actually moving; using 'path' alone
 # painted foam even when a hull was blocked by islands or sitting in port.
