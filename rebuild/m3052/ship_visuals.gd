@@ -36,7 +36,7 @@ static func heading_eight(heading: Vector2,previous: int=-1) -> int:
 
 ## Classic 2D must NEVER draw an independent path around the course.
 ## Draw its familiar pixel-raster judder as tiny 48px rhythm steps around
-## the real 3D/multiplayer line. 8px max side travel, no extra bends,
+## the real 3D/multiplayer line. 9px max side travel, no extra bends,
 ## reversals or A* waypoints. The same geometry works for all bearings.
 static func classic_tethered_raster(start: Vector2,goal: Vector2,world: Vector2,initial_offset: Vector2=Vector2.ZERO) -> Dictionary:
 	var delta: Vector2=goal-start
@@ -52,7 +52,7 @@ static func classic_tethered_raster(start: Vector2,goal: Vector2,world: Vector2,
 	var phase: float=fposmod(travelled/48.0+0.25,1.0)
 	var triangle: float=1.0-4.0*absf(phase-0.5)
 	var edge_fade: float=clampf(minf(travelled,distance_left)/18.0,0.0,1.0)
-	var lateral: float=8.0*triangle*edge_fade
+	var lateral: float=9.0*triangle*edge_fade
 	# Keep continuity if a tap redirects the captain mid-sprite step.
 	var old_fade: float=clampf(1.0-travelled/24.0,0.0,1.0)
 	var offset: Vector2=side*lateral+initial_offset*old_fade
