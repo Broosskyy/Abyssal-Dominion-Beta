@@ -85,7 +85,7 @@ func run() -> void:
 	var new_goal: Vector2=retap_start+Vector2(-250,-400)
 	retap_probe.path=[new_goal]
 	sim._advance_world_course(retap_probe,1.0,true)
-	check(not retap_probe.has("_iso_committed_step") and retap_probe.heading.dot((new_goal-retap_start).normalized())>0.99,"retap follows NEW direction immediately without tile-step lock")
+	check(not retap_probe.has("_iso_committed_step") and retap_probe.get("_iso_route",[]).back()==new_goal and retap_probe.pos.distance_to(retap_start)<=1.1,"retap rebuilds new grid destination immediately without jump or old tile lock")
 	for tick in 900:
 		if retap_probe.path.is_empty():break
 		sim._advance_world_course(retap_probe,165.0/30.0,true)
@@ -94,12 +94,12 @@ func run() -> void:
 	var goal:=Vector2(1200,500)
 	check(sim.classic_steering,"all ship renderers use one default 48x32 navigation")
 	check(sim.course(goal),"water tap creates a course")
-	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"native open water follows one direct line")
+	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"native 3D and 2D share the same clicked high-level destination")
 	var initial_route: Array=sim.player.path.duplicate()
 	var initial_pos: Vector2=sim.player.pos
 	sim.set_classic_steering(true)
 	check(sim.classic_steering and sim.player.path==initial_route and sim.player.pos==initial_pos,"switching to Classic never rewrites the physical route or teleports the captain")
-	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"Classic horizontal sailing has no synthetic diagonal zigzags")
+	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"shared high-level destination stays one click, while physical legs follow the isometric lattice")
 	var stock: Array=sim.player.ammo.duplicate()
 	var horizontal_facings: Dictionary={}
 	var start_y: float=sim.player.pos.y
@@ -109,7 +109,7 @@ func run() -> void:
 		max_y_error=maxf(max_y_error,absf(float(sim.player.pos.y)-start_y))
 		if not sim.player.path.is_empty():horizontal_facings[VISUALS.heading_four(sim.player.heading)]=true
 		if sim.player.path.is_empty():break
-	check(max_y_error<0.01 and horizontal_facings.size()<=2,"horizontal Classic now stays on a straight line without NE/SE zigzags")
+	check(max_y_error>=8.0 and max_y_error<35.0 and horizontal_facings.has(1) and horizontal_facings.has(3),"horizontal Classic physically alternates NE/SE raster steps rather than fake sprite motion")
 	check(sim.player.pos.distance_to(goal)<0.1 and sim.player.path.is_empty() and sim.player.ammo==stock,"raster Classic sailing arrives exactly without changing ammunition")
 	# Clicking a chart position selects one deterministic isometric tile.
 	# Harbor/portal scripted routes continue accepting exact coordinates.
@@ -126,20 +126,20 @@ func run() -> void:
 	check(not snapped_path.is_empty() and snapped_path.back()==snapped and NAV.classic_world_to_tile(snapped_path.back())==NAV.classic_world_to_tile(raw_click),"tile course has no non-isometric final tail")
 	sim.player.path=[]
 	var diagonal_goal:=Vector2(1600,850)
-	check(sim.course(diagonal_goal) and sim.player.path==sim.plan_path(sim.player.pos,diagonal_goal),"Classic navigation retains exact straight waypoint destinations")
+	check(sim.course(diagonal_goal) and sim.player.path==sim.plan_path(sim.player.pos,diagonal_goal),"Classic keeps exact clicked destinations while physical route traverses diamond steps")
 	sim._move(sim.player,0.25)
 	var corner: Vector2=sim.player.pos
 	check(sim.course(Vector2(300,850)) and sim.player.path.back()==Vector2(300,850),"new tap immediately replaces the course")
 	check(not sim.player.has("_iso_committed_step"),"new click never locks old raster microstep")
 	sim._move(sim.player,.01)
-	check(sim.player.pos.distance_to(corner)<2.0 and sim.player.heading.dot((Vector2(300,850)-corner).normalized())>0.99,"ship instantly follows new direct heading without teleport or turning circle")
+	check(sim.player.pos.distance_to(corner)<2.0 and not sim.player.get("_iso_route",[]).is_empty() and Vector2(sim.player.get("_iso_route",[]).back())==Vector2(300,850),"retap immediately selects a new authentic 48x32 path, without a teleport")
 	var changing_route: Array=sim.player.path.duplicate()
 	var switch_origin: Vector2=sim.player.pos
 	sim.set_classic_steering(false)
 	check(sim.classic_steering and sim.player.pos==switch_origin and sim.player.path==changing_route,"native 3D cannot disable 48x32 grid steering or change current course")
 	var npc_body: Dictionary={"pos":Vector2(500,500),"heading":Vector2.RIGHT,"kind":"ship"}
 	var npc_direct: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
-	check(npc_direct.size()==1 and npc_direct[0]==Vector2(1200,500),"native NPC patrol ship follows direct courses")
+	check(npc_direct.size()==1 and npc_direct[0]==Vector2(1200,500),"native NPC stores a single patrol destination; real movement still uses shared diamond route")
 	sim.set_classic_steering(true)
 	var npc_classic: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
 	check(npc_classic==npc_direct,"Classic NPCs keep the same high-level waypoints, then execute tile raster locally")
@@ -227,8 +227,8 @@ func run() -> void:
 	game.camera.position=game.sim.player.pos
 	game.camera.force_update_scroll()
 	# Validate eight-view headings on a PARKED ship. An actively sailing
-	# Classic ship now intentionally displays the 24x16 diagonal raster
-	# microleg instead of its one authoritative direct world heading.
+	# Classic draws the exact 24x16 physical microleg, with the four
+	# original diagonal atlased hull views (both 2D and 3D sail this path).
 	var parked_heading_probe: Dictionary={"id":9371,"kind":"ship","pos":game.sim.player.pos,
 		"heading":Vector2(1,-1),"path":[]}
 	check(game._classic_frame_for_actor(parked_heading_probe)==1,"parked Classic renderer selects the true NE atlas frame")
@@ -293,7 +293,7 @@ func run() -> void:
 		check(absf(rounded_delta.x)<=0.55 and absf(rounded_delta.y)<=0.55,"Classic snaps displayed RASTER position to <=0.5 screen pixels")
 		max_y_motion=maxf(max_y_motion,absf(float(motion_probe.pos.y)-start_y_motion))
 		max_visual_raster_y=maxf(max_visual_raster_y,absf(rendered.y-start_y_motion))
-	check(max_y_motion<0.01 and max_visual_raster_y>=8.0 and shown.has(1) and shown.has(3),"Classic ship visually zigzags NE/SE between 24x16 tiles while real course stays straight")
+	check(max_y_motion>=8.0 and max_visual_raster_y>=8.0 and shown.has(1) and shown.has(3),"Classic 2D visibly follows the same real NE/SE tile steps as 3D")
 	game.visual_before.erase(9318);game.visual_after.erase(9318)
 	check(game.camera.position==camera_before,"drawing real isometric ship steps never invents a camera motion mode")
 	var original_pos: Vector2=game.sim.player.pos
