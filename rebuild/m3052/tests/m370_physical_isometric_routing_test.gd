@@ -63,7 +63,7 @@ func _run() -> void:
 		check(real_steps.size()>=1 and real_steps.size()<=4,"3D hull really follows isometric microstep headings: "+str(target))
 	# Coast: detour must also remain on the grid and avoid collision.
 	var coast_start: Vector2=NAV.classic_tile_center(Vector2i(57,20))
-	var coast_goal: Vector2=coast_start+Vector2(600,0)
+	var coast_goal: Vector2=coast_start+Vector2(576,0)
 	obstacle=Rect2(coast_start+Vector2(240,-40),Vector2(96,80))
 	var safe: Array[Vector2]=NAV.classic_safe_route(coast_start,coast_goal,Callable(self,"clear"))
 	var previous: Vector2=coast_start
