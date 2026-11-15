@@ -23,9 +23,9 @@ const PLAYER_SPEED := 165.0
 # comparing a FULL course against the original-era reference.
 const CLASSIC_TILE_SAIL_SPEED := 76.0
 const CLASSIC_SHIP_SPEED_BONUS_MAX := 1.35
-# One authoritative sea-chart route for ALL ship graphics. 48x32 diamonds
-# select map targets; physical movement goes straight over clear water
-# and around coastline via shared smooth waypoints in both 2D and 3D.
+# One authoritative sea-chart route for ALL ship graphics.
+# The 48x32 diamond lattice now determines actual physical steps, not
+# merely the clicked destination. 2D and 3D sail identical micro-legs.
 const PLAYER_HP := 2400
 const PLAYER_SHIELD := 1000
 const SHIELD_DELAY := 8.0
@@ -297,7 +297,7 @@ func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
 	return plan_path(body.pos,goal)
 
 func _clear_classic_raster_state(body: Dictionary) -> void:
-	# No path regeneration or renderer-dependent teleport when retapping.
+	# No renderer-dependent teleport or camera-dependent route on retap.
 	for key in ["_iso_waypoint","_iso_guide_origin","_iso_leg_dir","_iso_leg_left",
 		"_iso_first_leg","_iso_tick_segments","_iso_goal","_iso_route",
 		"_iso_route_index","_iso_speed_scale","_iso_committed_step"]:
@@ -305,10 +305,10 @@ func _clear_classic_raster_state(body: Dictionary) -> void:
 
 
 func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
-	# Real, globally anchored 48x32 diamond-tile navigation.
-	# A new tap during a tile step queues its new itinerary at the NEXT
-	# centre; switching the route must not start from arbitrary mid-tile
-	# fractional pixels and invent an incorrect first diagonal.
+	# Real globally anchored four-neighbour 48x32 diamond navigation.
+	# BOTH 2D and 3D physical ship coordinates traverse these same legs.
+	# A mid-leg tap replans from the current world point without teleporting;
+	# the first partial alignment may be shorter than a full grid edge.
 	var tick_segments: Array[Dictionary]=[]
 	body["_iso_tick_segments"]=tick_segments
 	var iterations: int=0
@@ -345,7 +345,7 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 			continue
 		if not body.has("_iso_goal") or Vector2(body["_iso_goal"]).distance_squared_to(goal)>0.01:
 			# NPC AI and scripts can replace body.path directly. Replan from
-			# the exact current world position, not an old committed tile.
+			# the current world point via the SAME physical tile lattice.
 			_clear_classic_raster_state(body)
 			body["_iso_tick_segments"]=tick_segments
 			var tiles: Array[Vector2]=NAV.classic_water_route(body.pos,goal)
@@ -358,10 +358,8 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 					break
 				length+=origin.distance_to(point)
 				origin=point
-			# Never escape a blocked isometric path by sailing straight
-			# through the chart. Scripted harbor/portal and NPC courses
-			# must use the SAME four-neighbour coastal A* if their greedy
-			# tile itinerary collides with an island margin.
+			# A blocked grid leg triggers physical four-neighbour coastal
+			# A*, never a direct shortcut across land or visual-only detour.
 			if not valid:
 				tiles=NAV.classic_safe_route(body.pos,goal,Callable(self,"segment_free").bind(2.0))
 			if tiles.is_empty():
@@ -371,9 +369,8 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 			body["_iso_goal"]=goal
 			body["_iso_route"]=tiles
 			body["_iso_route_index"]=0
-			# Never accelerate diagonals to compensate for longer raster
-			# itineraries. Old code could make a visible hull leap twice
-			# as fast from one 24x16 tile to the next.
+			# Keep the same real speed on every 24x16 micro-leg.
+			# More turns on oblique paths are genuine route geometry.
 			body["_iso_speed_scale"]=1.0
 		var route: Array=body["_iso_route"]
 		var index: int=int(body["_iso_route_index"])
@@ -407,8 +404,8 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 
 
 func set_classic_steering(_enabled: bool) -> void:
-	# Renderer changes never reset world position, route, heading or speed.
-	# Both 2D and 3D use one shared course, independent of the chart grid.
+	# Render mode never resets world position, route, heading or speed.
+	# Both 2D and 3D physically traverse the same 48x32 grid.
 	classic_steering=true
 
 
@@ -454,8 +451,8 @@ func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 	var route: Array[Vector2]=[]
 	var raster: Array[Vector2]=[]
 	if classic_click:
-		# The 48x32 chart still selects the clicked tile. Physical travel
-		# stays straight on open water; only coasts introduce smooth bends.
+		# A click selects its actual 48x32 diamond, AND the vessel travels
+		# all resulting physical 24x16 grid legs, including diagonal clicks.
 		raster=NAV.classic_water_route(origin,point) if staff.flag("no_collision") else NAV.classic_safe_route(origin,point,Callable(self,"segment_free").bind(2.0))
 		if raster.is_empty() and origin.distance_squared_to(point)>0.001:
 			message="Küste voraus · kein befahrbarer Rasterkurs"
