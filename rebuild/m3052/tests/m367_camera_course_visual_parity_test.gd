@@ -84,7 +84,7 @@ func _run() -> void:
 	check(seen.has(1) and seen.has(3),"eastward Classic keeps familiar alternating NE/SE raster images")
 	# Switching from a wide cardinal step to upper-right MUST NOT carry
 	# the full old ±9px offset into the new diagonal target as a curve.
-	east.pos=start+Vector2(552,0)
+	east.pos=start+Vector2(540,0)
 	game._classic_raster_visual(east)
 	var new_target: Vector2=Vector2(east.pos)+Vector2(460,-460)
 	east.heading=(new_target-Vector2(east.pos)).normalized()
