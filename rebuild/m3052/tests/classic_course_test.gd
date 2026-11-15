@@ -1,6 +1,6 @@
 extends SceneTree
-## Update 359: the historical 48x32 diamond selects the destination, but
-## must NOT force any physical zigzag in either 2D or 3D.
+## Update 370: the historical 48x32 diamond selects destination AND
+## physically drives the same four-neighbour raster route in 2D and 3D.
 const NAV=preload("res://navigation.gd")
 const SIM=preload("res://simulation.gd")
 var checks: int=0
@@ -24,8 +24,8 @@ func _run() -> void:
 	var start: Vector2=NAV.classic_tile_center(Vector2i(170,10))
 	var goal: Vector2=NAV.classic_tile_center(Vector2i(182,-2))
 	var direct: Array[Vector2]=NAV.classic_water_route(start,goal)
-	check(direct.size()==1 and direct[0]==goal,"unobstructed water has one direct world-space segment")
-	check(NAV.classic_safe_route(start,goal,func(_a,_b):return true)==direct,"safe planner returns the identical direct segment when water is clear")
+	check(direct.size()>5 and direct.back()==goal,"unobstructed water follows real global 48x32 tile neighbours")
+	check(NAV.classic_safe_route(start,goal,func(_a,_b):return true)==direct,"safe planner uses identical physical raster legs when there are no obstacles")
 	check(not _clear_test_barrier(start,goal),"test barrier genuinely crosses direct course")
 	var detour: Array[Vector2]=NAV.classic_safe_route(start,goal,Callable(self,"_clear_test_barrier"))
 	check(detour.size()>1 and detour.back()==goal,"blocked water plans a real coast detour")
@@ -36,9 +36,9 @@ func _run() -> void:
 		safe=safe and _clear_test_barrier(previous,waypoint)
 		length+=previous.distance_to(waypoint)
 		previous=waypoint
-	check(safe and length>start.distance_to(goal),"smoothed coast itinerary never clips land or takes forbidden shortcut")
+	check(safe and length>start.distance_to(goal),"physical coastal A* tile itinerary avoids all land and shortcut segments")
 
-	# Real simulation: the same direct and coastal itinerary in all graphics.
+	# Real simulation: the same four-direction 48x32 route in all graphics.
 	var sim=SIM.new()
 	sim.npcs.clear()
 	sim.islands.clear()
@@ -48,7 +48,7 @@ func _run() -> void:
 	check(sim.course(target,true),"clear-water captain course accepted")
 	var snapped: Vector2=sim._classic_clicked_target(target)
 	var route: Array=sim.player.get("_iso_route",[])
-	check(route.size()==1 and route[0]==snapped,"clicked 48x32 tile stays selected, but sailing does not visit intermediate diamonds")
+	check(route.size()>4 and route.back()==snapped,"clicked 48x32 tile stays selected and real ship visits intermediate diamonds")
 	var max_cross: float=0.0
 	var dist: float=0.0
 	for frame in 650:
@@ -57,8 +57,13 @@ func _run() -> void:
 		sim._move(sim.player,1.0/30.0)
 		dist+=before.distance_to(Vector2(sim.player.pos))
 		max_cross=maxf(max_cross,absf(sim.player.pos.y-origin.y))
-	check(max_cross<0.01 and sim.player.pos.distance_to(snapped)<0.01 and sim.player.path.is_empty(),"physical ship sails straight without alternating sideways offsets")
-	check(absf(dist-origin.distance_to(snapped))<0.1 and is_equal_approx(SIM.CLASSIC_TILE_SAIL_SPEED,76.0),"direct course preserves real calibrated movement speed and path length")
+	check(max_cross>=8.0 and max_cross<35.0 and sim.player.pos.distance_to(snapped)<0.01 and sim.player.path.is_empty(),"physical ship really alternates +/-16px diagonal tile heights")
+	var expected_sailed: float=0.0
+	var leg_start: Vector2=origin
+	for next: Vector2 in route:
+		expected_sailed+=leg_start.distance_to(next)
+		leg_start=next
+	check(absf(dist-expected_sailed)<0.1 and is_equal_approx(SIM.CLASSIC_TILE_SAIL_SPEED,76.0),"physical 2D/3D travel distance equals sum of raster legs at unchanged sailing speed")
 
 	# A mid-course retap redirects instantly; it must NOT finish an old
 	# 24x16 tile step, and it must not jump to a distant original target.
@@ -70,7 +75,7 @@ func _run() -> void:
 	check(sim.course(new_target,true),"redirected course accepted")
 	check(not sim.player.has("_iso_committed_step") and sim.player.pos==mid,"retap does not restore obsolete tile lock or teleport")
 	sim._move(sim.player,1.0/30.0)
-	check(sim.player.heading.dot((sim._classic_clicked_target(new_target)-mid).normalized())>0.99,"retapped vessel immediately points along the new real course")
+	check(sim.player.get("_iso_route",[]).size()>2 and Vector2(sim.player.get("_iso_route",[]).back())==sim._classic_clicked_target(new_target) and sim.player.pos.distance_to(mid)<3.0,"retapped vessel immediately replans real tile route without teleporting")
 
 	# Coastline is validated against actual collision geometry, not merely
 	# a decorative tile edge or an optimistic long obstacle sample.
@@ -81,7 +86,7 @@ func _run() -> void:
 	sim._clear_classic_raster_state(sim.player)
 	check(sim.course(goal,true),"island-safe course accepted")
 	var actual: Array=sim.player.get("_iso_route",[])
-	check(actual.size()>1 and actual.back()==goal,"live ship chooses smooth coast detour instead of zigzag on open water")
+	check(actual.size()>1 and actual.back()==goal,"live ship chooses physical 48x32 A* coastal detour")
 	var p: Vector2=start
 	var all_clear: bool=true
 	for waypoint: Vector2 in actual:
