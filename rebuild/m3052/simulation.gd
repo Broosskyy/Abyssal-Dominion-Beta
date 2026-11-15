@@ -23,9 +23,9 @@ const PLAYER_SPEED := 165.0
 # comparing a FULL course against the original-era reference.
 const CLASSIC_TILE_SAIL_SPEED := 76.0
 const CLASSIC_SHIP_SPEED_BONUS_MAX := 1.35
-# One authoritative sea-chart route for ALL ship graphics.
-# The 48x32 diamond lattice now determines actual physical steps, not
-# merely the clicked destination. 2D and 3D sail identical micro-legs.
+# One shared direct / coastline-aware world course for ALL ship graphics.
+# The 48x32 diamond lattice is used ONLY to resolve classic tap coordinates;
+# no physical 24x16 zigzag is inserted into either the 2D or 3D ship track.
 const PLAYER_HP := 2400
 const PLAYER_SHIELD := 1000
 const SHIELD_DELAY := 8.0
@@ -305,10 +305,9 @@ func _clear_classic_raster_state(body: Dictionary) -> void:
 
 
 func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
-	# Real globally anchored four-neighbour 48x32 diamond navigation.
-	# BOTH 2D and 3D physical ship coordinates traverse these same legs.
-	# A mid-leg tap replans from the current world point without teleporting;
-	# the first partial alignment may be shorter than a full grid edge.
+	# Both 2D and 3D use exactly the same direct / coastal detour legs.
+	# Only sprite-facing can exhibit the Classic 48x32 display cadence.
+	# A mid-leg tap replans from the current position without teleporting.
 	var tick_segments: Array[Dictionary]=[]
 	body["_iso_tick_segments"]=tick_segments
 	var iterations: int=0
@@ -348,20 +347,11 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 			# the current world point via the SAME physical tile lattice.
 			_clear_classic_raster_state(body)
 			body["_iso_tick_segments"]=tick_segments
-			var tiles: Array[Vector2]=NAV.classic_water_route(body.pos,goal)
-			var valid: bool=true
-			var origin: Vector2=body.pos
-			var length: float=0.0
-			for point: Vector2 in tiles:
-				if not phasing and not segment_free(origin,point,2.0):
-					valid=false
-					break
-				length+=origin.distance_to(point)
-				origin=point
-			# A blocked grid leg triggers physical four-neighbour coastal
-			# A*, never a direct shortcut across land or visual-only detour.
-			if not valid:
-				tiles=NAV.classic_safe_route(body.pos,goal,Callable(self,"segment_free").bind(2.0))
+			var tiles: Array[Vector2]=[goal]
+			if not phasing and not segment_free(body.pos,goal,2.0):
+				# Both renderers take identical, collision-checked coastline
+				# detours; no legacy 24x16 microsteps or 3D-only shortcuts.
+				tiles=plan_path(body.pos,goal)
 			if tiles.is_empty():
 				body.path=[]
 				_clear_classic_raster_state(body)
@@ -369,8 +359,7 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 			body["_iso_goal"]=goal
 			body["_iso_route"]=tiles
 			body["_iso_route_index"]=0
-			# Keep the same real speed on every 24x16 micro-leg.
-			# More turns on oblique paths are genuine route geometry.
+			# Retain the same real speed on every direct/coastal segment.
 			body["_iso_speed_scale"]=1.0
 		var route: Array=body["_iso_route"]
 		var index: int=int(body["_iso_route_index"])
@@ -405,7 +394,7 @@ func _move_classic_tiles(body: Dictionary,travel: float,phasing: bool) -> void:
 
 func set_classic_steering(_enabled: bool) -> void:
 	# Render mode never resets world position, route, heading or speed.
-	# Both 2D and 3D physically traverse the same 48x32 grid.
+	# Both render modes follow the same world-space direct/coastal course.
 	classic_steering=true
 
 
@@ -449,18 +438,13 @@ func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 	var origin: Vector2=Vector2(player.pos)
 
 	var route: Array[Vector2]=[]
-	var raster: Array[Vector2]=[]
-	if classic_click:
-		# A click selects its actual 48x32 diamond, AND the vessel travels
-		# all resulting physical 24x16 grid legs, including diagonal clicks.
-		raster=NAV.classic_water_route(origin,point) if staff.flag("no_collision") else NAV.classic_safe_route(origin,point,Callable(self,"segment_free").bind(2.0))
-		if raster.is_empty() and origin.distance_squared_to(point)>0.001:
-			message="Küste voraus · kein befahrbarer Rasterkurs"
-			return false
+	if staff.flag("no_collision"):
 		route.append(point)
 	else:
-		if staff.flag("no_collision"):route.append(point)
-		else:route=plan_actor_path(player,point)
+		# The clicked classic diamond still selects the goal coordinate.
+		# Physical world movement is direct when free, and uses the same
+		# collision-safe A* turnpoints in 2D and native 3D.
+		route=plan_actor_path(player,point)
 	if route.is_empty():
 		message="Küste voraus · bitte freies Wasser wählen"
 		return false
@@ -468,8 +452,8 @@ func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 	player.path=route
 	_clear_classic_raster_state(player)
 	if classic_click:
-		player["_iso_goal"]=point
-		player["_iso_route"]=raster
+		player["_iso_goal"]=route[0]
+		player["_iso_route"]=[route[0]]
 		player["_iso_route_index"]=0
 		player["_iso_speed_scale"]=1.0
 	repairing=false
@@ -920,7 +904,7 @@ func _move(body: Dictionary, delta: float) -> void:
 	if bool(body.get("network_motion",false)):return
 	var slow_rate = float(body.get("slow_rate", 0.55)) if float(body.slow) > 0 else 1.0
 	var is_classic_ship: bool=classic_steering and (int(body.get("id",-1))==0 or str(body.get("kind",""))=="ship")
-	# Shared 2D/3D isometric sea cadence, independent of GLB vs atlas.
+	# Shared direct 2D/3D sailing speed, independent of GLB vs atlas.
 	# Preserve the approved update-344 ship pace in BOTH visual modes.
 	var rate: float=float(body.speed)
 	if is_classic_ship:
@@ -933,8 +917,8 @@ func _move(body: Dictionary, delta: float) -> void:
 	_advance_world_course(body,travel,phasing)
 
 func _advance_world_course(body: Dictionary,travel: float,phasing: bool) -> void:
-	# One authoritative raster course for all ship visual modes.
-	# Monster/non-ship units may still use independent direct navigation.
+	# One shared direct/coast route for all ship visual modes.
+	# Monster/non-ship units may still use their independent movement.
 	if classic_steering and (int(body.get("id",-1))==0 or str(body.get("kind",""))=="ship"):
 		_move_classic_tiles(body,travel,phasing)
 		return
