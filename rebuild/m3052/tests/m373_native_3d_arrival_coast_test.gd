@@ -1,8 +1,7 @@
 extends SceneTree
-## M373: the calm 3D hull may be visually eased, but MUST join the
-## authoritative 2D/3D raster pose BEFORE arrival, not jump onto it.
-## Straight projection must NEVER cut through coastal collision geometry.
-const SIM=preload("res://simulation.gd")
+## M373: 3D visuals must occupy exactly the authoritative 48x32
+## position while macro-heading stays calm across real microsteps.
+## No independent mesh/camera path, arrival snap or island shortcut.
 const NAV=preload("res://navigation.gd")
 var checks: int=0
 var failures: Array[String]=[]
@@ -22,75 +21,48 @@ func _run() -> void:
 	game.visual_before.clear()
 	game.visual_after.clear()
 	var origin: Vector2=NAV.classic_tile_center(Vector2i(70,40))
-	var targets: Array[Vector2]=[
-		origin+Vector2(576,0),origin+Vector2(480,-320),
-		origin+Vector2(-480,320),origin+Vector2(0,-384)]
-	for goal: Vector2 in targets:
+	for delta: Vector2 in [Vector2(576,0),Vector2(480,-320),Vector2(-480,320),Vector2(0,-384)]:
 		game.sim.player.pos=origin
 		game.sim.player.path=[]
 		game.sim._clear_classic_raster_state(game.sim.player)
 		game.native_course_poses.clear()
-		game.elapsed=0.0
-		check(game.sim.course(goal,true),"same physical grid click accepted "+str(goal))
-		var before_goal: Array=game.sim.player.get("_iso_route",[]).duplicate(true)
-		var last_visual: Vector2=origin
-		var start_stop_distance: float=0.0
-		var largest_offset: float=0.0
-		var maximum_step: float=0.0
-		var reached: bool=false
-		for tick in 650:
+		var goal: Vector2=origin+delta
+		check(game.sim.course(goal,true),"shared click works "+str(goal))
+		var physical: Array=game.sim.player.get("_iso_route",[]).duplicate(true)
+		check(physical.size()>4 and physical.back()==goal,"shared real 48x32 microstep route remains "+str(goal))
+		var no_drifts: bool=true
+		var stable_heading: bool=true
+		var max_jump: float=0.0
+		var last_display: Vector2=origin
+		for tick in 750:
 			if game.sim.player.path.is_empty():break
 			game.sim._move(game.sim.player,1.0/30.0)
-			game.elapsed+=1.0/30.0
 			var pose: Dictionary=game._native_visual_pose(game.sim.player)
-			var shown: Vector2=Vector2(pose.pos)
-			var actual: Vector2=game.sim.player.pos
-			var offset: float=shown.distance_to(actual)
-			largest_offset=maxf(largest_offset,offset)
-			maximum_step=maxf(maximum_step,shown.distance_to(last_visual))
-			last_visual=shown
-			if game.sim.player.path.is_empty():
-				start_stop_distance=offset
-				reached=true
-				break
-		check(reached and game.sim.player.pos.distance_to(goal)<0.001,"physics reaches exact 48x32 tile "+str(goal))
-		check(start_stop_distance<1.2,"3D hull has ALREADY joined physical tile on final movement frame "+str(goal))
-		check(largest_offset<=20.01,"3D never floats >20px away from its true physical route "+str(goal))
-		check(maximum_step<6.0,"3D hull does not jump on the last sailing leg "+str(goal))
-		check(game.sim.player.get("_iso_route",[])==[],"authoritative grid route clears naturally after arrival "+str(goal))
-		var after: Dictionary=game._native_visual_pose(game.sim.player)
-		check(Vector2(after.pos).distance_to(last_visual)<1.0,"stopped 3D mesh stays exactly where final sailing pose was drawn "+str(goal))
-	# A sailing course can stop unexpectedly from a collision or cancel:
-	# smooth the 3D display into the REAL stopped hull, do not snap.
-	game.sim.islands.clear()
+			var displayed: Vector2=Vector2(pose.pos)
+			var expected: Vector2=game._visual_actor_pos(game.sim.player)
+			var screen_mesh_anchor: Vector2=game._classic_actor_render_pos(game.sim.player)
+			no_drifts=no_drifts and displayed.distance_to(expected)<0.001 and screen_mesh_anchor.distance_to(expected)<0.001
+			stable_heading=stable_heading and Vector2(pose.heading).dot(delta.normalized())>0.995
+			max_jump=maxf(max_jump,displayed.distance_to(last_display))
+			last_display=displayed
+		check(no_drifts,"3D camera, mesh and HUD all share the precise physical raster position "+str(goal))
+		check(stable_heading,"3D nose does not alternate at each 24x16 raster step "+str(goal))
+		check(max_jump<6.0,"no 3D positional jump during physical raster sailing "+str(goal))
+		check(game.sim.player.pos.distance_to(goal)<0.001 and game.sim.player.path.is_empty(),"true physical and visible ship arrive at clicked tile "+str(goal))
+		check(Vector2(game._native_visual_pose(game.sim.player).pos).distance_to(goal)<0.001,"3D hull cannot snap when stopping at destination "+str(goal))
+	# Stopping in the middle of a raster microstep is also not allowed to
+	# jump a separate projected mesh back to the hitbox.
 	game.sim.player.pos=origin
 	game.sim.player.path.clear()
 	game.sim._clear_classic_raster_state(game.sim.player)
 	game.native_course_poses.clear()
-	check(game.sim.course(origin+Vector2(576,0),true),"sudden-stop regression sets course")
-	var visible_before: Vector2=origin
-	var stop_world: Vector2=origin
-	var sizable_offset: bool=false
-	for step in 220:
-		game.sim._move(game.sim.player,1.0/30.0)
-		game.elapsed+=1.0/30.0
-		visible_before=Vector2(game._native_visual_pose(game.sim.player).pos)
-		stop_world=game.sim.player.pos
-		if visible_before.distance_to(stop_world)>7.0:
-			sizable_offset=true
-			break
-	check(sizable_offset,"stop test catches a real microstep offset")
+	check(game.sim.course(origin+Vector2(576,0),true),"interrupted voyage accepted")
+	for tick in 35:game.sim._move(game.sim.player,1.0/30.0)
+	var prior: Vector2=Vector2(game._native_visual_pose(game.sim.player).pos)
 	game.sim.player.path.clear()
-	var initial_rest: Vector2=Vector2(game._native_visual_pose(game.sim.player).pos)
-	check(initial_rest.distance_to(visible_before)<0.001,"interrupted voyage does not snap 3D ship on first stopped frame")
-	game.elapsed+=0.11
-	var halfway: Vector2=Vector2(game._native_visual_pose(game.sim.player).pos)
-	check(halfway.distance_to(stop_world)<initial_rest.distance_to(stop_world),"3D display settles continuously to physics on unexpected stop")
-	game.elapsed+=0.15
-	var at_rest: Vector2=Vector2(game._native_visual_pose(game.sim.player).pos)
-	check(at_rest.distance_to(stop_world)<0.001,"3D hull converges to actual hitbox even if cancelled mid-tile")
-	# Coast: a straight display interpolation is not permitted when real
-	# A* grid routing deliberately takes the ship around an island.
+	var after: Vector2=Vector2(game._native_visual_pose(game.sim.player).pos)
+	check(prior.distance_to(after)<0.001 and after.distance_to(game.sim.player.pos)<0.001,"3D ship and hitbox never separate at sudden stop")
+	# Real raster A* coast detour: mesh may not shortcut through an island.
 	game.native_course_poses.clear()
 	game.sim.player.pos=origin
 	game.sim._clear_classic_raster_state(game.sim.player)
@@ -98,23 +70,41 @@ func _run() -> void:
 	game.sim.islands.append({"bounds":rect,"outline":PackedVector2Array([
 		rect.position,rect.position+Vector2(rect.size.x,0),rect.end,rect.position+Vector2(0,rect.size.y)])})
 	var coast_goal: Vector2=origin+Vector2(576,0)
-	check(not game.sim.segment_free(origin,coast_goal,2.0),"test coastline really blocks direct water line")
-	check(game.sim.course(coast_goal,true),"isometric A* can plot around test island")
+	check(not game.sim.segment_free(origin,coast_goal,2.0),"coastline blocks the physical direct segment")
+	check(game.sim.course(coast_goal,true),"real coastal grid A* course accepted")
 	var coast_route: Array=game.sim.player.get("_iso_route",[]).duplicate(true)
-	check(coast_route.size()>10 and coast_route.back()==coast_goal,"coastal physics still owns complete tile itinerary")
-	var avoided: bool=true
-	var never_blocked: bool=true
-	for tick in 750:
+	check(coast_route.size()>10 and coast_route.back()==coast_goal,"coast route preserves complete physical raster steps")
+	var coastal_match: bool=true
+	var safe: bool=true
+	for tick in 850:
 		if game.sim.player.path.is_empty():break
 		game.sim._move(game.sim.player,1.0/30.0)
-		game.elapsed+=1.0/30.0
-		var physical: Vector2=game.sim.player.pos
-		var coast_display: Vector2=Vector2(game._native_visual_pose(game.sim.player).pos)
-		avoided=avoided and coast_display.distance_to(physical)<0.001
-		never_blocked=never_blocked and not game.sim.blocked(coast_display,2.0)
-	check(avoided,"3D visible hull stays exactly on real A* collision-safe grid steps")
-	check(never_blocked,"coastal 3D displayed hull never enters island collision geometry")
-	check(game.sim.player.pos.distance_to(coast_goal)<0.001,"coastal 3D physically arrives at clicked tile")
+		var visible: Vector2=Vector2(game._native_visual_pose(game.sim.player).pos)
+		coastal_match=coastal_match and visible.distance_to(game.sim.player.pos)<0.001
+		safe=safe and not game.sim.blocked(visible,2.0)
+	check(coastal_match,"3D mesh and collision position stay together during island detour")
+	check(safe,"3D mesh never takes a separate path through island geometry")
+	check(game.sim.player.pos.distance_to(coast_goal)<0.001,"shared 2D/3D physical course reaches coastal target")
+	# Camera follow is centered on the SAME physical pose as the mesh.
+	game.sim.islands.clear()
+	game.sim.player.pos=origin
+	game.sim.player.path.clear()
+	game.sim._clear_classic_raster_state(game.sim.player)
+	game.native_course_poses.clear()
+	game.camera_locked=true
+	game.loading_left=0.0
+	game.camera.position=origin+Vector2(80,80)
+	game._process(0.0)
+	check(game.camera.position.distance_to(game._native_visual_pose(game.sim.player).pos)<0.001,"3D camera follows exact physical/visible mesh position")
+	# Switching views never changes route or world position.
+	check(game.sim.course(origin+Vector2(480,-320),true),"graphics-toggle real course accepted")
+	for tick in 10:game.sim._move(game.sim.player,1.0/30.0)
+	var state_pos: Vector2=game.sim.player.pos
+	var state_route: Array=game.sim.player.get("_iso_route",[]).duplicate(true)
+	game.browser_classic=true
+	check(game.sim.player.pos==state_pos and game.sim.player.get("_iso_route",[])==state_route,"switch to 2D preserves physical raster route")
+	game.browser_classic=false
+	check(game.sim.player.pos==state_pos and game.sim.player.get("_iso_route",[])==state_route and Vector2(game._native_visual_pose(game.sim.player).pos)==state_pos,"3D return preserves exact physical route and has zero visual position offset")
 	game.queue_free()
 	print(JSON.stringify({"checks":checks,"failures":failures,"status":"PASS" if failures.is_empty() else "FAIL"}))
 	quit(0 if failures.is_empty() else 1)
