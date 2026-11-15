@@ -839,12 +839,15 @@ func _process(delta: float) -> void:
 	if camera_pad.visible and not modal.visible:_pan_camera(camera_pad.value,delta)
 	_classic_keyboard_pan(delta)
 	var render_player: Vector2=_visual_actor_pos(sim.player)
-	# Update 367: native 2D and 3D now have THE SAME automatic camera.
-	# The former Classic-only edge-scroll made a diagonally travelling
-	# captain cross the screen while 3D kept that captain centered; this
-	# exaggerated the raster offsets into seemingly different courses.
-	# Manual camera-pad exploration still unlocks following in both modes.
+	# The physical sailing position, destination, and multiplayer path are
+	# shared. Camera framing is NOT shared: 3D locks to the captain whereas
+	# Classic 2D uses its original sea-chart edge-follow presentation.
+	# Both modes keep manual camera exploration independently available.
 	var goal: Vector2=render_player if camera_locked else camera_anchor
+	if browser_classic and camera_locked and loading_left<=0.0:
+		var world_view: Vector2=get_viewport_rect().size/maxf(camera.zoom.x,0.05)
+		goal=_classic_edge_camera_goal(render_player,camera.position,world_view)
+		camera_anchor=goal
 	pan=goal-render_player
 	if camera_locked:camera.position=goal
 	else:camera.position=camera.position.lerp(goal,1.0-exp(-delta*5.0))
