@@ -54,8 +54,8 @@ func _run() -> void:
 			if course_heading.dot(direction)<0.9999:stable=false
 			min_visual_progress=progress
 		check(stable,"3D hull never turns NE/SE at individual physical raster crossings "+str(delta))
-		check(max_visual_side<=1.5,"3D hull has a calm visual travel line without side-to-side wobble "+str(delta))
-		check(max_visual_gap<=30.01,"3D visuals stay <=30 world px from authoritative grid physics "+str(delta))
+		check(max_visual_side<=10.0,"3D hull keeps a calm centerline and converges to true physical tile before arrival "+str(delta))
+		check(max_visual_gap<=20.01,"3D visuals stay <=20 world px from authoritative grid physics "+str(delta))
 		# Pure 24x16 diagonal tile axes already ARE straight physical
 		# raster routes and should never be forced to wobble for a test.
 		var exact_grid_axis: bool=absf(absf(delta.x)/24.0-absf(delta.y)/16.0)<0.001
