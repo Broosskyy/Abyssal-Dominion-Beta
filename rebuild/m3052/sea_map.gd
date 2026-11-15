@@ -726,7 +726,15 @@ func _native_visual_pose(actor: Dictionary) -> Dictionary:
 		if not previous.is_empty():
 			var last_visible: Vector2=Vector2(previous.get("visual",world))
 			if last_visible.distance_to(world)<=30.0:carried_offset=last_visible-world
-		previous={"goal":goal,"start":world,"last_world":world,
+		# When the very first render happens AFTER a 30Hz physics step,
+		# use that step's real starting point. Otherwise vertical courses
+		# acquire a persistent 2-3px sideways shift on the native mesh.
+		var physical_origin: Vector2=world
+		var tick_legs: Array=actor.get("_iso_tick_segments",[])
+		if previous.is_empty() and not tick_legs.is_empty():
+			var first_origin: Vector2=Vector2(tick_legs[0].get("start",world))
+			if first_origin.distance_to(world)<8.0:physical_origin=first_origin
+		previous={"goal":goal,"start":physical_origin,"last_world":world,
 			"visual":world+carried_offset,"carry":carried_offset}
 		native_course_poses[id]=previous
 	var start: Vector2=Vector2(previous["start"])
