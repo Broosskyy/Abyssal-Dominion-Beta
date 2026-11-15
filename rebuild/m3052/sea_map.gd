@@ -1324,9 +1324,11 @@ func _classic_atlas_key(actor: Dictionary) -> String:
 		return "schattenkriegsschiff_shaded"
 	return str(actor.get("visual_key",""))
 
-## Display-only 48x32 micro-legs; actual physics and 3D stay identical.
-## Visible Classic sprites alternate authentic NE/SE/NW/SW neighbours,
-## but world coordinates, hitboxes and multiplayer remain untouched.
+## The visible Classic raster must stay on the SAME direct route as 3D.
+## Older versions built a second 24x16 tile itinerary and then replayed it;
+## on NE/NW courses that looked like unnecessary curves. The sprite now
+## follows world coordinates with only an <=10px bounded side-to-side step.
+## This affects neither collision, movement speed, camera nor multiplayer.
 func _classic_raster_visual(actor: Dictionary) -> Dictionary:
 	if not browser_classic or str(actor.get("kind","ship"))!="ship":return {}
 	var id: int=int(actor.get("id",-1))
@@ -1335,8 +1337,6 @@ func _classic_raster_visual(actor: Dictionary) -> Dictionary:
 	if path.is_empty():
 		classic_raster_visuals.erase(id)
 		return {}
-	# Obstructed courses may have several safe segments; show the
-	# current segment's raster and never create new physical waypoints.
 	var goal: Vector2=Vector2(path[0])
 	var steps: Array=actor.get("_iso_route",[])
 	var index: int=int(actor.get("_iso_route_index",0))
@@ -1348,31 +1348,17 @@ func _classic_raster_visual(actor: Dictionary) -> Dictionary:
 	var changed: bool=state.is_empty() or Vector2(state.get("goal",Vector2.ZERO)).distance_squared_to(goal)>0.01
 	if not changed and Vector2(state.get("last_world",world)).distance_to(world)>100.0:changed=true
 	if changed:
-		var visual_start: Vector2=world
+		var previous_offset: Vector2=Vector2.ZERO
 		if not state.is_empty():
-			var prior: Vector2=Vector2(state.get("visual",world))
-			# A retap must not jerk a half-finished visual raster leg back
-			# to the hidden authoritative straight line.
-			if prior.distance_to(world)<30.0:visual_start=prior
-		var path_2d: Array[Vector2]=NAV.classic_iso_route(visual_start,goal)
-		var trace: Array[Dictionary]=[]
-		var last: Vector2=visual_start
-		var total: float=0.0
-		for next: Vector2 in path_2d:
-			var gap: Vector2=next-last
-			var length: float=gap.length()
-			if length<=0.0001:continue
-			trace.append({"start":last,"end":next,"heading":gap/length,"distance":length})
-			total+=length
-			last=next
-		if trace.is_empty():return {}
+			var former_display: Vector2=Vector2(state.get("visual",world))
+			if former_display.distance_to(world)<=12.0:previous_offset=former_display-world
+		# A retap starts at the REAL current chart position and carries
+		# only its small visible raster offset into the next segment.
 		state={"goal":goal,"world_start":world,"last_world":world,
-			"visual":visual_start,"trace":trace,"total":total}
+			"visual":world+previous_offset,"initial_offset":previous_offset}
 		classic_raster_visuals[id]=state
-	var world_start: Vector2=Vector2(state["world_start"])
-	var direct: Vector2=goal-world_start
-	var fraction: float=clampf((world-world_start).dot(direct)/maxf(direct.length_squared(),0.0001),0.0,1.0)
-	var sample: Dictionary=VISUALS.classic_trace_sample(state["trace"],fraction)
+	var sample: Dictionary=VISUALS.classic_tethered_raster(
+		Vector2(state["world_start"]),goal,world,Vector2(state["initial_offset"]))
 	if sample.is_empty():return {}
 	state["visual"]=Vector2(sample.pos)
 	state["last_world"]=world
