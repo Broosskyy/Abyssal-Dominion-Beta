@@ -34,7 +34,7 @@ jobs:
       - name: Headless movement, coast and crossplay physics regressions
         run: |
           set -euo pipefail
-          for name in m365_straight_visual_raster_test m361_raster_only_visual_test m360_visual_parity_test classic_course_test navigation_test direct_crossplay_test sea_edges_test progression_test; do
+          for name in m365_straight_visual_raster_test m361_raster_only_visual_test m360_visual_parity_test classic_course_test navigation_test direct_crossplay_test sea_edges_test progression_test ammo_picker_test; do
             echo "Running $name"
             XDG_DATA_HOME="$(mktemp -d)" /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path rebuild/m3052 --script "tests/$name.gd" > "/tmp/$name.log" 2>&1 || { tail -120 "/tmp/$name.log"; exit 1; }
             tail -8 "/tmp/$name.log"
