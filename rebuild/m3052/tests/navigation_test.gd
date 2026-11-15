@@ -33,9 +33,9 @@ func _initialize() -> void:
 		native_track.append(Vector2(body.pos))
 		if not body.path.is_empty():native_headings[int(signf(float(body.heading.y)))]=true
 		if body.path.is_empty():break
-	var native_straight: bool=true
-	for point: Vector2 in native_track:native_straight=native_straight and absf(point.y-500.0)<0.01
-	check(body.pos.distance_to(Vector2(950,500))<0.1 and native_straight,"3D GLB sails directly across clear water without zigzag")
+	var max_native_y: float=0.0
+	for point: Vector2 in native_track:max_native_y=maxf(max_native_y,absf(point.y-500.0))
+	check(body.pos.distance_to(Vector2(950,500))<0.1 and max_native_y>=8.0 and max_native_y<35.0,"3D GLB physically follows horizontal NE/SE diamond tile steps")
 	# Four historic views now follow a 48×32 staggered diamond-grid path.
 	# The mainland high-level waypoint stays identical to native 3D.
 	sim.set_classic_steering(true)
@@ -52,7 +52,7 @@ func _initialize() -> void:
 		max_y_error=maxf(max_y_error,absf(float(body.pos.y)-start_y))
 		if not body.path.is_empty():diagonal_y[int(signf(float(body.heading.y)))]=true
 		if body.path.is_empty():break
-	check(max_y_error<0.01 and body.heading.is_equal_approx(Vector2.RIGHT),"Classic physically follows the same straight horizontal course")
+	check(max_y_error>=8.0 and max_y_error<35.0 and diagonal_y.has(1) and diagonal_y.has(-1),"Classic physically traverses the same alternating NE/SE steps as 3D")
 	check(body.pos.distance_to(Vector2(950,500))<0.1 and body.path.is_empty(),"tile steps plus final exact arrival reach original clicked destination")
 	# Compare actual trajectory samples, not just their common endpoint.
 	body.pos=Vector2(500,500);body.path=classic_route.duplicate()
@@ -72,7 +72,7 @@ func _initialize() -> void:
 	body.view_count=8
 	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"baked sprite count does not create an extra sailing mode")
 	sim.set_classic_steering(false)
-	check(sim.classic_steering and sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"legacy mode switch cannot switch off the authoritative raster route")
+	check(sim.classic_steering and sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"render-mode flag cannot switch off the shared physical 48x32 navigation")
 	for map_index in [0,1,2]:
 		sim.configure_map(map_index)
 		sim.shots.clear()
