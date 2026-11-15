@@ -49,10 +49,15 @@ func _run() -> void:
 	game.sim._clear_classic_raster_state(game.sim.player)
 	game.browser_classic=true
 	game.classic_raster_visuals.clear()
-	var goal: Vector2=Vector2(1100,120)
-	check(game.sim.course(goal,true),"upper-right direct course accepted")
+	var clicked_goal: Vector2=Vector2(1100,120)
+	check(game.sim.course(clicked_goal,true),"upper-right direct course accepted")
+	# A real 2D tap selects a 48x32 diamond CENTRE, not the unsnapped
+	# input pixel. Compare the visible movement against that exact
+	# authoritative destination (the same one 3D and online receive).
+	var goal: Vector2=Vector2(game.sim.player.path.back())
 	var world_start: Vector2=game.sim.player.pos
 	var course_dir: Vector2=(goal-world_start).normalized()
+	check(game.sim.player.get("_iso_route",[]).size()==1,"upper-right test uses one genuine free-water course")
 	var track_ok: bool=true
 	var path_untouched: Array=game.sim.player.path.duplicate(true)
 	var max_travel_error: float=0.0
