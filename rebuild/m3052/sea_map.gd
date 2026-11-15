@@ -652,7 +652,9 @@ func _classic_tick_sample(actor: Dictionary) -> Dictionary:
 	# A single 30 Hz physics tick can cross more than one physical diagonal.
 	# Interpolating its endpoints erases the real corner and makes the ship
 	# appear to sail sideways. Render the original microlegs, in order.
-	if not browser_classic or not sim.classic_steering:return {}
+	# Both native 3D and Classic 2D must interpolate the REAL tile corner,
+	# never render a diagonal shortcut through an in-progress microstep.
+	if not sim.classic_steering:return {}
 	var id: int=int(actor.get("id",-1))
 	if not visual_before.has(id) or not visual_after.has(id):return {}
 	var segments: Array=actor.get("_iso_tick_segments",[])
@@ -1323,60 +1325,20 @@ func _classic_atlas_key(actor: Dictionary) -> String:
 		return "schattenkriegsschiff_shaded"
 	return str(actor.get("visual_key",""))
 
-## The visible Classic raster must stay on the SAME direct route as 3D.
-## Older versions built a second 24x16 tile itinerary and then replayed it;
-## on NE/NW courses that looked like unnecessary curves. The sprite now
-## follows world coordinates with only an <=10px bounded side-to-side step.
-## This affects neither collision, movement speed, camera nor multiplayer.
+## Native Classic 2D now renders the REAL isometric navigation steps.
+## The old visual-only triangle-wave offset, phase oscillator and
+## cardinality taper have been removed. Four-direction sprites follow
+## the exact 24x16 physical segment that BOTH 2D and 3D currently sail.
+## No duplicate render itinerary, artificial wobble or heading fake.
 func _classic_raster_visual(actor: Dictionary) -> Dictionary:
 	if not browser_classic or str(actor.get("kind","ship"))!="ship":return {}
-	var id: int=int(actor.get("id",-1))
-	var world: Vector2=_visual_actor_pos(actor)
-	var path: Array=actor.get("path",[])
-	if path.is_empty():
-		classic_raster_visuals.erase(id)
-		return {}
-	var goal: Vector2=Vector2(path[0])
-	var steps: Array=actor.get("_iso_route",[])
-	var index: int=int(actor.get("_iso_route_index",0))
-	if index>=0 and index<steps.size():goal=Vector2(steps[index])
-	if world.distance_squared_to(goal)<0.001:
-		classic_raster_visuals.erase(id)
-		return {}
-	var state: Dictionary=classic_raster_visuals.get(id,{})
-	var changed: bool=state.is_empty() or Vector2(state.get("goal",Vector2.ZERO)).distance_squared_to(goal)>0.01
-	if not changed and Vector2(state.get("last_world",world)).distance_to(world)>100.0:changed=true
-	if changed:
-		var previous_offset: Vector2=Vector2.ZERO
-		if not state.is_empty():
-			var former_display: Vector2=Vector2(state.get("visual",world))
-			if former_display.distance_to(world)<=12.0:previous_offset=former_display-world
-		# A retap starts at the REAL current chart position and carries
-		# only its small visible raster offset into the next segment.
-		state={"goal":goal,"world_start":world,"last_world":world,
-			"visual":world+previous_offset,"initial_offset":previous_offset}
-		classic_raster_visuals[id]=state
-	var sample: Dictionary=VISUALS.classic_tethered_raster(
-		Vector2(state["world_start"]),goal,world,Vector2(state["initial_offset"]))
-	if sample.is_empty():return {}
-	state["visual"]=Vector2(sample.pos)
-	state["last_world"]=world
-	return sample
+	if actor.get("path",[]).is_empty():return {}
+	return {"pos":_visual_actor_pos(actor),"heading":_classic_display_heading(actor)}
 
 func _classic_frame_for_actor(actor: Dictionary) -> int:
 	var id: int=int(actor.get("id",-1))
 	var sample: Dictionary=_classic_raster_visual(actor)
-	var real_heading: Vector2=_classic_display_heading(actor)
-	# A diagonal target MUST display the actual NE/NW/SE/SW course, NOT
-	# the tangent of a fake 2D side-step. In 366, the 33-degree synthetic
-	# heading could turn an 8-way GLB sprite while the 3D hull went straight,
-	# creating the visual impression of extra corners/curves.
-	# Only almost cardinal courses use old alternating diagonal raster
-	# frames (east=>NE/SE, north=>NE/NW). This keeps their classic jitter.
-	var bearing: Vector2=real_heading.normalized()
-	var near_cardinal: bool=absf(absf(bearing.x)-absf(bearing.y))>=0.84
-	var previous: int=int(classic_heading_cache.get(id,-1))
-	var facing: int=VISUALS.heading_four(Vector2(sample.raster_heading),previous) if not sample.is_empty() and near_cardinal else VISUALS.heading_eight(real_heading,previous)
+	var facing: int=VISUALS.heading_four(Vector2(sample.heading),int(classic_heading_cache.get(id,-1))) if not sample.is_empty() else VISUALS.heading_eight(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
 	classic_heading_cache[id]=facing
 	return facing
 
