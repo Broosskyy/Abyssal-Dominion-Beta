@@ -103,6 +103,7 @@ func _run() -> void:
 	var coast_route: Array=game.sim.player.get("_iso_route",[]).duplicate(true)
 	check(coast_route.size()>10 and coast_route.back()==coast_goal,"coastal physics still owns complete tile itinerary")
 	var avoided: bool=true
+	var never_blocked: bool=true
 	for tick in 750:
 		if game.sim.player.path.is_empty():break
 		game.sim._move(game.sim.player,1.0/30.0)
@@ -110,8 +111,10 @@ func _run() -> void:
 		var physical: Vector2=game.sim.player.pos
 		var coast_display: Vector2=Vector2(game._native_visual_pose(game.sim.player).pos)
 		avoided=avoided and coast_display.distance_to(physical)<0.001
-		avoided=avoided and not game.sim.blocked(coast_display,2.0)
-	check(avoided and game.sim.player.pos.distance_to(coast_goal)<0.001,"3D image follows real A* detour without cutting through island")
+		never_blocked=never_blocked and not game.sim.blocked(coast_display,2.0)
+	check(avoided,"3D visible hull stays exactly on real A* collision-safe grid steps")
+	check(never_blocked,"coastal 3D displayed hull never enters island collision geometry")
+	check(game.sim.player.pos.distance_to(coast_goal)<0.001,"coastal 3D physically arrives at clicked tile")
 	game.queue_free()
 	print(JSON.stringify({"checks":checks,"failures":failures,"status":"PASS" if failures.is_empty() else "FAIL"}))
 	quit(0 if failures.is_empty() else 1)
