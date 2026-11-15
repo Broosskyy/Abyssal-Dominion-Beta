@@ -34,9 +34,11 @@ jobs:
       - name: Headless movement, coast and crossplay physics regressions
         run: |
           set -euo pipefail
+          failed=0
           for name in m370_physical_isometric_routing_test classic_course_test navigation_test direct_crossplay_test m368_course_only_shared_contract_test simulation_test sea_edges_test progression_test; do
             echo "Running $name"
-            XDG_DATA_HOME="$(mktemp -d)" /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path rebuild/m3052 --script "tests/$name.gd" > "/tmp/$name.log" 2>&1 || { tail -120 "/tmp/$name.log"; exit 1; }
+            XDG_DATA_HOME="$(mktemp -d)" /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path rebuild/m3052 --script "tests/$name.gd" > "/tmp/$name.log" 2>&1 || { tail -120 "/tmp/$name.log"; failed=1; continue; }
             tail -8 "/tmp/$name.log"
-            if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|"status":"FAIL"' "/tmp/$name.log"; then exit 1; fi
+            if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|"status":"FAIL"' "/tmp/$name.log"; then failed=1; fi
           done
+          exit "$failed"
