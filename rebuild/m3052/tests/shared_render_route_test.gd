@@ -95,7 +95,13 @@ func _run() -> void:
 	var packet3d: Dictionary=transport.calls.back().duplicate(true)
 	check(packet2d==packet3d,"2D and 3D send bit-identical route, target, mode and preexpanded flag")
 	check(str(packet2d.get("mode",""))=="classic_48x32" and bool(packet2d.get("preexpanded",false)),"3D does not use the server's old 165px/s direct navigation")
-	check(packet2d.get("route",[]).size()==1 and packet2d.get("route",[]).back()==destination,"online payload carries exact direct open-water leg to the server")
+	check(packet2d.get("route",[]).size()>5 and packet2d.get("route",[]).back()==destination and packet2d.get("route",[])==course_2d,"2D/3D online payload transmits the exact already-validated PHYSICAL 48x32 microsteps to the server")
+	var wire_steps: Array=packet2d.get("route",[])
+	var wire_edges_valid: bool=true
+	for i in range(1,wire_steps.size()):
+		var step: Vector2=Vector2(wire_steps[i])-Vector2(wire_steps[i-1])
+		wire_edges_valid=wire_edges_valid and absf(absf(step.x)-24.0)<0.001 and absf(absf(step.y)-16.0)<0.001
+	check(wire_edges_valid,"online raster_preexpanded packet contains only real 24x16 diamond neighbours, not straight shortcuts")
 	# Legacy save or direct API request must not make a third mode.
 	game._set_render_mode("hybrid")
 	check(game.render_mode=="3d" and game.sim.classic_steering,"obsolete Hybrid request migrates to true 3D with same physical grid")
