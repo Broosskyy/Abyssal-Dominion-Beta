@@ -35,7 +35,13 @@ func _run() -> void:
 			if Vector2(frame.heading).dot(axis)<0.82:bad=true
 			previous_progress=course_progress
 		check(not bad and not backwards,"2D remains <=10 world px off actual straight course without backward curves: "+str(target))
-		check(max_side>=7.0,"2D retains a visible short classic raster rhythm: "+str(target))
+		var cardinality: float=absf(absf(axis.x)-absf(axis.y))
+		if cardinality<0.12:
+			check(max_side>0.7 and max_side<=2.1,"diagonal 2D pixel rhythm stays <=2.1 world px from 3D line: "+str(target))
+		elif cardinality>0.98:
+			check(max_side>=7.0 and max_side<=9.1,"cardinal Classic course retains the authentic wider NE/SE pixel rhythm: "+str(target))
+		else:
+			check(max_side>0.8 and max_side<=9.1,"oblique raster smoothly scales its jitter without visual turns: "+str(target))
 		check(origin.distance_to(Vector2(VIS.classic_tethered_raster(origin,target,origin).pos))<0.0001,"starting any diagonal course is seamless")
 		check(target.distance_to(Vector2(VIS.classic_tethered_raster(origin,target,target).pos))<0.0001,"finishing any diagonal course reaches exactly the 3D target")
 	# Real scene, real navigation and real 2D renderer; compare identical
@@ -74,7 +80,7 @@ func _run() -> void:
 		var frame_id: int=game._classic_frame_for_actor(game.sim.player)
 		if old_frame>=0 and frame_id!=old_frame:frame_switches+=1
 		old_frame=frame_id
-	check(track_ok and max_travel_error>=3.0,"2D upper-right course has visible microsteps but no extra physical curves")
+	check(track_ok and max_travel_error>0.5 and max_travel_error<=3.0,"2D upper-right raster is visible but strictly stays within 3 world px of the real 3D course")
 	check(game.sim.player.path==path_untouched and game.sim.player.heading.dot(course_dir)>0.99,"2D drawing did not add any waypoint or bend to the 3D world course")
 	var real_pos: Vector2=game.sim.player.pos
 	game.browser_classic=false
