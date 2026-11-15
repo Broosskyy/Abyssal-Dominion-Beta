@@ -435,11 +435,15 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 			else:
 				push_error("Unable to switch Corsair albedo without re-instancing the ship")
 		if node==null:continue
-		var point: Vector2=host._visual_actor_pos(actor)
-		# Project ground-plane centers onto the exact 2D chart positions.
-		# Only the mesh gets depth / perspective; taps and combat stay 2D.
+		# Native 3D presentation is independent of the REAL grid-step
+		# physics. Keep the mesh on the macro sailing bearing so it does
+		# not yaw NE/SE or rock laterally at every 24x16 tile crossing.
+		# The shared 2D/3D simulation, collision and online coordinates
+		# still follow exactly the same physical raster waypoints.
+		var pose: Dictionary=host._native_visual_pose(actor)
+		var point: Vector2=Vector2(pose.pos)
 		node.position=Vector3(point.x,0,center.y+(point.y-center.y)/foreshortening)
-		var heading: Vector2=actor.heading
+		var heading: Vector2=Vector2(pose.heading)
 		var desired_yaw: float=yaw_for_heading(heading)
 		# Spawn at correct nose direction; only subsequent turns are smoothed.
 		if newly_instanced:node.rotation.y=desired_yaw
