@@ -839,16 +839,12 @@ func _process(delta: float) -> void:
 	if camera_pad.visible and not modal.visible:_pan_camera(camera_pad.value,delta)
 	_classic_keyboard_pan(delta)
 	var render_player: Vector2=_visual_actor_pos(sim.player)
+	# Update 367: native 2D and 3D now have THE SAME automatic camera.
+	# The former Classic-only edge-scroll made a diagonally travelling
+	# captain cross the screen while 3D kept that captain centered; this
+	# exaggerated the raster offsets into seemingly different courses.
+	# Manual camera-pad exploration still unlocks following in both modes.
 	var goal: Vector2=render_player if camera_locked else camera_anchor
-	if browser_classic and camera_locked and loading_left<=0.0:
-		# During a region transition, _sync_region() recenters the camera
-		# before the edge-scrolling presentation resumes after loading.
-		# 208901 reference: captain crosses the screen; the map stays still.
-		# Only scroll once a visible safe-area edge is reached. Do NOT change
-		# player world coordinates, waypoint path or ship heading.
-		var world_view: Vector2=get_viewport_rect().size/maxf(camera.zoom.x,0.05)
-		goal=_classic_edge_camera_goal(render_player,camera.position,world_view)
-		camera_anchor=goal
 	pan=goal-render_player
 	if camera_locked:camera.position=goal
 	else:camera.position=camera.position.lerp(goal,1.0-exp(-delta*5.0))
@@ -1367,9 +1363,17 @@ func _classic_raster_visual(actor: Dictionary) -> Dictionary:
 func _classic_frame_for_actor(actor: Dictionary) -> int:
 	var id: int=int(actor.get("id",-1))
 	var sample: Dictionary=_classic_raster_visual(actor)
-	# While sailing Classic uses the four old diagonal sprite frames.
-	# Stopped ships retain their true 8-view heading from update 360.
-	var facing: int=VISUALS.heading_four(Vector2(sample.heading),int(classic_heading_cache.get(id,-1))) if not sample.is_empty() else VISUALS.heading_eight(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
+	var real_heading: Vector2=_classic_display_heading(actor)
+	# A diagonal target MUST display the actual NE/NW/SE/SW course, NOT
+	# the tangent of a fake 2D side-step. In 366, the 33-degree synthetic
+	# heading could turn an 8-way GLB sprite while the 3D hull went straight,
+	# creating the visual impression of extra corners/curves.
+	# Only almost cardinal courses use old alternating diagonal raster
+	# frames (east=>NE/SE, north=>NE/NW). This keeps their classic jitter.
+	var bearing: Vector2=real_heading.normalized()
+	var near_cardinal: bool=absf(absf(bearing.x)-absf(bearing.y))>=0.84
+	var previous: int=int(classic_heading_cache.get(id,-1))
+	var facing: int=VISUALS.heading_four(Vector2(sample.raster_heading),previous) if not sample.is_empty() and near_cardinal else VISUALS.heading_eight(real_heading,previous)
 	classic_heading_cache[id]=facing
 	return facing
 
