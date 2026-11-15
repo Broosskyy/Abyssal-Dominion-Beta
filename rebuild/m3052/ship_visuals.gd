@@ -34,6 +34,35 @@ static func heading_eight(heading: Vector2,previous: int=-1) -> int:
 		if absf(wrapf(heading.angle()-center,-PI,PI))<=PI*0.125+0.06:return previous
 	return posmod(roundi((heading.angle()+PI*0.5)/(PI*0.25)),8)
 
+## Classic 2D must NEVER draw an independent path around the course.
+## Draw its familiar pixel-raster judder as tiny 48px rhythm steps around
+## the real 3D/multiplayer line. 8px max side travel, no extra bends,
+## reversals or A* waypoints. The same geometry works for all bearings.
+static func classic_tethered_raster(start: Vector2,goal: Vector2,world: Vector2,initial_offset: Vector2=Vector2.ZERO) -> Dictionary:
+	var delta: Vector2=goal-start
+	var length: float=delta.length()
+	if length<=0.0001:return {}
+	var forward: Vector2=delta/length
+	var side: Vector2=Vector2(-forward.y,forward.x)
+	# Position comes ONLY from the authoritative world movement.
+	var travelled: float=clampf((world-start).dot(forward),0.0,length)
+	var distance_left: float=length-travelled
+	# One complete 48px cycle, equivalent to alternating 24x16 edges
+	# when sailing east/west. Starts at zero, so course changes don't jump.
+	var phase: float=fposmod(travelled/48.0+0.25,1.0)
+	var triangle: float=1.0-4.0*absf(phase-0.5)
+	var edge_fade: float=clampf(minf(travelled,distance_left)/18.0,0.0,1.0)
+	var lateral: float=8.0*triangle*edge_fade
+	# Keep continuity if a tap redirects the captain mid-sprite step.
+	var old_fade: float=clampf(1.0-travelled/24.0,0.0,1.0)
+	var offset: Vector2=side*lateral+initial_offset*old_fade
+	if offset.length_squared()>100.0:offset=offset.normalized()*10.0
+	# The picture follows the local microstep, but physical headings
+	# and 3D meshes remain completely independent of this visual sample.
+	var slope: float=(2.0/3.0) if phase<0.5 else (-2.0/3.0)
+	return {"pos":world+offset,"heading":(forward+side*slope).normalized(),
+		"offset":offset,"progress":travelled}
+
 ## Draw along the SAME physical diagonal sublegs that the 30 Hz tile-grid simulation
 ## traversed. Interpolating only the tick endpoints cuts corners and makes
 ## the ship slide sideways whenever a tick straddles two raster legs.
