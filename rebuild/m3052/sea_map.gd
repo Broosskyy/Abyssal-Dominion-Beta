@@ -718,6 +718,14 @@ func _native_visual_pose(actor: Dictionary) -> Dictionary:
 	if path.is_empty():
 		if previous.is_empty():
 			return {"pos":world,"heading":physical_heading}
+		# Respawns, remote corrections, region changes, and manually moved
+		# test actors may be relocated WHILE idle. Their old smoothed resting
+		# pose is NOT valid at a new world coordinate: reset it immediately.
+		# Keep the generous 12px threshold above one normal 30Hz ship step.
+		var last_world: Vector2=Vector2(previous.get("last_world",world))
+		if world.distance_to(last_world)>12.0:
+			native_course_poses.erase(id)
+			return {"pos":world,"heading":physical_heading}
 		var held_heading: Vector2=Vector2(previous.get("heading",physical_heading))
 		# A route can end unexpectedly (blocked coast, cancel, port).
 		# Never jump a displayed hull 10-30px on the first stopped frame.
@@ -732,6 +740,7 @@ func _native_visual_pose(actor: Dictionary) -> Dictionary:
 		var eased: float=1.0-pow(1.0-rest_progress,3.0)
 		var stopped: Vector2=Vector2(previous["rest_origin"]).lerp(world,eased)
 		previous["visual"]=stopped
+		previous["last_world"]=world
 		return {"pos":stopped,"heading":held_heading}
 	var goal: Vector2=Vector2(path[0])
 	var changed: bool=previous.is_empty() or Vector2(previous.get("goal",Vector2.ZERO)).distance_squared_to(goal)>0.01 or previous.has("rest_at")
