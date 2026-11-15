@@ -53,9 +53,12 @@ func _run() -> void:
 	var dist: float=0.0
 	for frame in 650:
 		if sim.player.path.is_empty():break
-		var before: Vector2=sim.player.pos
 		sim._move(sim.player,1.0/30.0)
-		dist+=before.distance_to(Vector2(sim.player.pos))
+		# A 30Hz simulation tick may cross a real 24x16 corner. Summing
+		# endpoint distances would falsely cut the corner and undercount
+		# the actual sailed length; use recorded physical microsegments.
+		for leg: Dictionary in sim.player.get("_iso_tick_segments",[]):
+			dist+=float(leg.get("distance",0.0))
 		max_cross=maxf(max_cross,absf(sim.player.pos.y-origin.y))
 	check(max_cross>=8.0 and max_cross<35.0 and sim.player.pos.distance_to(snapped)<0.01 and sim.player.path.is_empty(),"physical ship really alternates +/-16px diagonal tile heights")
 	var expected_sailed: float=0.0
