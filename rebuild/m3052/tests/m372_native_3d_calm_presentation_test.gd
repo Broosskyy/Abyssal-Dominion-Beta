@@ -56,7 +56,10 @@ func _run() -> void:
 		check(stable,"3D hull never turns NE/SE at individual physical raster crossings "+str(delta))
 		check(max_visual_side<=1.5,"3D hull has a calm visual travel line without side-to-side wobble "+str(delta))
 		check(max_visual_gap<=30.01,"3D visuals stay <=30 world px from authoritative grid physics "+str(delta))
-		check(max_world_side>=5.0,"underlying 3D real world movement STILL follows original raster "+str(delta))
+		# Pure 24x16 diagonal tile axes already ARE straight physical
+		# raster routes and should never be forced to wobble for a test.
+		var exact_grid_axis: bool=absf(absf(delta.x)/24.0-absf(delta.y)/16.0)<0.001
+		check(max_world_side>=5.0 or exact_grid_axis,"underlying 3D world route keeps real isometric microsteps (some diagonals are naturally straight): "+str(delta))
 		check(game.sim.player.pos.distance_to(target)<0.01 and game.sim.player.path.is_empty(),"both modes physically reach exactly the same tile "+str(delta))
 	# A mid-sail switch must not change the 3D course or progress.
 	game.sim.player.pos=origin
