@@ -1,7 +1,7 @@
 extends SceneTree
-## Regression for the two supplied Nov 15 recordings: the old Classic
-## edge camera and fake raster-facing made straight upper-right sailing
-## look different from 3D even when multiplayer coordinates matched.
+## Mode contract: only course and physical sailing coordinates must match.
+## Classic 2D may use independent camera framing and sprite raster animation
+## while 3D remains centered on the vessel.
 const VIS=preload("res://ship_visuals.gd")
 var checks: int=0
 var failures: Array[String]=[]
@@ -32,15 +32,18 @@ func _run() -> void:
 		for classic: bool in [false,true,false]:
 			game.browser_classic=classic
 			game.camera_locked=true
-			# Deliberately begin far from captain, like the posted 2D
-			# recording; 3D and 2D must snap to identical player-follow.
-			game.camera.position=world+Vector2(330,-240)
+			var before_camera: Vector2=world+Vector2(330,-240)
+			game.camera.position=before_camera
 			game.camera.zoom=Vector2.ONE*parity_zoom
+			var expected: Vector2=game._classic_edge_camera_goal(world,before_camera,Vector2(dims)/parity_zoom) if classic else world
 			game._process(0.0)
-			check(game.camera.position.distance_to(world)<0.001,"locked camera follows exactly on both modes, %s, Classic=%s" % [dims,classic])
-			var screen_pos: Vector2=game.get_canvas_transform()*world
-			check(screen_pos.distance_to(Vector2(dims)*0.5)<1.2,"locked camera always centers the same captain on %s" % dims)
-			check(is_equal_approx(game._sharp_zoom(),parity_zoom) and is_equal_approx(game._actor_visual_length(game.sim.player),parity_hull),"same zoom and ship size across views on %s" % dims)
+			check(game.camera.position.distance_to(expected)<0.001,"Classic retains independent edge framing, native 3D centers captain on %s" % dims)
+			if not classic:
+				var screen_pos: Vector2=game.get_canvas_transform()*world
+				check(screen_pos.distance_to(Vector2(dims)*0.5)<1.2,"3D keeps captain centered on %s" % dims)
+			else:
+				check(game.camera.position.distance_to(world)>1.0,"2D Classic camera no longer forced to follow 3D framing on %s" % dims)
+			check(is_equal_approx(game._sharp_zoom(),parity_zoom) and is_equal_approx(game._actor_visual_length(game.sim.player),parity_hull),"shared current zoom and ship size preferences not changed by camera split on %s" % dims)
 	# Leave manual camera-joystick exploration working in either mode.
 	game.browser_classic=true
 	game._recenter_camera()
