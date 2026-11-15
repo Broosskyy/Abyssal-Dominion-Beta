@@ -727,13 +727,14 @@ func _native_visual_pose(actor: Dictionary) -> Dictionary:
 	if changed:
 		# A new click changes only the visual long-range bearing;
 		# no re-centering, teleport, physical steering or offsets.
-		previous={"goal":goal,"start":world,"last_world":world,"heading":heading}
+		previous={"goal":goal,"start":world,"last_world":world,
+			"heading":heading,"straight_clear":sim.segment_free(world,goal,2.0)}
 		native_course_poses[id]=previous
 	var start: Vector2=Vector2(previous["start"])
 	var macro: Vector2=goal-start
 	if macro.length_squared()>0.001:
 		heading=macro.normalized()
-	if not sim.segment_free(start,goal,2.0):
+	if not bool(previous.get("straight_clear",true)):
 		# For a true A* island detour look a few physical grid steps ahead
 		# so the bow turns along the coast instead of pointing through it.
 		# Position STILL equals the current true 48x32 grid location.
