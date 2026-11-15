@@ -38,8 +38,9 @@ static func classic_world_to_tile(world: Vector2) -> Vector2i:
 				selected=candidate
 	return selected
 
-## Legacy exact 24x16 tile-walk, retained for historical QA reference only.
-## Live player and NPC sailing now use classic_water_route() instead.
+## Physical 48x32 tile-walk, used by BOTH real 2D and real 3D sailing.
+## Every full leg follows one of the four 24x16 diamond edges. This is
+## the Seafight-era raster path, NOT a client-side animation offset.
 ## High-level pathfinder handles blocked shorelines; this stage chooses
 ## exactly one of four actual tile neighbours until the last small
 ## correction to the clicked coordinate. No view animation or oscillation
@@ -107,21 +108,17 @@ static func classic_iso_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
 		path.append(goal)
 	return path
 
-## The 48x32 lattice selects the clicked tile but never dictates the
-## physical ship trajectory. This one segment is shared by 2D and 3D.
+## Open sea also uses the real 48x32 lattice. The old implementation
+## returned [goal], forcing a dead-straight physical path and hiding all
+## zigzag tile motion inside a fake sprite animation.
 static func classic_water_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
-	var result: Array[Vector2]=[]
-	if start.distance_squared_to(goal)>0.0001:result.append(goal)
-	return result
+	return classic_iso_route(start,goal)
 
 
-## One tile-aware course for Classic gameplay, including coasts.
-## The old approach planned a path on a SQUARE 48px AStar grid, smoothed it
-## into arbitrary floating-point waypoints and then converted EACH waypoint
-## to diagonal motion. Whenever a tile microstep clipped an island it fell
-## back to a STRAIGHT segment: a hidden renderer/movement mismatch.
-## Use four-neighbour 48x32 diamond A* instead. Open sea keeps the exact
-## 344 greedy course (including its visual step rhythm) unchanged.
+## One physical diamond-grid course for all graphics and all coasts.
+## First attempt the cross-track-balanced four-neighbour greedy tile
+## route. If any real tile edge clips land, calculate an obstacle-safe
+## four-neighbour A* detour with no straight-line smoothing.
 static func classic_safe_route(start: Vector2,goal: Vector2,segment_clear: Callable,max_visited: int=16000) -> Array[Vector2]:
 	var direct: Array[Vector2]=classic_water_route(start,goal)
 	var previous: Vector2=start
@@ -168,7 +165,9 @@ static func classic_safe_route(start: Vector2,goal: Vector2,segment_clear: Calla
 			if start.distance_squared_to(begin_center)>0.0001:result.append(begin_center)
 			result.append_array(reverse)
 			if result.is_empty() or result[-1].distance_squared_to(goal)>0.0001:result.append(goal)
-			return _smooth_coastal_route(start,result,segment_clear)
+			# The coastline route stays on the same four diamond neighbours.
+			# Do not smooth the A* result into direct visual/physics shortcuts.
+			return result
 		touched+=1
 		var center: Vector2=classic_tile_center(cell)
 		for delta: Vector2i in directions:
@@ -189,9 +188,8 @@ static func classic_safe_route(start: Vector2,goal: Vector2,segment_clear: Calla
 	return []
 
 
-## Collapse the island A* tile itinerary into long safe straight legs.
-## Keep the A* coastline clearance but never physically draw every diamond
-## grid edge. This also keeps online route packets compact (<=512 points).
+## Legacy utility (not called by physical Seafight raster navigation):
+## historic shortcut smoothing would erase the four real grid directions.
 static func _smooth_coastal_route(start: Vector2,rough: Array[Vector2],segment_clear: Callable) -> Array[Vector2]:
 	var result: Array[Vector2]=[]
 	var anchor: Vector2=start
