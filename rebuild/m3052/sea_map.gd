@@ -88,6 +88,9 @@ var wake_tracks: Dictionary = {}
 # 361: 2D ONLY. Keeps the old 48x32 visual raster separate from 3D,
 # multiplayer world positions, collision and shared ship movement.
 var classic_raster_visuals: Dictionary = {}
+# 3D only: stable visual pose derived from the same REAL four-neighbour
+# raster position. No pathfinding, hitbox or multiplayer positions change.
+var native_course_poses: Dictionary = {}
 const WAKE_LIFETIME := 1.35
 const WAKE_SAMPLE_INTERVAL := 0.11
 
@@ -698,6 +701,50 @@ func _visual_actor_pos(actor: Dictionary) -> Vector2:
 	if not stepped.is_empty():return Vector2(stepped.pos)
 	return previous.lerp(latest,clampf(accumulator/SIMULATION_TICK,0.0,1.0))
 
+## 3D-only presentation. Physical 2D/3D positions still take every
+## authentic 24x16 raster edge; the native GLB hull visually glides along
+## the overall click bearing instead of steering NE/SE at every tiny tile.
+## A maximum 30px display correction bounds any discrepancy with hitboxes.
+## Classic 2D never invokes this projection and retains every real step.
+func _native_visual_pose(actor: Dictionary) -> Dictionary:
+	var world: Vector2=_visual_actor_pos(actor)
+	var heading: Vector2=Vector2(actor.get("heading",Vector2.RIGHT))
+	var id: int=int(actor.get("id",-1))
+	if browser_classic or str(actor.get("kind","ship"))!="ship":
+		return {"pos":world,"heading":heading}
+	var previous: Dictionary=native_course_poses.get(id,{})
+	var path: Array=actor.get("path",[])
+	if path.is_empty():
+		# At arrival keep the last macro bearing. Otherwise the final
+		# diagonal microstep would abruptly turn a now-stopped 3D hull.
+		return {"pos":world,"heading":Vector2(previous.get("heading",heading))}
+	var goal: Vector2=Vector2(path[0])
+	var changed: bool=previous.is_empty() or Vector2(previous.get("goal",Vector2.ZERO)).distance_squared_to(goal)>0.01
+	if not changed and Vector2(previous.get("last_world",world)).distance_to(world)>120.0:changed=true
+	if changed:
+		var carried_offset: Vector2=Vector2.ZERO
+		if not previous.is_empty():
+			var last_visible: Vector2=Vector2(previous.get("visual",world))
+			if last_visible.distance_to(world)<=30.0:carried_offset=last_visible-world
+		previous={"goal":goal,"start":world,"last_world":world,
+			"visual":world+carried_offset,"carry":carried_offset}
+		native_course_poses[id]=previous
+	var start: Vector2=Vector2(previous["start"])
+	var route: Vector2=goal-start
+	if route.length_squared()<=0.001:return {"pos":world,"heading":heading}
+	var forward: Vector2=route.normalized()
+	var travelled: float=clampf((world-start).dot(forward),0.0,route.length())
+	# Project only the MESH/CAMERA presentation, never the simulated ship.
+	var displayed: Vector2=start+forward*travelled
+	var fade: float=clampf(1.0-travelled/32.0,0.0,1.0)
+	displayed+=Vector2(previous.get("carry",Vector2.ZERO))*fade
+	if displayed.distance_to(world)>30.0:
+		displayed=world.move_toward(displayed,30.0)
+	previous["visual"]=displayed
+	previous["last_world"]=world
+	previous["heading"]=forward
+	return {"pos":displayed,"heading":forward}
+
 # Ships must leave trails only while actually moving; using 'path' alone
 # painted foam even when a hull was blocked by islands or sitting in port.
 func wake_motion_strength(measured: float,cruising: float) -> float:
@@ -719,7 +766,7 @@ func _update_wake_tracks(delta: float) -> void:
 		if int(actor.hp)<=0:continue
 		var id: int=int(actor.id)
 		alive[id]=true
-		var point: Vector2=_visual_actor_pos(actor)
+		var point: Vector2=_visual_actor_pos(actor) if browser_classic else Vector2(_native_visual_pose(actor).pos)
 		if not wake_tracks.has(id):
 			wake_tracks[id]={"last":point,"speed":0.0,"points":[],"sample_time":elapsed}
 			continue
@@ -834,13 +881,14 @@ func _process(delta: float) -> void:
 		ring_target_acquired_at=elapsed if ring_last_target>0 else -100.0
 	if previous_region!=sim.map_id:
 		wake_tracks.clear()
+		native_course_poses.clear()
 		_sync_region()
 	_update_online_ships(delta)
 	_update_wake_tracks(delta)
 	if loading_left>0:_advance_loading(delta)
 	if camera_pad.visible and not modal.visible:_pan_camera(camera_pad.value,delta)
 	_classic_keyboard_pan(delta)
-	var render_player: Vector2=_visual_actor_pos(sim.player)
+	var render_player: Vector2=_visual_actor_pos(sim.player) if browser_classic else Vector2(_native_visual_pose(sim.player).pos)
 	# The physical sailing position, destination, and multiplayer path are
 	# shared. Camera framing is NOT shared: 3D locks to the captain whereas
 	# Classic 2D uses its original sea-chart edge-follow presentation.
@@ -1228,7 +1276,7 @@ func _draw_actor(actor: Dictionary) -> void:
 		return
 	var is_player = int(actor.id)==0
 	var point: Vector2=_classic_actor_render_pos(actor)
-	var heading: Vector2=_classic_display_heading(actor) if browser_classic else Vector2(actor.heading)
+	var heading: Vector2=_classic_display_heading(actor) if browser_classic else Vector2(_native_visual_pose(actor).heading)
 	var length=_actor_visual_length(actor)
 	# Both renderers use cheap line/circle foam at the same water footprint.
 	_draw_bow_spray(actor,point,heading,length)
@@ -1344,7 +1392,7 @@ func _classic_frame_for_actor(actor: Dictionary) -> int:
 
 func _classic_actor_render_pos(actor: Dictionary) -> Vector2:
 	var actual_position: Vector2=_visual_actor_pos(actor)
-	if not browser_classic:return actual_position
+	if not browser_classic:return Vector2(_native_visual_pose(actor).pos)
 	if str(actor.get("kind",""))!="ship" and int(actor.get("id",-1))!=0 and not bool(actor.get("remote_player",false)):return actual_position
 	var raster: Dictionary=_classic_raster_visual(actor)
 	if not raster.is_empty():actual_position=Vector2(raster.pos)
@@ -5197,6 +5245,7 @@ func _set_render_mode(value: String) -> void:
 	# Preserve course, heading, world position, speed and zoom identically.
 	classic_heading_cache.clear()
 	classic_raster_visuals.clear()
+	native_course_poses.clear()
 	if ocean!=null:ocean.set_shader_parameter("web_classic",browser_classic)
 	_persist_display_preferences();_apply_web_performance()
 	if camera!=null:_sync_plate_overlay()
