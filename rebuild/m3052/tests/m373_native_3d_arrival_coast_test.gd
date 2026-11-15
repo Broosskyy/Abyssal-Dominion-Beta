@@ -115,6 +115,24 @@ func _run() -> void:
 	check(avoided,"3D visible hull stays exactly on real A* collision-safe grid steps")
 	check(never_blocked,"coastal 3D displayed hull never enters island collision geometry")
 	check(game.sim.player.pos.distance_to(coast_goal)<0.001,"coastal 3D physically arrives at clicked tile")
+	# Regression: a stationary NPC that is moved/respawned must not keep
+	# its previous resting 3D pose. Otherwise Android touches miss.
+	game.sim.npcs.clear()
+	var idle: Dictionary=game.sim.base_npcs[0].duplicate(true)
+	idle.pos=origin
+	idle.path=[origin+Vector2(576,0)]
+	game.native_course_poses.clear()
+	game.sim.npcs.append(idle)
+	game._native_visual_pose(idle)
+	idle.path=[]
+	game._native_visual_pose(idle)
+	idle.pos=origin+Vector2(155,80)
+	var relocated: Dictionary=game._native_visual_pose(idle)
+	check(Vector2(relocated.pos).distance_to(idle.pos)<0.001,"idle NPC respawn clears stale 3D rest pose instead of leaving artwork at old world position")
+	game.camera.position=idle.pos
+	game.camera.force_update_scroll()
+	var touch_point: Vector2=game.get_canvas_transform()*(idle.pos-Vector2(0,25))
+	check(game._enemy_at_screen(touch_point)==int(idle.id),"Android single tap selects visible respawned 3D ship, not its old position")
 	game.queue_free()
 	print(JSON.stringify({"checks":checks,"failures":failures,"status":"PASS" if failures.is_empty() else "FAIL"}))
 	quit(0 if failures.is_empty() else 1)
