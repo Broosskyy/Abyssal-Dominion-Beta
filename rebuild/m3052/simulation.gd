@@ -257,7 +257,7 @@ func plan_path(start: Vector2, goal: Vector2) -> Array[Vector2]:
 	var result: Array[Vector2] = []
 	if blocked(goal):
 		return result
-	if segment_free(start, goal):
+	if segment_free(start, goal, 2.0):
 		result.append(goal)
 		return result
 	var a = Vector2i(start / CELL)
@@ -269,7 +269,7 @@ func plan_path(start: Vector2, goal: Vector2) -> Array[Vector2]:
 		for y in range(-2, 3):
 			for x in range(-2, 3):
 				var n = a + Vector2i(x, y)
-				if grid.is_in_boundsv(n) and not grid.is_point_solid(n) and segment_free(start, grid.get_point_position(n)):
+				if grid.is_in_boundsv(n) and not grid.is_point_solid(n) and segment_free(start, grid.get_point_position(n), 2.0):
 					a = n
 					found = true
 					break
@@ -281,14 +281,14 @@ func plan_path(start: Vector2, goal: Vector2) -> Array[Vector2]:
 	while index < raw.size():
 		var furthest = index
 		for j in range(index, raw.size()):
-			if segment_free(current, raw[j]): furthest = j
+			if segment_free(current, raw[j], 2.0): furthest = j
 			else: break
-		if not segment_free(current, raw[furthest]): return []
+		if not segment_free(current, raw[furthest], 2.0): return []
 		if current.distance_to(raw[furthest]) > 1:
 			result.append(raw[furthest])
 		current = raw[furthest]
 		index = furthest + 1
-	if segment_free(current, goal): result.append(goal)
+	if segment_free(current, goal, 2.0): result.append(goal)
 	return result
 
 func plan_actor_path(body: Dictionary,goal: Vector2) -> Array[Vector2]:
