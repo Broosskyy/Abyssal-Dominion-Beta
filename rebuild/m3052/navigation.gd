@@ -78,13 +78,28 @@ static func classic_iso_route(start: Vector2,goal: Vector2) -> Array[Vector2]:
 					best_score=score
 					goal_tile=candidate
 	var tile: Vector2i=origin_tile
-	# A restored or spawned captain may start a few pixels away from an
-	# authentic tile centre. Smoothly finish that short alignment once,
-	# then ALL following legs are exactly 24x16. The retap logic holds
-	# the current committed leg to its centre before planning a new path.
+	# A ship mid-way through a physical 24x16 microleg may receive a
+	# new click. NEVER steer back to the nearest tile centre when it lies
+	# BEHIND the new course (that was another visible diagonal U-turn).
+	# Instead select the nearest safe forward centre among its four
+	# global lattice neighbours. This one short alignment never teleports;
+	# all subsequent full steps follow 24x16 exactly.
 	var origin_center: Vector2=classic_tile_center(origin_tile)
 	if start.distance_squared_to(origin_center)>0.0001:
-		path.append(origin_center)
+		var best: float=INF
+		var possibilities: Array[Vector2i]=[origin_tile,
+			origin_tile+Vector2i(1,0),origin_tile+Vector2i(0,1),
+			origin_tile+Vector2i(-1,0),origin_tile+Vector2i(0,-1)]
+		for candidate: Vector2i in possibilities:
+			var candidate_pos: Vector2=classic_tile_center(candidate)
+			var first: Vector2=candidate_pos-start
+			if first.dot(direct)<-0.0001:continue
+			var steps_left: int=absi(goal_tile.x-candidate.x)+absi(goal_tile.y-candidate.y)
+			var score: float=first.length()+float(steps_left)*Vector2(ISO_HALF_X,ISO_HALF_Y).length()+0.15*absf(first.cross(direct))
+			if score<best:
+				best=score
+				tile=candidate
+		path.append(classic_tile_center(tile))
 	var max_steps: int=absi(goal_tile.x-tile.x)+absi(goal_tile.y-tile.y)
 	for step in mini(max_steps,2048):
 		var move_q: bool=tile.x!=goal_tile.x
