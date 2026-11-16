@@ -2232,10 +2232,10 @@ func _layout() -> void:
 	quick_bar.mobile_first=mobile_hud
 	# Keep all three page tabs at least 44px wide as well as tall in
 	# compact landscape; grow the rail to the left, away from combat orbs.
-	var touch_extra: float=20.0 if mobile_hud else 0.0
+	var touch_extra: float=16.0 if mobile_hud else 0.0 # 3×44px tabs + 44px edit + 2×3px spacing
 	var quick_w: float=orb*3.0+gap*2.0+touch_extra
 	var quick_h: float=orb+quick_bar.tab_height()+4.0
-	var quick_x: float=(pad+18.0 if camera_pad_visible else 18.0) if mobile_hud else left+column-20.0
+	var quick_x: float=(pad+15.0 if camera_pad_visible else 18.0) if mobile_hud else left+column-20.0
 	var quick_y: float=s.y-quick_h-12.0 if mobile_hud else s.y-quick_h-10.0
 	_place(quick_bar,quick_x,quick_y,quick_w,quick_h)
 	quick_bar._layout()
