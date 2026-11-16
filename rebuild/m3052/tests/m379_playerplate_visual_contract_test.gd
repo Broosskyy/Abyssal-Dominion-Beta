@@ -44,6 +44,19 @@ func _run() -> void:
 	var points: Array[Vector2]=game._player_reference_ring_points(start,ring)
 	check(points.size()==44,"player ring remains a fine 44-dot ellipse")
 	check(game._selection_ring_tint(player)==Color("31e65d"),"green player identity independent of model paint")
+	# Authentic parked Classic ship must keep diagonal 3/4 sprite framing
+	# instead of the previous top-down cardinal 8-view image.
+	var was_classic: bool=game.browser_classic
+	game.browser_classic=true
+	var parked: Dictionary=player.duplicate(true)
+	parked["id"]=93781
+	parked["kind"]="ship"
+	parked["path"]=[]
+	for direction: Vector2 in [Vector2.UP,Vector2.RIGHT,Vector2.DOWN,Vector2.LEFT]:
+		parked["heading"]=direction
+		check(game._classic_frame_for_actor(parked) in [1,3,5,7],"parked Classic ship uses oblique 3/4 framing for "+str(direction))
+	game.classic_heading_cache.erase(93781)
+	game.browser_classic=was_classic
 	var original_skin: int=int(player.skin)
 	for skin in [1,2,11,12,13]:
 		player.skin=skin
