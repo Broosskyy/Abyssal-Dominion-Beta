@@ -162,7 +162,8 @@ func run() -> void:
 	# Original 48x32 isometric visual bearings are +/-atan(32/48)
 	# (~33.69 degrees), NOT +/-45-degree compass renders.
 	var expected_chart_iso: float=atan2(32.0,48.0)
-	var expected_model_yaw: float=atan2(32.0,48.0*cos(deg_to_rad(MESH_LAYER.FLEET_CAMERA_TILT_DEGREES)))
+	# M379 browser atlas uses the SAME 48° 3/4 view as native true 3D.
+	var expected_model_yaw: float=atan2(32.0,48.0*cos(deg_to_rad(MESH_LAYER.FULL_3D_CAMERA_TILT_DEGREES)))
 	var classic_frames: Array=game.classic_geometry.get("schattenkriegsschiff_shaded",{}).get("frames",[])
 	check(classic_frames.size()==8,"captain GLB is baked to eight distinct 2D frames")
 	if classic_frames.size()==8:

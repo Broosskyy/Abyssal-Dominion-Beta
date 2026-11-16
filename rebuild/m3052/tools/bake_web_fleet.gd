@@ -80,7 +80,9 @@ func _prepare_view() -> void:
 	camera.far=100.0
 	viewport.add_child(camera)
 	var focus=Vector3(0,.47,0)
-	var tilt=deg_to_rad(MESH.FLEET_CAMERA_TILT_DEGREES)
+	# Browser 2D uses the SAME 3/4 elevated camera as native true 3D.
+	# Heading-specific source GLB poses still determine actual direction.
+	var tilt=deg_to_rad(MESH.FULL_3D_CAMERA_TILT_DEGREES)
 	camera.position=focus+Vector3(0,cos(tilt)*9.0,sin(tilt)*9.0)
 	camera.look_at(focus,Vector3(0,0,-1))
 	camera.current=true
@@ -170,10 +172,10 @@ func _render_atlas(key: String,paint: int,name: String) -> bool:
 		# the same untouched GLB geometry.
 		var heading_angle: float=-PI*.5+float(heading_index)*PI*.25
 		# Isometric geometry specifies the SCREEN-space 48:32 slope.
-		# The model is rendered through a 40-degree tilted orthographic
-		# camera, which foreshortens world Z by cos(tilt). Bake the world
+		# The model is rendered through the native full-3D orthographic
+		# 3/4 camera, which foreshortens world Z by cos(tilt). Bake the world
 		# yaw that will project to precisely atan(32/48) on the 2D chart.
-		var view_cos: float=cos(deg_to_rad(MESH.FLEET_CAMERA_TILT_DEGREES))
+		var view_cos: float=cos(deg_to_rad(MESH.FULL_3D_CAMERA_TILT_DEGREES))
 		var iso_world_angle: float=atan2(32.0,48.0*view_cos)
 		match heading_index:
 			1:heading_angle= -iso_world_angle

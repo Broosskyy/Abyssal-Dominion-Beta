@@ -1,5 +1,5 @@
 {
-  "source_sha": "8f42a88c295d5949a8b8cbd723a9ae980c430f62",
-  "release": "browser-test-203",
-  "branch": "feat/m378-reference-playerplate-ring-decks"
+  "source_sha": "c116866bf338944f8a60c1ef8c8fc05b31eed105",
+  "release": "browser-test-207",
+  "branch": "fix/m379-reference-hud-ring-camera-polish"
 }
