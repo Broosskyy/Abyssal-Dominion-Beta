@@ -1,5 +1,5 @@
 {
-  "source_sha": "179ef436cace7cdd18c060c22d11c510a4087360",
-  "release": "browser-test-173",
-  "branch": "feat/shared-2d-3d-raster-navigation-346"
+  "source_sha": "856c6f89b3c7217578b846754eca532ae8cf47df",
+  "release": "browser-test-200",
+  "branch": "fix/m377-browser-regression-mobile-hud"
 }
