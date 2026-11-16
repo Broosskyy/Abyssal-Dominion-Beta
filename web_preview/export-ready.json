@@ -1,5 +1,5 @@
 {
-  "source_sha": "4ee65507eaf79a35bb1669789fee39c387d5f9c1",
-  "release": "browser-test-218",
-  "branch": "fix/m380-reference-ship-ring-deck-readability"
+  "source_sha": "6dc44c1e758b9af1001000a4208e88e7100ce22c",
+  "release": "browser-test-225",
+  "branch": "feat/m383-modular-deck-extensions-mojo"
 }
