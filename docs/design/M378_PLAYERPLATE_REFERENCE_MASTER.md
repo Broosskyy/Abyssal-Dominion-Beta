@@ -1,6 +1,6 @@
 # Abyssal Dominion · M378 Playerplate / Deck / Schiffsansicht – Masterregel
 
-Status: **verbindliche Gestaltungsvorgabe**, basierend auf den vom Projektinhaber bereitgestellten Bildern `208798.gif`, `208799.gif`, `208801.jpg`, `208802.jpg`, `208803.jpg` (16.11.2026). Keine Übernahme von Fremdgrafiken. Alle Ornamente sind eigenständig gezeichnete, kleine Vektorelemente.
+Status: **verbindliche Gestaltungsvorgabe nach M379-Screenshotkorrektur**, basierend auf den vom Projektinhaber bereitgestellten Bildern `208798.gif`, `208799.gif`, `208801.jpg`, `208802.jpg`, `208803.jpg` (16.11.2026). Keine Übernahme von Fremdgrafiken. Alle Ornamente sind eigenständig gezeichnete, kleine Vektorelemente.
 
 ## Bildreferenzen richtig interpretiert
 
@@ -13,7 +13,7 @@ Status: **verbindliche Gestaltungsvorgabe**, basierend auf den vom Projektinhabe
 ## Verbindlicher Aufbau des Spielerschiffs
 
 1. **Schiff selbst:** Original-GLB im nativen 3D-Modus; Browser/Classic rendert die aus genau diesen GLBs erzeugten 8 Blickwinkel. Schräg von oben (3/4-Draufsicht), bugwärts korrekt, Masten/Segel nicht spiegeln. Keine Zweitmodelle, keine andere physische Flugbahn. Bestehende Kameraorientierung beibehalten, bis direkte ingame Vergleichsaufnahmen eine sichere Anpassung erlauben.
-2. **Grüner Ring:** Eine einzige, im Wasser liegende **punktierte Ellipse** um das eigene Schiff mit **44 gleichmäßig verteilten Punkten**; Farbe `#31E65D`, unabhängig von Schiffsdesign, Rang oder temporären Buffs. Ellipsenradien für das eigene Schiff aus Modell-Länge `max(36, length×0.44)` und `max(16, length×0.185)`. Die Kreislinie bleibt sehr schwach. Keine Leuchtplatte oder 3D-Hovering-Platform, keine Änderung der Hitbox/Klickkoordinaten. Ein Zielgegner behält seine eigene, andersfarbige Zielmarkierung.
+2. **Grüner Ring:** Eine einzige, im Wasser liegende **punktierte Ellipse** um das eigene Schiff mit **44 gleichmäßig verteilten Punkten**; Farbe `#31E65D`, unabhängig von Schiffsdesign, Rang oder temporären Buffs. Ellipsenradien für das eigene Schiff aus Modell-Länge `max(36, length×0.38)` und `max(16, length×0.145)`; der Mittelpunkt liegt um `length×0.065` tiefer an der Wasserlinie. Die Kreislinie bleibt sehr schwach. Keine Leuchtplatte oder 3D-Hovering-Platform, keine Änderung der Hitbox/Klickkoordinaten. Ein Zielgegner behält seine eigene, andersfarbige Zielmarkierung.
 3. **Name:** direkt unter dem Rumpf, horizontal mittig. `(Piratenrang-Icon) [Gildenkürzel] Spielername (BP/PvP-Rang-Icon)`. Gildenkürzel goldgelb, übriger Name gut lesbar. Nur Admin-/Teamrollen bei Berechtigung ergänzen.
 4. **Darunter:** Spieler-ID dezent; schmale **grüne HP-Leiste** sowie **blaue Schildleiste**. Die Referenz zeigt verschiedene HP/VP-Farbvarianten; Abyssal behält sein funktionierendes HP-Grün/Schild-Blau für konsistentes Gameplay. **Keine HP-Zahlen am Schiff**; die Zahlen sind im oberen HUD.
 5. **Deckabzeichen:** unmittelbar unter den Leisten, **kein schwebendes Kartensystem** und keine leeren großen Quadrate. Zwei Schädel über einer mittigen Zahl, Kronen links/rechts, feine metallische Zierarme, unterer kleiner Schädel. Unten **zehn winzige echte Statusmarkierungen** in zwei Reihen zu fünf. Farbe entspricht dem realen Standarddeck-Material (Gold/Perlen/Kristall); leer = dunkel.
@@ -24,7 +24,7 @@ Status: **verbindliche Gestaltungsvorgabe**, basierend auf den vom Projektinhabe
 
 - Name und zugehörige Icons: vorhandene, scharfe native Schrift in der separaten `ShipPlateScreenSpace`-Ebene; keine Größenänderung beim Schwenken des 3D-Modells.
 - Grüner Ring: Skala mit tatsächlicher Schifflänge **im Spielraum**; Bead-Dicke in Bildschirmpixeln stabil bei Zoom.
-- Deckabzeichen: lokale Referenzskalierung `r=6×_plate_pixels()`. Symmetrische Kronen etwa `±7.25r`; zwei Schädel `±1.36r`. Mittelzahl `y=2.05r`, Untericon `y=4.05r`, zehn Statusmarkierungen `y=5.45r`.
+- Deckabzeichen: lokale Referenzskalierung `r=5.5×_plate_pixels()`. Symmetrische Kronen etwa `±6.5r`; zwei Schädel `±1.20r`. Mittelzahl `y=1.9r`, Untericon `y=3.95r`, zehn Statusmarkierungen `y=5.5r`.
 - Überlagerungen vermeiden: Deckabzeichen nur unter den HP/Schildstreifen, niemals in das eigene Segel oder benachbarte Menü-Buttons schieben. NPC-Abzeichen nicht anzeigen.
 - Unabhängige Kamerapositionen für 2D und 3D zulässig, **aber exakt ein gemeinsamer physischer Fahrtweg** und dieselben Weltkoordinaten.
 
@@ -38,3 +38,13 @@ Status: **verbindliche Gestaltungsvorgabe**, basierend auf den vom Projektinhabe
 ## Abgrenzung
 
 Diese Masterregel übernimmt **Layout, Rangordnung, Blickwinkel und Abstände** aus der Inspiration – nicht fremde Wappen, Grafiken, Schiffsmodelle oder Texturen. Die genaue ästhetische Feinabstimmung des 3D-Winkels und der Ornamentdetails erfolgt anhand echter Browser-/Android-Aufnahmen; M376-Multiplayer/Steuerung hat Vorrang vor kosmetischen Wünschen.
+
+## M379 – Screenshotkorrektur
+
+Die erste Ingame-Version von M378 zeigte übergroße breite Stahlflügel, ein auseinandergezogenes HUD, einen Ring im oberen Segelbereich und eine zu senkrechte Schiffsperspektive. Das entspricht **nicht** der akzeptierten Referenzform.
+
+- Leichte, symmetrische goldene Filigrane ersetzen die breiten Metallarme; Sonderdeck-Effekte markieren die Endpunkte nur bei realem Buff.
+- Namen höchstens 14-pt Basisgröße; Rangzeichen näher an den Namen, dezente 7-pt-ID; HP auf y=19, Schild auf y=28 und Deckzentrum auf y=47, jeweils mit nativer Pixelanpassung.
+- Der Spieler-Ring bleibt grün, mit 44 feineren Punkten und kleinerem Radius; sein Mittelpunkt wird auf den unteren Wasserkontakt versetzt. Keine Änderung an Hitbox, Fahrtweg oder Zielkoordinaten.
+- 2D-Classic-Sprites werden aus originalen GLB-Modellen unter **48° 3/4-Neigung** gebacken, exakt wie die native 3D-Kamera. Acht echte Richtungsansichten bleiben verfügbar; keine künstliche Drehung oder 2.5D-Simulation.
+- Künftige Änderungen müssen mit **frischen Browser-Captures** überprüft werden und nicht nur syntaktisch getestete Draw-Funktionen.
