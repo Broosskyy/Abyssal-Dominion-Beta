@@ -25,6 +25,25 @@ static func heading_four(heading: Vector2,previous: int=-1) -> int:
 	var prior_column: int=CLASSIC_FOUR_VIEW_ATLAS.find(previous)
 	return CLASSIC_FOUR_VIEW_ATLAS[heading_column(heading,prior_column)]
 
+## The classic left/right stepping is a 2D SPRITE-FRAME effect only.
+## Travelled distance (rather than elapsed frames) makes it independent of
+## FPS, browser performance and the native 3D hull yaw. World coordinates,
+## camera, hitboxes and network routing never read this result.
+static func classic_sprite_cadence(heading: Vector2,travelled: float,previous: int=-1) -> int:
+	if heading.length_squared()<0.0001:
+		return previous if CLASSIC_FOUR_VIEW_ATLAS.has(previous) else CLASSIC_FOUR_VIEW_ATLAS[0]
+	var direction: Vector2=heading.normalized()
+	var cardinality: float=absf(absf(direction.x)-absf(direction.y))
+	if cardinality<0.40:
+		return heading_four(direction,previous)
+	var alternate: bool=posmod(floori(maxf(0.0,travelled)/24.0),2)==1
+	if absf(direction.x)>=absf(direction.y):
+		if direction.x>=0.0:return 3 if alternate else 1 # E: SE / NE
+		return 5 if alternate else 7 # W: SW / NW
+	if direction.y>=0.0:return 5 if alternate else 3 # S: SW / SE
+	return 7 if alternate else 1 # N: NW / NE
+
+
 ## Eight-view geometry remains available for native modes. Classic chooses
 ## the original four diagonal images to match four grid-step bearings.
 static func heading_eight(heading: Vector2,previous: int=-1) -> int:

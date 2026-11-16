@@ -498,44 +498,18 @@ func _send_online_course(point: Vector2) -> void:
 	var destination: Vector2=Vector2(sim.player.path.back()) if not sim.player.path.is_empty() else point
 	var outgoing: Array[Vector2]=[]
 	for waypoint: Vector2 in sim.player.path:outgoing.append(waypoint)
-	var raster_ready: bool=false
-	if sim.classic_steering and not outgoing.is_empty():
-		# For tapped water courses use the EXACT same 48x32 itinerary
-		# already selected/validated by the offline ship mover. Previously
-		# online recomputed a greedy route from scratch and, if a coastline
-		# blocked it, replaced it with a STRAIGHT segment. That could send
-		# a different course to the server from the course the user saw.
-		var prepared: Array=sim.player.get("_iso_route",[])
-		var saved_goal: Vector2=Vector2(sim.player.get("_iso_goal",Vector2.ZERO))
-		if not prepared.is_empty() and saved_goal.distance_squared_to(destination)<0.001:
-			var expanded: Array[Vector2]=[]
-			if sim.player.has("_iso_committed_step"):
-				expanded.append(Vector2(sim.player["_iso_committed_step"]))
-			var index: int=int(sim.player.get("_iso_route_index",0))
-			for i in range(index,prepared.size()):
-				if expanded.size()>=512:break
-				expanded.append(Vector2(prepared[i]))
-			if expanded.size()<=512 and expanded.back().distance_squared_to(destination)<0.001:
-				outgoing=expanded
-				raster_ready=true
-		else:
-			# Scripted harbor and portal courses keep their earlier
-			# validated A* waypoint semantics.
-			var expanded: Array[Vector2]=[]
-			var current: Vector2=sim.player.pos
-			raster_ready=true
-			for waypoint: Vector2 in sim.player.path:
-				var micro: Array[Vector2]=NAV.classic_safe_route(current,waypoint,Callable(sim,"segment_free").bind(2.0))
-				if micro.is_empty() or expanded.size()+micro.size()>512:
-					raster_ready=false
-					break
-				expanded.append_array(micro)
-				current=waypoint
-			if raster_ready and not expanded.is_empty():outgoing=expanded
-	# Always use the same network navigation protocol irrespective of
-	# renderer. A 3D captain and a Classic 2D captain with identical
-	# starting coordinates and click must send identical tile waypoints.
-	online_client.send_course(destination,outgoing,"classic_48x32",raster_ready)
+	if outgoing.is_empty() or outgoing.size()>512:return
+	# Keep compatibility with the running protocol-2 server. When the
+	# preexpanded flag is true it follows the supplied waypoints verbatim at
+	# 76 world px/s instead of inserting its own physical 48x32 zigzag.
+	# Validate every direct/coastal leg locally before requesting playback.
+	var from: Vector2=Vector2(sim.player.pos)
+	for waypoint: Vector2 in outgoing:
+		if not sim.segment_free(from,waypoint,2.0):
+			_note("Kurs kann nicht online übertragen werden: Küste blockiert den Weg.",Color("ffbd99"))
+			return
+		from=waypoint
+	online_client.send_course(destination,outgoing,"classic_48x32",true)
 
 func _update_online_ships(delta: float) -> void:
 	if not online_connected:return
@@ -975,14 +949,11 @@ func _draw() -> void:
 	if not sim.player.path.is_empty():
 		var goal: Vector2=sim.player.path.back()
 		var before: Vector2=sim.player.pos
-		# The original-era Classic ship follows real 48x32 raster steps,
-		# so a STRAIGHT route preview falsely suggests it will sail straight.
-		# Use a destination marker there, not an incompatible diagonal line.
-		# Native 3D uses the exact same world course as Classic; only rendering differs.
-		if not browser_classic:
-			for point: Vector2 in sim.player.path:
-				draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
-				before=point
+		# Show the actual common direct/coast waypoints in both 2D and 3D.
+		# The 2D sprite-only facing cadence never modifies this route.
+		for point: Vector2 in sim.player.path:
+			draw_dashed_line(before,point,Color(0.50,0.83,0.80,0.35),1.4,10.0)
+			before=point
 		draw_arc(goal,16+sin(elapsed*3)*2,0,TAU,32,Color(0.54,0.92,0.85,0.7),1.7,true)
 		draw_line(goal-Vector2(22,0),goal+Vector2(22,0),Color(0.5,0.9,0.84,0.5),1.0)
 		draw_line(goal-Vector2(0,16),goal+Vector2(0,16),Color(0.5,0.9,0.84,0.5),1.0)
@@ -1380,11 +1351,9 @@ func _classic_atlas_key(actor: Dictionary) -> String:
 		return "schattenkriegsschiff_shaded"
 	return str(actor.get("visual_key",""))
 
-## Native Classic 2D now renders the REAL isometric navigation steps.
-## The old visual-only triangle-wave offset, phase oscillator and
-## cardinality taper have been removed. Four-direction sprites follow
-## the exact 24x16 physical segment that BOTH 2D and 3D currently sail.
-## No duplicate render itinerary, artificial wobble or heading fake.
+## The shared world route is direct (or coast-safe) in both renderers.
+## 2D Classic alone can alternate between its four fixed diagonal sprite
+## facings. It never injects a physical zigzag or offsets its ship centre.
 func _classic_raster_visual(actor: Dictionary) -> Dictionary:
 	if not browser_classic or str(actor.get("kind","ship"))!="ship":return {}
 	if actor.get("path",[]).is_empty():return {}
@@ -1393,7 +1362,22 @@ func _classic_raster_visual(actor: Dictionary) -> Dictionary:
 func _classic_frame_for_actor(actor: Dictionary) -> int:
 	var id: int=int(actor.get("id",-1))
 	var sample: Dictionary=_classic_raster_visual(actor)
-	var facing: int=VISUALS.heading_four(Vector2(sample.heading),int(classic_heading_cache.get(id,-1))) if not sample.is_empty() else VISUALS.heading_eight(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
+	var facing: int=VISUALS.heading_eight(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
+	if not sample.is_empty():
+		var world: Vector2=Vector2(actor.get("pos",Vector2.ZERO))
+		var state: Dictionary=classic_raster_visuals.get(id,{})
+		var cumulative: float=float(state.get("distance",0.0))
+		if not state.is_empty():
+			var prior: Vector2=Vector2(state.get("last",world))
+			var segment: float=prior.distance_to(world)
+			# Reset stale phases on respawns, teleports or new large courses.
+			if segment<48.0:cumulative+=segment
+			else:cumulative=0.0
+		classic_raster_visuals[id]={"last":world,"distance":cumulative}
+		facing=VISUALS.classic_sprite_cadence(Vector2(sample.heading),cumulative,
+			int(classic_heading_cache.get(id,-1)))
+	else:
+		classic_raster_visuals.erase(id)
 	classic_heading_cache[id]=facing
 	return facing
 
