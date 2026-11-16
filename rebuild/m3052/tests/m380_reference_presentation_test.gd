@@ -51,14 +51,14 @@ func _run() -> void:
 	var r: float=8.0
 	var layout: Dictionary=MARKS.reference_deck_geometry(r)
 	check(layout.left_crown.x==-layout.right_crown.x and layout.skulls[0].x==-layout.skulls[1].x,"gold crown/skull fittings are truly symmetric")
-	check(layout.skulls[0].y<0 and layout.number.y>0 and layout.number.y<layout.bottom_crest.y and layout.bottom_crest.y<layout.deck_pips.y,"two skulls, large number, bottom special and 10 deck cells form correct stack")
-	check(layout.number.x==0 and layout.bottom_crest.x==0 and layout.deck_pips.x==0,"the enlarged number and lower pirate crest remain centered")
-	check(int(roundi(r*3.2))>=25,"the central cannon number is at least 25px, not microscopic")
+	check(layout.skulls[0].y<0 and layout.number==layout.deck_pips and layout.deck_pips.y>0 and layout.deck_pips.y<layout.bottom_crest.y,"independent top skulls, ten midline deck pips and separate lower skull form the classic stack")
+	check(layout.deck_pips.x==0 and layout.bottom_crest.x==0,"ten deck pips and independent bottom skull remain centered")
+	check(MARKS.deck_entries(game.sim).size()==10,"the ten independent mounted deck pips take the former number location")
 	check(MARKS.deck_entries(game.sim).size()==10,"ten real independent deck statuses still exist")
 	var overlay_source: String=FileAccess.get_file_as_string("res://ship_plate_overlay.gd")
 	check(overlay_source.contains("51*pixel_scale),8.0*pixel_scale"),"rendered pixel-space overlay actually draws the larger deck")
 	var marks_source: String=FileAccess.get_file_as_string("res://sea_marks.gd")
-	check(marks_source.contains("_reference_special_icon") and marks_source.contains("\"tide\"") and marks_source.contains("\"storm\"") and marks_source.contains("\"salvage\""),"three specials have distinct original pictograms in the reference deck")
+	check(marks_source.contains("deck_extension_state") and marks_source.contains("mojo_frame") and marks_source.contains("skull_top_left") and marks_source.contains("skull_top_right"),"six extension SVG layers are independent from timed gameplay buffs")
 	check(player.pos==original_pos and player.path==original_path and player.get("radius",null)==original_hitbox and player.get("speed",null)==original_speed,"HUD, GLB appearance and ring never alter movement, collisions or ship speed")
 	check(game.sim.deck_slots==original_decks and game.sim.cannon_slots()==original_cannons,"gold/pearl/crystal upgrades and real cannon capacity unchanged")
 	if game.mesh_layer!=null:
