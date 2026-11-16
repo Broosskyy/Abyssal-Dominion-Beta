@@ -1,7 +1,7 @@
 extends SceneTree
 ## M379 corrects the photographed M378 discrepancy without altering M376 motion.
-## Compact side scrolls and smaller labels, green water-level dots and one
-## matching 48-degree 3/4 camera for native 3D and baked 2D.
+## M380 preserves compact player labels and diagonal 2D/3D parity while
+## increasing the deck emblem, lowering the camera and restoring green dots.
 const MARKS=preload("res://sea_marks.gd")
 const MESH=preload("res://ship_mesh_layer.gd")
 var checks: int=0
@@ -27,20 +27,20 @@ func _run() -> void:
 	var original_slots: Array=game.sim.deck_slots.duplicate(true)
 	var value: int=game.sim.cannon_slots()
 	var initial_mode: String=game.render_mode
-	var r: float=5.5
+	var r: float=8.0
 	var layout: Dictionary=MARKS.reference_deck_geometry(r)
-	check(float(MESH.FULL_3D_CAMERA_TILT_DEGREES)==48.0,"native 3D uses the shared 48-degree three-quarter camera")
+	check(float(MESH.FULL_3D_CAMERA_TILT_DEGREES)==56.0,"native 3D uses the shared lowered 56-degree three-quarter camera")
 	var baked_source: String=FileAccess.get_file_as_string("res://tools/bake_web_fleet.gd")
 	check(baked_source.contains("var tilt=deg_to_rad(MESH.FULL_3D_CAMERA_TILT_DEGREES)") and baked_source.contains("var view_cos: float=cos(deg_to_rad(MESH.FULL_3D_CAMERA_TILT_DEGREES))"),"2D source GLB frame projection uses the exact native full-3D viewing angle")
 	check(game._plate_title_size(player)<=14,"player caption is compact compared with the ship")
-	check(game.PLATE_ID_BASELINE==10.0 and game.PLATE_HP_Y==19.0 and game.PLATE_SHIELD_Y==28.0 and game.PLATE_DECK_Y==47.0,"name, faded identity, HP, shield and deck occupy tight independent rows")
+	check(game.PLATE_ID_BASELINE==10.0 and game.PLATE_HP_Y==19.0 and game.PLATE_SHIELD_Y==28.0 and game.PLATE_DECK_Y==51.0,"name, faded identity, HP, shield and deck occupy tight independent rows")
 	check(game.PLATE_SHIELD_Y+5.0<game.PLATE_DECK_Y-6.0,"compact player deck never overlaps the shield bar")
 	check(layout.left_crown.x==-layout.right_crown.x and absf(float(layout.left_crown.x))<=6.5*r+.001,"reference crowns remain symmetrical and close to ship center")
 	check(layout.skulls.size()==2 and float(layout.skulls[0].x)==-float(layout.skulls[1].x),"two skulls frame the middle deck value symmetrically")
 	check(layout.skulls[0].y<layout.number.y and layout.number.y<layout.bottom_crest.y and layout.bottom_crest.y<layout.deck_pips.y,"ornaments and two-row deck markers have the right vertical order")
 	var ring: Vector2=game._selection_ring_radii(player)
 	var ship: float=game._actor_visual_length(player)
-	check(ring.x<ship*.405 and ring.y<ship*.16,"waterline ring hugs hull instead of forming a broad glowing disc")
+	check(absf(ring.x-ship*.53)<.01 and absf(ring.y-ship*.215)<.01,"green dotted waterline ring stays proportional to the 15% smaller rendered hull")
 	var points: Array[Vector2]=game._player_reference_ring_points(start,ring)
 	check(points.size()==44,"player ring remains a fine 44-dot ellipse")
 	check(game._selection_ring_tint(player)==Color("31e65d"),"green player identity independent of model paint")
@@ -76,7 +76,7 @@ func _run() -> void:
 		var p: float=game._plate_pixels()
 		var anchor: Vector2=game._plate_screen_anchor(player)
 		var bar_rect:=Rect2(Vector2(anchor.x-58.0*p,anchor.y+19.0*p),Vector2(116.0*p,15.0*p))
-		var deck_rect:=Rect2(Vector2(anchor.x-48.0*p,anchor.y+39.0*p),Vector2(96.0*p,46.0*p))
+		var deck_rect:=Rect2(Vector2(anchor.x-66.0*p,anchor.y+33.0*p),Vector2(132.0*p,77.0*p))
 		var quick: Rect2=game.quick_bar.get_global_rect()
 		check(not quick.intersects(bar_rect),"mobile quick slots never cover captain HP/shield bars at "+str(screen))
 		check(not quick.intersects(deck_rect),"mobile quick slots never cover captain ornate deck emblem at "+str(screen))
