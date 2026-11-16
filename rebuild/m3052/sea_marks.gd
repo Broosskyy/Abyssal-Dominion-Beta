@@ -142,13 +142,95 @@ static func pirate_crest(canvas: CanvasItem,center: Vector2,r: float) -> void:
 	canvas.draw_arc(center-Vector2(0,r*.24),r*.82,PI*1.08,PI*1.95,12,Color("fff1c6",.6),.75,true)
 	canvas.draw_circle(center+Vector2(-r*.32,-r*.41),r*.10,Color("ffffff",.52))
 
+## M378: geometry from the captain reference, expressed in local HUD units.
+## The central number is REAL cannon capacity, never an invented "656" stat.
+## 10 small enamel pips retain the independently upgraded Gold/Pearl/Crystal
+## deck-slot state; 3 special-deck ornaments reflect actual buff timers.
+static func reference_deck_geometry(r: float) -> Dictionary:
+	return {
+		"left_crown":Vector2(-7.25*r,-1.0*r),
+		"right_crown":Vector2(7.25*r,-1.0*r),
+		"skulls":[Vector2(-1.36*r,-1.20*r),Vector2(1.36*r,-1.20*r)],
+		"number":Vector2(0,2.05*r),
+		"bottom_crest":Vector2(0,4.05*r),
+		"deck_pips":Vector2(0,5.45*r)
+	}
+
+static func _reference_crown(canvas: CanvasItem,center: Vector2,r: float,ink: Color) -> void:
+	var p: PackedVector2Array=PackedVector2Array([
+		center+Vector2(-1.10,0.60)*r,center+Vector2(-1.15,-0.62)*r,
+		center+Vector2(-0.52,-0.12)*r,center+Vector2(0,-1.0)*r,
+		center+Vector2(0.52,-0.12)*r,center+Vector2(1.15,-0.62)*r,
+		center+Vector2(1.10,0.60)*r
+	])
+	var shadow: PackedVector2Array=PackedVector2Array()
+	for v: Vector2 in p:shadow.append(v+Vector2(0,1.3))
+	canvas.draw_colored_polygon(shadow,Color("061018"))
+	canvas.draw_colored_polygon(p,ink.darkened(.18))
+	var border=p.duplicate();border.append(p[0])
+	canvas.draw_polyline(border,ink.lightened(.32),maxf(.7,r*.13),true)
+	for x in [-.72,0.0,.72]:
+		canvas.draw_circle(center+Vector2(x,-.15)*r,maxf(.65,r*.11),Color("f6e4b9"))
+	canvas.draw_line(center+Vector2(-1.03,.43)*r,center+Vector2(1.03,.43)*r,Color("654820"),maxf(.7,r*.19),true)
+
+static func _reference_skull(canvas: CanvasItem,point: Vector2,r: float,ink: Color) -> void:
+	canvas.draw_circle(point+Vector2(0,-.18)*r,r*.74,Color("061018"))
+	canvas.draw_circle(point+Vector2(0,-.18)*r,r*.57,ink)
+	canvas.draw_rect(Rect2(point+Vector2(-.36,.18)*r,Vector2(.72,.38)*r),ink.darkened(.18))
+	for side in [-1.0,1.0]:
+		canvas.draw_circle(point+Vector2(side*.27,-.23)*r,maxf(.65,r*.15),Color("091821"))
+	canvas.draw_colored_polygon(PackedVector2Array([
+		point+Vector2(0,-.08)*r,point+Vector2(-.11,.10)*r,point+Vector2(.11,.10)*r]),Color("26313a"))
+	for side in [-.18,.10]:
+		canvas.draw_line(point+Vector2(side,.25)*r,point+Vector2(side,.53)*r,Color("313d3b"),maxf(.7,r*.12),true)
+
+static func _reference_deck_pips(canvas: CanvasItem,center: Vector2,r: float,entries: Array) -> void:
+	# Two rows of five tiny enamel marks: each mark represents one ACTUAL
+	# mounted deck. Keep the marks legible without ten oversized panels.
+	for slot in 10:
+		var entry: Dictionary=entries[slot] if slot<entries.size() else {}
+		var point=center+Vector2((float(slot%5)-2.0)*r*.80,(float(floori(slot/5.0))-.5)*r*.75)
+		var lit: bool=bool(entry.get("lit",false))
+		var ink: Color=Color(entry.get("color",Color("495760"))) if lit else Color("324451")
+		var size=Vector2(r*.52,r*.46)
+		canvas.draw_rect(Rect2(point-size*.5, size).grow(.65),Color("061018"))
+		canvas.draw_rect(Rect2(point-size*.5, size),ink if lit else ink.darkened(.35))
+		if lit:canvas.draw_line(point-size*.42,point+Vector2(size.x*.42,-size.y*.42),ink.lightened(.35),.6,true)
+
 static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,time_seconds: float=0.0) -> void:
-	deck_tiles(canvas,center,r,deck_entries(sim),time_seconds)
-	pirate_crest(canvas,center-Vector2(0,r*2.6),r*.82)
-	special_deck_arm(canvas,center,r,-1,"tide",float(sim.buffs.tide_deck)>0,time_seconds)
-	special_deck_arm(canvas,center,r,1,"storm",float(sim.buffs.storm_deck)>0,time_seconds)
-	special_deck_arm(canvas,center,r,-1,"salvage",float(sim.buffs.salvage_deck)>0,time_seconds)
-	# Kristallsegen is a separate blessing in the buff bar, not a fourth special deck.
+	# Ornament geometry deliberately independent from hull size, camera
+	# yaw and render mode; only the overlay's native-pixel scale applies.
+	var layout: Dictionary=reference_deck_geometry(r)
+	var old_gold: Color=Color("c6a970")
+	var bright_gold: Color=Color("efd49b")
+	var tide: bool=float(sim.buffs.tide_deck)>0.0
+	var storm: bool=float(sim.buffs.storm_deck)>0.0
+	var salvage: bool=float(sim.buffs.salvage_deck)>0.0
+	# Symmetrical filigree around the central number. Specials change
+	# colour/effects of the three established fittings, not their layout.
+	special_deck_arm(canvas,center,r,-1.0,"tide",tide,time_seconds)
+	special_deck_arm(canvas,center,r,1.0,"storm",storm,time_seconds)
+	_reference_crown(canvas,center+Vector2(layout.left_crown),r*.82,Color("72dacc") if tide else old_gold)
+	_reference_crown(canvas,center+Vector2(layout.right_crown),r*.82,Color("91c8f1") if storm else old_gold)
+	for point: Vector2 in layout.skulls:
+		_reference_skull(canvas,center+point,r*.75,bright_gold)
+	# Use actual mounted cannon capacity as the readable numeric value.
+	# It will grow with equipped ordinary decks; no decorative fake stat.
+	var font: Font=ThemeDB.fallback_font
+	var value: String=str(sim.cannon_slots())
+	var fs: int=maxi(11,roundi(r*2.23))
+	var width: float=font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
+	var at: Vector2=center+Vector2(layout.number)-Vector2(width*.5,0)
+	canvas.draw_string_outline(font,at,value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,maxi(2,roundi(r*.34)),Color("07121c"))
+	canvas.draw_string(font,at,value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("f9eee1"))
+	# The third special deck is the independent bottom pirate emblem.
+	var bottom_ink: Color=Color("f7c86b") if salvage else old_gold.darkened(.12)
+	_reference_skull(canvas,center+Vector2(layout.bottom_crest),r*.72,bottom_ink)
+	if salvage:
+		canvas.draw_arc(center+Vector2(layout.bottom_crest),r*.70,0,TAU,24,Color("f3c26b",.7),maxf(.7,r*.16),true)
+	_reference_deck_pips(canvas,center+Vector2(layout.deck_pips),r,deck_entries(sim))
+	# Kristallsegen remains a separate, timed blessing; the 3 side decks
+	# do not consume any of the 10 independently upgraded standard slots.
 
 ## Kristallsegen beside the deck row: the crystal, a gold ring and a timer that runs down.
 static func blessing_crystal(canvas: CanvasItem,center: Vector2,r: float,texture: Texture2D,remaining: float,total: float) -> void:
