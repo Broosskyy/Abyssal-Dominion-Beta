@@ -237,6 +237,8 @@ class World:
                     self.peers.pop(previous,None)
             if sum(p['map_id']==map_id for p in self.peers.values())>=MAX_ROOM: raise ValueError('room full')
             saved = self.db.execute('SELECT x,y,heading,skin FROM characters WHERE account=? AND map_id=?',(account['id'],map_id)).fetchone()
+            if saved is None and self.identity.persistence_enabled:
+                saved = await self.identity.load_position(account['id'], map_id)
             peer = dict(**account,map_id=map_id,x=saved[0] if saved else 4200.,y=saved[1] if saved else 2900.,
                 heading=saved[2] if saved else math.pi,skin=saved[3] if saved else 0,
                 hp=2400,max_hp=2400,route=[],sequence=0,expires=time.monotonic()+max(0,account['expires_at']-time.time()))
