@@ -64,7 +64,7 @@ func _player_title_tint(actor: Dictionary) -> Color:
 	# Pure presentation decision; testable without screenshot/OCR.
 	if host.sim.staff.shows_badge():return host.sim.staff.color()
 	var skin: int=int(actor.get("skin",0))
-	return Color("d9f0e5") if skin==0 else host._ship_design_accent(skin).lightened(.17)
+	return Color("f1eee2") # Name stays readable ivory; only guild/rank accents vary by status.
 
 func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	var sim=host.sim
@@ -105,8 +105,8 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 		_caption(Vector2(-width*.5-19.0*pixel_scale,0),"NPC",8,Color(.64,.78,.84,.59),1)
 	if host._plate_has_rank(actor):
 		var tier=clampi(floori((sim.level-1)/4.0)+1,1,5) if player else clampi(int(actor.get("pirate_rank",1)),1,5)
-		_rank(Vector2(-width*.5-15*pixel_scale,-5*pixel_scale),tier,pixel_scale*.75)
-		if player:_battle_rank(Vector2(width*.5+15*pixel_scale,-5*pixel_scale),pixel_scale*.75,int(sim.battle_points))
+		_rank(Vector2(-width*.5-18*pixel_scale,-5*pixel_scale),tier,pixel_scale*.95)
+		if player:_battle_rank(Vector2(width*.5+18*pixel_scale,-5*pixel_scale),pixel_scale*.95,int(sim.battle_points))
 	var identity: String=host._plate_identity(actor)
 	if not identity.is_empty():_caption(Vector2(0,10*pixel_scale),identity,7,Color(.72,.86,.88,.38),1)
 	var bar_width=(116.0 if player else (96.0 if int(actor.id)==sim.target else 84.0))*pixel_scale
@@ -125,7 +125,7 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	if player:
 		# Keep ten deck slots physically aligned under shield, regardless
 		# of ship yaw or which Corsair material was chosen.
-		SEA_MARKS.deck_badge(self,Vector2(0,47*pixel_scale),5.5*pixel_scale,sim,float(host.elapsed))
+		SEA_MARKS.deck_badge(self,Vector2(0,51*pixel_scale),8.0*pixel_scale,sim,float(host.elapsed))
 	if float(actor.get("slow",0.0))>0.0:draw_circle(Vector2(bar_width*.5+6*pixel_scale,14*pixel_scale),2.5*pixel_scale,Color("9fdbf4"))
 	if player and sim.staff.hidden():_caption(Vector2(0,-20*pixel_scale),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color())
 	draw_set_transform(Vector2.ZERO)
