@@ -1,5 +1,5 @@
 {
-  "source_sha": "932fd8d05c1133b326601ec3b5f831882d732234",
-  "release": "browser-test-213",
-  "branch": "fix/m379-reference-hud-ring-camera-polish"
+  "source_sha": "4ee65507eaf79a35bb1669789fee39c387d5f9c1",
+  "release": "browser-test-218",
+  "branch": "fix/m380-reference-ship-ring-deck-readability"
 }

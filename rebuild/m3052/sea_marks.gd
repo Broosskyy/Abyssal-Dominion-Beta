@@ -148,12 +148,12 @@ static func pirate_crest(canvas: CanvasItem,center: Vector2,r: float) -> void:
 ## deck-slot state; 3 special-deck ornaments reflect actual buff timers.
 static func reference_deck_geometry(r: float) -> Dictionary:
 	return {
-		"left_crown":Vector2(-6.5*r,-.8*r),
-		"right_crown":Vector2(6.5*r,-.8*r),
-		"skulls":[Vector2(-1.20*r,-1.05*r),Vector2(1.20*r,-1.05*r)],
-		"number":Vector2(0,1.9*r),
-		"bottom_crest":Vector2(0,3.95*r),
-		"deck_pips":Vector2(0,5.5*r)
+		"left_crown":Vector2(-6.1*r,-.90*r),
+		"right_crown":Vector2(6.1*r,-.90*r),
+		"skulls":[Vector2(-1.28*r,-1.42*r),Vector2(1.28*r,-1.42*r)],
+		"number":Vector2(0,2.55*r),
+		"bottom_crest":Vector2(0,4.45*r),
+		"deck_pips":Vector2(0,6.05*r)
 	}
 
 static func _reference_crown(canvas: CanvasItem,center: Vector2,r: float,ink: Color) -> void:
@@ -224,6 +224,37 @@ static func _reference_side_scroll(canvas: CanvasItem,center: Vector2,r: float,s
 		canvas.draw_circle(pearl,r*.39,ink)
 		canvas.draw_circle(pearl,r*.17,Color("fff7e5"))
 
+## Distinct special-deck marks; only illuminate real timed buffs.
+## Drawn from original vectors, not copied 3rd-party icons.
+static func _reference_special_icon(canvas: CanvasItem,center: Vector2,r: float,key: String,active: bool) -> void:
+	var ink: Color={
+		"tide":Color("4ee2d0"),"storm":Color("a7c5fc"),
+		"salvage":Color("ffd57f")
+	}.get(key,Color("bfa46e"))
+	var tone: Color=ink if active else Color("806e4d",.68)
+	var disk: Color=Color("071521",.92)
+	canvas.draw_circle(center,r*.70,disk)
+	canvas.draw_arc(center,r*.70,0.0,TAU,24,Color(tone,.85),maxf(.7,r*.12),true)
+	if key=="tide":
+		for row in 2:
+			var points:=PackedVector2Array()
+			for i in 7:
+				var xx: float=(float(i)-3.0)*r*.15
+				points.append(center+Vector2(xx,(float(row)-.5)*r*.26+sin(float(i)*PI*.52)*r*.09))
+			canvas.draw_polyline(points,tone,maxf(1.0,r*.16),true)
+	elif key=="storm":
+		canvas.draw_colored_polygon(PackedVector2Array([
+			center+Vector2(-.1,-.54)*r,center+Vector2(.27,-.54)*r,
+			center+Vector2(.07,-.06)*r,center+Vector2(.30,-.06)*r,
+			center+Vector2(-.22,.53)*r,center+Vector2(-.08,.10)*r,
+			center+Vector2(-.31,.10)*r]),tone)
+	elif key=="salvage":
+		# Little anchor with spread flukes, visually different from a skull.
+		canvas.draw_circle(center+Vector2(0,-.48)*r,r*.12,tone)
+		canvas.draw_line(center+Vector2(0,-.33)*r,center+Vector2(0,.40)*r,tone,maxf(1.0,r*.15),true)
+		canvas.draw_line(center+Vector2(-.28,-.07)*r,center+Vector2(.28,-.07)*r,tone,maxf(1.0,r*.12),true)
+		canvas.draw_arc(center+Vector2(0,.22)*r,r*.37,0.12,PI-.12,12,tone,maxf(1.0,r*.14),true)
+
 static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,time_seconds: float=0.0) -> void:
 	# Ornament geometry deliberately independent from hull size, camera
 	# yaw and render mode; only the overlay's native-pixel scale applies.
@@ -237,24 +268,25 @@ static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,time_seco
 	# colour/effects of the three established fittings, not their layout.
 	_reference_side_scroll(canvas,center,r,-1.0,Color("72dacc") if tide else old_gold,tide,time_seconds)
 	_reference_side_scroll(canvas,center,r,1.0,Color("91c8f1") if storm else old_gold,storm,time_seconds)
-	_reference_crown(canvas,center+Vector2(layout.left_crown),r*.83,Color("72dacc") if tide else old_gold)
-	_reference_crown(canvas,center+Vector2(layout.right_crown),r*.83,Color("91c8f1") if storm else old_gold)
+	_reference_crown(canvas,center+Vector2(layout.left_crown),r*.92,Color("72dacc") if tide else old_gold)
+	_reference_crown(canvas,center+Vector2(layout.right_crown),r*.92,Color("91c8f1") if storm else old_gold)
+	_reference_special_icon(canvas,center+Vector2(-6.15*r,2.65*r),r*.98,"tide",tide)
+	_reference_special_icon(canvas,center+Vector2(6.15*r,2.65*r),r*.98,"storm",storm)
 	for point: Vector2 in layout.skulls:
-		_reference_skull(canvas,center+point,r*.75,bright_gold)
+		_reference_skull(canvas,center+point,r*1.1,bright_gold)
 	# Use actual mounted cannon capacity as the readable numeric value.
 	# It will grow with equipped ordinary decks; no decorative fake stat.
 	var font: Font=ThemeDB.fallback_font
 	var value: String=str(sim.cannon_slots())
-	var fs: int=maxi(12,roundi(r*2.65))
+	var fs: int=maxi(14,roundi(r*3.2))
 	var width: float=font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
 	var at: Vector2=center+Vector2(layout.number)-Vector2(width*.5,0)
 	canvas.draw_string_outline(font,at,value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,maxi(2,roundi(r*.34)),Color("07121c"))
 	canvas.draw_string(font,at,value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("f9eee1"))
 	# The third special deck is the independent bottom pirate emblem.
 	var bottom_ink: Color=Color("f7c86b") if salvage else old_gold.darkened(.12)
-	_reference_skull(canvas,center+Vector2(layout.bottom_crest),r*.79,bottom_ink)
-	if salvage:
-		canvas.draw_arc(center+Vector2(layout.bottom_crest),r*.70,0,TAU,24,Color("f3c26b",.7),maxf(.7,r*.16),true)
+	_reference_skull(canvas,center+Vector2(layout.bottom_crest),r*.96,bottom_ink)
+	_reference_special_icon(canvas,center+Vector2(layout.bottom_crest)+Vector2(2.1*r,0),r*.74,"salvage",salvage)
 	_reference_deck_pips(canvas,center+Vector2(layout.deck_pips),r,deck_entries(sim))
 	# Kristallsegen remains a separate, timed blessing; the 3 side decks
 	# do not consume any of the 10 independently upgraded standard slots.

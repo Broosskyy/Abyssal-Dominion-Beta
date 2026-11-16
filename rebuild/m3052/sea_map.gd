@@ -58,7 +58,7 @@ const NPC_HULL_CLEARANCE := 24.0
 const PLATE_ID_BASELINE := 10.0
 const PLATE_HP_Y := 19.0
 const PLATE_SHIELD_Y := 28.0
-const PLATE_DECK_Y := 47.0
+const PLATE_DECK_Y := 51.0
 const USER_ROOT := "res://assets/user/"
 const SAVE := "user://captain_m3052.json"
 const HUD_SAVE := "user://display_m3052.json"
@@ -322,6 +322,9 @@ const SHIPYARD_SEA_TILE: Texture2D=preload("res://assets/ui/painted/sea_tile.png
 const SHIPYARD_STUDIO_KEY: Shader=preload("res://shipyard_preview_key.gdshader")
 const FINAL_SHIP_LENGTH := 158.0
 const NPC_VISUAL_SCALE := 0.90
+# M380: presentation-only player model reduction. Both GLB and 8-view
+# baked sprite use _actor_visual_length; no game logic or physics changes.
+const PLAYER_PRESENTATION_SCALE := 0.85
 # Browser and Android have different physical viewport sizes. Test 338
 # applied the desktop-only 36% hull size on 709px-high Android screens,
 # making the hull tiny relative to islands, the selection ring and HUD.
@@ -335,7 +338,7 @@ const CLASSIC_HULL_SCALE_MOBILE := 1.0
 # entire center of the screenshot. Leave user pinch/zoom control intact.
 const CLASSIC_MOBILE_CAMERA_FACTOR := 1.0
 const CLASSIC_VIEWPORT_ZOOM_BOOST_MAX := 1.15
-const CLASSIC_LABEL_CLEARANCE_PX := 7.0
+const CLASSIC_LABEL_CLEARANCE_PX := 5.0
 var plate_fleet: Array[Dictionary] = []
 ## Keep the maximum artwork extent stable across all rendered headings.
 var status_age := 0.0
@@ -1132,8 +1135,10 @@ func _actor_visual_length(actor: Dictionary) -> float:
 		length=180.0
 	elif str(actor.get("kind",""))=="ship":
 		length=float(CONTENT.SHIP_LENGTHS[posmod(int(actor.art),CONTENT.SHIP_LENGTHS.size())])*NPC_VISUAL_SCALE
-	# No rendering-mode scale multiplier. 2D atlas and 3D GLB both get
-	# the same intended hull length in physical world coordinates.
+	# Identical player display size in native 3D and Classic 2D; NOT
+	# a collision, simulation or server size. NPC/monster sizes unchanged.
+	if int(actor.get("id",-1))==0 or bool(actor.get("remote_player",false)):
+		length*=PLAYER_PRESENTATION_SCALE
 	return length
 
 # M3095: classic sea-combat selection circles are flat chart overlays.
@@ -1151,7 +1156,7 @@ func _selection_ring_radii(actor: Dictionary) -> Vector2:
 	# forming the wide neon oval seen in the Android M3097 comparison.
 	# Both test models use the same visual length and therefore the same ring.
 	if int(actor.get("id",-1))==0:
-		return Vector2(maxf(36.0,length*0.38),maxf(16.0,length*0.145))
+		return Vector2(maxf(38.0,length*0.53),maxf(18.0,length*0.215))
 	return Vector2(maxf(36.0,length*0.58),maxf(16.0,length*0.245))
 
 func _ship_design_accent(skin_id: int) -> Color:
@@ -1208,12 +1213,13 @@ func _draw_player_reference_ring(center: Vector2,radii: Vector2,tint: Color) -> 
 	# Keep a faint water-contact line behind the individual green points.
 	_ellipse_line(center,radii,Color(tint,.12),_selection_ring_stroke(.95))
 	var beads: Array[Vector2]=_player_reference_ring_points(center,radii)
-	var radius: float=_selection_ring_stroke(1.50)
+	var radius: float=_selection_ring_stroke(2.35)
 	for index in beads.size():
 		var dot: Vector2=beads[index]
 		var shimmer: float=.84+.16*sin(elapsed*1.8+float(index)*.26)
-		draw_circle(dot,radius*1.40,Color(tint,.07*shimmer),true,-1,true)
-		draw_circle(dot,radius,Color(tint,.86*shimmer),true,-1,true)
+		draw_circle(dot,radius*1.55,Color(tint,.22*shimmer),true,-1,true)
+		draw_circle(dot,radius,Color(tint,.95*shimmer),true,-1,true)
+		draw_circle(dot,maxf(.5,radius*.32),Color("d8ffe3",.77*shimmer),true,-1,true)
 
 func _draw_ship_selection_ring(actor: Dictionary,point: Vector2) -> void:
 	if not _selection_ring_visible(actor):return
@@ -1225,7 +1231,7 @@ func _draw_ship_selection_ring(actor: Dictionary,point: Vector2) -> void:
 	# Both Classic sprites and native GLBs place the player ring on the
 	# lower hull's water contact. It does not move the world-space actor.
 	if not enemy_selected:
-		center.y+=_actor_visual_length(actor)*0.065
+		center.y+=_actor_visual_length(actor)*0.045
 	# Short water-borne pulse after choosing a ship; no combat or collision effect.
 	if not enemy_selected and elapsed-ship_switch_pulse_at>=0.0 and elapsed-ship_switch_pulse_at<1.15:
 		var phase: float=clampf((elapsed-ship_switch_pulse_at)/1.15,0.0,1.0)
@@ -1595,7 +1601,7 @@ func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 		var width=maxf((188.0 if player else 154.0)*pixels,
 			_plate_text_width(_plate_title(actor),_plate_title_size(actor))+58.0*pixels)
 		var anchor=_plate_screen_anchor(actor)
-		placed[int(actor.id)]=Rect2(anchor-Vector2(width*.5,17*pixels),Vector2(width,(91 if player else 56)*pixels))
+		placed[int(actor.id)]=Rect2(anchor-Vector2(width*.5,17*pixels),Vector2(width,(128 if player else 56)*pixels))
 	return placed
 
 ## One layout snapshot per *process frame* directly after Camera2D is scrolled.
@@ -1656,7 +1662,7 @@ func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
 	if shield>0:
 		if player:_status_bar(Rect2(-width*.5,PLATE_SHIELD_Y,width,5),float(actor.get("shield",0))/shield,Color("409fdf"),hit_flash)
 		else:_plate_bar(Rect2(-width*.5,22,width,3),float(actor.get("shield",0))/shield,Color("4d95be"))
-	if player:SEA_MARKS.deck_badge(self,Vector2(0,PLATE_DECK_Y),5.5,sim,elapsed)
+	if player:SEA_MARKS.deck_badge(self,Vector2(0,PLATE_DECK_Y),8.0,sim,elapsed)
 	if float(actor.get("slow",0))>0:draw_circle(Vector2(width*.5+6,14),2.5,Color("9fdbf4"))
 	if player and sim.staff.hidden():_label(Vector2(0,-20),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color(),2)
 	draw_set_transform(Vector2.ZERO)

@@ -14,7 +14,9 @@ const PLAYER_RAW_BOW := {"schattenkriegsschiff_shaded":Vector3(0,0,1), "black_cr
 const GAMEPLAY_WATER_IMMERSION := 0.23
 const PLAYER_WATER_IMMERSION := 0.205
 const FLEET_CAMERA_TILT_DEGREES := 40.0
-const FULL_3D_CAMERA_TILT_DEGREES := 48.0
+# M380: a lower, classic sea-combat 3/4 view shows more hull/sails.
+# The 8-way Web sprite baker uses this exact same native camera value.
+const FULL_3D_CAMERA_TILT_DEGREES := 56.0
 
 func _fleet_tilt() -> float:
 	return FULL_3D_CAMERA_TILT_DEGREES if mode=="3d" else FLEET_CAMERA_TILT_DEGREES
@@ -407,7 +409,7 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 	if not visible or chart_camera==null or stage==null:return
 	resize_view(screen)
 	var center: Vector2=chart_camera.position
-	var tilt=deg_to_rad(_fleet_tilt()) # Hybrid: 40°, full 3D: 48°, same GLB and navigation.
+	var tilt=deg_to_rad(_fleet_tilt()) # Native 3D: 56°, identical browser 8-view baking; world navigation unaffected.
 	var foreshortening=maxf(cos(tilt),0.1)
 	mesh_camera.size=screen.y/maxf(chart_camera.zoom.y,.05)
 	var altitude=950.0
@@ -453,7 +455,8 @@ func sync_fleet(fleet: Array[Dictionary],chart_camera: Camera2D,screen: Vector2)
 		# Subtle animated heave/roll: under one world unit so the real keel
 		# stays on the 2D sea plane. Larger hulls move more heavily.
 		var cruise: float=host._wake_intensity_for(actor)
-		var long_ship: bool=float(host._actor_visual_length(actor))>=175.0
+		# Classify ships by their original design, not M380 visual 0.85 scale.
+		var long_ship: bool=(int(actor.get("skin",0))>=1 and int(actor.get("skin",0))<=13) if id==0 or bool(actor.get("remote_player",false)) else float(host._actor_visual_length(actor))>=175.0
 		var swell: float=0.27 if long_ship else 0.42
 		var clock: float=host.elapsed*1.55+float(id)*1.37
 		var motion: bool=host.ship_animations_enabled

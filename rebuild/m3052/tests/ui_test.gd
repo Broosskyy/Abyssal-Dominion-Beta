@@ -170,14 +170,14 @@ func _run() -> void:
 	var expected_name: String=game._plate_title(game.sim.player)
 	check(expected_name.contains(game.sim.captain_name) and not expected_name.contains("TEST"),"captain displays player identity instead of selected hull design")
 	check(game._plate_title_size(game.sim.player)>=12,"M3099 captain title remains readable")
-	# The native-pixel HUD, not just the older chart drawing, must follow
-	# the selected original/Elite paint and size text at the actual font px.
+	# M380: the native-pixel captain's NAME remains ivory like the supplied
+	# reference; elite rarity belongs in the hull material and rank accents.
 	check(game.plate_overlay!=null and game.plate_overlay.host==game,"native ship/HUD overlay remains linked to the scene")
-	check(game.plate_overlay._player_title_tint(game.sim.player)==Color("d9f0e5"),"standard captain nameplate keeps readable light ink")
+	check(game.plate_overlay._player_title_tint(game.sim.player)==Color("f1eee2"),"standard captain nameplate uses readable ivory ink")
 	game.sim.player.skin=2
-	check(game.plate_overlay._player_title_tint(game.sim.player)==game._ship_design_accent(2).lightened(.17),"Elite 01 native HUD name takes the selected ship color")
+	check(game.plate_overlay._player_title_tint(game.sim.player)==Color("f1eee2"),"Elite 01 captain name stays white; guild and pirate-rank accents remain distinct")
 	game.sim.player.skin=11
-	check(game.plate_overlay._player_title_tint(game.sim.player)==game._ship_design_accent(11).lightened(.17),"Elite 10 native HUD name follows own unique color")
+	check(game.plate_overlay._player_title_tint(game.sim.player)==Color("f1eee2"),"Elite 10 captain title remains readable regardless of dark hull paint")
 	game.sim.player.skin=0
 	game.plate_text_width_cache.clear()
 	var expected_font_px: int=maxi(16,roundi(16.0*game._plate_pixels()))
@@ -314,7 +314,7 @@ func _run() -> void:
 		check(game.deck_icons.has(key) and game.deck_icons[key] is Texture2D,"original nautical SVG icon loads for "+key)
 	check(game.attack.has_method("_press_visual"),"combat orb has tap-feedback animation")
 	check(game._actor_visual_length(game.sim.npcs[14])<game._actor_visual_length(game.sim.npcs[12])*0.7,"elite pinnace stays visibly smaller than a non-elite galleon")
-	check(is_equal_approx(game._actor_visual_length(game.sim.player),158.0),"final hull has consistent visual size")
+	check(is_equal_approx(game._actor_visual_length(game.sim.player),158.0*.85),"M380 player GLB and Classic atlas share a consistently 15% smaller visual size")
 	for dimensions in [Vector2i(1280,720),Vector2i(844,390),Vector2i(720,405)]:
 		root.size=dimensions
 		await process_frame
