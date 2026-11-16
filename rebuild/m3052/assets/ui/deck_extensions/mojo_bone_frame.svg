@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="112" viewBox="0 0 320 112">
+<defs><linearGradient id="bone" x1="0" y1="0" x2=".5" y2="1"><stop stop-color="#f8edce"/><stop offset=".34" stop-color="#dfcda6"/><stop offset=".72" stop-color="#aa9678"/><stop offset="1" stop-color="#584f45"/></linearGradient></defs>
+<g stroke-linejoin="round" stroke-linecap="round">
+<!-- Actual open bone motif, not an oversized rectangular metal panel. -->
+<path d="M74 24Q49 25 37 47Q27 59 30 74Q34 87 56 87" fill="none" stroke="#19232a" stroke-width="13"/>
+<path d="M74 24Q49 25 37 47Q27 59 30 74Q34 87 56 87" fill="none" stroke="#695a48" stroke-width="9"/>
+<path d="M74 24Q49 25 37 47Q27 59 30 74Q34 87 56 87" fill="none" stroke="url(#bone)" stroke-width="6"/>
+<path d="M246 24Q271 25 283 47Q293 59 290 74Q286 87 264 87" fill="none" stroke="#19232a" stroke-width="13"/>
+<path d="M246 24Q271 25 283 47Q293 59 290 74Q286 87 264 87" fill="none" stroke="#695a48" stroke-width="9"/>
+<path d="M246 24Q271 25 283 47Q293 59 290 74Q286 87 264 87" fill="none" stroke="url(#bone)" stroke-width="6"/>
+<path d="M63 21Q86 12 108 17" fill="none" stroke="#332b29" stroke-width="10"/>
+<path d="M63 21Q86 12 108 17" fill="none" stroke="url(#bone)" stroke-width="6"/>
+<path d="M257 21Q234 12 212 17" fill="none" stroke="#332b29" stroke-width="10"/>
+<path d="M257 21Q234 12 212 17" fill="none" stroke="url(#bone)" stroke-width="6"/>
+<path d="M58 89Q86 100 116 93" fill="none" stroke="#3a3028" stroke-width="10"/>
+<path d="M58 89Q86 100 116 93" fill="none" stroke="url(#bone)" stroke-width="6"/>
+<path d="M262 89Q234 100 204 93" fill="none" stroke="#3a3028" stroke-width="10"/>
+<path d="M262 89Q234 100 204 93" fill="none" stroke="url(#bone)" stroke-width="6"/>
+<!-- Separate bone joints and knuckles -->
+<path d="M49 17q-7-11-16-3t-1 16q8 9 17 3l14-3q7 3 12-1t-1-11q-5-5-11-1Z" fill="url(#bone)" stroke="#51483c" stroke-width="2.5"/>
+<path d="M271 17q7-11 16-3t1 16q-8 9-17 3l-14-3q-7 3-12-1t1-11q5-5 11-1Z" fill="url(#bone)" stroke="#51483c" stroke-width="2.5"/>
+<path d="M45 80q-8-6-14 1t-1 14q7 6 15 1l14 2q8 7 15 0t-2-13q-7-5-15 0Z" fill="url(#bone)" stroke="#51483c" stroke-width="2.5"/>
+<path d="M275 80q8-6 14 1t1 14q-7 6-15 1l-14 2q-8 7-15 0t2-13q7-5 15 0Z" fill="url(#bone)" stroke="#51483c" stroke-width="2.5"/>
+<path d="M139 99q21 7 42 0" fill="none" stroke="#604e39" stroke-width="4"/>
+<path d="M145 101q15 3 30 0" fill="none" stroke="#e5d2a7" stroke-width="2"/>
+</g></svg>

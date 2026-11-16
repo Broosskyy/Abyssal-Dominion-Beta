@@ -97,6 +97,14 @@ var kessel_throws := 0
 var free_flask_day := ""
 var decks: Array = []
 var deck_slots := [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
+# Independent permanent *visual* deck extensions. These are NOT timed
+# tide/storm/salvage buffs, and do not replace the ten mounted normal decks.
+# Ownership/economy is intentionally not invented in this art update.
+const DECK_EXTENSION_KEYS := ["mojo_frame","crown_left","crest_right","skull_top_left","skull_top_right","skull_bottom"]
+var deck_extensions: Dictionary = {
+	"mojo_frame":false,"crown_left":false,"crest_right":false,
+	"skull_top_left":false,"skull_top_right":false,"skull_bottom":false
+}
 var bonus: Dictionary = {}
 var bonus_runs := 0
 var captain_name := "Kapitän"
@@ -2025,7 +2033,7 @@ func export_save() -> Dictionary:
 		"cannons":player.cannons,"mounted_cannons":mounted_cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
 		"essence":essence,"fragments":fragments,"bonus_pieces":bonus_pieces.duplicate(),"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
 		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
-		"deck_slots":deck_slots.duplicate(),"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),"guild_home":guild_home.duplicate(true),
+		"deck_slots":deck_slots.duplicate(),"deck_extensions":deck_extensions.duplicate(),"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),"guild_home":guild_home.duplicate(true),
 		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
@@ -2120,6 +2128,13 @@ func restore_save(data: Dictionary) -> bool:
 		for i in mini(saved_slots.size(),CONTENT.DECK_SLOT_COUNT):
 			var index:=int(saved_slots[i])
 			if index>=0 and index<decks.size() and not index in deck_slots:deck_slots[i]=index
+	# Older schema-8 saves lack this optional cosmetic equipment field.
+	# Reset all six keys before restoring, so previous save/character state
+	# cannot leak into a freshly loaded captain.
+	var saved_extensions: Variant=data.get("deck_extensions",{})
+	for key: String in DECK_EXTENSION_KEYS:
+		var stored: Variant=saved_extensions.get(key,false) if saved_extensions is Dictionary else false
+		deck_extensions[key]=stored if stored is bool else false
 	bonus={}
 	bonus_runs=maxi(0,int(data.get("bonus_runs",0)))
 	var run: Variant=data.get("bonus",{})
