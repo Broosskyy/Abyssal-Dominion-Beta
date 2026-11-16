@@ -30,6 +30,13 @@ jobs:
           set -euo pipefail
           XDG_DATA_HOME="$(mktemp -d)" /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --editor --path rebuild/m3052 --quit > /tmp/import.log 2>&1 || { tail -100 /tmp/import.log; exit 1; }
           if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script' /tmp/import.log; then exit 1; fi
+      - name: Bake 2D Classic sprites from source GLB for native renderer tests
+        run: |
+          set -euo pipefail
+          XDG_DATA_HOME="$(mktemp -d)" LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a --server-args='-screen 0 1280x720x24' /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tools/bake_web_fleet.gd > /tmp/m376-bake.log 2>&1 || { tail -100 /tmp/m376-bake.log; exit 1; }
+          grep -q WEB_SPRITES_READY /tmp/m376-bake.log || { tail -100 /tmp/m376-bake.log; exit 1; }
+          python3 rebuild/m3052/tools/embed_native_classic.py
+          XDG_DATA_HOME="$(mktemp -d)" /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --editor --path rebuild/m3052 --quit > /tmp/m376-bake-import.log 2>&1 || { tail -100 /tmp/m376-bake-import.log; exit 1; }
       - name: Direct route, coastline, offline crossplay and gameplay regressions
         run: |
           set -euo pipefail
