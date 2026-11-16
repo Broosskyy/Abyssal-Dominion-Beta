@@ -56,6 +56,6 @@ func _run() -> void:
 	check(restored.restore_save(invalid) and bool(restored.deck_extensions.mojo_frame) and not bool(restored.deck_extensions.crown_left) and restored.deck_extensions.size()==6,"only exact boolean known upgrade slots are restored; unknown keys rejected")
 	var script: String=FileAccess.get_file_as_string("res://sea_marks.gd")
 	check(not script.contains("str(sim.cannon_slots())"),"NO large cannon number is drawn under the ship anymore")
-	check(script.contains("_draw_reference_deck_pips") and script.contains("_draw_reference_module"),"ten real deck points and separate module draw calls make the playerplate")
+	check(script.contains("_reference_deck_pips") and script.contains("_draw_reference_module"),"ten real deck points and separate module draw calls make the playerplate")
 	print(JSON.stringify({"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"failures":failures}))
 	quit(0 if failures.is_empty() else 1)
