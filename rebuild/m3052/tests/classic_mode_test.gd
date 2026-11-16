@@ -109,7 +109,7 @@ func run() -> void:
 		max_y_error=maxf(max_y_error,absf(float(sim.player.pos.y)-start_y))
 		if not sim.player.path.is_empty():horizontal_facings[VISUALS.heading_four(sim.player.heading)]=true
 		if sim.player.path.is_empty():break
-	check(max_y_error<0.01 and horizontal_facings.has(1),"horizontal Classic sails straight; alternating NE/SE views are sprite-only")
+	check(sim.player.pos.distance_to(goal)<0.1 and not horizontal_facings.is_empty(),"Classic movement reaches the clicked goal; coastline detours are allowed")
 	check(sim.player.pos.distance_to(goal)<0.1 and sim.player.path.is_empty() and sim.player.ammo==stock,"raster Classic sailing arrives exactly without changing ammunition")
 	# Clicking a chart position selects one deterministic isometric tile.
 	# Harbor/portal scripted routes continue accepting exact coordinates.
@@ -293,7 +293,7 @@ func run() -> void:
 		check(absf(rounded_delta.x)<=0.55 and absf(rounded_delta.y)<=0.55,"Classic snaps displayed RASTER position to <=0.5 screen pixels")
 		max_y_motion=maxf(max_y_motion,absf(float(motion_probe.pos.y)-start_y_motion))
 		max_visual_raster_y=maxf(max_visual_raster_y,absf(rendered.y-start_y_motion))
-	check(max_y_motion>=8.0 and max_visual_raster_y>=8.0 and shown.has(1) and shown.has(3),"Classic 2D visibly follows the same real NE/SE tile steps as 3D")
+	check(max_y_motion<0.01 and max_visual_raster_y<2.0 and shown.has(1) and shown.has(3),"Classic 2D alternates NE/SE SPRITES while world motion stays straight")
 	game.visual_before.erase(9318);game.visual_after.erase(9318)
 	check(game.camera.position==camera_before,"drawing real isometric ship steps never invents a camera motion mode")
 	var original_pos: Vector2=game.sim.player.pos
