@@ -6,9 +6,10 @@ client logs or public source control. The public key only validates Auth calls.
 import os
 import re
 import time
+from datetime import datetime, timezone
 from urllib.parse import quote
 
-from aiohttp import ClientSession, ClientTimeout
+from aiohttp import ClientSession, ClientTimeout, ClientError
 
 UUID = re.compile(r"^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$")
 
@@ -32,7 +33,9 @@ class SupabaseIdentity:
                     if response.status != 200:
                         return None
                     user = await response.json()
-        except (OSError, TimeoutError, ValueError):
+        except (OSError, TimeoutError, ClientError, ValueError):
+            return None
+        if user.get("is_anonymous") is True:
             return None
         uid = user.get("id")
         if not isinstance(uid, str) or not UUID.fullmatch(uid):
@@ -69,7 +72,7 @@ class SupabaseIdentity:
                     result = await response.json()
                     if response.status >= 400:
                         return web.json_response({"error": "Registrierung oder Anmeldung fehlgeschlagen."}, status=response.status)
-        except (OSError, TimeoutError, ValueError):
+        except (OSError, TimeoutError, ClientError, ValueError):
             return web.json_response({"error": "Identitätsdienst nicht erreichbar."}, status=503)
         token = result.get("access_token")
         user = result.get("user") or {}
@@ -96,7 +99,7 @@ class SupabaseIdentity:
             async with ClientSession(timeout=ClientTimeout(total=6)) as http:
                 async with http.request(method, self.url + endpoint, headers=headers, json=payload) as response:
                     return 200 <= response.status < 300
-        except (OSError, TimeoutError, ValueError):
+        except (OSError, TimeoutError, ClientError, ValueError):
             return False
 
     @staticmethod
@@ -110,6 +113,7 @@ class SupabaseIdentity:
             "design_index": int(peer["skin"]),
             "route_sequence": int(peer["sequence"]),
             "online": bool(online),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
         }
 
     async def mark_join(self, peer):
@@ -142,10 +146,32 @@ class SupabaseIdentity:
             {"Prefer": "resolution=merge-duplicates"},
         )
 
+    async def load_position(self, account_id, map_id):
+        """Restore a cross-device sea position when local SQLite is empty."""
+        if not self.persistence_enabled or not UUID.fullmatch(account_id):
+            return None
+        params = ("?account_id=eq." + quote(account_id) + "&map_id=eq." + str(map_id)
+                  + "&select=pos_x,pos_y,heading,design_index&limit=1")
+        headers = {"apikey": self.service_key, "Authorization": "Bearer " + self.service_key}
+        try:
+            async with ClientSession(timeout=ClientTimeout(total=6)) as http:
+                async with http.get(self.url + "/rest/v1/captain_positions" + params,
+                                    headers=headers) as response:
+                    if response.status != 200:
+                        return None
+                    data = await response.json()
+                    if isinstance(data, list) and data:
+                        row = data[0]
+                        return (float(row["pos_x"]), float(row["pos_y"]),
+                                float(row["heading"]), int(row["design_index"]))
+        except (OSError, TimeoutError, ClientError, ValueError, TypeError, KeyError):
+            return None
+        return None
+
     async def mark_leave(self, peer):
         if not self.persistence_enabled or not UUID.fullmatch(peer["id"]):
             return False
         return await self._postgrest(
             "PATCH", "/rest/v1/captain_positions?account_id=eq." + quote(peer["id"]),
-            {"online": False},
+            {"online": False, "updated_at": datetime.now(timezone.utc).isoformat()},
         )
