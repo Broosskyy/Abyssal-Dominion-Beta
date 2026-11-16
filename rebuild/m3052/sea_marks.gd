@@ -217,7 +217,7 @@ static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,_time_sec
 	var tops: Array=layout.skulls
 	_draw_reference_module(canvas,center,r,"skull_top_left",bool(owned.skull_top_left),Vector2(tops[0]),Vector2(2.45,2.45))
 	_draw_reference_module(canvas,center,r,"skull_top_right",bool(owned.skull_top_right),Vector2(tops[1]),Vector2(2.45,2.45))
-	_draw_reference_deck_pips(canvas,center+Vector2(layout.deck_pips),r,deck_entries(sim))
+	_reference_deck_pips(canvas,center+Vector2(layout.deck_pips),r,deck_entries(sim))
 	_draw_reference_module(canvas,center,r,"skull_bottom",bool(owned.skull_bottom),Vector2(layout.bottom_crest),Vector2(2.45,2.45))
 	# Timed Gezeiten/Runen/Korsaren-Buffs remain in the normal buff UI.
 	# Neither a timer nor the cannon count unlocks ornamental modules.
