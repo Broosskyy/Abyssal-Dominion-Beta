@@ -51,6 +51,26 @@ func _run() -> void:
 	player.skin=original_skin
 	check(game.sim.cannon_slots()==value and game.sim.deck_slots==original_slots,"deck appearance never changes mounted cannons or ten real standard slots")
 	check(game.render_mode==initial_mode and player.pos==start and player.path==course,"player HUD and 2D sprite angle never mutate physical sailing route")
+	# M379 phone screenshot QA: the old touch quickbar covered the captain
+	# nameplate/HP while centered at 852x393. Test the REAL layout for each
+	# landscape phone size instead of only testing button dimensions.
+	for screen: Vector2i in [Vector2i(852,393),Vector2i(844,390),Vector2i(720,405)]:
+		root.size=screen
+		await process_frame
+		game._layout()
+		game.camera.position=player.pos
+		game.camera.force_update_scroll()
+		var p: float=game._plate_pixels()
+		var anchor: Vector2=game._plate_screen_anchor(player)
+		var bar_rect:=Rect2(Vector2(anchor.x-58.0*p,anchor.y+19.0*p),Vector2(116.0*p,15.0*p))
+		var deck_rect:=Rect2(Vector2(anchor.x-48.0*p,anchor.y+39.0*p),Vector2(96.0*p,46.0*p))
+		var quick: Rect2=game.quick_bar.get_global_rect()
+		check(not quick.intersects(bar_rect),"mobile quick slots never cover captain HP/shield bars at "+str(screen))
+		check(not quick.intersects(deck_rect),"mobile quick slots never cover captain ornate deck emblem at "+str(screen))
+		check(not game.camera_pad.visible or not quick.intersects(game.camera_pad.get_global_rect()),"quick slots do not cover movable camera pad at "+str(screen))
+		check(quick.position.x>=0.0 and quick.end.x<=float(screen.x) and quick.position.y>=0.0 and quick.end.y<=float(screen.y),"mobile quick bar stays fully on-screen at "+str(screen))
+		for tab: Button in game.quick_bar.tabs:
+			check(tab.size.x>=44.0 and tab.size.y>=44.0,"mobile quickbar has 44px page targets at "+str(screen))
 	game.queue_free()
 	print(JSON.stringify({"checks":checks,"failures":failures,"status":"PASS" if failures.is_empty() else "FAIL"}))
 	quit(0 if failures.is_empty() else 1)
