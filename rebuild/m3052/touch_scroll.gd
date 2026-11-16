@@ -67,9 +67,13 @@ func _input(event: InputEvent) -> void:
 	# Touch and its emulated mouse press arrive as two events in either order; both are swallowed
 	# while the list glides, so a tap only stops it and never presses what slid underneath.
 	if pointer and event.pressed and get_global_rect().has_point(event.position) and (gliding() or Time.get_ticks_msec()<swallow_until):
+		# A tap stops inertia, but must NOT also enter a fresh press gesture.
+		# Otherwise touch release can still activate an item sliding by.
 		swallow_until=maxi(swallow_until,Time.get_ticks_msec()+90)
-		velocity=0.0
+		_cancel_gesture()
+		glide=float(scroll_vertical)
 		get_viewport().set_input_as_handled()
+		return
 	var emulated=event is InputEventMouse and event.device==InputEvent.DEVICE_ID_EMULATION
 	if event is InputEventScreenTouch:
 		if event.pressed:
