@@ -206,9 +206,15 @@ static func _reference_deck_pips(canvas: CanvasItem,center: Vector2,r: float,ent
 		canvas.draw_rect(rect,ink if lit else ink.darkened(.44),true)
 		canvas.draw_line(point+Vector2(-size.x*.38,-size.y*.28),point+Vector2(size.x*.25,-size.y*.28),ink.lightened(.25) if lit else Color("56616b",.45),maxf(.55,r*.085),true)
 
-static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,_time_seconds: float=0.0) -> void:
+## The final argument is a TEMPORARY render-only preview.  Never mutate
+## sim.deck_extensions (persistent ownership), inventory, buffs or save data.
+## Only explicitly named/boolean slot overrides are accepted.
+static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,_time_seconds: float=0.0,preview: Dictionary={}) -> void:
 	var layout: Dictionary=reference_deck_geometry(r)
 	var owned: Dictionary=deck_extension_state(sim)
+	for key: String in EXTENSION_KEYS:
+		var requested: Variant=preview.get(key,null)
+		if requested is bool:owned[key]=requested
 	# Mojo is the BONE FRAME: draw BEHIND all five independent extensions.
 	_draw_reference_module(canvas,center,r,"mojo_frame",bool(owned.mojo_frame),Vector2(layout.mojo_frame),Vector2(17.5,5.55))
 	# Crown left and the top-right crest are distinct, not a paired toggle.

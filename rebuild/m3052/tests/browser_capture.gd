@@ -61,6 +61,30 @@ func _run() -> void:
 	for frame in 3:await process_frame
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output+"/852x393-mojo-only.png")
+	# M384: photograph the ACTUAL interactive Decks/VORSCHAU menu with
+	# all six individual SVG layers toggled, then the completely empty
+	# preview. Neither state is saved or given to the player.
+	for key: String in game.sim.DECK_EXTENSION_KEYS:
+		game.sim.deck_extensions[key]=false
+	game._open_modal("Decks")
+	game._switch_tab("Decks","VORSCHAU")
+	game._set_all_deck_previews(true)
+	game._layout()
+	for frame in 2:await process_frame
+	# Scroll to the real rendered badge, not just the top menu banner.
+	game.modal_scroll.scroll_vertical=80
+	game._sync_plate_overlay()
+	for frame in 4:await process_frame
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(output+"/852x393-deck-preview-all.png")
+	game._set_all_deck_previews(false)
+	for frame in 2:await process_frame
+	game.modal_scroll.scroll_vertical=80
+	game._sync_plate_overlay()
+	for frame in 4:await process_frame
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(output+"/852x393-deck-preview-none.png")
+	game._close_modal()
 	# The test fixture must not mutate actual persisted player equipment.
 	var motion: Dictionary=await preload("res://tests/ocean_motion_probe.gd").run(self)
 	print(JSON.stringify(motion))
