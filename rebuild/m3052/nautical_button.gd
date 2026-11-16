@@ -18,6 +18,11 @@ var motion_enabled:=true
 var hover_reaction:=0.0
 var motion_time:=0.0
 var press_reaction:=0.0
+# Decorative HUD particles/arcs need not redraw at 60/120 Hz.
+# A 20 FPS animation cadence cuts repeated circles, text and polygons on
+# mobile/WebGL without delaying actual presses or hover feedback.
+const DECORATIVE_FRAME_INTERVAL := 1.0/20.0
+var decorative_frame_elapsed := 0.0
 func _press_visual() -> void:
 	press_reaction=1.0 if motion_enabled else 0.0
 	queue_redraw()
@@ -29,7 +34,18 @@ func _process(delta: float) -> void:
 	if absf(hover_reaction-wanted)<.005:hover_reaction=wanted
 	motion_time=fposmod(motion_time+delta,TAU*64.0) if motion_enabled else 0.0
 	if press_reaction>0.0:press_reaction=maxf(0.0,press_reaction-delta*3.7)
-	if before>0.0 or absf(hover_before-hover_reaction)>.001 or (motion_enabled and (latched or ammo_marker or (hero and cooldown>0.0) or badge_alert or (hero and state_label=="BEREIT"))):queue_redraw()
+	# Input feedback remains immediate; only always-running decoration
+	# uses the slower visual budget. Never change game/simulation ticks.
+	if before>0.0 or absf(hover_before-hover_reaction)>.001:
+		queue_redraw()
+	var animated_decoration: bool=motion_enabled and (latched or ammo_marker or (hero and cooldown>0.0) or badge_alert or (hero and state_label=="BEREIT"))
+	if animated_decoration:
+		decorative_frame_elapsed+=delta
+		if decorative_frame_elapsed>=DECORATIVE_FRAME_INTERVAL:
+			decorative_frame_elapsed=fposmod(decorative_frame_elapsed,DECORATIVE_FRAME_INTERVAL)
+			queue_redraw()
+	else:
+		decorative_frame_elapsed=0.0
 func _ready() -> void:
 	add_to_group("living_hud")
 	motion_enabled=bool(get_tree().get_meta("abyssal_ui_motion",true))
