@@ -14,6 +14,7 @@ import time
 from collections import defaultdict, deque
 from pathlib import Path
 from aiohttp import web, WSMsgType
+from supabase_identity import SupabaseIdentity
 
 PROTOCOL = 2
 SEA_IDS = {0, 1, 2, *range(6, 43)}
@@ -131,6 +132,8 @@ class World:
             self.db.execute('UPDATE characters SET x=x*2,y=y*2')
             self.db.execute('PRAGMA user_version=2')
             self.db.commit()
+        self.identity = SupabaseIdentity()
+        self.remote_sync_task = None
         self.peers = {}
         self.rates = defaultdict(deque)
         self.tick = 0
@@ -181,6 +184,8 @@ class World:
 
     async def auth(self, request):
         if self.limited(('auth',request.remote)): return web.json_response({'error':'Zu viele Versuche. Bitte später erneut versuchen.'},status=429)
+        if self.identity.enabled:
+            return await self.identity.exchange(request, PROTOCOL)
         try:
             data = await request.json()
             if not isinstance(data,dict): raise ValueError()
@@ -222,7 +227,7 @@ class World:
         try:
             hello = await asyncio.wait_for(ws.receive_json(),timeout=8)
             if not isinstance(hello,dict) or hello.get('type')!='join' or hello.get('protocol')!=PROTOCOL: raise ValueError('protocol')
-            account = self.session(hello.get('token'))
+            account = await self.identity.verify(hello.get('token')) if self.identity.enabled else self.session(hello.get('token'))
             map_id = hello.get('map_id')
             if not account or type(map_id) is not int or map_id not in SEA_IDS: raise ValueError('auth/map')
             for previous,active in list(self.peers.items()):
@@ -232,10 +237,14 @@ class World:
                     self.peers.pop(previous,None)
             if sum(p['map_id']==map_id for p in self.peers.values())>=MAX_ROOM: raise ValueError('room full')
             saved = self.db.execute('SELECT x,y,heading,skin FROM characters WHERE account=? AND map_id=?',(account['id'],map_id)).fetchone()
+            if saved is None and self.identity.persistence_enabled:
+                saved = await self.identity.load_position(account['id'], map_id)
             peer = dict(**account,map_id=map_id,x=saved[0] if saved else 4200.,y=saved[1] if saved else 2900.,
                 heading=saved[2] if saved else math.pi,skin=saved[3] if saved else 0,
                 hp=2400,max_hp=2400,route=[],sequence=0,expires=time.monotonic()+max(0,account['expires_at']-time.time()))
             self.peers[ws] = peer
+            if self.identity.persistence_enabled:
+                await self.identity.mark_join(peer)
             await ws.send_json({'type':'welcome','protocol':PROTOCOL,'account_id':account['id'],'map_id':map_id,'tick_rate':20,'player':{k:peer[k] for k in ('x','y','heading','skin')},'scope':'presence-preview'})
             async for msg in ws:
                 if msg.type!=WSMsgType.TEXT: continue
@@ -289,7 +298,14 @@ class World:
         except (ValueError,TypeError,KeyError,asyncio.TimeoutError):
             await ws.close(code=1008,message=b'Invalid session or map')
         finally:
-            if peer is not None: self.save_character(peer)
+            if peer is not None:
+                self.save_character(peer)
+                # Avoid a stale connection overriding the new same-account room.
+                if self.identity.persistence_enabled and not any(
+                    other['id'] == peer['id'] and other is not peer
+                    for other in self.peers.values()
+                ):
+                    await self.identity.mark_leave(peer)
             self.peers.pop(ws,None)
         return ws
 
@@ -314,6 +330,12 @@ class World:
                         if distance<=step: peer['route'].pop(0)
                         else: break
                     if self.tick%100==0: self.save_character(peer)
+                # Write a coarse persistence checkpoint every ~5s; the existing
+                # 20Hz world simulation stays exclusively in this WS server.
+                if self.tick%100==0 and self.identity.persistence_enabled:
+                    if self.remote_sync_task is None or self.remote_sync_task.done():
+                        self.remote_sync_task=asyncio.create_task(
+                            self.identity.sync_positions([dict(p) for p in self.peers.values()]))
                 rooms={p['map_id'] for p in self.peers.values()}
                 snapshots={room: {'type':'snapshot','tick':self.tick,'map_id':room,'players':[
                     dict({k:p[k] for k in ('id','username','x','y','sequence','heading','skin','hp','max_hp')},moving=bool(p['route'])) for p in self.peers.values() if p['map_id']==room]} for room in rooms}
@@ -326,8 +348,12 @@ class World:
         task.cancel()
         try: await task
         except asyncio.CancelledError: pass
+        if self.remote_sync_task is not None and not self.remote_sync_task.done():
+            await self.remote_sync_task
         for ws,peer in list(self.peers.items()):
             self.save_character(peer)
+            if self.identity.persistence_enabled:
+                await self.identity.mark_leave(peer)
             await ws.close(code=1001,message=b'Server stopping')
         self.db.close()
 
@@ -352,7 +378,7 @@ def create_app(database='abyssal.sqlite3',allowed_origin=''):
     world=World(database);app['world']=world;app['allowed_origin']={item.strip() for item in allowed_origin.split(',') if item.strip()}
     app.router.add_post('/v1/register',world.auth);app.router.add_post('/v1/login',world.auth)
     app.router.add_get('/v1/world',world.websocket)
-    async def health(_): return web.json_response({'status':'ready','protocol':PROTOCOL,'scope':'presence-preview'})
+    async def health(_): return web.json_response({'status':'ready','protocol':PROTOCOL,'scope':'presence-preview','auth_provider':'supabase' if world.identity.enabled else 'local-sandbox','persist_positions':world.identity.persistence_enabled})
     app.router.add_get('/health',health)
     app.router.add_route('OPTIONS','/{tail:.*}',health)
     app.cleanup_ctx.append(world.ticks)

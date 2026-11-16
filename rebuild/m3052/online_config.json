@@ -1,0 +1,6 @@
+{
+  "provider": "supabase",
+  "supabase_url": "https://eysiaedrtfcomyzqqkxj.supabase.co",
+  "supabase_publishable_key": "sb_publishable_bLqisCubprpQ53YjkSICYA_sL7Enhyo",
+  "notes": "Publishable frontend key (not a secret). Do not add service role keys to client exports."
+}

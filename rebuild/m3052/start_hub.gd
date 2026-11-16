@@ -518,7 +518,7 @@ func _show(next: String) -> void:
 			_label("KONTO ERSTELLEN" if registration else "WILLKOMMEN ZURÜCK",true)
 			if registration:username=_field("Spielername · 3 bis 24 Zeichen")
 			email=_field("E-Mail");password=_field("Passwort · mindestens 10 Zeichen",true)
-			var notice=_label(status_text if not status_text.is_empty() else ("Beta-Server verbunden" if not network.server_url.is_empty() else "Beta-Server noch nicht verbunden · Gastspiel verfügbar"))
+			var notice=_label(status_text if not status_text.is_empty() else ("Supabase-Konto · Weltserver konfiguriert" if not network.server_url.is_empty() else "Supabase-Registrierung aktiv · Weltserver noch nicht verbunden"))
 			notice.name="AuthStatus"
 			_button("REGISTRIEREN" if registration else "ANMELDEN",func():
 				notice.text="Anmeldung wird geprüft …"
