@@ -13,6 +13,7 @@ var publishable_key := ""
 var token := ""
 var refresh_token := ""
 var expires_at_unix := 0
+var refresh_retry_at_unix := 0
 var account: Dictionary = {}
 var request: HTTPRequest
 var pending_action := ""
@@ -95,6 +96,8 @@ func _persist_memory_session() -> void:
 func _auth_result(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
     var action := pending_action
     pending_action = ""
+    if action == "supabase_refresh":
+        refresh_retry_at_unix = int(Time.get_unix_time_from_system()) + 60
     var parsed: Variant = JSON.parse_string(body.get_string_from_utf8()) if result == HTTPRequest.RESULT_SUCCESS and not body.is_empty() else null
     if result != HTTPRequest.RESULT_SUCCESS or not parsed is Dictionary:
         if action != "supabase_refresh":
@@ -121,6 +124,7 @@ func _auth_result(result: int, code: int, _headers: PackedStringArray, body: Pac
                 auth_completed.emit(false, "Kein gültiges Sitzungstoken.")
             return
         token = session_token
+        refresh_retry_at_unix = 0
         refresh_token = str(data.get("refresh_token", refresh_token))
         expires_at_unix = int(Time.get_unix_time_from_system()) + int(data.get("expires_in", 3600))
         var metadata: Variant = user.get("user_metadata", {})
@@ -143,7 +147,7 @@ func _auth_result(result: int, code: int, _headers: PackedStringArray, body: Pac
     auth_completed.emit(true, "Angemeldet als " + str(account.get("username", "Kapitän")))
 
 func _refresh_supabase_session() -> void:
-    if not _supabase_enabled() or refresh_token.is_empty() or pending_action != "":
+    if not _supabase_enabled() or refresh_token.is_empty() or pending_action != "" or int(Time.get_unix_time_from_system()) < refresh_retry_at_unix:
         return
     if request.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED:
         return
@@ -233,6 +237,7 @@ func sign_out() -> void:
     token = ""
     refresh_token = ""
     expires_at_unix = 0
+    refresh_retry_at_unix = 0
     account = {}
     if get_tree().has_meta("abyssal_session"):
         get_tree().remove_meta("abyssal_session")
