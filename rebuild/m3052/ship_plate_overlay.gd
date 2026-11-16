@@ -125,7 +125,7 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 	if player:
 		# Keep ten deck slots physically aligned under shield, regardless
 		# of ship yaw or which Corsair material was chosen.
-		SEA_MARKS.deck_badge(self,Vector2(0,51*pixel_scale),8.0*pixel_scale,sim,float(host.elapsed))
+		SEA_MARKS.deck_badge(self,Vector2(0,51*pixel_scale),8.0*pixel_scale,sim,float(host.elapsed),host._deck_preview_active())
 	if float(actor.get("slow",0.0))>0.0:draw_circle(Vector2(bar_width*.5+6*pixel_scale,14*pixel_scale),2.5*pixel_scale,Color("9fdbf4"))
 	if player and sim.staff.hidden():_caption(Vector2(0,-20*pixel_scale),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color())
 	draw_set_transform(Vector2.ZERO)
