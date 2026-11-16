@@ -19,7 +19,7 @@ func _initialize() -> void:
 	var sim=SIM.new()
 	var body=sim.npcs[0];body.pos=Vector2(500,500)
 	var route=sim.plan_actor_path(body,Vector2(950,500))
-	check(str(body.renderer)=="mesh" and sim.classic_steering and route==sim.plan_path(body.pos,Vector2(950,500)),"native 3D GLB ships share Classic's destination and tile navigation")
+	check(str(body.renderer)=="mesh" and sim.classic_steering and route==sim.plan_path(body.pos,Vector2(950,500)),"native 3D GLB ships share Classic's direct destination navigation")
 	var before: Vector2=body.pos
 	var safe=true
 	for point: Vector2 in route:
@@ -35,14 +35,14 @@ func _initialize() -> void:
 		if body.path.is_empty():break
 	var max_native_y: float=0.0
 	for point: Vector2 in native_track:max_native_y=maxf(max_native_y,absf(point.y-500.0))
-	check(body.pos.distance_to(Vector2(950,500))<0.1 and max_native_y>=8.0 and max_native_y<35.0,"3D GLB physically follows horizontal NE/SE diamond tile steps")
+	check(body.pos.distance_to(Vector2(950,500))<0.1 and max_native_y<0.01,"3D GLB follows a direct horizontal water line without lateral jitter")
 	# Four historic views now follow a 48×32 staggered diamond-grid path.
 	# The mainland high-level waypoint stays identical to native 3D.
 	sim.set_classic_steering(true)
 	body.pos=Vector2(500,500)
 	body.renderer="sprite";body.view_count=4
 	var classic_route=sim.plan_actor_path(body,Vector2(950,500))
-	check(classic_route==sim.plan_path(body.pos,Vector2(950,500)) and classic_route.size()==1,"Classic retains one exact destination waypoint without fake high-level nodes")
+	check(classic_route==sim.plan_path(body.pos,Vector2(950,500)) and classic_route.size()==1,"Classic retains a single open-water destination without extra physical tile steps")
 	body.path=classic_route.duplicate()
 	var start_y: float=body.pos.y
 	var max_y_error: float=0.0
@@ -52,8 +52,8 @@ func _initialize() -> void:
 		max_y_error=maxf(max_y_error,absf(float(body.pos.y)-start_y))
 		if not body.path.is_empty():diagonal_y[int(signf(float(body.heading.y)))]=true
 		if body.path.is_empty():break
-	check(max_y_error>=8.0 and max_y_error<35.0 and diagonal_y.has(1) and diagonal_y.has(-1),"Classic physically traverses the same alternating NE/SE steps as 3D")
-	check(body.pos.distance_to(Vector2(950,500))<0.1 and body.path.is_empty(),"tile steps plus final exact arrival reach original clicked destination")
+	check(max_y_error<0.01,"2D Classic keeps the same straight horizontal world line as 3D")
+	check(body.pos.distance_to(Vector2(950,500))<0.1 and body.path.is_empty(),"direct course reaches original clicked destination exactly")
 	# Compare actual trajectory samples, not just their common endpoint.
 	body.pos=Vector2(500,500);body.path=classic_route.duplicate()
 	body.erase("_iso_goal");body.erase("_iso_route");body.erase("_iso_route_index")
@@ -72,7 +72,7 @@ func _initialize() -> void:
 	body.view_count=8
 	check(sim.plan_actor_path(body,Vector2(950,500))==classic_route,"baked sprite count does not create an extra sailing mode")
 	sim.set_classic_steering(false)
-	check(sim.classic_steering and sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"render-mode flag cannot switch off the shared physical 48x32 navigation")
+	check(sim.classic_steering and sim.plan_actor_path(body,Vector2(950,500))==sim.plan_path(body.pos,Vector2(950,500)),"render-mode flag cannot change the shared direct navigation")
 	for map_index in [0,1,2]:
 		sim.configure_map(map_index)
 		sim.shots.clear()
