@@ -1,7 +1,7 @@
 {
   "engine": "4.7.2.stable.official.ed1daf0bf",
   "milestone": "M3059",
-  "source_commit": "62645ce68188a9cc5c0083279c42f67b580ba674",
+  "source_commit": "8f35da1f9cd5fb6b014f733b9946caea5e2e151f",
   "bootstrap_sha256": "8e97bafe54793eb72410248af725c99324486557bf48c5040cc7a27025c88fde",
   "tests": [
     {
@@ -147,14 +147,14 @@
     }
   ],
   "data": {
-    "revision": 380,
+    "revision": 381,
     "abi": 1,
     "engine": "4.7.2.stable",
     "min_apk": 305903,
-    "bytes": 129198183,
-    "sha256": "e4594fda7b3c68b0ed4b5d7359556724e48c67b6fa7d77d775de5e0ef781513a",
-    "signature": "YhrUtrqXO7wri4lSpuKtkCeqkt9hnrZxCCC9waXaSvFCqoj4UPFzi0/M9XfuZeGfd+t4Akl0CuwGjF4c2+JvS+MoMHVLpwWgQHRGyb4pfTEVrCoVimiTHIJN/g8Zqja3ee6LjvbXDxp0VdHqUSAg5BE6M2MeeyQdbiY+XkmtiFiDdNV/ZyYvnJ98Ioy46r24hKhrSS2zPcPJxThB+65Kk4G9UHJePKDcNjG3+8X0kx/Iz4kE6v4iV4J31RVOHlpdN6MfQnnj3ypfsSh9DdsEQn8sTcTZseJXrCbEXT8kuFQ5mokv9JIoFJYoA6aeaP7ExUpHWvi/86S3g8iic/n1NQ==",
-    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-380/ABYSSAL_DATA_380.zip"
+    "bytes": 129202117,
+    "sha256": "3c4815a34a6c485fe148ab4e03c92b9d285149eb02f37bf664e500566d55f1be",
+    "signature": "iXPgHVW5PEk3iKNPbSzV6BCO9ClhjxL5Gp+PeccHukl34G0IkeNih8csrxz4D+Z/RZwA9bnu/F/2ElC1Z9jQNnNydqMCfJB11zJhE1ZMBohIjsVsRJOmUXlfLQ0ryy5K9ipvL1Z+AAYEFynLmAMT586yD8TOT902b4H9t0bb3x3d+PBMCtu+T63ERR4kJgwwQo+kf8AUaIAOM30GxKgJrIjonjDLjmHdxNIjGgmOtuunfXnxMzuHN3Kx75XAQDIlFG78maeWKgQdvW53vVH+4FruHoXOc3PD2fe0JREgexvp6meLgXgVx6V3Wj4oH/jIvVlPNdIWVEmb8574o7YQVw==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-381/ABYSSAL_DATA_381.zip"
   },
   "audited_pngs": 44,
   "physical_android_test": "NOT_PERFORMED",
