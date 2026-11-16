@@ -3,6 +3,18 @@ extends RefCounted
 ## padlocks and check marks. The bundled font has no symbol glyphs, so these are drawn.
 const DECK_COLORS := {"cannon":Color("ff7a45"),"armor":Color("9cbde3"),"hunter":Color("6fd37a"),"navigation":Color("4fd6ec"),"logistics":Color("f2c14e"),"tide":Color("3fe8cf")}
 const ROMAN := ["I","II","III"]
+# Every image is an independent transparent Godot texture (NOT an atlas,
+# combined badge, timed buff, or drawn procedural surrogate).
+const EXTENSION_ART := {
+	"mojo_frame":preload("res://assets/ui/deck_extensions/mojo_bone_frame.svg"),
+	"crown_left":preload("res://assets/ui/deck_extensions/left_crown.svg"),
+	"crest_right":preload("res://assets/ui/deck_extensions/upper_right_crest.svg"),
+	"skull_top_left":preload("res://assets/ui/deck_extensions/skull_top_left.svg"),
+	"skull_top_right":preload("res://assets/ui/deck_extensions/skull_top_right.svg"),
+	"skull_bottom":preload("res://assets/ui/deck_extensions/skull_bottom.svg")
+}
+const EXTENSION_KEYS := ["mojo_frame","crown_left","crest_right","skull_top_left","skull_top_right","skull_bottom"]
+
 
 static func gem(canvas: CanvasItem,center: Vector2,r: float,color: Color,tier: int,lit: bool,font: Font=null,glow: float=0.0) -> void:
 	var w=r*.82
@@ -142,154 +154,73 @@ static func pirate_crest(canvas: CanvasItem,center: Vector2,r: float) -> void:
 	canvas.draw_arc(center-Vector2(0,r*.24),r*.82,PI*1.08,PI*1.95,12,Color("fff1c6",.6),.75,true)
 	canvas.draw_circle(center+Vector2(-r*.32,-r*.41),r*.10,Color("ffffff",.52))
 
-## M378: geometry from the captain reference, expressed in local HUD units.
-## The central number is REAL cannon capacity, never an invented "656" stat.
-## 10 small enamel pips retain the independently upgraded Gold/Pearl/Crystal
-## deck-slot state; 3 special-deck ornaments reflect actual buff timers.
+## M383: each pictogram in the user's screenshot is its OWN upgrade slot.
+## The Mojo bone frame is a separately equipped extension, never the
+## background of a precomposed static "deck badge". The old central cannon
+## count is gone; ten mounted ordinary decks occupy its exact position.
 static func reference_deck_geometry(r: float) -> Dictionary:
 	return {
-		"left_crown":Vector2(-6.1*r,-.90*r),
-		"right_crown":Vector2(6.1*r,-.90*r),
-		"skulls":[Vector2(-1.28*r,-1.42*r),Vector2(1.28*r,-1.42*r)],
-		"number":Vector2(0,2.55*r),
-		"bottom_crest":Vector2(0,4.45*r),
-		"deck_pips":Vector2(0,6.05*r)
+		"left_crown":Vector2(-6.9*r,-.85*r),
+		"right_crown":Vector2(6.9*r,-.85*r),
+		"skulls":[Vector2(-1.55*r,-1.05*r),Vector2(1.55*r,-1.05*r)],
+		"number":Vector2(0,1.35*r), # Legacy layout key: NOW ten deck pips, never a number.
+		"deck_pips":Vector2(0,1.35*r),
+		"bottom_crest":Vector2(0,4.15*r),
+		"mojo_frame":Vector2(0,1.45*r)
 	}
 
-static func _reference_crown(canvas: CanvasItem,center: Vector2,r: float,ink: Color) -> void:
-	var p: PackedVector2Array=PackedVector2Array([
-		center+Vector2(-1.10,0.60)*r,center+Vector2(-1.15,-0.62)*r,
-		center+Vector2(-0.52,-0.12)*r,center+Vector2(0,-1.0)*r,
-		center+Vector2(0.52,-0.12)*r,center+Vector2(1.15,-0.62)*r,
-		center+Vector2(1.10,0.60)*r
-	])
-	var shadow: PackedVector2Array=PackedVector2Array()
-	for v: Vector2 in p:shadow.append(v+Vector2(0,1.3))
-	canvas.draw_colored_polygon(shadow,Color("061018"))
-	canvas.draw_colored_polygon(p,ink.darkened(.18))
-	var border=p.duplicate();border.append(p[0])
-	canvas.draw_polyline(border,ink.lightened(.32),maxf(.7,r*.13),true)
-	for x in [-.72,0.0,.72]:
-		canvas.draw_circle(center+Vector2(x,-.15)*r,maxf(.65,r*.11),Color("f6e4b9"))
-	canvas.draw_line(center+Vector2(-1.03,.43)*r,center+Vector2(1.03,.43)*r,Color("654820"),maxf(.7,r*.19),true)
+static func deck_extension_state(sim) -> Dictionary:
+	var state: Dictionary={}
+	var installed: Variant=sim.deck_extensions if sim!=null else {}
+	for key: String in EXTENSION_KEYS:
+		state[key]=bool(installed.get(key,false)) if installed is Dictionary else false
+	return state
 
-static func _reference_skull(canvas: CanvasItem,point: Vector2,r: float,ink: Color) -> void:
-	canvas.draw_circle(point+Vector2(0,-.18)*r,r*.74,Color("061018"))
-	canvas.draw_circle(point+Vector2(0,-.18)*r,r*.57,ink)
-	canvas.draw_rect(Rect2(point+Vector2(-.36,.18)*r,Vector2(.72,.38)*r),ink.darkened(.18))
-	for side in [-1.0,1.0]:
-		canvas.draw_circle(point+Vector2(side*.27,-.23)*r,maxf(.65,r*.15),Color("091821"))
-	canvas.draw_colored_polygon(PackedVector2Array([
-		point+Vector2(0,-.08)*r,point+Vector2(-.11,.10)*r,point+Vector2(.11,.10)*r]),Color("26313a"))
-	for side in [-.18,.10]:
-		canvas.draw_line(point+Vector2(side,.25)*r,point+Vector2(side,.53)*r,Color("313d3b"),maxf(.7,r*.12),true)
+static func reference_deck_layers(sim) -> Array[Dictionary]:
+	var state: Dictionary=deck_extension_state(sim)
+	var result: Array[Dictionary]=[]
+	for key: String in EXTENSION_KEYS:
+		result.append({"key":key,"installed":bool(state[key]),"asset":EXTENSION_ART[key]})
+	return result
+
+static func _draw_reference_module(canvas: CanvasItem,center: Vector2,r: float,key: String,installed: bool,at: Vector2,dimensions: Vector2) -> void:
+	# No ghost extension is silently granted. Missing equipment is absent,
+	# not falsely rendered as a permanent crown, skull or Mojo buff.
+	if not installed:return
+	var image: Texture2D=EXTENSION_ART.get(key)
+	if image==null:return
+	var px_size: Vector2=dimensions*r
+	canvas.draw_texture_rect(image,Rect2(center+at-px_size*.5,px_size),false)
 
 static func _reference_deck_pips(canvas: CanvasItem,center: Vector2,r: float,entries: Array) -> void:
-	# Two rows of five tiny enamel marks: each mark represents one ACTUAL
-	# mounted deck. Keep the marks legible without ten oversized panels.
+	# Ten INDIVIDUAL normal slots: 2 x 5 points exactly where the
+	# old '133/411/656' number was. Material colour is live game data.
 	for slot in 10:
 		var entry: Dictionary=entries[slot] if slot<entries.size() else {}
-		var point=center+Vector2((float(slot%5)-2.0)*r*.80,(float(floori(slot/5.0))-.5)*r*.75)
+		var point: Vector2=center+Vector2((float(slot%5)-2.0)*r*.92,(float(floori(slot/5.0))-.5)*r*.92)
 		var lit: bool=bool(entry.get("lit",false))
-		var ink: Color=Color(entry.get("color",Color("495760"))) if lit else Color("324451")
-		var size=Vector2(r*.52,r*.46)
-		canvas.draw_rect(Rect2(point-size*.5, size).grow(.65),Color("061018"))
-		canvas.draw_rect(Rect2(point-size*.5, size),ink if lit else ink.darkened(.35))
-		if lit:canvas.draw_line(point-size*.42,point+Vector2(size.x*.42,-size.y*.42),ink.lightened(.35),.6,true)
+		var ink: Color=Color(entry.get("color",Color("536373"))) if lit else Color("536477")
+		var size: Vector2=Vector2(r*.61,r*.51)
+		var rect: Rect2=Rect2(point-size*.5,size)
+		canvas.draw_rect(rect.grow(maxf(.55,r*.11)),Color("08141d"),true)
+		canvas.draw_rect(rect,ink if lit else ink.darkened(.44),true)
+		canvas.draw_line(point+Vector2(-size.x*.38,-size.y*.28),point+Vector2(size.x*.25,-size.y*.28),ink.lightened(.25) if lit else Color("56616b",.45),maxf(.55,r*.085),true)
 
-## M379: light pirate filigree instead of M378's massive 150px steel arms.
-## Two simple floating scrolls with an optional real-buff coloured pearl.
-static func _reference_side_scroll(canvas: CanvasItem,center: Vector2,r: float,side: float,ink: Color,active: bool,time_seconds: float) -> void:
-	var top: PackedVector2Array=PackedVector2Array([
-		center+Vector2(side*7.95*r,.75*r),
-		center+Vector2(side*6.45*r,1.45*r),
-		center+Vector2(side*4.25*r,1.2*r),
-		center+Vector2(side*3.2*r,1.95*r)
-	])
-	var bottom: PackedVector2Array=PackedVector2Array([
-		center+Vector2(side*7.9*r,2.25*r),
-		center+Vector2(side*6.65*r,2.50*r),
-		center+Vector2(side*5.85*r,2.16*r)
-	])
-	canvas.draw_polyline(top,Color("0a1720",.92),maxf(1.5,r*.40),true)
-	canvas.draw_polyline(top,ink,maxf(.85,r*.20),true)
-	canvas.draw_polyline(bottom,ink.darkened(.12),maxf(.70,r*.18),true)
-	var crown_tip: Vector2=center+Vector2(side*7.9*r,1.1*r)
-	canvas.draw_circle(crown_tip,maxf(1.0,r*.25),ink)
-	canvas.draw_circle(crown_tip+Vector2(0,-.3*r),maxf(.5,r*.11),Color("fff1c8",.82))
-	if active:
-		var pearl: Vector2=center+Vector2(side*6.3*r,2.25*r)
-		var glow: float=.65+.35*sin(time_seconds*2.0)
-		canvas.draw_circle(pearl,r*.71,Color(ink,.13*glow))
-		canvas.draw_circle(pearl,r*.39,ink)
-		canvas.draw_circle(pearl,r*.17,Color("fff7e5"))
-
-## Distinct special-deck marks; only illuminate real timed buffs.
-## Drawn from original vectors, not copied 3rd-party icons.
-static func _reference_special_icon(canvas: CanvasItem,center: Vector2,r: float,key: String,active: bool) -> void:
-	var ink: Color={
-		"tide":Color("4ee2d0"),"storm":Color("a7c5fc"),
-		"salvage":Color("ffd57f")
-	}.get(key,Color("bfa46e"))
-	var tone: Color=ink if active else Color("806e4d",.68)
-	var disk: Color=Color("071521",.92)
-	canvas.draw_circle(center,r*.70,disk)
-	canvas.draw_arc(center,r*.70,0.0,TAU,24,Color(tone,.85),maxf(.7,r*.12),true)
-	if key=="tide":
-		for row in 2:
-			var points:=PackedVector2Array()
-			for i in 7:
-				var xx: float=(float(i)-3.0)*r*.15
-				points.append(center+Vector2(xx,(float(row)-.5)*r*.26+sin(float(i)*PI*.52)*r*.09))
-			canvas.draw_polyline(points,tone,maxf(1.0,r*.16),true)
-	elif key=="storm":
-		canvas.draw_colored_polygon(PackedVector2Array([
-			center+Vector2(-.1,-.54)*r,center+Vector2(.27,-.54)*r,
-			center+Vector2(.07,-.06)*r,center+Vector2(.30,-.06)*r,
-			center+Vector2(-.22,.53)*r,center+Vector2(-.08,.10)*r,
-			center+Vector2(-.31,.10)*r]),tone)
-	elif key=="salvage":
-		# Little anchor with spread flukes, visually different from a skull.
-		canvas.draw_circle(center+Vector2(0,-.48)*r,r*.12,tone)
-		canvas.draw_line(center+Vector2(0,-.33)*r,center+Vector2(0,.40)*r,tone,maxf(1.0,r*.15),true)
-		canvas.draw_line(center+Vector2(-.28,-.07)*r,center+Vector2(.28,-.07)*r,tone,maxf(1.0,r*.12),true)
-		canvas.draw_arc(center+Vector2(0,.22)*r,r*.37,0.12,PI-.12,12,tone,maxf(1.0,r*.14),true)
-
-static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,time_seconds: float=0.0) -> void:
-	# Ornament geometry deliberately independent from hull size, camera
-	# yaw and render mode; only the overlay's native-pixel scale applies.
+static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,_time_seconds: float=0.0) -> void:
 	var layout: Dictionary=reference_deck_geometry(r)
-	var old_gold: Color=Color("c6a970")
-	var bright_gold: Color=Color("efd49b")
-	var tide: bool=float(sim.buffs.tide_deck)>0.0
-	var storm: bool=float(sim.buffs.storm_deck)>0.0
-	var salvage: bool=float(sim.buffs.salvage_deck)>0.0
-	# Symmetrical filigree around the central number. Specials change
-	# colour/effects of the three established fittings, not their layout.
-	_reference_side_scroll(canvas,center,r,-1.0,Color("72dacc") if tide else old_gold,tide,time_seconds)
-	_reference_side_scroll(canvas,center,r,1.0,Color("91c8f1") if storm else old_gold,storm,time_seconds)
-	_reference_crown(canvas,center+Vector2(layout.left_crown),r*.92,Color("72dacc") if tide else old_gold)
-	_reference_crown(canvas,center+Vector2(layout.right_crown),r*.92,Color("91c8f1") if storm else old_gold)
-	_reference_special_icon(canvas,center+Vector2(-6.15*r,2.65*r),r*.98,"tide",tide)
-	_reference_special_icon(canvas,center+Vector2(6.15*r,2.65*r),r*.98,"storm",storm)
-	for point: Vector2 in layout.skulls:
-		_reference_skull(canvas,center+point,r*1.1,bright_gold)
-	# Use actual mounted cannon capacity as the readable numeric value.
-	# It will grow with equipped ordinary decks; no decorative fake stat.
-	var font: Font=ThemeDB.fallback_font
-	var value: String=str(sim.cannon_slots())
-	var fs: int=maxi(14,roundi(r*3.2))
-	var width: float=font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
-	var at: Vector2=center+Vector2(layout.number)-Vector2(width*.5,0)
-	canvas.draw_string_outline(font,at,value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,maxi(2,roundi(r*.34)),Color("07121c"))
-	canvas.draw_string(font,at,value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("f9eee1"))
-	# The third special deck is the independent bottom pirate emblem.
-	var bottom_ink: Color=Color("f7c86b") if salvage else old_gold.darkened(.12)
-	_reference_skull(canvas,center+Vector2(layout.bottom_crest),r*.96,bottom_ink)
-	_reference_special_icon(canvas,center+Vector2(layout.bottom_crest)+Vector2(2.1*r,0),r*.74,"salvage",salvage)
-	_reference_deck_pips(canvas,center+Vector2(layout.deck_pips),r,deck_entries(sim))
-	# Kristallsegen remains a separate, timed blessing; the 3 side decks
-	# do not consume any of the 10 independently upgraded standard slots.
+	var owned: Dictionary=deck_extension_state(sim)
+	# Mojo is the BONE FRAME: draw BEHIND all five independent extensions.
+	_draw_reference_module(canvas,center,r,"mojo_frame",bool(owned.mojo_frame),Vector2(layout.mojo_frame),Vector2(18.8,7.65))
+	# Crown left and the top-right crest are distinct, not a paired toggle.
+	_draw_reference_module(canvas,center,r,"crown_left",bool(owned.crown_left),Vector2(layout.left_crown),Vector2(2.8,2.9))
+	_draw_reference_module(canvas,center,r,"crest_right",bool(owned.crest_right),Vector2(layout.right_crown),Vector2(2.8,2.9))
+	var tops: Array=layout.skulls
+	_draw_reference_module(canvas,center,r,"skull_top_left",bool(owned.skull_top_left),Vector2(tops[0]),Vector2(2.45,2.45))
+	_draw_reference_module(canvas,center,r,"skull_top_right",bool(owned.skull_top_right),Vector2(tops[1]),Vector2(2.45,2.45))
+	_draw_reference_deck_pips(canvas,center+Vector2(layout.deck_pips),r,deck_entries(sim))
+	_draw_reference_module(canvas,center,r,"skull_bottom",bool(owned.skull_bottom),Vector2(layout.bottom_crest),Vector2(2.45,2.45))
+	# Timed Gezeiten/Runen/Korsaren-Buffs remain in the normal buff UI.
+	# Neither a timer nor the cannon count unlocks ornamental modules.
 
 ## Kristallsegen beside the deck row: the crystal, a gold ring and a timer that runs down.
 static func blessing_crystal(canvas: CanvasItem,center: Vector2,r: float,texture: Texture2D,remaining: float,total: float) -> void:
