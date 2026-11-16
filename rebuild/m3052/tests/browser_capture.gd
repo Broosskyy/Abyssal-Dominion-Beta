@@ -38,6 +38,30 @@ func _run() -> void:
 			await RenderingServer.frame_post_draw
 			var filename="%dx%d-heading%d.png" % [dimensions.x,dimensions.y,direction]
 			root.get_texture().get_image().save_png(output+"/"+filename)
+	# M383 UI visual proof: screenshot the SAME real game with (1) every
+	# independently unlocked ornament and (2) ONLY the Mojo bone frame.
+	# Test-only equipment fixture; no automatic gifts in player saves.
+	root.size=Vector2i(852,393)
+	await process_frame
+	game._layout()
+	game.sim.player.skin=0
+	game.sim.player.heading=Vector2.RIGHT
+	for key: String in game.sim.DECK_EXTENSION_KEYS:
+		game.sim.deck_extensions[key]=true
+	game.camera.force_update_scroll()
+	game._sync_plate_overlay()
+	game.queue_redraw()
+	for frame in 3:await process_frame
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(output+"/852x393-modular-all.png")
+	for key: String in game.sim.DECK_EXTENSION_KEYS:
+		game.sim.deck_extensions[key]=key=="mojo_frame"
+	game._sync_plate_overlay()
+	game.queue_redraw()
+	for frame in 3:await process_frame
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(output+"/852x393-mojo-only.png")
+	# The test fixture must not mutate actual persisted player equipment.
 	var motion: Dictionary=await preload("res://tests/ocean_motion_probe.gd").run(self)
 	print(JSON.stringify(motion))
 	var monsters: Dictionary=await preload("res://tests/monster_motion_probe.gd").run(self)
