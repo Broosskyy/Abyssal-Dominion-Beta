@@ -81,6 +81,14 @@ func _run() -> void:
 	# a decorative tile edge or an optimistic long obstacle sample.
 	var polygon: PackedVector2Array=PackedVector2Array([barrier.position,barrier.position+Vector2(barrier.size.x,0),barrier.end,barrier.position+Vector2(0,barrier.size.y)])
 	sim.islands.append({"bounds":barrier,"outline":polygon})
+	# The test creates land dynamically *after* SIM configured its grid.
+	# Refresh the A* solids so direct/coastal planning sees the actual
+	# obstruction instead of an obsolete, empty pre-test grid.
+	sim.grid.update()
+	for cy in sim.grid.region.size.y:
+		for cx in sim.grid.region.size.x:
+			var cell := Vector2i(cx,cy)
+			sim.grid.set_point_solid(cell,sim.blocked(sim.grid.get_point_position(cell),48.0))
 	sim.player.pos=start
 	sim.player.path.clear()
 	sim._clear_classic_raster_state(sim.player)
