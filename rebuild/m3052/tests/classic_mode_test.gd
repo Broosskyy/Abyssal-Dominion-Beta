@@ -74,9 +74,9 @@ func run() -> void:
 			visited_steps+=1
 			max_cross_track=maxf(max_cross_track,absf(Vector2(trial.pos).cross(heading_target.normalized())))
 			if not trial.path.is_empty() and Vector2(trial.pos).distance_to(heading_target)>32.0:
-				check(VISUALS.heading_four(trial.heading) in [1,3,5,7],"physical heading uses an actual four-way tile step "+str(heading_target))
+				check(VISUALS.heading_four(trial.heading) in [1,3,5,7],"physical heading maps to an available Classic sprite view "+str(heading_target))
 		check(trial.path.is_empty() and Vector2(trial.pos).distance_to(heading_target)<0.1,"all Classic tap directions reach exact clicked target "+str(heading_target))
-		check(max_cross_track<29.0 and visited_steps<1800,"isometric raster remains within one half-tile of the requested world line "+str(heading_target))
+		check(max_cross_track<29.0 and visited_steps<1800,"world track stays on the requested direct line "+str(heading_target))
 	# A new target changes the real course immediately with no compulsory
 	# 24x16 detour to an old tile centre or sudden teleport.
 	var retap_probe: Dictionary={"id":0,"pos":Vector2.ZERO,"heading":Vector2.RIGHT,"path":[Vector2(700,0)]}
@@ -85,21 +85,21 @@ func run() -> void:
 	var new_goal: Vector2=retap_start+Vector2(-250,-400)
 	retap_probe.path=[new_goal]
 	sim._advance_world_course(retap_probe,1.0,true)
-	check(not retap_probe.has("_iso_committed_step") and retap_probe.get("_iso_route",[]).back()==new_goal and retap_probe.pos.distance_to(retap_start)<=1.1,"retap rebuilds new grid destination immediately without jump or old tile lock")
+	check(not retap_probe.has("_iso_committed_step") and retap_probe.get("_iso_route",[]).back()==new_goal and retap_probe.pos.distance_to(retap_start)<=1.1,"retap replaces direct destination immediately without jump or tile lock")
 	for tick in 900:
 		if retap_probe.path.is_empty():break
 		sim._advance_world_course(retap_probe,165.0/30.0,true)
 	check(retap_probe.path.is_empty() and Vector2(retap_probe.pos).distance_to(new_goal)<0.1,"redirected direct course reaches exact destination")
 	sim.set_classic_steering(false)
 	var goal:=Vector2(1200,500)
-	check(sim.classic_steering,"all ship renderers use one default 48x32 navigation")
+	check(sim.classic_steering,"all ship renderers share one direct movement contract")
 	check(sim.course(goal),"water tap creates a course")
 	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"native 3D and 2D share the same clicked high-level destination")
 	var initial_route: Array=sim.player.path.duplicate()
 	var initial_pos: Vector2=sim.player.pos
 	sim.set_classic_steering(true)
 	check(sim.classic_steering and sim.player.path==initial_route and sim.player.pos==initial_pos,"switching to Classic never rewrites the physical route or teleports the captain")
-	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"shared high-level destination stays one click, while physical legs follow the isometric lattice")
+	check(sim.player.path.size()==1 and sim.player.path[0]==goal,"shared high-level destination stays one click with a direct open-water route")
 	var stock: Array=sim.player.ammo.duplicate()
 	var horizontal_facings: Dictionary={}
 	var start_y: float=sim.player.pos.y
@@ -109,7 +109,7 @@ func run() -> void:
 		max_y_error=maxf(max_y_error,absf(float(sim.player.pos.y)-start_y))
 		if not sim.player.path.is_empty():horizontal_facings[VISUALS.heading_four(sim.player.heading)]=true
 		if sim.player.path.is_empty():break
-	check(max_y_error>=8.0 and max_y_error<35.0 and horizontal_facings.has(1) and horizontal_facings.has(3),"horizontal Classic physically alternates NE/SE raster steps rather than fake sprite motion")
+	check(max_y_error<0.01 and horizontal_facings.has(1),"horizontal Classic sails straight; alternating NE/SE views are sprite-only")
 	check(sim.player.pos.distance_to(goal)<0.1 and sim.player.path.is_empty() and sim.player.ammo==stock,"raster Classic sailing arrives exactly without changing ammunition")
 	# Clicking a chart position selects one deterministic isometric tile.
 	# Harbor/portal scripted routes continue accepting exact coordinates.
@@ -126,23 +126,23 @@ func run() -> void:
 	check(not snapped_path.is_empty() and snapped_path.back()==snapped and NAV.classic_world_to_tile(snapped_path.back())==NAV.classic_world_to_tile(raw_click),"tile course has no non-isometric final tail")
 	sim.player.path=[]
 	var diagonal_goal:=Vector2(1600,850)
-	check(sim.course(diagonal_goal) and sim.player.path==sim.plan_path(sim.player.pos,diagonal_goal),"Classic keeps exact clicked destinations while physical route traverses diamond steps")
+	check(sim.course(diagonal_goal) and sim.player.path==sim.plan_path(sim.player.pos,diagonal_goal),"Classic keeps clicked destinations and follows direct world movement")
 	sim._move(sim.player,0.25)
 	var corner: Vector2=sim.player.pos
 	check(sim.course(Vector2(300,850)) and sim.player.path.back()==Vector2(300,850),"new tap immediately replaces the course")
 	check(not sim.player.has("_iso_committed_step"),"new click never locks old raster microstep")
 	sim._move(sim.player,.01)
-	check(sim.player.pos.distance_to(corner)<2.0 and not sim.player.get("_iso_route",[]).is_empty() and Vector2(sim.player.get("_iso_route",[]).back())==Vector2(300,850),"retap immediately selects a new authentic 48x32 path, without a teleport")
+	check(sim.player.pos.distance_to(corner)<2.0 and not sim.player.get("_iso_route",[]).is_empty() and Vector2(sim.player.get("_iso_route",[]).back())==Vector2(300,850),"retap immediately selects new direct course, without a teleport")
 	var changing_route: Array=sim.player.path.duplicate()
 	var switch_origin: Vector2=sim.player.pos
 	sim.set_classic_steering(false)
-	check(sim.classic_steering and sim.player.pos==switch_origin and sim.player.path==changing_route,"native 3D cannot disable 48x32 grid steering or change current course")
+	check(sim.classic_steering and sim.player.pos==switch_origin and sim.player.path==changing_route,"native 3D cannot change shared course or teleport")
 	var npc_body: Dictionary={"pos":Vector2(500,500),"heading":Vector2.RIGHT,"kind":"ship"}
 	var npc_direct: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
-	check(npc_direct.size()==1 and npc_direct[0]==Vector2(1200,500),"native NPC stores a single patrol destination; real movement still uses shared diamond route")
+	check(npc_direct.size()==1 and npc_direct[0]==Vector2(1200,500),"native NPC keeps a single direct patrol destination")
 	sim.set_classic_steering(true)
 	var npc_classic: Array[Vector2]=sim.plan_actor_path(npc_body,Vector2(1200,500))
-	check(npc_classic==npc_direct,"Classic NPCs keep the same high-level waypoints, then execute tile raster locally")
+	check(npc_classic==npc_direct,"Classic NPCs keep the same high-level waypoints and direct world motion")
 	var monster: Dictionary={"pos":Vector2(500,500),"heading":Vector2.RIGHT,"kind":"monster"}
 	check(sim.plan_actor_path(monster,Vector2(1200,500))==npc_direct,"sea monsters keep direct navigation in every mode")
 	root.content_scale_size=Vector2i.ZERO;root.size=Vector2i(1280,720)
@@ -150,7 +150,7 @@ func run() -> void:
 	await process_frame;game.set_process(false)
 	var before: Dictionary=game.sim.export_save()
 	game._set_render_mode("3d");await process_frame
-	check(game.sim.classic_steering and game.render_mode=="3d","native 3D uses identical raster steering")
+	check(game.sim.classic_steering and game.render_mode=="3d","native 3D uses identical direct steering")
 	var native_player_length: float=game._actor_visual_length(game.sim.player)
 	var native_npc_length: float=game._actor_visual_length(game.sim.npcs[0])
 	game.sim.course(game.sim.player.pos+Vector2(600,0))
