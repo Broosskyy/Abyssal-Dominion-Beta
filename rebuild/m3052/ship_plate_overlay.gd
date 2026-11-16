@@ -105,27 +105,27 @@ func _draw_plate(actor: Dictionary,anchor: Vector2) -> void:
 		_caption(Vector2(-width*.5-19.0*pixel_scale,0),"NPC",8,Color(.64,.78,.84,.59),1)
 	if host._plate_has_rank(actor):
 		var tier=clampi(floori((sim.level-1)/4.0)+1,1,5) if player else clampi(int(actor.get("pirate_rank",1)),1,5)
-		_rank(Vector2(-width*.5-23*pixel_scale,-6*pixel_scale),tier,pixel_scale)
-		if player:_battle_rank(Vector2(width*.5+23*pixel_scale,-6*pixel_scale),pixel_scale,int(sim.battle_points))
+		_rank(Vector2(-width*.5-15*pixel_scale,-5*pixel_scale),tier,pixel_scale*.75)
+		if player:_battle_rank(Vector2(width*.5+15*pixel_scale,-5*pixel_scale),pixel_scale*.75,int(sim.battle_points))
 	var identity: String=host._plate_identity(actor)
-	if not identity.is_empty():_caption(Vector2(0,13*pixel_scale),identity,8,Color(.72,.86,.88,.49),1)
-	var bar_width=(132.0 if player else (96.0 if int(actor.id)==sim.target else 84.0))*pixel_scale
+	if not identity.is_empty():_caption(Vector2(0,10*pixel_scale),identity,7,Color(.72,.86,.88,.38),1)
+	var bar_width=(116.0 if player else (96.0 if int(actor.id)==sim.target else 84.0))*pixel_scale
 	var hit_age=sim.clock-float(actor.get("last_hit",-100.0))
 	var flash=clampf(1.0-hit_age/.42,0.0,1.0)
 	var hp_ratio=float(actor.hp)/maxf(1.0,float(actor.max_hp))
 	if player:
-		_gauge(Rect2(-bar_width*.5,24*pixel_scale,bar_width,7*pixel_scale),hp_ratio,Color("49df24"),flash)
+		_gauge(Rect2(-bar_width*.5,19*pixel_scale,bar_width,5.5*pixel_scale),hp_ratio,Color("49df24"),flash)
 	else:
 		_gauge(Rect2(-bar_width*.5,12*pixel_scale,bar_width,5*pixel_scale),hp_ratio,Color("d97660") if hostile else Color("61b967"))
 	var max_shield=float(actor.get("max_shield",0))
 	if max_shield>0.0:
 		var ratio=float(actor.get("shield",0))/max_shield
-		if player:_gauge(Rect2(-bar_width*.5,35*pixel_scale,bar_width,5*pixel_scale),ratio,Color("409fdf"),flash)
+		if player:_gauge(Rect2(-bar_width*.5,28*pixel_scale,bar_width,4.5*pixel_scale),ratio,Color("409fdf"),flash)
 		else:_gauge(Rect2(-bar_width*.5,22*pixel_scale,bar_width,3*pixel_scale),ratio,Color("4d95be"))
 	if player:
 		# Keep ten deck slots physically aligned under shield, regardless
 		# of ship yaw or which Corsair material was chosen.
-		SEA_MARKS.deck_badge(self,Vector2(0,65*pixel_scale),6.0*pixel_scale,sim,float(host.elapsed))
+		SEA_MARKS.deck_badge(self,Vector2(0,47*pixel_scale),5.5*pixel_scale,sim,float(host.elapsed))
 	if float(actor.get("slow",0.0))>0.0:draw_circle(Vector2(bar_width*.5+6*pixel_scale,14*pixel_scale),2.5*pixel_scale,Color("9fdbf4"))
 	if player and sim.staff.hidden():_caption(Vector2(0,-20*pixel_scale),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color())
 	draw_set_transform(Vector2.ZERO)
