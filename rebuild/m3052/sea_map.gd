@@ -1390,7 +1390,15 @@ func _classic_raster_visual(actor: Dictionary) -> Dictionary:
 func _classic_frame_for_actor(actor: Dictionary) -> int:
 	var id: int=int(actor.get("id",-1))
 	var sample: Dictionary=_classic_raster_visual(actor)
-	var facing: int=VISUALS.heading_eight(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
+	var heading: Vector2=_classic_display_heading(actor)
+	var previous: int=int(classic_heading_cache.get(id,-1))
+	var facing: int=VISUALS.heading_eight(heading,previous)
+	# M379: a PARKED genuine Classic vessel must keep one of the four
+	# classic diagonal 3/4 ship portraits. Previously it snapped back to
+	# frontal N/S/E/W eight-view art when the last world waypoint ended.
+	# No visual fake rotation of physics, no change to the 3D GLB mode.
+	if browser_classic and str(actor.get("kind",""))=="ship" and sample.is_empty():
+		facing=VISUALS.heading_four(heading,previous)
 	if not sample.is_empty():
 		var world: Vector2=Vector2(actor.get("pos",Vector2.ZERO))
 		var state: Dictionary=classic_raster_visuals.get(id,{})
