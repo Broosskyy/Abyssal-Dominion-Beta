@@ -17,6 +17,7 @@ jobs:
         with:
           sparse-checkout: |
             rebuild/m3052
+            server
       - name: Download pinned Godot 4.7.2
         run: |
           set -euo pipefail
@@ -32,9 +33,21 @@ jobs:
       - name: Direct route, coastline, offline crossplay and gameplay regressions
         run: |
           set -euo pipefail
-          for name in m376_unified_direct_sailing_test classic_navigation_test sea_edges_test simulation_test progression_test network_client_test; do
+          for name in m376_unified_direct_sailing_test classic_navigation_test sea_edges_test simulation_test progression_test; do
             echo "Running $name"
             XDG_DATA_HOME="$(mktemp -d)" /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path rebuild/m3052 --script "tests/$name.gd" > "/tmp/$name.log" 2>&1 || { tail -120 "/tmp/$name.log"; exit 1; }
             tail -8 "/tmp/$name.log"
             if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|"status":"FAIL"' "/tmp/$name.log"; then exit 1; fi
           done
+      - name: Start test world-server and verify network crossplay
+        run: |
+          set -euo pipefail
+          python3 -m pip install -r server/requirements.txt
+          python3 -m unittest discover -s server -v
+          ABYSSAL_DATABASE="$RUNNER_TEMP/m376-crossplay.sqlite3" python3 server/world_server.py > "$RUNNER_TEMP/m376-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          python3 -c 'import socket,time; time.sleep(1); socket.create_connection(("127.0.0.1",8787),timeout=5).close()'
+          XDG_DATA_HOME="$(mktemp -d)" /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path rebuild/m3052 --script tests/network_client_test.gd > "$RUNNER_TEMP/m376-network.log" 2>&1 || { cat "$RUNNER_TEMP/m376-network.log"; exit 1; }
+          cat "$RUNNER_TEMP/m376-network.log"
+          if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|"status":"FAIL"' "$RUNNER_TEMP/m376-network.log"; then exit 1; fi
