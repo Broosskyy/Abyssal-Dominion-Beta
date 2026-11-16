@@ -3803,7 +3803,12 @@ func _deck_progression_roadmap(info: Dictionary) -> void:
 			else:tile.tooltip_text="Spätere Deckstufe"
 
 func _open_decks() -> void:
-	_banner_card(painted.tide_deck,"10 STANDARDDECKS · 3 SONDERDECKS","Alle zehn normalen Decks sind identisch und frei kombinierbar. Gold I–V → Perlen I–V → Kristall I–V. Jedes montierte Deck bringt Kanonenplätze UND zusätzliche Rumpf-HP (Beta-Balance).")
+	# M384: on small screens, render the actual visual preview FIRST.
+	# A giant shop banner above it hid the new feature below the viewport.
+	if _tab("Decks")=="VORSCHAU":
+		_section("DECK-ERWEITERUNGEN · VORSCHAU")
+	else:
+		_banner_card(painted.tide_deck,"10 STANDARDDECKS · 3 SONDERDECKS","Alle zehn normalen Decks sind identisch und frei kombinierbar. Gold I–V → Perlen I–V → Kristall I–V. Jedes montierte Deck bringt Kanonenplätze UND zusätzliche Rumpf-HP (Beta-Balance).")
 	match _tab("Decks"):
 		"SCHIFF":
 			_section("DECKS AN DEINEM SCHIFF · %d/10" % (CONTENT.DECK_SLOT_COUNT-sim.deck_slots.count(-1)))
@@ -4000,8 +4005,7 @@ func _open_decks() -> void:
 			_catalog_action(blessing,"ZUM KESSEL",func():_open_modal("Kessel"))
 			_note("Weitere eigenständige Segnungen, beispielsweise Königsgunst, können wir später ergänzen. Es wird dafür aktuell kein Bonus vorgetäuscht.")
 		"VORSCHAU":
-			_section("MODULARE DECK-ERWEITERUNGEN · NUR VORSCHAU")
-			_note("Sechs eigene Bilddateien: Mojo-Knochenrahmen, linke Krone, rechtes Emblem und drei separat ausrüstbare Totenköpfe. Hier prüfst du jedes Element EINZELN – ohne Kauf, Geschenk, Buff oder Änderung deines Spielstands.",Color("f6d89a"))
+			_note("Sechs getrennte Bild-Assets. Jede Erweiterung einzeln prüfen – ohne Kauf, Gratis-Freischaltung oder Speichern.",Color("f6d89a"))
 			if deck_extension_preview.is_empty():
 				deck_extension_preview=SEA_MARKS.deck_extension_state(sim)
 			var stage=Control.new()
