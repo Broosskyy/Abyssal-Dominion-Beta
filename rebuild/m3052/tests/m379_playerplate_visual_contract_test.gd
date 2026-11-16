@@ -37,7 +37,7 @@ func _run() -> void:
 	check(game.PLATE_SHIELD_Y+5.0<game.PLATE_DECK_Y-6.0,"compact player deck never overlaps the shield bar")
 	check(layout.left_crown.x==-layout.right_crown.x and absf(float(layout.left_crown.x))<=6.5*r+.001,"reference crowns remain symmetrical and close to ship center")
 	check(layout.skulls.size()==2 and float(layout.skulls[0].x)==-float(layout.skulls[1].x),"two skulls frame the middle deck value symmetrically")
-	check(layout.skulls[0].y<layout.number.y and layout.number.y<layout.bottom_crest.y and layout.bottom_crest.y<layout.deck_pips.y,"ornaments and two-row deck markers have the right vertical order")
+	check(layout.skulls[0].y<layout.deck_pips.y and layout.deck_pips.y<layout.bottom_crest.y and layout.number==layout.deck_pips,"ten center pips replace the old deck count; lower skull extension is separate")
 	var ring: Vector2=game._selection_ring_radii(player)
 	var ship: float=game._actor_visual_length(player)
 	check(absf(ring.x-ship*.53)<.01 and absf(ring.y-ship*.215)<.01,"green dotted waterline ring stays proportional to the 15% smaller rendered hull")
