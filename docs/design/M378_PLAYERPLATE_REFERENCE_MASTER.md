@@ -48,3 +48,17 @@ Die erste Ingame-Version von M378 zeigte übergroße breite Stahlflügel, ein au
 - Der Spieler-Ring bleibt grün, mit 44 feineren Punkten und kleinerem Radius; sein Mittelpunkt wird auf den unteren Wasserkontakt versetzt. Keine Änderung an Hitbox, Fahrtweg oder Zielkoordinaten.
 - 2D-Classic-Sprites werden aus originalen GLB-Modellen unter **48° 3/4-Neigung** gebacken, exakt wie die native 3D-Kamera. Acht echte Richtungsansichten bleiben verfügbar; keine künstliche Drehung oder 2.5D-Simulation.
 - Künftige Änderungen müssen mit **frischen Browser-Captures** überprüft werden und nicht nur syntaktisch getestete Draw-Funktionen.
+
+## M380 – visuelle Korrektur nach Referenzvergleich vom 16. November 2026
+
+Die vorliegenden originalen Spielbilder zeigen **eine deutlich sichtbare, kompakte, hochwertige Deckkomposition** unter dem Namen; weder miniaturhafte Dekoration noch eine riesige Befestigungsleiste. Nach den tatsächlichen M379-Screenshots sind verbindlich:
+
+- **Schiff:** Spieler (auch Remote-Spieler) erhalten einen Rendermaßstab von **0,85** des bisherigen Rumpfs; die physische Position, Trefferzone, Geschwindigkeit, Kursberechnung und Weltmodelle bleiben gleich. NPC-/Monstergrößen bleiben unverändert. Sowohl echte GLB-Darstellung als auch die 8 aus denselben GLBs gebackenen Browseransichten benutzen diese gemeinsame Darstellungslänge.
+- **Blickwinkel:** Native 3D-Kamera und der Classic-2D-Spritebäcker verwenden dieselbe **56° Neigung ab der vertikalen Kamerarichtung**, sodass Rumpf/Seiten stärker zur Geltung kommen. Weltbewegung und Sprite-Richtung bleiben getrennt.
+- **Ring:** 44 grüne, gleichmäßig verteilte Wasserpunkte `#31E65D` mit weißlich-hellen Kernen und schwachem Halo. Ellipsenradien `max(38, length×0.53)` bzw. `max(18, length×0.215)`, der Wassermittelpunkt auf `ship_world_position.y + length×0.045`. Keine Gameplay-Kollision und keine Klickflächen im Ring.
+- **Namenszeile:** Elfenbeinfarbener Spielername, goldenes Gildenkürzel, links Piratenrang/Staffrolle und rechts echte BP-Markierung. Dezente ID bleibt, gefolgt von grüner HP- und blauer Schildleiste ohne ausgeschriebene HP-Zahlen am Schiff.
+- **Deckblock:** Mittelpunkt **51 native Pixel** unter dem Namen, `r=8×_plate_pixels()` statt der bisherigen 5,5. **Zwei deutlich größere Goldschädel** oberhalb einer **mindestens 25 Pixel großen echten Kanonenplatz-Zahl** aus `sim.cannon_slots()`. Symmetrische Kronen und filigrane Seitenornamente; unteres Schädelabzeichen. Zehn ausrüstungsabhängig gefärbte Deckpunkte als **zwei Reihen zu fünf**. Die Zahl ist ausdrücklich nicht die frei erfundene 656 aus dem Referenzbild.
+- **Sonderdecks:** drei unterschiedliche eigene Vektor-Piktogramme im selben Ornamentrahmen: **Gezeiten (Wellen links), Sturm (Blitz rechts), Bergung (Anker unten)**. Die Leuchtdarstellung richtet sich nach den **tatsächlich aktiven Buff-Zeiten**. Kristallsegen bleibt eine eigenständige Anzeige.
+- **Mobil:** Gesamter Namens-/Status-/Deckblock hat eine stabile native Screen-Space-Darstellung. Mobile Kampf- und Schnellbuttons dürfen den erweiterten Block nicht überdecken. Das Gameplay-Feld wird nicht statisch verkleinert, der HUD-Layouttest prüft reale 852×393, 844×390 und 720×405.
+
+Die Veröffentlichung erfordert: Godot-Tests, alle aus den Source-GLBs neu erzeugten Sprites, WebGL2-Teststart **und Sichtprüfung der frisch gerenderten Captures**. Keine Freigabe allein aufgrund von erfolgreichem Commit oder PR.
