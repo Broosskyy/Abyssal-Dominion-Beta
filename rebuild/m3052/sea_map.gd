@@ -1163,7 +1163,9 @@ func _ship_design_accent(skin_id: int) -> Color:
 	return Color("62cce4")
 
 func _selection_ring_tint(actor: Dictionary) -> Color:
-	if int(actor.id)==0:return _ship_design_accent(int(actor.get("skin",0)))
+	# M378: the own-ship ring is ALWAYS reference green, even when the
+	# captain changes ship/paint. Skin rarity must not change player identity.
+	if int(actor.id)==0:return Color("31e65d")
 	if str(actor.get("kind",""))=="tower":
 		return Color("d8b06d") if sim.tower_friendly() else Color("f47d62")
 	if str(actor.get("event_key",""))=="halloween":return Color("eca655")
@@ -1192,6 +1194,27 @@ func _selection_ring_arc(center: Vector2,radii: Vector2,start: float,span: float
 		points.append(center+Vector2(cos(a)*radii.x,sin(a)*radii.y))
 	draw_polyline(points,tint,width,true)
 
+## Grounded reference: a shallow green ellipse of distinct light beads,
+## with no tall 3D torus, physics effect, input blocker or hitbox change.
+func _player_reference_ring_points(center: Vector2,radii: Vector2,beads: int=44) -> Array[Vector2]:
+	var points: Array[Vector2]=[]
+	var count: int=maxi(20,beads)
+	for index in count:
+		var angle: float=-PI*.5+TAU*float(index)/float(count)
+		points.append(center+Vector2(cos(angle)*radii.x,sin(angle)*radii.y))
+	return points
+
+func _draw_player_reference_ring(center: Vector2,radii: Vector2,tint: Color) -> void:
+	# Keep a faint water-contact line behind the individual green points.
+	_ellipse_line(center,radii,Color(tint,.12),_selection_ring_stroke(.95))
+	var beads: Array[Vector2]=_player_reference_ring_points(center,radii)
+	var radius: float=_selection_ring_stroke(2.35)
+	for index in beads.size():
+		var dot: Vector2=beads[index]
+		var shimmer: float=.84+.16*sin(elapsed*1.8+float(index)*.26)
+		draw_circle(dot,radius*1.7,Color(tint,.085*shimmer),true,-1,true)
+		draw_circle(dot,radius,Color(tint,.85*shimmer),true,-1,true)
+
 func _draw_ship_selection_ring(actor: Dictionary,point: Vector2) -> void:
 	if not _selection_ring_visible(actor):return
 	var enemy_selected: bool=int(actor.id)>0
@@ -1206,7 +1229,12 @@ func _draw_ship_selection_ring(actor: Dictionary,point: Vector2) -> void:
 	# Short water-borne pulse after choosing a ship; no combat or collision effect.
 	if not enemy_selected and elapsed-ship_switch_pulse_at>=0.0 and elapsed-ship_switch_pulse_at<1.15:
 		var phase: float=clampf((elapsed-ship_switch_pulse_at)/1.15,0.0,1.0)
-		_ellipse_line(center,radii*(1.05+phase*.8),Color(tint,(1.0-phase)*.58),_selection_ring_stroke(2.5-phase*.7))
+		_ellipse_line(center,radii*(1.05+phase*.8),Color(tint,(1.0-phase)*.40),_selection_ring_stroke(1.8))
+	# Player: the 44 stationary, green dotted lights from the reference.
+	# Enemy/selected NPC: retain the separate existing target treatment.
+	if not enemy_selected:
+		_draw_player_reference_ring(center,radii,tint)
+		return
 	_ellipse_line(center,radii*1.055,Color(tint,0.09+0.06*pulse),_selection_ring_stroke(3.0))
 	_ellipse_line(center,radii,Color(tint,0.64+0.14*pulse),_selection_ring_stroke(2.0 if enemy_selected else 1.8))
 	_ellipse_line(center,radii*0.92,Color(tint,0.16+0.04*pulse),_selection_ring_stroke(.9))

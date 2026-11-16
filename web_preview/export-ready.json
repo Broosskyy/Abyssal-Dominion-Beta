@@ -1,5 +1,5 @@
 {
-  "source_sha": "856c6f89b3c7217578b846754eca532ae8cf47df",
-  "release": "browser-test-200",
-  "branch": "fix/m377-browser-regression-mobile-hud"
+  "source_sha": "8f42a88c295d5949a8b8cbd723a9ae980c430f62",
+  "release": "browser-test-203",
+  "branch": "feat/m378-reference-playerplate-ring-decks"
 }
