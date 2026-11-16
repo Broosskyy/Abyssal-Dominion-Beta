@@ -58,7 +58,7 @@ const NPC_HULL_CLEARANCE := 24.0
 const PLATE_ID_BASELINE := 10.0
 const PLATE_HP_Y := 19.0
 const PLATE_SHIELD_Y := 28.0
-const PLATE_DECK_Y := 47.0
+const PLATE_DECK_Y := 51.0
 const USER_ROOT := "res://assets/user/"
 const SAVE := "user://captain_m3052.json"
 const HUD_SAVE := "user://display_m3052.json"
@@ -1601,7 +1601,7 @@ func _nameplate_layout(fleet: Array[Dictionary]) -> Dictionary:
 		var width=maxf((188.0 if player else 154.0)*pixels,
 			_plate_text_width(_plate_title(actor),_plate_title_size(actor))+58.0*pixels)
 		var anchor=_plate_screen_anchor(actor)
-		placed[int(actor.id)]=Rect2(anchor-Vector2(width*.5,17*pixels),Vector2(width,(91 if player else 56)*pixels))
+		placed[int(actor.id)]=Rect2(anchor-Vector2(width*.5,17*pixels),Vector2(width,(128 if player else 56)*pixels))
 	return placed
 
 ## One layout snapshot per *process frame* directly after Camera2D is scrolled.
@@ -1662,7 +1662,7 @@ func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
 	if shield>0:
 		if player:_status_bar(Rect2(-width*.5,PLATE_SHIELD_Y,width,5),float(actor.get("shield",0))/shield,Color("409fdf"),hit_flash)
 		else:_plate_bar(Rect2(-width*.5,22,width,3),float(actor.get("shield",0))/shield,Color("4d95be"))
-	if player:SEA_MARKS.deck_badge(self,Vector2(0,PLATE_DECK_Y),5.5,sim,elapsed)
+	if player:SEA_MARKS.deck_badge(self,Vector2(0,PLATE_DECK_Y),8.0,sim,elapsed)
 	if float(actor.get("slow",0))>0:draw_circle(Vector2(width*.5+6,14),2.5,Color("9fdbf4"))
 	if player and sim.staff.hidden():_label(Vector2(0,-20),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color(),2)
 	draw_set_transform(Vector2.ZERO)
