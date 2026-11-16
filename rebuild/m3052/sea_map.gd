@@ -1390,7 +1390,15 @@ func _classic_raster_visual(actor: Dictionary) -> Dictionary:
 func _classic_frame_for_actor(actor: Dictionary) -> int:
 	var id: int=int(actor.get("id",-1))
 	var sample: Dictionary=_classic_raster_visual(actor)
-	var facing: int=VISUALS.heading_eight(_classic_display_heading(actor),int(classic_heading_cache.get(id,-1)))
+	var heading: Vector2=_classic_display_heading(actor)
+	var previous: int=int(classic_heading_cache.get(id,-1))
+	var facing: int=VISUALS.heading_eight(heading,previous)
+	# M379: a PARKED genuine Classic vessel must keep one of the four
+	# classic diagonal 3/4 ship portraits. Previously it snapped back to
+	# frontal N/S/E/W eight-view art when the last world waypoint ended.
+	# No visual fake rotation of physics, no change to the 3D GLB mode.
+	if browser_classic and str(actor.get("kind",""))=="ship" and sample.is_empty():
+		facing=VISUALS.heading_four(heading,previous)
 	if not sample.is_empty():
 		var world: Vector2=Vector2(actor.get("pos",Vector2.ZERO))
 		var state: Dictionary=classic_raster_visuals.get(id,{})
@@ -2224,16 +2232,19 @@ func _layout() -> void:
 	_place(supply_selector,fx-orb-gap,fy-orb-gap,orb,orb)
 	for item: Button in supply_buttons.values():item.hide()
 	# One shared, persistent set of three configurable bars, two layouts.
-	# On touch devices the slots remain beside the cannon, with 44px tabs.
-	# On desktop they form a separate mouse/keyboard rail along bottom-left.
+	# M379: narrow touch screens must NOT place the quickbar over the
+	# centered captain's name/HP/deck block. The old rail sat just left
+	# of the cannon and covered the player's hull plate at 852x393.
+	# Put touch quick slots to the RIGHT of the left camera pad instead.
+	# Desktop retains its independent bottom-left position.
 	quick_bar.mobile_first=mobile_hud
 	# Keep all three page tabs at least 44px wide as well as tall in
 	# compact landscape; grow the rail to the left, away from combat orbs.
-	var touch_extra: float=20.0 if mobile_hud else 0.0
+	var touch_extra: float=16.0 if mobile_hud else 0.0 # 3×44px tabs + 44px edit + 2×3px spacing
 	var quick_w: float=orb*3.0+gap*2.0+touch_extra
 	var quick_h: float=orb+quick_bar.tab_height()+4.0
-	var quick_x: float=fx-4.0*(orb+gap)-touch_extra if mobile_hud else left+column-20.0
-	var quick_y: float=s.y-orb-10.0-quick_h-8.0 if mobile_hud else s.y-quick_h-10.0
+	var quick_x: float=(pad+15.0 if camera_pad_visible else 18.0) if mobile_hud else left+column-20.0
+	var quick_y: float=s.y-quick_h-12.0 if mobile_hud else s.y-quick_h-10.0
 	_place(quick_bar,quick_x,quick_y,quick_w,quick_h)
 	quick_bar._layout()
 	var hot: Array[Button]=[target_cycle,loadout_button]
