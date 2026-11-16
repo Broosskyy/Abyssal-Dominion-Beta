@@ -70,11 +70,16 @@ func _run() -> void:
 	game._switch_tab("Decks","VORSCHAU")
 	game._set_all_deck_previews(true)
 	game._layout()
+	for frame in 2:await process_frame
+	# Scroll to the real rendered badge, not just the top menu banner.
+	game.modal_scroll.scroll_vertical=80
 	game._sync_plate_overlay()
 	for frame in 4:await process_frame
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output+"/852x393-deck-preview-all.png")
 	game._set_all_deck_previews(false)
+	for frame in 2:await process_frame
+	game.modal_scroll.scroll_vertical=80
 	game._sync_plate_overlay()
 	for frame in 4:await process_frame
 	await RenderingServer.frame_post_draw
