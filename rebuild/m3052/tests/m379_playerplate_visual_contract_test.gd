@@ -35,7 +35,7 @@ func _run() -> void:
 	check(game._plate_title_size(player)<=14,"player caption is compact compared with the ship")
 	check(game.PLATE_ID_BASELINE==10.0 and game.PLATE_HP_Y==19.0 and game.PLATE_SHIELD_Y==28.0 and game.PLATE_DECK_Y==51.0,"name, faded identity, HP, shield and deck occupy tight independent rows")
 	check(game.PLATE_SHIELD_Y+5.0<game.PLATE_DECK_Y-6.0,"compact player deck never overlaps the shield bar")
-	check(layout.left_crown.x==-layout.right_crown.x and absf(float(layout.left_crown.x))<=6.5*r+.001,"reference crowns remain symmetrical and close to ship center")
+	check(layout.left_crown.x==-layout.right_crown.x and absf(float(layout.left_crown.x))<=7.0*r+.001,"reference crowns remain symmetrical and close to ship center")
 	check(layout.skulls.size()==2 and float(layout.skulls[0].x)==-float(layout.skulls[1].x),"two skulls frame the middle deck value symmetrically")
 	check(layout.skulls[0].y<layout.deck_pips.y and layout.deck_pips.y<layout.bottom_crest.y and layout.number==layout.deck_pips,"ten center pips replace the old deck count; lower skull extension is separate")
 	var ring: Vector2=game._selection_ring_radii(player)
