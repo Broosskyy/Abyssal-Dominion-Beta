@@ -237,6 +237,9 @@ var target_health_skin: StyleBoxFlat
 var hud_icons: Dictionary={}
 var painted: Dictionary={}
 var deck_icons: Dictionary={}
+# Temporary UI-only overlay of the six independently owned ornament slots.
+# It is NEVER exported, never written to sim and is cleared on modal close.
+var deck_extension_preview: Dictionary={}
 var focused_deck_index: int=-1 # Selected physical deck in the mobile deckyard
 var ammo_selector: Button
 var settings_button: Button
@@ -1662,7 +1665,7 @@ func _nameplate(actor: Dictionary,anchor: Vector2) -> void:
 	if shield>0:
 		if player:_status_bar(Rect2(-width*.5,PLATE_SHIELD_Y,width,5),float(actor.get("shield",0))/shield,Color("409fdf"),hit_flash)
 		else:_plate_bar(Rect2(-width*.5,22,width,3),float(actor.get("shield",0))/shield,Color("4d95be"))
-	if player:SEA_MARKS.deck_badge(self,Vector2(0,PLATE_DECK_Y),8.0,sim,elapsed)
+	if player:SEA_MARKS.deck_badge(self,Vector2(0,PLATE_DECK_Y),8.0,sim,elapsed,_deck_preview_active())
 	if float(actor.get("slow",0))>0:draw_circle(Vector2(width*.5+6,14),2.5,Color("9fdbf4"))
 	if player and sim.staff.hidden():_label(Vector2(0,-20),"GEIST" if sim.staff.presence=="ghost" else "ZUSCHAUER",10,sim.staff.color(),2)
 	draw_set_transform(Vector2.ZERO)
@@ -2613,10 +2616,13 @@ func _clock_text(seconds: float) -> String:
 	var minutes=floori((total%3600)/60.0)
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
-const MODAL_TABS := {"Logbuch":["AKTUELL","VERTRÄGE","VERLAUF"],"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
+const MODAL_TABS := {"Logbuch":["AKTUELL","VERTRÄGE","VERLAUF"],"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":["SCHIFF","LAGER","SPEZIAL","KAUFEN","VORSCHAU"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
 const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Menü":"Spielmenü","Events":"Events","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Freunde":"Freunde & Einladungen","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
+	# A preview is temporary; opening another menu or Decks category must
+	# never leave pretend ornament ownership on the real playerplate.
+	if kind!="Decks" or _tab("Decks")!="VORSCHAU":deck_extension_preview.clear()
 	if browser_classic and kind in ["Werft","Events"]:
 		var delivery=get_tree().root.get_node_or_null("BrowserContent")
 		if delivery!=null and not delivery.available("ship_designs"):
@@ -2693,6 +2699,8 @@ func _open_modal(kind: String,remember: bool=true) -> void:
 	modal_scroll.restore(sim.ammo_mode*99 if kind=="Munition" else scroll_position)
 
 func _close_modal() -> void:
+	deck_extension_preview.clear()
+	if plate_overlay!=null:plate_overlay.queue_redraw()
 	# Close BOTH surfaces. Leaving the backdrop active after X made the
 	# sea appear frozen because it still intercepted every touch.
 	_reset_enemy_tap()
@@ -2762,6 +2770,7 @@ func _menu_tab_art(kind: String,tab: String) -> Texture2D:
 				"LAGER":return painted.reward_chest
 				"SPEZIAL":return painted.tide_deck
 				"KAUFEN":return painted.gold_coins
+				"VORSCHAU":return painted.spyglass
 		"Kastelle":
 			return painted.nav_castles
 		"Werft":
@@ -2777,11 +2786,32 @@ func _menu_tab_art(kind: String,tab: String) -> Texture2D:
 	return null
 
 func _switch_tab(kind: String,tab: String) -> void:
+	if kind=="Decks" and tab!="VORSCHAU":deck_extension_preview.clear()
 	modal_tab[kind]=tab
 	_open_modal(kind)
 
 func _tab(kind: String) -> String:
 	return str(modal_tab.get(kind,""))
+
+func _deck_preview_active() -> Dictionary:
+	# Only the actual Decks/VORSCHAU menu is allowed to override rendering.
+	if modal!=null and modal.visible and modal_kind=="Decks" and _tab("Decks")=="VORSCHAU":
+		return deck_extension_preview
+	return {}
+
+func _set_deck_preview(key: String,enabled: bool) -> void:
+	if not key in SEA_MARKS.EXTENSION_KEYS:return
+	deck_extension_preview[key]=enabled
+	if plate_overlay!=null:plate_overlay.queue_redraw()
+	if modal!=null and modal.visible and modal_kind=="Decks" and _tab("Decks")=="VORSCHAU":
+		_open_modal("Decks")
+
+func _set_all_deck_previews(enabled: bool) -> void:
+	for key: String in SEA_MARKS.EXTENSION_KEYS:deck_extension_preview[key]=enabled
+	if plate_overlay!=null:plate_overlay.queue_redraw()
+	if modal!=null and modal.visible and modal_kind=="Decks" and _tab("Decks")=="VORSCHAU":
+		_open_modal("Decks")
+
 
 # --- Menu building blocks ------------------------------------------------------------
 
@@ -3969,6 +3999,47 @@ func _open_decks() -> void:
 			var blessing=_catalog_tile(modal_body,deck_icons.blessing,"KRISTALLSEGEN","Ein eigenständiger zeitlich begrenzter Schiffsbonus, kein zusätzliches Deck.","AKTIV · %s" % _clock_text(float(sim.buffs.blessing)) if sim.has_blessing() else "AUS DEM GEZEITENKESSEL",Color("b881e3"))
 			_catalog_action(blessing,"ZUM KESSEL",func():_open_modal("Kessel"))
 			_note("Weitere eigenständige Segnungen, beispielsweise Königsgunst, können wir später ergänzen. Es wird dafür aktuell kein Bonus vorgetäuscht.")
+		"VORSCHAU":
+			_section("MODULARE DECK-ERWEITERUNGEN · NUR VORSCHAU")
+			_note("Sechs eigene Bilddateien: Mojo-Knochenrahmen, linke Krone, rechtes Emblem und drei separat ausrüstbare Totenköpfe. Hier prüfst du jedes Element EINZELN – ohne Kauf, Geschenk, Buff oder Änderung deines Spielstands.",Color("f6d89a"))
+			if deck_extension_preview.is_empty():
+				deck_extension_preview=SEA_MARKS.deck_extension_state(sim)
+			var stage=Control.new()
+			stage.name="DeckExtensionPreviewStage"
+			stage.custom_minimum_size=Vector2(0,200)
+			stage.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			stage.mouse_filter=Control.MOUSE_FILTER_IGNORE
+			stage.draw.connect(func():
+				stage.draw_style_box(SKIN.card(),Rect2(Vector2.ZERO,stage.size))
+				SEA_MARKS.deck_badge(stage,Vector2(stage.size.x*.5,73),12.0,sim,elapsed,deck_extension_preview)
+				_canvas_text(stage,Vector2(stage.size.x*.5,168),"10 NORMALE DECKPUNKTE · 6 SEPARATE ELEMENTE",12,Color("f2db9b"))
+				_canvas_text(stage,Vector2(stage.size.x*.5,189),"VORSCHAU · KEINE KAUF-/STATUSÄNDERUNG",10,Color("9fb3bb")))
+			modal_body.add_child(stage)
+			_start_deck_motion(stage)
+			var slots=_catalog_grid(2 if get_viewport_rect().size.x<850 else 3)
+			var visuals: Dictionary={
+				"mojo_frame":["MOJO · KNOCHENRAHMEN","Eigenständiger Rahmen aus Knochen. Kann alleine sichtbar sein."],
+				"crown_left":["KRONE LINKS","Eine unabhängige Erweiterung links vom Deck."],
+				"crest_right":["EMBLEM RECHTS","Zweite unabhängige Erweiterung oben rechts."],
+				"skull_top_left":["TOTENKOPF OBEN LINKS","Separater Totenkopf über den zehn Deckpunkten."],
+				"skull_top_right":["TOTENKOPF OBEN RECHTS","Ein anderer separat ausrüstbarer Totenkopf."],
+				"skull_bottom":["TOTENKOPF UNTEN","Eigener unterer Totenkopf, unabhängig vom Mojo-Rahmen."]
+			}
+			for key: String in SEA_MARKS.EXTENSION_KEYS:
+				var slot_key: String=key
+				var display: Array=visuals[key]
+				var real_owned: bool=bool(sim.deck_extensions.get(key,false))
+				var shown: bool=bool(deck_extension_preview.get(key,real_owned))
+				var status: String=("VORSCHAU AN" if shown else "VORSCHAU AUS")+" · "+("AUSGERÜSTET" if real_owned else "NICHT FREIGESCHALTET")
+				var tile=_catalog_tile(slots,SEA_MARKS.EXTENSION_ART[key],str(display[0]),str(display[1]),status,Color("d3af6c") if shown else Color("607584"))
+				tile.name="DeckExtensionPreview_"+key
+				var toggle=_catalog_action(tile,"VORSCHAU AUSBLENDEN" if shown else "IN VORSCHAU ANZEIGEN",func():_set_deck_preview(slot_key,not bool(deck_extension_preview.get(slot_key,false))))
+				toggle.name="PreviewToggle_"+key
+			_section("DEINE AUSRÜSTUNG BLEIBT UNVERÄNDERT")
+			var actions=_grid(2)
+			_action("ALLE SECHS ANZEIGEN",func():_set_all_deck_previews(true),"normal",actions)
+			_action("ALLE AUSBLENDEN",func():_set_all_deck_previews(false),"normal",actions)
+			_note("Das sind reine Darstellungs-Schalter. Erwerb, Aufwertung und Ausrüsten der fünf Ornamente sowie des Mojo-Rahmens bekommen später getrennte Bedingungen. Deine zehn Standarddecks bleiben unangetastet.",Color("a9c8c6"))
 		"KAUFEN":
 			_section("STANDARDDECK · GOLD STUFE I")
 			_note("Es gibt nur eine normale Deckart. Du darfst mehrere gleiche Golddecks erwerben und jedes einzeln ausbauen: Gold I–V → Perlen I–V → Kristall I–V.")
@@ -3984,7 +4055,7 @@ func _open_decks() -> void:
 			buy.name="DeckBuy_cannon"
 			if not sim.docked:_note("Deckkauf und -umbau vorerst nur im Hafen möglich.",Color("e1b979"))
 		_:
-			_note("Wähle SCHIFF, LAGER, SPEZIAL oder KAUFEN.")
+			_note("Wähle SCHIFF, LAGER, SPEZIAL, KAUFEN oder VORSCHAU.")
 
 func _open_kessel() -> void:
 	var stage=KESSEL_FX.new()
