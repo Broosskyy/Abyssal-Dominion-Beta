@@ -148,12 +148,12 @@ static func pirate_crest(canvas: CanvasItem,center: Vector2,r: float) -> void:
 ## deck-slot state; 3 special-deck ornaments reflect actual buff timers.
 static func reference_deck_geometry(r: float) -> Dictionary:
 	return {
-		"left_crown":Vector2(-7.25*r,-1.0*r),
-		"right_crown":Vector2(7.25*r,-1.0*r),
-		"skulls":[Vector2(-1.36*r,-1.20*r),Vector2(1.36*r,-1.20*r)],
-		"number":Vector2(0,2.05*r),
-		"bottom_crest":Vector2(0,4.05*r),
-		"deck_pips":Vector2(0,5.45*r)
+		"left_crown":Vector2(-6.5*r,-.8*r),
+		"right_crown":Vector2(6.5*r,-.8*r),
+		"skulls":[Vector2(-1.20*r,-1.05*r),Vector2(1.20*r,-1.05*r)],
+		"number":Vector2(0,1.9*r),
+		"bottom_crest":Vector2(0,3.95*r),
+		"deck_pips":Vector2(0,5.5*r)
 	}
 
 static func _reference_crown(canvas: CanvasItem,center: Vector2,r: float,ink: Color) -> void:
@@ -197,6 +197,33 @@ static func _reference_deck_pips(canvas: CanvasItem,center: Vector2,r: float,ent
 		canvas.draw_rect(Rect2(point-size*.5, size),ink if lit else ink.darkened(.35))
 		if lit:canvas.draw_line(point-size*.42,point+Vector2(size.x*.42,-size.y*.42),ink.lightened(.35),.6,true)
 
+## M379: light pirate filigree instead of M378's massive 150px steel arms.
+## Two simple floating scrolls with an optional real-buff coloured pearl.
+static func _reference_side_scroll(canvas: CanvasItem,center: Vector2,r: float,side: float,ink: Color,active: bool,time_seconds: float) -> void:
+	var top: PackedVector2Array=PackedVector2Array([
+		center+Vector2(side*7.95*r,.75*r),
+		center+Vector2(side*6.45*r,1.45*r),
+		center+Vector2(side*4.25*r,1.2*r),
+		center+Vector2(side*3.2*r,1.95*r)
+	])
+	var bottom: PackedVector2Array=PackedVector2Array([
+		center+Vector2(side*7.9*r,2.25*r),
+		center+Vector2(side*6.65*r,2.50*r),
+		center+Vector2(side*5.85*r,2.16*r)
+	])
+	canvas.draw_polyline(top,Color("0a1720",.92),maxf(1.5,r*.40),true)
+	canvas.draw_polyline(top,ink,maxf(.85,r*.20),true)
+	canvas.draw_polyline(bottom,ink.darkened(.12),maxf(.70,r*.18),true)
+	var crown_tip: Vector2=center+Vector2(side*7.9*r,1.1*r)
+	canvas.draw_circle(crown_tip,maxf(1.0,r*.25),ink)
+	canvas.draw_circle(crown_tip+Vector2(0,-.3*r),maxf(.5,r*.11),Color("fff1c8",.82))
+	if active:
+		var pearl: Vector2=center+Vector2(side*6.3*r,2.25*r)
+		var glow: float=.65+.35*sin(time_seconds*2.0)
+		canvas.draw_circle(pearl,r*.71,Color(ink,.13*glow))
+		canvas.draw_circle(pearl,r*.39,ink)
+		canvas.draw_circle(pearl,r*.17,Color("fff7e5"))
+
 static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,time_seconds: float=0.0) -> void:
 	# Ornament geometry deliberately independent from hull size, camera
 	# yaw and render mode; only the overlay's native-pixel scale applies.
@@ -208,24 +235,24 @@ static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,time_seco
 	var salvage: bool=float(sim.buffs.salvage_deck)>0.0
 	# Symmetrical filigree around the central number. Specials change
 	# colour/effects of the three established fittings, not their layout.
-	special_deck_arm(canvas,center,r,-1.0,"tide",tide,time_seconds)
-	special_deck_arm(canvas,center,r,1.0,"storm",storm,time_seconds)
-	_reference_crown(canvas,center+Vector2(layout.left_crown),r*.82,Color("72dacc") if tide else old_gold)
-	_reference_crown(canvas,center+Vector2(layout.right_crown),r*.82,Color("91c8f1") if storm else old_gold)
+	_reference_side_scroll(canvas,center,r,-1.0,Color("72dacc") if tide else old_gold,tide,time_seconds)
+	_reference_side_scroll(canvas,center,r,1.0,Color("91c8f1") if storm else old_gold,storm,time_seconds)
+	_reference_crown(canvas,center+Vector2(layout.left_crown),r*.83,Color("72dacc") if tide else old_gold)
+	_reference_crown(canvas,center+Vector2(layout.right_crown),r*.83,Color("91c8f1") if storm else old_gold)
 	for point: Vector2 in layout.skulls:
 		_reference_skull(canvas,center+point,r*.75,bright_gold)
 	# Use actual mounted cannon capacity as the readable numeric value.
 	# It will grow with equipped ordinary decks; no decorative fake stat.
 	var font: Font=ThemeDB.fallback_font
 	var value: String=str(sim.cannon_slots())
-	var fs: int=maxi(11,roundi(r*2.23))
+	var fs: int=maxi(12,roundi(r*2.65))
 	var width: float=font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs).x
 	var at: Vector2=center+Vector2(layout.number)-Vector2(width*.5,0)
 	canvas.draw_string_outline(font,at,value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,maxi(2,roundi(r*.34)),Color("07121c"))
 	canvas.draw_string(font,at,value,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color("f9eee1"))
 	# The third special deck is the independent bottom pirate emblem.
 	var bottom_ink: Color=Color("f7c86b") if salvage else old_gold.darkened(.12)
-	_reference_skull(canvas,center+Vector2(layout.bottom_crest),r*.72,bottom_ink)
+	_reference_skull(canvas,center+Vector2(layout.bottom_crest),r*.79,bottom_ink)
 	if salvage:
 		canvas.draw_arc(center+Vector2(layout.bottom_crest),r*.70,0,TAU,24,Color("f3c26b",.7),maxf(.7,r*.16),true)
 	_reference_deck_pips(canvas,center+Vector2(layout.deck_pips),r,deck_entries(sim))
