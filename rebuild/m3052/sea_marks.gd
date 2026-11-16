@@ -165,8 +165,8 @@ static func reference_deck_geometry(r: float) -> Dictionary:
 		"skulls":[Vector2(-1.55*r,-1.05*r),Vector2(1.55*r,-1.05*r)],
 		"number":Vector2(0,1.35*r), # Legacy layout key: NOW ten deck pips, never a number.
 		"deck_pips":Vector2(0,1.35*r),
-		"bottom_crest":Vector2(0,4.15*r),
-		"mojo_frame":Vector2(0,1.45*r)
+		"bottom_crest":Vector2(0,3.25*r),
+		"mojo_frame":Vector2(0,1.20*r)
 	}
 
 static func deck_extension_state(sim) -> Dictionary:
@@ -210,7 +210,7 @@ static func deck_badge(canvas: CanvasItem,center: Vector2,r: float,sim,_time_sec
 	var layout: Dictionary=reference_deck_geometry(r)
 	var owned: Dictionary=deck_extension_state(sim)
 	# Mojo is the BONE FRAME: draw BEHIND all five independent extensions.
-	_draw_reference_module(canvas,center,r,"mojo_frame",bool(owned.mojo_frame),Vector2(layout.mojo_frame),Vector2(18.8,7.65))
+	_draw_reference_module(canvas,center,r,"mojo_frame",bool(owned.mojo_frame),Vector2(layout.mojo_frame),Vector2(17.5,5.55))
 	# Crown left and the top-right crest are distinct, not a paired toggle.
 	_draw_reference_module(canvas,center,r,"crown_left",bool(owned.crown_left),Vector2(layout.left_crown),Vector2(2.8,2.9))
 	_draw_reference_module(canvas,center,r,"crest_right",bool(owned.crest_right),Vector2(layout.right_crown),Vector2(2.8,2.9))
