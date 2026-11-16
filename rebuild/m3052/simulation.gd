@@ -2133,7 +2133,8 @@ func restore_save(data: Dictionary) -> bool:
 	# cannot leak into a freshly loaded captain.
 	var saved_extensions: Variant=data.get("deck_extensions",{})
 	for key: String in DECK_EXTENSION_KEYS:
-		deck_extensions[key]=saved_extensions.get(key,false)==true if saved_extensions is Dictionary else false
+		var stored: Variant=saved_extensions.get(key,false) if saved_extensions is Dictionary else false
+		deck_extensions[key]=stored if stored is bool else false
 	bonus={}
 	bonus_runs=maxi(0,int(data.get("bonus_runs",0)))
 	var run: Variant=data.get("bonus",{})
