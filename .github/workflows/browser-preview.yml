@@ -2,7 +2,7 @@ name: Abyssal Dominion – browser preview
 on:
   workflow_dispatch:
   push:
-    branches: [main, feature/classic-seafight-navigation-330, fix/classic-4way-small-step-navigation-334, fix/classic-four-view-visual-only-335, fix/classic-left-right-sailing-336, fix/classic-framing-scale-337, fix/classic-pixel-hull-only-dither-341, fix/classic-mobile-scale-fourway-stall-339, fix/classic-heading-render-phase-341, fix/classic-tick-raster-interpolation-342, fix/classic-straight-world-course-343, experiment/classic-iso-tile-grid-344, fix/classic-click-tile-course-zoom-345, fix/classic-atomic-grid-pace-344, fix/classic-isometric-safe-course-345, feat/shared-2d-3d-raster-navigation-346, fix/m377-browser-regression-mobile-hud]
+    branches: [main, feature/classic-seafight-navigation-330, fix/classic-4way-small-step-navigation-334, fix/classic-four-view-visual-only-335, fix/classic-left-right-sailing-336, fix/classic-framing-scale-337, fix/classic-pixel-hull-only-dither-341, fix/classic-mobile-scale-fourway-stall-339, fix/classic-heading-render-phase-341, fix/classic-tick-raster-interpolation-342, fix/classic-straight-world-course-343, experiment/classic-iso-tile-grid-344, fix/classic-click-tile-course-zoom-345, fix/classic-atomic-grid-pace-344, fix/classic-isometric-safe-course-345, feat/shared-2d-3d-raster-navigation-346, fix/m377-browser-regression-mobile-hud, feat/m378-reference-playerplate-ring-decks]
     paths:
       - 'rebuild/m3052/**'
       - 'server/**'
@@ -104,7 +104,7 @@ jobs:
           # Verify M376 shared direct/coastal navigation, Classic sprite-only
           # headings, crossplay and responsive HUD before stripping Web assets.
           # Never reintroduce obsolete 24x16 PHYSICAL zigzag assertions.
-          for suite in m376_unified_direct_sailing_test shared_render_route_test classic_course_test classic_mode_test classic_navigation_test navigation_test simulation_test m377_hud_touch_performance_test ui_test; do
+          for suite in m376_unified_direct_sailing_test shared_render_route_test classic_course_test classic_mode_test classic_navigation_test navigation_test simulation_test m377_hud_touch_performance_test m378_reference_playerplate_test deck_progression_test ui_test; do
             echo "START GODOT SUITE: ${suite}"
             timeout --signal=TERM 120s env XDG_DATA_HOME="$(mktemp -d)" "$engine" --headless --path rebuild/m3052 \
               --script "tests/${suite}.gd" > "/tmp/${suite}.log" 2>&1 || {
