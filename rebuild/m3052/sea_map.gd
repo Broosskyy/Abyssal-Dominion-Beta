@@ -475,7 +475,7 @@ func _online_snapshot(packet: Dictionary) -> void:
 		if not candidate is Dictionary:continue
 		var x: float=float(candidate.get("x",-1))
 		var y: float=float(candidate.get("y",-1))
-		if not Vector2(x,y).is_finite() or x<0 or x>sim.WORLD.x or y<0 or y>sim.WORLD.y:continue
+		if not Vector2(x,y).is_finite() or x<0 or x>sim.world_extent().x or y<0 or y>sim.world_extent().y:continue
 		var heading: Vector2=Vector2.from_angle(float(candidate.get("heading",PI)))
 		if str(candidate.get("id",""))==my_id:
 			online_own_target=Vector2(x,y)
@@ -1098,11 +1098,11 @@ func _draw_sea_edges(view: Rect2) -> void:
 	if sim.in_bonus_map():return
 	for edge: String in ["east","west","north","south"]:
 		var vertical: bool=edge in ["east","west"]
-		var fixed: float=64.0 if edge in ["west","north"] else (sim.WORLD.x-64.0 if vertical else sim.WORLD.y-64.0)
+		var fixed: float=64.0 if edge in ["west","north"] else (sim.world_extent().x-64.0 if vertical else sim.world_extent().y-64.0)
 		if vertical and (fixed<view.position.x-100 or fixed>view.end.x+100):continue
 		if not vertical and (fixed<view.position.y-100 or fixed>view.end.y+100):continue
 		var low: float=maxf(64.0,view.position.y if vertical else view.position.x)
-		var high: float=minf((sim.WORLD.y if vertical else sim.WORLD.x)-64.0,view.end.y if vertical else view.end.x)
+		var high: float=minf((sim.world_extent().y if vertical else sim.world_extent().x)-64.0,view.end.y if vertical else view.end.x)
 		if high<low:continue
 		var destination: int=CONTENT.sea_edge_neighbor(sim.map_id,edge)
 		var locked: bool=destination>=0 and sim.level<int(CONTENT.MAPS[destination].level)
@@ -1898,7 +1898,7 @@ func _build_ui() -> void:
 	ui.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
 	layer.add_child(ui)
 	feedback_overlay=preload("res://feedback_overlay.gd").new();feedback_overlay.host=self;layer.add_child(feedback_overlay)
-	ruler=RULER.new();ruler.world_size=sim.WORLD;ui.add_child(ruler)
+	ruler=RULER.new();ruler.world_size=sim.world_extent();ui.add_child(ruler)
 	chrome=_panel(ui)
 	for name in ["gold_coins","kills_skull"]:
 		var icon=_portrait(chrome);icon.texture=painted[name];wallet_icons.append(icon)
@@ -4416,7 +4416,7 @@ func _open_charts() -> void:
 	var chart=WORLD_CHART.new()
 	chart.name="WorldChart"
 	chart.sim=sim;chart.parchment=painted.chart_parchment;chart.font=font
-	chart.selected=chart_pick if chart_pick>=0 else sim.map_id
+	chart.selected=chart_pick if chart_pick>=0 else (sim.legacy_origin_map if sim.in_realm_world() else sim.map_id)
 	chart.chapter=chart_chapter
 	chart.custom_minimum_size=Vector2(0,1190 if chart_chapter==-1 else (440 if modal.size.x>=640 else 390))
 	chart.size_flags_horizontal=Control.SIZE_EXPAND_FILL
@@ -4425,10 +4425,21 @@ func _open_charts() -> void:
 	_note("Alle 40 Karten stehen in der Übersicht in zwei Spuren. Nach unten scrollen; mit 1–5, 6–10, 11–15 oder 16–20 einen Abschnitt vergrößern.",Color("84999c"))
 	_chart_details(chart.selected)
 
+func _realm_toggle(enter_beta: bool) -> void:
+	var changed: bool=sim.enter_realm_world() if enter_beta else sim.return_to_legacy_world()
+	if changed:_sync_region()
+	else:_refresh_ui()
+
 func _open_realm_preview() -> void:
 	if realm_chart_pick<1:realm_chart_pick=maxi(1,REALM_CATALOG.realm_for_map(sim.map_id))
 	_section("WELT 2.0 · 20 GROSSE SEEKARTEN · ENTWURF")
-	_note("20 große Reviere: die vier Ecken haben 2, Randreviere 3 und zentrale Reviere 4 Übergänge. Genau wie bisher durch Überfahren einer freigegebenen Kartenkante. Im Entwurfsmodus – die M385-Spielwelt bleibt bis zur geprüften Migration erhalten.",Color("b5cfcc"))
+	_note("20 große Seekarten mit echter doppelter Breite: 4 Eckkarten mit 2, 10 Randkarten mit 3 und 6 Innenkarten mit 4 Übergängen. Die klassische Welt bleibt parallel vollständig erhalten.",Color("b5cfcc"))
+	if sim.in_realm_world():
+		_action("ZUR KLASSISCHEN WELT ZURÜCK",func():_realm_toggle(false),"primary")
+		_note("SPIELBARER WELTTEST · Aktive 20-Reviere-Welt. Gildenfestungen bleiben vorerst in den ursprünglichen Seekarten.",Color("6fd1c1"))
+	elif not sim.in_bonus_map():
+		_action("20 GROSSE SEEKARTEN TESTEN · BETA",func():_realm_toggle(true),"primary")
+		_note("Freiwilliger Welt-Test. Dein bisheriger Kartenstand wird gesichert; Rückfahrt jederzeit außerhalb von Kampf und Hafen möglich. Online-Spieler in diesem Test benötigen den aktualisierten Weltserver.",Color("dfc28d"))
 	var edge_modes=_grid(2)
 	_action("HYBRID · 2 BIS 4 RÄNDER",func():realm_edge_mode="hybrid";_open_modal("Seekarten"),"tab_on" if realm_edge_mode=="hybrid" else "normal",edge_modes)
 	_action("VERGLEICH · LINKS/RECHTS",func():realm_edge_mode="two";_open_modal("Seekarten"),"tab_on" if realm_edge_mode=="two" else "normal",edge_modes)
@@ -4450,7 +4461,7 @@ func _realm_preview_details(realm_id: int) -> void:
 	var title: String="%02d · %s · AB LEVEL %d" % [realm_id,str(data.name).to_upper(),int(data.level)]
 	var description: String="%s\nLandschaft: %s\nHafen: %s\nGegner & Monster: %s\nAktivitäten: %s" % [str(data.zone),str(data.landscape),str(data.harbor),str(data.encounters),str(data.activity)]
 	_row(extra_icons.world_chart,title+"\n"+description,64,Color("6fd1c1"))
-	_note("Migrationszuordnung (nur Entwurf): bisherige Karten %s und %s werden später ein gemeinsames großes Revier. Noch keine Änderung an der spielbaren Seekarte." % [CONTENT.MAPS[existing[0]].code,CONTENT.MAPS[existing[1]].code])
+	_note("Spielbare neue Seekarte: %s (ID %d). Die Insel-Landschaften von %s und %s liegen jetzt auf einer zusammenhängenden großen Seekarte." % [CONTENT.MAPS[CONTENT.realm_map_id(realm_id)].code,CONTENT.realm_map_id(realm_id),CONTENT.MAPS[existing[0]].code,CONTENT.MAPS[existing[1]].code])
 	var edges: Dictionary=REALM_CATALOG.edge_links(realm_id,realm_edge_mode)
 	var destinations: Array[String]=[]
 	for edge: String in ["north","south","west","east"]:
@@ -4466,7 +4477,7 @@ func _realm_preview_details(realm_id: int) -> void:
 		for stop in path:labels.append(str(stop))
 		_note("Mögliche Kartenfolge von deinem Revier: "+" → ".join(labels)+" · Übergänge nur am tatsächlichen Kartenrand")
 	else:
-		_note("Bonuskarten bleiben eigenständige Instanzen. Keine neuen Weltübergänge in der Live-Version.")
+		_note("Bonuskarten bleiben eigenständige Instanzen. Der Welt-Test ist außerhalb der Bonuskarte verfügbar.")
 
 func _chart_details(index: int) -> void:
 	var staff=sim.staff
@@ -4930,6 +4941,7 @@ func _sync_region() -> void:
 		online_population=0
 		call_deferred("_join_online_room")
 	previous_region=sim.map_id
+	if ruler!=null:ruler.world_size=sim.world_extent()
 	chart_pick=-1
 	_close_modal()
 	_recenter_camera();camera.position=sim.player.pos
@@ -5487,7 +5499,7 @@ func _classic_keyboard_pan(delta: float) -> void:
 
 func _classic_chart_center() -> Vector2:
 	var view_center: Vector2=sim.player.pos if camera_locked else camera_anchor
-	return view_center.clamp(Vector2(8,8),sim.WORLD-Vector2(8,8))
+	return view_center.clamp(Vector2(8,8),sim.world_extent()-Vector2(8,8))
 
 func _classic_center_course() -> void:
 	# K navigates to the inspected chart center; C resumes normal follow.
@@ -5498,7 +5510,7 @@ func _classic_center_course() -> void:
 func _shift_camera(offset: Vector2) -> void:
 	if camera_locked:camera_anchor=sim.player.pos+pan
 	camera_locked=false
-	camera_anchor=(camera_anchor+offset).clamp(Vector2.ZERO,sim.WORLD)
+	camera_anchor=(camera_anchor+offset).clamp(Vector2.ZERO,sim.world_extent())
 	pan=camera_anchor-sim.player.pos
 
 func _recenter_camera() -> void:
