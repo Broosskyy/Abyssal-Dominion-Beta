@@ -50,7 +50,7 @@ jobs:
           set -euo pipefail
           engine=/tmp/godot/Godot_v4.7.2-stable_linux.x86_64
           for suite in m390_realm_visuals_test m389_realm_ecology_test m389_realm_mission_ui_test m388_playable_realm_test m388_playable_realm_ui_test m386_world_realm_catalog_test m386_world_atlas_ui_test m376_unified_direct_sailing_test sea_edges_test m385_deck_extension_equipment_test; do
-            timeout 120s "$engine" --headless --path rebuild/m3052 --script "tests/${suite}.gd" > "/tmp/${suite}.log" 2>&1 || { tail -120 "/tmp/${suite}.log"; exit 1; }
+            timeout 120s env XDG_DATA_HOME="$(mktemp -d)" "$engine" --headless --path rebuild/m3052 --script "tests/${suite}.gd" > "/tmp/${suite}.log" 2>&1 || { tail -120 "/tmp/${suite}.log"; exit 1; }
             tail -35 "/tmp/${suite}.log"
             grep -q '"status":"PASS"' "/tmp/${suite}.log"
             if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script' "/tmp/${suite}.log"; then exit 1; fi
