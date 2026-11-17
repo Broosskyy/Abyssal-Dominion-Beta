@@ -34,7 +34,7 @@ func _run() -> void:
 	if atlas!=null:
 		check(atlas.edge_mode=="hybrid","atlas points at real mixed border topology")
 		check(atlas.sim==game.sim,"world map reads player state without copying it")
-		check(atlas.custom_minimum_size.y>=1100.0,"mobile list has room for all twenty sea cards")
+		check(atlas.custom_minimum_size.y>=(1120.0 if game.modal_scroll.size.x<560.0 else 650.0),"responsive atlas reserves enough height for chosen column count")
 		atlas.size=Vector2(350,1120)
 		check(atlas._columns()==2,"mobile viewport stacks atlas in two columns")
 		check(atlas.node_point(20).y+48.0<atlas.size.y-24.0,"twentieth sea card is fully visible")
