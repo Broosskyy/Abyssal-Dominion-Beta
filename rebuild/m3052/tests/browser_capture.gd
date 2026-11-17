@@ -90,14 +90,18 @@ func _run() -> void:
 	# mounted without accidentally unlocking any adjacent ornaments.
 	game._open_modal("Decks")
 	game._switch_tab("Decks","ERWEITERUNGEN")
-	game.modal_scroll.scroll_vertical=80
+	for frame in 3:await process_frame
+	var first_module: Control=game.modal_body.find_child("DeckExtensionGear_mojo_frame",true,false)
+	if first_module!=null:game.modal_scroll.ensure_control_visible(first_module)
 	for frame in 4:await process_frame
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output+"/852x393-deck-equipment-locked.png")
 	game.sim.unlock_deck_extension("mojo_frame")
 	game.sim.set_deck_extension_equipped("mojo_frame",true)
 	game._open_modal("Decks")
-	game.modal_scroll.scroll_vertical=80
+	for frame in 3:await process_frame
+	var owned_module: Control=game.modal_body.find_child("DeckExtensionGear_mojo_frame",true,false)
+	if owned_module!=null:game.modal_scroll.ensure_control_visible(owned_module)
 	game._sync_plate_overlay()
 	for frame in 4:await process_frame
 	await RenderingServer.frame_post_draw
