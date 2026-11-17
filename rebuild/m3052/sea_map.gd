@@ -3824,6 +3824,8 @@ func _open_decks() -> void:
 	# A giant shop banner above it hid the new feature below the viewport.
 	if _tab("Decks")=="VORSCHAU":
 		_section("DECK-ERWEITERUNGEN · VORSCHAU")
+	elif _tab("Decks")=="ERWEITERUNGEN":
+		_section("SECHS EIGENE DECK-ERWEITERUNGEN")
 	else:
 		_banner_card(painted.tide_deck,"10 STANDARDDECKS · 3 SONDERDECKS","Alle zehn normalen Decks sind identisch und frei kombinierbar. Gold I–V → Perlen I–V → Kristall I–V. Jedes montierte Deck bringt Kanonenplätze UND zusätzliche Rumpf-HP (Beta-Balance).")
 	match _tab("Decks"):
@@ -4023,14 +4025,14 @@ func _open_decks() -> void:
 			_catalog_action(blessing,"ZUM KESSEL",func():_open_modal("Kessel"))
 			_note("Weitere eigenständige Segnungen, beispielsweise Königsgunst, können wir später ergänzen. Es wird dafür aktuell kein Bonus vorgetäuscht.")
 		"ERWEITERUNGEN":
-			_section("SECHS EIGENE ERWEITERUNGSPLÄTZE")
-			_note("Freischaltung und Ausrüstung sind unabhängig. Jedes Symbol ist ein eigenes Asset und lässt sich nur ausrüsten, wenn du es tatsächlich besitzt. Die zehn normalen Deckplätze und zeitlichen Spezialdecks bleiben unverändert.",Color("e8d5a8"))
+			# On narrow phones show the six individual asset cards immediately,
+			# not below an unrelated deck-purchase banner or long instructions.
 			var unlock_count: int=0
 			var equip_count: int=0
 			for key: String in SEA_MARKS.EXTENSION_KEYS:
 				if sim.owns_deck_extension(key):unlock_count+=1
 				if bool(sim.deck_extensions.get(key,false)):equip_count+=1
-			_note("%d/6 freigeschaltet · %d/6 ausgerüstet" % [unlock_count,equip_count],Color("93d7c1"))
+			_note("%d/6 freigeschaltet · %d/6 ausgerüstet · Nur eigene Module montierbar" % [unlock_count,equip_count],Color("93d7c1"))
 			var gear_grid=_catalog_grid(2 if get_viewport_rect().size.x<920 else 3)
 			for key: String in SEA_MARKS.EXTENSION_KEYS:
 				var slot_key: String=key
