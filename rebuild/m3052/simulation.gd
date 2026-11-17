@@ -1,6 +1,7 @@
 extends RefCounted
 const CONTENT = preload("res://content.gd")
 const REALM_CATALOG = preload("res://realm_catalog.gd")
+const REALM_ECOLOGY = preload("res://realm_ecology.gd")
 const NAV = preload("res://navigation.gd")
 const CONTRACTS = preload("res://sea_contracts.gd")
 const STAFF=preload("res://staff.gd")
@@ -70,6 +71,45 @@ var legacy_origin_map: int=0
 var legacy_origin_pos: Vector2=START
 var realm_last_map: int=-1
 var realm_last_pos: Vector2=START
+# Per-realm one-time exploration bounties. No shop currency, paid entitlements
+# or PvP points are granted by this local beta content.
+var realm_missions: Dictionary={}
+
+func realm_mission_info() -> Dictionary:
+	if not in_realm_world():return {}
+	var realm_id: int=CONTENT.realm_id_for_map(map_id)
+	var info: Dictionary=REALM_ECOLOGY.mission(realm_id)
+	var state: Dictionary=realm_missions.get(str(realm_id),{})
+	info["salvage"]=clampi(int(state.get("salvage",0)),0,int(info.salvage_goal))
+	info["hunts"]=clampi(int(state.get("hunts",0)),0,int(info.hunt_goal))
+	info["claimed"]=bool(state.get("claimed",false))
+	info["ready"]=not bool(info.claimed) and int(info.salvage)>=int(info.salvage_goal) and int(info.hunts)>=int(info.hunt_goal)
+	return info
+
+func _realm_mission_record(kind: String) -> void:
+	if not in_realm_world() or staff.active() or not kind in ["salvage","hunts"]:return
+	var info: Dictionary=realm_mission_info()
+	if info.is_empty() or bool(info.claimed):return
+	var realm_id: String=str(info.realm_id)
+	var state: Dictionary=realm_missions.get(realm_id,{"salvage":0,"hunts":0,"claimed":false})
+	var field: String="salvage_goal" if kind=="salvage" else "hunt_goal"
+	state[kind]=mini(int(info[field]),int(state.get(kind,0))+1)
+	realm_missions[realm_id]=state
+
+func claim_realm_mission() -> bool:
+	var info: Dictionary=realm_mission_info()
+	if info.is_empty() or not bool(info.ready) or staff.active():return false
+	# Mark first, then pay once. No duplicate payout from reopening the panel.
+	var key: String=str(info.realm_id)
+	var state: Dictionary=realm_missions.get(key,{})
+	state["claimed"]=true
+	realm_missions[key]=state
+	player.gold+=int(info.gold)
+	essence+=int(info.essence)
+	award_xp(int(info.xp))
+	message="%s abgeschlossen · +%d Gold · +%d EP · +%d Essenz" % [str(info.title),int(info.gold),int(info.xp),int(info.essence)]
+	_event("loot",player.pos,int(info.gold),0)
+	return true
 
 func in_realm_world() -> bool:
 	return map_id in CONTENT.REALM_MAP_IDS
@@ -1279,7 +1319,9 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 				return
 			EXPANSION.award_event_hunt(self,victim)
 			kills += 1
-			if victim.kind == "monster": monster_kills += 1
+			if victim.kind == "monster":
+				monster_kills += 1
+				_realm_mission_record("hunts")
 			elif victim.elite: elite_kills += 1
 			award_xp(150 if victim.kind == "monster" else (60 if victim.elite else 25))
 			_add_drop(victim.pos, loot_gold(int(victim.reward)))
@@ -1318,12 +1360,16 @@ func _spawn_sparkles() -> void:
 	sparkles.clear()
 	for i in 5:
 		next_id += 1
-		sparkles.append({"id": next_id, "pos": _sparkle_point(), "respawn": 0.0})
+		var p: Vector2=_sparkle_point()
+		if in_realm_world() and i<4:
+			p=_free_water(REALM_ECOLOGY.salvage_site(CONTENT.realm_id_for_map(map_id),i))
+		sparkles.append({"id": next_id, "pos": p, "respawn": 0.0})
 
 func _collect_sparkles() -> void:
 	for sparkle in sparkles:
 		if float(sparkle.respawn) > 0 or player.pos.distance_to(sparkle.pos) > 70: continue
 		essence += 1
+		_realm_mission_record("salvage")
 		_event("essence", sparkle.pos, 1, 0)
 		message = "Glitzernde Strömung · +1 Gezeitenessenz"
 		sparkle.respawn = 90.0
@@ -2130,6 +2176,7 @@ func export_save() -> Dictionary:
 		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,
 		"legacy_origin_map":legacy_origin_map,"legacy_origin_pos":[legacy_origin_pos.x,legacy_origin_pos.y],
 		"realm_last_map":realm_last_map,"realm_last_pos":[realm_last_pos.x,realm_last_pos.y],
+		"realm_missions":realm_missions.duplicate(true),
 		"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
@@ -2296,6 +2343,21 @@ func restore_save(data: Dictionary) -> bool:
 		var previous_beta_pos: Vector2=Vector2(float(beta_origin[0]),float(beta_origin[1]))
 		if previous_beta_pos.is_finite() and previous_beta_pos.x>=0.0 and previous_beta_pos.y>=0.0 and previous_beta_pos.x<=WORLD.x*2.0 and previous_beta_pos.y<=WORLD.y:
 			realm_last_pos=previous_beta_pos
+	realm_missions.clear()
+	var saved_missions: Variant=data.get("realm_missions",{})
+	if saved_missions is Dictionary:
+		for key in saved_missions:
+			if not str(key).is_valid_int():continue
+			var region_id: int=int(key)
+			if region_id<1 or region_id>20:continue
+			var entry: Variant=saved_missions[key]
+			if not entry is Dictionary:continue
+			var limits: Dictionary=REALM_ECOLOGY.mission(region_id)
+			realm_missions[str(region_id)]={
+				"salvage":clampi(int(entry.get("salvage",0)),0,int(limits.salvage_goal)),
+				"hunts":clampi(int(entry.get("hunts",0)),0,int(limits.hunt_goal)),
+				"claimed":bool(entry.get("claimed",false))
+			}
 	var restored_map: int=int(data.get("map_id",0))
 	configure_map(restored_map if CONTENT.is_playable_sea_id(restored_map) else 0)
 	player.pos=START
