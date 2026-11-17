@@ -1,7 +1,7 @@
 {
   "engine": "4.7.2.stable.official.ed1daf0bf",
   "milestone": "M3059",
-  "source_commit": "f59f02a9fe199fb6f8c63d04a7c001ef85fcec8b",
+  "source_commit": "b5b315392e06727c0139459c7e560413cf437cc7",
   "bootstrap_sha256": "8e97bafe54793eb72410248af725c99324486557bf48c5040cc7a27025c88fde",
   "tests": [
     {
@@ -158,7 +158,19 @@
     },
     {
       "test": "m386_world_atlas_ui_test",
-      "checks": 17,
+      "checks": 18,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "m388_playable_realm_test",
+      "checks": 268,
+      "failures": [],
+      "status": "PASS"
+    },
+    {
+      "test": "m388_playable_realm_ui_test",
+      "checks": 9,
       "failures": [],
       "status": "PASS"
     },
@@ -183,14 +195,14 @@
     }
   ],
   "data": {
-    "revision": 387,
+    "revision": 388,
     "abi": 1,
     "engine": "4.7.2.stable",
     "min_apk": 305903,
-    "bytes": 129309282,
-    "sha256": "3adc961632c303f1e586378f71f0f5f7b7c6005904e1d578a9d8fdf696934a41",
-    "signature": "TenLrZS0ru+yQll3tjI04ySv3x5+InMfIBOJxAaaJp9OfA58vGdZtkuNrR2G4zukVIe3mXfFpuGowCtb7bYdJLXR/4PV2s8POW7vngUZWBvVlNd79MSHflkTkni6sIXyxdYfyJe3VcJDslpb2TVKCcqqPj3F+DClPc4s9YtlP4xhP6m7ALujIbMEqvqac/XhxZuMI2HMwFFy6I9gxWqe2fes/2GI+CasC5oWyC3erWhvm+k3jj3b4F/vYbyxbMB49qme58nxeoBWR21lD+Ybe9oAnXWLnFR1CDJk6+oKtm2HtQd2h3gnpIdPvOYovAopiicIXxmHlOp17UcUqQaQ8Q==",
-    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-387/ABYSSAL_DATA_387.zip"
+    "bytes": 129326326,
+    "sha256": "9c443697a33152107789464fde4605024af054e2a4c846264b02b72e3ada2e01",
+    "signature": "MM28IVWL6XmvLHyTDkpsv+Ek+BcFl0FCLs/HrfQUe/E839UgLOtwt9g5dYVu5fPFh4qbmBOO8DYM3J9widQT134fnX3oqWNz3GDfdzhBWNt6P8u/Fn446Ej2/eSIUwHdbuboeeJkCAAXxsScDbVX5+SXyKzYi0R2D04qSKAWgUkmwPuWlDZVy/3vOIsP+ZN70kQ8nmtJb2GFX7SluDZ76eFxV7RBoqnkPba4H4r3IMrHNALho8qY+td3w6+PvxlepZAZhAEN48OYvZRYqnV2HKKPOrjndVmWrBYFHTiynjC8MT2M5/DlcYMfgl8702NQCy1eG45D55kNRr4xzM2/TA==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-388/ABYSSAL_DATA_388.zip"
   },
   "audited_pngs": 44,
   "physical_android_test": "NOT_PERFORMED",
