@@ -18,7 +18,9 @@ func _run() -> void:
 	check(CATALOG.REALMS.size()==20,"twenty independent large-sea concepts")
 	check(CATALOG.ZONES.size()==5,"five geographic zones")
 	check(CONTENT.SEA_MAP_IDS.size()==40,"forty old physical maps remain untouched")
-	check(CATALOG.EDGE_MODES==["two","four"],"only familiar map-edge variants are proposed")
+	check(CATALOG.EDGE_MODES==["hybrid","two"],"hybrid classic edges are default, with optional comparison")
+	check(CATALOG.DEFAULT_EDGE_MODE=="hybrid","default layout uses 2-4 classic borders")
+	var edge_counts: Dictionary={2:0,3:0,4:0}
 	var names: Array[String]=[]
 	var mapped: Dictionary={}
 	for realm_id in range(1,21):
@@ -39,6 +41,7 @@ func _run() -> void:
 			var links: Dictionary=CATALOG.edge_links(realm_id,mode)
 			check(not links.is_empty(),"every sea has at least one accessible boundary in "+mode)
 			check(links.size()<= (2 if mode=="two" else 4),"maximum classic boundaries")
+			if mode=="hybrid":edge_counts[links.size()]=int(edge_counts.get(links.size(),0))+1
 			var values: Dictionary={}
 			for edge: String in links:
 				check(edge in OPPOSITE,"only 4 classic cardinal map borders")
@@ -57,15 +60,26 @@ func _run() -> void:
 		check(CATALOG.edge_neighbor(realm_id,"west","two")==(realm_id-1 if realm_id>1 else -1),"two-border west is predecessor")
 		check(CATALOG.edge_neighbor(realm_id,"east","two")==(realm_id+1 if realm_id<20 else -1),"two-border east is successor")
 	check(mapped.size()==40,"all old maps appear exactly once")
-	check(CATALOG.edge_neighbor(4,"east","four")==-1,"four-border world respects east-most world boundary")
-	check(CATALOG.edge_neighbor(5,"west","four")==-1,"four-border world respects west-most world boundary")
-	check(CATALOG.edge_neighbor(1,"south","four")==5,"four-border world uses geographic south")
-	check(CATALOG.edge_neighbor(5,"north","four")==1,"four-border world returns via north")
+	check(edge_counts[2]==4 and edge_counts[3]==10 and edge_counts[4]==6,"20 big seas have exactly 4 corners (2 exits), 10 coast maps (3 exits) and 6 central maps (4 exits)")
+	check(CATALOG.edge_neighbor(4,"east","hybrid")==-1,"hybrid world respects east-most world boundary")
+	check(CATALOG.edge_neighbor(5,"west","hybrid")==-1,"hybrid world respects west-most world boundary")
+	check(CATALOG.edge_neighbor(1,"south","hybrid")==5,"hybrid world uses geographic south")
+	check(CATALOG.edge_neighbor(5,"north","hybrid")==1,"hybrid world returns via north")
 	for bonus in [3,4,5]:
 		check(CATALOG.realm_for_map(bonus)==-1,"bonus world stays independent")
 	check(CATALOG.realm(0).is_empty() and CATALOG.realm(21).is_empty(),"out-of-range realms rejected")
 	check(CATALOG.edge_links(1,"currents").is_empty() and CATALOG.route(1,20,"currents").is_empty(),"invented shortcut mode not supported")
-	check(CATALOG.route(1,20,"two").size()==20,"two-border layout follows simple classic linear progression")
+	check(CATALOG.route(1,20,"two").size()==20,"linear comparison follows classic predecessor/successor")
+	check(CATALOG.exit_count(1)==2 and CATALOG.exit_count(7)==4 and CATALOG.exit_count(8)==3,"hybrid exit counts match corners, center and rim")
+	check(CATALOG.edge_neighbor(7,"north")==3 and CATALOG.edge_neighbor(7,"south")==11 and CATALOG.edge_neighbor(7,"west")==6 and CATALOG.edge_neighbor(7,"east")==8,"central sea has the correct four real neighbors")
+	for edge: String in CATALOG.CARDINAL_EDGES:
+		check(CATALOG.opposite_edge(CATALOG.opposite_edge(edge))==edge,"opposite travel side returns home")
+	check(CATALOG.entry_position(Vector2(8800,6400),"east",1950)==Vector2(240,1950),"east crossing arrives near destination west side")
+	check(CATALOG.entry_position(Vector2(8800,6400),"west",1950)==Vector2(8560,1950),"west crossing arrives near destination east side")
+	check(CATALOG.entry_position(Vector2(8800,6400),"north",3500)==Vector2(3500,6160),"north crossing arrives near destination south side")
+	check(CATALOG.entry_position(Vector2(8800,6400),"south",3500)==Vector2(3500,240),"south crossing arrives near destination north side")
+	check(CATALOG.entry_position(Vector2(8800,6400),"south",5)==Vector2(240,240),"near-corner tangent clamps to safe inset")
+	check(CATALOG.entry_position(Vector2(8800,6400),"portal",3500)==Vector2(-1,-1),"unknown edge cannot teleport")
 	var sim=SIM.new()
 	var before: Dictionary=sim.export_save()
 	var position: Vector2=sim.player.pos
