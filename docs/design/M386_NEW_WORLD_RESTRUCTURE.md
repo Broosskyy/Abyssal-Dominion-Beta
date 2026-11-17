@@ -24,19 +24,24 @@ Die 20 Einträge samt individueller Kurzbeschreibung liegen maschinenlesbar in `
 
 Jede Karte bekommt mindestens: **3 Landschaftstypen**, **1 Hafen/Ankerplatz**, **2 sichtbare Wahrzeichen**, **3–5 NPC-Rollen**, **1–3 Monsterarten**, **1 Sammel- oder Bergungssystem**, **2–4 regionale Aufträge** und mindestens **1 optionale Ereignisvariation**. Diese Zahlen sind Entwurfsziele, noch keine vorhandenen Features.
 
-## Reisen – Hybrid statt ausschließlich Kartenränder
+## Reisen – KORRIGIERT: klassische Kartenrand-Überfahrten bleiben
 
-Vorgesehen sind drei unterscheidbare Verbindungen:
+Der Spieler will **kein Reise-Netz aus erfundenen Seewegen/Strömungs-Teleportern/Hafen-Schnellreisen**. Der gewohnte direkte Kartenwechsel durch das **Überfahren eines Kartenrandes** soll erhalten bleiben. Offen ist nur, an **wie vielen Randseiten** die jeweilige Karte Nachbarn hat.
 
-1. **Seewege / Engstellen**: bewusst erkennbare Durchfahrten auf der Seekarte, die man wirklich anfährt; kein automatischer Übergang über jede offene Kartenkante.
-2. **Hafenüberfahrten**: eine ausdrücklich bestätigte Route zwischen passenden Häfen/Regionen; Kosten, Cooldown und Freischaltungen bleiben zunächst offen.
-3. **Besondere Portale / Strömungen**: optionale Abkürzungen zu Events, versteckten Seegebieten oder gefährlichen Revieren; nicht jeder Knoten ist überallhin verbunden.
+### Vergleichbar im M386-Prototyp (keine aktive Reisemechanik)
 
-Die `neighbors()`- und `passage_type()`-Funktionen beschreiben **nur einen konzeptionellen Graphen**. **Sie führen keine Reisen aus.** In der Live-Version gelten weiterhin die bisherigen 40 Karten und die originalen Randüberfahrten.
+- **A: Zwei Randseiten – derzeit bevorzugt:** Ost = nächstes Revier, West = vorheriges Revier, Nord/Süd = normale äußere Wassergrenzen ohne Reise. In einer linearen Kette mit 20 Karten hat Revier 1 nur Ost und Revier 20 nur West. Beim Überfahren der freigegebenen Kante automatische Überfahrt nach den klassischen Level-/Kampfregeln.
+- **B: Vier Randseiten – klassische Alternative:** 20 Reviere als zusammenhängendes 4×5-Raster. Ost/West/Nord/Süd führen zum jeweils geografisch benachbarten Revier, sofern eines existiert. Außenkanten sind echte Weltgrenzen. Keine erfundenen Direktverbindungen.
+- **C: Spätere denkbare Mischung:** Zwei Normalgrenzen und gelegentlich ein zusätzlicher Randübergang. Nur eine Option für später, **nicht** jetzt eingebaut.
+- **Nur ein Kartenrand:** Für Fortschritt UND Rückreise unpraktisch (man müsste am selben Rand Ziele auswählen). Deshalb zunächst nicht als Standard.
 
-### Reise-UX später
+Die **20 großen Seekarten** bleiben ein Vorschlag, keine endgültig festgelegte Kartenzahl. Ebenso ist zwei statt vier Ausgänge noch kein Produktentscheid. **Beide Varianten erscheinen im Seekarten-Entwurfsmodus als umschaltbare Vorschau.**
 
-In Weltkarte Karte wählen → **Details** (Level, Gefahren, Aktivitäten, mögliche Wege) → **Route anzeigen** → zur tatsächlich erreichbaren Passage/Hafenanlage navigieren → Wechsel nach Zugangsprüfung. Kein Teleport von jedem beliebigen Kartenpunkt. Keine Überfahrt unter Treffer-Cooldown, keine Umgehung durch UI.
+### Kartenwechsel aus Spielersicht (spätere Live-Umsetzung)
+
+Auf Seekarte fahren → ein freigegebener Kartenrand wird erreicht → direkt in den benachbarten Weltabschnitt wechseln → an der gegenüberliegenden Randseite weiterfahren. In der Weltkarte sieht man benachbarte Reviere, Stufen und Sperrungen. **Kein Klick-Dialog, keine Schnellreise und kein extra Portal-Objekt**, außer es wird später ausdrücklich als gesonderter Spielinhalt konzipiert.
+
+Die `edge_links()`-/`edge_neighbor()`-Funktionen dokumentieren nur die beiden möglichen **Kartengrenzen-Layouts**. Sie ändern keinerlei Position und führen keine Reise aus. Die 40 live geschalteten Karten behalten ihre Randwechsel bis nach einer gesondert geprüften Migration.
 
 ## Technische Migration, erst nach gesonderten Tests
 
@@ -46,7 +51,7 @@ Derzeit: 40 persistente Seekarten-IDs, originale Bonuskarten **3–5**, pro Seek
 
 **Phase B – technische Weltmigration:** neues persistentes Revier-Kennzeichen und `world_schema`. Alte 2 Seekarten eines Tiers werden einem Revier zugeordnet; Positionskonvertierung und Gildenbesitz ausdrücklich und reversibel. Physische Karten könnten z. B. gestreamte **2×8800×6400**-Abschnitte verbinden; zunächst Leistung auf Mobilgeräten messen, bevor endgültige Größe festgelegt wird. Server/Browser/Android in einem konsistenten Protokollwechsel, nicht unabhängige Halb-Migrationen. Bonusinstanzen und Event-Belohnungen getrennt halten. Map-Inhalte nur nach serverseitig validierter Reiseprüfung wechseln. Bestehende aktive Fahrwege beim Wechsel korrekt beenden, nicht beim Grafikmoduswechsel.
 
-**Phase C – richtige Reisen:** Portal-/Hafenorte als eigene sichtbare Objekte mit kollisionsgeprüftem Wasserzugang, Ankunftspunkten, Level-Gates, Kampf-Cooldown und klarer Benutzerführung. Neue Überfahrts- und Crossplay-Tests, keine Auto-Reise über die gesamte Kante.
+**Phase C – echte klassische Randwechsel:** Je nach freigegebener Option 2 oder 4 automatische Überfahrtskanten mit originalem Level-Gate, 6-Sekunden-Treffer-Sperre, kollisionsfreier Ankunft auf der gegenüberliegenden Seite und Retap-Verhalten. Keine Ersetzung durch Teleport- oder Hafenschnellreisen.
 
 **Phase D – Inhaltsintegration:** Datensatz je Revier für Hintergrund, Inselanordnung, Spawn-Rollen, Quests, Events, handelbare Gegenstände, Jagdgebiete, Gildeninseln und Portale. Nicht bloß HUD-Text austauschen: Spawnmanager, Questfortschritt und Belohnungsledger müssen dieselben IDs verwenden.
 
@@ -61,7 +66,7 @@ Derzeit: 40 persistente Seekarten-IDs, originale Bonuskarten **3–5**, pro Seek
 
 ## Bedienbarkeit
 
-Die Weltkarte soll nicht nur nummerierte Punkte darstellen: Zonenfilter, geografische Symbole, Anzeigen für „hier“, „gesperrt“, „entdeckt“, „Gildenbesitz“ und auf Wunsch eine markierte Überfahrtsroute. Mobil nur zwei Spalten, große Touchflächen, klare Zurück-Navigation. Gameplay-Panels aufräumen; neue Features lieber in eigene Tabs integrieren als die Kampfleiste überladen.
+Die Weltkarte soll nicht nur nummerierte Punkte darstellen: Zonenfilter, geografische Symbole, Anzeigen für „hier“, „gesperrt“, „entdeckt“, „Gildenbesitz“ und sichtbare benachbarte Kartenränder. Mobil nur zwei Spalten, große Touchflächen, klare Zurück-Navigation. Gameplay-Panels aufräumen; neue Features lieber in eigene Tabs integrieren als die Kampfleiste überladen.
 
 ## Qualitätskriterien vor produktiver Aktivierung
 
@@ -69,7 +74,7 @@ Die Weltkarte soll nicht nur nummerierte Punkte darstellen: Zonenfilter, geograf
 - Jeder der 40 alten Seekarten-IDs hat genau **eine** beabsichtigte Nachfolgerzuordnung; Bonuskarten werden **nicht** in normale Reviere verschoben.
 - Alte M385-Spielstände, Gildenbesitz, Decks, PvP-Rang und Währungen bleiben erhalten.
 - Browser (2D) und App (2D/3D) haben nach Reisen dieselbe Position und nutzen identische serverseitige Wege; Retap während der Fahrt und Hindernisse bleiben korrekt.
-- Hafen/Seeweg/Portal nicht im Kampf ausnutzbar; Ankunft nie auf Land und ohne unbeabsichtigte sofortige Rückreise.
+- Normale Randübergänge nicht im Kampf ausnutzbar; Ankunft nie auf Land und ohne unbeabsichtigte sofortige Rückreise.
 - Keine Renderregressionen auf mobilen 852×393- und 720×405-Ansichten; Assets über kleine Streamingpakete nachladen.
 - Das Konzept gilt erst als umgesetzt, wenn Godot-Tests, echte Browser-/Android-Prüfungen und Gameplay-Abnahme bestanden sind.
 
