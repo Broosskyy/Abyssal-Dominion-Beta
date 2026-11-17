@@ -85,7 +85,25 @@ func _run() -> void:
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(output+"/852x393-deck-preview-none.png")
 	game._close_modal()
-	# The test fixture must not mutate actual persisted player equipment.
+	# M385: screenshot the REAL six-card equipment UI. Demonstrate that all
+	# six slots start locked, and a pre-awarded test-only Mojo frame can be
+	# mounted without accidentally unlocking any adjacent ornaments.
+	game._open_modal("Decks")
+	game._switch_tab("Decks","ERWEITERUNGEN")
+	game.modal_scroll.scroll_vertical=80
+	for frame in 4:await process_frame
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(output+"/852x393-deck-equipment-locked.png")
+	game.sim.unlock_deck_extension("mojo_frame")
+	game.sim.set_deck_extension_equipped("mojo_frame",true)
+	game._open_modal("Decks")
+	game.modal_scroll.scroll_vertical=80
+	game._sync_plate_overlay()
+	for frame in 4:await process_frame
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(output+"/852x393-deck-equipment-mojo-owned.png")
+	game._close_modal()
+	# The above fixtures are created ONLY in a headless CI process.
 	var motion: Dictionary=await preload("res://tests/ocean_motion_probe.gd").run(self)
 	print(JSON.stringify(motion))
 	var monsters: Dictionary=await preload("res://tests/monster_motion_probe.gd").run(self)
