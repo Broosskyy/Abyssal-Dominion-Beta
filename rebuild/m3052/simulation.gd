@@ -2127,7 +2127,10 @@ func export_save() -> Dictionary:
 		"essence":essence,"fragments":fragments,"bonus_pieces":bonus_pieces.duplicate(),"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
 		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
 		"deck_slots":deck_slots.duplicate(),"deck_extensions":deck_extensions.duplicate(),"deck_extension_owned":owned_for_save,"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),"guild_home":guild_home.duplicate(true),
-		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,"staff_marked":staff_marked or staff.touched}
+		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,
+		"legacy_origin_map":legacy_origin_map,"legacy_origin_pos":[legacy_origin_pos.x,legacy_origin_pos.y],
+		"realm_last_map":realm_last_map,"realm_last_pos":[realm_last_pos.x,realm_last_pos.y],
+		"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
 	if not int(data.get("schema",0)) in [1,2,3,4,5,6,7,8]: return false
@@ -2246,7 +2249,7 @@ func restore_save(data: Dictionary) -> bool:
 			if int(data.get("world_layout",1))<WORLD_LAYOUT and origin_pos is Array and origin_pos.size()==2 and run.has("origin_pos"):
 				origin_pos=[float(origin_pos[0])*AUTHORED_SCALE,float(origin_pos[1])*AUTHORED_SCALE]
 			bonus={"tier":clampi(int(run.get("tier",0)),0,CONTENT.BONUS_TIERS.size()-1),"wave":clampi(int(run.get("wave",0)),0,CONTENT.BONUS_WAVES.size()-1),
-				"state":"break","timer":3.0,"origin":int(run.get("origin",0)) if int(run.get("origin",0)) in CONTENT.SEA_MAP_IDS else 0,
+				"state":"break","timer":3.0,"origin":int(run.get("origin",0)) if CONTENT.is_playable_sea_id(int(run.get("origin",0))) else 0,
 				"origin_pos":origin_pos if origin_pos is Array and origin_pos.size()==2 else [START.x,START.y]}
 	guild={}
 	var saved_guild: Variant=data.get("guild",{})
@@ -2277,8 +2280,24 @@ func restore_save(data: Dictionary) -> bool:
 	var saved_visited: Variant=data.get("visited",[])
 	if saved_visited is Array:
 		for i in mini(saved_visited.size(),visited.size()):visited[i]=bool(saved_visited[i])
+	legacy_origin_map=int(data.get("legacy_origin_map",0))
+	if not legacy_origin_map in CONTENT.SEA_MAP_IDS:legacy_origin_map=0
+	legacy_origin_pos=START
+	var old_origin: Variant=data.get("legacy_origin_pos",[])
+	if old_origin is Array and old_origin.size()==2:
+		var previous_pos: Vector2=Vector2(float(old_origin[0]),float(old_origin[1]))
+		if previous_pos.is_finite() and previous_pos.x>=0.0 and previous_pos.y>=0.0 and previous_pos.x<=WORLD.x and previous_pos.y<=WORLD.y:
+			legacy_origin_pos=previous_pos
+	realm_last_map=int(data.get("realm_last_map",-1))
+	if not realm_last_map in CONTENT.REALM_MAP_IDS:realm_last_map=-1
+	realm_last_pos=START
+	var beta_origin: Variant=data.get("realm_last_pos",[])
+	if beta_origin is Array and beta_origin.size()==2:
+		var previous_beta_pos: Vector2=Vector2(float(beta_origin[0]),float(beta_origin[1]))
+		if previous_beta_pos.is_finite() and previous_beta_pos.x>=0.0 and previous_beta_pos.y>=0.0 and previous_beta_pos.x<=WORLD.x*2.0 and previous_beta_pos.y<=WORLD.y:
+			realm_last_pos=previous_beta_pos
 	var restored_map: int=int(data.get("map_id",0))
-	configure_map(restored_map if restored_map in CONTENT.SEA_MAP_IDS else 0)
+	configure_map(restored_map if CONTENT.is_playable_sea_id(restored_map) else 0)
 	player.pos=START
 	var position: Variant=data.get("position",[])
 	if position is Array and position.size()==2:
