@@ -37,6 +37,7 @@ const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
 const REALM_CATALOG = preload("res://realm_catalog.gd")
 const REALM_CHART = preload("res://realm_chart.gd")
+const REALM_VISUALS = preload("res://realm_visuals.gd")
 const AMMO_CHOICE=preload("res://ammo_choice.gd")
 const NETWORK=preload("res://network_client.gd")
 const COMBAT_FX=preload("res://combat_fx.gd")
@@ -934,6 +935,10 @@ func _draw() -> void:
 		var point: Vector2=island.pos
 		draw_texture_rect(tex,Rect2(point-dimensions*Vector2(0.5,0.65),dimensions),false)
 		_draw_coastal_surf(island)
+		if sim.in_realm_world():
+			REALM_VISUALS.draw_island_landmark(self,island,CONTENT.realm_id_for_map(sim.map_id),
+				int(island.get("realm_island_index",-1)),int(island.get("realm_island_half",-1)),
+				elapsed,OS.has_feature("web") and web_fast_mode)
 		if guild_island:
 			# Dynamic owner crest; the texture never hardcodes any guild's name.
 			var owned: bool=sim.tower_friendly()
@@ -1023,6 +1028,8 @@ func _draw() -> void:
 		if event.type=="impact":
 			if bool(vfx_flags.enabled) and bool(vfx_flags.impact):
 				SPRITE_FX.draw_impact(self,event,age,fx_strength,fx_particles,fx_splashes,fx_flashes)
+				if bool(event.get("monster",false)):
+					REALM_VISUALS.draw_monster_impact(self,event,age,int(event.get("realm_id",-1)),fast_fx)
 		elif event.type=="muzzle":
 			if bool(event.get("powder",false)):
 				_ellipse_line(p-Vector2(0,20),Vector2(22+age*32,10+age*15),Color("ffb155",maxf(0,.8-age)),3.0)
@@ -1030,6 +1037,8 @@ func _draw() -> void:
 				SPRITE_FX.draw_muzzle(self,event,age,fx_strength,fx_particles,fx_flashes)
 		elif event.type=="sunk":
 			COMBAT_FX.draw_sinking(self,event,age)
+			if bool(event.get("monster",false)) and bool(vfx_flags.enabled) and bool(vfx_flags.water):
+				REALM_VISUALS.draw_monster_sinking(self,event,age,int(event.get("realm_id",-1)),fast_fx)
 		elif event.type=="loot":pass
 		elif event.type=="level":
 			_ellipse_line(p,Vector2(50+age*80,22+age*35),Color(0.5,0.9,1,1-age/1.2),2.2)
@@ -1332,6 +1341,9 @@ func _draw_actor(actor: Dictionary) -> void:
 	var hull_alpha=0.45 if is_player and sim.staff.hidden() else 1.0
 	var monster = not is_player and actor.kind=="monster"
 	if monster:
+		if sim.in_realm_world() and ship_animations_enabled:
+			REALM_VISUALS.draw_monster_presence(self,actor,CONTENT.realm_id_for_map(sim.map_id),elapsed,
+				OS.has_feature("web") and web_fast_mode)
 		var key: String=str(actor.get("monster_key",""))
 		if expansion_art.has(key):
 			var tex: Texture2D=expansion_art[key]
