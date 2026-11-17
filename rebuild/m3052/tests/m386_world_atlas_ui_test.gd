@@ -60,7 +60,11 @@ func _run() -> void:
 	check(game.modal_body.find_child("WorldChart",true,false)!=null,"the original 40-map world chart remains accessible")
 	game.chart_realm_preview=true
 	game._open_modal("Seekarten")
-	check(game.sim.export_save()==before,"opening and switching future charts does not modify game progress")
+	var after: Dictionary=game.sim.export_save()
+	var modified: Array[String]=[]
+	for key: String in before:
+		if before[key]!=after.get(key):modified.append(key)
+	check(modified.is_empty(),"opening and switching future charts does not modify game progress: "+", ".join(modified))
 	check(game.sim.map_id==old_map and game.sim.player.pos==pos and game.sim.player.heading==heading,"atlas selection changes neither sea nor active 2D/3D ship movement")
 	game._close_modal()
 	game.queue_free()
