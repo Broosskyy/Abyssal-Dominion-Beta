@@ -83,7 +83,7 @@ static func leave_bonus(s) -> bool:
 	if str(s.bonus.state) == "fight" and s.clock - float(s.player.last_hit) < 6.0:
 		s.message = "Ausgang erst 6 Sekunden ohne Treffer"
 		return false
-	var origin = int(s.bonus.origin) if int(s.bonus.origin) in CONTENT.SEA_MAP_IDS else 0
+	var origin = int(s.bonus.origin) if CONTENT.is_playable_sea_id(int(s.bonus.origin)) else 0
 	var saved: Array = s.bonus.origin_pos
 	var finished = str(s.bonus.state) == "done"
 	if finished:
