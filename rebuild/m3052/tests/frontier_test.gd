@@ -172,7 +172,11 @@ func _run() -> void:
 		check(game.modal_body.find_children("Use_*","Button",true,false).size()==11,"all eleven functional items in picker")
 		check(Rect2(Vector2.ZERO,Vector2(dimensions)).encloses(game.modal.get_global_rect()),"consumables fit viewport "+str(dimensions))
 		game._open_modal("Seekarten");await process_frame
-		check(game.modal_body.find_child("WorldChart",true,false)!=null,"forty-map chart opens")
+		var atlas=game.modal_body.find_child("RealmChartPreview",true,false)
+		check(atlas!=null and atlas.sim==game.sim and atlas.edge_mode=="hybrid","M386 twenty-realm atlas opens in every phone/tablet orientation")
+		game.chart_realm_preview=false
+		game._open_modal("Seekarten");await process_frame
+		check(game.modal_body.find_child("WorldChart",true,false)!=null,"original forty-map chart still opens on demand")
 		var chart=game.modal_body.find_child("WorldChart",true,false)
 		check(game.target_clear.z_index>game.target_numbers.z_index,"target cancel button owns the top drawing layer")
 		chart.chapter=-1
@@ -186,6 +190,7 @@ func _run() -> void:
 				check(chart.node_at(chart.node_point(index))==index,"illustrated atlas hitbox "+str(index))
 				if index in CONTENT.SEA_MAP_IDS:catalog.append(index)
 		check(catalog.size()==40 and catalog==CONTENT.SEA_MAP_IDS,"four illustrated leaves expose all forty seas in order")
+		game.chart_realm_preview=true
 		for tab in ["GRAFIK","STEUERUNG","HUD","EFFEKTE"]:
 			game.modal_tab["Anzeige"]=tab;game._open_modal("Anzeige");await process_frame
 			check(game.modal_tabs.get_child_count()==4 and game.modal_scroll.size.y>80,"categorized settings "+tab+" at "+str(dimensions))
