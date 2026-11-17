@@ -2100,7 +2100,7 @@ func configure_map(destination: int) -> void:
 		npc.shield = npc.max_shield
 		npc.reward = roundi(float(npc.reward) * float(config.enemy_scale))
 		if map_id >=6 and not in_realm_world(): npc.name="%s · " % config.code+str(npc.name)
-		elif map_id > 0: npc.name = ("Frost · " if map_id == 1 else "Schatten · ") + str(npc.name)
+		elif map_id > 0 and not in_realm_world(): npc.name = ("Frost · " if map_id == 1 else "Schatten · ") + str(npc.name)
 	var restored := map_states.has(map_id)
 	if restored:
 		npcs = map_states[map_id].npcs.duplicate(true)
