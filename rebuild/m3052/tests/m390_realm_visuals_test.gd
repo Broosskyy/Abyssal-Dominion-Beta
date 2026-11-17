@@ -77,7 +77,6 @@ func _run()->void:
 	await process_frame
 	game_scene.set_process(false)
 	game_scene.sim.configure_map(CONTENT.realm_map_id(9))
-	game_scene._sync_region()
 	game_scene.queue_redraw()
 	await process_frame
 	await process_frame
