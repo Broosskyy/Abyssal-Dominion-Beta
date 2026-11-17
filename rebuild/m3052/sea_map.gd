@@ -216,7 +216,7 @@ var chart_pick := -1
 var chart_chapter := -1
 var chart_realm_preview := false
 var realm_chart_pick := 1
-var realm_edge_mode := "two"
+var realm_edge_mode := "hybrid"
 var drag_start := Vector2.ZERO
 var dragging := false
 var last_mouse := Vector2.ZERO
@@ -4427,16 +4427,16 @@ func _open_charts() -> void:
 
 func _open_realm_preview() -> void:
 	_section("WELT 2.0 · 20 GROSSE SEEKARTEN · ENTWURF")
-	_note("Klassisches Seafight-artiges Reisen durch das Überfahren freigegebener Kartenränder. Noch keine Sonderportale, Hafenreisen oder Teleport-Wege. Die bisherige spielbare 40er-Welt bleibt unverändert.",Color("b5cfcc"))
+	_note("20 große Reviere: die vier Ecken haben 2, Randreviere 3 und zentrale Reviere 4 Übergänge. Genau wie bisher durch Überfahren einer freigegebenen Kartenkante. Im Entwurfsmodus – die M385-Spielwelt bleibt bis zur geprüften Migration erhalten.",Color("b5cfcc"))
 	var edge_modes=_grid(2)
-	_action("2 RANDSEITEN · LINKS/RECHTS",func():realm_edge_mode="two";_open_modal("Seekarten"),"tab_on" if realm_edge_mode=="two" else "normal",edge_modes)
-	_action("4 RANDSEITEN · KLASSISCH",func():realm_edge_mode="four";_open_modal("Seekarten"),"tab_on" if realm_edge_mode=="four" else "normal",edge_modes)
+	_action("HYBRID · 2 BIS 4 RÄNDER",func():realm_edge_mode="hybrid";_open_modal("Seekarten"),"tab_on" if realm_edge_mode=="hybrid" else "normal",edge_modes)
+	_action("VERGLEICH · LINKS/RECHTS",func():realm_edge_mode="two";_open_modal("Seekarten"),"tab_on" if realm_edge_mode=="two" else "normal",edge_modes)
 	var atlas=REALM_CHART.new()
 	atlas.name="RealmChartPreview"
 	atlas.sim=sim
 	atlas.selected=clampi(realm_chart_pick,1,20)
 	atlas.edge_mode=realm_edge_mode
-	atlas.custom_minimum_size=Vector2(0,890 if modal_scroll.size.x<560 else 620)
+	atlas.custom_minimum_size=Vector2(0,1120 if modal_scroll.size.x<560 else 650)
 	atlas.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	atlas.picked.connect(func(realm_id: int):realm_chart_pick=realm_id;_open_modal("Seekarten"))
 	modal_body.add_child(atlas)
@@ -4457,7 +4457,7 @@ func _realm_preview_details(realm_id: int) -> void:
 			var compass: String={"north":"NORD","south":"SÜD","west":"WEST","east":"OST"}[edge]
 			var neighbor: int=int(edges[edge])
 			destinations.append("%s → %02d · %s" % [compass,neighbor,REALM_CATALOG.realm(neighbor).name])
-	_note("Kartenrand-Ausgänge im gewählten Entwurf: "+(", ".join(destinations) if not destinations.is_empty() else "keine"))
+	_note("%d klassische Kartenrand-Übergänge: " % edges.size()+(", ".join(destinations) if not destinations.is_empty() else "keine"))
 	var current: int=REALM_CATALOG.realm_for_map(sim.map_id)
 	if current>0:
 		var path: Array[int]=REALM_CATALOG.route(current,realm_id,realm_edge_mode)
