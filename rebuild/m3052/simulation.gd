@@ -1,6 +1,7 @@
 extends RefCounted
 const CONTENT = preload("res://content.gd")
 const REALM_CATALOG = preload("res://realm_catalog.gd")
+const REALM_ECOLOGY = preload("res://realm_ecology.gd")
 const NAV = preload("res://navigation.gd")
 const CONTRACTS = preload("res://sea_contracts.gd")
 const STAFF=preload("res://staff.gd")
@@ -70,6 +71,45 @@ var legacy_origin_map: int=0
 var legacy_origin_pos: Vector2=START
 var realm_last_map: int=-1
 var realm_last_pos: Vector2=START
+# Per-realm one-time exploration bounties. No shop currency, paid entitlements
+# or PvP points are granted by this local beta content.
+var realm_missions: Dictionary={}
+
+func realm_mission_info() -> Dictionary:
+	if not in_realm_world():return {}
+	var realm_id: int=CONTENT.realm_id_for_map(map_id)
+	var info: Dictionary=REALM_ECOLOGY.mission(realm_id)
+	var state: Dictionary=realm_missions.get(str(realm_id),{})
+	info["salvage"]=clampi(int(state.get("salvage",0)),0,int(info.salvage_goal))
+	info["hunts"]=clampi(int(state.get("hunts",0)),0,int(info.hunt_goal))
+	info["claimed"]=bool(state.get("claimed",false))
+	info["ready"]=not bool(info.claimed) and int(info.salvage)>=int(info.salvage_goal) and int(info.hunts)>=int(info.hunt_goal)
+	return info
+
+func _realm_mission_record(kind: String) -> void:
+	if not in_realm_world() or staff.active() or not kind in ["salvage","hunts"]:return
+	var info: Dictionary=realm_mission_info()
+	if info.is_empty() or bool(info.claimed):return
+	var realm_id: String=str(info.realm_id)
+	var state: Dictionary=realm_missions.get(realm_id,{"salvage":0,"hunts":0,"claimed":false})
+	var field: String="salvage_goal" if kind=="salvage" else "hunt_goal"
+	state[kind]=mini(int(info[field]),int(state.get(kind,0))+1)
+	realm_missions[realm_id]=state
+
+func claim_realm_mission() -> bool:
+	var info: Dictionary=realm_mission_info()
+	if info.is_empty() or not bool(info.ready) or staff.active():return false
+	# Mark first, then pay once. No duplicate payout from reopening the panel.
+	var key: String=str(info.realm_id)
+	var state: Dictionary=realm_missions.get(key,{})
+	state["claimed"]=true
+	realm_missions[key]=state
+	player.gold+=int(info.gold)
+	essence+=int(info.essence)
+	award_xp(int(info.xp))
+	message="%s abgeschlossen · +%d Gold · +%d EP · +%d Essenz" % [str(info.title),int(info.gold),int(info.xp),int(info.essence)]
+	_event("loot",player.pos,int(info.gold),0)
+	return true
 
 func in_realm_world() -> bool:
 	return map_id in CONTENT.REALM_MAP_IDS
@@ -1279,7 +1319,9 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 				return
 			EXPANSION.award_event_hunt(self,victim)
 			kills += 1
-			if victim.kind == "monster": monster_kills += 1
+			if victim.kind == "monster":
+				monster_kills += 1
+				_realm_mission_record("hunts")
 			elif victim.elite: elite_kills += 1
 			award_xp(150 if victim.kind == "monster" else (60 if victim.elite else 25))
 			_add_drop(victim.pos, loot_gold(int(victim.reward)))
@@ -1318,12 +1360,16 @@ func _spawn_sparkles() -> void:
 	sparkles.clear()
 	for i in 5:
 		next_id += 1
-		sparkles.append({"id": next_id, "pos": _sparkle_point(), "respawn": 0.0})
+		var p: Vector2=_sparkle_point()
+		if in_realm_world() and i<4:
+			p=_free_water(REALM_ECOLOGY.salvage_site(CONTENT.realm_id_for_map(map_id),i))
+		sparkles.append({"id": next_id, "pos": p, "respawn": 0.0})
 
 func _collect_sparkles() -> void:
 	for sparkle in sparkles:
 		if float(sparkle.respawn) > 0 or player.pos.distance_to(sparkle.pos) > 70: continue
 		essence += 1
+		_realm_mission_record("salvage")
 		_event("essence", sparkle.pos, 1, 0)
 		message = "Glitzernde Strömung · +1 Gezeitenessenz"
 		sparkle.respawn = 90.0
@@ -2017,27 +2063,35 @@ func configure_map(destination: int) -> void:
 		_build_grid()
 		return
 	islands = base_islands.duplicate(true)
+	var realm_id: int=CONTENT.realm_id_for_map(map_id)
 	for i in islands.size():
-		islands[i].pos = _map_point(base_islands[i].pos)
-		islands[i].art = config.art[i]
+		islands[i].pos = REALM_ECOLOGY.island_site(realm_id,i,0) if in_realm_world() else _map_point(base_islands[i].pos)
+		islands[i].art = REALM_ECOLOGY.island_art(realm_id,i,0) if in_realm_world() else config.art[i]
 		# Preserve the authored width, but normalize the *visible* footprint
 		# of each atlas and its land collision together.
-		islands[i].width=float(base_islands[i].width)*island_art_scale(str(config.art[i]))
-		if map_id > 0: islands[i].name = (["Eishafen","Frostbucht","Weißes Riff","Gletscherwacht","Eisbrecherbucht","Nordstern","Winterhafen","Frostzahn","Polarwacht"] if map_id == 1 else ["Nebelwacht","Schwarze Bucht","Totenriff","Schattenklippen","Korsarenfestung","Nachtwacht","Dämmerhafen","Drachenzahn","Knochenriff"])[i]
+		islands[i].width=float(base_islands[i].width)*island_art_scale(str(islands[i].art))
+		if in_realm_world():islands[i].name=REALM_ECOLOGY.island_title(realm_id,i,0)
+		elif map_id > 0: islands[i].name = (["Eishafen","Frostbucht","Weißes Riff","Gletscherwacht","Eisbrecherbucht","Nordstern","Winterhafen","Frostzahn","Polarwacht"] if map_id == 1 else ["Nebelwacht","Schwarze Bucht","Totenriff","Schattenklippen","Korsarenfestung","Nachtwacht","Dämmerhafen","Drachenzahn","Knochenriff"])[i]
 	if in_realm_world():
 		# The other former lane is continuous sea, not another scene load.
-		var secondary: Array=config.secondary_art
 		for i in base_islands.size():
 			var other: Dictionary=base_islands[i].duplicate(true)
-			other.pos=Vector2(WORLD.x,0)+_map_point(Vector2(base_islands[i].pos))
-			other.art=str(secondary[i])
+			other.pos=REALM_ECOLOGY.island_site(realm_id,i,1)
+			other.art=REALM_ECOLOGY.island_art(realm_id,i,1)
 			other.width=float(base_islands[i].width)*island_art_scale(str(other.art))
-			other.name="%s · Ostküste %d" % [str(config.name),i+1]
+			other.name=REALM_ECOLOGY.island_title(realm_id,i,1)
 			islands.append(other)
 	npcs = base_npcs.duplicate(true)
 	for npc in npcs:
 		npc.pos = _map_point(npc.pos)
-		if in_realm_world() and int(npc.id)%2==0:npc.pos.x+=WORLD.x
+		if in_realm_world():
+			var actor_id: int=int(npc.id)
+			if actor_id>=1 and actor_id<=16:
+				npc.pos=REALM_ECOLOGY.patrol_site(realm_id,actor_id-1)
+				npc.name=REALM_ECOLOGY.patrol_title(realm_id,actor_id-1)
+			elif actor_id==100:
+				npc.pos=REALM_ECOLOGY.monster_site(realm_id,0)
+				npc.name=REALM_ECOLOGY.monster_title(realm_id,"tiamat")
 		npc.home = npc.pos
 		npc.path = []
 		npc.hp = roundi(float(npc.max_hp) * float(config.enemy_scale))
@@ -2045,17 +2099,23 @@ func configure_map(destination: int) -> void:
 		npc.max_shield = roundi(float(npc.max_shield) * float(config.enemy_scale))
 		npc.shield = npc.max_shield
 		npc.reward = roundi(float(npc.reward) * float(config.enemy_scale))
-		if map_id >=6: npc.name="%s · " % config.code+str(npc.name)
-		elif map_id > 0: npc.name = ("Frost · " if map_id == 1 else "Schatten · ") + str(npc.name)
+		if map_id >=6 and not in_realm_world(): npc.name="%s · " % config.code+str(npc.name)
+		elif map_id > 0 and not in_realm_world(): npc.name = ("Frost · " if map_id == 1 else "Schatten · ") + str(npc.name)
 	var restored := map_states.has(map_id)
 	if restored:
 		npcs = map_states[map_id].npcs.duplicate(true)
 		drops = map_states[map_id].drops.duplicate(true)
 	else:
 		drops.clear()
-		_add_drop(START + Vector2(-170,130),25 + map_id * 15)
-		_add_drop(START + Vector2(220,-120),25 + map_id * 15)
-		_add_drop(_map_point(Vector2(2170,1780)),30 + map_id * 20)
+		if in_realm_world():
+			# Salvage is spread across both halves; rewards use progression,
+			# not the internal room ID (43..62) that could inflate gold.
+			for slot in 4:
+				_add_drop(REALM_ECOLOGY.salvage_site(realm_id,slot),45+realm_id*15)
+		else:
+			_add_drop(START + Vector2(-170,130),25 + map_id * 15)
+			_add_drop(START + Vector2(220,-120),25 + map_id * 15)
+			_add_drop(_map_point(Vector2(2170,1780)),30 + map_id * 20)
 	# Compatibility name: these are logical whole-edge links, never point portals.
 	for neighbor in CONTENT.sea_neighbors(map_id):
 		for edge: String in ["east","west","north","south"]:
@@ -2130,6 +2190,7 @@ func export_save() -> Dictionary:
 		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,
 		"legacy_origin_map":legacy_origin_map,"legacy_origin_pos":[legacy_origin_pos.x,legacy_origin_pos.y],
 		"realm_last_map":realm_last_map,"realm_last_pos":[realm_last_pos.x,realm_last_pos.y],
+		"realm_missions":realm_missions.duplicate(true),
 		"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
@@ -2296,6 +2357,21 @@ func restore_save(data: Dictionary) -> bool:
 		var previous_beta_pos: Vector2=Vector2(float(beta_origin[0]),float(beta_origin[1]))
 		if previous_beta_pos.is_finite() and previous_beta_pos.x>=0.0 and previous_beta_pos.y>=0.0 and previous_beta_pos.x<=WORLD.x*2.0 and previous_beta_pos.y<=WORLD.y:
 			realm_last_pos=previous_beta_pos
+	realm_missions.clear()
+	var saved_missions: Variant=data.get("realm_missions",{})
+	if saved_missions is Dictionary:
+		for key in saved_missions:
+			if not str(key).is_valid_int():continue
+			var region_id: int=int(key)
+			if region_id<1 or region_id>20:continue
+			var entry: Variant=saved_missions[key]
+			if not entry is Dictionary:continue
+			var limits: Dictionary=REALM_ECOLOGY.mission(region_id)
+			realm_missions[str(region_id)]={
+				"salvage":clampi(int(entry.get("salvage",0)),0,int(limits.salvage_goal)),
+				"hunts":clampi(int(entry.get("hunts",0)),0,int(limits.hunt_goal)),
+				"claimed":bool(entry.get("claimed",false))
+			}
 	var restored_map: int=int(data.get("map_id",0))
 	configure_map(restored_map if CONTENT.is_playable_sea_id(restored_map) else 0)
 	player.pos=START

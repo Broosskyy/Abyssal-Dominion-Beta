@@ -2621,7 +2621,7 @@ func _clock_text(seconds: float) -> String:
 	var minutes=floori((total%3600)/60.0)
 	return "%d:%02d:%02d" % [hours,minutes,total%60] if hours>0 else "%d:%02d" % [minutes,total%60]
 
-const MODAL_TABS := {"Logbuch":["AKTUELL","VERTRÄGE","VERLAUF"],"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":["SCHIFF","LAGER","ERWEITERUNGEN","SPEZIAL","KAUFEN","VORSCHAU"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
+const MODAL_TABS := {"Logbuch":["AKTUELL","VERTRÄGE","REVIER","VERLAUF"],"Spielinfo":["KAPITÄN","SCHIFF","WELT","SYSTEM"],"Decks":["SCHIFF","LAGER","ERWEITERUNGEN","SPEZIAL","KAUFEN","VORSCHAU"],"Werft":["SCHIFFE","KANONEN"],"Hafen":["DOCK","DIENSTE"],"Markt":["AUSRÜSTUNG","MUNITION","ITEMS","AUKTION"],"Kastelle":["KASTELLE","TALENTE"],"Gilde":["HEIMATBASIS","WELTINSEL"],"Anzeige":["GRAFIK","STEUERUNG","HUD","EFFEKTE"],"Seekarten":["WELTKARTE","ANLEITUNG"],"Staff":["ÜBERSICHT","TELEPORT","SCHIFF","WELT","GEWÄHREN","ZIEL","PROTOKOLL"]}
 const MODAL_TITLES := {"Spielinfo":"Kapitänsmenü","Menü":"Spielmenü","Events":"Events","Monster":"Seeungeheuer","Schnellzugriff":"Schnellleisten","Hilfe":"Spielanleitung","Verbrauch":"Verbrauchsgegenstände","Profil":"Spielerprofil","Freunde":"Freunde & Einladungen","Belohnungen":"Tagesbonus & AFK-Beute","Munition":"Munitionsauswahl","Markt":"Markt & Handel","Premium-Shop":"Kronen-Shop · Vorschau","Battle Pass":"Saisonpass","Kessel":"Gezeitenkessel","Staff":"Staff-Werkzeuge","Anzeige":"Anzeige & Steuerung","Rangliste":"Rangliste","Bonuskarten":"Bonuskarten"}
 
 func _open_modal(kind: String,remember: bool=true) -> void:
@@ -2762,7 +2762,7 @@ func _reveal_menu_tab(button: Control) -> void:
 # provides a directly recognizable pictogram beside its active pill.
 func _menu_tab_art(kind: String,tab: String) -> Texture2D:
 	match kind:
-		"Logbuch":return painted.nav_ship if tab=="VERTRÄGE" else (painted.spyglass if tab=="VERLAUF" else painted.nav_quests)
+		"Logbuch":return painted.nav_ship if tab in ["VERTRÄGE","REVIER"] else (painted.spyglass if tab=="VERLAUF" else painted.nav_quests)
 		"Markt":
 			match tab:
 				"AUSRÜSTUNG":return extra_icons.cannon_1
@@ -3602,6 +3602,9 @@ func _open_logbook() -> void:
 	if _tab("Logbuch")=="VERTRÄGE":
 		_open_sea_contracts()
 		return
+	if _tab("Logbuch")=="REVIER":
+		_open_realm_mission()
+		return
 	_info("KAMPAGNE · LV. %d · %d/%d AUFTRÄGE ERLEDIGT" % [sim.level,mini(sim.quest_index,CONTENT.QUESTS.size()),CONTENT.QUESTS.size()],CYAN)
 	if _tab("Logbuch")=="VERLAUF":
 		_section("ABGESCHLOSSENE AUFTRÄGE")
@@ -3633,6 +3636,38 @@ func _open_logbook() -> void:
 	_section("LETZTE MELDUNGEN")
 	var recent=message_history.duplicate();recent.reverse()
 	_note("\n".join(recent) if not recent.is_empty() else "Noch keine Meldungen",Color("d6e2e4"))
+
+func _open_realm_mission() -> void:
+	if not sim.in_realm_world():
+		_section("REVIERAUFTRÄGE · NEUE GROSSE WELT")
+		_note("Revieraufträge sind in den 20 großen Seekarten spielbar. Deine bisherigen 40 Seekarten, Kampagnenaufträge und Gildengebiete bleiben unverändert.")
+		_action("ZUR NEUEN WELTKARTE",func():chart_realm_preview=true;_open_modal("Seekarten"),"primary")
+		return
+	var info: Dictionary=sim.realm_mission_info()
+	if info.is_empty():return
+	_section("%s · STUFE %d" % [str(info.title).to_upper(),int(info.realm_id)])
+	_note(str(info.description)+" · eine einmalige Revierprämie ohne Premiumwährung oder Battle Points.")
+	_meter("GEZEITENFUNDE BERGEN",int(info.salvage),int(info.salvage_goal),Color("62bdae"),"%d / %d" % [int(info.salvage),int(info.salvage_goal)])
+	_meter("SEEUNGEHEUER MIT HARPUNEN BESIEGEN",int(info.hunts),int(info.hunt_goal),Color("d2a55a"),"%d / %d" % [int(info.hunts),int(info.hunt_goal)])
+	_row(painted.reward_chest,"BELOHNUNG · %d Gold · %d EP · %d Essenz" % [int(info.gold),int(info.xp),int(info.essence)],54,Color("f2d29a"))
+	var status: String="BEREITS ABGEHOLT" if bool(info.claimed) else ("ZUM ABHOLEN BEREIT" if bool(info.ready) else "IN ARBEIT")
+	var claim=_primary(status if bool(info.claimed) else "REVIERPRÄMIE ABHOLEN",func():
+		if sim.claim_realm_mission():_save_progress();_open_modal("Logbuch");_refresh_ui())
+	claim.name="RealmMissionClaim"
+	claim.disabled=not bool(info.ready) or sim.staff.active()
+	_section("DIESES REVIER ERKUNDEN")
+	_note("%d Inseln · %d Schiffs-Patrouillen · %d Seeungeheuer · 4 feste Bergungsorte" % [
+		sim.islands.size(),
+		sim.npcs.filter(func(n):return str(n.kind)=="ship").size(),
+		sim.npcs.filter(func(n):return str(n.kind)=="monster").size()])
+	for actor: Dictionary in sim.npcs:
+		if str(actor.get("kind",""))!="monster":continue
+		var availability: String="%d HP" % int(actor.hp) if int(actor.hp)>0 else "Rückkehr in %d s" % ceili(float(actor.respawn))
+		_note("%s · %s" % [str(actor.name),availability],Color("9ad1c8"))
+	var actions=_grid(2)
+	_action("MONSTERJAGD",func():_open_modal("Monster"),"normal",actions)
+	_action("WELTKARTE",func():_open_modal("Seekarten"),"normal",actions)
+	_note("Gezeitenfunde erscheinen auf beiden Hälften der großen Seekarte. Harpunenjagd und Bergung zählen nur auf dieser Seekarte; Fortschritt bleibt nach dem Zurückwechseln gespeichert.")
 
 func _open_sea_contracts() -> void:
 	_info("WIEDERHOLBARE SEEVERTRÄGE",CYAN)
@@ -4432,7 +4467,7 @@ func _realm_toggle(enter_beta: bool) -> void:
 
 func _open_realm_preview() -> void:
 	if realm_chart_pick<1:realm_chart_pick=maxi(1,REALM_CATALOG.realm_for_map(sim.map_id))
-	_section("WELT 2.0 · 20 GROSSE SEEKARTEN · ENTWURF")
+	_section("WELT 2.0 · 20 GROSSE SEEKARTEN · SPIELBARER TEST")
 	_note("20 große Seekarten mit echter doppelter Breite: 4 Eckkarten mit 2, 10 Randkarten mit 3 und 6 Innenkarten mit 4 Übergängen. Die klassische Welt bleibt parallel vollständig erhalten.",Color("b5cfcc"))
 	if sim.in_realm_world():
 		_action("ZUR KLASSISCHEN WELT ZURÜCK",func():_realm_toggle(false),"primary")
@@ -4461,7 +4496,14 @@ func _realm_preview_details(realm_id: int) -> void:
 	var title: String="%02d · %s · AB LEVEL %d" % [realm_id,str(data.name).to_upper(),int(data.level)]
 	var description: String="%s\nLandschaft: %s\nHafen: %s\nGegner & Monster: %s\nAktivitäten: %s" % [str(data.zone),str(data.landscape),str(data.harbor),str(data.encounters),str(data.activity)]
 	_row(extra_icons.world_chart,title+"\n"+description,64,Color("6fd1c1"))
-	_note("Spielbare neue Seekarte: %s (ID %d). Die Insel-Landschaften von %s und %s liegen jetzt auf einer zusammenhängenden großen Seekarte." % [CONTENT.MAPS[CONTENT.realm_map_id(realm_id)].code,CONTENT.realm_map_id(realm_id),CONTENT.MAPS[existing[0]].code,CONTENT.MAPS[existing[1]].code])
+	_note("Spielbare Seekarte: %s (ID %d). 18 regional angeordnete Inseln, eigenständige Patrouillen, Seeungeheuer und Bergungsaufträge auf einer zusammenhängenden großen Seekarte. Bisherige Karten: %s und %s." % [CONTENT.MAPS[CONTENT.realm_map_id(realm_id)].code,CONTENT.realm_map_id(realm_id),CONTENT.MAPS[existing[0]].code,CONTENT.MAPS[existing[1]].code])
+	if sim.in_realm_world() and REALM_CATALOG.realm_for_map(sim.map_id)==realm_id:
+		var mission: Dictionary=sim.realm_mission_info()
+		if not mission.is_empty():
+			_note("REVIERAUFTRAG · %d/%d Bergung · %d/%d Monster · %s" % [
+				int(mission.salvage),int(mission.salvage_goal),int(mission.hunts),int(mission.hunt_goal),
+				"Prämie bereit" if bool(mission.ready) else ("erledigt" if bool(mission.claimed) else "aktiv")],Color("6fd1c1"))
+			_action("ZUM REVIERAUFTRAG",func():_switch_tab("Logbuch","REVIER"),"primary")
 	var edges: Dictionary=REALM_CATALOG.edge_links(realm_id,realm_edge_mode)
 	var destinations: Array[String]=[]
 	for edge: String in ["north","south","west","east"]:
