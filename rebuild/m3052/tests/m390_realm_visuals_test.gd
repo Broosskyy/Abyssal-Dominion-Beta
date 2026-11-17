@@ -33,22 +33,22 @@ func _run()->void:
 	check(styles.size()>=15,"each biome draws more than one distinguishable coastal landmark")
 	check(VIS.landmark_key(0,0,0).is_empty() and VIS.landmark_key(21,0,0).is_empty(),"unknown seas never draw decorations")
 	check(VIS.landmark_key(1,0,5).is_empty() and VIS.landmark_key(1,9,0).is_empty(),"invalid slots rejected")
-	check(VIS.accent(0).is_finite(),"invalid region falls back to a harmless ink")
-	var blank:SIM=SIM.new()
+	check(VIS.accent(0).a>0.0,"invalid region falls back to a harmless ink")
+	var blank=SIM.new()
 	check(blank.map_id==0 and blank.islands.size()==9,"classic sea untouched by visual biome module")
 	for island:Dictionary in blank.islands:
 		check(not island.has("realm_island_index"),"no landmark metadata in legacy sea")
 	for region in [1,5,9,13,20]:
-		var game:SIM=SIM.new()
+		var game=SIM.new()
 		game.configure_map(CONTENT.realm_map_id(region))
 		check(game.islands.size()==18,"both large-sea island halves preserved")
-		check(game.portals.size()==VIS.zone_index(region)+2 or game.portals.size()>=2,"existing map boundaries preserved")
+		check(game.portals.size()==CONTENT.sea_neighbors(CONTENT.realm_map_id(region)).size(),"existing map boundaries preserved")
 		var art_count:int=0
 		for island:Dictionary in game.islands:
 			var idx:int=int(island.get("realm_island_index",-1))
 			var half:int=int(island.get("realm_island_half",-1))
 			check(idx>=0 and idx<9 and half in [0,1],"real island carries correct decorative slot metadata")
-			check(not game.blocked(VIS.island_anchor(island)) or game.blocked(VIS.island_anchor(island)),"visual anchor never changes island collision")
+			check(VIS.island_anchor(island).is_finite(),"visual anchor remains a finite world coordinate")
 			check(island.has("outline") and island.has("bounds"),"real coastline collision still generated")
 			if VIS.landmark_variant(region,idx,half)>=0:art_count+=1
 		check(art_count==6,"six physically positioned decorative coastal landmarks")
@@ -65,7 +65,7 @@ func _run()->void:
 		var sunken:Dictionary=game.events.filter(func(e):return str(e.type)=="sunk").back()
 		check(bool(sunken.get("monster",false)) and int(sunken.get("realm_id",-1))==region,"monster sink gets unique regional cosmetic water effect")
 		check(game.player.pos==old_position and game.world_extent()==old_world,"VFX metadata cannot change sailing physics or world size")
-	var old:SIM=SIM.new()
+	var old=SIM.new()
 	old.npcs[0].hp=1
 	old._hit({"source":0,"damage":99999,"weapon":"cannon"},old.npcs[0])
 	var classic_sinking:Dictionary=old.events.filter(func(e):return str(e.type)=="sunk").back()
