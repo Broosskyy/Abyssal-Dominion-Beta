@@ -13,6 +13,7 @@ const PALETTE := [
 ]
 var sim: RefCounted
 var selected: int=1
+var edge_mode: String="two"
 var press_at := Vector2(-1.0,-1.0)
 var font: Font=ThemeDB.fallback_font
 
@@ -73,14 +74,13 @@ func _draw() -> void:
 		draw_rect(Rect2(8,top,size.x-16,bottom-top),Color(PALETTE[zone],.21))
 		var title: String=str(CATALOG.ZONES[zone]).to_upper()
 		_label(Vector2(size.x*.5,top+16),title,11,INK)
-	# The prototype graph indicates navigable passages; it does not teleport.
+	# Conventional automatic edge transitions only; preview never performs a map switch.
 	for realm_id in range(1,21):
-		for target in CATALOG.neighbors(realm_id):
+		var links: Dictionary=CATALOG.edge_links(realm_id,edge_mode)
+		for edge: String in links:
+			var target: int=int(links[edge])
 			if target<=realm_id:continue
-			var mode: String=CATALOG.passage_type(realm_id,target)
-			var ink: Color=Color("8b6635",.60) if mode=="region_gate" else Color("507b85",.49)
-			if mode=="current":ink=Color("d09b49",.65)
-			draw_line(node_point(realm_id),node_point(target),ink,3.0 if mode=="region_gate" else 1.8,true)
+			draw_line(node_point(realm_id),node_point(target),Color("507b85",.52),2.0,true)
 	var here: int=CATALOG.realm_for_map(int(sim.map_id)) if sim!=null else -1
 	for realm_id in range(1,21):
 		var data: Dictionary=CATALOG.realm(realm_id)
@@ -95,4 +95,4 @@ func _draw() -> void:
 		_label(center+Vector2(0,6),"%02d" % realm_id,16,INK)
 		_label(center+Vector2(0,40),str(data.name).to_upper(),10,INK)
 		if locked: _label(center+Vector2(19,-17),"L",10,Color("8e2e25"))
-	_label(Vector2(size.x*.5,size.y-13),"WELTENTWURF · ANTIPPEN FÜR DETAILS",11,INK)
+	_label(Vector2(size.x*.5,size.y-13),"VORSCHAU · %s · ANTIPPEN FÜR DETAILS" % ("2 RANDSEITEN" if edge_mode=="two" else "4 RANDSEITEN"),11,INK)
