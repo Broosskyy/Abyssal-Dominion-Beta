@@ -1,5 +1,6 @@
 extends RefCounted
 ## Local beta events and data-driven creatures. Sprites can later be replaced by GLBs.
+const ECOLOGY=preload("res://realm_ecology.gd")
 const MONSTERS := [
 	{"key":"kraken","name":"Kraken · Tentakelwächter","hp":1250,"reward":180,"speed":23.0,"width":220.0},
 	{"key":"serpent","name":"Nerissa · Panzerschlange","hp":980,"reward":145,"speed":32.0,"width":225.0},
@@ -84,8 +85,14 @@ static func spawn_monsters(s) -> void:
 	for i in MONSTERS.size():
 		var spec: Dictionary=MONSTERS[i]
 		var body: Dictionary=s.base_npcs.back().duplicate(true)
-		var site: Vector2=s._free_water(s._map_point([Vector2(740,600),Vector2(3000,800),Vector2(3100,2480)][i]))
-		body.merge({"id":110+i,"name":spec.name,"kind":"monster","monster_key":spec.key,"pos":site,"home":site,"path":[],"hp":roundi(spec.hp*float(s.CONTENT.MAPS[s.map_id].enemy_scale)),"max_hp":roundi(spec.hp*float(s.CONTENT.MAPS[s.map_id].enemy_scale)),"shield":0,"max_shield":0,"reward":spec.reward,"speed":spec.speed,"aggressive":false},true)
+		var site: Vector2=s._map_point([Vector2(740,600),Vector2(3000,800),Vector2(3100,2480)][i])
+		var name: String=str(spec.name)
+		if s.in_realm_world():
+			var realm_id: int=s.CONTENT.realm_id_for_map(s.map_id)
+			site=ECOLOGY.monster_site(realm_id,i+1)
+			name=ECOLOGY.monster_title(realm_id,str(spec.key))
+		site=s._free_water(site)
+		body.merge({"id":110+i,"name":name,"kind":"monster","monster_key":spec.key,"pos":site,"home":site,"path":[],"hp":roundi(spec.hp*float(s.CONTENT.MAPS[s.map_id].enemy_scale)),"max_hp":roundi(spec.hp*float(s.CONTENT.MAPS[s.map_id].enemy_scale)),"shield":0,"max_shield":0,"reward":spec.reward,"speed":spec.speed,"aggressive":false},true)
 		s.npcs.append(body)
 
 static func spawn_collectibles(s) -> void:
