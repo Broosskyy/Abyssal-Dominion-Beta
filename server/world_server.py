@@ -17,7 +17,13 @@ from aiohttp import web, WSMsgType
 from supabase_identity import SupabaseIdentity
 
 PROTOCOL = 2
-SEA_IDS = {0, 1, 2, *range(6, 43)}
+SEA_IDS = {0, 1, 2, *range(6, 43), *range(43, 63)}
+REALM_IDS = frozenset(range(43, 63))
+WORLD_WIDTH = 8800.0
+WORLD_HEIGHT = 6400.0
+
+def world_width(map_id: int) -> float:
+    return WORLD_WIDTH * (2 if map_id in REALM_IDS else 1)
 SESSION_SECONDS = 86400
 MAX_CLIENTS = 128
 MAX_ROOM = 32
@@ -94,14 +100,14 @@ def classic_segment_route(start, goal):
         route.append(goal)
     return route
 
-def classic_expand_route(start, waypoints):
+def classic_expand_route(start, waypoints, max_x=8760.0):
     route, previous = [], start
     direct_length, tile_length = 0.0, 0.0
     for goal in waypoints:
         segment = classic_segment_route(previous, goal)
         # Bounds remain authoritative: a local coast/edge tile may not
         # exist, so keep the original valid straight A* waypoint instead.
-        if any(not (40<=x<=8760 and 40<=y<=6360) for x,y in segment):
+        if any(not (40<=x<=max_x and 40<=y<=6360) for x,y in segment):
             segment = [goal]
         direct_length += math.dist(previous,goal)
         for waypoint in segment:
@@ -144,7 +150,7 @@ class World:
         self.db.commit()
 
     @staticmethod
-    def route(data):
+    def route(data, map_id=None):
         route = data.get('route', [[data.get('x'), data.get('y')]])
         if not isinstance(route,list) or not 1 <= len(route) <= 512: return None
         result = []
@@ -152,7 +158,7 @@ class World:
             if not isinstance(point,list) or len(point)!=2: return None
             x,y=point
             if type(x) not in (int,float) or type(y) not in (int,float): return None
-            if not math.isfinite(x) or not math.isfinite(y) or not (40<=x<=8760 and 40<=y<=6360): return None
+            if not math.isfinite(x) or not math.isfinite(y) or not (40<=x<=world_width(map_id)-40 and 40<=y<=WORLD_HEIGHT-40): return None
             result.append((float(x),float(y)))
         return result
 
@@ -262,7 +268,7 @@ class World:
                     if data.get('type')!='course': continue
                     seq=data.get('sequence')
                     if type(seq) is not int or seq<=peer['sequence'] or seq>2**31: continue
-                    route=self.route(data)
+                    route=self.route(data,peer['map_id'])
                     if route is None: continue
                     # Protocol 2 extension: Classic clients request a real
                     # four-way chart course. The server expands/authorizes
@@ -289,7 +295,7 @@ class World:
                             # Server-computed Classic route for large courses.
                             # Limit untrusted input and expansion work.
                             if len(route)>64: continue
-                            expanded=classic_expand_route((peer['x'],peer['y']),route)
+                            expanded=classic_expand_route((peer['x'],peer['y']),route,world_width(peer['map_id'])-40)
                             if expanded is None: continue
                             route,_unused_compensation=expanded
                             scale=1.0
