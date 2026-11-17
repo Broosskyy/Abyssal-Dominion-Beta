@@ -36,15 +36,16 @@ func node_point(realm_id: int) -> Vector2:
 	var row: int=int(index/cols)
 	return Vector2((float(column)+0.5)*size.x/float(cols),86.0+float(row)*(106.0 if cols==2 else 116.0))
 
+func card_rect(realm_id: int) -> Rect2:
+	var cols: int=_columns()
+	var width: float=minf(132.0,size.x/float(cols)-12.0)
+	return Rect2(node_point(realm_id)-Vector2(width*.5,42.0),Vector2(width,87.0))
+
 func node_at(point: Vector2) -> int:
-	var best: int=-1
-	var max_dist: float=45.0
+	# Full card is clickable on touch, not only a tiny circle around its ID.
 	for realm_id in range(1,CATALOG.REALMS.size()+1):
-		var d: float=point.distance_to(node_point(realm_id))
-		if d<max_dist:
-			best=realm_id
-			max_dist=d
-	return best
+		if card_rect(realm_id).has_point(point):return realm_id
+	return -1
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT:
@@ -90,8 +91,7 @@ func _draw() -> void:
 		var locked: bool=sim!=null and int(sim.level)<int(data.level)
 		var here: bool=sim!=null and CATALOG.realm_for_map(int(sim.map_id))==realm_id
 		var chosen: bool=selected==realm_id
-		var width: float=minf(132.0,size.x/float(cols)-12.0)
-		var rect: Rect2=Rect2(center-Vector2(width*.5,42.0),Vector2(width,87.0))
+		var rect: Rect2=card_rect(realm_id)
 		draw_rect(rect,Color("faf2d9") if not chosen else Color("fbe5b4"))
 		draw_rect(Rect2(rect.position,Vector2(rect.size.x,3.0)),SEA_PALETTE[zone])
 		draw_rect(Rect2(rect.position+Vector2(0,rect.size.y-2.0),Vector2(rect.size.x,2.0)),Color("af996e",.65))
