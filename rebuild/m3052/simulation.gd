@@ -101,7 +101,10 @@ var deck_slots := [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
 # tide/storm/salvage buffs, and do not replace the ten mounted normal decks.
 # Ownership/economy is intentionally not invented in this art update.
 const DECK_EXTENSION_KEYS := ["mojo_frame","crown_left","crest_right","skull_top_left","skull_top_right","skull_bottom"]
-var deck_extensions: Dictionary = {
+# The six render flags above represent *equipped*, not *owned*.
+# M385: permanent acquisition is tracked independently, like owned ships.
+# All six start locked; no economy, stat or loot source is invented here.
+var deck_extension_owned: Dictionary = {
 	"mojo_frame":false,"crown_left":false,"crest_right":false,
 	"skull_top_left":false,"skull_top_right":false,"skull_bottom":false
 }
@@ -666,6 +669,29 @@ func unmount_cannons(quantity: int) -> bool:
 		return false
 	mounted_cannons-=removing
 	message="%d Kanonen ins Arsenal gelegt · %d im Lager" % [removing,cannon_storage()]
+	return true
+
+## M385: independent ownership vs. visible equipped status.
+## No hidden coins, temporary buffs, cannon slots or movement changes.
+## Acquisition only happens through explicit trusted game reward logic,
+## using this API when a real reward source is specified.
+func owns_deck_extension(key: String) -> bool:
+	return key in DECK_EXTENSION_KEYS and deck_extension_owned.get(key,false)==true
+
+func unlock_deck_extension(key: String) -> bool:
+	if key not in DECK_EXTENSION_KEYS or owns_deck_extension(key):return false
+	deck_extension_owned[key]=true
+	message="Deck-Erweiterung freigeschaltet"
+	return true
+
+func set_deck_extension_equipped(key: String,enabled: bool) -> bool:
+	if key not in DECK_EXTENSION_KEYS:return false
+	if enabled and not owns_deck_extension(key):
+		message="Erweiterung noch nicht freigeschaltet"
+		return false
+	if bool(deck_extensions.get(key,false))==enabled:return false
+	deck_extensions[key]=enabled
+	message="Deck-Erweiterung montiert" if enabled else "Deck-Erweiterung abgelegt"
 	return true
 
 func owns_deck(type: String,tier: int) -> bool:
@@ -2021,6 +2047,11 @@ func export_save() -> Dictionary:
 	if in_bonus_map() and not bonus.is_empty():
 		region = int(bonus.origin)
 		position = Vector2(float(bonus.origin_pos[0]), float(bonus.origin_pos[1]))
+	# Exports remain compatible with M383 saves that stored only active flags.
+	# A legacy directly-equipped extension is treated as owned in the snapshot.
+	var owned_for_save: Dictionary={}
+	for key: String in DECK_EXTENSION_KEYS:
+		owned_for_save[key]=owns_deck_extension(key) or deck_extensions.get(key,false)==true
 	var run := {}
 	if not bonus.is_empty() and not bool(bonus.get("staff", false)):
 		run = {"tier": int(bonus.tier), "wave": int(bonus.wave), "done": str(bonus.state) == "done", "origin": int(bonus.origin), "origin_pos": bonus.origin_pos.duplicate()}
@@ -2033,7 +2064,7 @@ func export_save() -> Dictionary:
 		"cannons":player.cannons,"mounted_cannons":mounted_cannons,"supplies":supplies.duplicate(),"buffs":buffs.duplicate(),
 		"essence":essence,"fragments":fragments,"bonus_pieces":bonus_pieces.duplicate(),"scrolls":scrolls.duplicate(),"kessel_meter":kessel_meter,
 		"kessel_throws":kessel_throws,"free_flask_day":free_flask_day,"decks":decks.duplicate(true),
-		"deck_slots":deck_slots.duplicate(),"deck_extensions":deck_extensions.duplicate(),"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),"guild_home":guild_home.duplicate(true),
+		"deck_slots":deck_slots.duplicate(),"deck_extensions":deck_extensions.duplicate(),"deck_extension_owned":owned_for_save,"bonus":run,"bonus_runs":bonus_runs,"guild":guild.duplicate(),"guild_home":guild_home.duplicate(true),
 		"fortress_conquests":fortress_conquests,"fortress_hold":fortress_hold,"staff_marked":staff_marked or staff.touched}
 
 func restore_save(data: Dictionary) -> bool:
@@ -2128,13 +2159,20 @@ func restore_save(data: Dictionary) -> bool:
 		for i in mini(saved_slots.size(),CONTENT.DECK_SLOT_COUNT):
 			var index:=int(saved_slots[i])
 			if index>=0 and index<decks.size() and not index in deck_slots:deck_slots[i]=index
-	# Older schema-8 saves lack this optional cosmetic equipment field.
-	# Reset all six keys before restoring, so previous save/character state
-	# cannot leak into a freshly loaded captain.
+	# M385: schema-8 backward compatibility. Previous M383/M384 saves had
+	# only deck_extensions; every previously installed item remains owned.
+	# New saves require separate exact booleans for equipped and acquired.
 	var saved_extensions: Variant=data.get("deck_extensions",{})
+	var saved_owned: Variant=data.get("deck_extension_owned",{})
+	var modern_ownership: bool=data.has("deck_extension_owned")
 	for key: String in DECK_EXTENSION_KEYS:
 		var stored: Variant=saved_extensions.get(key,false) if saved_extensions is Dictionary else false
-		deck_extensions[key]=stored if stored is bool else false
+		var fitted: bool=stored if stored is bool else false
+		var stored_owner: Variant=saved_owned.get(key,false) if saved_owned is Dictionary else false
+		var entitled: bool=stored_owner if stored_owner is bool else false
+		if not modern_ownership:entitled=fitted
+		deck_extension_owned[key]=entitled
+		deck_extensions[key]=fitted and entitled
 	bonus={}
 	bonus_runs=maxi(0,int(data.get("bonus_runs",0)))
 	var run: Variant=data.get("bonus",{})
