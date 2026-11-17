@@ -64,18 +64,55 @@ const MAPS := [
 	{"name":"Tiefenreich", "code":"19/1", "level":19, "art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":6.40, "tier":19, "lane":1},
 	{"name":"Tiefenreich", "code":"19/2", "level":19, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.85,0.92,1.20), "npc_hostile":true, "enemy_scale":6.52, "tier":19, "lane":2},
 	{"name":"Tiefenreich", "code":"20/1", "level":20, "art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":6.70, "tier":20, "lane":1},
-	{"name":"Tiefenreich", "code":"20/2", "level":20, "art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":6.82, "tier":20, "lane":2}
+	{"name":"Tiefenreich", "code":"20/2", "level":20, "art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"], "tint":Color(0.93,0.79,1.06), "npc_hostile":true, "enemy_scale":6.82, "tier":20, "lane":2},
+	{"name":"Karibische See","code":"R-%02d".format([1]),"tier":1,"lane":0,"level":1,"art":["tropical","rock","tropical","tropical","rock","tropical","tropical","rock","tropical"],"secondary_art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"tint":Color(0.75,1.14,1.12),"npc_hostile":false,"enemy_scale":1.0,"realm":true},
+	{"name":"Freibeuterbucht","code":"R-%02d".format([2]),"tier":2,"lane":0,"level":2,"art":["snow2","snow","snow2","snow","rock","snow2","snow","rock","snow2"],"secondary_art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"tint":Color(0.78,0.98,1.32),"npc_hostile":false,"enemy_scale":1.5,"realm":true},
+	{"name":"Korallenpassage","code":"R-%02d".format([3]),"tier":3,"lane":0,"level":3,"art":["rock","rock","snow2","rock","rock","snow","rock","rock","snow2"],"secondary_art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"tint":Color(0.90,0.68,1.02),"npc_hostile":true,"enemy_scale":2.2,"realm":true},
+	{"name":"Schmugglerküste","code":"R-%02d".format([4]),"tier":4,"lane":0,"level":4,"art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"secondary_art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"],"tint":Color(0.85,0.92,1.20),"npc_hostile":true,"enemy_scale":1.90,"realm":true},
+	{"name":"Handelsstrom","code":"R-%02d".format([5]),"tier":5,"lane":0,"level":5,"art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"secondary_art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"],"tint":Color(0.93,0.79,1.06),"npc_hostile":true,"enemy_scale":2.20,"realm":true},
+	{"name":"Nebelinseln","code":"R-%02d".format([6]),"tier":6,"lane":0,"level":6,"art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"secondary_art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"],"tint":Color(0.75,1.10,1.12),"npc_hostile":true,"enemy_scale":2.50,"realm":true},
+	{"name":"Sturmklippen","code":"R-%02d".format([7]),"tier":7,"lane":0,"level":7,"art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"secondary_art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"],"tint":Color(0.85,0.92,1.20),"npc_hostile":true,"enemy_scale":2.80,"realm":true},
+	{"name":"Alte Seewege","code":"R-%02d".format([8]),"tier":8,"lane":0,"level":8,"art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"],"secondary_art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"],"tint":Color(0.93,0.79,1.06),"npc_hostile":true,"enemy_scale":3.10,"realm":true},
+	{"name":"Frostmeer","code":"R-%02d".format([9]),"tier":9,"lane":0,"level":9,"art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"],"secondary_art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"],"tint":Color(0.75,1.10,1.12),"npc_hostile":true,"enemy_scale":3.40,"realm":true},
+	{"name":"Eisbruchpassage","code":"R-%02d".format([10]),"tier":10,"lane":0,"level":10,"art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"],"secondary_art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"],"tint":Color(0.85,0.92,1.20),"npc_hostile":true,"enemy_scale":3.70,"realm":true},
+	{"name":"Walbucht","code":"R-%02d".format([11]),"tier":11,"lane":0,"level":11,"art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"],"secondary_art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"],"tint":Color(0.93,0.79,1.06),"npc_hostile":true,"enemy_scale":4.00,"realm":true},
+	{"name":"Polarwacht","code":"R-%02d".format([12]),"tier":12,"lane":0,"level":12,"art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"],"secondary_art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"],"tint":Color(0.75,1.10,1.12),"npc_hostile":true,"enemy_scale":4.30,"realm":true},
+	{"name":"Kanonenstraße","code":"R-%02d".format([13]),"tier":13,"lane":0,"level":13,"art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"],"secondary_art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"],"tint":Color(0.85,0.92,1.20),"npc_hostile":true,"enemy_scale":4.60,"realm":true},
+	{"name":"Trümmermeer","code":"R-%02d".format([14]),"tier":14,"lane":0,"level":14,"art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"],"secondary_art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"],"tint":Color(0.93,0.79,1.06),"npc_hostile":true,"enemy_scale":4.90,"realm":true},
+	{"name":"Donnersee","code":"R-%02d".format([15]),"tier":15,"lane":0,"level":15,"art":["rock", "snow", "snow", "rock", "snow", "snow", "rock", "snow", "snow"],"secondary_art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"],"tint":Color(0.75,1.10,1.12),"npc_hostile":true,"enemy_scale":5.20,"realm":true},
+	{"name":"Korsarenfront","code":"R-%02d".format([16]),"tier":16,"lane":0,"level":16,"art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"],"secondary_art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"tint":Color(0.85,0.92,1.20),"npc_hostile":true,"enemy_scale":5.50,"realm":true},
+	{"name":"Versunkene Reiche","code":"R-%02d".format([17]),"tier":17,"lane":0,"level":17,"art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"],"secondary_art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"tint":Color(0.93,0.79,1.06),"npc_hostile":true,"enemy_scale":5.80,"realm":true},
+	{"name":"Schwarze Strömung","code":"R-%02d".format([18]),"tier":18,"lane":0,"level":18,"art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"],"secondary_art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"tint":Color(0.75,1.10,1.12),"npc_hostile":true,"enemy_scale":6.10,"realm":true},
+	{"name":"Drachenriff","code":"R-%02d".format([19]),"tier":19,"lane":0,"level":19,"art":["rock", "tropical", "tropical", "rock", "tropical", "tropical", "rock", "tropical", "tropical"],"secondary_art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"tint":Color(0.85,0.92,1.20),"npc_hostile":true,"enemy_scale":6.40,"realm":true},
+	{"name":"Abyssale Tiefe","code":"R-%02d".format([20]),"tier":20,"lane":0,"level":20,"art":["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],"secondary_art":["rock", "snow2", "snow2", "rock", "snow2", "snow2", "rock", "snow2", "snow2"],"tint":Color(0.93,0.79,1.06),"npc_hostile":true,"enemy_scale":6.70,"realm":true}
 ]
 # The original bonus ids 3..5 are deliberately reserved forever.
 const REGION_COUNT := 3
 const SEA_MAP_IDS := [0, 6, 1, 7, 2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42]
 const SEA_MAP_COUNT := 40
+const REALM_MAP_IDS := [43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
+const REALM_FIRST_MAP_ID := 43
+const REALM_LAST_MAP_ID := 62
+static func is_playable_sea_id(index: int) -> bool:
+	return index in SEA_MAP_IDS or index in REALM_MAP_IDS
+
+static func realm_map_id(realm_id: int) -> int:
+	return REALM_FIRST_MAP_ID+realm_id-1 if realm_id>=1 and realm_id<=20 else -1
+
+static func realm_id_for_map(index: int) -> int:
+	return index-REALM_FIRST_MAP_ID+1 if index in REALM_MAP_IDS else -1
 
 static func sea_index(tier: int,lane: int) -> int:
 	if tier<1 or tier>20 or lane<1 or lane>2:return -1
 	return int(SEA_MAP_IDS[(tier-1)*2+lane-1])
 
 static func sea_neighbors(index: int) -> Array[int]:
+	if index in REALM_MAP_IDS:
+		var adjacent: Array[int]=[]
+		for edge: String in ["north","south","west","east"]:
+			var neighbor: int=sea_edge_neighbor(index,edge)
+			if neighbor>=0:adjacent.append(neighbor)
+		return adjacent
 	if not index in SEA_MAP_IDS:return []
 	var config: Dictionary=MAPS[index]
 	var tier: int=int(config.get("tier",index+1))
@@ -89,6 +126,18 @@ static func sea_neighbors(index: int) -> Array[int]:
 
 # Spatial adjacency shared by the sea, minimap and crossing simulation.
 static func sea_edge_neighbor(index: int, edge: String) -> int:
+	# M388: 20 physically separate, fully connected large sea instances.
+	# Existing 40 historical map IDs keep their exact old transitions.
+	if index in REALM_MAP_IDS:
+		var offset: int=index-REALM_FIRST_MAP_ID
+		var col: int=offset%4
+		var row: int=int(offset/4)
+		match edge:
+			"west":return index-1 if col>0 else -1
+			"east":return index+1 if col<3 else -1
+			"north":return index-4 if row>0 else -1
+			"south":return index+4 if row<4 else -1
+		return -1
 	if not index in SEA_MAP_IDS:return -1
 	var region: Dictionary=MAPS[index]
 	var tier: int=int(region.tier)
@@ -101,7 +150,8 @@ static func sea_edge_neighbor(index: int, edge: String) -> int:
 	return -1
 
 static func next_sea_on_route(origin: int,destination: int) -> int:
-	if not origin in SEA_MAP_IDS or not destination in SEA_MAP_IDS:return -1
+	if not is_playable_sea_id(origin) or not is_playable_sea_id(destination):return -1
+	if (origin in REALM_MAP_IDS)!=(destination in REALM_MAP_IDS):return -1
 	var queue: Array[int]=[origin]
 	var previous: Dictionary={origin:-1}
 	while not queue.is_empty():
