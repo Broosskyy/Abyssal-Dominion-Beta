@@ -272,7 +272,7 @@ func _build_grid() -> void:
 		var bounds=Rect2(polygon[0],Vector2.ZERO)
 		for vertex: Vector2 in polygon:bounds=bounds.expand(vertex)
 		island.bounds=bounds
-	grid.region = Rect2i(0, 0, ceili(WORLD.x / CELL), ceili(WORLD.y / CELL))
+	grid.region = Rect2i(0, 0, ceili(world_extent().x / CELL), ceili(world_extent().y / CELL))
 	grid.cell_size = Vector2.ONE * CELL
 	grid.offset = Vector2.ONE * CELL * 0.5
 	grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
@@ -283,7 +283,7 @@ func _build_grid() -> void:
 			grid.set_point_solid(cell, blocked(grid.get_point_position(cell), 48.0))
 
 func blocked(point: Vector2, margin: float = 36.0) -> bool:
-	if point.x < margin or point.y < margin or point.x > WORLD.x - margin or point.y > WORLD.y - margin:
+	if point.x < margin or point.y < margin or point.x > world_extent().x - margin or point.y > world_extent().y - margin:
 		return true
 	if not harbor_outline.is_empty() and harbor_bounds.grow(margin).has_point(point):
 		if Geometry2D.is_point_in_polygon(point,harbor_outline):return true
@@ -489,7 +489,7 @@ func course(point: Vector2,snap_click_to_classic_tile: bool=false) -> bool:
 	pending_portal=-1
 	if docked:return false
 	if int(player.hp)<=0:return false
-	point=point.clamp(Vector2(80,80),WORLD-Vector2(80,80))
+	point=point.clamp(Vector2(80,80),world_extent()-Vector2(80,80))
 	var classic_click: bool=snap_click_to_classic_tile and classic_steering
 	if classic_click:point=_classic_clicked_target(point)
 
@@ -1307,12 +1307,12 @@ func _sparkle_point() -> Vector2:
 	var avoid: Array[Vector2] = [START, harbor]
 	for portal in portals: avoid.append(portal.pos)
 	for attempt in 40:
-		var point := Vector2(rng.randf_range(260, WORLD.x - 260), rng.randf_range(260, WORLD.y - 260))
+		var point := Vector2(rng.randf_range(260, world_extent().x - 260), rng.randf_range(260, world_extent().y - 260))
 		if blocked(point, 70.0): continue
 		var clear := true
 		for spot in avoid: clear = clear and point.distance_to(spot) > 300
 		if clear: return point
-	return Vector2(WORLD.x * 0.5, WORLD.y * 0.25)
+	return Vector2(world_extent().x * 0.5, world_extent().y * 0.25)
 
 func _spawn_sparkles() -> void:
 	sparkles.clear()
@@ -1625,7 +1625,7 @@ func staff_inspect() -> Dictionary:
 
 func _free_water(goal: Vector2) -> Vector2:
 	var low := Vector2(80, 80)
-	var high := WORLD - Vector2(80, 80)
+	var high := world_extent() - Vector2(80, 80)
 	goal = goal.clamp(low, high) if goal.is_finite() else START
 	if not blocked(goal): return goal
 	for radius in [70.0, 140.0, 210.0, 300.0, 420.0, 560.0, 760.0]:
@@ -1850,20 +1850,20 @@ func harbor_repair() -> bool:
 	return true
 
 func edge_point(edge: String, from: Vector2) -> Vector2:
-	var point: Vector2=from.clamp(Vector2(EDGE_INSET,EDGE_INSET),WORLD-Vector2(EDGE_INSET,EDGE_INSET))
+	var point: Vector2=from.clamp(Vector2(EDGE_INSET,EDGE_INSET),world_extent()-Vector2(EDGE_INSET,EDGE_INSET))
 	match edge:
-		"east":point.x=WORLD.x-80.0
+		"east":point.x=world_extent().x-80.0
 		"west":point.x=80.0
 		"north":point.y=80.0
-		"south":point.y=WORLD.y-80.0
+		"south":point.y=world_extent().y-80.0
 	return point
 
 func edge_distance(point: Vector2,edge: String) -> float:
 	match edge:
-		"east":return WORLD.x-point.x
+		"east":return world_extent().x-point.x
 		"west":return point.x
 		"north":return point.y
-		"south":return WORLD.y-point.y
+		"south":return world_extent().y-point.y
 	return INF
 
 func near_portal() -> int:
@@ -1881,7 +1881,7 @@ func request_portal(destination: int) -> bool:
 	pending_portal=-1
 	if docked:message="Vor der Überfahrt zuerst im Hafen ablegen";return false
 	if int(player.hp)<=0:return false
-	if destination<0 or not destination in CONTENT.SEA_MAP_IDS or destination==map_id:return false
+	if destination<0 or not CONTENT.is_playable_sea_id(destination) or destination==map_id:return false
 	if level<int(CONTENT.MAPS[destination].level):
 		message="%s: Kapitänsstufe %d benötigt" % [CONTENT.MAPS[destination].name,CONTENT.MAPS[destination].level]
 		return false
@@ -1902,7 +1902,7 @@ func request_portal(destination: int) -> bool:
 	return false
 
 func travel(destination: int) -> bool:
-	if destination < 0 or not destination in CONTENT.SEA_MAP_IDS or destination == map_id or docked or int(player.hp) <= 0: return false
+	if destination < 0 or not CONTENT.is_playable_sea_id(destination) or destination == map_id or docked or int(player.hp) <= 0: return false
 	if near_portal() != destination:
 		message = "Für den Kartenwechsel an den markierten Kartenrand fahren"
 		return false
@@ -1912,13 +1912,13 @@ func travel(destination: int) -> bool:
 	if clock - float(player.last_hit) < 6.0:
 		message = "Kartenwechsel erst 6 Sekunden ohne Treffer"
 		return false
-	var arrival: Vector2=player.pos.clamp(Vector2(EDGE_INSET,EDGE_INSET),WORLD-Vector2(EDGE_INSET,EDGE_INSET))
+	var arrival: Vector2=player.pos.clamp(Vector2(EDGE_INSET,EDGE_INSET),world_extent()-Vector2(EDGE_INSET,EDGE_INSET))
 	for link in portals:
 		if int(link.destination)!=destination:continue
 		match str(link.edge):
 			"east":arrival.x=EDGE_INSET
-			"west":arrival.x=WORLD.x-EDGE_INSET
-			"north":arrival.y=WORLD.y-EDGE_INSET
+			"west":arrival.x=world_extent().x-EDGE_INSET
+			"north":arrival.y=world_extent().y-EDGE_INSET
 			"south":arrival.y=EDGE_INSET
 	map_states[map_id] = {"npcs":npcs.duplicate(true),"drops":drops.duplicate(true)}
 	configure_map(destination)
@@ -1982,10 +1982,12 @@ func _find_harbor_site() -> Vector2:
 
 func _map_point(point: Vector2) -> Vector2:
 	point *= AUTHORED_SCALE
+	# Lane one sits on the left side of the physical double-width realm.
+	if in_realm_world():return point
 	match map_id%6:
-		1, 4: return Vector2(WORLD.x - point.x,point.y)
-		2, 5: return Vector2(point.x,WORLD.y - point.y)
-		3: return WORLD - point
+		1, 4: return Vector2(world_extent().x - point.x,point.y)
+		2, 5: return Vector2(point.x,world_extent().y - point.y)
+		3: return world_extent() - point
 	return point
 
 func configure_map(destination: int) -> void:
@@ -2022,9 +2024,20 @@ func configure_map(destination: int) -> void:
 		# of each atlas and its land collision together.
 		islands[i].width=float(base_islands[i].width)*island_art_scale(str(config.art[i]))
 		if map_id > 0: islands[i].name = (["Eishafen","Frostbucht","Weißes Riff","Gletscherwacht","Eisbrecherbucht","Nordstern","Winterhafen","Frostzahn","Polarwacht"] if map_id == 1 else ["Nebelwacht","Schwarze Bucht","Totenriff","Schattenklippen","Korsarenfestung","Nachtwacht","Dämmerhafen","Drachenzahn","Knochenriff"])[i]
+	if in_realm_world():
+		# The other former lane is continuous sea, not another scene load.
+		var secondary: Array=config.secondary_art
+		for i in base_islands.size():
+			var other: Dictionary=base_islands[i].duplicate(true)
+			other.pos=Vector2(WORLD.x,0)+_map_point(Vector2(base_islands[i].pos))
+			other.art=str(secondary[i])
+			other.width=float(base_islands[i].width)*island_art_scale(str(other.art))
+			other.name="%s · Ostküste %d" % [str(config.name),i+1]
+			islands.append(other)
 	npcs = base_npcs.duplicate(true)
 	for npc in npcs:
 		npc.pos = _map_point(npc.pos)
+		if in_realm_world() and int(npc.id)%2==0:npc.pos.x+=WORLD.x
 		npc.home = npc.pos
 		npc.path = []
 		npc.hp = roundi(float(npc.max_hp) * float(config.enemy_scale))
@@ -2047,7 +2060,7 @@ func configure_map(destination: int) -> void:
 	for neighbor in CONTENT.sea_neighbors(map_id):
 		for edge: String in ["east","west","north","south"]:
 			if CONTENT.sea_edge_neighbor(map_id,edge)==neighbor:
-				portals.append({"pos":edge_point(edge,WORLD*.5),"destination":neighbor,"edge":edge})
+				portals.append({"pos":edge_point(edge,world_extent()*.5),"destination":neighbor,"edge":edge})
 	if CONTENT.has_guild_island(map_id):
 		# A purpose-built island with integrated coastal walls, an open sea gate,
 		# navigable central harbor and twelve independent physical defenses.
