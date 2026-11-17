@@ -1,5 +1,6 @@
 extends RefCounted
 const CONTENT = preload("res://content.gd")
+const REALM_CATALOG = preload("res://realm_catalog.gd")
 const NAV = preload("res://navigation.gd")
 const CONTRACTS = preload("res://sea_contracts.gd")
 const STAFF=preload("res://staff.gd")
@@ -64,6 +65,49 @@ var ammo_mode := 0
 var kills := 0
 var claimed := false
 var map_id := 0
+# Reversible test-world save slots; old maps and guild territories remain intact.
+var legacy_origin_map: int=0
+var legacy_origin_pos: Vector2=START
+var realm_last_map: int=-1
+var realm_last_pos: Vector2=START
+
+func in_realm_world() -> bool:
+	return map_id in CONTENT.REALM_MAP_IDS
+
+func world_extent() -> Vector2:
+	# Every test realm is twice the classic sea width and joins both old lanes.
+	return Vector2(WORLD.x*2.0,WORLD.y) if in_realm_world() else WORLD
+
+func enter_realm_world() -> bool:
+	if in_realm_world() or in_bonus_map() or docked or int(player.hp)<=0:return false
+	if clock-float(player.last_hit)<6.0:
+		message="Weltwechsel erst 6 Sekunden ohne Treffer"
+		return false
+	legacy_origin_map=map_id
+	legacy_origin_pos=player.pos
+	var realm: int=clampi(int(CONTENT.MAPS[map_id].tier),1,maxi(1,level))
+	var destination: int=CONTENT.realm_map_id(realm)
+	if realm_last_map in CONTENT.REALM_MAP_IDS and level>=int(CONTENT.MAPS[realm_last_map].level):
+		destination=realm_last_map
+	map_states[map_id]={"npcs":npcs.duplicate(true),"drops":drops.duplicate(true)}
+	configure_map(destination)
+	_arrive(_free_water(realm_last_pos if destination==realm_last_map else START))
+	message="Neue Welt · %s · 20 Reviere" % CONTENT.MAPS[map_id].name
+	return true
+
+func return_to_legacy_world() -> bool:
+	if not in_realm_world() or docked or int(player.hp)<=0:return false
+	if clock-float(player.last_hit)<6.0:
+		message="Rückfahrt erst 6 Sekunden ohne Treffer"
+		return false
+	realm_last_map=map_id
+	realm_last_pos=player.pos
+	map_states[map_id]={"npcs":npcs.duplicate(true),"drops":drops.duplicate(true)}
+	var destination: int=legacy_origin_map if legacy_origin_map in CONTENT.SEA_MAP_IDS else 0
+	configure_map(destination)
+	_arrive(_free_water(legacy_origin_pos))
+	message="Klassische Welt · %s" % CONTENT.MAPS[map_id].code
+	return true
 var docked := false
 var level := 1
 var pearls: int=0
