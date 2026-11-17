@@ -45,38 +45,63 @@ static func zone_id(realm_id: int) -> int:
 	if realm_id < 1 or realm_id > REALMS.size():return -1
 	return (realm_id-1)/4
 
-## Alternative boundary layouts are preview data only. No invented sea passages.
-## "two": classic automatic East/West borders in a linear 20-map chain.
-## "four": classic automatic N/S/E/W borders in a 4-column x 5-row world.
-const EDGE_MODES := ["two","four"]
+## M386 selected topology: classic automatic map-edge transitions only.
+## "hybrid": rectangular 4x5 world; corner seas have 2 exits, exterior 3,
+## interior 4. No special waypoints, portals or harbor fast travel.
+## "two": alternative linear east/west comparison kept only in preview.
+const EDGE_MODES := ["hybrid","two"]
+const DEFAULT_EDGE_MODE := "hybrid"
+const GRID_COLUMNS := 4
+const GRID_ROWS := 5
+const CARDINAL_EDGES := ["north","south","west","east"]
+const OPPOSITE_EDGE := {"north":"south","south":"north","west":"east","east":"west"}
 
-static func edge_links(realm_id: int,mode: String="two") -> Dictionary:
+static func edge_links(realm_id: int,mode: String=DEFAULT_EDGE_MODE) -> Dictionary:
 	if realm_id<1 or realm_id>REALMS.size() or not mode in EDGE_MODES:return {}
 	var result: Dictionary={}
 	if mode=="two":
 		if realm_id>1:result["west"]=realm_id-1
 		if realm_id<REALMS.size():result["east"]=realm_id+1
 		return result
-	# Four-border option: geographic neighbours, no arbitrary shortcuts.
-	var col: int=(realm_id-1)%4
-	var row: int=int((realm_id-1)/4)
+	# True geographical adjacency. The perimeter is a world boundary, not
+	# an invisible warp; every exit has the opposite entrance in its neighbor.
+	var col: int=(realm_id-1)%GRID_COLUMNS
+	var row: int=int((realm_id-1)/GRID_COLUMNS)
 	if col>0:result["west"]=realm_id-1
-	if col<3:result["east"]=realm_id+1
-	if row>0:result["north"]=realm_id-4
-	if row<4:result["south"]=realm_id+4
+	if col<GRID_COLUMNS-1:result["east"]=realm_id+1
+	if row>0:result["north"]=realm_id-GRID_COLUMNS
+	if row<GRID_ROWS-1:result["south"]=realm_id+GRID_COLUMNS
 	return result
 
-static func edge_neighbor(realm_id: int,edge: String,mode: String="two") -> int:
+static func edge_neighbor(realm_id: int,edge: String,mode: String=DEFAULT_EDGE_MODE) -> int:
 	return int(edge_links(realm_id,mode).get(edge,-1))
 
-static func neighbors(realm_id: int,mode: String="two") -> Array[int]:
+static func exit_count(realm_id: int,mode: String=DEFAULT_EDGE_MODE) -> int:
+	return edge_links(realm_id,mode).size()
+
+static func opposite_edge(edge: String) -> String:
+	return str(OPPOSITE_EDGE.get(edge,""))
+
+static func entry_position(world: Vector2,edge: String,tangent: float,inset: float=240.0) -> Vector2:
+	# Physical transfer prototype: retains the tangent along the crossed
+	# boundary, and places the arrival safely inside the opposite edge.
+	# Does not affect the M385 live simulation until the world migration.
+	if not edge in CARDINAL_EDGES or not world.is_finite():return Vector2(-1,-1)
+	if world.x<=inset*2.0 or world.y<=inset*2.0:return Vector2(-1,-1)
+	if edge in ["east","west"]:
+		var y: float=clampf(tangent,inset,world.y-inset)
+		return Vector2(inset if edge=="east" else world.x-inset,y)
+	var x: float=clampf(tangent,inset,world.x-inset)
+	return Vector2(x,world.y-inset if edge=="north" else inset)
+
+static func neighbors(realm_id: int,mode: String=DEFAULT_EDGE_MODE) -> Array[int]:
 	var result: Array[int]=[]
 	for next in edge_links(realm_id,mode).values():
 		result.append(int(next))
 	result.sort()
 	return result
 
-static func route(from_realm: int,to_realm: int,mode: String="two") -> Array[int]:
+static func route(from_realm: int,to_realm: int,mode: String=DEFAULT_EDGE_MODE) -> Array[int]:
 	if realm(from_realm).is_empty() or realm(to_realm).is_empty() or not mode in EDGE_MODES:return []
 	if from_realm==to_realm:return [from_realm]
 	var queue: Array[int]=[from_realm]
