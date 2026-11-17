@@ -45,34 +45,46 @@ static func zone_id(realm_id: int) -> int:
 	if realm_id < 1 or realm_id > REALMS.size():return -1
 	return (realm_id-1)/4
 
-static func neighbors(realm_id: int) -> Array[int]:
-	if realm_id < 1 or realm_id > REALMS.size():return []
+## Alternative boundary layouts are preview data only. No invented sea passages.
+## "two": classic automatic East/West borders in a linear 20-map chain.
+## "four": classic automatic N/S/E/W borders in a 4-column x 5-row world.
+const EDGE_MODES := ["two","four"]
+
+static func edge_links(realm_id: int,mode: String="two") -> Dictionary:
+	if realm_id<1 or realm_id>REALMS.size() or not mode in EDGE_MODES:return {}
+	var result: Dictionary={}
+	if mode=="two":
+		if realm_id>1:result["west"]=realm_id-1
+		if realm_id<REALMS.size():result["east"]=realm_id+1
+		return result
+	# Four-border option: geographic neighbours, no arbitrary shortcuts.
+	var col: int=(realm_id-1)%4
+	var row: int=int((realm_id-1)/4)
+	if col>0:result["west"]=realm_id-1
+	if col<3:result["east"]=realm_id+1
+	if row>0:result["north"]=realm_id-4
+	if row<4:result["south"]=realm_id+4
+	return result
+
+static func edge_neighbor(realm_id: int,edge: String,mode: String="two") -> int:
+	return int(edge_links(realm_id,mode).get(edge,-1))
+
+static func neighbors(realm_id: int,mode: String="two") -> Array[int]:
 	var result: Array[int]=[]
-	# Main sea lane: a connected route through all twenty realms.
-	if realm_id > 1:result.append(realm_id-1)
-	if realm_id < REALMS.size():result.append(realm_id+1)
-	# Alternative short passages WITHIN a geographical zone.
-	var offset: int=(realm_id-1)%4
-	if offset < 2:result.append(realm_id+2)
-	else:result.append(realm_id-2)
+	for next in edge_links(realm_id,mode).values():
+		result.append(int(next))
 	result.sort()
 	return result
 
-static func passage_type(from_realm: int,to_realm: int) -> String:
-	if not to_realm in neighbors(from_realm):return ""
-	if zone_id(from_realm)!=zone_id(to_realm):return "region_gate"
-	if abs(to_realm-from_realm)==2:return "current"
-	return "sea_lane"
-
-static func route(from_realm: int,to_realm: int) -> Array[int]:
-	if realm(from_realm).is_empty() or realm(to_realm).is_empty():return []
+static func route(from_realm: int,to_realm: int,mode: String="two") -> Array[int]:
+	if realm(from_realm).is_empty() or realm(to_realm).is_empty() or not mode in EDGE_MODES:return []
 	if from_realm==to_realm:return [from_realm]
 	var queue: Array[int]=[from_realm]
 	var previous: Dictionary={from_realm:-1}
 	while not queue.is_empty():
 		var current: int=queue.pop_front()
 		if current==to_realm:break
-		for next: int in neighbors(current):
+		for next: int in neighbors(current,mode):
 			if previous.has(next):continue
 			previous[next]=current
 			queue.append(next)
