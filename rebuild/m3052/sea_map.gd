@@ -214,8 +214,8 @@ var staff_pill: Button
 var staff_code_input: LineEdit
 var chart_pick := -1
 var chart_chapter := -1
-var chart_realm_preview := false
-var realm_chart_pick := 1
+var chart_realm_preview := true
+var realm_chart_pick := -1
 var realm_edge_mode := "hybrid"
 var drag_start := Vector2.ZERO
 var dragging := false
@@ -4426,6 +4426,7 @@ func _open_charts() -> void:
 	_chart_details(chart.selected)
 
 func _open_realm_preview() -> void:
+	if realm_chart_pick<1:realm_chart_pick=maxi(1,REALM_CATALOG.realm_for_map(sim.map_id))
 	_section("WELT 2.0 · 20 GROSSE SEEKARTEN · ENTWURF")
 	_note("20 große Reviere: die vier Ecken haben 2, Randreviere 3 und zentrale Reviere 4 Übergänge. Genau wie bisher durch Überfahren einer freigegebenen Kartenkante. Im Entwurfsmodus – die M385-Spielwelt bleibt bis zur geprüften Migration erhalten.",Color("b5cfcc"))
 	var edge_modes=_grid(2)
