@@ -1289,6 +1289,8 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 		victim.last_hit = clock
 	_event("impact", _projectile_target(victim), dealt, victim.id)
 	if not events.is_empty():
+		events.back()["realm_id"]=CONTENT.realm_id_for_map(map_id) if in_realm_world() else -1
+		events.back()["monster"]=str(victim.get("kind",""))=="monster"
 		events.back()["structure"]=str(victim.get("kind",""))=="tower"
 		events.back()["powder"]=bool(shot.get("powder",false))
 		events.back()["plates"]=plated
@@ -1298,6 +1300,9 @@ func _hit(shot: Dictionary, victim: Dictionary) -> void:
 		victim.path = []
 		victim.respawn = 8.0 if int(victim.id) == 0 else (90.0 if victim.kind == "tower" else 48.0)
 		_event("sunk", victim.pos, 0, victim.id)
+		# Event tags change only presentation, never damage, rewards or save.
+		events.back()["realm_id"]=CONTENT.realm_id_for_map(map_id) if in_realm_world() else -1
+		events.back()["monster"]=str(victim.get("kind",""))=="monster"
 		if int(victim.id) == 0:
 			pending_portal=-1
 			firing = false
@@ -2070,7 +2075,10 @@ func configure_map(destination: int) -> void:
 		# Preserve the authored width, but normalize the *visible* footprint
 		# of each atlas and its land collision together.
 		islands[i].width=float(base_islands[i].width)*island_art_scale(str(islands[i].art))
-		if in_realm_world():islands[i].name=REALM_ECOLOGY.island_title(realm_id,i,0)
+		if in_realm_world():
+			islands[i]["realm_island_index"]=i
+			islands[i]["realm_island_half"]=0
+			islands[i].name=REALM_ECOLOGY.island_title(realm_id,i,0)
 		elif map_id > 0: islands[i].name = (["Eishafen","Frostbucht","Weißes Riff","Gletscherwacht","Eisbrecherbucht","Nordstern","Winterhafen","Frostzahn","Polarwacht"] if map_id == 1 else ["Nebelwacht","Schwarze Bucht","Totenriff","Schattenklippen","Korsarenfestung","Nachtwacht","Dämmerhafen","Drachenzahn","Knochenriff"])[i]
 	if in_realm_world():
 		# The other former lane is continuous sea, not another scene load.
@@ -2080,6 +2088,8 @@ func configure_map(destination: int) -> void:
 			other.art=REALM_ECOLOGY.island_art(realm_id,i,1)
 			other.width=float(base_islands[i].width)*island_art_scale(str(other.art))
 			other.name=REALM_ECOLOGY.island_title(realm_id,i,1)
+			other["realm_island_index"]=i
+			other["realm_island_half"]=1
 			islands.append(other)
 	npcs = base_npcs.duplicate(true)
 	for npc in npcs:
