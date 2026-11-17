@@ -1337,8 +1337,12 @@ func _run() -> void:
 	check(not game.sim.staff.active() and game.sim.map_id==map_before,"signing out with restore returns the sea to the state before the staff session")
 	game._advance_loading(5.0);game.modal.hide()
 	game._open_modal("Seekarten");await process_frame;await process_frame
+	var atlas=game.modal_body.get_node_or_null("RealmChartPreview")
+	check(atlas!=null and atlas.sim==game.sim and atlas.edge_mode=="hybrid","new hybrid twenty-realm atlas opens by default and reads the live captain safely")
+	game.chart_realm_preview=false
+	game._open_modal("Seekarten");await process_frame;await process_frame
 	var chart=game.modal_body.get_node_or_null("WorldChart")
-	check(chart!=null and chart.sim==game.sim and chart.parchment!=null,"world chart is drawn from the live simulation and the parchment")
+	check(chart!=null and chart.sim==game.sim and chart.parchment!=null,"original forty-map world chart remains available with its live parchment")
 	for tab: Button in game.modal_tabs.get_children():
 		if tab.text=="ANLEITUNG":tab.pressed.emit();break
 	await process_frame;await process_frame
