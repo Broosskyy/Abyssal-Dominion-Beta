@@ -24,34 +24,40 @@ Die 20 Einträge samt individueller Kurzbeschreibung liegen maschinenlesbar in `
 
 Jede Karte bekommt mindestens: **3 Landschaftstypen**, **1 Hafen/Ankerplatz**, **2 sichtbare Wahrzeichen**, **3–5 NPC-Rollen**, **1–3 Monsterarten**, **1 Sammel- oder Bergungssystem**, **2–4 regionale Aufträge** und mindestens **1 optionale Ereignisvariation**. Diese Zahlen sind Entwurfsziele, noch keine vorhandenen Features.
 
-## Reisen – KORRIGIERT: klassische Kartenrand-Überfahrten bleiben
+## Weltlayout M386 – aktueller Arbeitsstand
 
-Der Spieler will **kein Reise-Netz aus erfundenen Seewegen/Strömungs-Teleportern/Hafen-Schnellreisen**. Der gewohnte direkte Kartenwechsel durch das **Überfahren eines Kartenrandes** soll erhalten bleiben. Offen ist nur, an **wie vielen Randseiten** die jeweilige Karte Nachbarn hat.
+Die **20 großen Seekarten** sind als rechteckige **4 × 5**-Welt verknüpft. Jede Karte ist physisch einer geografischen Position zugeordnet. Dadurch entstehen **automatisch und ohne Sonderregeln**:
 
-### Vergleichbar im M386-Prototyp (keine aktive Reisemechanik)
+- **4 Seekarten an den vier Weltecken:** je **2** Randübergänge.
+- **10 Seekarten an den äußeren Weltkanten (ohne Ecken):** je **3** Randübergänge.
+- **6 Seekarten in der Mitte:** je **4** Randübergänge.
 
-- **A: Zwei Randseiten – derzeit bevorzugt:** Ost = nächstes Revier, West = vorheriges Revier, Nord/Süd = normale äußere Wassergrenzen ohne Reise. In einer linearen Kette mit 20 Karten hat Revier 1 nur Ost und Revier 20 nur West. Beim Überfahren der freigegebenen Kante automatische Überfahrt nach den klassischen Level-/Kampfregeln.
-- **B: Vier Randseiten – klassische Alternative:** 20 Reviere als zusammenhängendes 4×5-Raster. Ost/West/Nord/Süd führen zum jeweils geografisch benachbarten Revier, sofern eines existiert. Außenkanten sind echte Weltgrenzen. Keine erfundenen Direktverbindungen.
-- **C: Spätere denkbare Mischung:** Zwei Normalgrenzen und gelegentlich ein zusätzlicher Randübergang. Nur eine Option für später, **nicht** jetzt eingebaut.
-- **Nur ein Kartenrand:** Für Fortschritt UND Rückreise unpraktisch (man müsste am selben Rand Ziele auswählen). Deshalb zunächst nicht als Standard.
+Das ist die gewählte **Hybrid-Variante aus klassischen zwei-, drei- und vierseitigen Kartenwechseln**.
 
-Die **20 großen Seekarten** bleiben ein Vorschlag, keine endgültig festgelegte Kartenzahl. Ebenso ist zwei statt vier Ausgänge noch kein Produktentscheid. **Beide Varianten erscheinen im Seekarten-Entwurfsmodus als umschaltbare Vorschau.**
+Jeder Übergang erfolgt wie früher **automatisch beim Befahren eines freigegebenen Kartenrandes**. Der entgegengesetzte Kartenrand des Nachbarreviers führt logisch zurück. Nicht belegte Außenkanten bleiben Weltgrenzen. **Kein Hafen-Schnellreisesystem, keine Zusatzportale, keine besonderen Verbindungsstraßen und keine abstrakten Teleportnetzwerke.**
 
-### Kartenwechsel aus Spielersicht (spätere Live-Umsetzung)
+Es gibt weiterhin eine reine Links-/Rechts-Vergleichsansicht als alternative Weltkartenvorschau; die bevorzugte Variante und der Code-Standard sind aber die gemischten **2–4** Kartenränder.
 
-Auf Seekarte fahren → ein freigegebener Kartenrand wird erreicht → direkt in den benachbarten Weltabschnitt wechseln → an der gegenüberliegenden Randseite weiterfahren. In der Weltkarte sieht man benachbarte Reviere, Stufen und Sperrungen. **Kein Klick-Dialog, keine Schnellreise und kein extra Portal-Objekt**, außer es wird später ausdrücklich als gesonderter Spielinhalt konzipiert.
+Die Atlas-Vorschau zeigt für jedes Revier die freigegebenen Himmelsrichtungen, konkrete Nachbarreviere, den Level-Zugang sowie die vorgesehene Ankunftsrichtung. Die **20 wirklich großen physikalischen Seekarten** sind damit noch nicht aktiv; dafür ist die folgende geprüfte Welt-/Servermigration notwendig. Die M385-Spielwelt mit 40 Karten bleibt unverändert.
 
-Die `edge_links()`-/`edge_neighbor()`-Funktionen dokumentieren nur die beiden möglichen **Kartengrenzen-Layouts**. Sie ändern keinerlei Position und führen keine Reise aus. Die 40 live geschalteten Karten behalten ihre Randwechsel bis nach einer gesondert geprüften Migration.
+### Echte Übergangsmechanik für die spätere Umstellung
+
+- Nachbarziel aus der geografischen Weltposition, niemals einer losen Liste von Portalen bestimmen.
+- Beim Überfahren einer Kante automatisch wechseln, solange Level- und Kampfbedingungen erfüllt sind.
+- Die **quer zur Kante gefahrene Koordinate** am anderen Ende erhalten (Ost-/West-Wechsel behalten Y, Nord-/Süd-Wechsel behalten X).
+- Ankunft am gegenüberliegenden Rand innerhalb eines sicheren Abstands; kollisionsfrei und ohne sofortiges Zurückspringen.
+- Identischer Kurs in Browser-2D und App-2D/3D; Online-Server validiert dieselben Koordinaten.
+- Bonuskarten bleiben getrennte Instanzen.
 
 ## Technische Migration, erst nach gesonderten Tests
 
 Derzeit: 40 persistente Seekarten-IDs, originale Bonuskarten **3–5**, pro Seekarte `8800×6400` Weltpixel, alte Kartengrenzen, Gildeninsel-Besitzstände, Level-Gates und bestehende Server-Protokolle.
 
-**Phase A – M386 (dieser Branch):** nur neues Revierverzeichnis, testbarer Verbindungsgraph, anklickbare Weltkarten-Vorschau unter Seekarten → WELTKARTE. Fallback auf bisherige Welt. Keine Änderung an `content.gd`, `simulation.gd`, `world_server.py`, Save-Schema, `near_portal()` oder M376-Physik.
+**Phase A – M386 (dieser Branch):** neues Revierverzeichnis, testbarer geografischer 2–4-Rand-Nachbarschaftsgraph, anklickbare Weltkarten-Vorschau unter Seekarten → WELTKARTE. Fallback auf bisherige Welt. Keine Änderung an `content.gd`, `simulation.gd`, `world_server.py`, Save-Schema, `near_portal()` oder M376-Physik.
 
 **Phase B – technische Weltmigration:** neues persistentes Revier-Kennzeichen und `world_schema`. Alte 2 Seekarten eines Tiers werden einem Revier zugeordnet; Positionskonvertierung und Gildenbesitz ausdrücklich und reversibel. Physische Karten könnten z. B. gestreamte **2×8800×6400**-Abschnitte verbinden; zunächst Leistung auf Mobilgeräten messen, bevor endgültige Größe festgelegt wird. Server/Browser/Android in einem konsistenten Protokollwechsel, nicht unabhängige Halb-Migrationen. Bonusinstanzen und Event-Belohnungen getrennt halten. Map-Inhalte nur nach serverseitig validierter Reiseprüfung wechseln. Bestehende aktive Fahrwege beim Wechsel korrekt beenden, nicht beim Grafikmoduswechsel.
 
-**Phase C – echte klassische Randwechsel:** Je nach freigegebener Option 2 oder 4 automatische Überfahrtskanten mit originalem Level-Gate, 6-Sekunden-Treffer-Sperre, kollisionsfreier Ankunft auf der gegenüberliegenden Seite und Retap-Verhalten. Keine Ersetzung durch Teleport- oder Hafenschnellreisen.
+**Phase C – echte klassische Randwechsel:** Je nach Lage zwei, drei oder vier automatische Überfahrtskanten mit originalem Level-Gate, 6-Sekunden-Treffer-Sperre, kollisionsfreier Ankunft auf der gegenüberliegenden Seite und Retap-Verhalten. Keine Ersetzung durch Teleport- oder Hafenschnellreisen.
 
 **Phase D – Inhaltsintegration:** Datensatz je Revier für Hintergrund, Inselanordnung, Spawn-Rollen, Quests, Events, handelbare Gegenstände, Jagdgebiete, Gildeninseln und Portale. Nicht bloß HUD-Text austauschen: Spawnmanager, Questfortschritt und Belohnungsledger müssen dieselben IDs verwenden.
 
@@ -70,8 +76,8 @@ Die Weltkarte soll nicht nur nummerierte Punkte darstellen: Zonenfilter, geograf
 
 ## Qualitätskriterien vor produktiver Aktivierung
 
-- 20 eindeutige Reviere, fünf Zonen, alle Graphknoten erreichbar, keine ungültigen Verbindungen.
-- Jeder der 40 alten Seekarten-IDs hat genau **eine** beabsichtigte Nachfolgerzuordnung; Bonuskarten werden **nicht** in normale Reviere verschoben.
+- 20 eindeutige Reviere, fünf Zonen, alle Graphknoten erreichbar, keine ungültigen Verbindungen; genau 4 Karten mit 2, 10 Karten mit 3 und 6 Karten mit 4 Ausgängen.
+- Jeder der 40 alten Seekarten-IDs hat genau **eine** beabsichtigte Nachfolgerzuordnung; Bonuskarten werden **nicht** in normale Reviere verschoben. Jede Kante hat eine Rückkante und die querliegende Ankunftskoordinate bleibt erhalten.
 - Alte M385-Spielstände, Gildenbesitz, Decks, PvP-Rang und Währungen bleiben erhalten.
 - Browser (2D) und App (2D/3D) haben nach Reisen dieselbe Position und nutzen identische serverseitige Wege; Retap während der Fahrt und Hindernisse bleiben korrekt.
 - Normale Randübergänge nicht im Kampf ausnutzbar; Ankunft nie auf Land und ohne unbeabsichtigte sofortige Rückreise.
