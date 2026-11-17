@@ -35,6 +35,8 @@ const CLASSIC_MODEL_KEYS := [
 const KESSEL_FX = preload("res://kessel_fx.gd")
 const WORLD_CHART = preload("res://world_chart.gd")
 const CHART_GUIDE = preload("res://chart_guide.gd")
+const REALM_CATALOG = preload("res://realm_catalog.gd")
+const REALM_CHART = preload("res://realm_chart.gd")
 const AMMO_CHOICE=preload("res://ammo_choice.gd")
 const NETWORK=preload("res://network_client.gd")
 const COMBAT_FX=preload("res://combat_fx.gd")
@@ -212,6 +214,8 @@ var staff_pill: Button
 var staff_code_input: LineEdit
 var chart_pick := -1
 var chart_chapter := -1
+var chart_realm_preview := false
+var realm_chart_pick := 1
 var drag_start := Vector2.ZERO
 var dragging := false
 var last_mouse := Vector2.ZERO
@@ -4394,6 +4398,13 @@ func _open_charts() -> void:
 	if _tab("Seekarten")=="ANLEITUNG":
 		_open_chart_guide()
 		return
+	# Safe side-by-side preview: existing map ids, saves and edge travel stay live.
+	var atlas_layout=_grid(2)
+	_action("NEUE WELT · 20 REVIERE",func():chart_realm_preview=true;realm_chart_pick=maxi(1,REALM_CATALOG.realm_for_map(sim.map_id));_open_modal("Seekarten"),"tab_on" if chart_realm_preview else "normal",atlas_layout)
+	_action("BISHERIGE WELT · 40",func():chart_realm_preview=false;_open_modal("Seekarten"),"tab_on" if not chart_realm_preview else "normal",atlas_layout)
+	if chart_realm_preview:
+		_open_realm_preview()
+		return
 	_section("40 SEEKARTEN · 1/1 BIS 20/2")
 	# -1 is the complete overview, not an invalid page.
 	var leaves=_grid(5)
@@ -4412,6 +4423,36 @@ func _open_charts() -> void:
 	modal_body.add_child(chart)
 	_note("Alle 40 Karten stehen in der Übersicht in zwei Spuren. Nach unten scrollen; mit 1–5, 6–10, 11–15 oder 16–20 einen Abschnitt vergrößern.",Color("84999c"))
 	_chart_details(chart.selected)
+
+func _open_realm_preview() -> void:
+	_section("WELT 2.0 · 20 GROSSE SEEKARTEN · ENTWURF")
+	_note("Interaktiver Entwurf mit fünf Seezonen, zwanzig benannten Revieren und vorbereiteten Reiseverbindungen. Die bisherigen 40 Karten, Kartenränder und alle Spielstände bleiben bis zur geprüften Umstellung unverändert.",Color("b5cfcc"))
+	var atlas=REALM_CHART.new()
+	atlas.name="RealmChartPreview"
+	atlas.sim=sim
+	atlas.selected=clampi(realm_chart_pick,1,20)
+	atlas.custom_minimum_size=Vector2(0,890 if modal_scroll.size.x<560 else 620)
+	atlas.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	atlas.picked.connect(func(realm_id: int):realm_chart_pick=realm_id;_open_modal("Seekarten"))
+	modal_body.add_child(atlas)
+	_realm_preview_details(clampi(realm_chart_pick,1,20))
+
+func _realm_preview_details(realm_id: int) -> void:
+	var data: Dictionary=REALM_CATALOG.realm(realm_id)
+	if data.is_empty():return
+	var existing: Array[int]=REALM_CATALOG.legacy_maps(realm_id)
+	var title: String="%02d · %s · AB LEVEL %d" % [realm_id,str(data.name).to_upper(),int(data.level)]
+	var description: String="%s\nLandschaft: %s\nHafen: %s\nGegner & Monster: %s\nAktivitäten: %s" % [str(data.zone),str(data.landscape),str(data.harbor),str(data.encounters),str(data.activity)]
+	_row(extra_icons.world_chart,title+"\n"+description,64,Color("6fd1c1"))
+	_note("Migrationszuordnung (nur Entwurf): bisherige Karten %s und %s werden später ein gemeinsames großes Revier. Noch keine Änderung an der spielbaren Seekarte." % [CONTENT.MAPS[existing[0]].code,CONTENT.MAPS[existing[1]].code])
+	var current: int=REALM_CATALOG.realm_for_map(sim.map_id)
+	if current>0:
+		var path: Array[int]=REALM_CATALOG.route(current,realm_id)
+		var labels: Array[String]=[]
+		for stop in path:labels.append(str(stop))
+		_note("Geplante Reiseroute von deinem aktuellen Revier: "+" → ".join(labels)+" · keine Schnellreise freigeschaltet")
+	else:
+		_note("Bonuskarten bleiben eigenständige Instanzen und sind nicht mit normalen Weltreisen verbunden.")
 
 func _chart_details(index: int) -> void:
 	var staff=sim.staff
