@@ -101,6 +101,11 @@ var deck_slots := [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
 # tide/storm/salvage buffs, and do not replace the ten mounted normal decks.
 # Ownership/economy is intentionally not invented in this art update.
 const DECK_EXTENSION_KEYS := ["mojo_frame","crown_left","crest_right","skull_top_left","skull_top_right","skull_bottom"]
+# Actual currently equipped / rendered per-slot ornaments.
+var deck_extensions: Dictionary = {
+	"mojo_frame":false,"crown_left":false,"crest_right":false,
+	"skull_top_left":false,"skull_top_right":false,"skull_bottom":false
+}
 # The six render flags above represent *equipped*, not *owned*.
 # M385: permanent acquisition is tracked independently, like owned ships.
 # All six start locked; no economy, stat or loot source is invented here.
