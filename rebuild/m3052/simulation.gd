@@ -2063,27 +2063,35 @@ func configure_map(destination: int) -> void:
 		_build_grid()
 		return
 	islands = base_islands.duplicate(true)
+	var realm_id: int=CONTENT.realm_id_for_map(map_id)
 	for i in islands.size():
-		islands[i].pos = _map_point(base_islands[i].pos)
-		islands[i].art = config.art[i]
+		islands[i].pos = REALM_ECOLOGY.island_site(realm_id,i,0) if in_realm_world() else _map_point(base_islands[i].pos)
+		islands[i].art = REALM_ECOLOGY.island_art(realm_id,i,0) if in_realm_world() else config.art[i]
 		# Preserve the authored width, but normalize the *visible* footprint
 		# of each atlas and its land collision together.
-		islands[i].width=float(base_islands[i].width)*island_art_scale(str(config.art[i]))
-		if map_id > 0: islands[i].name = (["Eishafen","Frostbucht","Weißes Riff","Gletscherwacht","Eisbrecherbucht","Nordstern","Winterhafen","Frostzahn","Polarwacht"] if map_id == 1 else ["Nebelwacht","Schwarze Bucht","Totenriff","Schattenklippen","Korsarenfestung","Nachtwacht","Dämmerhafen","Drachenzahn","Knochenriff"])[i]
+		islands[i].width=float(base_islands[i].width)*island_art_scale(str(islands[i].art))
+		if in_realm_world():islands[i].name=REALM_ECOLOGY.island_title(realm_id,i,0)
+		elif map_id > 0: islands[i].name = (["Eishafen","Frostbucht","Weißes Riff","Gletscherwacht","Eisbrecherbucht","Nordstern","Winterhafen","Frostzahn","Polarwacht"] if map_id == 1 else ["Nebelwacht","Schwarze Bucht","Totenriff","Schattenklippen","Korsarenfestung","Nachtwacht","Dämmerhafen","Drachenzahn","Knochenriff"])[i]
 	if in_realm_world():
 		# The other former lane is continuous sea, not another scene load.
-		var secondary: Array=config.secondary_art
 		for i in base_islands.size():
 			var other: Dictionary=base_islands[i].duplicate(true)
-			other.pos=Vector2(WORLD.x,0)+_map_point(Vector2(base_islands[i].pos))
-			other.art=str(secondary[i])
+			other.pos=REALM_ECOLOGY.island_site(realm_id,i,1)
+			other.art=REALM_ECOLOGY.island_art(realm_id,i,1)
 			other.width=float(base_islands[i].width)*island_art_scale(str(other.art))
-			other.name="%s · Ostküste %d" % [str(config.name),i+1]
+			other.name=REALM_ECOLOGY.island_title(realm_id,i,1)
 			islands.append(other)
 	npcs = base_npcs.duplicate(true)
 	for npc in npcs:
 		npc.pos = _map_point(npc.pos)
-		if in_realm_world() and int(npc.id)%2==0:npc.pos.x+=WORLD.x
+		if in_realm_world():
+			var actor_id: int=int(npc.id)
+			if actor_id>=1 and actor_id<=16:
+				npc.pos=REALM_ECOLOGY.patrol_site(realm_id,actor_id-1)
+				npc.name=REALM_ECOLOGY.patrol_title(realm_id,actor_id-1)
+			elif actor_id==100:
+				npc.pos=REALM_ECOLOGY.monster_site(realm_id,0)
+				npc.name=REALM_ECOLOGY.monster_title(realm_id,"tiamat")
 		npc.home = npc.pos
 		npc.path = []
 		npc.hp = roundi(float(npc.max_hp) * float(config.enemy_scale))
@@ -2091,7 +2099,7 @@ func configure_map(destination: int) -> void:
 		npc.max_shield = roundi(float(npc.max_shield) * float(config.enemy_scale))
 		npc.shield = npc.max_shield
 		npc.reward = roundi(float(npc.reward) * float(config.enemy_scale))
-		if map_id >=6: npc.name="%s · " % config.code+str(npc.name)
+		if map_id >=6 and not in_realm_world(): npc.name="%s · " % config.code+str(npc.name)
 		elif map_id > 0: npc.name = ("Frost · " if map_id == 1 else "Schatten · ") + str(npc.name)
 	var restored := map_states.has(map_id)
 	if restored:
@@ -2099,9 +2107,15 @@ func configure_map(destination: int) -> void:
 		drops = map_states[map_id].drops.duplicate(true)
 	else:
 		drops.clear()
-		_add_drop(START + Vector2(-170,130),25 + map_id * 15)
-		_add_drop(START + Vector2(220,-120),25 + map_id * 15)
-		_add_drop(_map_point(Vector2(2170,1780)),30 + map_id * 20)
+		if in_realm_world():
+			# Salvage is spread across both halves; rewards use progression,
+			# not the internal room ID (43..62) that could inflate gold.
+			for slot in 4:
+				_add_drop(REALM_ECOLOGY.salvage_site(realm_id,slot),45+realm_id*15)
+		else:
+			_add_drop(START + Vector2(-170,130),25 + map_id * 15)
+			_add_drop(START + Vector2(220,-120),25 + map_id * 15)
+			_add_drop(_map_point(Vector2(2170,1780)),30 + map_id * 20)
 	# Compatibility name: these are logical whole-edge links, never point portals.
 	for neighbor in CONTENT.sea_neighbors(map_id):
 		for edge: String in ["east","west","north","south"]:
