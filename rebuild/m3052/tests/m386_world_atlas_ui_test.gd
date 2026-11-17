@@ -63,8 +63,12 @@ func _run() -> void:
 	var after: Dictionary=game.sim.export_save()
 	var modified: Array[String]=[]
 	for key: String in before:
+		# The separate AFK ledger advances its real-time checkpoint while
+		# the menu is open. That is allowed, not a map/economy mutation.
+		if key=="rewards":continue
 		if before[key]!=after.get(key):modified.append(key)
 	check(modified.is_empty(),"opening and switching future charts does not modify game progress: "+", ".join(modified))
+	check(int(after.gold)==int(before.gold) and int(after.pearls)==int(before.pearls) and int(after.crystals)==int(before.crystals),"the atlas neither spends nor grants in-game currencies")
 	check(game.sim.map_id==old_map and game.sim.player.pos==pos and game.sim.player.heading==heading,"atlas selection changes neither sea nor active 2D/3D ship movement")
 	game._close_modal()
 	game.queue_free()

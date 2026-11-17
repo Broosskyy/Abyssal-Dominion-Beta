@@ -32,8 +32,17 @@ static func realm(realm_id: int) -> Dictionary:
 	return REALMS[realm_id-1].duplicate(true)
 
 static func realm_for_map(map_id: int) -> int:
+	# Both an existing legacy lane and its new double-width test instance
+	# correspond to the same conceptual sea. No implicit save migration.
+	if map_id in CONTENT.REALM_MAP_IDS:return CONTENT.realm_id_for_map(map_id)
 	if not map_id in CONTENT.SEA_MAP_IDS:return -1
 	return int(CONTENT.MAPS[map_id].tier)
+
+static func playable_map_id(realm_id: int) -> int:
+	return CONTENT.realm_map_id(realm_id)
+
+static func playable_neighbor(map_id: int,edge: String) -> int:
+	return CONTENT.sea_edge_neighbor(map_id,edge) if map_id in CONTENT.REALM_MAP_IDS else -1
 
 static func legacy_maps(realm_id: int) -> Array[int]:
 	if realm_id < 1 or realm_id > REALMS.size():return []

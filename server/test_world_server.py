@@ -16,6 +16,45 @@ class CrossplayTest(unittest.IsolatedAsyncioTestCase):
         response=await self.client.post('/v1/register',json={'protocol':2,'email':email,'username':name,'password':'test-password-937'})
         self.assertEqual(response.status,200)
         return await response.json()
+    async def test_twenty_new_seas_have_isolated_double_width_authoritative_rooms(self):
+        from world_server import SEA_IDS, REALM_IDS, World, world_width
+        self.assertEqual(REALM_IDS, frozenset(range(43,63)))
+        self.assertTrue(SEA_IDS.issuperset(REALM_IDS))
+        self.assertEqual(world_width(0),8800.0)
+        self.assertEqual(world_width(43),17600.0)
+        self.assertIsNone(World.route({'x':12000,'y':3200},0))
+        self.assertEqual(World.route({'x':12000,'y':3200},43),[(12000.,3200.)])
+        self.assertIsNone(World.route({'x':17700,'y':3200},43))
+        account=await self.account('realm-beta@example.com','RealmTester')
+        witness=await self.account('realm-other@example.com','RealmWitness')
+        room=await self.client.ws_connect('/v1/world')
+        other=await self.client.ws_connect('/v1/world')
+        try:
+            await room.send_json({'type':'join','protocol':2,'token':account['token'],'map_id':43})
+            welcome=await room.receive_json()
+            self.assertEqual(welcome['type'],'welcome')
+            self.assertEqual(welcome['map_id'],43)
+            await other.send_json({'type':'join','protocol':2,'token':witness['token'],'map_id':0})
+            self.assertEqual((await other.receive_json())['map_id'],0)
+            await room.send_json({'type':'course','sequence':1,'x':12000,'y':2900,
+                                  'navigation_mode':'classic_48x32',
+                                  'raster_preexpanded':True,'route':[[12000,2900]]})
+            await asyncio.sleep(.06)
+            realm_peer=next(p for p in self.client.server.app['world'].peers.values()
+                            if p['map_id']==43)
+            self.assertEqual(realm_peer['sequence'],1)
+            self.assertEqual(realm_peer['route'][-1],(12000.,2900.))
+            # No cross-world presence leakage, and old 8800 bounds stay strict.
+            old_peer=next(p for p in self.client.server.app['world'].peers.values()
+                          if p['map_id']==0)
+            self.assertEqual(old_peer['sequence'],0)
+            await other.send_json({'type':'course','sequence':1,'x':12000,'y':2900})
+            await asyncio.sleep(.06)
+            self.assertEqual(old_peer['sequence'],0)
+        finally:
+            await room.close()
+            await other.close()
+
     async def test_isometric_48x32_course_and_crossplay_snapshot(self):
         from world_server import (classic_tile_center, classic_world_to_tile,
                                   classic_segment_route, classic_expand_route)
