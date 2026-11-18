@@ -2,7 +2,7 @@ name: Abyssal Dominion – browser preview
 on:
   workflow_dispatch:
   push:
-    branches: [main, feature/classic-seafight-navigation-330, fix/classic-4way-small-step-navigation-334, fix/classic-four-view-visual-only-335, fix/classic-left-right-sailing-336, fix/classic-framing-scale-337, fix/classic-pixel-hull-only-dither-341, fix/classic-mobile-scale-fourway-stall-339, fix/classic-heading-render-phase-341, fix/classic-tick-raster-interpolation-342, fix/classic-straight-world-course-343, experiment/classic-iso-tile-grid-344, fix/classic-click-tile-course-zoom-345, fix/classic-atomic-grid-pace-344, fix/classic-isometric-safe-course-345, feat/shared-2d-3d-raster-navigation-346, fix/m377-browser-regression-mobile-hud, feat/m378-reference-playerplate-ring-decks, fix/m379-reference-hud-ring-camera-polish, fix/m380-reference-ship-ring-deck-readability, feat/m383-modular-deck-extensions-mojo, feat/m384-deck-extensions-visual-preview, feat/m385-deck-extensions-own-equip-separate, feat/m386-world-realm-atlas-foundation, feat/m388-playable-twenty-realms-beta, feat/m389-regional-ecology-hunts, feat/m390-maritime-landmarks-monster-vfx, feat/m392-modular-island-art-pipeline, fix/m392-content-only-island-catalog]
+    branches: [main, feature/classic-seafight-navigation-330, fix/classic-4way-small-step-navigation-334, fix/classic-four-view-visual-only-335, fix/classic-left-right-sailing-336, fix/classic-framing-scale-337, fix/classic-pixel-hull-only-dither-341, fix/classic-mobile-scale-fourway-stall-339, fix/classic-heading-render-phase-341, fix/classic-tick-raster-interpolation-342, fix/classic-straight-world-course-343, experiment/classic-iso-tile-grid-344, fix/classic-click-tile-course-zoom-345, fix/classic-atomic-grid-pace-344, fix/classic-isometric-safe-course-345, feat/shared-2d-3d-raster-navigation-346, fix/m377-browser-regression-mobile-hud, feat/m378-reference-playerplate-ring-decks, fix/m379-reference-hud-ring-camera-polish, fix/m380-reference-ship-ring-deck-readability, feat/m383-modular-deck-extensions-mojo, feat/m384-deck-extensions-visual-preview, feat/m385-deck-extensions-own-equip-separate, feat/m386-world-realm-atlas-foundation, feat/m388-playable-twenty-realms-beta, feat/m389-regional-ecology-hunts, feat/m390-maritime-landmarks-monster-vfx, feat/m392-modular-island-art-pipeline, fix/m392-content-only-island-catalog, feat/m394-first-a01-island-collision-test]
     paths:
       - 'rebuild/m3052/**'
       - 'server/**'
@@ -27,6 +27,8 @@ jobs:
             rebuild/m3052
             server
             web_preview/tests
+      - name: Install free RGBA art validator
+        run: python3 -m pip install 'Pillow>=11,<13'
       - name: M392 verify catalog and forbid unapproved island replacements
         run: python3 rebuild/m3052/tools/validate_m392_islands.py
       - name: Verify online Classic 48x32 crossplay movement
@@ -106,7 +108,7 @@ jobs:
           # Verify M376 shared direct/coastal navigation, Classic sprite-only
           # headings, crossplay and responsive HUD before stripping Web assets.
           # Never reintroduce obsolete 24x16 PHYSICAL zigzag assertions.
-          for suite in m376_unified_direct_sailing_test shared_render_route_test classic_course_test classic_mode_test classic_navigation_test navigation_test simulation_test m377_hud_touch_performance_test m378_reference_playerplate_test m379_playerplate_visual_contract_test m380_reference_presentation_test m383_modular_deck_extensions_test m384_deck_extension_preview_test m385_deck_extension_equipment_test m386_world_realm_catalog_test m386_world_atlas_ui_test m388_playable_realm_test m388_playable_realm_ui_test m389_realm_ecology_test m389_realm_mission_ui_test m390_realm_visuals_test m392_island_catalog_test deck_progression_test chart_presentation_test ui_test; do
+          for suite in m376_unified_direct_sailing_test shared_render_route_test classic_course_test classic_mode_test classic_navigation_test navigation_test simulation_test m377_hud_touch_performance_test m378_reference_playerplate_test m379_playerplate_visual_contract_test m380_reference_presentation_test m383_modular_deck_extensions_test m384_deck_extension_preview_test m385_deck_extension_equipment_test m386_world_realm_catalog_test m386_world_atlas_ui_test m388_playable_realm_test m388_playable_realm_ui_test m389_realm_ecology_test m389_realm_mission_ui_test m390_realm_visuals_test m392_island_catalog_test m394_first_island_test deck_progression_test chart_presentation_test ui_test; do
             echo "START GODOT SUITE: ${suite}"
             timeout --signal=TERM 120s env XDG_DATA_HOME="$(mktemp -d)" "$engine" --headless --path rebuild/m3052 \
               --script "tests/${suite}.gd" > "/tmp/${suite}.log" 2>&1 || {
