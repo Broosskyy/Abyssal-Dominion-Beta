@@ -1,7 +1,7 @@
 name: M392 modular 30-island-art QA
 on:
   push:
-    branches: [feat/m392-modular-island-art-pipeline]
+    branches: [feat/m392-modular-island-art-pipeline, fix/m392-content-only-island-catalog]
     paths:
       - 'rebuild/m3052/**'
       - 'server/**'
@@ -22,6 +22,11 @@ jobs:
           sparse-checkout: |
             rebuild/m3052
             server
+            updates/latest.json
+      - name: Verify unchanged native bootstrap and mirrored source art
+        run: |
+          python3 rebuild/m3052/tools/release_plan.py
+          python3 rebuild/m3052/tools/sync_m392_catalog.py --check
       - name: Test authoritative crossplay sea bounds
         shell: bash
         run: |

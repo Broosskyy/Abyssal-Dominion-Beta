@@ -3,14 +3,14 @@ extends RefCounted
 ## artist-reviewed, checksum-verified texture AND collision pairs can render.
 ## The default is the existing original coast shape and texture. This must
 ## not change M376 sailing, M388 transition borders or historic saves.
-const MANIFEST := "res://assets/visuals/m392_island_catalog.json"
+const EMBEDDED=preload("res://island_asset_embedded.gd")
 const REGIONS := ["A","B","C","D","E"]
 const SLOT_VARIANTS := [0,1,2,3,4,5,1,3,4]
 static var _cache: Dictionary={}
 
 static func catalog() -> Dictionary:
 	if _cache.is_empty():
-		var parsed: Variant=JSON.parse_string(FileAccess.get_file_as_string(MANIFEST))
+		var parsed: Variant=JSON.parse_string(EMBEDDED.CATALOG_JSON)
 		if parsed is Dictionary and int(parsed.get("schema",0))==1:
 			_cache=parsed
 	return _cache
@@ -45,9 +45,15 @@ static func approved_collision(item: Dictionary) -> Dictionary:
 	var signature: String=str(item.get("sha256_collision",""))
 	# Never allow art-only swaps over the old collision polygon.
 	if not png.begins_with("res://assets/m392/islands/") or not collision.begins_with("res://assets/m392/collision/"):return {}
-	if signature.length()!=64 or not FileAccess.file_exists(collision) or FileAccess.get_sha256(collision)!=signature:return {}
-	if not ResourceLoader.exists(png):return {}
-	var parsed: Variant=JSON.parse_string(FileAccess.get_file_as_string(collision))
+	if signature.length()!=64 or not ResourceLoader.exists(png):return {}
+	# Collisions are embedded from exact SHA256-reviewed JSON by the asset
+	# sync tool. Never require original .json files inside a signed APK
+	# data pack, and never change the native bootstrap export config.
+	var records: Variant=JSON.parse_string(EMBEDDED.APPROVED_COLLISIONS_JSON)
+	if not records is Dictionary:return {}
+	var bundle: Variant=records.get(str(item.get("id","")),{})
+	if not bundle is Dictionary or str(bundle.get("sha256",""))!=signature:return {}
+	var parsed: Variant=bundle.get("collision",{})
 	if not parsed is Dictionary:return {}
 	if str(parsed.get("asset_id",""))!=str(item.get("id","")) or not bool(parsed.get("reviewed",false)):return {}
 	var dimensions: Variant=parsed.get("size",[])
