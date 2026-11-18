@@ -43,8 +43,8 @@ def source_path(path:str,asset_id:str,folder:str,extension:str)->Path:
 
 
 def _poly_area(points:list[list[float]])->float:
-    return abs(sum(p[0]*q[1]-q[0]*p[1]
-                   for p,q in zip(points,points[1:]+points[:1]))*.5
+    return .5*abs(sum(p[0]*q[1]-q[0]*p[1]
+                       for p,q in zip(points,points[1:]+points[:1])))
 
 
 def _orientation(a,b,c)->float:
