@@ -23,7 +23,7 @@ func _run()->void:
 	var texture:Texture2D=load(str(descriptor.source_png))
 	check(texture!=null and texture.get_size()==Vector2(512,512),"alpha artwork actually loads at verified game resolution")
 	var shape:Dictionary=CATALOG.approved_collision(descriptor)
-	check(not shape.is_empty() and shape.points.size()==20 and shape.size==[512,512],"reviewed A01 polygon embedded alongside artwork")
+	check(not shape.is_empty() and shape.get("points",[]).size()==20 and int(shape.get("size",[0,0])[0])==512 and int(shape.get("size",[0,0])[1])==512,"reviewed A01 polygon embedded alongside artwork")
 	var fallback:Dictionary=CATALOG.resolve(5,0,0,"rock")
 	check(not bool(fallback.approved) and str(fallback.art)=="rock","unapproved region B art still uses original rock")
 	var before=SIM.new()
@@ -73,6 +73,15 @@ func _run()->void:
 	await process_frame
 	scene.set_process(false)
 	scene.sim.configure_map(CONTENT.realm_map_id(1))
+	var visible_island:Dictionary={}
+	for candidate:Dictionary in scene.sim.islands:
+		if str(candidate.get("m392_asset_id",""))=="A01":
+			visible_island=candidate
+			break
+	check(not visible_island.is_empty(),"A01 exists in the displayed test sea")
+	if not visible_island.is_empty():
+		scene.camera.position=Vector2(visible_island.pos)
+		scene.camera.force_update_scroll()
 	scene.queue_redraw()
 	await process_frame
 	await process_frame
