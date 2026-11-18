@@ -29,7 +29,7 @@ Aktuell gibt es aus den gelieferten Bildern **Kandidaten** für genau diese **14
 ## Qualitätssicherung
 
 - Alle 39 PNGs haben echte Transparenz, freigestellte Einzelobjekte, eindeutige Namen und SHA256-Werte.
-- Das Skript erhält den Original-Alphakanal und ordnet lose Nachbarfelsen nach der nächstgelegenen Objektmaske zu. Die Rohquellen bleiben unverändert.
+- Das Skript erhält die Antialias-Kanten und ordnet lose Nachbarfelsen der nächstgelegenen Objektmaske zu. Nur fast opake Alphawerte (250–254) werden für den technischen PNG-Validator auf 255 normalisiert; die Originalquellen bleiben unverändert.
 - **10 von 39** benötigen besondere Sichtkontrolle, da das Motiv im Originalblatt sehr nah an einer Bildkante liegt oder diese berührt.
 - 34 automatisch erfasste Objekt-**Außenkonturen** sind als Hilfsdaten enthalten; sie sind ausdrücklich **keine geprüften Wasserlinien-Kollisionen**.
 - Ein offener Karten-/Hafeneingang wird nicht durch eine grobe Außenkontur verschlossen. Vor Freigabe muss die echte Schiffsfahrt im Godot-Raster erfolgreich sein.
