@@ -689,4 +689,6 @@ const CATALOG_JSON := """
   ]
 }
 """
-const APPROVED_COLLISIONS_JSON := """\n{}\n"""
+const APPROVED_COLLISIONS_JSON := """
+{}
+"""
