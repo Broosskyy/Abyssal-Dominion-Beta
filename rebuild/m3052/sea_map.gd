@@ -38,6 +38,7 @@ const CHART_GUIDE = preload("res://chart_guide.gd")
 const REALM_CATALOG = preload("res://realm_catalog.gd")
 const REALM_CHART = preload("res://realm_chart.gd")
 const REALM_VISUALS = preload("res://realm_visuals.gd")
+const FIRST_APPROVED_A01: Texture2D = preload("res://assets/m392/islands/a01.png")
 const AMMO_CHOICE=preload("res://ammo_choice.gd")
 const NETWORK=preload("res://network_client.gd")
 const COMBAT_FX=preload("res://combat_fx.gd")
@@ -603,6 +604,9 @@ func _load_assets() -> void:
 		skin_previews.append(_ship_preview("res://assets/expansion/preview_"+("halloween" if skins.size()==13 else "columbus")+".webp"))
 	for name in ["tropical","rock","snow","snow2"]:
 		island_textures[name] = load("res://assets/reference/islands/"+name+".png")
+	# Keep the first actually approved original island in the export graph and
+	# cached renderer. Later approved entries can still load lazily on demand.
+	island_textures["m392_a01"]=FIRST_APPROVED_A01
 	for name in ["cannonball","harpoon","chain","repair_chest"]:
 		icons[name] = load(USER_ROOT+"ui/"+name+".png")
 	beast = load("res://assets/reference/monsters/tiamat.png")

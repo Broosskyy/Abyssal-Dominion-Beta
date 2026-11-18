@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "asset_id": "A01",
+  "reviewed": true,
+  "size": [
+    512,
+    512
+  ],
+  "points": [
+    [
+      0.116,
+      0.76
+    ],
+    [
+      0.168,
+      0.707
+    ],
+    [
+      0.256,
+      0.674
+    ],
+    [
+      0.32,
+      0.681
+    ],
+    [
+      0.397,
+      0.663
+    ],
+    [
+      0.491,
+      0.663
+    ],
+    [
+      0.57,
+      0.683
+    ],
+    [
+      0.646,
+      0.689
+    ],
+    [
+      0.722,
+      0.723
+    ],
+    [
+      0.814,
+      0.757
+    ],
+    [
+      0.874,
+      0.788
+    ],
+    [
+      0.878,
+      0.824
+    ],
+    [
+      0.817,
+      0.87
+    ],
+    [
+      0.711,
+      0.894
+    ],
+    [
+      0.581,
+      0.914
+    ],
+    [
+      0.459,
+      0.913
+    ],
+    [
+      0.35,
+      0.903
+    ],
+    [
+      0.261,
+      0.883
+    ],
+    [
+      0.183,
+      0.847
+    ],
+    [
+      0.123,
+      0.814
+    ]
+  ],
+  "manual_review": "Original transparent image from 209642.png, isolated small tropical rock island. Polygon traces only lower navigable shore, not vertical rock face and palms.",
+  "source_asset": "209642_01_tropical_spire_islet.png"
+}
