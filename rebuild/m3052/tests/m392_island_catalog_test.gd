@@ -75,7 +75,13 @@ func _run()->void:
 			check(str(island.get("m392_asset_id",""))==id,"physics island and visual asset share one stable ID")
 			check(str(island.get("m392_size_class",""))==str(CATALOG.entry(id).size_class),
 				"renderer and simulation share size metadata")
-			check(island.outline.size()>7 and island.bounds.has_point(island.pos),"coastline collision matches active bitmap")
+			var silhouette: Dictionary=sim.island_shapes[str(island.art)]
+			var width: float=float(island.width)
+			var dimensions: Vector2=Vector2(width,width*float(silhouette.size[1])/float(silhouette.size[0]))
+			var first_point: Array=silhouette.points[0]
+			var expected_vertex: Vector2=Vector2(island.pos)+(Vector2(first_point[0],first_point[1])-Vector2(.5,.65))*dimensions
+			check(island.outline.size()==silhouette.points.size() and island.outline[0].distance_to(expected_vertex)<.02,
+				"coastline vertices use the selected bitmap silhouette and width, not the image bounds center")
 			check(not sim.blocked(sim.harbor),"new art catalog does not close harbor")
 			represented[id]=true
 		check(represented.size()==6,"every tested sea contains its regional variation")
