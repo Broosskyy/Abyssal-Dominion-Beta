@@ -138,6 +138,14 @@ def _check_image(path:Path,asset_id:str):
 
 def validate(require_approved:bool=False)->dict:
     data=json.loads(MANIFEST.read_text(encoding="utf-8"))
+    # Signed Android content packs embed source JSON and independently
+    # approved polygons in GDScript; boot/export presets must stay unchanged.
+    from sync_m392_catalog import expected,extract
+    authored,authored_collisions=expected()
+    embedded,embedded_collisions=extract()
+    require(authored==data and embedded==data and
+            authored_collisions==embedded_collisions,
+            "M392 authoring JSON and compiled data pack differ; run sync_m392_catalog.py --write")
     require(data.get("schema")==1,"island catalog schema must be 1")
     require(len(data.get("regions",[]))==5,"exactly five island regions required")
     require([(r["id"],r["realm_min"],r["realm_max"]) for r in data["regions"]]
