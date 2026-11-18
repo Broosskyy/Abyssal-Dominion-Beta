@@ -76,3 +76,18 @@ jobs:
             grep -q '"status":"PASS"' "/tmp/${suite}.log"
             if grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script' "/tmp/${suite}.log"; then exit 1; fi
           done
+      - name: Render real in-game A01 island in landscape and mobile size
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/m394-a01-captures"
+          timeout 120s env XDG_DATA_HOME="$(mktemp -d)" xvfb-run -a /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --audio-driver Dummy --path rebuild/m3052 --script tests/m394_island_capture.gd -- "--out=$RUNNER_TEMP/m394-a01-captures" > /tmp/m394-a01-render.log 2>&1 || { cat /tmp/m394-a01-render.log; exit 1; }
+          grep -q '"status":"CAPTURED"' /tmp/m394-a01-render.log
+          test -s "$RUNNER_TEMP/m394-a01-captures/a01_island_landscape_in_game.png"
+          test -s "$RUNNER_TEMP/m394-a01-captures/a01_island_mobile_in_game.png"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Abyssal-M394-A01-real-game-screenshots
+          path: ${{ runner.temp }}/m394-a01-captures/*.png
+          if-no-files-found: error
+          retention-days: 21
