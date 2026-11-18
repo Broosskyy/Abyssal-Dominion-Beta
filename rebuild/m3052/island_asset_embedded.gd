@@ -71,11 +71,11 @@ const CATALOG_JSON := """
       "fallback_art": "rock",
       "description": "compact limestone reef with sparse palms and clear rock shore",
       "reference_prompt": "Abyssal Dominion original standalone island asset A01: compact limestone reef with sparse palms and clear rock shore. Isometric 3/4 orthographic camera at consistent 48 degree elevation; premium semi-realistic sharp maritime game asset with accurate stone and vegetation, centered, clean silhouette, full perimeter visible; isolated RGBA transparency, no water, no backdrop, no people, no text, clean dock route if any.",
-      "status": "planned",
-      "approved": false,
-      "collision_reviewed": false,
-      "sha256_png": "",
-      "sha256_collision": ""
+      "status": "approved",
+      "approved": true,
+      "collision_reviewed": true,
+      "sha256_png": "52ac3bd963cde48f5ca7d5f1707c8d16f65419394b2d24c59a1b9b3bb899b442",
+      "sha256_collision": "ce4d7255a3fb0a7447c6047b63ea7c90e7ce38dec9e29289189b6a957e189516"
     },
     {
       "id": "A02",
@@ -690,5 +690,102 @@ const CATALOG_JSON := """
 }
 """
 const APPROVED_COLLISIONS_JSON := """
-{}
+{
+  "A01": {
+    "sha256": "ce4d7255a3fb0a7447c6047b63ea7c90e7ce38dec9e29289189b6a957e189516",
+    "collision": {
+      "schema": 1,
+      "asset_id": "A01",
+      "reviewed": true,
+      "size": [
+        512,
+        512
+      ],
+      "points": [
+        [
+          0.116,
+          0.76
+        ],
+        [
+          0.168,
+          0.707
+        ],
+        [
+          0.256,
+          0.674
+        ],
+        [
+          0.32,
+          0.681
+        ],
+        [
+          0.397,
+          0.663
+        ],
+        [
+          0.491,
+          0.663
+        ],
+        [
+          0.57,
+          0.683
+        ],
+        [
+          0.646,
+          0.689
+        ],
+        [
+          0.722,
+          0.723
+        ],
+        [
+          0.814,
+          0.757
+        ],
+        [
+          0.874,
+          0.788
+        ],
+        [
+          0.878,
+          0.824
+        ],
+        [
+          0.817,
+          0.87
+        ],
+        [
+          0.711,
+          0.894
+        ],
+        [
+          0.581,
+          0.914
+        ],
+        [
+          0.459,
+          0.913
+        ],
+        [
+          0.35,
+          0.903
+        ],
+        [
+          0.261,
+          0.883
+        ],
+        [
+          0.183,
+          0.847
+        ],
+        [
+          0.123,
+          0.814
+        ]
+      ],
+      "manual_review": "Original transparent image from 209642.png, isolated small tropical rock island. Polygon traces only lower navigable shore, not vertical rock face and palms.",
+      "source_asset": "209642_01_tropical_spire_islet.png"
+    }
+  }
+}
 """
