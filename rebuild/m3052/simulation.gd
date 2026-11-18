@@ -2,6 +2,7 @@ extends RefCounted
 const CONTENT = preload("res://content.gd")
 const REALM_CATALOG = preload("res://realm_catalog.gd")
 const REALM_ECOLOGY = preload("res://realm_ecology.gd")
+const ISLAND_ASSETS = preload("res://island_asset_catalog.gd")
 const NAV = preload("res://navigation.gd")
 const CONTRACTS = preload("res://sea_contracts.gd")
 const STAFF=preload("res://staff.gd")
@@ -2072,6 +2073,18 @@ func configure_map(destination: int) -> void:
 	for i in islands.size():
 		islands[i].pos = REALM_ECOLOGY.island_site(realm_id,i,0) if in_realm_world() else _map_point(base_islands[i].pos)
 		islands[i].art = REALM_ECOLOGY.island_art(realm_id,i,0) if in_realm_world() else config.art[i]
+		if in_realm_world():
+			var selected: Dictionary=ISLAND_ASSETS.resolve(realm_id,i,0,str(islands[i].art))
+			islands[i]["m392_asset_id"]=str(selected.asset_id)
+			islands[i]["m392_size_class"]=str(selected.size_class)
+			islands[i]["m392_art_source"]="approved" if bool(selected.approved) else "legacy"
+			if bool(selected.approved):
+				# Approved PNG and its matching silhouette always activate
+				# together BEFORE _build_grid; never paint a new shoreline
+				# over the previous island's collision.
+				islands[i].art=str(selected.art)
+				islands[i]["m392_texture_path"]=str(selected.texture_path)
+				island_shapes[str(selected.art)]=selected.collision
 		# Preserve the authored width, but normalize the *visible* footprint
 		# of each atlas and its land collision together.
 		islands[i].width=float(base_islands[i].width)*island_art_scale(str(islands[i].art))
@@ -2086,6 +2099,14 @@ func configure_map(destination: int) -> void:
 			var other: Dictionary=base_islands[i].duplicate(true)
 			other.pos=REALM_ECOLOGY.island_site(realm_id,i,1)
 			other.art=REALM_ECOLOGY.island_art(realm_id,i,1)
+			var selected: Dictionary=ISLAND_ASSETS.resolve(realm_id,i,1,str(other.art))
+			other["m392_asset_id"]=str(selected.asset_id)
+			other["m392_size_class"]=str(selected.size_class)
+			other["m392_art_source"]="approved" if bool(selected.approved) else "legacy"
+			if bool(selected.approved):
+				other.art=str(selected.art)
+				other["m392_texture_path"]=str(selected.texture_path)
+				island_shapes[str(selected.art)]=selected.collision
 			other.width=float(base_islands[i].width)*island_art_scale(str(other.art))
 			other.name=REALM_ECOLOGY.island_title(realm_id,i,1)
 			other["realm_island_index"]=i

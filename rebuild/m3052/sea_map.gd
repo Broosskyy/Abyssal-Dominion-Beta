@@ -929,7 +929,15 @@ func _draw() -> void:
 	for island in sim.islands:
 		if not view.has_point(island.pos): continue
 		var guild_island: bool=bool(island.get("guild_fortress",false))
-		var tex: Texture2D=GUILD_FORTRESS_ART if guild_island else island_textures[island.art]
+		var art_key: String=str(island.art)
+		# Only the explicitly reviewed PNG can replace a beta island's
+		# 2D/3D shared texture. Cache each approved texture once; never load
+		# assets per frame. Unapproved catalog entries still use old art.
+		var source_path: String=str(island.get("m392_texture_path",""))
+		if not guild_island and not source_path.is_empty() and not island_textures.has(art_key):
+			var approved_texture: Texture2D=load(source_path) as Texture2D
+			if approved_texture!=null:island_textures[art_key]=approved_texture
+		var tex: Texture2D=GUILD_FORTRESS_ART if guild_island else island_textures.get(art_key,island_textures["rock"])
 		var width: float=island.width
 		var dimensions: Vector2=Vector2(width,width*CONTENT.GUILD_FORTRESS_ASPECT) if guild_island else tex.get_size()*width/tex.get_width()
 		var point: Vector2=island.pos
