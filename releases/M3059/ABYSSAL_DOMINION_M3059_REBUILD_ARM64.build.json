@@ -1,7 +1,7 @@
 {
   "engine": "4.7.2.stable.official.ed1daf0bf",
   "milestone": "M3059",
-  "source_commit": "8b0392f5389cd09002925a2c1eda66938df220a7",
+  "source_commit": "27d40fc47d222a829bf428dbca7161b9063686aa",
   "bootstrap_sha256": "8e97bafe54793eb72410248af725c99324486557bf48c5040cc7a27025c88fde",
   "tests": [
     {
@@ -194,10 +194,22 @@
     },
     {
       "test": "m392_island_catalog_test",
-      "approved": 0,
-      "checks": 2164,
+      "approved": 1,
+      "checks": 2163,
       "failures": [],
-      "pending": 30,
+      "pending": 29,
+      "status": "PASS"
+    },
+    {
+      "test": "m394_first_island_test",
+      "approved_count": 1,
+      "asset": "A01",
+      "checks": 130,
+      "failures": [],
+      "png_size": [
+        512,
+        512
+      ],
       "status": "PASS"
     },
     {
@@ -221,14 +233,14 @@
     }
   ],
   "data": {
-    "revision": 392,
+    "revision": 393,
     "abi": 1,
     "engine": "4.7.2.stable",
     "min_apk": 305903,
-    "bytes": 129360548,
-    "sha256": "51070e1b7fc6d9fca45cd3be0ab70cfa3d5afe3e21e87c4c661585f0df7a0435",
-    "signature": "a09iI/UPaDfExBScRIYVPxZa9+zSxvWgqQHrGbDWvBfo3N2r9/k7y3piXV2dEZeWNolUluX53EP3WCcFMGSxAFRCurTNqASheYFqjM4UIVXZcZalak7MVf7xtv/5Ic7BLjjJvM+AoDw63LePFJ70NgrxnLNFhD5QnxIYS0kCP78jMCEQHwFS/zaRbb6eX4rn0k+ownK5rvhojMkBVKJ1WDrlz4AtGqCLsOuupTryscCUHdGvDj1LTNFSRshSMmMU8O5XB1G52MsFl+jPqfV5rfINmNjiIO/0MH35c4oxRvKobmBen/deTs9d3zMSS2Um9U5ged6OgCWecV0jw4Rkng==",
-    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-392/ABYSSAL_DATA_392.zip"
+    "bytes": 129622523,
+    "sha256": "b9b3120a80315f1ccc00bf3f9e6beaa005569d3aecc8c73d352156765799dcea",
+    "signature": "crrWC6IruEazRp2LT0oKxMpjgmYGaQ2Wsc6ouRUBvwVbH0A9kWWp9OhhgcrNdMxvNtQww2tlwPMlMrzeC3ZbRdUM+UVB2dTXZXHLRMCCApC65rwY7W9/Dkfu6tHtth8+jhNjIHZcZIupmw6+aeAJwqdqYEF1hPt9NvCMtrDHg0bU3unek5FqWVFcD6Yqu7Ziq8xpXeLOiqi88vAbFfONiET5Jaf7NoOxOcp8fV1LQLNwbMSdaCMK/ROtxJ0vqaPe2BcqJ2mmeZc8nfp/0O/yy7aND2Ehy9IoWCulkq6thvmylkfHZabdpwuxaoqy9d55RdNqSpLNQkLb4ydAHGIYPw==",
+    "url": "https://github.com/Broosskyy/Abyssal-Dominion-Beta/releases/download/data-393/ABYSSAL_DATA_393.zip"
   },
   "audited_pngs": 44,
   "physical_android_test": "NOT_PERFORMED",
