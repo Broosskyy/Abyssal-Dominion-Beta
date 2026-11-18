@@ -1,0 +1,364 @@
+{
+  "schema": 1,
+  "project": "Abyssal Dominion",
+  "milestone": "M393-reference-intake",
+  "source_images": 10,
+  "asset_count": 39,
+  "status": "reference_extracted_unreviewed",
+  "gameplay_enabled": false,
+  "approved_count": 0,
+  "note": "Metadata only. Actual RGBA PNGs and SHA256 audits are in the user-facing ZIP. No binary island images are committed to GitHub; approve and upload each PNG and matching shoreline via M392 checks.",
+  "entries": [
+    {
+      "source_sheet": "209629.png",
+      "archive_path": "event/209629_01_blossom_islet.png",
+      "category": "event",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209629.png",
+      "archive_path": "event/209629_02_blossom_meadow.png",
+      "category": "event",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209629.png",
+      "archive_path": "event/209629_03_graveyard_ruin.png",
+      "category": "event",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209629.png",
+      "archive_path": "core_candidate/209629_04_coast_lighthouse_harbor.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "B03",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209640.png",
+      "archive_path": "event/209640_01_volcanic_ridge_small.png",
+      "category": "event",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209640.png",
+      "archive_path": "event/209640_02_lava_plateau.png",
+      "category": "event",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209640.png",
+      "archive_path": "event/209640_03_mineral_watchtower.png",
+      "category": "event",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209640.png",
+      "archive_path": "event/209640_04_volcano_harbor.png",
+      "category": "event",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209641.png",
+      "archive_path": "event/209641_01_christmas_tree_islet.png",
+      "category": "event",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209641.png",
+      "archive_path": "event/209641_02_winter_market_outpost.png",
+      "category": "event",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209641.png",
+      "archive_path": "event/209641_03_winter_cabin_islet.png",
+      "category": "event",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209641.png",
+      "archive_path": "event/209641_04_winter_harbor_village.png",
+      "category": "event",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209642.png",
+      "archive_path": "core_candidate/209642_01_tropical_spire_islet.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "A01",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209642.png",
+      "archive_path": "core_candidate/209642_02_tropical_stone_arch.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "A06",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209642.png",
+      "archive_path": "core_candidate/209642_03_waterfall_cliff_coast.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "A03",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": true,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209642.png",
+      "archive_path": "core_candidate/209642_04_green_rock_harbor.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "A05",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209647.png",
+      "archive_path": "core_candidate/209647_01_maritime_lighthouse.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "B02",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209647.png",
+      "archive_path": "core_candidate/209647_02_merchant_harbor_warehouses.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "B04",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": true,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209647.png",
+      "archive_path": "core_candidate/209647_03_ruin_cove.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "E03",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209647.png",
+      "archive_path": "core_candidate/209647_04_merchant_port_town.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "B06",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": true,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209648.png",
+      "archive_path": "core_candidate/209648_01_reef_coral_palms.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "A04",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209648.png",
+      "archive_path": "core_candidate/209648_02_fantasy_grove.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "E04",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209648.png",
+      "archive_path": "core_candidate/209648_03_ancient_arcane_ruins.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "E05",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209648.png",
+      "archive_path": "core_candidate/209648_04_relic_temple_waterfall.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "E06",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209649.png",
+      "archive_path": "core_candidate/209649_01_palm_sand_spit.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "A02",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209649.png",
+      "archive_path": "core_candidate/209649_02_palm_rock_outcrop.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "A01",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209649.png",
+      "archive_path": "core_candidate/209649_03_rocky_green_pair.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "A03",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209649.png",
+      "archive_path": "core_candidate/209649_04_green_coast_with_watchtower.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "A06",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209695.png",
+      "archive_path": "guild/209695_01_guild_bastion_island.png",
+      "category": "guild",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": true,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209695.png",
+      "archive_path": "guild_component/209695_02_tower_stone_plain.png",
+      "category": "guild_component",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209695.png",
+      "archive_path": "guild_component/209695_03_tower_cannon_black.png",
+      "category": "guild_component",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209695.png",
+      "archive_path": "guild_component/209695_04_tower_roof_black.png",
+      "category": "guild_component",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": true,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209695.png",
+      "archive_path": "guild_component/209695_05_tower_roof_red.png",
+      "category": "guild_component",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209695.png",
+      "archive_path": "guild_component/209695_06_tower_roof_gold.png",
+      "category": "guild_component",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": false,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209704.png",
+      "archive_path": "guild/209704_01_guild_island_tropical.png",
+      "category": "guild",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": true,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209704.png",
+      "archive_path": "guild/209704_02_guild_island_mountain.png",
+      "category": "guild",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": true,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209704.png",
+      "archive_path": "guild/209704_03_guild_island_dry.png",
+      "category": "guild",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": true,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209704.png",
+      "archive_path": "guild/209704_04_guild_island_snow.png",
+      "category": "guild",
+      "proposed_m392_id": "",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": true,
+      "engine_enabled": false
+    },
+    {
+      "source_sheet": "209809.png",
+      "archive_path": "core_candidate/209809_01_tropical_waterfall_harbor_master.png",
+      "category": "core_candidate",
+      "proposed_m392_id": "A05",
+      "status": "reference_extracted_unreviewed",
+      "requires_edge_review": true,
+      "engine_enabled": false
+    }
+  ]
+}
