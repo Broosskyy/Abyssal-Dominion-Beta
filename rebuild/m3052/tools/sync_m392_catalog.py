@@ -52,9 +52,9 @@ def extract()->tuple[dict,dict]:
 def generate(data:dict,collisions:dict)->str:
     return (HEADER+
         'const CATALOG_JSON := """\n'+json.dumps(data,ensure_ascii=False,indent=2)+'\n"""\n'+
-        'const APPROVED_COLLISIONS_JSON := """'+
+        'const APPROVED_COLLISIONS_JSON := """\n'+
         (json.dumps(collisions,ensure_ascii=False,indent=2) if collisions else "{}")+
-        '"""\n')
+        '\n"""\n')
 
 
 def main()->None:
